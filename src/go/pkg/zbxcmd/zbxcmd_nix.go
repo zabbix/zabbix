@@ -30,7 +30,7 @@ import (
 	"syscall"
 	"time"
 
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/log"
 )
 
 func execute(s string, timeout time.Duration, path string, strict bool) (string, error) {

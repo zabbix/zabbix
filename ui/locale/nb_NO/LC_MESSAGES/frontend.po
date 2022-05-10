@@ -335,6 +335,14 @@ msgstr "10 sekunder"
 msgid "100 busiest triggers"
 msgstr "100 mest aktive utløsere"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:184
+msgid "12-hour"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:183
+msgid "24-hour"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
 msgstr ""
@@ -679,6 +687,10 @@ msgstr "Aktiv"
 msgctxt "maintenance status"
 msgid "Active"
 msgstr "Aktiv"
+
+#: include/hosts.inc.php:497
+msgid "Active checks"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -1167,6 +1179,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:73
+msgid "Analog"
 msgstr ""
 
 #: app/partials/popup.operations.php:240
@@ -3662,6 +3678,10 @@ msgstr ""
 msgid "Clock"
 msgstr "Klokke"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:72
+msgid "Clock type"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:139
 #: app/views/administration.mediatype.edit.php:365
@@ -5519,6 +5539,10 @@ msgstr "Enhetens unikhetskriterier"
 msgid "Digest"
 msgstr ""
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:74
+msgid "Digital"
+msgstr ""
+
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
 msgstr ""
@@ -5778,6 +5802,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1282
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1379
+msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1306
@@ -7173,6 +7201,11 @@ msgstr "Skriftstørrelse"
 #: app/views/popup.httpstep.php:85
 msgid "Form data"
 msgstr "Skjema data"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:182
+#: include/classes/widgets/forms/CWidgetFormClock.php:242
+msgid "Format"
+msgstr ""
 
 #: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
 #: include/views/configuration.item.prototype.edit.php:707
@@ -10999,6 +11032,10 @@ msgstr ""
 #: app/controllers/CControllerWidgetClockView.php:123
 msgid "Local"
 msgstr "Lokal"
+
+#: include/classes/widgets/fields/CWidgetFieldTimeZone.php:58
+msgid "Local default"
+msgstr ""
 
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
@@ -15959,6 +15996,10 @@ msgstr "Sekundær POC-telefon B"
 msgid "Secondary POC screen name"
 msgstr "Sekundært POC skjermnavn"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:173
+msgid "Seconds"
+msgstr ""
+
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
 msgstr ""
@@ -16391,6 +16432,10 @@ msgstr "Deling"
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Delingsalternativet \"%1$s\" mangler en verdi for kart \"%2$s\"."
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:243
+msgid "Short"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:154
 #: app/partials/monitoring.problem.filter.php:222
@@ -19182,6 +19227,14 @@ msgstr ""
 msgid "Users"
 msgstr "Brukere"
 
+#: include/classes/data/CItemData.php:1255
+msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1259
+msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1702
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware-cachestatistikk. Gyldige moduser er: totalt, gratis, pfree, brukt og pusset."
@@ -19193,6 +19246,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware-klyngestatus, <url> - VMware-tjenesteadresse, <navn> - VMware-klyngenavn"
+
+#: include/classes/data/CItemData.php:1251
+msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
@@ -19235,6 +19292,10 @@ msgstr "VMware hypervisor ballooned minne størrelse, <url> - VMware tjeneste UR
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor cluster navn, <url> - VMware service URL, <uuid> - VMware hypervisor vertsnavn"
 
+#: include/classes/data/CItemData.php:1275
+msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
@@ -19267,6 +19328,10 @@ msgstr "VMware hypervisor navn, <url> - VMware service URL, <uuid> - VMware hype
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hypervisor nettverksinngangsstatistikk, <url> - VMware-tjenesteadresse, <uuid> - VMware-hypervisorvertsnavn, <modus> - bps"
 
+#: include/classes/data/CItemData.php:1387
+msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware hypervisor nettverksutgangsstatistikk, <url> - VMware-tjenesteadresse, <uuid> - VMware hypervisor vertsnavn, <modus> - bps"
@@ -19286,6 +19351,14 @@ msgstr "VMware hypervisor prosessormodell, <url> - VMware service URL, <uuid> - 
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware hypervisor prosessor bruk i Hz, <url> - VMware tjeneste URL, <uuid> - VMware hypervisor vertsnavn"
+
+#: include/classes/data/CItemData.php:1351
+msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1355
+msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19331,6 +19404,10 @@ msgstr "VMware-virtuell maskin forpliktet lagringsplass, <url> - VMware-tjeneste
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware-maskinvarekomprimert minnestørrelse, <url> - VMware-tjenesteadresse, <uuid> - VMware-maskinens vertsnavn"
 
+#: include/classes/data/CItemData.php:1431
+msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
@@ -19342,6 +19419,10 @@ msgstr "VMware virtuell maskin diskenhet lese statistikk, <url> - VMware service
 #: include/classes/data/CItemData.php:1558
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware virtuell maskin disk enhet skrive skrive statistikk, <url> - VMware tjeneste URL, <uuid> - VMware virtuell maskin vertsnavn, <instance> - disk enhet instans, <modus> - bps / ops - bytes / operasjoner per sekund"
+
+#: include/classes/data/CItemData.php:1439
+msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1566
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -19395,9 +19476,21 @@ msgstr "Bruk av VMware virtuell maskinprosessor i Hz, <url> - VMware-tjenesteadr
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware virtuell maskin delt minne størrelse, <url> - VMware tjeneste URL, <uuid> - VMware virtuell maskin vertsnavn"
 
+#: include/classes/data/CItemData.php:1555
+msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1559
+msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware virtuell maskin byttet minne størrelse, <url> - VMware tjeneste URL, <uuid> - VMware virtuell maskin vertsnavn"
+
+#: include/classes/data/CItemData.php:1591
+msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"

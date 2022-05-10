@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "zbxalgo.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -281,6 +282,58 @@ static int	DBpatch_6010020(void)
 	return DBdrop_field("config", "ldap_search_attribute");
 }
 
+static int	DBpatch_6010021(void)
+{
+	const ZBX_TABLE	table =
+			{"host_rtdata", "hostid", 0,
+				{
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"active_available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010022(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_rtdata", 1, &field);
+}
+
+static int	DBpatch_6010023(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	hostid;
+	zbx_db_insert_t	insert;
+	int		ret;
+
+	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "active_available", NULL);
+
+	result = DBselect("select hostid from hosts where flags!=%i and status in (%i,%i)",
+			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		zbx_db_insert_add_values(&insert, hostid, INTERFACE_AVAILABLE_UNKNOWN);
+	}
+	DBfree_result(result);
+
+	if (0 != insert.rows.values_num)
+		ret = zbx_db_insert_execute(&insert);
+	else
+		ret = SUCCEED;
+
+	zbx_db_insert_clean(&insert);
+
+	return ret;
+}
+
 #define DBPATCH_HOST_STATUS_TEMPLATE	"3"
 #define DBPATCH_GROUPIDS(cmp)									\
 		"select distinct g.groupid"							\
@@ -303,35 +356,35 @@ hstgrp_t;
 ZBX_PTR_VECTOR_DECL(hstgrp, hstgrp_t *)
 ZBX_PTR_VECTOR_IMPL(hstgrp, hstgrp_t *)
 
-static int	DBpatch_6010021(void)
+static int	DBpatch_6010024(void)
 {
 	return DBdrop_field("hstgrp", "internal");
 }
 
-static int	DBpatch_6010022(void)
+static int	DBpatch_6010025(void)
 {
 	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hstgrp", &field);
 }
 
-static int	DBpatch_6010023(void)
+static int	DBpatch_6010026(void)
 {
 	return DBdrop_index("hstgrp", "hstgrp_1");
 }
 
-static int	DBpatch_6010024(void)
+static int	DBpatch_6010027(void)
 {
 	return DBcreate_index("hstgrp", "hstgrp_1", "type,name", 1);
 }
 
-static void	DBpatch_6010025_hstgrp_free(hstgrp_t *hstgrp)
+static void	DBpatch_6010028_hstgrp_free(hstgrp_t *hstgrp)
 {
 	zbx_free(hstgrp->name);
 	zbx_free(hstgrp->uuid);
 }
 
-static int	DBpatch_6010025_split_groups(void)
+static int	DBpatch_6010028_split_groups(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -426,21 +479,21 @@ out:
 	DBfree_result(result);
 	zbx_free(sql);
 
-	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010025_hstgrp_free);
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010028_hstgrp_free);
 	zbx_vector_hstgrp_destroy(&hstgrps);
 
 	return ret;
 }
 
-static int	DBpatch_6010025(void)
+static int	DBpatch_6010028(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010025_split_groups();
+	return DBpatch_6010028_split_groups();
 }
 
-static int	DBpatch_6010026(void)
+static int	DBpatch_6010029(void)
 {
 	int	ret = SUCCEED;
 
@@ -457,7 +510,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010027_update_empty_parents(void)
+static int	DBpatch_6010030_update_empty_parents(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -515,15 +568,15 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010027(void)
+static int	DBpatch_6010030(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010027_update_empty_parents();
+	return DBpatch_6010030_update_empty_parents();
 }
 
-static int	DBpatch_6010028_update_empty_children(void)
+static int	DBpatch_6010031_update_empty_children(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -582,12 +635,12 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010028(void)
+static int	DBpatch_6010031(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010028_update_empty_children();
+	return DBpatch_6010031_update_empty_children();
 }
 #endif
 
@@ -624,5 +677,8 @@ DBPATCH_ADD(6010025, 0,	1)
 DBPATCH_ADD(6010026, 0,	1)
 DBPATCH_ADD(6010027, 0,	1)
 DBPATCH_ADD(6010028, 0,	1)
+DBPATCH_ADD(6010029, 0,	1)
+DBPATCH_ADD(6010030, 0,	1)
+DBPATCH_ADD(6010031, 0,	1)
 
 DBPATCH_END()

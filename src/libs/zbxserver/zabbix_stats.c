@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zabbix_stats.h"
+#include "zbxserver.h"
 
 #include "common.h"
 #include "dbcache.h"
@@ -26,6 +26,21 @@
 #include "preproc.h"
 
 extern unsigned char	program_type;
+extern int	CONFIG_SERVER_STARTUP_TIME;
+
+static zbx_get_zabbix_stats_ext_func_t	stats_ex_cb;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sets stats callback function                                      *
+ *                                                                            *
+ * Parameters: cb - [IN] callback function                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext_func_t cb)
+{
+	stats_ex_cb = cb;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -65,7 +80,7 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	/* zabbix[preprocessing_queue] */
 	zbx_json_adduint64(json, "preprocessing_queue", zbx_preprocessor_get_queue_size());
 
-	zbx_get_zabbix_stats_ext(json);
+	stats_ex_cb(json);
 
 	/* zabbix[rcache,<cache>,<mode>] */
 	zbx_json_addobject(json, "rcache");
