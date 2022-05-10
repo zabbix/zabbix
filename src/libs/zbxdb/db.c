@@ -2547,7 +2547,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 
 		zbx_json_addint64(json, "flag", info->ext_flag);
 		zbx_json_addint64(json, "extension_err_code", info->ext_err_code);
-
+#ifdef HAVE_POSTGRESQL
 		if (0 == zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		{
 			if (ON == zbx_tsdb_get_compression_availability())
@@ -2559,7 +2559,7 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 				zbx_json_addstring(json, "compression_availability", "false", ZBX_JSON_TYPE_INT);
 			}
 		}
-
+#endif
 		zbx_json_close(json);
 	}
 }
