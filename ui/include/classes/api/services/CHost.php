@@ -464,6 +464,15 @@ class CHost extends CHostGeneral {
 				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
+
+			if (array_key_exists('active_available', $options['filter'])
+					&& $options['filter']['active_available'] !== null) {
+				$this->dbFilter('host_rtdata hr', ['filter' => [
+						'active_available' => $options['filter']['active_available']
+					]] + $options,
+					$sqlParts
+				);
+			}
 		}
 
 		// tags
@@ -495,6 +504,7 @@ class CHost extends CHostGeneral {
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
 			$all_keys[] = 'inventory_mode';
+			$all_keys[] = 'active_available';
 			$options['output'] = array_diff($all_keys, $write_only_keys);
 		}
 		/*
@@ -581,15 +591,27 @@ class CHost extends CHostGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])) {
-			$sqlParts['select']['inventory_mode'] =
-				dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
-		}
-
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
 			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
 			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		if ((!$options['countOutput'] && $this->outputIsRequested('active_available', $options['output']))
+				|| (is_array($options['filter']) && array_key_exists('active_available', $options['filter']))) {
+			$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		if (!$options['countOutput']) {
+			if ($this->outputIsRequested('inventory_mode', $options['output'])) {
+				$sqlParts['select']['inventory_mode'] =
+					dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
+			}
+
+			if ($this->outputIsRequested('active_available', $options['output'])) {
+				$sqlParts = $this->addQuerySelect('hr.active_available', $sqlParts);
+			}
 		}
 
 		return $sqlParts;
@@ -644,10 +666,13 @@ class CHost extends CHostGeneral {
 		$hosts_inventory = [];
 		$templates_hostids = [];
 
+		$hosts_rtdata = [];
+
 		$hostids = DB::insert('hosts', $hosts);
 
 		foreach ($hosts as $index => &$host) {
 			$host['hostid'] = $hostids[$index];
+			$hosts_rtdata[$index] = ['hostid' => $hostids[$index]];
 
 			foreach ($host['groups'] as $group) {
 				$hosts_groups[] = [
@@ -721,6 +746,8 @@ class CHost extends CHostGeneral {
 		if ($hosts_inventory) {
 			DB::insert('host_inventory', $hosts_inventory, false);
 		}
+
+		DB::insertBatch('host_rtdata', $hosts_rtdata, false);
 
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST, $hosts);
 
@@ -1752,7 +1779,9 @@ class CHost extends CHostGeneral {
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
 			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => 'templateid,host,name,description,uuid,link_type']
 		]];
+
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}

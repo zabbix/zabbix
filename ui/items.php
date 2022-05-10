@@ -222,7 +222,7 @@ $fields = [
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
-											'"item.massdisable","item.massenable","item.masscheck_now"'
+											'"item.massdisable","item.massenable"'
 										),
 										null
 									],
@@ -232,7 +232,6 @@ $fields = [
 	'copy' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'check_now' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
 	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -630,16 +629,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 }
-elseif (hasRequest('check_now') && hasRequest('itemid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-		'request' => [
-			'itemid' => getRequest('itemid')
-		]
-	]);
-
-	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
-}
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	$result = (bool) API::History()->clear([getRequest('itemid')]);
@@ -735,26 +724,6 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
-}
-elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$tasks = [];
-
-	foreach (getRequest('group_itemid') as $itemid) {
-		$tasks[] = [
-			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-			'request' => [
-				'itemid' => $itemid
-			]
-		];
-	}
-
-	$result = (bool) API::Task()->create($tasks);
-
-	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
-	}
-
-	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 
 if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
@@ -948,7 +917,6 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'hostid' => $hostid,
-		'is_template' => true,
 		'context' => getRequest('context')
 	];
 
@@ -1325,20 +1293,6 @@ else {
 	}
 	else {
 		$page_num = CPagerHelper::loadPage($page['file']);
-	}
-
-	// Set is_template false, when one of hosts is not template.
-	if ($data['items']) {
-		$hosts_status = [];
-		foreach ($data['items'] as $item) {
-			$hosts_status[$item['hosts'][0]['status']] = true;
-		}
-		foreach ($hosts_status as $key => $value) {
-			if ($key != HOST_STATUS_TEMPLATE) {
-				$data['is_template'] = false;
-				break;
-			}
-		}
 	}
 
 	CPagerHelper::savePage($page['file'], $page_num);

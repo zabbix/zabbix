@@ -794,7 +794,7 @@ class testFormHost extends CWebTest {
 		}
 		else {
 			$this->query('button:Create host')->one()->waitUntilClickable()->click();
-			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		}
 
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
@@ -1653,7 +1653,7 @@ class testFormHost extends CWebTest {
 		$this->query('button', $button)->waitUntilClickable()->one()->click();
 
 		$cloned_form = (!$this->standalone)
-			? COverlayDialogElement::find()->asForm()->waitUntilPresent()->one()
+			? COverlayDialogElement::find()->asForm()->waitUntilReady()->one()
 			: $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 
 		$cloned_form->submit();
@@ -1918,7 +1918,7 @@ class testFormHost extends CWebTest {
 			$host_link->one()->click();
 		}
 
-		return COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+		return COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 	}
 
 	/**

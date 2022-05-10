@@ -33,7 +33,10 @@ class CTask extends CApiService {
 	protected $tableAlias = 't';
 	protected $sortColumns = ['taskid'];
 
+	private $item_cache = [];
+
 	const RESULT_STATUS_ERROR = -1;
+
 	/**
 	 * Get results of requested ZBX_TM_TASK_DATA task.
 	 *
@@ -148,7 +151,7 @@ class CTask extends CApiService {
 	 * @return array
 	 */
 	public function create(array $tasks): array {
-		$this->validateCreate($tasks);
+		$check_now_itemids = $this->validateCreate($tasks);
 
 		$tasks_by_types = [
 			ZBX_TM_DATA_TYPE_DIAGINFO => [],
@@ -157,7 +160,17 @@ class CTask extends CApiService {
 		];
 
 		foreach ($tasks as $index => $task) {
-			$tasks_by_types[$task['type']][$index] = $task;
+			if ($task['type'] == ZBX_TM_DATA_TYPE_CHECK_NOW) {
+				$tasks_by_types[$task['type']][$index] = [
+					'type' => $task['type'],
+					'request' => [
+						'itemid' => $check_now_itemids[$task['request']['itemid']]
+					]
+				];
+			}
+			else {
+				$tasks_by_types[$task['type']][$index] = $task;
+			}
 		}
 
 		$return = $this->createTasksDiagInfo($tasks_by_types[ZBX_TM_DATA_TYPE_DIAGINFO])
@@ -170,13 +183,16 @@ class CTask extends CApiService {
 	}
 
 	/**
-	 * Validates the input for create method.
+	 * Validates the input for create method and return valid item IDs. Meaning that if dependent item ID was given, try
+	 * to find a valid master item. If valid master items were found return those item IDs.
 	 *
 	 * @param array $tasks  Tasks to validate.
 	 *
 	 * @throws APIException if the input is invalid.
+	 *
+	 * @return array
 	 */
-	protected function validateCreate(array &$tasks) {
+	protected function validateCreate(array &$tasks): array {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_DATA_TYPE_CHECK_NOW])],
 			'request' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
@@ -228,7 +244,7 @@ class CTask extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$min_permissions = USER_TYPE_ZABBIX_ADMIN;
+		$min_permissions = USER_TYPE_ZABBIX_USER;
 		$itemids_editable = [];
 		$proxy_hostids = [];
 
@@ -259,7 +275,9 @@ class CTask extends CApiService {
 		}
 
 		$this->checkProxyHostids(array_keys($proxy_hostids));
-		$this->checkEditableItems(array_keys($itemids_editable));
+		$itemids_editable = $this->checkEditableItems(array_keys($itemids_editable));
+
+		return $itemids_editable;
 	}
 
 	/**
@@ -286,8 +304,8 @@ class CTask extends CApiService {
 
 		// Check if tasks for items and LLD rules already exist.
 		$db_tasks = DBselect(
-			'SELECT t.taskid, tcn.itemid'.
-			' FROM task t, task_check_now tcn'.
+			'SELECT t.taskid,tcn.itemid'.
+			' FROM task t,task_check_now tcn'.
 			' WHERE t.taskid=tcn.taskid'.
 				' AND t.type='.ZBX_TM_TASK_CHECK_NOW.
 				' AND t.status='.ZBX_TM_STATUS_NEW.
@@ -303,27 +321,36 @@ class CTask extends CApiService {
 
 		// Create new tasks.
 		if ($itemids) {
-			$taskid = DB::reserveIds('task', count($itemids));
+			$item_cnt = count(array_keys(array_flip($itemids)));
+			$taskid = DB::reserveIds('task', $item_cnt);
 			$task_rows = [];
 			$task_check_now_rows = [];
 			$time = time();
+			$itemids_taskids = [];
 
 			foreach ($itemids as $index => $itemid) {
-				$task_rows[] = [
-					'taskid' => $taskid,
-					'type' => ZBX_TM_TASK_CHECK_NOW,
-					'status' => ZBX_TM_STATUS_NEW,
-					'clock' => $time,
-					'ttl' => SEC_PER_HOUR
-				];
-				$task_check_now_rows[] = [
-					'taskid' => $taskid,
-					'itemid' => $itemid,
-					'parent_taskid' => $taskid
-				];
+				// Use already existing task ID and do not create a duplicate record in DB.
+				if (array_key_exists($itemid, $itemids_taskids)) {
+					$return[$index] = $itemids_taskids[$itemid];
+				}
+				else {
+					$task_rows[] = [
+						'taskid' => $taskid,
+						'type' => ZBX_TM_TASK_CHECK_NOW,
+						'status' => ZBX_TM_STATUS_NEW,
+						'clock' => $time,
+						'ttl' => SEC_PER_HOUR
+					];
+					$task_check_now_rows[] = [
+						'taskid' => $taskid,
+						'itemid' => $itemid,
+						'parent_taskid' => $taskid
+					];
 
-				$return[$index] = $taskid;
-				$taskid = bcadd($taskid, 1, 0);
+					$return[$index] = $taskid;
+					$itemids_taskids[$itemid] = $taskid;
+					$taskid = bcadd($taskid, 1, 0);
+				}
 			}
 
 			DB::insertBatch('task', $task_rows, false);
@@ -465,23 +492,34 @@ class CTask extends CApiService {
 	/**
 	 * Validate user permissions to items and LLD rules;
 	 * Check if requested items are allowed to make 'check now' operation;
-	 * Check if items are monitored and they belong to monitored hosts.
+	 * Check if items are monitored and they belong to monitored hosts;
+	 * Check if given items are dependent items. If so, find valid master items. Master item must also be monitored
+	 * and of valid type. Don't return the same dependent item IDs, but return the top level master item IDs.
 	 *
 	 * @param array $itemids
 	 *
-	 * @throws Exception
+	 * @throws APIException
+	 *
+	 * @return array
 	 */
-	protected function checkEditableItems(array $itemids): void {
+	protected function checkEditableItems(array $itemids): array {
 		if (!$itemids) {
-			return;
+			return [];
 		}
+
+		/*
+		 * Array keys are the original item IDs given by user, but values are item IDs than can change whether item
+		 * is dependent or not. If item is dependent key remains the same, but value changes to master item ID. Until
+		 * the value is changed to top most master item ID.
+		 */
+		$itemid_mapping = array_combine($itemids, $itemids);
 
 		// Check permissions.
 		$items = API::Item()->get([
-			'output' => ['name', 'type', 'status', 'flags'],
+			'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
 			'selectHosts' => ['name', 'status'],
 			'itemids' => $itemids,
-			'editable' => true,
+			'editable' => !self::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
 			'preservekeys' => true
 		]);
 
@@ -489,10 +527,10 @@ class CTask extends CApiService {
 
 		if (count($items) != $itemids_cnt) {
 			$items += API::DiscoveryRule()->get([
-				'output' => ['name', 'type', 'status', 'flags'],
+				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
-				'editable' => true,
+				'editable' => !self::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
 				'preservekeys' => true
 			]);
 
@@ -505,8 +543,10 @@ class CTask extends CApiService {
 
 		// Validate item and LLD rule type and status.
 		$allowed_types = checkNowAllowedTypes();
+		$master_itemids = [];
 
-		foreach ($items as $item) {
+		// Check item and LLD rule first level. Collect master item IDs if type is dependent.
+		foreach ($items as $itemid => $item) {
 			if (!in_array($item['type'], $allowed_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot send request: %1$s.',
@@ -524,7 +564,109 @@ class CTask extends CApiService {
 					: _s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $host_name);
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.', $problem));
 			}
+
+			// Collect master item IDs and real item IDs.
+			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				$master_itemids[$item['master_itemid']] = $itemid;
+
+				// Replace the dependent item IDs with master item ID.
+				$itemid_mapping[$itemid] = $item['master_itemid'];
+			}
 		}
+
+		// Put already collected items in cache.
+		if ($master_itemids) {
+			$this->item_cache = $items;
+
+			// Get master items.
+			while ($master_itemids) {
+				// Get already known items from cache or DB.
+				$master_items = $this->getMasterItems(array_keys($master_itemids));
+				$master_itemids = [];
+
+				// Check the master item type and status.
+				foreach ($master_items as $itemid => $item) {
+					if (!in_array($item['type'], $allowed_types)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Cannot send request: %1$s.', _('wrong master item type'))
+						);
+					}
+
+					if ($item['status'] != ITEM_STATUS_ACTIVE || $item['hosts'][0]['status'] != HOST_STATUS_MONITORED) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot send request: %1$s.',
+							_s('item "%1$s" on host "%2$s" is not monitored', $item['name'], $item['hosts'][0]['name'])
+						));
+					}
+
+					/*
+					 * If the master item was also another dependent item, add master item IDs for next loop, otherwise
+					 * store the item ID. This will replace the original item ID from request.
+					 */
+					if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+						// Look matching items and replace once again with master item ID.
+						foreach ($itemid_mapping as &$itemid_new) {
+							if (bccomp($itemid, $itemid_new) == 0) {
+								$itemid_new = $item['master_itemid'];
+							}
+						}
+						unset($itemid_new);
+
+						$master_itemids[$item['master_itemid']] = $itemid;
+					}
+				}
+			}
+		}
+
+		// Returns both original item IDs as keys and real item IDs as values.
+		return $itemid_mapping;
+	}
+
+	/**
+	 * Find master items by given item IDs either stored in cache or DB. Returns the item if found.
+	 *
+	 * @param array $itemids  An array of master item IDs.
+	 *
+	 * @throws APIException if item is not found or user has no permissions.
+	 *
+	 * @return array
+	 */
+	private function getMasterItems(array $itemids): array {
+		$items = [];
+
+		// First try get items from cache if possible.
+		foreach ($itemids as $num => $itemid) {
+			if (array_key_exists($itemid, $this->item_cache)) {
+				$item = $this->item_cache[$itemid];
+				$items[$itemid] = $item;
+				unset($itemids[$num]);
+			}
+		}
+
+		// If some items were not found in cache, select them from DB.
+		if ($itemids) {
+			$items_db = API::Item()->get([
+				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
+				'selectHosts' => ['name', 'status'],
+				'itemids' => $itemids,
+				'editable' => !self::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
+				'preservekeys' => true
+			]);
+
+			if (!$items_db) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			// Add newly found items to cache.
+			$this->item_cache += $items_db;
+
+			// Append newly found items to items requested from cache.
+			$items += $items_db;
+		}
+
+		// Return only requested items either from cache or DB.
+		return $items;
 	}
 
 	/**

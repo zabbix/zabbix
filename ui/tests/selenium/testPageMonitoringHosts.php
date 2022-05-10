@@ -1109,4 +1109,67 @@ class testPageMonitoringHosts extends CWebTest {
 			$this->assertEquals('ЗАББИКС Сервер', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
 		}
 	}
+
+	public static function getCheckCountersData() {
+		return [
+			[
+				[
+					'host' => 'Host ZBX6663',
+					'counters' => [
+						[
+							'column' => 'Latest data',
+							'counter' => 14
+						],
+						[
+							'column' => 'Problems',
+							'counter' => null
+						],
+						[
+							'column' => 'Graphs',
+							'counter' => 2
+						],
+						[
+							'column' => 'Web',
+							'counter' => 2
+						]
+					]
+				]
+			],
+			[
+				[
+					'host' => 'ЗАББИКС Сервер',
+					'counters' => [
+						[
+							'column' => 'Dashboards',
+							'counter' => 4
+						],
+						[
+							'column' => 'Problems',
+							'counter' => "1\n5"
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCheckCountersData
+	 */
+	public function testPageMonitoringHosts_CheckCounters($data) {
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['host']);
+
+		foreach ($data['counters'] as $counter) {
+			if ($counter['column'] === 'Problems') {
+				$text = ($counter['counter'] === null) ? $counter['column'] : $counter['counter'];
+				$this->assertEquals($text, $row->getColumn($counter['column'])->getText());
+			}
+			else {
+				$this->assertEquals($counter['column'].' '.$counter['counter'],
+						$row->getColumn($counter['column'])->getText()
+				);
+			}
+		}
+	}
 }

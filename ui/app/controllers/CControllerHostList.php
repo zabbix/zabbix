@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -223,7 +223,7 @@ class CControllerHostList extends CController {
 
 		$hosts = API::Host()->get([
 			'output' => ['name', 'proxy_hostid', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'flags',
-				'status', 'tls_connect', 'tls_accept'
+				'status', 'tls_connect', 'tls_accept', 'active_available'
 			],
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip',  'ip', 'dns', 'port', 'available', 'error',
@@ -242,6 +242,20 @@ class CControllerHostList extends CController {
 		]);
 
 		order_result($hosts, $sort_field, $sort_order);
+
+		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7).
+		$db_items_active_count = API::Item()->get([
+			'groupCount' => true,
+			'countOutput' => true,
+			'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
+			'hostids' => array_column($hosts, 'hostid')
+		]);
+
+		$item_active_by_hostid = [];
+
+		foreach ($db_items_active_count as $value) {
+			$item_active_by_hostid[$value['hostid']] = $value['rowscount'];
+		}
 
 		// Selecting linked templates to templates linked to hosts.
 		$templateids = [];
@@ -283,6 +297,17 @@ class CControllerHostList extends CController {
 			CArrayHelper::sort($host['interfaces'], [
 				['field' => 'main', 'order' => ZBX_SORT_DOWN]
 			]);
+
+			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
+			if (array_key_exists($host['hostid'], $item_active_by_hostid)
+					&& $item_active_by_hostid[$host['hostid']] > 0) {
+				$host['interfaces'][] = [
+					'type' => INTERFACE_TYPE_AGENT_ACTIVE,
+					'available' => $host['active_available'],
+					'error' => ''
+				];
+			}
+			unset($host['active_available']);
 
 			if ($host['proxy_hostid']) {
 				$proxy_hostids[$host['proxy_hostid']] = $host['proxy_hostid'];

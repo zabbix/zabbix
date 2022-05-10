@@ -458,7 +458,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=authentication.edit',
-					'form' => 'name:form_auth',
+					'form' => 'id:authentication-form',
 					'tabs' => [
 						[
 							'name' => 'HTTP settings',

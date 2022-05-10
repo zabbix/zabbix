@@ -26,5 +26,9 @@
 int	zbx_evaluatable_for_notsupported(const char *fn);
 int	zbx_evaluate_RATE(zbx_variant_t *value, DC_ITEM *item, const char *parameters, const zbx_timespec_t *ts,
 		char **error);
+int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
+		const zbx_timespec_t *ts, char **error);
+
+int	zbx_is_trigger_function(const char *name, size_t len);
 
 #endif
