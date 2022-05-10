@@ -314,7 +314,7 @@ class testGraphLinking extends CIntegrationTest {
 	 */
 	public function testGraphLinking_checkGraphsCreate() {
 		$this->reloadConfigurationCache();
-		
+
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->checkGraphsCreate();
 	}
