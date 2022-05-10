@@ -1,6 +1,15 @@
 Changes for 6.2.0beta2
 
 New features:
+....I..... [ZBXNEXT-7693] replaced filename-length-max=99 option with tar-pax in configure.ac (yurii)
+.......PS. [ZBXNEXT-7029] added support of vmware.dvswitch.discovery and vmware.dvswitch.fetchports.get (MVekslers)
+A.FG...PS. [ZBXNEXT-5088] added active check availability icon (acikuns, dgoloscapov)
+.......PS. [ZBXNEXT-5341] added new vmware item vmware.vm.attribute (MVekslers, ssimonenko)
+.......PS. [ZBXNEXT-2302] added new vmware keys *.hv.connectionstate *.hv.hw.serialnumber *.hv.net.if.discovery *.hv.network.linkspeed *.hv.hw.sensors.get *.vm.state *.vm.tools and other improvements (MVekslers, ssimonenko)
+..F....... [ZBXNEXT-5771] added digital clock feature to clock widget (ashubin, mkrisjanis, rlataria)
+..F....... [ZBX-20946] enabled German and Vietnamese languages in frontend (miks)
+..F....... [ZBXNEXT-7461] implemented expandable subfilters in latest data page; fixed clickable tags (miks)
+.......PS. [ZBXNEXT-7604] modified functionality to ignore NaN in Prometheus preprocessing aggregate functions (akozlovs)
 .......PS. [ZBXNEXT-2591] added resource pool path to vmware.vm.discovery (asestakovs)
 .......PS. [ZBXNEXT-2043] added support for collecting vmware snapshot information and new items vmware.vm.snapshot.get and vmware.vm.consolidationneeded (MVekslers)
 .......PS. [ZBXNEXT-2012] added additional NIC counters for VMware monitoring (asestakovs)
@@ -8,6 +17,8 @@ New features:
 A.F....... [ZBXNEXT-7476] disabled php 8 strict type validation (ashubin)
 
 Bug fixes:
+..F....... [ZBX-21008] fixed broken popup for SLA selection for User role (averza)
+..F....... [ZBX-20380] fixed maintenance highlighting having priority over problem severity highlighting for map elements of map, host group and trigger types (agriscenko)
 .........T [ZBX-20982] fixed api request by coordinates in openweathermap template (vkhaliev)
 ........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
 ..F....... [ZBX-20458] fixed broken host link not opening in Inventory (rdetlavs)
