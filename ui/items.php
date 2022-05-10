@@ -472,7 +472,7 @@ else {
 	}
 }
 
-$filter_groupids = getSubGroups(getRequest('filter_groupids', []));
+$filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, [], getRequest('context'));
 $filter_hostids = getRequest('filter_hostids');
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
@@ -1430,6 +1430,13 @@ else {
 				'editable' => true
 			]), ['hostid' => 'id'])
 			: [];
+		$groups_filter = getRequest('filter_groupids')
+			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => getRequest('filter_groupids'),
+				'editable' => true
+			]), ['groupid' => 'id'])
+			: [];
 	}
 	else {
 		$host_template_filter = $filter_hostids
@@ -1439,16 +1446,17 @@ else {
 				'editable' => true
 			]), ['templateid' => 'id'])
 			: [];
-	}
-
-	$data['filter_data'] = [
-		'groups' => hasRequest('filter_groupids')
-			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+		$groups_filter = getRequest('filter_groupids')
+			? CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => getRequest('filter_groupids'),
 				'editable' => true
 			]), ['groupid' => 'id'])
-			: [],
+			: [];
+	}
+
+	$data['filter_data'] = [
+		'groups' => $groups_filter,
 		'hosts' => $host_template_filter,
 		'filter_name' => getRequest('filter_name'),
 		'filter_key' => getRequest('filter_key'),

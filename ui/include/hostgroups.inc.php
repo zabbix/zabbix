@@ -63,17 +63,19 @@ function isWritableHostGroups(array $groupids) {
 }
 
 /**
- * Get sub-groups of selected host groups.
+ * Get sub-groups of selected host groups or template groups.
  *
  * @param array $groupids
  * @param array $ms_groups  [OUT] the list of groups for multiselect.
- * @param array $options    additional API options to select host groups.
+ * @param array $options    additional API options to select host groups or template groups.
+ * @param string $context   context of hosts or templates.
  *
  * @return array
  */
-function getSubGroups(array $groupids, array &$ms_groups = null, array $options = []) {
+function getSubGroups(array $groupids, array &$ms_groups = null, array $options = [], string $context = 'host') {
+	$entity = $context === 'host' ? API::HostGroup() : API::TemplateGroup();
 	$db_groups = $groupids
-		? API::HostGroup()->get([
+		? $entity->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -91,7 +93,7 @@ function getSubGroups(array $groupids, array &$ms_groups = null, array $options 
 	}
 
 	if ($db_groups_names) {
-		$db_groups += API::HostGroup()->get([
+		$db_groups += $entity->get([
 			'output' => ['groupid'],
 			'search' => ['name' => $db_groups_names],
 			'searchByAny' => true,

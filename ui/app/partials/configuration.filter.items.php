@@ -52,14 +52,17 @@ zbx_add_post_js("var filterTypeSwitcher".
 
 // First column.
 $filter_column_1
-	->addRow((new CLabel(_('Host groups'), 'filter_groupid_ms')),
+	->addRow(
+		(new CLabel(($data['context'] === 'host') ? _('Host groups') : _('Template groups'),
+			'filter_groupid_ms'
+		)),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
-			'object_name' => 'hostGroup',
+			'object_name' => ($data['context'] === 'host') ? 'hostGroup' : 'templateGroup',
 			'data' => $data['filter_data']['groups'],
 			'popup' => [
 				'parameters' => [
-					'srctbl' => 'host_groups',
+					'srctbl' => ($data['context'] === 'host') ? 'host_groups' : 'template_group',
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_groupids_',
@@ -75,9 +78,9 @@ $filter_column_1
 			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 			'data' => $data['filter_data']['hosts'],
 			'popup' => [
-				'filter_preselect_fields' => [
-					'hostgroups' => 'filter_groupids_'
-				],
+				'filter_preselect_fields' => ($data['context'] === 'host')
+					? ['hostgroups' => 'filter_groupids_']
+					: ['templategroups' => 'filter_groupids_'],
 				'parameters' => [
 					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
