@@ -327,12 +327,12 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
-	protected static function waitForStartup($component, $waitLogLineOverride = '', $check_pid = true) {
+	protected static function waitForStartup($component, $waitLogLineOverride = '', $skip_pid = false) {
 		self::validateComponent($component);
 
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
-			if ($check_pid == false || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
+			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
 				switch ($component) {
 					case self::COMPONENT_SERVER_HANODE1:
 						self::waitForLogLineToBePresent($component, 'HA manager started', false, 5, 1);
@@ -525,7 +525,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @throws Exception    on missing configuration or failed start
 	 */
-	protected function startComponent($component, $waitLogLineOverride = '', $check_pid = true) {
+	protected function startComponent($component, $waitLogLineOverride = '', $skip_pid = false) {
 		self::validateComponent($component);
 
 		$config = PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf';
@@ -552,7 +552,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::executeCommand($bin_path, ['-c', $config], $background);
-		self::waitForStartup($component, $waitLogLineOverride, $check_pid );
+		self::waitForStartup($component, $waitLogLineOverride, $skip_pid );
 	}
 
 	/**
