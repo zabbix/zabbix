@@ -25,16 +25,18 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 	use MacrosTrait;
 
+	protected static $action_list;
+	protected static $old_resourcetype = 0;
+
 	private $actions = [
-		-1 => 'All',
-		0 /* CAudit::ACTION_ADD */ => 'Add',
-		2 /* CAudit::ACTION_DELETE */ => 'Delete',
-		7 /* CAudit::ACTION_EXECUTE */ => 'Execute',
-		9 /* CAudit::ACTION_LOGIN_FAILED */ => 'Failed login',
-		10 /* CAudit::ACTION_HISTORY_CLEAR */ => 'History clear',
-		8 /* CAudit::ACTION_LOGIN_SUCCESS */ => 'Login',
-		4 /* CAudit::ACTION_LOGOUT */ => 'Logout',
-		1 /* CAudit::ACTION_UPDATE */ => 'Update'
+		'id:filter_actions_0' /* CAudit::ACTION_ADD */ => 'Add',
+		'id:filter_actions_2' /* CAudit::ACTION_DELETE */ => 'Delete',
+		'id:filter_actions_7' /* CAudit::ACTION_EXECUTE */ => 'Execute',
+		'id:filter_actions_9' /* CAudit::ACTION_LOGIN_FAILED */ => 'Failed login',
+		'id:filter_actions_10' /* CAudit::ACTION_HISTORY_CLEAR */ => 'History clear',
+		'id:filter_actions_8' /* CAudit::ACTION_LOGIN_SUCCESS */ => 'Login',
+		'id:filter_actions_4' /* CAudit::ACTION_LOGOUT */ => 'Logout',
+		'id:filter_actions_1' /* CAudit::ACTION_UPDATE */ => 'Update'
 	];
 
 	private $resourcetypes = [
@@ -82,67 +84,72 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentId('filter_userids__ms');
 		$this->zbxTestAssertElementPresentId('filter_resourceid');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='filter_resourceid' and @maxlength='255']");
-
-		$this->zbxTestDropdownHasOptions('filter_action', $this->actions);
+		self::$action_list = $this->query('id:filter-actions')->one()->asCheckboxList();
+		$this->assertTrue(!array_diff($this->actions, self::$action_list->getLabels()->asText()));
 		$this->zbxTestDropdownHasOptions('filter_resourcetype', $this->resourcetypes);
 	}
 
 	public static function auditActions() {
 		return [
-			['action' => 8 /* CAudit::ACTION_LOGIN */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
-			['action' => 4 /* CAudit::ACTION_LOGOUT */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 4 /* CAudit::RESOURCE_HOST */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 4 /* CAudit::RESOURCE_HOST */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 4 /* CAudit::RESOURCE_HOST */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 14 /* CAudit::RESOURCE_HOST_GROUP */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 14 /* CAudit::RESOURCE_HOST_GROUP */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 14 /* CAudit::RESOURCE_HOST_GROUP */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 18 /* CAudit::RESOURCE_IT_SERVICE */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 18 /* CAudit::RESOURCE_IT_SERVICE */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 18 /* CAudit::RESOURCE_IT_SERVICE */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 16 /* CAudit::RESOURCE_IMAGE */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 15 /* CAudit::RESOURCE_ITEM */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 15 /* CAudit::RESOURCE_ITEM */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 15 /* CAudit::RESOURCE_ITEM */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 13 /* CAudit::RESOURCE_TRIGGER */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 13 /* CAudit::RESOURCE_TRIGGER */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 13 /* CAudit::RESOURCE_TRIGGER */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 6 /* CAudit::RESOURCE_GRAPH */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 6 /* CAudit::RESOURCE_GRAPH */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 6 /* CAudit::RESOURCE_GRAPH */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 5 /* CAudit::RESOURCE_ACTION */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 5 /* CAudit::RESOURCE_ACTION */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 5 /* CAudit::RESOURCE_ACTION */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 23 /* CAudit::RESOURCE_DISCOVERY_RULE */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 23 /* CAudit::RESOURCE_DISCOVERY_RULE */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 23 /* CAudit::RESOURCE_DISCOVERY_RULE */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 29 /* RESOURCE_MACRO */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 29 /* RESOURCE_MACRO */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 29 /* RESOURCE_MACRO */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 27 /* CAudit::RESOURCE_MAINTENANCE */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 27 /* CAudit::RESOURCE_MAINTENANCE */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 27 /* CAudit::RESOURCE_MAINTENANCE */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 19 /* CAudit::RESOURCE_MAP */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 19 /* CAudit::RESOURCE_MAP */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 19 /* CAudit::RESOURCE_MAP */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 3 /* CAudit::RESOURCE_MEDIA_TYPE */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 3 /* CAudit::RESOURCE_MEDIA_TYPE */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 3 /* CAudit::RESOURCE_MEDIA_TYPE */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 28 /* CAudit::RESOURCE_REGEXP */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 28 /* CAudit::RESOURCE_REGEXP */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 28 /* CAudit::RESOURCE_REGEXP */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 22 /* CAudit::RESOURCE_SCENARIO */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 22 /* CAudit::RESOURCE_SCENARIO */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 22 /* CAudit::RESOURCE_SCENARIO */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 25 /* CAudit::RESOURCE_SCRIPT */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 25 /* CAudit::RESOURCE_SCRIPT */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 25 /* CAudit::RESOURCE_SCRIPT */],
-			['action' => 0 /* CAudit::ACTION_ADD */, 'resourcetype' => 17 /* CAudit::RESOURCE_VALUE_MAP */],
-			['action' => 1 /* CAudit::ACTION_UPDATE */, 'resourcetype' => 17 /* CAudit::RESOURCE_VALUE_MAP */],
-			['action' => 2 /* CAudit::ACTION_DELETE */, 'resourcetype' => 17 /* CAudit::RESOURCE_VALUE_MAP */]
+			['action' => 'id:filter_actions_8' /* CAudit::ACTION_LOGIN */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
+			['action' => 'id:filter_actions_4' /* CAudit::ACTION_LOGOUT */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
+			['action' => 'id:filter_actions_9' /* CAudit::ACTION_LOGIN_FAILED */, 'resourcetype' => 0 /* CAudit::RESOURCE_USER */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 4 /* CAudit::RESOURCE_HOST */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 4 /* CAudit::RESOURCE_HOST */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 4 /* CAudit::RESOURCE_HOST */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 14 /* CAudit::RESOURCE_HOST_GROUP */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 14 /* CAudit::RESOURCE_HOST_GROUP */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 14 /* CAudit::RESOURCE_HOST_GROUP */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 18 /* CAudit::RESOURCE_IT_SERVICE */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 18 /* CAudit::RESOURCE_IT_SERVICE */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 18 /* CAudit::RESOURCE_IT_SERVICE */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 16 /* CAudit::RESOURCE_IMAGE */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 16 /* CAudit::RESOURCE_IMAGE */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 16 /* CAudit::RESOURCE_IMAGE */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 15 /* CAudit::RESOURCE_ITEM */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 15 /* CAudit::RESOURCE_ITEM */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 15 /* CAudit::RESOURCE_ITEM */],
+			['action' => 'id:filter_actions_10' /* CAudit::ACTION_HISTORY_CLEAR */, 'resourcetype' => 15 /* CAudit::RESOURCE_ITEM */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 13 /* CAudit::RESOURCE_TRIGGER */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 13 /* CAudit::RESOURCE_TRIGGER */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 13 /* CAudit::RESOURCE_TRIGGER */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 6 /* CAudit::RESOURCE_GRAPH */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 6 /* CAudit::RESOURCE_GRAPH */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 6 /* CAudit::RESOURCE_GRAPH */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 5 /* CAudit::RESOURCE_ACTION */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 5 /* CAudit::RESOURCE_ACTION */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 5 /* CAudit::RESOURCE_ACTION */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 23 /* CAudit::RESOURCE_DISCOVERY_RULE */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 23 /* CAudit::RESOURCE_DISCOVERY_RULE */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 23 /* CAudit::RESOURCE_DISCOVERY_RULE */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 29 /* RESOURCE_MACRO */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 29 /* RESOURCE_MACRO */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 29 /* RESOURCE_MACRO */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 27 /* CAudit::RESOURCE_MAINTENANCE */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 27 /* CAudit::RESOURCE_MAINTENANCE */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 27 /* CAudit::RESOURCE_MAINTENANCE */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 19 /* CAudit::RESOURCE_MAP */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 19 /* CAudit::RESOURCE_MAP */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 19 /* CAudit::RESOURCE_MAP */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 3 /* CAudit::RESOURCE_MEDIA_TYPE */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 3 /* CAudit::RESOURCE_MEDIA_TYPE */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 3 /* CAudit::RESOURCE_MEDIA_TYPE */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 28 /* CAudit::RESOURCE_REGEXP */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 28 /* CAudit::RESOURCE_REGEXP */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 28 /* CAudit::RESOURCE_REGEXP */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 22 /* CAudit::RESOURCE_SCENARIO */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 22 /* CAudit::RESOURCE_SCENARIO */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 22 /* CAudit::RESOURCE_SCENARIO */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 25 /* CAudit::RESOURCE_SCRIPT */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 25 /* CAudit::RESOURCE_SCRIPT */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 25 /* CAudit::RESOURCE_SCRIPT */],
+			['action' => 'id:filter_actions_7' /* CAudit::ACTION_EXECUTE */, 'resourcetype' => 25 /* CAudit::RESOURCE_SCRIPT */],
+			['action' => 'id:filter_actions_0' /* CAudit::ACTION_ADD */, 'resourcetype' => 17 /* CAudit::RESOURCE_VALUE_MAP */],
+			['action' => 'id:filter_actions_1' /* CAudit::ACTION_UPDATE */, 'resourcetype' => 17 /* CAudit::RESOURCE_VALUE_MAP */],
+			['action' => 'id:filter_actions_2' /* CAudit::ACTION_DELETE */, 'resourcetype' => 17 /* CAudit::RESOURCE_VALUE_MAP */]
 		];
 	}
 
@@ -157,10 +164,15 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestExpandFilterTab();
 		$this->zbxTestMultiselectClear('filter_userids_');
 		$this->zbxTestDropdownSelectWait('filter_resourcetype', $this->resourcetypes[$resourcetype]);
-		$this->zbxTestDropdownSelectWait('filter_action', $this->actions[$action]);
 
+		if (self::$old_resourcetype != $this->resourcetypes[$resourcetype]) {
+			self::$action_list->uncheckAll();
+		}
+
+		self::$action_list->check($this->actions[$action]);
 		$this->zbxTestClickXpathWait("//form[@name='zbx_filter']//button[@name='filter_set']");
 		$this->zbxTestCheckHeader('Audit log');
+		self::$old_resourcetype = $this->resourcetypes[$resourcetype];
 	}
 
 	/**
@@ -169,8 +181,8 @@ class testPageReportsAudit extends CLegacyWebTest {
 	public function testPageReportsAudit_ActionsState() {
 		$this->page->login()->open('zabbix.php?action=auditlog.list');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$actions = self::$action_list->getCheckboxes();
 
-		$actions = $form->getField('Action')->getOptions();
 		foreach ($this->resourcetypes as $type) {
 			$form->fill(['Resource' => $type]);
 			$enabled = array_values($actions->filter(new CElementFilter(CElementFilter::ATTRIBUTES_NOT_PRESENT, ['disabled']))->asText());
@@ -193,12 +205,12 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 				case 'Image':
 				case 'Event correlation':
-					$this->assertEquals(['All', 'Add', 'Delete', 'Update'], $enabled);
+					$this->assertEquals(['Add', 'Delete', 'Update'], $enabled);
 					break;
 
 				case 'Housekeeping':
 				case 'Settings':
-					$this->assertEquals(['All', 'Update'], $enabled);
+					$this->assertEquals(['Update'], $enabled);
 					break;
 
 				case 'Script':
