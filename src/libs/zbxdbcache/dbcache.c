@@ -1599,7 +1599,7 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	if (0 != item_num)
 	{
 		DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, item_num);
-		prepare_triggers((DC_TRIGGER **)trigger_order.values, trigger_order.values_num);
+		zbx_prepare_triggers((DC_TRIGGER **)trigger_order.values, trigger_order.values_num);
 		zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
 	}
 
@@ -1611,13 +1611,13 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 
 		if (offset != trigger_order.values_num)
 		{
-			prepare_triggers((DC_TRIGGER **)trigger_order.values + offset,
+			zbx_prepare_triggers((DC_TRIGGER **)trigger_order.values + offset,
 					trigger_order.values_num - offset);
 		}
 	}
 
 	zbx_vector_ptr_sort(&trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	evaluate_expressions(&trigger_order, history_itemids, history_items, history_errcodes);
+	zbx_evaluate_expressions(&trigger_order, history_itemids, history_items, history_errcodes);
 	zbx_process_triggers(&trigger_order, trigger_diff);
 
 	DCfree_triggers(&trigger_order);

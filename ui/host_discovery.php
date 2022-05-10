@@ -196,7 +196,7 @@ $fields = [
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"discoveryrule.massdelete","discoveryrule.massdisable",'.
-										'"discoveryrule.massenable","discoveryrule.masscheck_now"'
+										'"discoveryrule.massenable"'
 									),
 									null
 								],
@@ -206,7 +206,6 @@ $fields = [
 	'clone' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'check_now' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	// filter
@@ -422,16 +421,6 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
-}
-elseif (hasRequest('check_now') && hasRequest('itemid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-		'request' => [
-			'itemid' => getRequest('itemid')
-		]
-	]);
-
-	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	$result = true;
@@ -785,26 +774,6 @@ elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdele
 	}
 	show_messages($result, _('Discovery rules deleted'), _('Cannot delete discovery rules'));
 }
-elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.masscheck_now' && hasRequest('g_hostdruleid')) {
-	$tasks = [];
-
-	foreach (getRequest('g_hostdruleid') as $taskid) {
-		$tasks[] = [
-			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-			'request' => [
-				'itemid' => $taskid
-			]
-		];
-	}
-
-	$result = (bool) API::Task()->create($tasks);
-
-	if ($result) {
-		uncheckTableRows($checkbox_hash);
-	}
-
-	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
-}
 
 if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
 	$hostdrules = API::DiscoveryRule()->get([
@@ -914,7 +883,6 @@ else {
 		'profileIdx' => $prefix.'host_discovery.filter',
 		'active_tab' => CProfile::get($prefix.'host_discovery.filter.active', 1),
 		'checkbox_hash' => $checkbox_hash,
-		'is_template' => true,
 		'context' => getRequest('context')
 	];
 
@@ -1010,20 +978,6 @@ else {
 	}
 
 	$data['discoveries'] = expandItemNamesWithMasterItems($data['discoveries'], 'items');
-
-	// Set is_template false, when one of hosts is not template.
-	if ($data['discoveries']) {
-		$hosts_status = [];
-		foreach ($data['discoveries'] as $discovery) {
-			$hosts_status[$discovery['hosts'][0]['status']] = true;
-		}
-		foreach ($hosts_status as $key => $value) {
-			if ($key != HOST_STATUS_TEMPLATE) {
-				$data['is_template'] = false;
-				break;
-			}
-		}
-	}
 
 	// pager
 	if (hasRequest('page')) {

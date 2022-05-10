@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -142,6 +143,199 @@ out:
 static int	DBpatch_6010006(void)
 {
 	const ZBX_TABLE	table =
+		{"userdirectory", "userdirectoryid", 0,
+			{
+				{"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 255, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"host", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"port", "389", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"base_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"bind_dn", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"bind_password", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"search_attribute", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"start_tls", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"search_filter", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010007(void)
+{
+	const ZBX_FIELD	field = {"ldap_userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_6010008(void)
+{
+	const ZBX_FIELD	field = {"ldap_userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("config", 3, &field);
+}
+
+static int	DBpatch_6010009(void)
+{
+	return DBcreate_index("config", "config_3", "ldap_userdirectoryid", 0);
+}
+
+static int	DBpatch_6010010(void)
+{
+	const ZBX_FIELD	field = {"userdirectoryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("usrgrp", &field);
+}
+
+static int	DBpatch_6010011(void)
+{
+	const ZBX_FIELD	field = {"userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("usrgrp", 2, &field);
+}
+
+static int	DBpatch_6010012(void)
+{
+	return DBcreate_index("usrgrp", "usrgrp_2", "userdirectoryid", 0);
+}
+
+static int	DBpatch_6010013(void)
+{
+	int		rc = ZBX_DB_OK;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	if (NULL == (result = DBselect("select ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,"
+			"ldap_bind_password,ldap_search_attribute"
+			" from config where ldap_configured=1")))
+	{
+		return FAIL;
+	}
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		char	*base_dn_esc, *bind_dn_esc, *password_esc, *search_esc;
+
+		base_dn_esc = DBdyn_escape_string(row[2]);
+		bind_dn_esc = DBdyn_escape_string(row[3]);
+		password_esc = DBdyn_escape_string(row[4]);
+		search_esc = DBdyn_escape_string(row[5]);
+
+		rc = DBexecute("insert into userdirectory (userdirectoryid,name,description,host,port,"
+				"base_dn,bind_dn,bind_password,search_attribute,start_tls) values "
+				"(1,'Default LDAP server','','%s',%s,'%s','%s','%s','%s',%d)",
+				row[0], row[1], base_dn_esc, bind_dn_esc, password_esc, search_esc, 0);
+
+		zbx_free(search_esc);
+		zbx_free(password_esc);
+		zbx_free(bind_dn_esc);
+		zbx_free(base_dn_esc);
+	}
+
+	DBfree_result(result);
+
+	if (ZBX_DB_OK > rc)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010014(void)
+{
+	if (ZBX_DB_OK > DBexecute("update config set ldap_userdirectoryid=1 where ldap_configured=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010015(void)
+{
+	return DBdrop_field("config", "ldap_host");
+}
+
+static int	DBpatch_6010016(void)
+{
+	return DBdrop_field("config", "ldap_port");
+}
+
+static int	DBpatch_6010017(void)
+{
+	return DBdrop_field("config", "ldap_base_dn");
+}
+
+static int	DBpatch_6010018(void)
+{
+	return DBdrop_field("config", "ldap_bind_dn");
+}
+
+static int	DBpatch_6010019(void)
+{
+	return DBdrop_field("config", "ldap_bind_password");
+}
+
+static int	DBpatch_6010020(void)
+{
+	return DBdrop_field("config", "ldap_search_attribute");
+}
+
+static int	DBpatch_6010021(void)
+{
+	const ZBX_TABLE	table =
+			{"host_rtdata", "hostid", 0,
+				{
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"active_available", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010022(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("host_rtdata", 1, &field);
+}
+
+static int	DBpatch_6010023(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	hostid;
+	zbx_db_insert_t	insert;
+	int		ret;
+
+	zbx_db_insert_prepare(&insert, "host_rtdata", "hostid", "active_available", NULL);
+
+	result = DBselect("select hostid from hosts where flags!=%i and status in (%i,%i)",
+			ZBX_FLAG_DISCOVERY_PROTOTYPE, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+		zbx_db_insert_add_values(&insert, hostid, INTERFACE_AVAILABLE_UNKNOWN);
+	}
+	DBfree_result(result);
+
+	if (0 != insert.rows.values_num)
+		ret = zbx_db_insert_execute(&insert);
+	else
+		ret = SUCCEED;
+
+	zbx_db_insert_clean(&insert);
+
+	return ret;
+}
+
+static int	DBpatch_6010024(void)
+{
+	const ZBX_TABLE	table =
 			{"changelog", "changelogid", 0,
 				{
 					{"changelogid", NULL, NULL, NULL, 0, ZBX_TYPE_SERIAL, ZBX_NOTNULL, 0},
@@ -157,7 +351,7 @@ static int	DBpatch_6010006(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6010007(void)
+static int	DBpatch_6010025(void)
 {
 #ifdef HAVE_ORACLE
 	return DBcreate_serial_sequence("changelog");
@@ -166,7 +360,7 @@ static int	DBpatch_6010007(void)
 #endif
 }
 
-static int	DBpatch_6010008(void)
+static int	DBpatch_6010026(void)
 {
 #ifdef HAVE_ORACLE
 	return DBcreate_serial_trigger("changelog", "changelogid");
@@ -175,130 +369,131 @@ static int	DBpatch_6010008(void)
 #endif
 }
 
-static int	DBpatch_6010009(void)
+static int	DBpatch_6010027(void)
 {
 	return DBcreate_index("changelog", "changelog_1", "clock", 0);
 }
 
-static int	DBpatch_6010010(void)
+static int	DBpatch_6010028(void)
 {
 	return DBcreate_changelog_insert_trigger("hosts", "hostid");
 }
 
-static int	DBpatch_6010011(void)
+static int	DBpatch_6010029(void)
 {
 	return DBcreate_changelog_update_trigger("hosts", "hostid");
 }
 
-static int	DBpatch_6010012(void)
+static int	DBpatch_6010030(void)
 {
 	return DBcreate_changelog_delete_trigger("hosts", "hostid");
 }
 
-static int	DBpatch_6010013(void)
+static int	DBpatch_6010031(void)
 {
 	return DBcreate_changelog_insert_trigger("host_tag", "hosttagid");
 }
 
-static int	DBpatch_6010014(void)
+static int	DBpatch_6010032(void)
 {
 	return DBcreate_changelog_update_trigger("host_tag", "hosttagid");
 }
 
-static int	DBpatch_6010015(void)
+static int	DBpatch_6010033(void)
 {
 	return DBcreate_changelog_delete_trigger("host_tag", "hosttagid");
 }
 
-static int	DBpatch_6010016(void)
+static int	DBpatch_6010034(void)
 {
 	return DBcreate_changelog_insert_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010017(void)
+static int	DBpatch_6010035(void)
 {
 	return DBcreate_changelog_update_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010018(void)
+static int	DBpatch_6010036(void)
 {
 	return DBcreate_changelog_delete_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010019(void)
+static int	DBpatch_6010037(void)
 {
 	return DBcreate_changelog_insert_trigger("item_tag", "itemtagid");
 }
 
-static int	DBpatch_6010020(void)
+static int	DBpatch_6010038(void)
 {
 	return DBcreate_changelog_update_trigger("item_tag", "itemtagid");
 }
 
-static int	DBpatch_6010021(void)
+static int	DBpatch_6010039(void)
 {
 	return DBcreate_changelog_delete_trigger("item_tag", "itemtagid");
 }
 
-static int	DBpatch_6010022(void)
+static int	DBpatch_6010040(void)
 {
 	return DBcreate_changelog_insert_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_6010023(void)
+static int	DBpatch_6010041(void)
 {
 	return DBcreate_changelog_update_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_6010024(void)
+static int	DBpatch_6010042(void)
 {
 	return DBcreate_changelog_delete_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_6010025(void)
+static int	DBpatch_6010043(void)
 {
 	return DBcreate_changelog_insert_trigger("trigger_tag", "triggertagid");
 }
 
-static int	DBpatch_6010026(void)
+static int	DBpatch_6010044(void)
 {
 	return DBcreate_changelog_update_trigger("trigger_tag", "triggertagid");
 }
 
-static int	DBpatch_6010027(void)
+static int	DBpatch_6010045(void)
 {
 	return DBcreate_changelog_delete_trigger("trigger_tag", "triggertagid");
 }
 
-static int	DBpatch_6010028(void)
+static int	DBpatch_6010046(void)
 {
 	return DBcreate_changelog_insert_trigger("functions", "functionid");
 }
 
-static int	DBpatch_6010029(void)
+static int	DBpatch_6010047(void)
 {
 	return DBcreate_changelog_update_trigger("functions", "functionid");
 }
 
-static int	DBpatch_6010030(void)
+static int	DBpatch_6010048(void)
 {
 	return DBcreate_changelog_delete_trigger("functions", "functionid");
 }
 
-static int	DBpatch_6010031(void)
+static int	DBpatch_6010049(void)
 {
 	return DBcreate_changelog_insert_trigger("item_preproc", "item_preprocid");
 }
 
-static int	DBpatch_6010032(void)
+static int	DBpatch_6010050(void)
 {
 	return DBcreate_changelog_update_trigger("item_preproc", "item_preprocid");
 }
 
-static int	DBpatch_6010033(void)
+static int	DBpatch_6010051(void)
 {
 	return DBcreate_changelog_delete_trigger("item_preproc", "item_preprocid");
 }
+
 #endif
 
 DBPATCH_START(6010)
@@ -325,19 +520,37 @@ DBPATCH_ADD(6010016, 0, 1)
 DBPATCH_ADD(6010017, 0, 1)
 DBPATCH_ADD(6010018, 0, 1)
 DBPATCH_ADD(6010019, 0, 1)
-DBPATCH_ADD(6010020, 0, 1)
-DBPATCH_ADD(6010021, 0, 1)
-DBPATCH_ADD(6010022, 0, 1)
-DBPATCH_ADD(6010023, 0, 1)
-DBPATCH_ADD(6010024, 0, 1)
-DBPATCH_ADD(6010025, 0, 1)
-DBPATCH_ADD(6010026, 0, 1)
-DBPATCH_ADD(6010027, 0, 1)
-DBPATCH_ADD(6010028, 0, 1)
-DBPATCH_ADD(6010029, 0, 1)
-DBPATCH_ADD(6010030, 0, 1)
-DBPATCH_ADD(6010031, 0, 1)
-DBPATCH_ADD(6010032, 0, 1)
-DBPATCH_ADD(6010033, 0, 1)
+DBPATCH_ADD(6010020, 0,	1)
+DBPATCH_ADD(6010021, 0,	1)
+DBPATCH_ADD(6010022, 0,	1)
+DBPATCH_ADD(6010023, 0,	1)
+DBPATCH_ADD(6010024, 0,	1)
+DBPATCH_ADD(6010025, 0,	1)
+DBPATCH_ADD(6010026, 0,	1)
+DBPATCH_ADD(6010027, 0,	1)
+DBPATCH_ADD(6010028, 0,	1)
+DBPATCH_ADD(6010029, 0,	1)
+DBPATCH_ADD(6010030, 0,	1)
+DBPATCH_ADD(6010031, 0,	1)
+DBPATCH_ADD(6010032, 0,	1)
+DBPATCH_ADD(6010033, 0,	1)
+DBPATCH_ADD(6010034, 0,	1)
+DBPATCH_ADD(6010035, 0,	1)
+DBPATCH_ADD(6010036, 0,	1)
+DBPATCH_ADD(6010037, 0,	1)
+DBPATCH_ADD(6010038, 0,	1)
+DBPATCH_ADD(6010039, 0,	1)
+DBPATCH_ADD(6010040, 0,	1)
+DBPATCH_ADD(6010041, 0,	1)
+DBPATCH_ADD(6010042, 0,	1)
+DBPATCH_ADD(6010043, 0,	1)
+DBPATCH_ADD(6010044, 0,	1)
+DBPATCH_ADD(6010045, 0,	1)
+DBPATCH_ADD(6010046, 0,	1)
+DBPATCH_ADD(6010047, 0,	1)
+DBPATCH_ADD(6010048, 0,	1)
+DBPATCH_ADD(6010049, 0,	1)
+DBPATCH_ADD(6010050, 0,	1)
+DBPATCH_ADD(6010051, 0,	1)
 
 DBPATCH_END()

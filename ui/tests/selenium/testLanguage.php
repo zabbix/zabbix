@@ -264,6 +264,7 @@ class testLanguage extends CWebTest {
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.
 				zbx_dbstr($data['fields']['Username'])));
 		$this->assertEquals($data['defaultdb_lang'], CDBHelper::getValue('SELECT default_lang FROM config'));
+		$this->page->logout();
 	}
 
 	private function checkLanguage($message, $page_title, $html_lang, $defaultdb_lang) {

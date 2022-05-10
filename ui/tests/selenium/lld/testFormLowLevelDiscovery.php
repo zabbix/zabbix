@@ -482,7 +482,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='conditions_0_value']", 'maxlength', 255);
 
 		if (CTestArrayHelper::get($data, 'filter_check', false)) {
-			$operation_dropdown = $this->query('name:conditions[0][operator]')->one()->asZDropdown();
+			$operation_dropdown = $this->query('name:conditions[0][operator]')->asDropdown()->one();
 			foreach (['matches', 'does not match', 'exists', 'does not exist'] as $operation) {
 				$operation_dropdown->select($operation);
 				$this->assertEquals(in_array($operation, ['matches', 'does not match']), $this->query('id:conditions_0_value')->one()->isVisible());
@@ -1648,15 +1648,15 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					$this->zbxTestAssertNotVisibleId('interface-select');
 			}
 
-			// "Check now" button availability
+			// "Execute now" button availability
 			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMP agent', 'Zabbix internal', 'External check',
 					'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent',
-					'JMX agent'])) {
-				$this->zbxTestClick('check_now');
+					'JMX agent', 'Dependent item'])) {
+				$this->zbxTestClickButtonText('Execute now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
 			}
 			else {
-				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
+				$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
 			}
 
 			if (isset($data['ipmi_sensor'])) {

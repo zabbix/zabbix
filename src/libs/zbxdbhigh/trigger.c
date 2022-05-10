@@ -445,7 +445,7 @@ static int	db_trigger_expand_macros(const DB_TRIGGER *trigger, zbx_eval_context_
 				continue;
 		}
 
-		if (SUCCEED == substitute_simple_macros(NULL, &db_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		if (SUCCEED == zbx_substitute_simple_macros(NULL, &db_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				NULL, NULL, NULL, &value, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0))
 		{
 			zbx_variant_clear(&token->value);

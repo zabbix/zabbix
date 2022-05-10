@@ -846,10 +846,12 @@ class testSID extends CWebTest {
 			$this->page->login()->open($link)->waitUntilReady();
 
 			if (CTestArrayHelper::get($data, 'json_output')) {
-				$this->assertEquals('<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;'.
-					'">{"error":{"title":"Access denied","messages":["You are logged in as \"Admin\". You have no permissions '.
+				$message = [];
+				preg_match('/<pre[^>]+>(.+)<\/pre>/', $this->page->getSource(), $message);
+
+				$this->assertEquals('{"error":{"title":"Access denied","messages":["You are logged in as \"Admin\". You have no permissions '.
 					'to access this page.","If you think this message is wrong, please consult your administrators '.
-					'about getting the necessary permissions."]}}</pre></body></html>', $this->page->getSource()
+					'about getting the necessary permissions."]}}', $message[1]
 				);
 			}
 			else {
