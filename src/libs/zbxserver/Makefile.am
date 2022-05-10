@@ -19,7 +19,7 @@ libzbxserver_a_SOURCES = \
 	get_host_from_event.h \
 	zabbix_users.c \
 	zabbix_users.h \
-	expression_eval.c
+	calc_checks_eval.c
 
 libzbxserver_server_a_SOURCES = \
 	zabbix_stats.h \
