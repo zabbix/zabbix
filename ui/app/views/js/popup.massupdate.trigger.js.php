@@ -48,7 +48,7 @@
 				curl.setArgument('form', 'update');
 				curl.setArgument('parent_discoveryid', '<?= $data['parent_discoveryid'] ?>');
 				curl.setArgument('triggerid', value.triggerid);
-				curl.setArgument('context', '<?= $data['context'] ?>')
+				curl.setArgument('context', '<?= $data['context'] ?>');
 			}
 			else {
 				curl = new Curl('triggers.php', false);
