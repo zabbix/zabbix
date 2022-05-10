@@ -20,8 +20,7 @@ libzbxserver_a_SOURCES = \
 	zabbix_users.c \
 	zabbix_users.h \
 	calc_checks_eval.c \
-	evaluate_simple.c \
-	evaluate_simple.h
+	evaluate_simple.c
 
 libzbxserver_server_a_SOURCES = \
 	zabbix_stats.h \
