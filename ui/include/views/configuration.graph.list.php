@@ -90,14 +90,16 @@ else {
 			->addFilterTab(_('Filter'), [
 				(new CFormList())
 					->addRow(
-						(new CLabel(_('Host groups'), 'filter_groups__ms')),
+						(new CLabel(($data['context'] === 'host') ? _('Host groups') : _('Template groups'),
+								'filter_groups__ms'
+						)),
 						(new CMultiSelect([
 							'name' => 'filter_groupids[]',
-							'object_name' => 'hostGroup',
+							'object_name' => ($data['context'] === 'host') ? 'hostGroup' : 'templateGroup',
 							'data' => $data['filter']['groups'],
 							'popup' => [
 								'parameters' => [
-									'srctbl' => 'host_groups',
+									'srctbl' =>  ($data['context'] === 'host') ? 'host_groups' : 'template_group',
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groupids_',
