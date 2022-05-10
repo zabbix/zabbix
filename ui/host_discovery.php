@@ -380,7 +380,6 @@ if ($filter['groups']) {
 		]), ['groupid' => 'id']);
 	}
 
-
 	$filter_groupids = getSubGroups(array_keys($filter['groups']), $ms_groups, [], getRequest('context'));
 }
 
