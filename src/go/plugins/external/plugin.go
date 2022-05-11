@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -62,7 +61,7 @@ func (p *Plugin) ExecutePlugin() {
 	startLock.Lock()
 	defer startLock.Unlock()
 
-	p.setPath()
+	p.checkPath()
 
 	p.cmd = exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial))
 
@@ -153,17 +152,10 @@ func (p *Plugin) Cleanup() {
 	p.cmd = nil
 }
 
-func (p *Plugin) setPath() {
-	if filepath.IsAbs(p.Path) {
-		return
+func (p *Plugin) checkPath() {
+	if !filepath.IsAbs(p.Path) {
+		panic(fmt.Sprintf("failed to start plugin %s, path must be absolute", p.Path))
 	}
-
-	e, err := os.Executable()
-	if err != nil {
-		panic(fmt.Sprintf("failed to start plugin %s, %s", p.Path, err.Error()))
-	}
-
-	p.Path = filepath.Join(filepath.Dir(e), p.Path)
 }
 
 func getConnection(listener net.Listener, timeout time.Duration) (conn net.Conn, err error) {
