@@ -26,12 +26,15 @@ require_once dirname(__FILE__).'/../common/testFormHost.php';
  *
  * @onBefore createTemplate
  */
-class testFormHostDiscovered extends testFormHost {
+class testFormDiscoveryHost extends testFormHost {
 
 	protected static $host = 'Host prototype LLD';
+	protected static $template_names;
+	protected static $templateids;
+	protected static $hostid;
 
 	public static function createTemplate() {
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr(self::$host));
+		self::$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr(self::$host));
 
 		// Create templates.
 		$templates = CDataHelper::createTemplates([
@@ -97,54 +100,51 @@ class testFormHostDiscovered extends testFormHost {
 				]
 			],
 			[
-				'host' => '1 template with tags for link',
+				'host' => '1 template for unlink',
 				'groups' => [
 					'groupid' => 4
 				],
-				'tags' => [
+				'items' => [
 					[
-						'tag' => 'action',
-						'value' => 'clone'
+						'name' => 'Template1 item1',
+						'key_' => 'trap.template1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
-						'tag' => 'tag',
-						'value' => 'clone'
-					],
-					[
-						'tag' => 'tag'
+						'name' => 'Template1 item2',
+						'key_' => 'template.item1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
 					]
 				]
 			],
 			[
-				'host' => '2 template with tags for link',
+				'host' => '2 template for clear',
 				'groups' => [
 					'groupid' => 4
 				],
-				'tags' => [
+				'items' => [
 					[
-						'tag' => 'action',
-						'value' => 'update'
+						'name' => 'Template2 item1',
+						'key_' => 'trap.template2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
 					],
 					[
-						'tag' => 'tag without value'
-					],
-					[
-						'tag' => 'test',
-						'value' => 'update'
+						'name' => 'Template2 item2',
+						'key_' => 'template.item2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
 					]
 				]
 			]
 		]);
 
-		foreach ($templates['templateids'] as $value) {
-			$templateids[] = $value;
+		foreach ($templates['templateids'] as $name => $value) {
+			self::$template_names[] = $name;
+			self::$templateids[] = $value;
 		}
-
-		// Link templates.
-		$template_link = CDataHelper::call('host.update',[
-			'hostid' => $hostid,
-			'templates' => $templateids
-		]);
 	}
 
 	public static function getState() {
@@ -178,12 +178,18 @@ class testFormHostDiscovered extends testFormHost {
 	 *
 	 * @dataProvider getState
 	 */
-	public function testFormHostDiscovered_FormLayout($data) {
+	public function testFormDiscoveryHost_FormLayout($data) {
 		$this->standalone = $data['standalone'];
 		$this->link = $data['url'];
 		$this->monitoring = $data['monitoring'];
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr(self::$host));
-		$form = $this->openForm(($this->standalone ? $this->link.$hostid : $this->link), self::$host);
+
+		// Link templates.
+		CDataHelper::call('host.update',[
+			'hostid' => self::$hostid,
+			'templates' => self::$templateids
+		]);
+		$this->checkItems();
+		$form = $this->openForm(($this->standalone ? $this->link.self::$hostid : $this->link), self::$host);
 		$interfaces_form = ($form->getFieldContainer('Interfaces')->asHostInterfaceElement());
 		$this->assertEquals('Discovery rule 1',($form->getField('Discovered by')->gettext()));
 
@@ -224,22 +230,58 @@ class testFormHostDiscovered extends testFormHost {
 		// Close the hint-box.
 		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 		$hint->waitUntilNotPresent();
-
 		$template_table = $form->query('id:linked-templates')->asTable()->one()->waitUntilVisible();
 
-		foreach (['Unlink', 'Unlink and clear'] as $button) {
-			$this->assertTrue($template_table->findRow('Name', 'Template for link testing')->getColumn('Action')
-					->query('button:'.$button)->one()->isClickable());
+		foreach (self::$template_names as $name) {
+			$template_row = $template_table->findRow('Name', $name);
+
+			foreach (['Unlink', 'Unlink and clear'] as $button) {
+				$this->assertTrue($template_row->getColumn('Action')->query('button:'.$button)->one()->isClickable());
+			}
+
+			(strpos($name, 'unlink') !== false) ?
+				$template_row->getColumn('Action')->query('button:Unlink')->one()->click() :
+				$template_row->getColumn('Action')->query('button:Unlink and clear')->one()->click();
 		}
 
 		$this->assertEquals('', ($template_table->findRow('Name', 'Linux by Zabbix agent', true)->getColumn('Action')->getText()));
 		$this->assertEquals('(linked by host discovery)', $template_table->findRow('Name', 'Linux by Zabbix agent', true)
 				->getColumn('Name')->query('xpath:.//sup')->one()->getText());
+		$form->submit();
+		$form->waitUntilNotVisible();
+		$this->checkItems(true);
+	}
 
-		if (!$this->standalone) {
-			$this->query('xpath:.//div[@class="dashboard-widget-head"]/button[@class="overlay-close-btn"]')->one()->click();
+	private function checkItems($clear = false) {
+		if ($clear) {
+			$this->page->open('items.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host')->waitUntilReady();
+		}
+		else {
+			$this->page->login()->open('items.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid.'&context=host')->waitUntilReady();
 		}
 
+		$table = $this->query('xpath://form[@name="items"]/table')->asTable()->one();
+
+		foreach ($table->getRows() as $row) {
+			$names[] = $row->getColumn('Name')->getText();
+		}
+
+		if ($clear) {
+			foreach (['Template1 item1', 'Template1 item2'] as $item) {
+				$this->assertTrue(in_array($item, $names));
+			}
+
+			foreach (['2 template for clear: Template2 item1', '2 template for clear: Template2 item2'] as $item) {
+				$this->assertFalse(in_array($item, $names));
+			}
+		}
+		else {
+
+			foreach (['1 template for unlink: Template1 item1', '1 template for unlink: Template1 item2',
+						'2 template for clear: Template2 item1', '2 template for clear: Template2 item2'] as $item) {
+				$this->assertTrue(in_array($item, $names));
+			}
+		}
 	}
 
 	private function openForm($url, $host) {
@@ -255,7 +297,6 @@ class testFormHostDiscovered extends testFormHost {
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
-
 		$host_link = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()
 				->findRow('Name', $host, true)->getColumn('Name')->query($this->monitoring ? 'tag:a' : 'xpath://a[@onclick]')
 				->waitUntilClickable();
