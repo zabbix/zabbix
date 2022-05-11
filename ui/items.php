@@ -603,7 +603,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$item_defaults = DB::getDefaults('items') + array_fill_keys(['valuemapid', 'interfaceid', 'master_itemid'], 0);
 		$draft_fields = array_fill_keys(['tags', 'preprocessing'], true)
 			+ CItemHelper::extractConditionFields($api_input_rules['fields']);
-		$item_draft = CItemHelper::combineFromFieldIndex($draft_fields, $req_data, $item_defaults);
+		$item_draft += CItemHelper::combineFromFieldIndex($draft_fields, $req_data, $item_defaults);
 		$input_index = CItemHelper::extractExpectedFieldIndex($api_input_rules, $item_draft, $db_item);
 		$item = CItemHelper::combineFromFieldIndex($input_index, $req_data, $item_defaults);
 

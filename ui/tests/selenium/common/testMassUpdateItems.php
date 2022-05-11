@@ -1441,15 +1441,11 @@ class testMassUpdateItems extends CWebTest{
 				'preprocessing' => [
 					[
 						'type' => '4',
-						'params' => '123',
-						'error_handler' => 0,
-						'error_handler_params' => ''
+						'params' => '123'
 					],
 					[
 						'type' => '25',
-						'params' => "error\nmistake",
-						'error_handler' => 0,
-						'error_handler_params' => ''
+						'params' => "error\nmistake"
 					]
 				]
 			],
