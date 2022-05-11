@@ -5546,7 +5546,13 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_dbsync_init(&maintenance_group_sync, mode);
 	zbx_dbsync_init(&maintenance_host_sync, mode);
 
+#ifdef HAVE_ORACLE
+	/* With Oracle fetch statements can fail before all data has been fetched. */
+	/* In such cache next sync will need to do full scan rather than just      */
+	/* applying changelog diff. To detect this problem configuration is synced */
+	/* in transaction and error is checked at the end.                         */
 	DBbegin();
+#endif
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_config(&config_sync))
@@ -6200,12 +6206,19 @@ out:
 
 	FINISH_SYNC;
 
-	if (ZBX_DB_OK != DBcommit())
+#ifdef HAVE_ORACLE
+	if (SUCCEED == ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Configuration cache has not been fully initialized because of database"
-				" errors. Full database scan will be attempted on next sync.");
-		ret = FAIL;
+		if (ZBX_DB_OK != DBcommit())
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Configuration cache has not been fully initialized because of"
+					" database errors. Full database scan will be attempted on next sync.");
+			ret = FAIL;
+		}
 	}
+	else
+		DBrollback();
+#endif
 
 	if (SUCCEED == ret)
 	{
