@@ -74,9 +74,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	];
 
 	public function testPageReportsAudit_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=auditlog.list');
-		$this->zbxTestCheckTitle('Audit log');
-		$this->zbxTestAssertElementPresentId('config');
+		$this->login();
 
 		$this->zbxTestCheckHeader('Audit log');
 		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'Recordset ID', 'ID', 'Details']);
@@ -84,7 +82,6 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentId('filter_userids__ms');
 		$this->zbxTestAssertElementPresentId('filter_resourceid');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='filter_resourceid' and @maxlength='255']");
-		self::$action_list = $this->query('id:filter-actions')->one()->asCheckboxList();
 		$this->assertTrue(!array_diff($this->actions, self::$action_list->getLabels()->asText()));
 		$this->zbxTestDropdownHasOptions('filter_resourcetype', $this->resourcetypes);
 	}
@@ -157,9 +154,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	 * @dataProvider auditActions
 	 */
 	public function testPageReportsAudit_Filter($action, $resourcetype) {
-		$this->zbxTestLogin('zabbix.php?action=auditlog.list');
-		$this->zbxTestCheckTitle('Audit log');
-		$this->zbxTestAssertElementPresentId('config');
+		$this->login();
 
 		$this->zbxTestExpandFilterTab();
 		$this->zbxTestMultiselectClear('filter_userids_');
@@ -179,7 +174,8 @@ class testPageReportsAudit extends CLegacyWebTest {
 	 * Check whether actions are enabled or disabled depending on the selected resource.
 	 */
 	public function testPageReportsAudit_ActionsState() {
-		$this->page->login()->open('zabbix.php?action=auditlog.list');
+		$this->login();
+
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$actions = self::$action_list->getCheckboxes();
 
@@ -275,5 +271,13 @@ class testPageReportsAudit extends CLegacyWebTest {
 			$text = $row->getColumnData($column, $value);
 			$this->assertEquals($value, $text);
 		}
+	}
+
+	private function login () {
+		$this->zbxTestLogin('zabbix.php?action=auditlog.list');
+		$this->zbxTestCheckTitle('Audit log');
+		$this->zbxTestAssertElementPresentId('config');
+		self::$action_list = $this->query('id:filter-actions')->one()->asCheckboxList();
+
 	}
 }
