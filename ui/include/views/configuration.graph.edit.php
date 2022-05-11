@@ -178,7 +178,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 		]))
-		->setDisabled($readonly);
+		->setDisabled($readonly)
+		->setFocusableElementId('ymin_type_label');
 
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -235,11 +236,9 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
 	}
 
-	$yaxismin_label = new CLabel(_('Y axis MIN value'));
+	$yaxismin_label = new CLabel(_('Y axis MIN value'),'ymin_type_label');
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-		$yaxismin_label
-			->setAsteriskMark()
-			->setAttribute('for', 'ymin_name');
+		$yaxismin_label->setAsteriskMark();
 	}
 
 	$graphFormList->addRow($yaxismin_label, $yaxisMinData);
@@ -253,7 +252,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 		]))
-		->setDisabled($readonly);
+		->setDisabled($readonly)
+		->setFocusableElementId('ymax_type_label');
 
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
@@ -310,11 +310,10 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
 	}
 
-	$yaxismax_label = new CLabel(_('Y axis MAX value'));
+	$yaxismax_label = new CLabel(_('Y axis MAX value'), 'ymax_type_label');
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$yaxismax_label
-			->setAsteriskMark()
-			->setAttribute('for', 'ymax_name');
+			->setAsteriskMark();
 	}
 
 	$graphFormList->addRow($yaxismax_label, $yaxisMaxData);
