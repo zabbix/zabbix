@@ -154,7 +154,6 @@ CViewSwitcher.prototype = {
 				if (obj.getAttribute('type').toUpperCase() === 'CHECKBOX') {
 					return obj.checked ? obj.value : null;
 				}
-				break;
 			default:
 				return obj.value;
 		}
