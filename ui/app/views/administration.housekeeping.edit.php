@@ -154,8 +154,8 @@ $house_keeper_tab = (new CFormList())
 	);
 
 	if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
-		switch ($data['compression_state']) {
-			case ZBX_STATE_UNKNOWN:
+		switch ($data['extension_err_code']) {
+			case ZBX_EXT_ERR_UNDEFINED:
 				$timescaledb_error = _('Unable to retrieve TimescaleDB compression support status.');
 				break;
 
@@ -194,7 +194,7 @@ $house_keeper_tab = (new CFormList())
 				$timescaledb_error = _('Detected TimescaleDB license does not support compression. Compression is supported in TimescaleDB Community Edition.');
 				break;
 
-			case ZBX_TIMESCALEDB_COMPRESSION_SUPPORTED:
+			case ZBX_EXT_SUCCEED:
 			default:
 				$timescaledb_error = '';
 		}
@@ -202,6 +202,7 @@ $house_keeper_tab = (new CFormList())
 		$timescaledb_error = $timescaledb_error !== ''
 			? (makeErrorIcon($timescaledb_error))->addStyle('margin-left: 5px;')
 			: null;
+
 		$compression_status_checkbox = (new CCheckBox('compression_status'))
 			->setChecked($data['compression_status'] == 1)
 			->setEnabled($data['compression_availability']);

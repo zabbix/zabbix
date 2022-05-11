@@ -102,8 +102,8 @@ class CControllerHousekeepingEdit extends CController {
 				CHousekeepingHelper::HK_TRENDS_GLOBAL
 			)),
 			'hk_trends' => $this->getInput('hk_trends', CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)),
+			'extension_err_code' => ZBX_EXT_ERR_UNDEFINED,
 			'compression_availability' => false,
-			'compression_state' => ZBX_STATE_UNKNOWN,
 			'compression_status' => $this->getInput('compression_status', CHousekeepingHelper::get(
 				CHousekeepingHelper::COMPRESSION_STATUS
 			)),
@@ -123,8 +123,8 @@ class CControllerHousekeepingEdit extends CController {
 						$data['timescaledb_min_version'] = $dbversion['min_version'];
 						$data['timescaledb_max_version'] = $dbversion['max_version'];
 						$data['timescaledb_min_supported_version'] = $dbversion['min_supported_version'];
+						$data['extension_err_code'] = $dbversion['extension_err_code'];
 						$data['compression_availability'] = $dbversion['compression_availability'];
-						$data['compression_state'] = $dbversion['compression_state'];
 						break;
 					}
 				}
