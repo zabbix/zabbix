@@ -1283,10 +1283,10 @@ INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (935,102
 INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (936,102,40034,4);
 
 -- testZBX6648.eventsFilter
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50000,'ZBX6648 Group No Hosts',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50001,'ZBX6648 Disabled Triggers',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50002,'ZBX6648 Enabled Triggers',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50003,'ZBX6648 All Triggers',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50000,'ZBX6648 Group No Hosts',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50001,'ZBX6648 Disabled Triggers',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50002,'ZBX6648 Enabled Triggers',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50003,'ZBX6648 All Triggers',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50003, 'ZBX6648 Disabled Triggers Host', 'ZBX6648 Disabled Triggers Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50004, 'ZBX6648 Enabled Triggers Host', 'ZBX6648 Enabled Triggers Host', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50005, 'ZBX6648 All Triggers Host', 'ZBX6648 All Triggers Host', 0, '');
@@ -1465,7 +1465,7 @@ INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refres
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (90, 90, 90);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (91, 91, 90);
 -- Tag based permissions: host group, host, item, two triggers
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50004, 'Host group for tag permissions', 0);
+INSERT INTO hstgrp (groupid, name, type) VALUES (50004, 'Host group for tag permissions', 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50009, 'Host for tag permissions', 'Host for tag permissions', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90280, 50009, 50004);
 INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.0.1', '', '1', '10050', '1', 50009, 50022);
@@ -1680,7 +1680,7 @@ INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, send
 INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (127, 12, 1, 7, 1478122535, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2016.11.02 23:35:35', 1, 0, '', 1, 1, '');
 
 -- testInheritanceHostPrototype
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50019, 'Inheritance test', 0);
+INSERT INTO hstgrp (groupid, name, type) VALUES (50019, 'Inheritance test', 1);
 INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99000, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, NULL, '');
 INSERT INTO hosts (hostid, host, name, flags, templateid, description) VALUES (99001, 'testInheritanceHostPrototype {#TEST}', 'testInheritanceHostPrototype {#TEST}', 2, 99000, '');
 INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastcheck, ts_delete) VALUES (99000, NULL, 15011, '', 0, 0);
@@ -1799,7 +1799,7 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (114,99,'Theta',
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (115,99,'Delta','t');
 
 -- Problem suppression test: host, item, trigger, maintenance, event, problem, tags
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50013, 'Host group for suppression', 0);
+INSERT INTO hstgrp (groupid, name, type) VALUES (50013, 'Host group for suppression', 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99011, 'Host for suppression', 'Host for suppression', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99007, 99011, 50013);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50025,99011,1,1,1,'127.0.0.1','','10050');
@@ -1821,7 +1821,7 @@ INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALU
 INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (200,175,'SupTag','A');
 
 -- testPageHostGraph
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50005,'Group for host graph check',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50005,'Group for host graph check',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99012, 'Host to check graph 1', 'Host to check graph 1', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99008, 99012, 50005);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50026,99012,1,1,1,'127.0.0.1','','10050');
@@ -1846,7 +1846,7 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700032, 700024, 99008, 0, 0, '1A7C11', 0, 2, 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99014, 'Empty template', 'Empty template', 3, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99010, 99014, 1);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50006,'Empty group',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50006,'Empty group',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99015, 'Empty host', 'Empty host', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99011, 99015, 50006);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50028,99015,1,1,1,'127.0.0.1','','10050');
@@ -1855,7 +1855,7 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99012, 99016, 1)
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99009, 2, 99016, 'Item to check graph', '', 'graph[2]', 0, NULL, '', '', 'zabbix.com', '', '','');
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (700025,'Graph to check copy',900,200,0.0,100.0,NULL,1,1,0,1,0,0.0,0.0,0,0,NULL,NULL,0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (700033, 700025, 99009, 0, 0, '1A7C11', 0, 2, 0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50007,'Group to copy graph',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50007,'Group to copy graph',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99017, 'Host with item and without graph 1', 'Host with item and without graph 1', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99013, 99017, 50007);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50029,99017,1,1,1,'127.0.0.1','','10050');
@@ -1864,7 +1864,7 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99018, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99014, 99018, 50007);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50030,99018,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99011, 2, 99018, 'Item', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50008,'Group to copy all graph',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50008,'Group to copy all graph',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99019, 'Host with item to copy all graphs 1', 'Host with item to copy all graphs 1', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99015, 99019, 50008);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50031,99019,1,1,1,'127.0.0.1','','10050');
@@ -1901,12 +1901,12 @@ INSERT INTO hosts (hostid, host, name, status, description) VALUES (99026, 'Host
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99024, 99026, 50005);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50036,99026,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99019, 2, 99026, 'Item to check graph', '', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50009,'Copy graph to several groups 1',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50009,'Copy graph to several groups 1',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99027, 'Host 1 from first group', 'Host 1 from first group', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99025, 99027, 50009);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50037,99027,1,1,1,'127.0.0.1','','10050');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, url, posts, query_fields, headers) VALUES (99020, 2, 99027, 'Item to check graph', '{$A}', 'graph[1]', 0, NULL, '', '', 'zabbix.com', '', '','');
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50010,'Copy graph to several groups 2',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50010,'Copy graph to several groups 2',0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99028, 'Host 1 from second group', 'Host 1 from second group', 0, '');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99026, 99028, 50010);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50038,99028,1,1,1,'127.0.0.1','','10050');
@@ -1950,8 +1950,8 @@ INSERT INTO triggers (triggerid, description, expression, value, priority, state
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '$');
 
 -- testDashboardHostAvailabilityWidget
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50011, 'Group to check Overview', 0);
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50012, 'Another group to check Overview', 0);
+INSERT INTO hstgrp (groupid, name, type) VALUES (50011, 'Group to check Overview', 0);
+INSERT INTO hstgrp (groupid, name, type) VALUES (50012, 'Another group to check Overview', 0);
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50011, '1_Host_to_check_Monitoring_Overview', '1_Host_to_check_Monitoring_Overview', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50012, '3_Host_to_check_Monitoring_Overview', '3_Host_to_check_Monitoring_Overview', 0, '');
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50013, '4_Host_to_check_Monitoring_Overview', '4_Host_to_check_Monitoring_Overview', 0, '');
@@ -2055,7 +2055,7 @@ INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9046, 'ser
 INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9047, 'Street','dzelzavas', 100065);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99062, 'Host for triggers filtering', 'Host for triggers filtering', 0, '');
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50014,'Group to check triggers filtering',0);
+INSERT INTO hstgrp (groupid, name, type) VALUES (50014,'Group to check triggers filtering',0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99914, 99062, 50014);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50004, 99062, 99061);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (55033, 99062, 1, 1, 1, '127.0.0.1', '', '10050');
@@ -2110,8 +2110,8 @@ INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height)
 INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10002, 1345, 'hostavail', 'Reference HA widget to delete', 0, 3, 6, 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1234, 10002, 2, 'groupids', 0, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1235, 10002, 0, 'layout', 1);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50015,'Group for Host availability widget',0);
-INSERT INTO hstgrp (groupid,name,internal) VALUES (50016,'Group in maintenance for Host availability widget',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50015,'Group for Host availability widget',0);
+INSERT INTO hstgrp (groupid,name,type) VALUES (50016,'Group in maintenance for Host availability widget',0);
 
 INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (5,'Maintenance for Host availability widget',0,'Maintenance for checking Show hosts in maintenance option in Host availability widget',1534971600,2147378400,0);
 INSERT INTO timeperiods (timeperiodid, timeperiod_type, every, month, dayofweek, day, start_time, period, start_date) VALUES (14,0,1,0,0,1,43200,612406800,1534971600);
@@ -2309,7 +2309,7 @@ INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (201, 9003, '
 
 -- testDynamicItemWidgets
 INSERT INTO hosts (hostid, host, name, description) VALUES (99202, 'Dynamic widgets H1', 'Dynamic widgets H1', '');
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50017, 'Dynamic widgets HG1 (H1 and H2)', 0);
+INSERT INTO hstgrp (groupid, name, type) VALUES (50017, 'Dynamic widgets HG1 (H1 and H2)', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99983, 99202, 50017);
 INSERT INTO interface (interfaceid, hostid, main, type) VALUES (55074, 99202, 1, 1);
 INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99103, 2, 99202, 'Dynamic widgets H1I1', 'dynamic[1]', '', '', '', '');
@@ -2361,7 +2361,7 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700051, 7
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700052, 700035, 99105, 1);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99204, 'Dynamic widgets H3', 'Dynamic widgets H3', 0, '');
-INSERT INTO hstgrp (groupid, name, internal) VALUES (50018, 'Dynamic widgets HG2 (H3)', 0);
+INSERT INTO hstgrp (groupid, name, type) VALUES (50018, 'Dynamic widgets HG2 (H3)', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99985, 99204, 50018);
 INSERT INTO interface (interfaceid, hostid, main, type) VALUES (55076, 99204, 1, 1);
 INSERT INTO items (itemid, type, hostid, name, key_, params, description, posts, headers) VALUES (99106, 2, 99204, 'Dynamic widgets H3I1', 'dynamic[1]', '', '', '', '');
