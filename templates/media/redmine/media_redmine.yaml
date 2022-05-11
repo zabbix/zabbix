@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2020-10-16T09:33:50Z'
+  version: '6.0'
+  date: '2022-02-03T16:00:17Z'
   media_types:
     -
       name: Redmine
@@ -70,51 +70,18 @@ zabbix_export:
         
             addCustomFields: function (data, fields) {
                 if (typeof fields === 'object' && Object.keys(fields).length) {
-                    var schema = Redmine.getSchema();
         
-                    if (schema) {
-                        data.issue.custom_fields = [];
+                    data.issue.custom_fields = [];
+                    Object.keys(fields)
+                        .forEach(function (field) {
+                            var field_value = fields[field];
         
-                        Object.keys(fields)
-                            .forEach(function(field) {
-                                for (var idx in schema.custom_fields) {
-                                    if (schema.custom_fields[idx].id != field) {
-                                        continue;
-                                    }
+                            if (field_value !== undefined) {
+                                data.issue.custom_fields.push({ id: field, value: field_value });
+                            }
+                        });
         
-                                    var field_value;
-        
-                                    switch (schema.custom_fields[idx].field_format) {
-                                        case 'string':
-                                            field_value = fields[field];
-                                            break;
-        
-                                        case 'int':
-                                            field_value = parseInt(fields[field]);
-                                            break;
-        
-                                        case 'float':
-                                            field_value = parseFloat(fields[field]);
-                                            break;
-        
-                                        case 'date':
-                                            if (fields[field].match(/^\d{4}[.-]\d{2}[.-]\d{2}$/)) {
-                                                field_value = fields[field].replace(/\./g, '-');
-                                            }
-                                            break;
-                                    }
-        
-                                    if (field_value !== undefined) {
-                                        data.issue.custom_fields.push({id: field, value: field_value});
-                                    }
-                                }
-                            });
-                    }
-                    else {
-                        Zabbix.log(4, '[ Redmine Webhook ] Failed to retrieve field schema.');
-                    }
                 }
-        
                 return data;
             },
         
@@ -219,12 +186,6 @@ zabbix_export:
                 return project_id;
             },
         
-            getSchema: function() {
-                var result = Redmine.request('get', 'custom_fields.json');
-        
-                return result.response;
-            },
-        
             createIssue: function(subject, description, priority, fields) {
                 var project_id = /^\d+$/.test(Redmine.params.project)
                         ? Redmine.params.project
@@ -254,15 +215,20 @@ zabbix_export:
                 return result.response.issue.id;
             },
         
-            updateIssue: function(note, fields) {
+            updateIssue: function (note, fields, status) {
                 var data = {
                     issue: {
                         notes: note || ''
                     }
                 };
         
+                if (status) {
+                    data.issue.status_id = status;
+                }
+        
                 Redmine.request('put', 'issues/' + Redmine.params.issue_key + '.json', Redmine.addCustomFields(data, fields));
             }
+        
         };
         
         try {
@@ -318,6 +284,11 @@ zabbix_export:
                 throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
             }
         
+        
+            if (typeof params_redmine.close_status_id === 'string' && params_redmine.close_status_id.trim() !== '' && !parseInt(params_redmine.close_status_id, 10)) {
+                throw 'Incorrect "redmine_close_status_id" parameter given! Must be an integer.';
+            }
+        
             if (params.event_source !== '0' && params.event_value === '0') {
                 throw 'Recovery operations are supported only for trigger-based actions.';
             }
@@ -362,6 +333,10 @@ zabbix_export:
                 result.tags.__zbx_redmine_issue_id = issue_id;
                 result.tags.__zbx_redmine_issuelink = params.redmine_url +
                     (params.redmine_url.endsWith('/') ? '' : '/') + 'issues/' + issue_id;
+            }
+            // Close issue if parameter close_status_id is set and it is a recovery operation
+            else if (params.event_value === '0' && typeof params_redmine.close_status_id === 'string' && params_redmine.close_status_id.trim() !== '') {
+                Redmine.updateIssue(params.alert_subject + '\n' + params.alert_message, params_fields, params_redmine.close_status_id);
             }
             // Update created issue for trigger-based event.
             else {

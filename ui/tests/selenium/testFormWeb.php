@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -231,7 +231,6 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 64);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
 		}
@@ -244,13 +243,11 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Update interval');
 		$this->zbxTestAssertVisibleId('delay');
 		$this->zbxTestAssertAttribute("//input[@id='delay']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='delay']", 'size', 20);
 		$this->zbxTestAssertElementValue('delay', '1m');
 
 		$this->zbxTestTextPresent('Attempts');
 		$this->zbxTestAssertVisibleId('retries');
 		$this->zbxTestAssertAttribute("//input[@id='retries']", 'maxlength', 2);
-		$this->zbxTestAssertAttribute("//input[@id='retries']", 'size', 20);
 		$this->zbxTestAssertElementValue('retries', 1);
 
 		$this->zbxTestTextPresent('Agent');
@@ -261,7 +258,7 @@ class testFormWeb extends CLegacyWebTest {
 			'Chromium 80 (Linux)', 'Opera 67 (Windows)', 'Opera 67 (Linux)', 'Opera 67 (macOS)', 'Safari 13 (macOS)',
 			'Safari 13 (iPhone)', 'Safari 13 (iPad)', 'Safari 13 (iPod Touch)', 'Zabbix', 'Lynx 2.8.8rel.2', 'Links 2.8',
 			'Googlebot 2.1', 'other ...'];
-		$agent_element = $this->query('id:agent')->asZDropdown()->one();
+		$agent_element = $this->query('id:agent')->asDropdown()->one();
 		$this->assertEquals($agent_element->getOptions()->asText(), $agents);
 
 		$agent_groups = ['Internet Explorer', 'Mozilla Firefox', 'Opera', 'Safari', 'Google Chrome', 'Others'];
@@ -279,7 +276,6 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestTextPresent('HTTP proxy');
 		$this->zbxTestAssertVisibleId('http_proxy');
 		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]');
 
 		$this->zbxTestTextPresent('Variables');
@@ -341,12 +337,10 @@ class testFormWeb extends CLegacyWebTest {
 			$this->zbxTestTextPresent('User');
 			$this->zbxTestAssertVisibleId('http_user');
 			$this->zbxTestAssertAttribute("//input[@id='http_user']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='http_user']", 'size', 20);
 
 			$this->zbxTestTextPresent('Password');
 			$this->zbxTestAssertVisibleId('http_password');
 			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'maxlength', 64);
-			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'size', 20);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User', 'Password'], $this->query('id:authenticationTab')->one());

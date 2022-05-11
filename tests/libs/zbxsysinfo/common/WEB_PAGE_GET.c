@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ CURLcode	__wrap_curl_easy_setopt(CURL *easyhandle, int opt, void *val)
 			req_url = zbx_strdup(req_url, (char*)val);
 			break;
 		case CURLOPT_WRITEFUNCTION:
-			cb_ptr = val;
+			*(void **)(&cb_ptr) = val;
 			break;
 		case CURLOPT_WRITEDATA:
 			page_data = val;

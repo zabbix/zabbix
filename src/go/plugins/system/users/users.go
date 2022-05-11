@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import (
 	"errors"
 	"fmt"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 type Plugin struct {
@@ -32,7 +32,8 @@ type Plugin struct {
 }
 
 type Options struct {
-	Timeout int `conf:"optional,range=1:30"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int `conf:"optional,range=1:30"`
 }
 
 var impl Plugin

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ import (
 	"regexp"
 	"strings"
 
-	"zabbix.com/pkg/metric"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/metric"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/uri"
 )
 
 const (
@@ -47,6 +47,7 @@ const (
 	keyLocks                           = "pgsql.locks"
 	keyOldestXid                       = "pgsql.oldest.xid"
 	keyPing                            = "pgsql.ping"
+	keyQueries                         = "pgsql.queries"
 	keyReplicationCount                = "pgsql.replication.count"
 	keyReplicationLagB                 = "pgsql.replication.lag.b"
 	keyReplicationLagSec               = "pgsql.replication.lag.sec"
@@ -107,7 +108,8 @@ func getHandlerFunc(key string) handlerFunc {
 		return locksHandler
 	case keyOldestXid:
 		return oldestXIDHandler
-
+	case keyQueries:
+		return queriesHandler
 	default:
 		return nil
 	}
@@ -241,6 +243,11 @@ var metrics = metric.MetricSet{
 	keyPing: metric.New("Tests if connection is alive or not.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
 			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+
+	keyQueries: metric.New("Returns queries statistic.",
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase,
+			metric.NewParam("TimePeriod", "Execution time limit for count of slow queries.").SetRequired(),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationCount: metric.New("Returns number of standby servers.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,

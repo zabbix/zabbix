@@ -1,0 +1,952 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:27:51Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 2420a8a4fda74fbc81743aed69fafa3b
+      template: 'Kubernetes Controller manager by HTTP'
+      name: 'Kubernetes Controller manager by HTTP'
+      description: |
+        Get Kubernetes Controller manager metrics by HTTP agent from Prometheus metrics endpoint.
+        
+        Don't forget change macros {$KUBE.API.SERVER.URL}.
+        Some metrics may not be collected depending on your Kubernetes Controller manager instance version and configuration.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 774693b22f844424a93f6a56001c8cba
+          name: 'Kubernetes Controller Manager: REST Client requests: 2xx, rate'
+          type: DEPENDENT
+          key: kubernetes.controller.client_http_requests_200.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of HTTP requests with 2xx status code per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'rest_client_requests_total{code =~ "2.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: rest
+            -
+              tag: http-code
+              value: 2xx
+        -
+          uuid: ace0d156101b481d9f53c3f48e84bd38
+          name: 'Kubernetes Controller Manager: REST Client requests: 3xx, rate'
+          type: DEPENDENT
+          key: kubernetes.controller.client_http_requests_300.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of HTTP requests with 3xx status code per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'rest_client_requests_total{code =~ "3.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: rest
+            -
+              tag: http-code
+              value: 3xx
+        -
+          uuid: c6b67e4330184ca98281773c69925d98
+          name: 'Kubernetes Controller Manager: REST Client requests: 4xx, rate'
+          type: DEPENDENT
+          key: kubernetes.controller.client_http_requests_400.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of HTTP requests with 4xx status code per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'rest_client_requests_total{code =~ "4.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: rest
+            -
+              tag: http-code
+              value: 4xx
+        -
+          uuid: ac6397e9f62749199f857e6c859daa59
+          name: 'Kubernetes Controller Manager: REST Client requests: 5xx, rate'
+          type: DEPENDENT
+          key: kubernetes.controller.client_http_requests_500.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of HTTP requests with 5xx status code per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'rest_client_requests_total{code =~ "5.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: rest
+            -
+              tag: http-code
+              value: 5xx
+          triggers:
+            -
+              uuid: 13c32daebddd454bb5908a9a27c3a76f
+              expression: 'min(/Kubernetes Controller manager by HTTP/kubernetes.controller.client_http_requests_500.rate,5m)>{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}'
+              name: 'Kubernetes Controller Manager: Too many HTTP client errors'
+              event_name: 'Kubernetes Controller Manager: Too many HTTP client errors (over {$KUBE.CONTROLLER.HTTP.CLIENT.ERROR} for 5m)'
+              priority: WARNING
+              description: '"Kubernetes Controller manager is experiencing high error rate (with 5xx HTTP code).'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 6bde8365469f47359fcc5716207b8870
+          name: 'Kubernetes Controller Manager: CPU'
+          type: DEPENDENT
+          key: kubernetes.controller.cpu.util
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Total user and system CPU usage ratio.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_cpu_seconds_total
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '100'
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: c684929ea8444a6aa24f1fb80812a6eb
+          name: 'Kubernetes Controller: Get Controller metrics'
+          type: HTTP_AGENT
+          key: kubernetes.controller.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get raw metrics from Controller instance /metrics endpoint.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          timeout: 15s
+          url: '{$KUBE.CONTROLLER.SERVER.URL}'
+          headers:
+            -
+              name: Authorization
+              value: 'Bearer {$KUBE.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 8e4f98354c89410ebad42af485e3f710
+          name: 'Kubernetes Controller Manager: Goroutines'
+          type: DEPENDENT
+          key: kubernetes.controller.go_goroutines
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of goroutines that currently exist.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - go_goroutines
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: goroutines
+        -
+          uuid: f30ba3d8679b4ffd86a20427892da228
+          name: 'Kubernetes Controller Manager: Go threads'
+          type: DEPENDENT
+          key: kubernetes.controller.go_threads
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of OS threads created.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - go_threads
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: go-threads
+        -
+          uuid: b9ef0724331f4f9da830c470b8e2fea1
+          name: 'Kubernetes Controller Manager: Leader election status'
+          type: DEPENDENT
+          key: kubernetes.controller.leader_election_master_status
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Gauge of if the reporting system is master of the relevant lease, 0 indicates backup, 1 indicates master.'
+          valuemap:
+            name: 'Leader status'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - leader_election_master_status
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: leader
+        -
+          uuid: 5bb0657b329c44e6a7a6dd169551205b
+          name: 'Kubernetes Controller Manager: Fds max'
+          type: DEPENDENT
+          key: kubernetes.controller.max_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum allowed open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_max_fds
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: fds
+        -
+          uuid: 43698df9a76c410792f0fdb9d41ee42c
+          name: 'Kubernetes Controller Manager: Fds open'
+          type: DEPENDENT
+          key: kubernetes.controller.open_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_open_fds
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: fds
+        -
+          uuid: 7497f4f8d1d8422dad301d9d25b42150
+          name: 'Kubernetes Controller Manager: Resident memory, bytes'
+          type: DEPENDENT
+          key: kubernetes.controller.process_resident_memory_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Resident memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_resident_memory_bytes
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 884a7a4de05548ffbdf14629bbe5d181
+          name: 'Kubernetes Controller Manager: Virtual memory, bytes'
+          type: DEPENDENT
+          key: kubernetes.controller.process_virtual_memory_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Virtual memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_virtual_memory_bytes
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.controller.get_metrics
+          tags:
+            -
+              tag: component
+              value: memory
+      discovery_rules:
+        -
+          uuid: 3117060c51564c2e897e3194821b137f
+          name: 'Workqueue metrics discovery'
+          type: DEPENDENT
+          key: kubernetes.controller.workqueue.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: 70277a128a254462ad0bf7a023738ba0
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue duration seconds bucket, {#LE}'
+              type: DEPENDENT
+              key: 'kubernetes.controller.duration_seconds_bucket[{#LE},"{#NAME}"]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              description: 'How long in seconds processing an item from workqueue takes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'workqueue_work_duration_seconds_bucket{name = "{#NAME}",le = "{#LE}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.controller.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 8357905c82ea42b98d686eee2d9c35f6
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Queue duration seconds bucket, {#LE}'
+              type: DEPENDENT
+              key: 'kubernetes.controller.queue_duration_seconds_bucket[{#LE},"{#NAME}"]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              description: 'How long in seconds an item stays in workqueue before being requested.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'workqueue_queue_duration_seconds_bucket{name = "{#NAME}",le = "{#LE}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.controller.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 940dc936417849c7aed7ae824883fdaf
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue adds total, rate'
+              type: DEPENDENT
+              key: 'kubernetes.controller.workqueue_adds_total["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              description: 'Total number of adds handled by workqueue per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'workqueue_adds_total{name = "{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: kubernetes.controller.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 7edfab667cdf41908bd551c0a25e4adc
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue depth'
+              type: DEPENDENT
+              key: 'kubernetes.controller.workqueue_depth["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              description: 'Current depth of workqueue.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'workqueue_depth{name = "{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.controller.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 9a510f3b3d3547c1817b72e38340ccd2
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue longest running processor, sec'
+              type: DEPENDENT
+              key: 'kubernetes.controller.workqueue_longest_running_processor_seconds["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              description: 'How many seconds has the longest running processor for workqueue been running.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'workqueue_longest_running_processor_seconds{name = "{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.controller.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 0657d0741d5649a2b0ad87c2f39dc243
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue queue duration, 50p'
+              type: CALCULATED
+              key: 'kubernetes.controller.workqueue_queue_duration_seconds_p50["{#NAME}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,"{#NAME}"],5m,50)'
+              description: '50 percentile of how long in seconds an item stays in workqueue before being requested. If there are no requests for 5 minute, item value will be discarded.'
+              preprocessing:
+                -
+                  type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 9f976d181b7f4776a271e683d9efd396
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue queue duration, p90'
+              type: CALCULATED
+              key: 'kubernetes.controller.workqueue_queue_duration_seconds_p90["{#NAME}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,"{#NAME}"],5m,90)'
+              description: '90 percentile of how long in seconds an item stays in workqueue before being requested, by queue.'
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: ce4b9daa161742ffb6fec0790c1dc689
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue queue duration, p95'
+              type: CALCULATED
+              key: 'kubernetes.controller.workqueue_queue_duration_seconds_p95["{#NAME}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,"{#NAME}"],5m,95)'
+              description: '95 percentile of how long in seconds an item stays in workqueue before being requested, by queue.'
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 61d5f616cc474ae3adfcbd1a15fdd607
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue queue duration, p99'
+              type: CALCULATED
+              key: 'kubernetes.controller.workqueue_queue_duration_seconds_p99["{#NAME}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.controller.queue_duration_seconds_bucket[*,"{#NAME}"],5m,99)'
+              description: '99 percentile of how long in seconds an item stays in workqueue before being requested, by queue.'
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: a4e25b0e8cd340d48e098b89ffcdd49a
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue retries, rate'
+              type: DEPENDENT
+              key: 'kubernetes.controller.workqueue_retries_total["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              description: 'Total number of retries handled by workqueue per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'workqueue_retries_total{name = "{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: kubernetes.controller.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: e230e1573f4042b088a8a4b2e3998d43
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue unfinished work, sec'
+              type: DEPENDENT
+              key: 'kubernetes.controller.workqueue_unfinished_work_seconds["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              description: 'How many seconds of work has done that is in progress and hasn''t been observed by work_duration. Large values indicate stuck threads. One can deduce the number of stuck threads by observing the rate at which this increases.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'workqueue_unfinished_work_seconds{name = "{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.controller.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 68efc8bc4fec458384e21b7b19db696c
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue work duration, 50p'
+              type: CALCULATED
+              key: 'kubernetes.controller.workqueue_work_duration_seconds_p50["{#NAME}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,"{#NAME}"],5m,50)'
+              description: '50 percentiles of how long in seconds processing an item from workqueue takes, by queue.'
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: ff4f4b222dfd47f69b96513fed4393f5
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue work duration, p90'
+              type: CALCULATED
+              key: 'kubernetes.controller.workqueue_work_duration_seconds_p90["{#NAME}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,"{#NAME}"],5m,90)'
+              description: '90 percentile of how long in seconds processing an item from workqueue takes, by queue.'
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 34a688601a404d63aea3a774a9f5970a
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue work duration, p95'
+              type: CALCULATED
+              key: 'kubernetes.controller.workqueue_work_duration_seconds_p95["{#NAME}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,"{#NAME}"],5m,95)'
+              description: '95 percentile of how long in seconds processing an item from workqueue takes, by queue.'
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: e5b4ea49906e4a12b01757854a5766a4
+              name: 'Kubernetes Controller Manager: ["{#NAME}"]: Workqueue work duration, p99'
+              type: CALCULATED
+              key: 'kubernetes.controller.workqueue_work_duration_seconds_p99["{#NAME}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.controller.duration_seconds_bucket[*,"{#NAME}"],5m,99)'
+              description: '99 percentile of how long in seconds processing an item from workqueue takes, by queue.'
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+          graph_prototypes:
+            -
+              uuid: 40113b2f3fe04e9dbfd4d6dc204be7ce
+              name: 'Kubernetes Controller Manager: ["{#NAME}"] Workqueue add rate'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_adds_total["{#NAME}"]'
+            -
+              uuid: 99bd6b4904964738a2ba7f165cc78d9c
+              name: 'Kubernetes Controller Manager: ["{#NAME}"] Workqueue depth'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_depth["{#NAME}"]'
+            -
+              uuid: 4f823f87056b42d29a284f8e2614b76f
+              name: 'Kubernetes Controller Manager: ["{#NAME}"] Workqueue latency'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_queue_duration_seconds_p95["{#NAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_queue_duration_seconds_p99["{#NAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_queue_duration_seconds_p90["{#NAME}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_queue_duration_seconds_p50["{#NAME}"]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_work_duration_seconds_p95["{#NAME}"]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_work_duration_seconds_p99["{#NAME}"]'
+                -
+                  sortorder: '6'
+                  color: AC8C14
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_work_duration_seconds_p90["{#NAME}"]'
+                -
+                  sortorder: '7'
+                  color: 611F27
+                  item:
+                    host: 'Kubernetes Controller manager by HTTP'
+                    key: 'kubernetes.controller.workqueue_work_duration_seconds_p50["{#NAME}"]'
+          master_item:
+            key: kubernetes.controller.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~ "workqueue_*", name =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      if (item.name === 'workqueue_adds_total') {
+                          var label_name = item.labels.name;
+                  
+                          if (lookup[label_name]) {
+                              return;
+                          }
+                          lookup[label_name] = 1;
+                          result.push({
+                              '{#TYPE}': 'totals',
+                              '{#NAME}': label_name
+                          });
+                      }
+                      else if  (item.name === 'workqueue_work_duration_seconds_bucket') {
+                          result.push({
+                              '{#TYPE}': 'buckets',
+                              '{#NAME}': item.labels.name,
+                              '{#LE}': item.labels.le
+                          });
+                      }
+                  });
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          overrides:
+            -
+              name: 'bucket item'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: buckets
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: 'total item'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: totals
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: 'kubernetes controller manager'
+      macros:
+        -
+          macro: '{$KUBE.API.TOKEN}'
+          description: 'API Authorization Token'
+        -
+          macro: '{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}'
+          value: '2'
+          description: 'Maximum number of HTTP client requests failures used for trigger'
+        -
+          macro: '{$KUBE.CONTROLLER.SERVER.URL}'
+          value: 'http://localhost:10252/metrics'
+          description: 'Instance URL'
+      valuemaps:
+        -
+          uuid: fa1732213d27418a88a61c964d93e9d7
+          name: 'Leader status'
+          mappings:
+            -
+              value: '0'
+              newvalue: backup
+            -
+              value: '1'
+              newvalue: master
+  graphs:
+    -
+      uuid: 23af35d1d9af40e2ace1915ab8df7eec
+      name: 'Kubernetes Controller Manager: Memory usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Kubernetes Controller manager by HTTP'
+            key: kubernetes.controller.process_virtual_memory_bytes
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Kubernetes Controller manager by HTTP'
+            key: kubernetes.controller.process_resident_memory_bytes
+    -
+      uuid: 908af34b10044af9b028e5e024eb89b3
+      name: 'Kubernetes Controller Manager: REST Client query rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Kubernetes Controller manager by HTTP'
+            key: kubernetes.controller.client_http_requests_500.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Kubernetes Controller manager by HTTP'
+            key: kubernetes.controller.client_http_requests_400.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Kubernetes Controller manager by HTTP'
+            key: kubernetes.controller.client_http_requests_300.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Kubernetes Controller manager by HTTP'
+            key: kubernetes.controller.client_http_requests_200.rate

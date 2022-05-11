@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,9 @@ class CScript extends CApiService {
 	/**
 	 * Fields from "actions" table. Used in get() validation and addRelatedObjects() when selecting action fields.
 	 */
-	private $action_fields = ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed'];
+	private $action_fields = ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed',
+		'notify_if_canceled'
+	];
 
 	/**
 	 * This property, if filled out, will contain all hostrgroup ids
@@ -557,7 +559,7 @@ class CScript extends CApiService {
 			if ($script['scope'] != $db_script['scope'] && $script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
 				$script['menu_path'] = '';
 				$script['usrgrpid'] = 0;
-				$script['host_access'] = DB::getDefault('scripts', 'host_access');;
+				$script['host_access'] = DB::getDefault('scripts', 'host_access');
 				$script['confirmation'] = '';
 			}
 
@@ -1186,7 +1188,9 @@ class CScript extends CApiService {
 
 		$group_search_names = [];
 		foreach ($result as $script) {
-			$has_write_access_level |= ($script['host_access'] == PERM_READ_WRITE);
+			if ($script['host_access'] == PERM_READ_WRITE) {
+				$has_write_access_level = true;
+			}
 
 			// If any script belongs to all host groups.
 			if ($script['groupid'] == 0) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,8 +38,6 @@
 #define ZBX_MULTIPART_MIXED_BOUNDARY	"MULTIPART-MIXED-BOUNDARY"
 
 /******************************************************************************
- *                                                                            *
- * Function: str_base64_encode_rfc2047                                        *
  *                                                                            *
  * Purpose: Encode a string into a base64 string as required by rfc2047.      *
  *          Used for encoding e-mail headers.                                 *
@@ -121,8 +119,6 @@ static int	smtp_readln(zbx_socket_t *s, const char **buf)
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: smtp_parse_mailbox                                                 *
  *                                                                              *
  * Purpose: 1. Extract a display name and an angle address from mailbox string  *
  *             for using in "MAIL FROM:", "RCPT TO:", "From:" and "To:" fields. *
@@ -794,8 +790,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_mailaddr_free                                                *
  *                                                                            *
  * Purpose: frees the mail address object                                     *
  *                                                                            *

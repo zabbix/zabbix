@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ class CFormElement extends CElement {
 			}
 
 			if ($labels->count() > 1) {
-				CTest::addWarning('Form label "'.$name.'" is not unique.');
+				CTest::zbxAddWarning('Form label "'.$name.'" is not unique.');
 			}
 		}
 
@@ -285,6 +285,15 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Get tabs from form.
+	 *
+	 * @return CElementCollection
+	 */
+	public function getTabs() {
+		return $this->query("xpath:.//li[@role='tab']")->all()->asText();
+	}
+
+	/**
 	 * Switch to tab by tab name.
 	 *
 	 * @return $this
@@ -361,9 +370,14 @@ class CFormElement extends CElement {
 
 				foreach ($values as $name => $value) {
 					$xpath = './/*[@id='.CXPathHelper::escapeQuotes($name).' or @name='.CXPathHelper::escapeQuotes($name).']';
-					$container->query('xpath', $xpath)->one()->detect()->fill($value);
+					$this->setUTFValue($container->query('xpath', $xpath)->one()->detect(), $value);
 				}
 			}
+
+			return $this;
+		}
+		elseif ($values instanceof \Closure) {
+			$values($this, $field, $element);
 
 			return $this;
 		}
@@ -372,9 +386,24 @@ class CFormElement extends CElement {
 			return $this;
 		}
 
-		$element->fill($values);
+		$this->setUTFValue($element, $values);
 
 		return $this;
+	}
+
+	/**
+	 * Function for utf8mb4 values detection and filling.
+	 *
+	 * @param CElement $element   element to be filled
+	 * @param string   $value     value to be filled in
+	 */
+	protected function setUTFValue($element, $value) {
+		if (!is_array($value) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $value) === 1) {
+			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
+		}
+		else {
+			$element->fill($value);
+		}
 	}
 
 	/**
@@ -473,5 +502,21 @@ class CFormElement extends CElement {
 			CExceptionHelper::setMessage($exception, 'Failed to check value of field "'.$field.'":' . "\n" . $exception->getMessage());
 			throw $exception;
 		}
+	}
+
+	/**
+	 * Wait for form reload after form element select.
+	 *
+	 * @param string $value		text to be written into the field
+	 *
+	 * @return Closure
+	 */
+	public static function RELOADABLE_FILL($value) {
+		return function ($form, $field, $element) use ($value) {
+			if (!($element instanceof CDropdownElement) || $element->getText() !== $value) {
+				$element->fill($value);
+				$form->waitUntilReloaded();
+			}
+		};
 	}
 }

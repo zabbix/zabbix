@@ -1,0 +1,53 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:42Z'
+  groups:
+    -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    -
+      uuid: 22c53db48be0472cb97209c74418cf16
+      template: 'NNTP Service'
+      name: 'NNTP Service'
+      description: |
+        Template module for monitoring NNTP service
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: 4ac15acb2a1f488eb56088c6f963d1c7
+          name: 'NNTP service is running'
+          type: SIMPLE
+          key: 'net.tcp.service[nntp]'
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: f549234088cb4d1981c72eae82665f56
+              expression: 'max(/NNTP Service/net.tcp.service[nntp],#3)=0'
+              name: 'NNTP service is down on {HOST.NAME}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      valuemaps:
+        -
+          uuid: e0acc1611fcf43e38d6d1de761c48409
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up

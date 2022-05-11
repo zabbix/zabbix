@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,21 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zabbix_stats.h"
+
 #include "common.h"
-#include "zbxjson.h"
 #include "dbcache.h"
 #include "valuecache.h"
-#include "preproc.h"
 #include "zbxlld.h"
 #include "log.h"
 #include "zbxtrends.h"
 #include "zbxha.h"
 
-#include "zabbix_stats.h"
-
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_zabbix_stats_ext                                         *
  *                                                                            *
  * Purpose: get program type (server) specific internal statistics            *
  *                                                                            *
@@ -47,7 +43,6 @@ void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
 	zbx_uint64_t		queue_size;
 	char			*value, *error = NULL;
 	zbx_tfc_stats_t		tcache_stats;
-
 
 	/* zabbix[lld_queue] */
 	if (SUCCEED == zbx_lld_get_queue_size(&queue_size, &error))

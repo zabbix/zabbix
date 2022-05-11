@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -696,6 +696,7 @@ class CConfigurationImport {
 
 		$items_to_create = [];
 		$items_to_update = [];
+		$levels = [];
 
 		foreach ($this->getFormattedItems() as $host => $items) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
@@ -709,6 +710,7 @@ class CConfigurationImport {
 			foreach ($order_tree[$host] as $item_key => $level) {
 				$item = $items[$item_key];
 				$item['hostid'] = $hostid;
+				$levels[$level] = true;
 
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $item['interface_ref']);
@@ -803,12 +805,14 @@ class CConfigurationImport {
 			}
 		}
 
-		if ($this->options['items']['updateExisting'] && $items_to_update) {
-			$this->updateItemsWithDependency($items_to_update, $master_item_key, API::Item());
-		}
-
-		if ($this->options['items']['createMissing'] && $items_to_create) {
-			$this->createItemsWithDependency($items_to_create, $master_item_key, API::Item());
+		ksort($levels);
+		foreach (array_keys($levels) as $level) {
+			if ($this->options['items']['updateExisting'] && array_key_exists($level, $items_to_update)) {
+				$this->updateItemsWithDependency([$items_to_update[$level]], $master_item_key, API::Item());
+			}
+			if ($this->options['items']['createMissing'] && array_key_exists($level, $items_to_create)) {
+				$this->createItemsWithDependency([$items_to_create[$level]], $master_item_key, API::Item());
+			}
 		}
 
 		// Refresh items because templated ones can be inherited to host and used in triggers, graphs, etc.
@@ -1067,7 +1071,7 @@ class CConfigurationImport {
 		$item_prototypes_to_create = [];
 		$host_prototypes_to_update = [];
 		$host_prototypes_to_create = [];
-		$ex_group_prototypes_where = [];
+		$levels = [];
 
 		foreach ($discovery_rules_by_hosts as $host => $discovery_rules) {
 			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
@@ -1086,6 +1090,7 @@ class CConfigurationImport {
 				foreach ($item_prototypes as $index => $level) {
 					$item_prototype = $discovery_rule['item_prototypes'][$index];
 					$item_prototype['hostid'] = $hostid;
+					$levels[$level] = true;
 
 					if (array_key_exists('interface_ref', $item_prototype) && $item_prototype['interface_ref']) {
 						$interfaceid = $this->referencer->findInterfaceidByRef($hostid,
@@ -1246,14 +1251,6 @@ class CConfigurationImport {
 						);
 
 					if ($host_prototypeid !== null) {
-						if ($host_prototype['groupPrototypes']) {
-							$ex_group_prototypes_where[] = '('.dbConditionInt('hostid', [$host_prototypeid]).
-								' AND '.dbConditionString('name',
-									array_column($host_prototype['groupPrototypes'], 'name')
-								).
-							')';
-						}
-
 						if (array_key_exists('macros', $host_prototype)) {
 							foreach ($host_prototype['macros'] as &$macro) {
 								$hostmacroid = $this->referencer->findHostPrototypeMacroid($host_prototypeid,
@@ -1279,45 +1276,18 @@ class CConfigurationImport {
 			}
 		}
 
-		// Attach existing host group prototype ids.
-		if ($ex_group_prototypes_where) {
-			$db_group_prototypes = DBFetchArray(DBselect(
-				'SELECT group_prototypeid,name,hostid'.
-					' FROM group_prototype'.
-					' WHERE '.implode(' OR ', $ex_group_prototypes_where)
-			));
-
-			if ($db_group_prototypes) {
-				$groups_hash = [];
-				foreach ($db_group_prototypes as $group) {
-					$groups_hash[$group['hostid']][$group['name']] = $group['group_prototypeid'];
-				}
-
-				foreach ($host_prototypes_to_update as &$host_prototype) {
-					if (!array_key_exists($host_prototype['hostid'], $groups_hash)) {
-						continue;
-					}
-
-					$hash = $groups_hash[$host_prototype['hostid']];
-					foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
-						if (array_key_exists($group_prototype['name'], $hash)) {
-							$group_prototype['group_prototypeid'] = $hash[$group_prototype['name']];
-						}
-					}
-					unset($group_prototype, $hash);
-				}
-				unset($host_prototype, $groups_hash);
+		ksort($levels);
+		foreach (array_keys($levels) as $level) {
+			if (array_key_exists($level, $item_prototypes_to_update) && $item_prototypes_to_update[$level]) {
+				$this->updateItemsWithDependency([$item_prototypes_to_update[$level]], $master_item_key,
+					API::ItemPrototype()
+				);
 			}
-		}
-
-		if ($item_prototypes_to_update) {
-			ksort($item_prototypes_to_update);
-			$this->updateItemsWithDependency($item_prototypes_to_update, $master_item_key, API::ItemPrototype());
-		}
-
-		if ($item_prototypes_to_create) {
-			ksort($item_prototypes_to_create);
-			$this->createItemsWithDependency($item_prototypes_to_create, $master_item_key, API::ItemPrototype());
+			if (array_key_exists($level, $item_prototypes_to_create) && $item_prototypes_to_create[$level]) {
+				$this->createItemsWithDependency([$item_prototypes_to_create[$level]], $master_item_key,
+					API::ItemPrototype()
+				);
+			}
 		}
 
 		if ($host_prototypes_to_update) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func databasesDiscoveryHandler(ctx context.Context, conn MyClient, _ map[string]string,

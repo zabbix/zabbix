@@ -1336,7 +1336,7 @@ in:
     some_user{country="lv",addr="user1@domain.com"} 1
     some_user{country="lv",addr="user2@domain.org"} 2
     some_user{country="lv",addr="no_valid_addr"} 2
-  params: some_user{country="lv",addr=~"^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"}
+  params: some_user{country="lv",addr=~"^[-\\w\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"}
 out:
   result: SUCCEED
   metrics:

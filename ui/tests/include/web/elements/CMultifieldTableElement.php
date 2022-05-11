@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -493,8 +493,8 @@ class CMultifieldTableElement extends CTableElement {
 
 			foreach ($values as $key => $value) {
 				// Elements with predefined values are always ignored.
-				if (in_array(CTestArrayHelper::get($fields, $key), [CDropdownElement::class, CCheckboxElement::class,
-						CRadioButtonList::class, CSegmentedRadioElement::class])) {
+				if (in_array(CTestArrayHelper::get($fields, $key), [CCheckboxElement::class, CRadioButtonList::class,
+						CSegmentedRadioElement::class])) {
 					continue;
 				}
 

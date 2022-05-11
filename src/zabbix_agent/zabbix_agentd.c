@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,16 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
-
-#include "cfg.h"
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "comms.h"
 #include "modbtype.h"
-
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAMES		= NULL;
@@ -300,7 +295,7 @@ int	CONFIG_ALERTDB_FORKS		= 0;
 int	CONFIG_HISTORYPOLLER_FORKS	= 0;
 int	CONFIG_AVAILMAN_FORKS		= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 0;
-int	CONFIG_PROBLEMHOUSEKEEPER_FORKS = 0;
+int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 0;
 
 char	*opt = NULL;
 
@@ -366,7 +361,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->data))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, &t->data))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
@@ -470,7 +465,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* Option 'c' is always optional.	*/
 	/*   p  t  i  d  s  x  m    opt_mask	*/
 	/* ---------------------    --------	*/
-	/*   -  -  -  -  -  -  - 	0x00	*/
+	/*   -  -  -  -  -  -  -	0x00	*/
 	/*   p  -  -  -  -  -  -	0x40	*/
 	/*   -  t  -  -  -  -  -	0x20	*/
 	/*   -  -  i  -  -  -  -	0x10	*/
@@ -554,11 +549,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: set_defaults                                                     *
- *                                                                            *
  * Purpose: set configuration defaults                                        *
- *                                                                            *
- * Author: Vladimir Levijev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
 static void	set_defaults(void)
@@ -620,8 +611,6 @@ static void	set_defaults(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_validate_config_hostnames                                    *
- *                                                                            *
  * Purpose: validate listed host names                                        *
  *                                                                            *
  ******************************************************************************/
@@ -650,11 +639,7 @@ static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_validate_config                                              *
- *                                                                            *
  * Purpose: validate configuration parameters                                 *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
@@ -686,8 +671,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer than"
-				" %d characters", HOST_INTERFACE_LEN);
+		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer"
+				" than %d characters", HOST_INTERFACE_LEN);
 		err = 1;
 	}
 
@@ -794,8 +779,6 @@ static void	parse_hostnames(const char *hostname_param, zbx_vector_str_t *hostna
 
 /******************************************************************************
  *                                                                            *
- * Function: load_enable_remote_commands                                      *
- *                                                                            *
  * Purpose: aliases EnableRemoteCommands parameter to                         *
  *          Allow/DenyKey=system.run[*]                                       *
  *                                                                            *
@@ -826,8 +809,6 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_load_config                                                  *
- *                                                                            *
  * Purpose: load configuration from config file                               *
  *                                                                            *
  * Parameters: requirement - produce error if config file missing or not      *
@@ -835,8 +816,9 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
  ******************************************************************************/
 static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
-	static char		*active_hosts;
-	zbx_vector_str_t	hostnames;
+	static char			*active_hosts;
+	zbx_vector_str_t		hostnames;
+	cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
 
 	struct cfg_line	cfg[] =
 	{
@@ -888,7 +870,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{"EnableRemoteCommands",	&load_enable_remote_commands,		TYPE_CUSTOM,
+		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	TYPE_CUSTOM,
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
 			PARM_OPT,	0,			1},
@@ -948,14 +930,17 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSCipherAll",		&CONFIG_TLS_CIPHER_ALL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"AllowKey",			load_key_access_rule,			TYPE_CUSTOM,
+		{"AllowKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
-		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM,
+		{"DenyKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
+
+	parser_load_enable_remove_commands.cfg_custom_parameter_parser_func = load_enable_remote_commands;
+	parser_load_key_access_rule.cfg_custom_parameter_parser_func = load_key_access_rule;
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
@@ -1007,11 +992,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_free_config                                                  *
- *                                                                            *
  * Purpose: free configuration memory                                         *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_free_config(void)
@@ -1276,8 +1257,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_free_service_resources                                       *
- *                                                                            *
  * Purpose: free service resources allocated by main thread                   *
  *                                                                            *
  ******************************************************************************/
@@ -1285,7 +1264,7 @@ void	zbx_free_service_resources(int ret)
 {
 	if (NULL != threads)
 	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
+		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */
 		zbx_free(threads);
 		zbx_free(threads_flags);
 	}

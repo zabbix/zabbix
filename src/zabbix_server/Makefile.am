@@ -39,9 +39,7 @@ libzbxserver_a_SOURCES = \
 	operations.c \
 	operations.h \
 	postinit.c \
-	postinit.h \
-	rtc.c \
-	rtc.h
+	postinit.h
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \
@@ -116,9 +114,13 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_builddir)/src/libs/zbxdiag/libzbxdiag_server.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_builddir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver_server.a \
 	$(top_builddir)/src/libs/zbxha/libzbxha.a \
+	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
+	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_server.a \
+	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \

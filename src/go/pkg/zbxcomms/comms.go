@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import (
 	"net"
 	"time"
 
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/tls"
 )
 
@@ -81,7 +81,7 @@ func open(address string, localAddr *net.Addr, timeout time.Duration, connect_ti
 			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
 		}
 		if tlsconfig != nil {
-			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout, timeoutMode == TimeoutModeShift)
+			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout, timeoutMode == TimeoutModeShift, address)
 		}
 	}
 	return

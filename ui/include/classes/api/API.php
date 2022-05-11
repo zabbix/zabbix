@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -372,6 +372,13 @@ class API {
 	 */
 	public static function Service() {
 		return self::getApi('service');
+	}
+
+	/**
+	 * @return CSla
+	 */
+	public static function Sla() {
+		return self::getApi('sla');
 	}
 
 	/**

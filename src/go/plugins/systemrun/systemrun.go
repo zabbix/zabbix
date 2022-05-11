@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,16 +23,16 @@ import (
 	"fmt"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxcmd"
 )
 
 type Options struct {
-	Timeout           int `conf:"optional,range=1:30"`
-	Capacity          int `conf:"optional,range=1:100"`
-	LogRemoteCommands int `conf:"optional,range=0:1,default=0"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int `conf:"optional,range=1:30"`
+	LogRemoteCommands    int `conf:"optional,range=0:1,default=0"`
 }
 
 // Plugin -

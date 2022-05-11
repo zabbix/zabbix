@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
-#include "dbcache.h"
+#include "active.h"
+
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -27,13 +26,9 @@
 
 #include "../../libs/zbxcrypto/tls_tcp_active.h"
 
-#include "active.h"
-
 extern unsigned char	program_type;
 
 /******************************************************************************
- *                                                                            *
- * Function: db_register_host                                                 *
  *                                                                            *
  * Purpose: perform active agent auto registration                            *
  *                                                                            *
@@ -140,8 +135,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_hostid_by_host                                               *
- *                                                                            *
  * Purpose: check for host name and return hostid                             *
  *                                                                            *
  * Parameters: sock          - [IN] open socket of server-agent connection    *
@@ -156,8 +149,6 @@ out:
  *                                                                            *
  * Return value:  SUCCEED - host is found                                     *
  *                FAIL - an error occurred or host not found                  *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  * Comments: NB! adds host to the database if it does not exist or if it      *
  *           exists but metadata, interface, interface type or port has       *
@@ -341,8 +332,6 @@ static void	get_list_of_active_checks(zbx_uint64_t hostid, zbx_vector_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: send_list_of_active_checks                                       *
- *                                                                            *
  * Purpose: send list of active checks to the host (older version agent)      *
  *                                                                            *
  * Parameters: sock - open socket of server-agent connection                  *
@@ -452,8 +441,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_vector_str_append_uniq                                       *
- *                                                                            *
  * Purpose: append non duplicate string to the string vector                  *
  *                                                                            *
  * Parameters: vector - [IN/OUT] the string vector                            *
@@ -467,8 +454,6 @@ static void	zbx_vector_str_append_uniq(zbx_vector_str_t *vector, const char *str
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_itemkey_extract_global_regexps                               *
  *                                                                            *
  * Purpose: extract global regular expression names from item key             *
  *                                                                            *
@@ -522,8 +507,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: send_list_of_active_checks_json                                  *
- *                                                                            *
  * Purpose: send list of active checks to the host                            *
  *                                                                            *
  * Parameters: sock - open socket of server-agent connection                  *
@@ -531,8 +514,6 @@ out:
  *                                                                            *
  * Return value:  SUCCEED - list of active checks sent successfully           *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
@@ -542,8 +523,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	struct zbx_json		json;
 	int			ret = FAIL, i, version;
 	zbx_uint64_t		hostid;
-	size_t			host_metadata_alloc = 1;	/* for at least NUL-termination char */
-	size_t			interface_alloc = 1;		/* for at least NUL-termination char */
+	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminated string */
+	size_t			interface_alloc = 1;		/* for at least NUL-terminated string */
 	size_t			buffer_size, reserved = 0;
 	unsigned short		port;
 	zbx_vector_uint64_t	itemids;
@@ -655,7 +636,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
-
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
 			substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL,
 					MACRO_TYPE_ITEM_KEY, NULL, 0);
@@ -670,6 +650,11 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 					zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY_ORIG,
 							dc_items[i].key_orig, ZBX_JSON_TYPE_STRING);
 				}
+
+				/* in the case scheduled/flexible interval set delay to 0 causing */
+				/* 'Incorrect update interval' error in agent                     */
+				if (NULL != strchr(dc_items[i].delay, ';'))
+					delay = 0;
 
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_DELAY, delay);
 			}

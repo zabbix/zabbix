@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,20 +18,7 @@
 **/
 
 #include "configcache.h"
-
-#include "zbxmocktest.h"
-#include "zbxmockdata.h"
-#include "zbxmockassert.h"
-#include "zbxmockutil.h"
-
-#include "zbxserver.h"
-#include "common.h"
-#include "zbxalgo.h"
-#include "dbcache.h"
-#include "mutexs.h"
-
-#define ZBX_DBCONFIG_IMPL
-#include "dbconfig.h"
+#include "configcache_mock.h"
 
 zbx_mock_config_t	mock_config;
 
@@ -44,6 +31,13 @@ void	mock_config_free_hosts(void);
 void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 {
 	int	i;
+
+	if (&mock_config.dc.items == hs)
+	{
+		static ZBX_DC_ITEM	item = {.hostid = 1};
+
+		return &item;
+	}
 
 	if (0 != (mock_config.initialized & ZBX_MOCK_CONFIG_USERMACROS))
 	{

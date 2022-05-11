@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -289,7 +289,7 @@ class CUser extends CApiService {
 	 */
 	private function validateCreate(array &$users) {
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
-		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones()));
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys(CTimezoneHelper::getList()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['username'], ['alias']], 'fields' => [
@@ -443,7 +443,7 @@ class CUser extends CApiService {
 	 */
 	private function validateUpdate(array &$users, array &$db_users = null) {
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
-		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys((new CDateTimeZoneHelper())->getAllDateTimeZones()));
+		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys(CTimezoneHelper::getList()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['userid'], ['alias'], ['username']], 'fields' => [
@@ -1633,9 +1633,7 @@ class CUser extends CApiService {
 	public function loginByUsername($username, $case_sensitive = null, $default_auth = null) {
 		// Check whether the method is called via an API call or from a local php file.
 		if ($case_sensitive === null || $default_auth === null) {
-			return self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect method "%1$s.%2$s".', 'user', 'loginByUsername')
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect method "%1$s.%2$s".', 'user', 'loginByUsername'));
 		}
 
 		$user_data = $this->findAccessibleUser($username, $case_sensitive, $default_auth, false);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #ifndef ZABBIX_DISK_H
 #define ZABBIX_DISK_H
+
+#include "config.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #	error "This module is only available for Windows OS"

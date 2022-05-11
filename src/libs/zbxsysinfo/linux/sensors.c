@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,8 +77,6 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 
 #ifndef KERNEL_2_4
 /*********************************************************************************
- *                                                                               *
- * Function: sysfs_read_attr                                                     *
  *                                                                               *
  * Purpose: locate and read the name attribute of a sensor from sysfs            *
  *                                                                               *

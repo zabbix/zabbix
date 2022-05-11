@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:17Z'
+  version: '6.0'
+  date: '2022-04-13T21:49:37Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get Etcd metrics by HTTP agent.
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -41,16 +41,21 @@ zabbix_export:
             key: etcd.get_version
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: application
           triggers:
             -
               uuid: 7c87424c4fb34c56bc9b976755b4ec02
               expression: 'last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0'
-              name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
+              name: 'Etcd: Cluster version has changed'
+              event_name: 'Etcd: Cluster version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Etcd version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 04b0fa552b7d4267b4c5b67ee82ef5f1
           name: 'Etcd: CPU'
@@ -66,6 +71,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_cpu_seconds_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -75,8 +81,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: cpu
         -
           uuid: bfa5bd42637642808802f7b2485a0c4d
           name: 'Etcd: DB size'
@@ -92,13 +98,14 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_db_total_size_in_bytes
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: database
         -
           uuid: a5bc7ffb090641ab92f537b38b6055e5
           name: 'Etcd: Deletes per second'
@@ -114,6 +121,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_delete_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -123,8 +131,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: operations
         -
           uuid: 183843bd93f84dc887a03fb638b2d323
           name: 'Etcd: Pending events'
@@ -138,13 +146,14 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_pending_events_total
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: events
         -
           uuid: 34ffab33275a400ab88e5217dee5ef96
           name: 'Etcd: Get node metrics'
@@ -159,8 +168,8 @@ zabbix_export:
           url: '{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/metrics'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: fdf7593420ab42b2a5af8f8b8030b517
           name: 'Etcd: Get version'
@@ -172,8 +181,8 @@ zabbix_export:
           url: '{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/version'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: application
         -
           uuid: d23baf75628043e193ba0a607e1b4215
           name: 'Etcd: RPCs received per second'
@@ -205,8 +214,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: grpc
         -
           uuid: eda81182710e47e1b5f2f21bb05b4775
           name: 'Etcd: RPCs sent per second'
@@ -238,8 +247,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: grpc
         -
           uuid: bf59a130b20d480d93eb9330750e8e28
           name: 'Etcd: RPCs started per second'
@@ -271,8 +280,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: grpc
         -
           uuid: e03575f4c472410eb6fbcf731ac6aab2
           name: 'Etcd: Server has a leader'
@@ -288,6 +297,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_has_leader
+                - value
                 - ''
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -297,15 +307,19 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: leader
           triggers:
             -
               uuid: 20165719d521453bb239d818ac57805c
               expression: 'last(/Etcd by HTTP/etcd.has.leader)=0'
               name: 'Etcd: Member has no leader'
               priority: AVERAGE
-              description: '"If a member does not have a leader, it is totally unavailable."'
+              description: 'If a member does not have a leader, it is totally unavailable.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 3fde4db8b9684ba4b56ba915e48957b5
           name: 'Etcd: Node health'
@@ -333,11 +347,10 @@ zabbix_export:
               parameters:
                 - 10m
           url: '{$ETCD.SCHEME}://{HOST.CONN}:{$ETCD.PORT}/health'
-          status_codes: ''
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: health
           triggers:
             -
               uuid: 6acda7bdc9df4a4ab5b7cca76c6369f0
@@ -350,6 +363,10 @@ zabbix_export:
                 -
                   name: 'Etcd: Service is unavailable'
                   expression: 'last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 923a408dd4514e808b6e2137a94f8140
           name: 'Etcd: HTTP 4XX'
@@ -381,8 +398,11 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: http
+            -
+              tag: http-code
+              value: 4xx
         -
           uuid: c0f27d4bfba344079a31ce8c10b22683
           name: 'Etcd: HTTP 5XX'
@@ -414,15 +434,23 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: http
+            -
+              tag: http-code
+              value: 5xx
           triggers:
             -
               uuid: 0302957e0f6b43389546e1cfb958ed9c
               expression: 'min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}'
-              name: 'Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'''
+              name: 'Etcd: Too many HTTP requests failures'
+              event_name: 'Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: '"Too many reqvests failed on etcd instance with 5xx HTTP code"'
+              description: 'Too many requests failed on etcd instance with 5xx HTTP code.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 2a19db1c58ee4a509061fcb1b557c1a3
           name: 'Etcd: HTTP requests received'
@@ -454,8 +482,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: http
         -
           uuid: b3760811472440baad6a338f481ba13a
           name: 'Etcd: Server is a leader'
@@ -471,6 +499,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_is_leader
+                - value
                 - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
@@ -482,20 +511,25 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: leader
           triggers:
             -
               uuid: 44d66eb1a332418daf4c3a1110db5458
               expression: 'nodata(/Etcd by HTTP/etcd.is.leader,30m)=1'
-              name: 'Etcd: Failed to fetch info data (or no data for 30m)'
+              name: 'Etcd: Failed to fetch info data'
+              event_name: 'Etcd: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received data for items for the last 30 minutes'
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Etcd: Service is unavailable'
                   expression: 'last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: ecd1ae9c038f4fc2b720ad562ced0191
           name: 'Etcd: Keys compacted per second'
@@ -510,6 +544,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_db_compaction_keys_total
+                - value
                 - ''
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
@@ -521,8 +556,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: keys
         -
           uuid: a3f910efb0a04cc494c07b8703f9d2ec
           name: 'Etcd: Keys expired per second'
@@ -537,6 +572,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_store_expires_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -546,8 +582,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: keys
         -
           uuid: fbda737014544cf1bcf544a48aa6e48b
           name: 'Etcd: Keys total'
@@ -561,13 +597,14 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_keys_total
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: keys
         -
           uuid: e45ba61d99b8432b86f5797a2cfdb416
           name: 'Etcd: Leader changes'
@@ -575,26 +612,32 @@ zabbix_export:
           key: etcd.leader.changes
           delay: '0'
           history: 7d
-          description: 'The the number of leader changes the member has seen since its start.'
+          description: 'The number of leader changes the member has seen since its start.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_leader_changes_seen_total
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: leader
           triggers:
             -
               uuid: 1ea623927179489890a5a73eeb8177f7
               expression: '(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}'
-              name: 'Etcd: Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)'''
+              name: 'Etcd: Instance has seen too many leader changes'
+              event_name: 'Etcd: Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)'''
               priority: WARNING
               description: 'Rapid leadership changes impact the performance of etcd significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the etcd cluster.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 348e15d2ec3a4bb88e2ca371f96c2f00
           name: 'Etcd: Maximum open file descriptors'
@@ -609,13 +652,14 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_max_fds
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: fds
         -
           uuid: d016b8674ebd4251943f2e94b22f5ff2
           name: 'Etcd: Client gRPC received bytes per second'
@@ -625,12 +669,13 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes received from grpc clients per second'
+          description: 'The number of bytes received from grpc clients per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_network_client_grpc_received_bytes_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -640,8 +685,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: grpc
         -
           uuid: e50d2d088c6448dbb3ecaeebc3b2b8f1
           name: 'Etcd: Client gRPC sent bytes per second'
@@ -651,12 +696,13 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: Bps
-          description: 'The number of bytes sent from grpc clients per second'
+          description: 'The number of bytes sent from grpc clients per second.'
           preprocessing:
             -
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_network_client_grpc_sent_bytes_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -666,8 +712,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: grpc
         -
           uuid: d5099d4cdb3044ba95935c2aea2b6352
           name: 'Etcd: Open file descriptors'
@@ -682,13 +728,14 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_open_fds
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: fds
         -
           uuid: a2927b1e85af41cab9c28b1b79c229ea
           name: 'Etcd: Proposals applied per second'
@@ -703,6 +750,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_proposals_applied_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -712,8 +760,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: proposals
         -
           uuid: e829f3df055e42dfbce5f27eb7ca487c
           name: 'Etcd: Proposals committed per second'
@@ -728,6 +776,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_proposals_committed_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -737,8 +786,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: proposals
         -
           uuid: 6b45b99526394a219d31b5c22cb98c85
           name: 'Etcd: Proposals failed per second'
@@ -753,6 +802,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_proposals_failed_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -762,17 +812,20 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: proposals
           triggers:
             -
               uuid: 432cea8bddd742ca98528be2fbc7e35e
               expression: 'min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
-              name: 'Etcd: Too many proposal failures (over {$ETCD.PROPOSAL.FAIL.MAX.WARN} for 5m)'''
+              name: 'Etcd: Too many proposal failures'
+              event_name: 'Etcd: Too many proposal failures (over {$ETCD.PROPOSAL.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
-              description: |
-                "Normally related to two issues: temporary failures related to a leader election or 
-                longer downtime caused by a loss of quorum in the cluster."
+              description: 'Normally related to two issues: temporary failures related to a leader election or longer downtime caused by a loss of quorum in the cluster.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 1c506ff69e7b4564a6d95fd35b1a11fd
           name: 'Etcd: Proposals pending'
@@ -786,20 +839,26 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_server_proposals_pending
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: proposals
           triggers:
             -
               uuid: 5feefc4dd5d14fe2b56dd63029b57026
               expression: 'min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
-              name: 'Etcd: Too many proposals are queued to commit (over {$ETCD.PROPOSAL.PENDING.MAX.WARN} for 5m)'''
+              name: 'Etcd: Too many proposals are queued to commit'
+              event_name: 'Etcd: Too many proposals are queued to commit (over {$ETCD.PROPOSAL.PENDING.MAX.WARN} for 5m)'''
               priority: WARNING
-              description: '"Rising pending proposals suggests there is a high client load or the member cannot commit proposals."'
+              description: 'Rising pending proposals suggests there is a high client load or the member cannot commit proposals.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: bd7398507c274bfab53339380df16761
           name: 'Etcd: PUT per second'
@@ -815,6 +874,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_put_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -824,8 +884,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: operations
         -
           uuid: b744c07f3290467b96b21ea38ad5d497
           name: 'Etcd: Range per second'
@@ -841,6 +901,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_range_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -850,8 +911,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: operations
         -
           uuid: 88c91b36eca94fd2b357a67d171dc621
           name: 'Etcd: Reads per second'
@@ -884,8 +945,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: store
         -
           uuid: 4b881e32094e4f478c5d0849cb5d07a7
           name: 'Etcd: Resident memory'
@@ -901,13 +962,14 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_resident_memory_bytes
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: memory
         -
           uuid: dee9ed8897cf4d3582957707ea09cdf8
           name: 'Etcd: Server version'
@@ -931,16 +993,21 @@ zabbix_export:
             key: etcd.get_version
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: application
           triggers:
             -
               uuid: cfb2fc467b224ef694d59b5c081ed965
               expression: 'last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0'
-              name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
+              name: 'Etcd: Server version has changed'
+              event_name: 'Etcd: Server version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Etcd version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: b14c787c716146e990bc388d277a2803
           name: 'Etcd: Transaction per second'
@@ -956,6 +1023,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - etcd_debugging_mvcc_range_total
+                - value
                 - ''
             -
               type: CHANGE_PER_SECOND
@@ -965,8 +1033,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: transactions
         -
           uuid: 98ec9085d621446aa462efc86cf93905
           name: 'Etcd: Uptime'
@@ -982,6 +1050,7 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_start_time_seconds
+                - value
                 - ''
             -
               type: JAVASCRIPT
@@ -993,16 +1062,21 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: application
           triggers:
             -
               uuid: 6843369969f5410a840494104d71fe1f
               expression: 'last(/Etcd by HTTP/etcd.uptime)<10m'
-              name: 'Etcd: has been restarted (uptime < 10m)'
+              name: 'Etcd: has been restarted'
+              event_name: 'Etcd: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: c35810b8b7bc4a62970b5293fb2d8fb2
           name: 'Etcd: Virtual memory'
@@ -1018,13 +1092,14 @@ zabbix_export:
               type: PROMETHEUS_PATTERN
               parameters:
                 - process_virtual_memory_bytes
+                - value
                 - ''
           master_item:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: memory
         -
           uuid: 16c041fc189248bfaaa5826ffaf38459
           name: 'Etcd: Writes per second'
@@ -1056,8 +1131,8 @@ zabbix_export:
             key: etcd.get_metrics
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: store
         -
           uuid: a0f94f429b99432e86d15ffa74d6eada
           name: 'Etcd: Service''s TCP port state'
@@ -1073,8 +1148,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Etcd
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
           triggers:
             -
               uuid: 74164f0783ae4227ba44f3e865fee3bd
@@ -1082,6 +1160,10 @@ zabbix_export:
               name: 'Etcd: Service is unavailable'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 5e6121383e5d4f3eb1150a2068a4633b
@@ -1111,7 +1193,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of RPCs completed on the server with grpc_code {#GRPC.CODE}'
+              description: 'The number of RPCs completed on the server with grpc_code {#GRPC.CODE}.'
               preprocessing:
                 -
                   type: PROMETHEUS_TO_JSON
@@ -1133,14 +1215,22 @@ zabbix_export:
                 key: etcd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: Etcd
+                  tag: component
+                  value: grpc
+                -
+                  tag: grpc-code
+                  value: '{#GRPC.CODE}'
               trigger_prototypes:
                 -
                   uuid: 459b6ee5735047d597a6a4ab41b76e21
                   expression: 'min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}'
-                  name: 'Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m)'
+                  name: 'Etcd: Too many failed gRPC requests with code: {#GRPC.CODE}'
+                  event_name: 'Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           master_item:
             key: etcd.get_metrics
           preprocessing:
@@ -1200,12 +1290,13 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'The number of bytes received from peer with ID {#ETCD.PEER}'
+              description: 'The number of bytes received from peer with ID {#ETCD.PEER}.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'etcd_network_peer_received_bytes_total{From="{#ETCD.PEER}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
@@ -1217,8 +1308,14 @@ zabbix_export:
                 key: etcd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'Etcd peer {#ETCD.PEER}'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: peers
+                -
+                  tag: peer
+                  value: '{#ETCD.PEER}'
             -
               uuid: 8f5fecbabe474baaab40df46879401af
               name: 'Etcd: Etcd peer {#ETCD.PEER}: Bytes sent'
@@ -1228,12 +1325,13 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Bps
-              description: 'The number of bytes sent to peer with ID {#ETCD.PEER}'
+              description: 'The number of bytes sent to peer with ID {#ETCD.PEER}.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'etcd_network_peer_sent_bytes_total{To="{#ETCD.PEER}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
@@ -1245,8 +1343,14 @@ zabbix_export:
                 key: etcd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'Etcd peer {#ETCD.PEER}'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: peers
+                -
+                  tag: peer
+                  value: '{#ETCD.PEER}'
             -
               uuid: 2521ccfc16fc43069001883b85aa0243
               name: 'Etcd: Etcd peer {#ETCD.PEER}: Receive failures failures'
@@ -1256,12 +1360,13 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of receive failures from the peer with ID {#ETCD.PEER}'
+              description: 'The number of receive failures from the peer with ID {#ETCD.PEER}.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'etcd_network_peer_received_failures_total{To="{#ETCD.PEER}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
@@ -1273,8 +1378,14 @@ zabbix_export:
                 key: etcd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'Etcd peer {#ETCD.PEER}'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: peers
+                -
+                  tag: peer
+                  value: '{#ETCD.PEER}'
             -
               uuid: 5756f1a16e5c42b79f6d6225c5382599
               name: 'Etcd: Etcd peer {#ETCD.PEER}: Send failures'
@@ -1284,12 +1395,13 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: rps
-              description: 'The number of send failures from peer with ID {#ETCD.PEER}'
+              description: 'The number of send failures from peer with ID {#ETCD.PEER}.'
               preprocessing:
                 -
                   type: PROMETHEUS_PATTERN
                   parameters:
                     - 'etcd_network_peer_sent_failures_total{To="{#ETCD.PEER}"}'
+                    - value
                     - ''
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
@@ -1301,8 +1413,14 @@ zabbix_export:
                 key: etcd.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'Etcd peer {#ETCD.PEER}'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: peers
+                -
+                  tag: peer
+                  value: '{#ETCD.PEER}'
           master_item:
             key: etcd.get_metrics
           lld_macro_paths:
@@ -1314,53 +1432,60 @@ zabbix_export:
               type: PROMETHEUS_TO_JSON
               parameters:
                 - etcd_network_peer_sent_bytes_total
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: etcd
       macros:
         -
           macro: '{$ETCD.GRPC.ERRORS.MAX.WARN}'
           value: '1'
-          description: 'Maximum number of gRPC requests failures'
+          description: 'Maximum number of gRPC requests failures.'
         -
           macro: '{$ETCD.GRPC_CODE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md'
+          description: 'Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.'
         -
           macro: '{$ETCD.GRPC_CODE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md'
+          description: 'Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.'
         -
           macro: '{$ETCD.GRPC_CODE.TRIGGER.MATCHES}'
           value: Aborted|Unavailable
-          description: 'Filter of discoverable gRPC codes which will be create triggers'
+          description: 'Filter of discoverable gRPC codes which will create triggers.'
         -
           macro: '{$ETCD.HTTP.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of HTTP requests failures'
+          description: 'Maximum number of HTTP requests failures.'
         -
           macro: '{$ETCD.LEADER.CHANGES.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of leader changes'
+          description: 'Maximum number of leader changes.'
         -
           macro: '{$ETCD.OPEN.FDS.MAX.WARN}'
           value: '90'
-          description: 'Maximum percentage of used file descriptors'
+          description: 'Maximum percentage of used file descriptors.'
         -
           macro: '{$ETCD.PASSWORD}'
         -
           macro: '{$ETCD.PORT}'
           value: '2379'
-          description: 'The port of Etcd API endpoint'
+          description: 'The port of Etcd API endpoint.'
         -
           macro: '{$ETCD.PROPOSAL.FAIL.MAX.WARN}'
           value: '2'
-          description: 'Maximum number of proposal failures'
+          description: 'Maximum number of proposal failures.'
         -
           macro: '{$ETCD.PROPOSAL.PENDING.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of proposals in queue'
+          description: 'Maximum number of proposals in queue.'
         -
           macro: '{$ETCD.SCHEME}'
           value: http
-          description: 'Request scheme which may be http or https'
+          description: 'Request scheme which may be http or https.'
         -
           macro: '{$ETCD.USER}'
       valuemaps:
@@ -1398,11 +1523,16 @@ zabbix_export:
     -
       uuid: c45583928d204c04ad8884115e1e35c5
       expression: 'min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}'
-      name: 'Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)'
+      name: 'Etcd: Current number of open files is too high'
+      event_name: 'Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
       description: |
-        "Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue. 
-        If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files."
+        Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.
+        If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.
+      tags:
+        -
+          tag: scope
+          value: capacity
   graphs:
     -
       uuid: 18baccd03c0f4814a42d32b51334787d

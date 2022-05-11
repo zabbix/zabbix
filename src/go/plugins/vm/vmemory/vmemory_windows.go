@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,9 +20,9 @@
 package vmemory
 
 import (
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/win32"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -

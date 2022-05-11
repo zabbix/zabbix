@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ class CWidgetNavTree extends CWidget {
 					srcfld1: 'sysmapid',
 					srcfld2: 'name',
 					multiselect: '1'
-				}, null, e.target);
+				}, {dialogue_class: 'modal-popup-generic', trigger_element: e.target});
 			},
 
 			editItem: (e) => {
@@ -846,6 +846,7 @@ class CWidgetNavTree extends CWidget {
 
 				overlayDialogue({
 					'title': t('Edit tree element'),
+					'class': 'modal-popup',
 					'content': resp.body,
 					'buttons': [
 						{
@@ -896,7 +897,7 @@ class CWidgetNavTree extends CWidget {
 												jQuery('> .tree-row > .content > .item-name', $row)
 													.empty()
 													.attr('title', resp['name'])
-													.append(jQuery('<span/>').text(resp.name));
+													.append(jQuery('<span>').text(resp.name));
 												$row.toggleClass('no-map', resp.sysmapid == 0);
 											}
 											else {

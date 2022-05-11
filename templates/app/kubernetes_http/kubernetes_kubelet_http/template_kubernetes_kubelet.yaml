@@ -1,0 +1,970 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:27:51Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: e785916967c14544b59c3644c3edda3a
+      template: 'Kubernetes Kubelet by HTTP'
+      name: 'Kubernetes Kubelet by HTTP'
+      description: |
+        Get Kubernetes kubelet metrics by HTTP agent from Prometheus metrics endpoint.
+        
+        Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
+        Some metrics may not be collected depending on your Kubernetes API server instance version and configuration.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 1f94bbb521cb41dfa093e1408efbb15a
+          name: 'Kubernetes: Get cadvisor metrics'
+          type: HTTP_AGENT
+          key: kube.cadvisor.metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Collecting raw Kubelet metrics from /metrics/cadvisor endpoint.'
+          timeout: 10s
+          url: '{$KUBE.KUBELET.URL}{$KUBE.KUBELET.CADVISOR.ENDPOINT}'
+          status_codes: '200, 403'
+          headers:
+            -
+              name: Authorization
+              value: 'Bearer {$KUBE.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: bc395860d45b45cb89401fc7e50bc015
+          name: 'Kubernetes: Containers restarts'
+          type: DEPENDENT
+          key: kube.kubelet.containers.restarts
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of times the container has been restarted.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.items[*].status.containerStatuses[*].restartCount.sum()'
+          master_item:
+            key: kube.pods
+          tags:
+            -
+              tag: component
+              value: containers
+        -
+          uuid: e524234eea87438d9ee2a1db9f24cfbb
+          name: 'Kubernetes: Containers running'
+          type: DEPENDENT
+          key: kube.kubelet.containers.running
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of running containers.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.items[*].status.containerStatuses[*].restartCount.sum()'
+          master_item:
+            key: kube.pods
+          tags:
+            -
+              tag: component
+              value: containers
+        -
+          uuid: cff44957e9a54d5d887d4f92b3e4da72
+          name: 'Kubernetes: CPU cores, total'
+          type: DEPENDENT
+          key: kube.kubelet.cpu.cores
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of cores in this machine (available until kubernetes v1.18).'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - machine_cpu_cores
+                - value
+                - ''
+          master_item:
+            key: kube.cadvisor.metrics
+          tags:
+            -
+              tag: component
+              value: containers
+        -
+          uuid: 6735723da30d41dcb7bd46c954b2998f
+          name: 'Kubernetes: Machine memory, bytes'
+          type: DEPENDENT
+          key: kube.kubelet.machine.memory
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Resident memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_resident_memory_bytes
+                - value
+                - ''
+          master_item:
+            key: kube.kubelet.metrics
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: c71fc79a77104ef4a0d6b89d5f7b7bad
+          name: 'Kubernetes: Get kubelet metrics'
+          type: HTTP_AGENT
+          key: kube.kubelet.metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Collecting raw Kubelet metrics from /metrics endpoint.'
+          timeout: 10s
+          url: '{$KUBE.KUBELET.URL}{$KUBE.KUBELET.METRIC.ENDPOINT}'
+          status_codes: '200, 403'
+          headers:
+            -
+              name: Authorization
+              value: 'Bearer {$KUBE.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 46635d3fee04488caa4b07de7709f71e
+          name: 'Kubernetes: Pods running'
+          type: DEPENDENT
+          key: kube.kubelet.pods.running
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of running pods.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.items[?(@.status.phase == "Running")].length()'
+          master_item:
+            key: kube.pods
+          tags:
+            -
+              tag: component
+              value: pods
+        -
+          uuid: d1388216cb384ff08c984919572b0ffb
+          name: 'Kubernetes: File descriptors, max'
+          type: DEPENDENT
+          key: kube.kubelet.process_max_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum number of open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_max_fds
+                - value
+                - ''
+          master_item:
+            key: kube.kubelet.metrics
+          tags:
+            -
+              tag: component
+              value: descriptors
+        -
+          uuid: dc3a6371dcb34ae5b65cbf5224d4712c
+          name: 'Kubernetes: File descriptors, open'
+          type: DEPENDENT
+          key: kube.kubelet.process_open_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_open_fds
+                - value
+                - ''
+          master_item:
+            key: kube.kubelet.metrics
+          tags:
+            -
+              tag: component
+              value: descriptors
+        -
+          uuid: c382b67cf7e947fbb9c29e86446ffac5
+          name: 'Kubernetes: Virtual memory, bytes'
+          type: DEPENDENT
+          key: kube.kubelet.virtual.memory
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Virtual memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_virtual_memory_bytes
+                - value
+                - ''
+          master_item:
+            key: kube.kubelet.metrics
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 11da04549bd840b0a8d5c70ff0d2b46f
+          name: 'Kubernetes: Containers last state terminated'
+          type: DEPENDENT
+          key: kube.kublet.containers.terminated
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of containers that were previously terminated.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.items[*].status.containerStatuses[?(@.lastState.terminated.exitCode > 0)].length()'
+          master_item:
+            key: kube.pods
+          tags:
+            -
+              tag: component
+              value: containers
+        -
+          uuid: 7c8cc6c3ed8e412eb69e7ab8e2fe7e12
+          name: 'Kubernetes: Get pods'
+          type: HTTP_AGENT
+          key: kube.pods
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Collecting raw Kubelet metrics from /pods endpoint.'
+          timeout: 10s
+          url: '{$KUBE.KUBELET.URL}{$KUBE.KUBELET.PODS.ENDPOINT}'
+          status_codes: '200, 403'
+          headers:
+            -
+              name: Authorization
+              value: 'Bearer {$KUBE.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+      discovery_rules:
+        -
+          uuid: 5f70768ebe62429a96e17576dd767382
+          name: 'Container memory discovery'
+          type: DEPENDENT
+          key: kube.kubelet.container.memory.cache.discovery
+          delay: '0'
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 8f8b1df2a801475a92604544b2019b2e
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory page cache'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.cache["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Number of bytes of page cache memory.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_cache{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
+              uuid: 6dcf948e79b94f3f96677a7948d2dfd4
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Memory max usage'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.max_usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Maximum memory usage recorded in bytes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_max_usage_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
+              uuid: 47d35c31a52643c1b587efcec57f9dff
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: RSS'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.rss["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Size of RSS in bytes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_rss{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
+              uuid: 2cf31296f67947ec85f576773352a25b
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Swap'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.swap["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Container swap usage in bytes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_swap{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
+              uuid: 146d17ecec7149efb20878d7e0466eeb
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Usage'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.usage["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Current memory usage in bytes, including all memory regardless of when it was accessed.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_usage_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
+              uuid: d3a24d207c6d4201a5e7235f246e0c59
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#POD}] Container [{#CONTAINER}]: Working set'
+              type: DEPENDENT
+              key: 'kube.kubelet.container.memory.working_set["{#CONTAINER}", "{#NAMESPACE}", "{#POD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Current working set in bytes.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_memory_working_set_bytes{container="{#CONTAINER}", namespace="{#NAMESPACE}", pod="{#POD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: container
+                  value: '{#CONTAINER}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+          master_item:
+            key: kube.cadvisor.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'container_memory_cache{container =~ ".*", namespace =~ ".*", pod =~ "POD"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var container_labels = item.labels.container + item.labels.namespace + item.labels.pod;
+                      if (item.labels.container !== '' && !lookup[container_labels]) {
+                          lookup[container_labels] = 1;
+                          result.push({
+                              '{#CONTAINER}': item.labels.container,
+                              '{#NAMESPACE}': item.labels.namespace,
+                              '{#POD}': item.labels.pod
+                          });
+                      }
+                  })
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: b98223fcf0ee4a558035ed23de0d2616
+          name: 'Pods discovery'
+          type: DEPENDENT
+          key: kube.kubelet.pods.discovery
+          delay: '0'
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 41e8f027979a462983789f1f45a9e332
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s'
+              type: DEPENDENT
+              key: 'kube.pod.container_cpu_load_average_10s[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Pods cpu load average over the last 10 seconds.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_cpu_load_average_10s{pod="{#NAME}", namespace="{#NAMESPACE}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: pod
+                  value: '{#NAME}'
+            -
+              uuid: 434c913e7547435bb74c922f81f3ff7a
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: System seconds, total'
+              type: DEPENDENT
+              key: 'kube.pod.container_cpu_system_seconds_total[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'The number of cores used for system time.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_cpu_system_seconds_total{pod="{#NAME}", namespace="{#NAMESPACE}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: pod
+                  value: '{#NAME}'
+            -
+              uuid: e0b1c1edcc3c4738a71b46712a085ed0
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: User seconds, total'
+              type: DEPENDENT
+              key: 'kube.pod.container_cpu_user_seconds_total[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'The number of cores used for user time.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'container_cpu_user_seconds_total{pod="{#NAME}", namespace="{#NAMESPACE}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.cadvisor.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: pod
+                  value: '{#NAME}'
+          master_item:
+            key: kube.pods
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.items.forEach(function (pod) {
+                      output.push({
+                          '{#NAME}': pod.metadata.name,
+                          '{#NAMESPACE}': pod.metadata.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: cb42f71e6bfb4661861e3601e31eeaa6
+          name: 'REST client requests discovery'
+          type: DEPENDENT
+          key: kube.kubelet.rest.requests.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: c569ce73bfb44098be3ceb8d016e3d24
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] CPU: Load average, 10s'
+              type: DEPENDENT
+              key: 'kube.kubelet.rest.requests["{#CODE}", "{#HOST}", "{#METHOD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of HTTP requests, partitioned by status code, method, and host.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'rest_client_requests_total{code="{#CODE}", host="{#HOST}", method="{#METHOD}"}'
+                    - value
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.kubelet.metrics
+              tags:
+                -
+                  tag: code
+                  value: '{#CODE}'
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: host
+                  value: '{#HOST}'
+                -
+                  tag: method
+                  value: '{#METHOD}'
+          master_item:
+            key: kube.kubelet.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'rest_client_requests_total{code =~ ".*", host =~ ".*", method =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var request_labels = item.labels.code + item.labels.host + item.labels.method;
+                      if (!(lookup[request_labels])) {
+                          lookup[request_labels] = 1;
+                          result.push({
+                              '{#CODE}': item.labels.code,
+                              '{#HOST}': item.labels.host,
+                              '{#METHOD}': item.labels.method
+                          });
+                      }
+                  })
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 6feb0006bb364a8f9295495c92741c16
+          name: 'Runtime operations discovery'
+          type: DEPENDENT
+          key: kube.kubelet.runtime_operations_bucket.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: 13de106611a347e0907dda9ff52f3a20
+              name: 'Kubernetes: [{#OP_TYPE}] Runtime operations bucket: {#LE}'
+              type: DEPENDENT
+              key: 'kube.kublet.runtime_ops_duration_seconds_bucket[{#LE},"{#OP_TYPE}"]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              description: 'Duration in seconds of runtime operations. Broken down by operation type.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kubelet_runtime_operations_duration_seconds_bucket{le="{#LE}",operation_type="{#OP_TYPE}"}'
+                    - function
+                    - sum
+              master_item:
+                key: kube.kubelet.metrics
+              tags:
+                -
+                  tag: component
+                  value: operations
+            -
+              uuid: 3d9545d396b24ef6b87eb730ad93cda7
+              name: 'Kubernetes: [{#OP_TYPE}] Operations, p50'
+              type: CALCULATED
+              key: 'kube.kublet.runtime_ops_duration_seconds_p50["{#OP_TYPE}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,50)'
+              description: '50 percentile of operation latency distribution in seconds for each verb.'
+              tags:
+                -
+                  tag: component
+                  value: operations
+            -
+              uuid: 039a47a0b20741e79701fecb924e6a08
+              name: 'Kubernetes: [{#OP_TYPE}] Operations, p90'
+              type: CALCULATED
+              key: 'kube.kublet.runtime_ops_duration_seconds_p90["{#OP_TYPE}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,90)'
+              description: '90 percentile of operation latency distribution in seconds for each verb.'
+              tags:
+                -
+                  tag: component
+                  value: operations
+            -
+              uuid: e846265636ac433ba2bce034aca1e394
+              name: 'Kubernetes: [{#OP_TYPE}] Operations, p95'
+              type: CALCULATED
+              key: 'kube.kublet.runtime_ops_duration_seconds_p95["{#OP_TYPE}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,95)'
+              description: '95 percentile of operation latency distribution in seconds for each verb.'
+              tags:
+                -
+                  tag: component
+                  value: operations
+            -
+              uuid: 68f17a6132dd48deb3825efd2b83b6ce
+              name: 'Kubernetes: [{#OP_TYPE}] Operations, p99'
+              type: CALCULATED
+              key: 'kube.kublet.runtime_ops_duration_seconds_p99["{#OP_TYPE}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kube.kublet.runtime_ops_duration_seconds_bucket[*,"{#OP_TYPE}"],5m,99)'
+              description: '99 percentile of operation latency distribution in seconds for each verb.'
+              tags:
+                -
+                  tag: component
+                  value: operations
+            -
+              uuid: 736abc78366e44b69234caf56abe8a4a
+              name: 'Kubernetes: [{#OP_TYPE}] Runtime operations total, rate'
+              type: DEPENDENT
+              key: 'kube.kublet.runtime_ops_total.rate["{#OP_TYPE}"]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              description: 'Cumulative number of runtime operations by operation type.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kubelet_runtime_operations_total{operation_type="{#OP_TYPE}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: kube.kubelet.metrics
+              tags:
+                -
+                  tag: component
+                  value: operations
+          graph_prototypes:
+            -
+              uuid: 3a32d1b4253b48078279b24fdf8f3476
+              name: 'Kubernetes: [{#OP_TYPE}] Operations latency'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Kubernetes Kubelet by HTTP'
+                    key: 'kube.kublet.runtime_ops_duration_seconds_p90["{#OP_TYPE}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Kubernetes Kubelet by HTTP'
+                    key: 'kube.kublet.runtime_ops_duration_seconds_p95["{#OP_TYPE}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Kubernetes Kubelet by HTTP'
+                    key: 'kube.kublet.runtime_ops_duration_seconds_p99["{#OP_TYPE}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Kubernetes Kubelet by HTTP'
+                    key: 'kube.kublet.runtime_ops_duration_seconds_p50["{#OP_TYPE}"]'
+          master_item:
+            key: kube.kubelet.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~ "kubelet_runtime_operations_*", operation_type =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      lookup_histogram = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      if (item.name === 'kubelet_runtime_operations_total'){
+                          var op_type = item.labels.operation_type;
+                  
+                          if (lookup[op_type]) {
+                              return;
+                          }
+                          lookup[op_type] = 1;
+                          result.push({
+                              '{#TYPE}': 'totals',
+                              '{#OP_TYPE}': op_type
+                          });
+                      }
+                  
+                      else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket'){
+                          var labels = item.labels.operation_type + item.labels.le;
+                  
+                          if (lookup_histogram[labels]) {
+                              return;
+                          }
+                          lookup_histogram[labels] = 1;
+                          result.push({
+                              '{#TYPE}': 'buckets',
+                              '{#OP_TYPE}': item.labels.operation_type,
+                              '{#LE}': item.labels.le
+                          });
+                      }
+                  });
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          overrides:
+            -
+              name: 'bucket item'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: buckets
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: 'total item'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: totals
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: 'kubernetes kubelet'
+      macros:
+        -
+          macro: '{$KUBE.API.TOKEN}'
+          description: 'Service account bearer token'
+        -
+          macro: '{$KUBE.KUBELET.CADVISOR.ENDPOINT}'
+          value: /metrics/cadvisor
+          description: 'cAdvisor metrics from Kubelet /metrics/cadvisor endpoint'
+        -
+          macro: '{$KUBE.KUBELET.METRIC.ENDPOINT}'
+          value: /metrics
+          description: 'Kubelet /metrics endpoint'
+        -
+          macro: '{$KUBE.KUBELET.PODS.ENDPOINT}'
+          value: /pods
+          description: 'Kubelet /pods endpoint'
+        -
+          macro: '{$KUBE.KUBELET.URL}'
+          value: 'https://localhost:10250'
+          description: 'Instance URL'

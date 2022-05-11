@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/watch"
 
 	"github.com/fsnotify/fsnotify"

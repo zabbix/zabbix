@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 (new CWidget())->show();
 
 (new CScriptTag(
-	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).', null, null);'.
+	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).');'.
 
 	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
 		'clearMessages();'.

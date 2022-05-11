@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -206,28 +206,38 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 							? array_column($template['parentTemplates'], 'templateid')
 							: [];
 
-						switch ($this->hasInput('mass_action_tpls')) {
+						switch ($this->getInput('mass_action_tpls')) {
 							case ZBX_ACTION_ADD:
-								$template['templates'] = array_unique(
-									array_merge($parent_templateids, $this->getInput('linked_templates', []))
+								$template['templates'] = zbx_toObject(
+									array_unique(
+										array_merge($parent_templateids, $this->getInput('linked_templates', []))
+									),
+									'templateid'
 								);
 								break;
 
 							case ZBX_ACTION_REPLACE:
-								$template['templates'] = $this->getInput('linked_templates', []);
+								$template['templates'] = zbx_toObject($this->getInput('linked_templates', []),
+									'templateid'
+								);
+
 								if ($this->getInput('mass_clear_tpls', 0)) {
-									$template['templates_clear'] = array_unique(
-										array_diff($parent_templateids, $this->getInput('linked_templates', []))
+									$template['templates_clear'] = zbx_toObject(
+										array_diff($parent_templateids, $this->getInput('linked_templates', [])),
+										'templateid'
 									);
 								}
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								$template['templates'] = array_unique(
-									array_diff($parent_templateids, $this->getInput('linked_templates', []))
+								$template['templates'] = zbx_toObject(
+									array_diff($parent_templateids, $this->getInput('linked_templates', [])),
+									'templateid'
 								);
+
 								if ($this->getInput('mass_clear_tpls', 0)) {
-									$template['templates_clear'] = array_unique($this->getInput('linked_templates', []));
+									$template['templates_clear'] =
+										zbx_toObject($this->getInput('linked_templates', []), 'templateid');
 								}
 								break;
 						}
@@ -344,8 +354,12 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 			DBend($result);
 
 			if ($result) {
+				$output = [
+					'title' => _('Templates updated'),
+					'script_inline' => (new CScriptTag('sessionStorage.removeItem("cb_templates");'))->toString()
+				];
 				$messages = CMessageHelper::getMessages();
-				$output = ['title' => _('Templates updated')];
+
 				if (count($messages)) {
 					$output['messages'] = array_column($messages, 'message');
 				}

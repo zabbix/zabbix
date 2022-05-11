@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,6 +70,8 @@ class CTableInfo extends CTable {
 	/**
 	 * Rotate table header text vertical.
 	 * Cells must be marked with "vertical_rotation" class.
+	 *
+	 * @deprecated  Use CSS writing-mode.
 	 */
 	public function makeVerticalRotation() {
 		$this->addMakeVerticalRotationJs = true;

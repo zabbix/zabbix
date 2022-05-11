@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,6 +81,7 @@ class CAudit {
 	public const RESOURCE_AUTH_TOKEN = 45;
 	public const RESOURCE_SCHEDULED_REPORT = 46;
 	public const RESOURCE_HA_NODE = 47;
+	public const RESOURCE_SLA = 48;
 
 	/**
 	 * Audit details actions.
@@ -111,13 +112,16 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => 'config',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_HOST => 'hosts',
 		self::RESOURCE_HOST_GROUP => 'hstgrp',
+		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
 		self::RESOURCE_HOUSEKEEPING => 'config',
 		self::RESOURCE_ICON_MAP => 'icon_map',
 		self::RESOURCE_IMAGE => 'images',
 		self::RESOURCE_ITEM => 'items',
 		self::RESOURCE_IT_SERVICE => 'services',
 		self::RESOURCE_MACRO => 'globalmacro',
+		self::RESOURCE_MAINTENANCE => 'maintenances',
 		self::RESOURCE_MEDIA_TYPE => 'media_type',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'hosts',
@@ -125,19 +129,22 @@ class CAudit {
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'scripts',
 		self::RESOURCE_SETTINGS => 'config',
+		self::RESOURCE_SLA => 'sla',
+		self::RESOURCE_TEMPLATE => 'hosts',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
 	];
 
 	/**
-	 * Table primary keys of audit resources.
-	 * resource => table key
+	 * ID field names of audit resources.
+	 * resource => ID field name
 	 *
 	 * @var array
 	 */
-	private const TABLE_PKS = [
-		self::RESOURCE_PROXY => 'proxyid'
+	private const ID_FIELD_NAMES = [
+		self::RESOURCE_PROXY => 'proxyid',
+		self::RESOURCE_TEMPLATE => 'templateid'
 	];
 
 	/**
@@ -153,13 +160,16 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => null,
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
+		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'name',
+		self::RESOURCE_HOST_PROTOTYPE => 'host',
 		self::RESOURCE_HOUSEKEEPING => null,
 		self::RESOURCE_ICON_MAP => 'name',
 		self::RESOURCE_IMAGE => 'name',
 		self::RESOURCE_ITEM => 'name',
 		self::RESOURCE_IT_SERVICE => 'name',
 		self::RESOURCE_MACRO => 'macro',
+		self::RESOURCE_MAINTENANCE => 'name',
 		self::RESOURCE_MEDIA_TYPE => 'name',
 		self::RESOURCE_MODULE => 'id',
 		self::RESOURCE_PROXY => 'host',
@@ -167,6 +177,8 @@ class CAudit {
 		self::RESOURCE_SCHEDULED_REPORT => 'name',
 		self::RESOURCE_SCRIPT => 'name',
 		self::RESOURCE_SETTINGS => null,
+		self::RESOURCE_SLA => 'name',
+		self::RESOURCE_TEMPLATE => 'host',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USER_GROUP => 'name'
@@ -185,13 +197,16 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => 'autoregistration',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'hostgroup',
+		self::RESOURCE_HOST_PROTOTYPE => 'hostprototype',
 		self::RESOURCE_HOUSEKEEPING => 'housekeeping',
 		self::RESOURCE_ICON_MAP => 'iconmap',
 		self::RESOURCE_IMAGE => 'image',
 		self::RESOURCE_ITEM => 'item',
 		self::RESOURCE_IT_SERVICE => 'service',
 		self::RESOURCE_MACRO => 'usermacro',
+		self::RESOURCE_MAINTENANCE => 'maintenance',
 		self::RESOURCE_MEDIA_TYPE => 'mediatype',
 		self::RESOURCE_MODULE => 'module',
 		self::RESOURCE_PROXY => 'proxy',
@@ -199,13 +214,15 @@ class CAudit {
 		self::RESOURCE_SCHEDULED_REPORT => 'report',
 		self::RESOURCE_SCRIPT => 'script',
 		self::RESOURCE_SETTINGS => 'settings',
+		self::RESOURCE_SLA => 'sla',
+		self::RESOURCE_TEMPLATE => 'template',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USER_GROUP => 'usergroup'
 	];
 
 	/**
-	 * Array of paths that should be masked in audit details.
+	 * Array of abstract paths that should be masked in audit details.
 	 *
 	 * @var array
 	 */
@@ -215,19 +232,27 @@ class CAudit {
 		self::RESOURCE_AUTOREGISTRATION => [
 			'paths' => ['autoregistration.tls_psk_identity', 'autoregistration.tls_psk']
 		],
+		self::RESOURCE_HOST_PROTOTYPE => [
+			'paths' => ['hostprototype.macros.value'],
+			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+		],
 		self::RESOURCE_MACRO => [
 			'paths' => ['usermacro.value'],
-			'conditions' => ['usermacro.type' => ZBX_MACRO_TYPE_SECRET]
+			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
 		self::RESOURCE_MEDIA_TYPE => ['paths' => ['mediatype.passwd']],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
+		self::RESOURCE_TEMPLATE => [
+			'paths' => ['template.macros.value'],
+			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
+		],
 		self::RESOURCE_USER => ['paths' => ['user.passwd']]
 	];
 
 	/**
 	 * Table names of nested objects to check default values.
-	 * path => table name
+	 * abstract path => table name
 	 *
 	 * @var array
 	 */
@@ -269,7 +294,18 @@ class CAudit {
 		'dashboard.pages.widgets.fields' => 'widget_field',
 		'hostgroup.hosts' => 'hosts_groups',
 		'hostgroup.templates' => 'hosts_groups',
+		'hostprototype.groupLinks' => 'group_prototype',
+		'hostprototype.groupPrototypes' => 'group_prototype',
+		'hostprototype.interfaces' => 'interface',
+		'hostprototype.interfaces.details' => 'interface_snmp',
+		'hostprototype.macros' => 'hostmacro',
+		'hostprototype.tags' => 'host_tag',
+		'hostprototype.templates' => 'hosts_templates',
 		'iconmap.mappings' => 'icon_mapping',
+		'maintenance.groups' => 'maintenances_groups',
+		'maintenance.hosts' => 'maintenances_hosts',
+		'maintenance.tags' => 'maintenance_tag',
+		'maintenance.timeperiods' => 'timeperiods',
 		'mediatype.message_templates' => 'media_type_message',
 		'mediatype.parameters' => 'media_type_param',
 		'proxy.hosts' => 'hosts',
@@ -282,8 +318,15 @@ class CAudit {
 		'service.problem_tags' => 'service_problem_tag',
 		'service.status_rules' => 'service_status_rule',
 		'service.tags' => 'service_tag',
-		'service.times' => 'services_times',
+		'sla.service_tags' => 'sla_service_tag',
+		'sla.schedule' => 'sla_schedule',
+		'sla.excluded_downtimes' => 'sla_excluded_downtime',
 		'script.parameters' => 'script_param',
+		'template.groups' => 'hosts_groups',
+		'template.macros' => 'hostmacro',
+		'template.tags' => 'host_tag',
+		'template.templates' => 'hosts_templates',
+		'template.templates_clear' => 'hosts_templates',
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
@@ -295,12 +338,12 @@ class CAudit {
 	];
 
 	/**
-	 * ID field names for arrays of nested objects.
-	 * path => id field
+	 * ID field names of nested objects that stored in a parent object properties containing an array of nested objects.
+	 * abstract path => id field name
 	 *
 	 * @var array
 	 */
-	private const NESTED_OBJECTS_IDS = [
+	private const NESTED_OBJECTS_ID_FIELD_NAMES = [
 		'action.filter.conditions' => 'conditionid',
 		'action.operations' => 'operationid',
 		'action.operations.opconditions' => 'opconditionid',
@@ -329,7 +372,17 @@ class CAudit {
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
 		'hostgroup.hosts' => 'hostgroupid',
 		'hostgroup.templates' => 'hostgroupid',
+		'hostprototype.groupLinks' => 'group_prototypeid',
+		'hostprototype.groupPrototypes' => 'group_prototypeid',
+		'hostprototype.interfaces' => 'interfaceid',
+		'hostprototype.macros' => 'hostmacroid',
+		'hostprototype.tags' => 'hosttagid',
+		'hostprototype.templates' => 'hosttemplateid',
 		'iconmap.mappings' => 'iconmappingid',
+		'maintenance.groups' => 'maintenance_groupid',
+		'maintenance.hosts' => 'maintenance_hostid',
+		'maintenance.tags' => 'maintenancetagid',
+		'maintenance.timeperiods' => 'timeperiodid',
 		'mediatype.message_templates' => 'mediatype_messageid',
 		'mediatype.parameters' => 'mediatype_paramid',
 		'proxy.hosts' => 'hostid',
@@ -342,7 +395,14 @@ class CAudit {
 		'service.problem_tags' => 'service_problem_tagid',
 		'service.status_rules' => 'service_status_ruleid',
 		'service.tags' => 'servicetagid',
-		'service.times' => 'timeid',
+		'sla.service_tags' => 'sla_service_tagid',
+		'sla.schedule' => 'sla_scheduleid',
+		'sla.excluded_downtimes' => 'sla_excluded_downtimeid',
+		'template.groups' => 'hostgroupid',
+		'template.macros' => 'hostmacroid',
+		'template.tags' => 'hosttagid',
+		'template.templates' => 'hosttemplateid',
+		'template.templates_clear' => 'hosttemplateid',
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
@@ -354,35 +414,23 @@ class CAudit {
 	];
 
 	/**
-	 * ID field names for single nested objects.
-	 * path => id field
-	 *
-	 * @var array
-	 */
-	private const NESTED_SINGLE_OBJECTS_IDS = [
-		'action.operations.opmessage' => 'operationid',
-		'action.operations.opcommand' => 'operationid',
-		'action.operations.opinventory' => 'operationid',
-		'action.recovery_operations.opmessage' => 'operationid',
-		'action.recovery_operations.opcommand' => 'operationid',
-		'action.update_operations.opmessage' => 'operationid',
-		'action.update_operations.opcommand' => 'operationid',
-		'proxy.interface' => 'interfaceid'
-	];
-
-	/**
-	 * Array of paths that should be skipped in audit details.
+	 * Array of abstract paths that should be skipped in audit details.
 	 *
 	 * @var array
 	 */
 	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
 
 	/**
-	 * Array of paths that contain blob fields.
+	 * Array of abstract paths that contain blob fields.
 	 *
 	 * @var array
 	 */
 	private const BLOB_FIELDS = ['image.image'];
+
+	/**
+	 * Array of abstract paths that can only contain a data to delete.
+	 */
+	private const DELETE_ONLY_FIELDS = ['template.templates_clear'];
 
 	/**
 	 * Add audit records.
@@ -426,8 +474,8 @@ class CAudit {
 				break;
 
 			default:
-				$table_key = array_key_exists($resource, self::TABLE_PKS)
-					? self::TABLE_PKS[$resource]
+				$table_key = array_key_exists($resource, self::ID_FIELD_NAMES)
+					? self::ID_FIELD_NAMES[$resource]
 					: DB::getPk(self::TABLE_NAMES[$resource]);
 
 				foreach ($objects as $object) {
@@ -460,7 +508,7 @@ class CAudit {
 	}
 
 	/**
-	 * Return recordsetid. Generate recordsetid if its not been generated yet.
+	 * Return recordsetid. Generate recordsetid if it has not been generated yet.
 	 *
 	 * @return string
 	 */
@@ -578,11 +626,9 @@ class CAudit {
 			return false;
 		}
 
-		if (strpos($path, '[') !== false) {
-			$path = preg_replace('/\[[0-9]+\]/', '', $path);
-		}
+		$object_path = self::getLastObjectPath($path);
 
-		if (!in_array($path, self::MASKED_PATHS[$resource]['paths'])) {
+		if (!in_array(self::getAbstractPath($path), self::MASKED_PATHS[$resource]['paths'])) {
 			return false;
 		}
 
@@ -590,66 +636,66 @@ class CAudit {
 			return true;
 		}
 
-		$all_counditions = count(self::MASKED_PATHS[$resource]['conditions']);
+		$all_conditions = count(self::MASKED_PATHS[$resource]['conditions']);
 		$true_conditions = 0;
 
-		foreach (self::MASKED_PATHS[$resource]['conditions'] as $condition_path => $value) {
+		foreach (self::MASKED_PATHS[$resource]['conditions'] as $condition_key => $value) {
+			$condition_path = $object_path.'.'.$condition_key;
+
 			if (array_key_exists($condition_path, $object) && $object[$condition_path] == $value) {
 				$true_conditions++;
 			}
 		}
 
-		return ($true_conditions == $all_counditions);
+		return ($true_conditions == $all_conditions);
 	}
 
 	/**
 	 * Converts the object properties to the one-dimensional array where the key is a path.
 	 *
-	 * @param string $prefix
-	 * @param array  $object
+	 * @param string $path    Path to object or to array of objects.
+	 * @param array  $object  The object or array of objects to convert.
 	 *
 	 * @return array
 	 */
-	private static function convertKeysToPaths(string $prefix, array $object): array {
+	private static function convertKeysToPaths(string $path, array $object): array {
 		$result = [];
 
-		$is_nested_single_object = array_key_exists($prefix, self::NESTED_SINGLE_OBJECTS_IDS);
-		$is_nested_object = false;
+		$is_field_of_another_object = strpos($path, '.') !== false && !preg_match('/\[[0-9]+\]$/', $path);
+		$is_array_of_objects = false;
 
-		if ($is_nested_single_object) {
-			$pk = self::NESTED_SINGLE_OBJECTS_IDS[$prefix];
-		}
-		elseif (!preg_match('/\[[0-9]+\]$/', $prefix)) {
-			$object_prefix = preg_replace('/\[[0-9]+\]/', '', $prefix);
-			$is_nested_object = array_key_exists($object_prefix, self::NESTED_OBJECTS_IDS);
+		if ($is_field_of_another_object) {
+			$abstract_path = self::getAbstractPath($path);
+			$is_array_of_objects = array_key_exists($abstract_path, self::NESTED_OBJECTS_ID_FIELD_NAMES);
 
-			if ($is_nested_object) {
-				$pk = self::NESTED_OBJECTS_IDS[$object_prefix];
+			if ($is_array_of_objects) {
+				$id_field_name = self::NESTED_OBJECTS_ID_FIELD_NAMES[$abstract_path];
 			}
 		}
 
-		foreach ($object as $key => $value) {
-			if ($is_nested_single_object) {
-				$index = '['.$object[$pk].'].'.$key;
-			}
-			elseif ($is_nested_object) {
-				$index = '['.$value[$pk].']';
-			}
-			else {
-				$index = '.'.$key;
-			}
+		if ($is_array_of_objects) {
+			$objects = $object;
 
-			$new_prefix = $prefix.$index;
+			foreach ($objects as $object) {
+				$path_to_object = $path.'['.$object[$id_field_name].']';
 
-			if (in_array($new_prefix, self::SKIP_FIELDS)) {
-				continue;
+				$result += self::convertKeysToPaths($path_to_object, $object);
 			}
+		}
+		else {
+			foreach ($object as $field => $value) {
+				$path_to_field = $path.'.'.$field;
 
-			if (is_array($value)) {
-				$result += self::convertKeysToPaths($new_prefix, $value);
-			}
-			else {
-				$result[$new_prefix] = (string) $value;
+				if (in_array(self::getAbstractPath($path_to_field), self::SKIP_FIELDS)) {
+					continue;
+				}
+
+				if (is_array($value)) {
+					$result += self::convertKeysToPaths($path_to_field, $value);
+				}
+				else {
+					$result[$path_to_field] = (string) $value;
+				}
 			}
 		}
 
@@ -670,11 +716,7 @@ class CAudit {
 		$table_name = self::TABLE_NAMES[$resource];
 
 		if ($object_path !== self::API_NAMES[$resource]) {
-			if (strpos($object_path, '[') !== false) {
-				$object_path = preg_replace('/\[[0-9]+\]/', '', $object_path);
-			}
-
-			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[$object_path];
+			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[self::getAbstractPath($object_path)];
 		}
 
 		$schema_fields = DB::getSchema($table_name)['fields'];
@@ -711,6 +753,21 @@ class CAudit {
 	 */
 	private static function getLastObjectPath(string $path): string {
 		return substr($path, 0, strrpos($path, '.'));
+	}
+
+	/**
+	 * Return the abstract path (without indexes).
+	 *
+	 * @param string $path
+	 *
+	 * @return string
+	 */
+	private static function getAbstractPath(string $path): string {
+		if (strpos($path, '[') !== false) {
+			$path = preg_replace('/\[[0-9]+\]/', '', $path);
+		}
+
+		return $path;
 	}
 
 	/**
@@ -761,7 +818,7 @@ class CAudit {
 			if (self::isValueToMask($resource, $path, $object)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD, ZBX_SECRET_MASK];
 			}
-			elseif (in_array($path, self::BLOB_FIELDS)) {
+			elseif (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
 				$result[$path] = [self::DETAILS_ACTION_ADD];
 			}
 			else {
@@ -794,7 +851,18 @@ class CAudit {
 
 		foreach ($nested_objects_paths as $path) {
 			if (!in_array($path, $db_nested_objects_paths)) {
-				$result[$path] = [self::DETAILS_ACTION_ADD];
+				if (in_array(self::getAbstractPath($path), self::DELETE_ONLY_FIELDS)) {
+					$result[$path] = [self::DETAILS_ACTION_DELETE];
+
+					foreach ($object as $object_path => $value) {
+						if (substr($object_path, 0, strlen($path)) === $path) {
+							unset($object[$object_path]);
+						}
+					}
+				}
+				else {
+					$result[$path] = [self::DETAILS_ACTION_ADD];
+				}
 			}
 		}
 
@@ -806,7 +874,7 @@ class CAudit {
 					continue;
 				}
 
-				if (in_array($path, self::BLOB_FIELDS)) {
+				if (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
 					$result[$path] = [self::DETAILS_ACTION_ADD];
 				}
 				else {
@@ -816,20 +884,25 @@ class CAudit {
 					];
 				}
 			}
-			elseif ($value != $db_value) {
-				if (self::isNestedObjectProperty($path)) {
-					$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
-				}
+			else {
+				$is_mask_value = self::isValueToMask($resource, $path, $object);
+				$is_mask_db_value = self::isValueToMask($resource, $path, $db_object);
 
-				if (in_array($path, self::BLOB_FIELDS)) {
-					$result[$path] = [self::DETAILS_ACTION_UPDATE];
-				}
-				else {
-					$result[$path] = [
-						self::DETAILS_ACTION_UPDATE,
-						self::isValueToMask($resource, $path, $object) ? ZBX_SECRET_MASK : $value,
-						self::isValueToMask($resource, $path, $db_object) ? ZBX_SECRET_MASK : $db_value
-					];
+				if ($value != $db_value || $is_mask_value || $is_mask_db_value) {
+					if (self::isNestedObjectProperty($path)) {
+						$result[self::getLastObjectPath($path)] = [self::DETAILS_ACTION_UPDATE];
+					}
+
+					if (in_array(self::getAbstractPath($path), self::BLOB_FIELDS)) {
+						$result[$path] = [self::DETAILS_ACTION_UPDATE];
+					}
+					else {
+						$result[$path] = [
+							self::DETAILS_ACTION_UPDATE,
+							$is_mask_value ? ZBX_SECRET_MASK : $value,
+							$is_mask_db_value ? ZBX_SECRET_MASK : $db_value
+						];
+					}
 				}
 			}
 		}

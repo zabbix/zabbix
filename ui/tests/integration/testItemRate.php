@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,6 +85,48 @@ class testItemRate extends CIntegrationTest {
 			'start' => 0,
 			'step' => 32,
 			'count' => 120
+		],
+		[
+			'key' => 'kuber_metric2[promparam,0.1]',
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'start' => 0,
+			'step' => 1,
+			'count' => 120
+		],
+		[
+			'key' => 'kuber_metric2[promparam,0.3]',
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'start' => 0,
+			'step' => 2,
+			'count' => 120
+		],
+		[
+			'key' => 'kuber_metric2[promparam,0.5]',
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'start' => 0,
+			'step' => 4,
+			'count' => 120
+		],
+		[
+			'key' => 'kuber_metric2[promparam,0.7]',
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'start' => 0,
+			'step' => 8,
+			'count' => 120
+		],
+		[
+			'key' => 'kuber_metric2[promparam,0.9]',
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'start' => 0,
+			'step' => 16,
+			'count' => 120
+		],
+		[
+			'key' => 'kuber_metric2[promparam,+Inf]',
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'start' => 0,
+			'step' => 32,
+			'count' => 120
 		]
 	];
 
@@ -153,6 +195,23 @@ class testItemRate extends CIntegrationTest {
 			'item' => [
 				'name' => 'histogram_quantile',
 				'params' => 'histogram_quantile(0.8, bucket_rate_foreach(/'.'/kuber_metric[*],60,1))',
+				'delay' => 1,
+				'item_num' => 0
+			]
+		],
+		[
+			'api_request' => [
+				'output' => ['value']
+			],
+			'expected_result' => [
+				[
+					'value' => '0.9'
+				]
+			],
+			'expected_error' => false,
+			'item' => [
+				'name' => 'histogram_quantile2',
+				'params' => 'histogram_quantile(0.8, bucket_rate_foreach(/'.'/kuber_metric2[promparam,*],60,2))',
 				'delay' => 1,
 				'item_num' => 0
 			]

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ $value_type = '';
 
 if ($itemids) {
 	$items = API::Item()->get([
-		'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid', 'history', 'trends'],
+		'output' => ['itemid', 'name', 'value_type'],
 		'selectHosts' => ['name'],
 		'itemids' => $itemids,
 		'preservekeys' => true,
@@ -87,7 +87,6 @@ if ($itemids) {
 		}
 	}
 
-	$items = CMacrosResolverHelper::resolveItemNames($items);
 	$item = reset($items);
 	$value_type = $item['value_type'];
 }

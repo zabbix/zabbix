@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:23Z'
+  version: '6.0'
+  date: '2022-04-06T19:33:25Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384765-discussion-thread-for-official-zabbix-template-nginx
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -31,13 +31,17 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: f5db329410a14609a5f3e883ca493cc8
               expression: 'min(/Nginx by Zabbix agent/net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN}'
-              name: 'Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              name: 'Nginx: Service response time is too high'
+              event_name: 'Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -47,6 +51,10 @@ zabbix_export:
                 -
                   name: 'Nginx: Service is down'
                   expression: 'last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: f06e76888f464e13b7cc4c3db33e8131
           name: 'Nginx: Service status'
@@ -61,8 +69,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: c043191c22f34522ba4f83430d9f88b1
@@ -74,6 +85,10 @@ zabbix_export:
                 -
                   name: 'Nginx: Process is not running'
                   expression: 'last(/Nginx by Zabbix agent/proc.num[nginx])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 9e2be446ac79491c8be1bcd789392066
           name: 'Nginx: Connections accepted per second'
@@ -97,8 +112,8 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: 436f2dc87cda418eb8f19ed6910c7bd0
           name: 'Nginx: Connections active'
@@ -117,8 +132,8 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: 4027e6db5e024aff98056faa2d4b43cd
           name: 'Nginx: Connections dropped per second'
@@ -145,13 +160,14 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
           triggers:
             -
               uuid: f2d431fa9bc446608caa3f80ef27c41b
               expression: 'min(/Nginx by Zabbix agent/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
-              name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
+              name: 'Nginx: High connections drop rate'
+              event_name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               opdata: 'Current rate: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
@@ -162,6 +178,10 @@ zabbix_export:
                 -
                   name: 'Nginx: Service is down'
                   expression: 'last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 06191636a7104e1bb40d197493b80958
           name: 'Nginx: Connections handled per second'
@@ -185,8 +205,8 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: f5925c78389143c7924432483a5c716c
           name: 'Nginx: Connections reading'
@@ -205,8 +225,8 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: d6cfa828ba344ffe948d8d985b849316
           name: 'Nginx: Connections waiting'
@@ -225,8 +245,8 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: c038a572f73f4a418ddcc5aeb8b0a547
           name: 'Nginx: Connections writing'
@@ -245,8 +265,8 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: connections
         -
           uuid: b28444fb9b834d03a72036882c80b921
           name: 'Nginx: Requests total'
@@ -265,8 +285,8 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: requests
         -
           uuid: 2600a696278f490f86cadd8c8836f269
           name: 'Nginx: Requests per second'
@@ -290,8 +310,8 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: requests
         -
           uuid: 3dcc81006977478f92be6dd040d66eb5
           name: 'Nginx: Version'
@@ -315,16 +335,21 @@ zabbix_export:
             key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: application
           triggers:
             -
               uuid: 7ad80c508f2f48b59f7659c673db9f36
               expression: 'last(/Nginx by Zabbix agent/nginx.version,#1)<>last(/Nginx by Zabbix agent/nginx.version,#2) and length(last(/Nginx by Zabbix agent/nginx.version))>0'
-              name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Nginx: Version has changed'
+              event_name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Nginx version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 84c95c1955bf4ccaa12a060a9acdb478
           name: 'Nginx: CPU utilization'
@@ -335,8 +360,8 @@ zabbix_export:
           description: 'Process CPU utilization percentage.'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: cpu
         -
           uuid: 64d208475c034bae953a64cde1833ebb
           name: 'Nginx: Memory usage (rss)'
@@ -346,8 +371,8 @@ zabbix_export:
           description: 'Resident set size memory used by process in bytes.'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: memory
         -
           uuid: 21fccb0286fb407c85f1972e994c698e
           name: 'Nginx: Memory usage (vsize)'
@@ -357,8 +382,8 @@ zabbix_export:
           description: 'Virtual memory size used by process in bytes.'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: memory
         -
           uuid: ba3da6baccee4b31947bf20d3cae0e5f
           name: 'Nginx: Number of processes running'
@@ -367,14 +392,18 @@ zabbix_export:
           description: 'Number of the Nginx processes running.'
           tags:
             -
-              tag: Application
-              value: Nginx
+              tag: component
+              value: system
           triggers:
             -
               uuid: 903e6a1f30154ee49df3f8d87e0164cc
               expression: 'last(/Nginx by Zabbix agent/proc.num[nginx])=0'
               name: 'Nginx: Process is not running'
               priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 52a23a9f6d60490c8f5565b938154f61
           name: 'Nginx: Get stub status page'
@@ -394,15 +423,19 @@ zabbix_export:
             https://nginx.org/en/docs/http/ngx_http_stub_status_module.html
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: a497b80eb03f469c9552881b498003b2
               expression: |
                 find(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],,"like","HTTP/1.1 200")=0 or
                  nodata(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],30m)=1
-              name: 'Nginx: Failed to fetch stub status page (or no data for 30m)'
+              name: 'Nginx: Failed to fetch stub status page'
+              event_name: 'Nginx: Failed to fetch stub status page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -413,6 +446,17 @@ zabbix_export:
                 -
                   name: 'Nginx: Service is down'
                   expression: 'last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: nginx
       macros:
         -
           macro: '{$NGINX.DROP_RATE.MAX.WARN}'

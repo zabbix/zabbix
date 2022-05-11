@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #define ZABBIX_COMMON_H
 
 #include "sysinc.h"
-#include "zbxtypes.h"
 #include "module.h"
 #include "version.h"
 #include "md5.h"
@@ -99,6 +98,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
 #define	CONFIG_ERROR	-7
+#define	SIG_ERROR	-8
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
@@ -188,6 +188,7 @@ typedef enum
 	INTERFACE_TYPE_SNMP,
 	INTERFACE_TYPE_IPMI,
 	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_OPT = 254,
 	INTERFACE_TYPE_ANY = 255
 }
 zbx_interface_type_t;
@@ -569,8 +570,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_REPORTMANAGER		33
 #define ZBX_PROCESS_TYPE_REPORTWRITER		34
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
-#define ZBX_PROCESS_TYPE_PROBLEMHOUSEKEEPER	36
-#define ZBX_PROCESS_TYPE_COUNT			37	/* number of process types */
+#define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	36
+#define ZBX_PROCESS_TYPE_ODBCPOLLER		37
+#define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -721,6 +723,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ACTION_PAUSE_SUPPRESSED_FALSE	0	/* process escalation for suppressed events */
 #define ACTION_PAUSE_SUPPRESSED_TRUE	1	/* pause escalation for suppressed events */
 
+/* action escalation canceled notification mode */
+#define ACTION_NOTIFY_IF_CANCELED_TRUE	1	/* notify about canceled escalations for action (default) */
+#define ACTION_NOTIFY_IF_CANCELED_FALSE	0	/* do not notify about canceled escalations for action */
+
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
 
@@ -793,7 +799,7 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_TRIGGER_CORRELATION_NONE	0
 #define ZBX_TRIGGER_CORRELATION_TAG	1
 
-/* acknowledgement actions (flags) */
+/* acknowledgment actions (flags) */
 #define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
 #define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
 #define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
@@ -978,6 +984,8 @@ typedef enum
 }
 zbx_task_t;
 
+/* runtime control commands */
+#define ZBX_RTC_UNKNOWN				0
 #define ZBX_RTC_LOG_LEVEL_INCREASE		1
 #define ZBX_RTC_LOG_LEVEL_DECREASE		2
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE		3
@@ -991,6 +999,16 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+
+/* internal rtc messages */
+#define ZBX_RTC_SUBSCRIBE			100
+#define ZBX_RTC_SHUTDOWN			101
+#define ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT	102
+
+/* runtime control notifications, must be less than 10000 */
+#define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+
+#define ZBX_IPC_RTC_MAX				9999
 
 typedef enum
 {
@@ -1010,6 +1028,7 @@ typedef struct
 	zbx_task_t	task;
 	unsigned int	flags;
 	int		data;
+	char		*opts;
 }
 ZBX_TASK_EX;
 
@@ -1191,6 +1210,7 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 double		zbx_time(void);
 void		zbx_timespec(zbx_timespec_t *ts);
 double		zbx_current_time(void);
+int		zbx_is_leap_year(int year);
 void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
 long		zbx_get_timezone_offset(time_t t, struct tm *tm);
 struct tm	*zbx_localtime(const time_t *time, const char *tz);
@@ -1674,7 +1694,7 @@ int	zbx_validate_value_dbl(double value, int dbl_precision);
 
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-		int *nextcheck, char **error);
+		int *nextcheck, int *scheduling, char **error);
 #define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
 char	*zbx_create_token(zbx_uint64_t seed);
 
@@ -1685,7 +1705,7 @@ char	*zbx_create_token(zbx_uint64_t seed);
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#define ZBX_PCRE_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+#define ZBX_REGEXP_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
 #endif
 
 int	zbx_str_extract(const char *text, size_t len, char **value);
@@ -1700,6 +1720,7 @@ typedef enum
 	ZBX_TIME_UNIT_WEEK,
 	ZBX_TIME_UNIT_MONTH,
 	ZBX_TIME_UNIT_YEAR,
+	ZBX_TIME_UNIT_ISOYEAR,
 	ZBX_TIME_UNIT_COUNT
 }
 zbx_time_unit_t;
@@ -1711,6 +1732,8 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
 void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
 
 const char	*zbx_timespec_str(const zbx_timespec_t *ts);
+
+int	zbx_get_week_number(const struct tm *tm);
 
 zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
 int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
@@ -1782,4 +1805,6 @@ typedef enum
 }
 zbx_err_codes_t;
 
+void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif

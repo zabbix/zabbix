@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,14 +103,13 @@ if (!$readonly) {
 	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$key_controls[] = (new CButton('keyButton', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.generic",jQuery.extend('.
-			json_encode([
+		->onClick(
+			'return PopUp("popup.generic", jQuery.extend('.json_encode([
 				'srctbl' => 'help_items',
 				'srcfld1' => 'key',
 				'dstfrm' => $form->getName(),
 				'dstfld1' => 'key'
-			]).
-				',{itemtype: jQuery("#type").val()}), null, this);'
+			]).', {itemtype: jQuery("#type").val()}), {dialogue_class: "modal-popup-generic"});'
 		);
 }
 
@@ -165,12 +164,21 @@ $item_tab
 $query_fields_data = [];
 
 if (is_array($data['query_fields']) && $data['query_fields']) {
+	$i = 0;
 	foreach ($data['query_fields'] as $pair) {
-		$query_fields_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$query_fields_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$readonly) {
-	$query_fields_data[] = ['name' => '', 'value' => ''];
+	$query_fields_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 
 $query_fields = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -243,7 +251,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -357,12 +369,21 @@ $item_tab
 $headers_data = [];
 
 if (is_array($data['headers']) && $data['headers']) {
+	$i = 0;
 	foreach ($data['headers'] as $pair) {
-		$headers_data[] = ['name' => key($pair), 'value' => reset($pair)];
+		$headers_data[] = [
+			'name' => key($pair),
+			'value' => reset($pair),
+			'sortorder' => $i++
+		];
 	}
 }
 elseif (!$readonly) {
-	$headers_data[] = ['name' => '', 'value' => ''];
+	$headers_data[] = [
+		'name' => '',
+		'value' => '',
+		'sortorder' => 0
+	];
 }
 
 $headers = (new CTag('script', true))->setAttribute('type', 'text/json');
@@ -388,7 +409,11 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol(
+							(new CDiv(
+								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+							))->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -582,6 +607,15 @@ if ($data['display_interfaces']) {
 					->setId('js-item-interface-field')
 			]);
 		}
+		else {
+			$item_tab->addItem([
+				(new CLabel(_('Host interface'), 'interface'))->setId('js-item-interface-label'),
+				(new CFormField(
+					(new CTextBox('interface', interfaceType2str(INTERFACE_TYPE_OPT), true))
+						->setAttribute('disabled', 'disabled')
+				))->setId('js-item-interface-field')
+			]);
+		}
 	}
 	else {
 		$select_interface = getInterfaceSelect($data['interfaces'])
@@ -590,6 +624,10 @@ if ($data['display_interfaces']) {
 			->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
+
+		if ($readonly) {
+			$select_interface->setAttribute('readonly', 'readonly');
+		}
 
 		$item_tab->addItem([
 			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
@@ -621,7 +659,7 @@ $item_tab->addItem([
 
 $item_tab
 	->addItem([
-		(new CLabel(_('IPMI sensor')))->setId('js-item-impi-sensor-label'),
+		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
 		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-impi-sensor-field')
@@ -650,7 +688,7 @@ $item_tab
 		))->setId('js-item-jmx-endpoint-field')
 	])
 	->addItem([
-		(new CLabel(_('User name')))->setId('js-item-username-label'),
+		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
 		(new CFormField((new CTextBox('username', $data['username'], $discovered_item, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete()
@@ -675,7 +713,7 @@ $item_tab
 		))->setId('js-item-private-key-field')
 	])
 	->addItem([
-		(new CLabel(_('Password')))->setId('js-item-password-label'),
+		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
 		(new CFormField((new CTextBox('password', $data['password'], $discovered_item, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->disableAutocomplete()
@@ -715,7 +753,7 @@ $item_tab
 		))->setId('js-item-formula-field')
 	])
 	->addItem([
-		(new CLabel(_('Units')))->setId('js-item-units-label'),
+		(new CLabel(_('Units'), 'units'))->setId('js-item-units-label'),
 		(new CFormField((new CTextBox('units', $data['units'], $readonly))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)))
 			->setId('js-item-units-field')
 	])
@@ -872,7 +910,7 @@ $item_tab
 		]))->setId('js-item-trends-field')
 	])
 	->addItem([
-		(new CLabel(_('Log time format')))->setId('js-item-log-time-format-label'),
+		(new CLabel(_('Log time format'), 'logtimefmt'))->setId('js-item-log-time-format-label'),
 		(new CFormField(
 			(new CTextBox('logtimefmt', $data['logtimefmt'], $readonly, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-log-time-format-field')
@@ -915,7 +953,7 @@ $item_tab
 		]))->setId('js-item-allow-traps-field')
 	])
 	->addItem([
-		(new CLabel(_('Allowed hosts')))->setId('js-item-trapper-hosts-label'),
+		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField((new CTextBox('trapper_hosts', $data['trapper_hosts']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-trapper-hosts-field')
@@ -958,7 +996,7 @@ else {
 // Append description to form list.
 $item_tab
 	->addItem([
-		new CLabel(_('Description')),
+		new CLabel(_('Description'), 'description'),
 		new CFormField((new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('items', 'description'))
@@ -967,9 +1005,23 @@ $item_tab
 	])
 	// Append status to form list.
 	->addItem([
-		new CLabel(_('Enabled')),
+		new CLabel(_('Enabled'), 'status'),
 		new CFormField((new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['status'] == ITEM_STATUS_ACTIVE))
 	]);
+
+	// Add link to Latest data.
+if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['itemid'] != 0
+		&& $data['context'] === 'host') {
+	$item_tab->addItem(
+		(new CFormField((new CLink(_('Latest data'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'latest.view')
+				->setArgument('hostids[]', $data['hostid'])
+				->setArgument('name', $data['name'])
+				->setArgument('filter_name', '')
+		))->setTarget('_blank')))
+	);
+}
 
 // Append tabs to form.
 $item_tabs = (new CTabView())
@@ -1063,3 +1115,12 @@ $widget->show();
 		'interface_types' => itemTypeInterface()
 	]).');
 '))->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $form->getName(),
+		'trends_default' => $data['trends_default']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

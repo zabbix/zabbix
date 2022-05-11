@@ -1,0 +1,663 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:27:33Z'
+  groups:
+    -
+      uuid: 846977d1dfed4968bc5f8bdb363285bc
+      name: 'Templates/Operating systems'
+  templates:
+    -
+      uuid: b1fd823d262042e08291313f72be9452
+      template: 'HP-UX by Zabbix agent'
+      name: 'HP-UX by Zabbix agent'
+      description: |
+        Official HP-UX template. Requires agent of Zabbix 4.0.0 or newer.+
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Operating systems'
+      items:
+        -
+          uuid: 27949a6910304d39b3d2a68c90525581
+          name: 'Host name of Zabbix agent running'
+          key: agent.hostname
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 98507eac4f70420698dc234c2a6e3198
+          name: 'Zabbix agent ping'
+          key: agent.ping
+          history: 7d
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          valuemap:
+            name: 'Zabbix agent ping status'
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 3f456ce86b284b089f545d8c72c64405
+          name: 'Version of Zabbix agent running'
+          key: agent.version
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: application
+        -
+          uuid: bcba4702a58d48339c6e7e49dea574c4
+          name: 'Processor load (1 min average per core)'
+          key: 'system.cpu.load[percpu,avg1]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 6721e8fbe5ee45aa9d06b698210a268a
+              expression: 'avg(/HP-UX by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
+              name: 'Processor load is too high'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 60057d54b81342f4aaa0103a278bf7b6
+          name: 'Processor load (5 min average per core)'
+          key: 'system.cpu.load[percpu,avg5]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 296dbd5148184004b26ac50ae5e6893b
+          name: 'Processor load (15 min average per core)'
+          key: 'system.cpu.load[percpu,avg15]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 2b82ccaf9eb1424593e2738a5512e182
+          name: 'CPU idle time'
+          key: 'system.cpu.util[,idle]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent doing nothing.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 8665bd2dc84e46daa081a379548b0603
+          name: 'CPU nice time'
+          key: 'system.cpu.util[,nice]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent running users'' processes that have been niced.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 8419321f4744476ea27b7d1acddcd365
+          name: 'CPU system time'
+          key: 'system.cpu.util[,system]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent running the kernel and its processes.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 611c9a3c70aa4455b6ec7bebe64b5316
+          name: 'CPU user time'
+          key: 'system.cpu.util[,user]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent running users'' processes that are not niced.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 6e3b32f3f92543759ef2f30834899ba0
+          name: 'Host name'
+          key: system.hostname
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          description: 'System host name.'
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: 07215ae05345423d8625962b85d9d4ec
+              expression: 'last(/HP-UX by Zabbix agent/system.hostname,#1)<>last(/HP-UX by Zabbix agent/system.hostname,#2)'
+              name: 'Hostname was changed'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 16c6c420c710498083355361b104f7a2
+          name: 'Host local time'
+          key: system.localtime
+          history: 1w
+          units: unixtime
+          tags:
+            -
+              tag: component
+              value: os
+        -
+          uuid: b66598337e0e4990a2776d2a42020e72
+          name: 'System information'
+          key: system.uname
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          description: 'The information as normally returned by ''uname -a''.'
+          inventory_link: OS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: 34f76014b2d3434a8d1f1f0657b5605f
+              expression: 'last(/HP-UX by Zabbix agent/system.uname,#1)<>last(/HP-UX by Zabbix agent/system.uname,#2)'
+              name: 'Host information was changed'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: bb698e97aa1b45ebadcb48da729b8e64
+          name: 'Number of logged in users'
+          key: system.users.num
+          history: 1w
+          description: 'Number of users who are currently logged in.'
+          tags:
+            -
+              tag: component
+              value: os
+        -
+          uuid: 4e11e7c5d43a4566989b39dbc0c23266
+          name: 'Checksum of /etc/passwd'
+          key: 'vfs.file.cksum[/etc/passwd,sha256]'
+          delay: 1h
+          history: 1w
+          tags:
+            -
+              tag: component
+              value: security
+          triggers:
+            -
+              uuid: f65c254d50e2454d9840784ff979f5d3
+              expression: 'last(/HP-UX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/HP-UX by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
+              name: '/etc/passwd has been changed'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: security
+        -
+          uuid: 767abadfa8be4bccb2c4c5a1d532ba87
+          name: 'Available memory'
+          key: 'vm.memory.size[available]'
+          history: 1w
+          units: B
+          description: 'Available memory is defined as free+cached+buffers memory.'
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: 005730efb6a94c4a83c4265f42aa8dff
+              expression: 'last(/HP-UX by Zabbix agent/vm.memory.size[available])<20M'
+              name: 'Lack of available memory on server'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 6da082e7f822465592f66e2bd0a46947
+          name: 'Total memory'
+          key: 'vm.memory.size[total]'
+          delay: 1h
+          history: 1w
+          units: B
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 5b0a1ce4ca4a441484eea38724eaf24d
+          name: 'Zabbix agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,agent,available]'
+          history: 7d
+          description: 'Monitoring agent availability status'
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: ce008290ad6341b98386adf9ea5c315b
+              expression: 'max(/HP-UX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              priority: AVERAGE
+              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      discovery_rules:
+        -
+          uuid: 83058e954f1d497d8c33c82c771d2250
+          name: 'Network interface discovery'
+          key: net.if.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#IFNAME}'
+                value: '@Network interfaces for discovery'
+                formulaid: A
+          description: 'Discovery of network interfaces as defined in global regular expression "Network interfaces for discovery".'
+          item_prototypes:
+            -
+              uuid: 1c1dc757da2a43c4827734e4b7b3fcd2
+              name: 'Interface {#IFNAME}: Incoming network traffic'
+              key: 'net.if.in[{#IFNAME}]'
+              history: 1w
+              units: bps
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 4de64b1ecae344afa12f892937caa04e
+              name: 'Interface {#IFNAME}: Outgoing network traffic'
+              key: 'net.if.out[{#IFNAME}]'
+              history: 1w
+              units: bps
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+          graph_prototypes:
+            -
+              uuid: dec3568ab5e7457da4a81d32a8ba2b72
+              name: 'Interface {#IFNAME}: Network traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HP-UX by Zabbix agent'
+                    key: 'net.if.in[{#IFNAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HP-UX by Zabbix agent'
+                    key: 'net.if.out[{#IFNAME}]'
+        -
+          uuid: 883b3a5efab34685b9e6c9a84a6bec84
+          name: 'Mounted filesystem discovery'
+          key: vfs.fs.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#FSTYPE}'
+                value: '@File systems for discovery'
+                formulaid: A
+          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          item_prototypes:
+            -
+              uuid: dbf8305aadb049a58b19a50d4e36fde9
+              name: '{#FSNAME}: Free inodes, %'
+              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              history: 1w
+              value_type: FLOAT
+              units: '%'
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 9d7587a6cae149d69e90cdefa024d254
+                  expression: 'last(/HP-UX by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  name: '{#FSNAME}: Free inodes is less than 20%'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 75efb4ab311848ec9bbb03cf05efef8b
+              name: '{#FSNAME}: Free disk space'
+              key: 'vfs.fs.size[{#FSNAME},free]'
+              history: 1w
+              units: B
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: 707d7dfb2dc243d49e4623f1d043a5b7
+              name: '{#FSNAME}: Free disk space, %'
+              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              history: 1w
+              value_type: FLOAT
+              units: '%'
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 07153df58e1a4a2bad7bf27a1ddf24a0
+                  expression: 'last(/HP-UX by Zabbix agent/vfs.fs.size[{#FSNAME},pfree])<20'
+                  name: '{#FSNAME}: Free disk space is less than 20%'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 3d75a99c05bf41a2b63ce2b0caf4a6cc
+              name: '{#FSNAME}: Total disk space'
+              key: 'vfs.fs.size[{#FSNAME},total]'
+              delay: 1h
+              history: 1w
+              units: B
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: 0aa8dd5bbaea4f35808ef735f0cec18d
+              name: '{#FSNAME}: Used disk space'
+              key: 'vfs.fs.size[{#FSNAME},used]'
+              history: 1w
+              units: B
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+          graph_prototypes:
+            -
+              uuid: 92f6b017c10640b6bfe7cd68a949d2d5
+              name: '{#FSNAME}: Disk space usage'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HP-UX by Zabbix agent'
+                    key: 'vfs.fs.size[{#FSNAME},total]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HP-UX by Zabbix agent'
+                    key: 'vfs.fs.size[{#FSNAME},free]'
+      tags:
+        -
+          tag: class
+          value: os
+        -
+          tag: target
+          value: hp-ux
+      macros:
+        -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 3m
+          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
+      dashboards:
+        -
+          uuid: cbac7a8959574b308d1c1e23cf3760ee
+          name: 'System performance'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU load'
+                        host: 'HP-UX by Zabbix agent'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU utilization'
+                        host: 'HP-UX by Zabbix agent'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Memory usage'
+                        host: 'HP-UX by Zabbix agent'
+      valuemaps:
+        -
+          uuid: 663bea44626447b5a72a71238dfda919
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: 3f4bc88020d444e1b951aebfa8f3dfb8
+          name: 'Zabbix agent ping status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+  graphs:
+    -
+      uuid: 808ceffbcb844def962b03d6fa7a3496
+      name: 'CPU load'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'HP-UX by Zabbix agent'
+            key: 'system.cpu.load[percpu,avg1]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'HP-UX by Zabbix agent'
+            key: 'system.cpu.load[percpu,avg5]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'HP-UX by Zabbix agent'
+            key: 'system.cpu.load[percpu,avg15]'
+    -
+      uuid: 8c47ac69fba642f4827fcad01b3a0379
+      name: 'CPU utilization'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'HP-UX by Zabbix agent'
+            key: 'system.cpu.util[,nice]'
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'HP-UX by Zabbix agent'
+            key: 'system.cpu.util[,system]'
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'HP-UX by Zabbix agent'
+            key: 'system.cpu.util[,user]'
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'HP-UX by Zabbix agent'
+            key: 'system.cpu.util[,idle]'
+    -
+      uuid: 4cf12f1ea3934cb99f76c20916067a71
+      name: 'Memory usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'HP-UX by Zabbix agent'
+            key: 'vm.memory.size[available]'

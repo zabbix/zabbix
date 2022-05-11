@@ -1,6 +1,6 @@
 /* /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@ import (
 	"context"
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // databaseAgeHandler gets age of specific database respectively or nil otherwise.

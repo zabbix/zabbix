@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ import (
 	"strconv"
 	"time"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 const (
@@ -54,8 +54,8 @@ const (
 )
 
 type Options struct {
-	Timeout  time.Duration `conf:"optional,range=1:30"`
-	Capacity int           `conf:"optional,range=1:100"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              time.Duration `conf:"optional,range=1:30"`
 }
 
 // Plugin -

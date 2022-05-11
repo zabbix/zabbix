@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,15 +47,15 @@ $form_list = (new CFormList())
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic",'.
-				json_encode([
+			->onClick(
+				'return PopUp("popup.generic", '.json_encode([
 					'srctbl' => 'sysmaps',
 					'srcfld1' => 'sysmapid',
 					'srcfld2' => 'name',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'sysmapid',
 					'dstfld2' => 'sysmapname'
-				]).', null, this);'
+				]).', {dialogue_class: "modal-popup-generic"});'
 			)
 	]);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "cfg.h"
+
+#include "common.h"
 #include "log.h"
-#include "comms.h"
 
 extern unsigned char	program_type;
 
@@ -37,8 +37,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		int noexit);
 
 /******************************************************************************
- *                                                                            *
- * Function: match_glob                                                       *
  *                                                                            *
  * Purpose: see whether a file (e.g., "parameter.conf")                       *
  *          matches a pattern (e.g., "p*.conf")                               *
@@ -127,8 +125,6 @@ static int	match_glob(const char *file, const char *pattern)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_glob                                                       *
- *                                                                            *
  * Purpose: parse a glob like "/usr/local/etc/zabbix_agentd.conf.d/p*.conf"   *
  *          into "/usr/local/etc/zabbix_agentd.conf.d" and "p*.conf" parts    *
  *                                                                            *
@@ -198,8 +194,6 @@ trim:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: parse_cfg_dir                                                    *
  *                                                                            *
  * Purpose: parse directory with configuration files                          *
  *                                                                            *
@@ -307,8 +301,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_cfg_object                                                 *
- *                                                                            *
  * Purpose: parse "Include=..." line in configuration file                    *
  *                                                                            *
  * Parameters: cfg_file - full name of config file                            *
@@ -358,8 +350,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_cfg_file                                                   *
- *                                                                            *
  * Purpose: parse configuration file                                          *
  *                                                                            *
  * Parameters: cfg_file - full name of config file                            *
@@ -372,10 +362,9 @@ clean:
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing config file                          *
  *                                                                            *
- * Author: Alexei Vladishev, Eugene Grigorjev                                 *
- *                                                                            *
  ******************************************************************************/
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict, int noexit)
+static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
+		int noexit)
 {
 #define ZBX_MAX_INCLUDE_LEVEL	10
 
@@ -493,11 +482,14 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					case TYPE_CUSTOM:
 						if (NULL != cfg[i].variable)
 						{
-							cfg_custom_parameter_parser_t custom_parser =
-									(cfg_custom_parameter_parser_t)cfg[i].variable;
+							cfg_custom_parameter_parser_t	*p =
+									(cfg_custom_parameter_parser_t*)cfg[i].variable;
 
-							if (SUCCEED != custom_parser(value, &cfg[i]))
+							if (SUCCEED != p->cfg_custom_parameter_parser_func(value,
+									&cfg[i]))
+							{
 								goto incorrect_config;
+							}
 
 							continue;
 						}
@@ -637,8 +629,6 @@ static int	addr_compare_func(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_set_data_destination_hosts                                   *
  *                                                                            *
  * Purpose: parse "ServerActive' parameter value and set destination servers  *
  *          using a callback function                                         *

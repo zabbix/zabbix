@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+#include "fatal.h"
 
 #include "config.h"
 
@@ -39,8 +41,6 @@
 
 #include "common.h"
 #include "log.h"
-
-#include "fatal.h"
 
 const char	*get_signal_name(int sig)
 {
@@ -247,6 +247,8 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 
 #if defined(REG_EIP) || defined(REG_RIP)
 	ucontext_t	*uctx = (ucontext_t *)context;
+#else
+	ZBX_UNUSED(context);
 #endif
 
 	/* look for GET_PC() macro in sigcontextinfo.h files */
@@ -265,8 +267,6 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 #	endif
 
 #endif	/* HAVE_SYS_UCONTEXT_H */
-	int	i;
-	FILE	*fd;
 
 	zabbix_log(LOG_LEVEL_CRIT, "====== Fatal information: ======");
 
@@ -275,6 +275,7 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 #ifdef	HAVE_SYS_UCONTEXT_H
 
 #ifdef	ZBX_GET_PC
+		int	i;
 		/* On 64-bit GNU/Linux ZBX_GET_PC() returns 'greg_t' defined as 'long long int' (8 bytes). */
 		/* On 32-bit GNU/Linux it is defined as 'int' (4 bytes). To print registers in a common way we print */
 		/* them as 'long int' or 'unsigned long int' which is 8 bytes on 64-bit GNU/Linux and 4 bytes on */
@@ -335,6 +336,8 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 
 	if (0 != (flags & ZBX_FATAL_LOG_MEM_MAP))
 	{
+		FILE	*fd;
+
 		zabbix_log(LOG_LEVEL_CRIT, "=== Memory map: ===");
 
 		if (NULL != (fd = fopen("/proc/self/maps", "r")))

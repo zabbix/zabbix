@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 func Test_databasesDiscoveryHandler(t *testing.T) {

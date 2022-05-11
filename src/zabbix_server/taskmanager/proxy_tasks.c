@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,18 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include <assert.h>
-
 #include "common.h"
-#include "log.h"
-
 #include "db.h"
-#include "zbxjson.h"
+
 #include "zbxtasks.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_tm_get_remote_tasks                                          *
  *                                                                            *
  * Purpose: get tasks scheduled to be executed on a proxy                     *
  *                                                                            *
@@ -117,4 +111,3 @@ void	zbx_tm_get_remote_tasks(zbx_vector_ptr_t *tasks, zbx_uint64_t proxy_hostid)
 	}
 	DBfree_result(result);
 }
-

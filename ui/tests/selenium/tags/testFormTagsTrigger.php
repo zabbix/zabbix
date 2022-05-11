@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ class testFormTagsTrigger extends testFormTags {
 
 	public $update_name = 'Trigger with tags for updating';
 	public $clone_name = 'Trigger with tags for cloning';
+	public $remove_name = 'Trigger for tags removing';
 	public $link;
 	public $saved_link = 'triggers.php?form=update&context=host&triggerid=';
 	public $host = 'Host for tags testing';
@@ -187,5 +188,14 @@ class testFormTagsTrigger extends testFormTags {
 		$host_link = 'triggers.php?filter_set=1&context=host&filter_hostids[0]='.$hostid;
 
 		$this->checkInheritedElementTags($data, 'trigger', $host_link, $expression);
+	}
+
+	/**
+	 * Test removing tags from Trigger.
+	 */
+	public function testFormTagsTrigger_RemoveTags() {
+		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
+		$this->link = 'triggers.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$hostid;
+		$this->clearTags('trigger');
 	}
 }

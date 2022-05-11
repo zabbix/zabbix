@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,8 +112,6 @@ class HostInterfaceManager {
 
 				this.interfaces[value.interfaceid] = value;
 			});
-
-		return this;
 	}
 
 	/**
@@ -410,10 +408,9 @@ class HostInterfaceManager {
 
 		this.data[interfaceid].useip = use_ip;
 
-		[...elem.querySelectorAll('input[name$="[ip]"], input[name$="[dns]"]')].map((el) => {
+		[...elem.querySelectorAll('input[name$="[ip]"], input[name$="[dns]"]')].map((el) =>
 			el.removeAttribute('aria-required')
-			return el;
-		});
+		);
 
 		elem
 			.querySelector((use_ip == HostInterfaceManager.INTERFACE_USE_IP) ? '[name$="[ip]"]' : '[name$="[dns]"]')
@@ -515,7 +512,7 @@ class HostInterfaceManager {
 	}
 
 	makeReadonly() {
-		[...document.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_ROW)].map((row) => {
+		[...document.querySelectorAll('.' + HostInterfaceManager.ZBX_STYLE_HOST_INTERFACE_ROW)].forEach((row) => {
 			[...row.querySelectorAll('input, z-select')].map((el) => {
 				this.setReadonly(el);
 			});

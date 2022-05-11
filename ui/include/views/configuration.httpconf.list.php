@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -233,3 +233,7 @@ $httpForm->addItem([$httpTable, $data['paging'], new CActionButtonList('action',
 $widget->addItem($httpForm);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

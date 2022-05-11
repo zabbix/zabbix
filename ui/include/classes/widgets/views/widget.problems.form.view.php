@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,14 +85,14 @@ $form_list->addRow(CWidgetHelper::getLabel($fields['show_tags']), CWidgetHelper:
 // Tag name.
 $form_list->addRow(CWidgetHelper::getLabel($fields['tag_name_format']),
 	CWidgetHelper::getRadioButtonList($fields['tag_name_format'])
-		->setEnabled($fields['show_tags']->getValue() !== PROBLEMS_SHOW_TAGS_NONE)
+		->setEnabled($fields['show_tags']->getValue() !== SHOW_TAGS_NONE)
 );
 
 // Tag display priority.
 $form_list->addRow(CWidgetHelper::getLabel($fields['tag_priority']),
 	CWidgetHelper::getTextBox($fields['tag_priority'])
 		->setAttribute('placeholder', _('comma-separated list'))
-		->setEnabled($fields['show_tags']->getValue() !== PROBLEMS_SHOW_TAGS_NONE)
+		->setEnabled($fields['show_tags']->getValue() !== SHOW_TAGS_NONE)
 );
 
 // Show operational data.

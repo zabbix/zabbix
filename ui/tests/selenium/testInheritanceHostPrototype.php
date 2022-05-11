@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -574,8 +574,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$sql = 'SELECT macro,type,value,description FROM hostmacro WHERE hostid=%d ORDER BY hostmacroid';
-		$this->assertSame(CDBHelper::getHash(vsprintf($sql, $template_prototype_id)),
-			CDBHelper::getHash(vsprintf($sql, $host_prototype_id))
+		$this->assertSame(CDBHelper::getHash(vsprintf($sql, [$template_prototype_id])),
+			CDBHelper::getHash(vsprintf($sql, [$host_prototype_id]))
 		);
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@
 **/
 
 #include "common.h"
-
-#include "cfg.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxembed.h"
@@ -56,7 +54,6 @@ const char	*help_message[] = {
 	"  zabbix_js -s script-file.js -p example",
 	NULL	/* end of text */
 };
-
 
 /* long options */
 struct zbx_option	longopts[] =
@@ -102,7 +99,6 @@ char	*CONFIG_TLS_CIPHER_CMD		= NULL;
 
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
-
 
 char	*CONFIG_SOURCE_IP 		= NULL;
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
@@ -203,7 +199,6 @@ int	main(int argc, char **argv)
 		goto clean;
 	}
 
-
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{
 		usage();
@@ -254,6 +249,9 @@ int	main(int argc, char **argv)
 	printf("\n%s\n", result);
 close:
 	zabbix_close_log();
+#ifndef _WINDOWS
+	zbx_locks_destroy();
+#endif
 clean:
 	zbx_free(result);
 	zbx_free(error);
