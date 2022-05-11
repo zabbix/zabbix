@@ -382,16 +382,17 @@ static void	DBpatch_6010028_hstgrp_free(hstgrp_t *hstgrp)
 {
 	zbx_free(hstgrp->name);
 	zbx_free(hstgrp->uuid);
+	zbx_free(hstgrp);
 }
 
 static int	DBpatch_6010028_split_groups(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
 	int			i, permission, ret = SUCCEED;
-	zbx_uint64_t		nextid, groupid, id;
+	zbx_uint64_t		nextid, groupid;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
 	zbx_vector_hstgrp_t	hstgrps;
 	zbx_db_insert_t		db_insert;
 
@@ -414,6 +415,7 @@ static int	DBpatch_6010028_split_groups(void)
 
 		zbx_vector_hstgrp_append(&hstgrps, hstgrp);
 	}
+	DBfree_result(result);
 
 	if (0 == hstgrps.values_num)
 		goto out;
@@ -424,7 +426,7 @@ static int	DBpatch_6010028_split_groups(void)
 
 	for (i = 0; i < hstgrps.values_num; i++)
 	{
-		hstgrps.values[i]->newgroupid = ++nextid;
+		hstgrps.values[i]->newgroupid = nextid++;
 		zbx_db_insert_add_values(&db_insert, hstgrps.values[i]->newgroupid, hstgrps.values[i]->name,
 				HOSTGROUP_TYPE_TEMPLATE, hstgrps.values[i]->uuid);
 	}
@@ -432,12 +434,16 @@ static int	DBpatch_6010028_split_groups(void)
 	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
+	if (SUCCEED != ret)
+		goto out;
+
 	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", NULL);
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	for (i = 0; i < hstgrps.values_num; i++)
 	{
 		result = DBselect(
-				"select r.groupid,r.permission,r.id"
+				"select r.groupid,r.permission"
 				" from rights r"
 				" where r.id=" ZBX_FS_UI64,
 				hstgrps.values[i]->groupid);
@@ -446,39 +452,37 @@ static int	DBpatch_6010028_split_groups(void)
 		{
 			ZBX_STR2UINT64(groupid, row[0]);
 			permission = atoi(row[1]);
-			ZBX_STR2UINT64(id, row[2]);
-
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid,
-					permission, hstgrps.values[i]->newgroupid);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid, permission,
+					hstgrps.values[i]->newgroupid);
 		}
+		DBfree_result(result);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_groups hg"
-				" set hg.groupid ="  ZBX_FS_UI64
-				" where groupid=" ZBX_FS_UI64
-				" and hostid in ("
-				" select h.hostid"
-				" from hosts h"
-				" where status=" DBPATCH_HOST_STATUS_TEMPLATE ");\n",
-				hstgrps.values[i]->newgroupid,
-				hstgrps.values[i]->groupid);
+				" set hg.groupid =" ZBX_FS_UI64
+				" where hg.groupid=" ZBX_FS_UI64
+				" and hg.hostid in ("
+					"select h.hostid"
+					" from hosts h"
+					" where h.status=" DBPATCH_HOST_STATUS_TEMPLATE
+				");\n", hstgrps.values[i]->newgroupid, hstgrps.values[i]->groupid);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
 	}
+
 	zbx_db_insert_autoincrement(&db_insert, "rightid");
 
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
+		goto out;
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (0 == hstgrps.values_num || ZBX_DB_OK > DBexecute("%s", sql))
-		goto out;
+	if (ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
 out:
-	DBfree_result(result);
 	zbx_free(sql);
-
+	zbx_db_insert_clean(&db_insert);
 	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010028_hstgrp_free);
 	zbx_vector_hstgrp_destroy(&hstgrps);
 
@@ -498,71 +502,111 @@ static int	DBpatch_6010029(void)
 	int	ret = SUCCEED;
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		goto out;
+		return ret;
 
-	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where groupid in (" DBPATCH_TPLGRP_GROUPIDS ")",
-				HOSTGROUP_TYPE_TEMPLATE))
+	if (ZBX_DB_OK > DBexecute("update hstgrp p set p.type=%d where p.type<>%d and p.groupid in"
+			" (select t.groupid from (" DBPATCH_TPLGRP_GROUPIDS ") as t)",
+			HOSTGROUP_TYPE_TEMPLATE, HOSTGROUP_TYPE_TEMPLATE))
 	{
 		ret = FAIL;
-		goto out;
 	}
-out:
+
 	return ret;
 }
 
-static int	DBpatch_6010030_update_empty_parents(void)
+static int	DBpatch_6010030_startfrom(const zbx_vector_str_t *names, const char *name)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
-	int			i, ret = SUCCEED;
+	int	i;
+
+	for (i = 0; i < names->values_num; i++)
+	{
+		size_t	t_sz, g_sz;
+		char	tmp[256 * ZBX_MAX_BYTES_IN_UTF8_CHAR];
+
+		t_sz = strlen(names->values[i]);
+		g_sz = strlen(name);
+
+		if (g_sz == t_sz)
+			continue;
+
+		if (t_sz < g_sz)
+		{
+			zbx_strlcpy(tmp, names->values[i], sizeof(tmp));
+			zbx_strlcat(tmp, "/", sizeof(tmp));
+
+			if (0 == strncmp(tmp, name, strlen(tmp)))
+				return SUCCEED;
+		}
+		else
+		{
+			zbx_strlcpy(tmp, name, sizeof(tmp));
+			zbx_strlcat(tmp, "/", sizeof(tmp));
+
+			if (0 == strncmp(tmp, names->values[i], strlen(tmp)))
+				return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_6010030_update_empty(void)
+{
+	int			ret = SUCCEED;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		id;
 	zbx_vector_uint64_t	ids;
+	zbx_vector_str_t	names;
+	DB_RESULT		result;
+	DB_ROW			row;
 
 	result = DBselect(
-			"select g.groupid from hstgrp g"
+			"select g.name from hstgrp g"
+			" where g.type=%d"
+			" order by length(g.name) asc", HOSTGROUP_TYPE_TEMPLATE);
+
+	zbx_vector_str_create(&names);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_vector_str_append(&names, zbx_strdup(NULL, row[0]));
+	}
+	DBfree_result(result);
+
+	result = DBselect(
+			"select g.groupid,g.name from hstgrp g"
 			" left join hosts_groups hg on hg.groupid=g.groupid"
 			" left join group_prototype p on p.groupid=g.groupid"
-			" where hg.groupid is null and p.groupid is null and"
-			" exists(select null from hstgrp where type=%d and"
-			" left(name, length(g.name)+1)=concat(g.name, '/'))",
-			HOSTGROUP_TYPE_TEMPLATE);
+			" where hg.groupid is null and p.groupid is null"
+			" order by length(g.name) asc");
 
 	zbx_vector_uint64_create(&ids);
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		if (FAIL == DBpatch_6010030_startfrom(&names, row[1]))
+			continue;
+
+		zbx_vector_str_append(&names, zbx_strdup(NULL, row[1]));
 		ZBX_STR2UINT64(id, row[0]);
 		zbx_vector_uint64_append(&ids, id);
 	}
+	DBfree_result(result);
 
 	if (0 == ids.values_num)
 		goto out;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	for (i = 0; i < ids.values_num; i++)
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"update hstgrp set type=%d"
-			" where groupid=" ZBX_FS_UI64 ";\n", HOSTGROUP_TYPE_TEMPLATE, ids.values[i]);
-
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-		{
-			ret = FAIL;
-			goto out;
-		}
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hstgrp g set g.type=%d where",
+			HOSTGROUP_TYPE_TEMPLATE);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid", ids.values, ids.values_num);
 
 	if (ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
+	zbx_vector_str_clear_ext(&names, zbx_str_free);
+	zbx_vector_str_destroy(&names);
 	zbx_vector_uint64_destroy(&ids);
-
-	DBfree_result(result);
 	zbx_free(sql);
 
 	return ret;
@@ -573,74 +617,7 @@ static int	DBpatch_6010030(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010030_update_empty_parents();
-}
-
-static int	DBpatch_6010031_update_empty_children(void)
-{
-	DB_RESULT		result;
-	DB_ROW			row;
-	int			i, ret = SUCCEED;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		id;
-	zbx_vector_uint64_t	ids;
-
-
-	result = DBselect(
-			"select g.groupid from hstgrp g"
-			" left join hosts_groups hg on hg.groupid=g.groupid"
-			" left join group_prototype p on p.groupid=g.groupid"
-			" where hg.groupid is null and p.groupid is null and"
-			" exists(select null from hstgrp where type=%d and"
-			" left(g.name, length(name)+1)=concat(name, '/'))",
-			HOSTGROUP_TYPE_TEMPLATE);
-
-	zbx_vector_uint64_create(&ids);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(id, row[0]);
-		zbx_vector_uint64_append(&ids, id);
-	}
-
-	if (0 == ids.values_num)
-		goto out;
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	for (i = 0; i < ids.values_num; i++)
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"update hstgrp set type=%d"
-			" where groupid=" ZBX_FS_UI64 ";\n", HOSTGROUP_TYPE_TEMPLATE, ids.values[i]);
-
-		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-		{
-			ret = FAIL;
-			goto out;
-		}
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (ZBX_DB_OK > DBexecute("%s", sql))
-		ret = FAIL;
-out:
-	zbx_vector_uint64_destroy(&ids);
-
-	DBfree_result(result);
-	zbx_free(sql);
-
-	return ret;
-}
-
-static int	DBpatch_6010031(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	return DBpatch_6010031_update_empty_children();
+	return DBpatch_6010030_update_empty();
 }
 #endif
 
@@ -679,6 +656,5 @@ DBPATCH_ADD(6010027, 0,	1)
 DBPATCH_ADD(6010028, 0,	1)
 DBPATCH_ADD(6010029, 0,	1)
 DBPATCH_ADD(6010030, 0,	1)
-DBPATCH_ADD(6010031, 0,	1)
 
 DBPATCH_END()
