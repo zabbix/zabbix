@@ -572,6 +572,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t *value2)
 {
 	ZBX_RETURN_IF_NOT_EQUAL(value1->data.ui64, value2->data.ui64);
+
 	return 0;
 }
 

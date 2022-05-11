@@ -147,8 +147,4 @@ int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp
 
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error);
-
-
-
-
 #endif

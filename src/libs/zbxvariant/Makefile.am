@@ -5,4 +5,3 @@ noinst_LIBRARIES = libzbxvariant.a
 libzbxvariant_a_SOURCES = \
 	variant.c \
 	variant_misc.c
-
