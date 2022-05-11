@@ -432,19 +432,21 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	dbsync_prune_changelog();
 	changelog_num = dbsync_env.changelog.num_data;
 
-	result = DBselect("select changelogid,object,objectid,operation,clock from changelog");
-
 	if (ZBX_DBSYNC_INIT == mode)
 	{
+		result = DBselect("select changelogid,clock from changelog");
+
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_DBROW2UINT64(changelog_local.changelogid, row[0]);
-			changelog_local.clock = atoi(row[4]);
+			changelog_local.clock = atoi(row[1]);
 			zbx_hashset_insert(&dbsync_env.changelog, &changelog_local, sizeof(changelog_local));
 		}
 	}
 	else
 	{
+		result = DBselect("select changelogid,object,objectid,operation,clock from changelog");
+
 		while (NULL != (row = DBfetch(result)))
 		{
 			int				operation;
