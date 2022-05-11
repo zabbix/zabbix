@@ -1092,6 +1092,7 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 static void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
 {
 	vmware_shared_strfree(dsname->name);
+	vmware_shared_strfree(dsname->uuid);
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 
 	__vm_mem_free_func(dsname);
@@ -1531,6 +1532,7 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 	dsname = (zbx_vmware_dsname_t *)__vm_mem_malloc_func(NULL, sizeof(zbx_vmware_dsname_t));
 
 	dsname->name = vmware_shared_strdup(src->name);
+	dsname->uuid = vmware_shared_strdup(src->uuid);
 
 	VMWARE_VECTOR_CREATE(&dsname->hvdisks, vmware_hvdisk);
 	zbx_vector_vmware_hvdisk_reserve(&dsname->hvdisks, src->hvdisks.values_num);
@@ -1779,6 +1781,7 @@ static void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 {
 	zbx_vector_vmware_hvdisk_destroy(&dsname->hvdisks);
 	zbx_free(dsname->name);
+	zbx_free(dsname->uuid);
 	zbx_free(dsname);
 }
 
@@ -3398,6 +3401,23 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_ds_uuid_compare                                           *
+ *                                                                            *
+ * Purpose: sorting function to sort Datastore vector by uuid                 *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_ds_uuid_compare(const void *d1, const void *d2)
+{
+	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
+	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
+
+	return strcmp(ds1->uuid, ds2->uuid);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_ds_name_compare                                           *
+ *                                                                            *
  * Purpose: sorting function to sort Datastore vector by name                 *
  *                                                                            *
  ******************************************************************************/
@@ -3814,8 +3834,17 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		hv_ds_access.name = zbx_strdup(NULL, hv->uuid);
 		hv_ds_access.value = vmware_hv_get_ds_access(details, ds->id);
 		zbx_vector_str_uint64_pair_append_ptr(&ds->hv_uuids_access, &hv_ds_access);
+
+		if (NULL == ds->uuid)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): Datastore \"%s\" does not have uuid.", __func__,
+					datastores.values[i]);
+			continue;
+		}
+
 		dsname = (zbx_vmware_dsname_t *)zbx_malloc(NULL, sizeof(zbx_vmware_dsname_t));
 		dsname->name = zbx_strdup(NULL, ds->name);
+		dsname->uuid = zbx_strdup(NULL, ds->uuid);
 		zbx_vector_vmware_hvdisk_create(&dsname->hvdisks);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): for %d diskextents check multipath at ds:\"%s\"", __func__,
 				ds->diskextents.values_num, ds->name);
@@ -5635,7 +5664,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 				zbx_str_uint64_pair_name_compare);
 	}
 
-	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_name_compare);
+	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_uuid_compare);
 
 	if (0 == service->eventlog.req_sz && 0 == evt_pause)
 	{
