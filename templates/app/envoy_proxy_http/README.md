@@ -24,7 +24,7 @@ Internal service metrics are collected from {$ENVOY.METRICS.PATH} endpoint (defa
 https://www.envoyproxy.io/docs/envoy/v1.20.0/operations/stats_overview
 
 
-Don't forget to change macros {$ENVOY.API.URL}, {$ENVOY.METRICS.PATH}.
+Don't forget to change macros {$ENVOY.URL}, {$ENVOY.METRICS.PATH}.
 Also, see the Macros section for a list of macros used to set trigger values.  
 *NOTE.* Some metrics may not be collected depending on your Envoy Proxy instance version and configuration.  
 
