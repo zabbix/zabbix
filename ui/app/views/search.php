@@ -366,10 +366,6 @@ if ($data['admin']) {
 $table = (new CTableInfo())
 	->setHeader((new CRowHeader())
 		->addItem(new CColHeader(_('Template group')))
-		->addItem((new CColHeader(_('Monitoring')))
-			->setColSpan($data['template_groups'] ? 3 : 1)
-			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
-		)
 		->addItem($data['admin']
 			? (new CColHeader(_('Configuration')))
 				->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
@@ -391,40 +387,12 @@ foreach ($data['template_groups'] as $groupid => $group) {
 		$templates_link = (new CCol($templates_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 	}
 
-	$latest_data_link = $data['allowed_ui_latest_data']
-		? new CLink(_('Latest data'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'latest.view')
-				->setArgument('groupids[]', $groupid)
-				->setArgument('filter_name', '')
-		)
-		: _('Latest data');
-
-	$latest_data_link = (new CCol($latest_data_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
-
 	$table->addRow([
 		$group['editable'] && $data['allowed_ui_conf_template_groups']
 			? (new CLink($caption))
 				->addClass('js-edit-templategroup')
 				->setAttribute('data-groupid', $groupid)
 			: new CSpan($caption),
-		$latest_data_link,
-		$data['allowed_ui_problems']
-			? new CLink(_('Problems'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'problem.view')
-				->setArgument('filter_name', '')
-				->setArgument('groupids', [$groupid])
-			)
-			: _('Problems'),
-		$data['allowed_ui_hosts']
-			? new CLink(_('Web'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'web.view')
-				->setArgument('filter_groupids[]', $groupid)
-				->setArgument('filter_set', '1')
-			)
-			:_('Web'),
 		$templates_link
 	]);
 }
