@@ -160,7 +160,7 @@ class CControllerUsergroupEdit extends CController {
 			return $this->getInput('group_rights');
 		}
 
-		return collapseHostGroupRights(
+		return collapseGroupRights(
 			getHostGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : [])
 		);
 	}
@@ -173,7 +173,7 @@ class CControllerUsergroupEdit extends CController {
 			return $this->getInput('templategroup_rights');
 		}
 
-		return collapseHostGroupRights(
+		return collapseGroupRights(
 			getTemplateGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : [])
 		);
 	}

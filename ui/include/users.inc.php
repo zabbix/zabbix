@@ -251,7 +251,7 @@ function getTemplateGroupsRights(array $usrgrpids = []) {
  *
  * @return array
  */
-function collapseHostGroupRights(array $groups_rights) {
+function collapseGroupRights(array $groups_rights) {
 	$groups = [];
 
 	foreach ($groups_rights as $groupid => $group_rights) {

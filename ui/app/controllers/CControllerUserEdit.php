@@ -237,8 +237,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			];
 		}
 		else {
-			$data['groups_rights'] = collapseHostGroupRights(getHostGroupsRights($user_groups));
-			$data['templategroups_rights'] = collapseHostGroupRights(getTemplateGroupsRights($user_groups));
+			$data['groups_rights'] = collapseGroupRights(getHostGroupsRights($user_groups));
+			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 		}
 
 		$data['modules'] = API::Module()->get([

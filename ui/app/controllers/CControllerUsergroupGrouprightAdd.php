@@ -68,7 +68,7 @@ class CControllerUsergroupGrouprightAdd extends CController {
 			: [$new_group_right['groupids'], []];
 
 		$this->setResponse(new CControllerResponseData([
-			'group_rights' => collapseHostGroupRights(applyHostGroupRights(
+			'group_rights' => collapseGroupRights(applyHostGroupRights(
 				$this->getInput('group_rights'), $groupids, $subgroupids, $new_group_right['permission']
 			)),
 			'user' => [
