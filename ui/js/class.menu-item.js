@@ -35,7 +35,7 @@ class CMenuItem extends CBaseComponent {
 		this._toggle = this._target.querySelector('a');
 
 		if (this.hasClass('has-submenu')) {
-			this._submenu = new CMenu(this._target.querySelector('.submenu'), level);
+			this._submenu = new CMenu(this._target.querySelector('.submenu'), ++level);
 		}
 
 		this._is_expanded = this.hasClass('is-expanded');
