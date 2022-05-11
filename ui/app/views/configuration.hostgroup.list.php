@@ -115,7 +115,6 @@ foreach ($this->data['groups'] as $group) {
 
 	$host_count = $this->data['groupCounts'][$group['groupid']]['hosts'];
 
-
 	$name = [];
 	if ($group['discoveryRule']) {
 		if ($data['allowed_ui_conf_hosts']) {

@@ -82,7 +82,7 @@ class CControllerTemplateGroupEdit extends CController{
 			$group = $groups[0];
 			$data['name'] = $group['name'];
 		}
-		// For clone action
+		// For clone action.
 		if ($this->hasInput('name')) {
 			$data['name'] = $this->getInput('name');
 		}
