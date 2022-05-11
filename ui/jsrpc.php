@@ -130,7 +130,7 @@ switch ($data['method']) {
 
 	/**
 	 * Create multi select data.
-	 * Supported objects: "hosts", "hostGroup", "templates", "triggers"
+	 * Supported objects: "hosts", "hostGroup", "templates", "templateGroups", "triggers"
 	 *
 	 * @param string $data['object_name']
 	 * @param string $data['search']
@@ -145,14 +145,12 @@ switch ($data['method']) {
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'with_hosts' => array_key_exists('real_hosts', $data) ? $data['real_hosts'] : null,
-					'with_items' => array_key_exists('with_items', $data) ? $data['with_items'] : null,
-					'with_httptests' => array_key_exists('with_httptests', $data) ? $data['with_httptests'] : null,
-					'with_monitored_triggers' => array_key_exists('with_monitored_triggers', $data)
-						? $data['with_monitored_triggers']
-						: null,
-					'with_triggers' => array_key_exists('with_triggers', $data) ? $data['with_triggers'] : null,
-					'editable' => array_key_exists('editable', $data) ? $data['editable'] : false,
+					'with_hosts' => array_key_exists('real_hosts', $data),
+					'with_items' => array_key_exists('with_items', $data),
+					'with_httptests' => array_key_exists('with_httptests', $data),
+					'with_monitored_triggers' => array_key_exists('with_monitored_triggers', $data),
+					'with_triggers' => array_key_exists('with_triggers', $data),
+					'editable' => array_key_exists('editable', $data),
 					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
 					'preservekeys' => true
 				];
@@ -322,6 +320,38 @@ switch ($data['method']) {
 					}
 
 					$result = CArrayHelper::renameObjectsKeys($templates, ['templateid' => 'id']);
+				}
+				break;
+
+			case 'templateGroup':
+				$options = [
+					'output' => ['groupid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
+					'with_templates' => array_key_exists('templated_hosts', $data),
+					'with_items' => array_key_exists('with_items', $data),
+					'with_httptests' => array_key_exists('with_httptests', $data),
+					'with_triggers' => array_key_exists('with_triggers', $data),
+					'editable' => array_key_exists('editable', $data),
+					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
+					'preservekeys' => true
+				];
+				$templateGroups = API::TemplateGroup()->get($options);
+
+				if ($templateGroups) {
+					if (array_key_exists('enrich_parent_groups', $data)) {
+						$templateGroups = enrichParentTemplateGroups($templateGroups);
+					}
+
+					CArrayHelper::sort($templateGroups, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (isset($data['limit'])) {
+						$templateGroups = array_slice($templateGroups, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($templateGroups, ['groupid' => 'id']);
 				}
 				break;
 
