@@ -25,7 +25,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 	use MacrosTrait;
 
-	protected static $action_list;
+	protected static $action_list = null;
 	protected static $old_resourcetype = 0;
 
 	private $actions = [
@@ -72,19 +72,6 @@ class testPageReportsAudit extends CLegacyWebTest {
 		17 /* CAudit::RESOURCE_VALUE_MAP */ => 'Value map',
 		22 /* CAudit::RESOURCE_SCENARIO */ => 'Web scenario'
 	];
-
-	public function testPageReportsAudit_CheckLayout() {
-		$this->login();
-
-		$this->zbxTestCheckHeader('Audit log');
-		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'Recordset ID', 'ID', 'Details']);
-		$this->zbxTestExpandFilterTab();
-		$this->zbxTestAssertElementPresentId('filter_userids__ms');
-		$this->zbxTestAssertElementPresentId('filter_resourceid');
-		$this->zbxTestAssertElementPresentXpath("//input[@id='filter_resourceid' and @maxlength='255']");
-		$this->assertTrue(!array_diff($this->actions, self::$action_list->getLabels()->asText()));
-		$this->zbxTestDropdownHasOptions('filter_resourcetype', $this->resourcetypes);
-	}
 
 	public static function auditActions() {
 		return [
@@ -150,23 +137,62 @@ class testPageReportsAudit extends CLegacyWebTest {
 		];
 	}
 
+	private function getFormAndActionList() {
+		$this->page->login()->open('zabbix.php?action=auditlog.list')->waitUntilReady();
+		$this->page->assertTitle('Audit log');
+		$this->page->assertHeader('Audit log');
+
+		if (self::$action_list === null) {
+			self::$action_list = $this->query('id:filter-actions')->one()->asCheckboxList();
+		}
+
+		return $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+	}
+
+	public function testPageReportsAudit_CheckLayout() {
+		$form = $this->getFormAndActionList();
+		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'],$form->getLabels()->asText());
+		$this->assertTrue(!array_diff($this->actions, self::$action_list->getLabels()->asText()));
+
+		$filter_fields_limits = [
+			'Resource ID' => 255,
+			'Recordset ID' => 255
+		];
+		foreach ($filter_fields_limits as $field => $max_length) {
+			$this->assertEquals($max_length, $form->getField($field)->getAttribute('maxlength'));
+		}
+
+		$this->zbxTestDropdownHasOptions('filter_resourcetype', $this->resourcetypes);
+
+		foreach (['Apply', 'Reset'] as $button) {
+			$this->assertTrue($this->query("xpath://div[@class=\"filter-forms\"]//button[text()=".
+					CXPathHelper::escapeQuotes($button)."]")->one()->isClickable());
+		}
+	}
+
 	/**
+	 * !!! This scenario is very questionable, it checks nothing. After Audit task is ready, please consider to
+	 *  check filter results after submitting.
+	 *
 	 * @dataProvider auditActions
 	 */
 	public function testPageReportsAudit_Filter($action, $resourcetype) {
-		$this->login();
+		$form = $this->getFormAndActionList();
 
-		$this->zbxTestExpandFilterTab();
-		$this->zbxTestMultiselectClear('filter_userids_');
-		$this->zbxTestDropdownSelectWait('filter_resourcetype', $this->resourcetypes[$resourcetype]);
+		if (!($form->getField('Users')->isVisible())) {
+			$this->query('id:ui-id-2')->waitUntilClickable()->one()->click();
+		}
+
+		$form->getField('Users')->asMultiselect()->clear();
+		$form->getField('Resource')->asDropdown()->select($this->resourcetypes[$resourcetype]);
 
 		if (self::$old_resourcetype != $this->resourcetypes[$resourcetype]) {
 			self::$action_list->uncheckAll();
 		}
 
 		self::$action_list->check($this->actions[$action]);
-		$this->zbxTestClickXpathWait("//form[@name='zbx_filter']//button[@name='filter_set']");
-		$this->zbxTestCheckHeader('Audit log');
+		$form->submit();
+		$this->page->assertHeader('Audit log');
 		self::$old_resourcetype = $this->resourcetypes[$resourcetype];
 	}
 
@@ -174,9 +200,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 	 * Check whether actions are enabled or disabled depending on the selected resource.
 	 */
 	public function testPageReportsAudit_ActionsState() {
-		$this->login();
-
-		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form = $this->getFormAndActionList();
 		$actions = self::$action_list->getCheckboxes();
 
 		foreach ($this->resourcetypes as $type) {
@@ -271,13 +295,5 @@ class testPageReportsAudit extends CLegacyWebTest {
 			$text = $row->getColumnData($column, $value);
 			$this->assertEquals($value, $text);
 		}
-	}
-
-	private function login () {
-		$this->zbxTestLogin('zabbix.php?action=auditlog.list');
-		$this->zbxTestCheckTitle('Audit log');
-		$this->zbxTestAssertElementPresentId('config');
-		self::$action_list = $this->query('id:filter-actions')->one()->asCheckboxList();
-
 	}
 }
