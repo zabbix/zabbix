@@ -154,6 +154,7 @@ CViewSwitcher.prototype = {
 				if (obj.getAttribute('type').toUpperCase() === 'CHECKBOX') {
 					return obj.checked ? obj.value : null;
 				}
+				// break; is not missing here.
 
 			default:
 				return obj.value;
@@ -176,17 +177,18 @@ CViewSwitcher.prototype = {
 					}
 				}
 				break;
+
 			case 'input':
-				var inpType = obj.getAttribute('type');
-				if (!is_null(inpType) && inpType.toLowerCase() == 'checkbox') {
+				let input_type = obj.getAttribute('type');
+				if (!is_null(input_type) && input_type.toLowerCase() === 'checkbox') {
 					obj.checked = true;
-					obj.value == value;
-					break;
 				}
-				break;
+				// break; is not missing here.
+
 			case 'textarea':
 			default:
 				obj.value = value;
+				// break; is not missing here.
 		}
 	},
 
