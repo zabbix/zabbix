@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,8 +40,9 @@ void metric_set_unsupported(ZBX_ACTIVE_METRIC *metric);
 int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
 		zbx_uint64_t lastlogsize_last, int mtime_last);
 
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
-		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, char **error);
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
+		char **error);
 
 typedef struct
 {
@@ -121,12 +122,14 @@ static void free_eventlog_result(eventlog_result_t *result)
 	zbx_free(result);
 }
 
-int	process_eventlog_value_cb(zbx_vector_ptr_t *addrs, const char *host, const char *key,
-		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
+int	process_eventlog_value_cb(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
+		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
 {
-	eventlog_result_t *result = (eventlog_result_t *)addrs;
+	ZBX_UNUSED(addrs);
+
+	eventlog_result_t *result = (eventlog_result_t *)agent2_result;
 	if (result->values.values_num == result->slots)
 		return FAIL;
 
@@ -171,9 +174,9 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	result := C.new_eventlog_result(C.int(item.Output.PersistSlotsAvailable()))
 
 	var cerrmsg *C.char
-	ret := C.process_eventlog_check(C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
-		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent,
-		&cerrmsg)
+	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
+		C.zbx_vector_ptr_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
+		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, &cerrmsg)
 
 	// add cached results
 	var cvalue, csource *C.char

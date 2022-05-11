@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,10 @@
 **/
 
 #include "common.h"
-#include "dbcache.h"
 #include "log.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+
 #include "db.h"
 
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation)
@@ -37,8 +39,6 @@ void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_oper
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_override_operations_load_tags                                *
  *                                                                            *
  * Purpose: load tag override operations from database                        *
  *                                                                            *
@@ -101,8 +101,6 @@ static void	lld_override_operations_load_tags(const zbx_vector_uint64_t *overrid
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_override_operations_load_templates                           *
- *                                                                            *
  * Purpose: load template lld override operations from database               *
  *                                                                            *
  * Parameters: overrideids - [IN] the lld overrideids, sorted                 *
@@ -161,8 +159,6 @@ static void	lld_override_operations_load_templates(const zbx_vector_uint64_t *ov
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_load_lld_override_operations                                 *
  *                                                                            *
  * Purpose: load lld override operations from database                        *
  *                                                                            *
@@ -244,8 +240,8 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		override_operation->severity = FAIL == DBis_null(row[10]) ? (unsigned char)atoi(row[10]) :
 				TRIGGER_SEVERITY_COUNT;
 
-		override_operation->inventory_mode = FAIL == DBis_null(row[11]) ?
-				(unsigned char)atoi(row[11]) : HOST_INVENTORY_COUNT;
+		override_operation->inventory_mode = FAIL == DBis_null(row[11]) ? (signed char)atoi(row[11]) :
+				HOST_INVENTORY_COUNT;
 
 		zbx_vector_ptr_append(ops, override_operation);
 

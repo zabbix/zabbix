@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,11 @@
 **/
 
 
+/**
+ * @var CView $form
+ * @var array $data
+ */
+
 $form = (new CForm())->setName('host_view');
 
 $table = (new CTableInfo());
@@ -30,7 +35,6 @@ $table->setHeader([
 	(new CColHeader(_('Interface'))),
 	(new CColHeader(_('Availability'))),
 	(new CColHeader(_('Tags'))),
-	(new CColHeader(_('Problems'))),
 	make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $view_url),
 	(new CColHeader(_('Latest data'))),
 	(new CColHeader(_('Problems'))),
@@ -39,14 +43,12 @@ $table->setHeader([
 	(new CColHeader(_('Web')))
 ]);
 
-$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
-
 foreach ($data['hosts'] as $hostid => $host) {
 	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
 
 	$interface = null;
 	if ($host['interfaces']) {
-		foreach ($interface_types as $interface_type) {
+		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
 			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
 				return ($host_interface['type'] == $interface_type);
 			});
@@ -57,7 +59,11 @@ foreach ($data['hosts'] as $hostid => $host) {
 		}
 	}
 
-	$problems_div = (new CDiv())->addClass(ZBX_STYLE_PROBLEM_ICON_LIST);
+	$problems_link = new CLink('', (new CUrl('zabbix.php'))
+		->setArgument('action', 'problem.view')
+		->setArgument('filter_name', '')
+		->setArgument('severities', $data['filter']['severities'])
+		->setArgument('hostids', [$host['hostid']]));
 
 	$total_problem_count = 0;
 
@@ -67,12 +73,20 @@ foreach ($data['hosts'] as $hostid => $host) {
 				|| (!$data['filter']['severities'] && $count > 0)) {
 			$total_problem_count += $count;
 
-			$problems_div->addItem((new CSpan($count))
+			$problems_link->addItem((new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
 				->addClass(CSeverityHelper::getStatusStyle($severity))
 				->setAttribute('title', CSeverityHelper::getName($severity))
 			);
 		}
+
+	}
+
+	if ($total_problem_count == 0) {
+		$problems_link->addItem('Problems');
+	}
+	else {
+		$problems_link->addClass(ZBX_STYLE_PROBLEM_ICON_LINK);
 	}
 
 	$maintenance_icon = '';
@@ -96,7 +110,6 @@ foreach ($data['hosts'] as $hostid => $host) {
 		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_NOWRAP),
 		getHostAvailabilityTable($host['interfaces']),
 		$host['tags'],
-		$problems_div,
 		($host['status'] == HOST_STATUS_MONITORED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED),
@@ -105,30 +118,21 @@ foreach ($data['hosts'] as $hostid => $host) {
 				? new CLink(_('Latest data'),
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'latest.view')
-						->setArgument('filter_set', '1')
-						->setArgument('filter_hostids', [$host['hostid']])
-				)
-				: _('Latest data')
-		],
-		[
-			$data['allowed_ui_problems']
-				? new CLink(_('Problems'),
-					(new CUrl('zabbix.php'))
-						->setArgument('action', 'problem.view')
-						->setArgument('filter_name', '')
-						->setArgument('severities', $data['filter']['severities'])
 						->setArgument('hostids', [$host['hostid']])
+						->setArgument('filter_name', '')
 				)
-				: _('Problems'),
-			CViewHelper::showNum($total_problem_count)
+				: (new CSpan(_('Latest data')))->addClass(ZBX_STYLE_DISABLED),
+				CViewHelper::showNum($host['items_count'])
 		],
+		$problems_link,
 		$host['graphs']
 			? [
 				new CLink(_('Graphs'),
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'charts.view')
-						->setArgument('filter_set', '1')
 						->setArgument('filter_hostids', (array) $host['hostid'])
+						->setArgument('filter_show', GRAPH_FILTER_HOST)
+						->setArgument('filter_set', '1')
 				),
 				CViewHelper::showNum($host['graphs'])
 			]

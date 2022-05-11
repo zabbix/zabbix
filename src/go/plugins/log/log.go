@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,17 +25,17 @@ import (
 	"time"
 	"unsafe"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/zbxlib"
 )
 
 type Options struct {
-	MaxLinesPerSecond int `conf:"range=1:1000,default=20"`
-	Capacity          int `conf:"optional,range=1:100"`
+	plugin.SystemOptions `conf:"optional"`
+	MaxLinesPerSecond    int `conf:"range=1:1000,default=20"`
 }
 
 // Plugin -

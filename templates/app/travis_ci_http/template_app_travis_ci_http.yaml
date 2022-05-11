@@ -1,0 +1,684 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:35:32Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 8cdbe00a2a3046ee962d28d32567968a
+      template: 'Travis CI by HTTP'
+      name: 'Travis CI by HTTP'
+      description: |
+        Template for monitoring Travis CI https://travis-ci.com
+        You must set {$TRAVIS.API.TOKEN} and {$TRAVIS.API.URL} macros.
+          {$TRAVIS.API.TOKEN} is a Travis API authentication token located in User -> Settings -> API authentication.
+          {$TRAVIS.API.URL} could be in 2 different variations:
+           - for a private project : api.travis-ci.com
+           - for an enterprise projects: api.example.com (where you replace example.com with the domain Travis CI is running on)
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: dbdaf09ff13742b988bd0356923f625f
+          name: 'Travis: Builds duration'
+          type: DEPENDENT
+          key: travis.builds.duration
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'Sum of all builds durations in all repos.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $..duration.sum()
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: travis.get_builds
+          tags:
+            -
+              tag: component
+              value: builds
+        -
+          uuid: e0d31827266f4d1599cb687d15d42747
+          name: 'Travis: Builds'
+          type: DEPENDENT
+          key: travis.builds.total
+          delay: '0'
+          history: 7d
+          description: 'Total count of builds in all repos.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.builds.length()
+          master_item:
+            key: travis.get_builds
+          tags:
+            -
+              tag: component
+              value: builds
+        -
+          uuid: 08466cd6902441299856cba3ce601510
+          name: 'Travis: Get builds'
+          type: HTTP_AGENT
+          key: travis.get_builds
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Getting builds using Travis API.'
+          url: 'https://{$TRAVIS.API.URL}/builds'
+          query_fields:
+            -
+              name: limit
+              value: '0'
+          headers:
+            -
+              name: Travis-API-Version
+              value: '3'
+            -
+              name: Authorization
+              value: 'token {$TRAVIS.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: builds
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 997172d503c54798800d01c613aca92a
+          name: 'Travis: Get health'
+          type: HTTP_AGENT
+          key: travis.get_health
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'Getting home JSON using Travis API.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.parse(value).config ? 1 : 0'
+          url: 'https://{$TRAVIS.API.URL}/'
+          headers:
+            -
+              name: Travis-API-Version
+              value: '3'
+            -
+              name: Authorization
+              value: 'token {$TRAVIS.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: 6baed695cac34d349a42ab6e8295910d
+              expression: 'nodata(/Travis CI by HTTP/travis.get_health,30m)=1'
+              name: 'Travis: Failed to fetch home page'
+              event_name: 'Travis: Failed to fetch home page (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: e8398acab5a74505a85ade5d3ca5f590
+              expression: 'last(/Travis CI by HTTP/travis.get_health)=0'
+              name: 'Travis: Service is unavailable'
+              priority: HIGH
+              description: 'Travis API is unavailable. Please check if the correct macros are set.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 5a01061d1f3d48f8ad0beb4d32e2168d
+          name: 'Travis: Get jobs'
+          type: HTTP_AGENT
+          key: travis.get_jobs
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Getting jobs using Travis API.'
+          url: 'https://{$TRAVIS.API.URL}/jobs'
+          headers:
+            -
+              name: Travis-API-Version
+              value: '3'
+            -
+              name: Authorization
+              value: 'token {$TRAVIS.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: jobs
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 5212bfa6de6c4a17b98a80012f617eea
+          name: 'Travis: Get repos'
+          type: HTTP_AGENT
+          key: travis.get_repos
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Getting repos using Travis API.'
+          url: 'https://{$TRAVIS.API.URL}/repos'
+          query_fields:
+            -
+              name: limit
+              value: '0'
+          headers:
+            -
+              name: Travis-API-Version
+              value: '3'
+            -
+              name: Authorization
+              value: 'token {$TRAVIS.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: repos
+        -
+          uuid: 81504a37965b402bad9b71507c4a8926
+          name: 'Travis: Jobs active'
+          type: DEPENDENT
+          key: travis.jobs.active
+          delay: '0'
+          history: 7d
+          description: 'Active jobs in all repos.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.jobs[?(@.state == "started")].length()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: travis.get_jobs
+          tags:
+            -
+              tag: component
+              value: jobs
+        -
+          uuid: a1045b05877941bfba97e086ef33234c
+          name: 'Travis: Jobs in queue'
+          type: DEPENDENT
+          key: travis.jobs.queue
+          delay: '0'
+          history: 7d
+          description: 'Jobs in queue in all repos.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.jobs[?(@.state == "received")].length()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: travis.get_jobs
+          tags:
+            -
+              tag: component
+              value: jobs
+        -
+          uuid: 421a1a1a886c46188047914d5149c075
+          name: 'Travis: Jobs passed'
+          type: DEPENDENT
+          key: travis.jobs.total
+          delay: '0'
+          history: 7d
+          description: 'Total count of passed jobs in all repos.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.jobs.length()
+          master_item:
+            key: travis.get_jobs
+          tags:
+            -
+              tag: component
+              value: jobs
+      discovery_rules:
+        -
+          uuid: 0bd67f5bd26f4dbbbda7e2d36efac649
+          name: 'Repos metrics discovery'
+          type: DEPENDENT
+          key: travis.repos.discovery
+          delay: '0'
+          description: 'Metrics for Repos statistics.'
+          item_prototypes:
+            -
+              uuid: 3ff94b65151e4378b3ef46d049aff1f7
+              name: 'Travis: Repo [{#SLUG}]: Builds failed'
+              type: DEPENDENT
+              key: 'travis.repo.builds.failed[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of all failed builds in {#SLUG} repo.'
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return JSON.parse(value).builds.filter(function (e){return e.state !== "passed" && e.state !== "started" }).length'
+              master_item:
+                key: 'travis.repo.get_builds[{#SLUG}]'
+              tags:
+                -
+                  tag: component
+                  value: builds
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: 0d2f2c7b23284836ad52b4ddc98dcfc8
+              name: 'Travis: Repo [{#SLUG}]: Builds passed, %'
+              type: CALCULATED
+              key: 'travis.repo.builds.passed.pct[{#SLUG}]'
+              history: 7d
+              units: '%'
+              params: 'last(//travis.repo.builds.passed[{#SLUG}])/last(//travis.repo.builds.total[{#SLUG}])*100'
+              description: 'Percent of passed builds in {#SLUG} repo.'
+              tags:
+                -
+                  tag: component
+                  value: builds
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+              trigger_prototypes:
+                -
+                  uuid: 8279ce31c4fe4cb7a03baa8a0149a557
+                  expression: 'last(/Travis CI by HTTP/travis.repo.builds.passed.pct[{#SLUG}])<{$TRAVIS.BUILDS.SUCCESS.PERCENT}'
+                  name: 'Travis: Repo [{#SLUG}]: Percent of successful builds'
+                  event_name: 'Travis: Repo [{#SLUG}]: Percent of successful builds are < {$TRAVIS.BUILDS.SUCCESS.PERCENT}%'
+                  priority: WARNING
+                  description: 'Low successful builds rate.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 1b2143c3e6934e0fae5589b4bb0063b5
+              name: 'Travis: Repo [{#SLUG}]: Builds passed'
+              type: DEPENDENT
+              key: 'travis.repo.builds.passed[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of all passed builds in {#SLUG} repo.'
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return JSON.parse(value).builds.filter(function (e){return e.state == "passed"}).length'
+              master_item:
+                key: 'travis.repo.get_builds[{#SLUG}]'
+              tags:
+                -
+                  tag: component
+                  value: builds
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: d67070c3c7b44c5b8849a315f5f97c8b
+              name: 'Travis: Repo [{#SLUG}]: Builds total'
+              type: DEPENDENT
+              key: 'travis.repo.builds.total[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of total builds in {#SLUG} repo.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.builds.length()
+              master_item:
+                key: 'travis.repo.get_builds[{#SLUG}]'
+              tags:
+                -
+                  tag: component
+                  value: builds
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: 5fa0c9393f224efa8d6b42c3a0f12319
+              name: 'Travis: Repo [{#SLUG}]: Cache files'
+              type: DEPENDENT
+              key: 'travis.repo.caches.files[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of cache files in {#SLUG} repo.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.caches.length()
+              master_item:
+                key: 'travis.repo.get_caches[{#SLUG}]'
+              tags:
+                -
+                  tag: component
+                  value: caches
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: 6fe5a61db38e4a2da25314a18cf10a8e
+              name: 'Travis: Repo [{#SLUG}]: Cache size'
+              type: DEPENDENT
+              key: 'travis.repo.caches.size[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total size of cache files in {#SLUG} repo.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.caches..size.sum()
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '0'
+              master_item:
+                key: 'travis.repo.get_caches[{#SLUG}]'
+              tags:
+                -
+                  tag: component
+                  value: caches
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: 2705ff3b0b51434ba0469362aa91c67d
+              name: 'Travis: Repo [{#SLUG}]: Description'
+              type: DEPENDENT
+              key: 'travis.repo.description[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Description of Travis repo (git project description).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.repositories[?(@.slug == "{#SLUG}")].description.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: travis.get_repos
+              tags:
+                -
+                  tag: component
+                  value: repo
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: ed33292bc0924b9c85cb54443d5aa999
+              name: 'Travis: Repo [{#SLUG}]: Get builds'
+              type: HTTP_AGENT
+              key: 'travis.repo.get_builds[{#SLUG}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Getting builds of {#SLUG} using Travis API.'
+              url: 'https://{$TRAVIS.API.URL}/repo/{#ID}/builds'
+              query_fields:
+                -
+                  name: limit
+                  value: '50'
+              headers:
+                -
+                  name: Travis-API-Version
+                  value: '3'
+                -
+                  name: Authorization
+                  value: 'token {$TRAVIS.API.TOKEN}'
+              tags:
+                -
+                  tag: component
+                  value: builds
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: 2e0c047997624373a50001b8399b3d7c
+              name: 'Travis: Repo [{#SLUG}]: Get caches'
+              type: HTTP_AGENT
+              key: 'travis.repo.get_caches[{#SLUG}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Getting caches of {#SLUG} using Travis API.'
+              url: 'https://{$TRAVIS.API.URL}/repo/{#ID}/caches'
+              query_fields:
+                -
+                  name: limit
+                  value: '50'
+              headers:
+                -
+                  name: Travis-API-Version
+                  value: '3'
+                -
+                  name: Authorization
+                  value: 'token {$TRAVIS.API.TOKEN}'
+              tags:
+                -
+                  tag: component
+                  value: caches
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: 7391c532acf649259be018cbf499b565
+              name: 'Travis: Repo [{#SLUG}]: Last build duration'
+              type: DEPENDENT
+              key: 'travis.repo.last_build.duration[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Last build duration in {#SLUG} repo.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.builds[0].duration'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'travis.repo.get_builds[{#SLUG}]'
+              tags:
+                -
+                  tag: component
+                  value: last_build
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: fbcb7b4001b949889fc85f2499684aae
+              name: 'Travis: Repo [{#SLUG}]: Last build id'
+              type: DEPENDENT
+              key: 'travis.repo.last_build.id[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              description: 'Last build id in {#SLUG} repo.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.builds[0].id'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'travis.repo.get_builds[{#SLUG}]'
+              tags:
+                -
+                  tag: component
+                  value: last_build
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: d9dbe9ffeafa46569fce1ca5ba4897cf
+              name: 'Travis: Repo [{#SLUG}]: Last build number'
+              type: DEPENDENT
+              key: 'travis.repo.last_build.number[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              description: 'Last build number in {#SLUG} repo.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.builds[0].number'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'travis.repo.get_builds[{#SLUG}]'
+              tags:
+                -
+                  tag: component
+                  value: last_build
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+            -
+              uuid: a081582913ca40ee93a6e5fb326c5c64
+              name: 'Travis: Repo [{#SLUG}]: Last build state'
+              type: DEPENDENT
+              key: 'travis.repo.last_build.state[{#SLUG}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Last build state in {#SLUG} repo.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.builds[0].state'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'travis.repo.get_builds[{#SLUG}]'
+              tags:
+                -
+                  tag: component
+                  value: last_build
+                -
+                  tag: repo
+                  value: '{#SLUG}'
+              trigger_prototypes:
+                -
+                  uuid: 9b26f06ae3854aad8d2c0f4623bb1533
+                  expression: 'find(/Travis CI by HTTP/travis.repo.last_build.state[{#SLUG}],,"like","errored")=1'
+                  name: 'Travis: Repo [{#SLUG}]: Last build status is ''errored'''
+                  priority: WARNING
+                  description: 'Last build status is errored.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+          graph_prototypes:
+            -
+              uuid: b13d986ae110458a80d74f32bb267ed7
+              name: 'Travis: Repo [{#SLUG}]: Builds'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Travis CI by HTTP'
+                    key: 'travis.repo.builds.failed[{#SLUG}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Travis CI by HTTP'
+                    key: 'travis.repo.builds.passed[{#SLUG}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Travis CI by HTTP'
+                    key: 'travis.repo.builds.total[{#SLUG}]'
+          master_item:
+            key: travis.get_repos
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).repositories.forEach(function (e) {
+                      result.push({ '{#ID}': e.id, '{#SLUG}': e.slug });
+                  });
+                  
+                  return JSON.stringify(result)
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+      tags:
+        -
+          tag: class
+          value: service
+        -
+          tag: target
+          value: travis
+      macros:
+        -
+          macro: '{$TRAVIS.API.TOKEN}'
+          description: 'Travis API Token'
+        -
+          macro: '{$TRAVIS.API.URL}'
+          value: api.travis-ci.com
+          description: 'Travis API URL'
+        -
+          macro: '{$TRAVIS.BUILDS.SUCCESS.PERCENT}'
+          value: '80'
+          description: 'Percent of successful builds in the repo (for trigger expression)'

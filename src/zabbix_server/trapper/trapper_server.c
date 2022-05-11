@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,14 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "trapper_request.h"
+
 #include "log.h"
 #include "cfg.h"
-#include "zbxjson.h"
-#include "trapper_request.h"
 #include "trapper_auth.h"
 #include "zbxreport.h"
-#include "zbxjson.h"
 #include "db.h"
 #include "../alerter/alerter_protocol.h"
 #include "zbxipcservice.h"
@@ -69,8 +67,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: recv_alert_send                                                  *
  *                                                                            *
  * Purpose: process alert send request that is used to test media types       *
  *                                                                            *

@@ -1,8 +1,9 @@
+//go:build windows
 // +build windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +28,8 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/pdh"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
 
@@ -226,7 +227,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		if interval, err = strconv.ParseInt(params[1], 10, 32); err != nil {
 			return nil, errors.New("Invalid second parameter.")
 		}
-		if interval < 1 || interval >= maxInterval {
+		if interval < 1 || interval > maxInterval {
 			return nil, errors.New("Interval out of range.")
 		}
 	}
@@ -261,6 +262,8 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) Stop() {
+	p.counters = make(map[perfCounterIndex]*perfCounter)
+
 	_ = win32.PdhCloseQuery(p.query)
 	p.query = 0
 }

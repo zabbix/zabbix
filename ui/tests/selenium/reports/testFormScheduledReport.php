@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -324,7 +324,7 @@ class testFormScheduledReport extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'start time 24 hour'
+						'Name' => 'start time 24 hours'
 					],
 					'Start time' => '24:10',
 					'message_details' => 'Incorrect value for field "hours": value must be no greater than "23".'
@@ -914,7 +914,7 @@ class testFormScheduledReport extends CWebTest {
 						'Description' => '',
 						'Enabled' => false
 					],
-					'Start time' => '0:0',
+					'Start time' => '00:00',
 					'Subscriptions' => [
 						[
 							'action' => USER_ACTION_REMOVE,

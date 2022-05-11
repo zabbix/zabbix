@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,
+				'class': 'position-middle',
 				'content': $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
 				'buttons': [
 					{

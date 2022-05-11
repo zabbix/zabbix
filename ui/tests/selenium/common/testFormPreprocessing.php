@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -842,7 +842,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Simple change'],
 						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name']
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
+								'parameter_3' => 'label_name']
 					]
 				]
 			],
@@ -1563,7 +1564,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-space'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label name']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => 'label name'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1576,8 +1582,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-quotes'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '"label_name"']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '"label_name"'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1590,8 +1600,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-triangle-quotes'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '<label_name>']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '<label_name>'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1604,8 +1618,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-slash'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '\0']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '\0'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1618,8 +1636,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-digits'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '123']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '123'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1701,7 +1723,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometeus-both-parameters-present'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => 'label_name'
+						]
 					]
 				]
 			],
@@ -1869,7 +1896,11 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometeus-macros-1'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '{$METRIC_NAME}==1', 'parameter_2' => '{$LABEL_NAME}']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{$METRIC_NAME}==1',
+							'parameter_2' => 'label',
+							'parameter_3' => '{$LABEL_NAME}']
 					]
 				]
 			],
@@ -1930,6 +1961,86 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"<regex>"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function sum',
+						'Key' => 'prometeus-function-sum'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{$METRIC_NAME}==1',
+							'parameter_2' => 'sum'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function min',
+						'Key' => 'prometeus-function-min'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{label_name!~"<regex>"}',
+							'parameter_2' => 'min'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function max',
+						'Key' => 'prometeus-function-max'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{{$LABEL_NAME}="<label value>"}',
+							'parameter_2' => 'max'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function avg',
+						'Key' => 'prometeus-function-avg'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{label="value\\\\"}',
+							'parameter_2' => 'avg'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function count',
+						'Key' => 'prometeus-function-count'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{label_name!~"name"}',
+							'parameter_2' => 'count'
+						]
 					]
 				]
 			]
@@ -2030,7 +2141,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometeus-space-in-parameters'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '  metric  ', 'parameter_2' => '  output  ']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '  metric  ',
+							'parameter_2' => 'label',
+							'parameter_3' => '  output  '
+						]
 					]
 				]
 			],
@@ -2070,7 +2186,12 @@ abstract class testFormPreprocessing extends CWebTest {
 
 		// Remove spaces.
 		foreach ($data['preprocessing'] as $i => &$options) {
-			foreach (['parameter_1', 'parameter_2'] as $parameter) {
+
+		$parameters = CTestArrayHelper::get($options, 'type') === 'Prometheus pattern'
+			? ['parameter_1', 'parameter_3']
+			: ['parameter_1', 'parameter_2'];
+
+			foreach ($parameters as $parameter) {
 				if (array_key_exists($parameter, $options)) {
 					$options[$parameter] = trim($options[$parameter]);
 				}
@@ -2577,7 +2698,8 @@ abstract class testFormPreprocessing extends CWebTest {
 					[
 						'type' => 'Prometheus pattern',
 						'parameter_1' => 'cpu_usage_system',
-						'parameter_2' => 'label_name',
+						'parameter_2' => 'label',
+						'parameter_3' => 'label_name',
 						'on_fail' => true,
 						'error_handler' => 'Set error to',
 						'error_handler_params' => 'Custom_text'

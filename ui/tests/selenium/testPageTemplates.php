@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
@@ -29,13 +29,13 @@ class testPageTemplates extends CLegacyWebTest {
 
 	public $templateName = 'Huawei OceanStor 5300 V5 SNMP';
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	public static function allTemplates() {
-		// TODO: remove 'AND name NOT LIKE "%Cisco Catalyst%"' and change to single quotes after fix ZBX-19356
-		return CDBHelper::getRandomizedDataProvider("SELECT * FROM hosts WHERE status IN (".HOST_STATUS_TEMPLATE.")".
-				" AND name NOT LIKE '%Cisco Catalyst%' AND name NOT LIKE '%Mellanox%'", 25);
+		return CDBHelper::getRandomizedDataProvider(
+			'SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_TEMPLATE.')', 25
+		);
 	}
 
 	public function testPageTemplates_CheckLayout() {
@@ -67,11 +67,6 @@ class testPageTemplates extends CLegacyWebTest {
 	 * @dataProvider allTemplates
 	 */
 	public function testPageTemplates_SimpleUpdate($template) {
-		// TODO: Remove the below if condition along with its content when ZBX-20020 is merged
-		if ($template['name'] === 'Cisco UCS Manager SNMP') {
-			return;
-		}
-
 		$host = $template['host'];
 		$name = $template['name'];
 
@@ -130,12 +125,12 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Linked templates')->fill([
-				'values' => 'ICMP Ping',
+				'values' => 'Template ZBX6663 Second',
 				'context' => 'Templates'
 		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Generic SNMP']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template ZBX6663 Second']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 

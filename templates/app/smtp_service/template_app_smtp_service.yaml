@@ -1,0 +1,53 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:44Z'
+  groups:
+    -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    -
+      uuid: ea3cad7f70f9481ea85f797ef6ea684e
+      template: 'SMTP Service'
+      name: 'SMTP Service'
+      description: |
+        Template module for monitoring SMTP service
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: 7edce69c026143258edc03dc8e970ec9
+          name: 'SMTP service is running'
+          type: SIMPLE
+          key: 'net.tcp.service[smtp]'
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: b90e7dafca6c4b92b318f74bb07e8ac4
+              expression: 'max(/SMTP Service/net.tcp.service[smtp],#3)=0'
+              name: 'SMTP service is down on {HOST.NAME}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      valuemaps:
+        -
+          uuid: 41d22d9ad511457ba57ff86c11453f0b
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up

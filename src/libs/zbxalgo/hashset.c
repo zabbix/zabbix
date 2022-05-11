@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,8 +126,6 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_hashset_reserve                                              *
- *                                                                            *
  * Purpose: allocation not less than the required number of slots for hashset *
  *                                                                            *
  * Parameters: hs            - [IN] the destination hashset                   *
@@ -138,7 +136,7 @@ int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req)
 {
 	if (0 == hs->num_slots)
 	{
-		/* correction for prevent the second relocation in the case that requires the same number of slots */
+		/* correction to prevent the second relocation in case the same number of slots is required */
 		if (SUCCEED != zbx_hashset_init_slots(hs, MAX(ZBX_HASHSET_DEFAULT_SLOTS,
 				num_slots_req * (2 - CRIT_LOAD_FACTOR) + 1)))
 		{

@@ -1,0 +1,652 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:28:04Z'
+  groups:
+    -
+      uuid: 846977d1dfed4968bc5f8bdb363285bc
+      name: 'Templates/Operating systems'
+  templates:
+    -
+      uuid: f895df5b37494f668cde1a2388d7af8b
+      template: macOS
+      name: macOS
+      description: |
+        Official macOS template. Requires Zabbix agent 4.0.0 or newer.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Operating systems'
+      items:
+        -
+          uuid: 96c93b959e884934808b4d3c3b2f93d6
+          name: 'Host name of Zabbix agent running'
+          key: agent.hostname
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 3e70e8cc76bb4099a3a6b96f5669f059
+          name: 'Zabbix agent ping'
+          key: agent.ping
+          history: 7d
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check'
+          valuemap:
+            name: 'Zabbix agent ping status'
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 32e67f37a30c4fb28db9119d9e26a996
+          name: 'Version of Zabbix agent running'
+          key: agent.version
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: application
+        -
+          uuid: d25aa1f2eae445ceb18b7e4ee5383585
+          name: 'Maximum number of opened files'
+          key: kernel.maxfiles
+          delay: 1h
+          history: 7d
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: 933b14ead0974a9c96d36c833da90ebb
+              expression: last(/macOS/kernel.maxfiles)<1024
+              name: 'Configured max number of opened files is too low'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 5c376cae54854613a1533eb804bcee56
+          name: 'Maximum number of processes'
+          key: kernel.maxproc
+          delay: 1h
+          history: 7d
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: 0e89b2e0cad948c0b81bc223d2ed673c
+              expression: last(/macOS/kernel.maxproc)<256
+              name: 'Configured max number of processes is too low'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 951d874e6b644f9787c7a0d267bafcf8
+          name: 'Incoming network traffic on en0'
+          key: 'net.if.in[en0]'
+          history: 7d
+          units: bps
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: ac875bd25d484d38b16cb02c30be6b67
+          name: 'Outgoing network traffic on en0'
+          key: 'net.if.out[en0]'
+          history: 7d
+          units: bps
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '8'
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 928f973c004447d099a79e09a8b98cee
+          name: 'Host boot time'
+          key: system.boottime
+          delay: 10m
+          history: 7d
+          units: unixtime
+          tags:
+            -
+              tag: component
+              value: os
+        -
+          uuid: 5abd63bb64114794ae6d253dcc12afb4
+          name: 'Processor load (1 min average per core)'
+          key: 'system.cpu.load[percpu,avg1]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 3cf40421e61b41bab7697bbf9a2649d6
+              expression: 'avg(/macOS/system.cpu.load[percpu,avg1],5m)>5'
+              name: 'Processor load is too high'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 7e569411a7b4415098d21aaa44068dee
+          name: 'Processor load (5 min average per core)'
+          key: 'system.cpu.load[percpu,avg5]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 1ddc219f824541ca9c9ef30afda56df2
+          name: 'Processor load (15 min average per core)'
+          key: 'system.cpu.load[percpu,avg15]'
+          history: 7d
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 9c0230c0bb944523bd781c37304bb87b
+          name: 'Host name'
+          key: system.hostname
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'System host name.'
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: ffb713a281a543879e4196e4207bdd62
+              expression: 'last(/macOS/system.hostname,#1)<>last(/macOS/system.hostname,#2)'
+              name: 'Hostname was changed'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 5a7ce2c61d3a4696ac76e0406308e61b
+          name: 'Host local time'
+          key: system.localtime
+          history: 7d
+          units: unixtime
+          tags:
+            -
+              tag: component
+              value: os
+        -
+          uuid: 5c73ff0f28d24d92955c667e5245cfa0
+          name: 'System information'
+          key: system.uname
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'The information as normally returned by ''uname -a''.'
+          inventory_link: OS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: 55d8650af70d4aeea56345985e454df9
+              expression: 'last(/macOS/system.uname,#1)<>last(/macOS/system.uname,#2)'
+              name: 'Host information was changed'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 34c001a77a904224aa90338590375870
+          name: 'System uptime'
+          key: system.uptime
+          delay: 10m
+          history: 7d
+          units: uptime
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: 1f0cc03186cc4bb98483927f425df8e9
+              expression: change(/macOS/system.uptime)<0
+              name: 'Server has just been restarted'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 31ea6bafabbe440ea1b8d1b6cea74444
+          name: 'Number of logged in users'
+          key: system.users.num
+          history: 7d
+          description: 'Number of users who are currently logged in.'
+          tags:
+            -
+              tag: component
+              value: os
+            -
+              tag: component
+              value: security
+        -
+          uuid: 6df0d9e8694d45dfa11e433d8de7be41
+          name: 'Checksum of /etc/passwd'
+          key: 'vfs.file.cksum[/etc/passwd,sha256]'
+          delay: 1h
+          history: 7d
+          tags:
+            -
+              tag: component
+              value: security
+          triggers:
+            -
+              uuid: 39cfe50a3d2a46ad9a53b9ec7443ec18
+              expression: 'last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/macOS/vfs.file.cksum[/etc/passwd,sha256],#2)'
+              name: '/etc/passwd has been changed'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: security
+        -
+          uuid: daf35c33bb84443f893bb06bfe10f870
+          name: 'Available memory'
+          key: 'vm.memory.size[available]'
+          history: 7d
+          units: B
+          description: 'Available memory is defined as free+cached+buffers memory.'
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: c38dfc1b95d1463585d378f60d6a689a
+              expression: 'last(/macOS/vm.memory.size[available])<20M'
+              name: 'Lack of available memory on server'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 83c0218324a548c4a01054801a4d8b0b
+          name: 'Total memory'
+          key: 'vm.memory.size[total]'
+          delay: 1h
+          history: 7d
+          units: B
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: d00cf9691f6c446fa35dab03b2201aa4
+          name: 'Zabbix agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,agent,available]'
+          history: 7d
+          description: 'Monitoring agent availability status'
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: 0766e9c2a02f46e7adbb86dbef67556f
+              expression: 'max(/macOS/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              priority: AVERAGE
+              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      discovery_rules:
+        -
+          uuid: c537fbe006d7434dab08add1dcf87537
+          name: 'Mounted filesystem discovery'
+          key: vfs.fs.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#FSTYPE}'
+                value: '@File systems for discovery'
+                formulaid: A
+          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          item_prototypes:
+            -
+              uuid: b7560dc2b6f743458128961cc962bcd3
+              name: '{#FSNAME}: Free inodes (percentage)'
+              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 91cccd7935854a47bf4ca184b1d4d09a
+                  expression: 'last(/macOS/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  name: '{#FSNAME}: Free inodes is less than 20%'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 29340ac4c5d3419cb4508641e85d787d
+              name: '{#FSNAME}: Free disk space'
+              key: 'vfs.fs.size[{#FSNAME},free]'
+              history: 7d
+              units: B
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: 6d9aa50bddb642499ad575a0cc71146b
+              name: '{#FSNAME}: Free disk space (percentage)'
+              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 673dbc5aec474abda3a3b392d31b6c11
+                  expression: 'last(/macOS/vfs.fs.size[{#FSNAME},pfree])<20'
+                  name: '{#FSNAME}: Free disk space is less than 20%'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: c311ced2b4204b368af1c8a8c27f9c99
+              name: '{#FSNAME}: Total disk space'
+              key: 'vfs.fs.size[{#FSNAME},total]'
+              delay: 1h
+              history: 7d
+              units: B
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: 748612098b4e4befa0f39f11b99eced4
+              name: '{#FSNAME}: Used disk space'
+              key: 'vfs.fs.size[{#FSNAME},used]'
+              history: 7d
+              units: B
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+          graph_prototypes:
+            -
+              uuid: 6ce28b13df4e4494a4d39750afb25290
+              name: '{#FSNAME}: Disk space usage'
+              width: '600'
+              height: '340'
+              show_work_period: 'NO'
+              show_triggers: 'NO'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: C80000
+                  type: GRAPH_SUM
+                  item:
+                    host: macOS
+                    key: 'vfs.fs.size[{#FSNAME},total]'
+                -
+                  sortorder: '1'
+                  color: 00C800
+                  item:
+                    host: macOS
+                    key: 'vfs.fs.size[{#FSNAME},free]'
+      tags:
+        -
+          tag: class
+          value: os
+        -
+          tag: target
+          value: macos
+      macros:
+        -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 3m
+          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
+      dashboards:
+        -
+          uuid: d66f39e86e2047289acea0bc9a218807
+          name: 'System performance'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU load'
+                        host: macOS
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Memory usage'
+                        host: macOS
+      valuemaps:
+        -
+          uuid: 0355844b2bee4fb59bddda6175ef4810
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: a72caf871acf4776a891a612932fbf2e
+          name: 'Zabbix agent ping status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+  graphs:
+    -
+      uuid: f0e648fb4c5345748b11a7bdb05f6526
+      name: 'CPU load'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: '009900'
+          item:
+            host: macOS
+            key: 'system.cpu.load[percpu,avg1]'
+        -
+          sortorder: '1'
+          color: '000099'
+          item:
+            host: macOS
+            key: 'system.cpu.load[percpu,avg5]'
+        -
+          sortorder: '2'
+          color: '990000'
+          item:
+            host: macOS
+            key: 'system.cpu.load[percpu,avg15]'
+    -
+      uuid: 5c942cb1fe5b440aa9428d45ee85e09c
+      name: 'Memory usage'
+      ymin_type_1: FIXED
+      ymax_type_1: ITEM
+      ymax_item_1:
+        host: macOS
+        key: 'vm.memory.size[total]'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 00C800
+          item:
+            host: macOS
+            key: 'vm.memory.size[available]'
+    -
+      uuid: 5c4b08f992c541dbb02835bbd4f0a55e
+      name: 'Network traffic on en0'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 00AA00
+          item:
+            host: macOS
+            key: 'net.if.in[en0]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 3333FF
+          item:
+            host: macOS
+            key: 'net.if.out[en0]'

@@ -1,0 +1,1645 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:27:50Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 85ce114c802e4e28a5f3597e07d07032
+      template: 'Kubernetes API server by HTTP'
+      name: 'Kubernetes API server by HTTP'
+      description: |
+        Get Kubernetes API server metrics by HTTP agent from Prometheus metrics endpoint.
+        
+        Don't forget change macros {$KUBE.API.SERVER.URL}, {$KUBE.API.TOKEN}.
+        Some metrics may not be collected depending on your Kubernetes API server instance version and configuration.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 28944ee2c0a3478e84612cd5650f3cd5
+          name: 'Kubernetes API: Request terminations, rate'
+          type: DEPENDENT
+          key: kubernetes.api.apiserver_request_terminations
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of requests which apiserver terminated in self-defense per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - apiserver_request_terminations_total
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+        -
+          uuid: 1ac74141a4b241b196bc47d0dee37a2c
+          name: 'Kubernetes API: API server requests: 0'
+          type: DEPENDENT
+          key: kubernetes.api.apiserver_request_total_0.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Counter of apiserver requests broken out for each HTTP response code.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'apiserver_request_total{code = "0"}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: '0'
+        -
+          uuid: d7f8363e1bc5424f89c7386fcbe6fb06
+          name: 'Kubernetes API: API server requests: 2xx, rate'
+          type: DEPENDENT
+          key: kubernetes.api.apiserver_request_total_200.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Counter of apiserver requests broken out for each HTTP response code.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'apiserver_request_total{code =~ "2.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 2xx
+        -
+          uuid: 453852b621ca4a7cbc4d80e5327c80da
+          name: 'Kubernetes API: API server requests: 3xx, rate'
+          type: DEPENDENT
+          key: kubernetes.api.apiserver_request_total_300.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Counter of apiserver requests broken out for each HTTP response code.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'apiserver_request_total{code =~ "3.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 3xx
+        -
+          uuid: 1f72779899f94620bc55870f5e2c2ca0
+          name: 'Kubernetes API: API server requests: 4xx, rate'
+          type: DEPENDENT
+          key: kubernetes.api.apiserver_request_total_400.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Counter of apiserver requests broken out for each HTTP response code.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'apiserver_request_total{code =~ "4.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 4xx
+        -
+          uuid: 1c24d58b28bc423e868a965d689cf146
+          name: 'Kubernetes API: API server requests: 5xx, rate'
+          type: DEPENDENT
+          key: kubernetes.api.apiserver_request_total_500.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Counter of apiserver requests broken out for each HTTP response code.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'apiserver_request_total{code =~ "5.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 5xx
+          triggers:
+            -
+              uuid: 0e1ef1630b5d4cb98270564f324f5382
+              expression: 'min(/Kubernetes API server by HTTP/kubernetes.api.apiserver_request_total_500.rate,5m)>{$KUBE.API.HTTP.SERVER.ERROR}'
+              name: 'Kubernetes API: Too many server errors'
+              event_name: 'Kubernetes API: Too many server errors (over {$KUBE.API.HTTP.SERVER.ERROR} for 5m)'
+              priority: WARNING
+              description: '"Kubernetes API server is experiencing high error rate (with 5xx HTTP code).'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 5bd8b2deaf1142369ba67afc7a41ab11
+          name: 'Kubernetes API: TLS handshake errors, rate'
+          type: DEPENDENT
+          key: kubernetes.api.apiserver_tls_handshake_errors_total.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of requests dropped with ''TLS handshake error from'' error per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - apiserver_tls_handshake_errors_total
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: tls
+        -
+          uuid: 54723f57a20a47a698fbf47cbec0f7a1
+          name: 'Kubernetes API: Audit events, total'
+          type: DEPENDENT
+          key: kubernetes.api.audit_event_total
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Accumulated number audit events generated and sent to the audit backend.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - apiserver_audit_event_total
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: audit
+        -
+          uuid: de87284b8bd644398e4a88a064e206bb
+          name: 'Kubernetes API: CPU'
+          type: DEPENDENT
+          key: kubernetes.api.cpu.util
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Total user and system CPU usage ratio.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_cpu_seconds_total
+                - value
+                - ''
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '100'
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: e4e3c570a55a48689c145c4a2310c597
+          name: 'Kubernetes API: Get API instance metrics'
+          type: HTTP_AGENT
+          key: kubernetes.api.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get raw metrics from API instance /metrics endpoint.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          timeout: 15s
+          url: '{$KUBE.API.SERVER.URL}'
+          headers:
+            -
+              name: Authorization
+              value: 'Bearer {$KUBE.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 79db985ac8f645999fe8aa73b4073bfb
+          name: 'Kubernetes API: Goroutines'
+          type: DEPENDENT
+          key: kubernetes.api.go_goroutines
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of goroutines that currently exist.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - go_goroutines
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: goroutines
+        -
+          uuid: 2022d65c2f7a4f07bc1cba435a2be1e9
+          name: 'Kubernetes API: Go threads'
+          type: DEPENDENT
+          key: kubernetes.api.go_threads
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of OS threads created.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - go_threads
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: go-threads
+        -
+          uuid: 837c546cb3bc400ab7a62a672792f88b
+          name: 'Kubernetes API: gRPCs messages ressived, rate'
+          type: DEPENDENT
+          key: kubernetes.api.grpc_client_msg_received.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of gRPC stream messages received per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - grpc_client_msg_received_total
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: grpc
+        -
+          uuid: 353559f3b9684647a74bd429d80731b9
+          name: 'Kubernetes API: gRPCs messages sent, rate'
+          type: DEPENDENT
+          key: kubernetes.api.grpc_client_msg_sent.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of gRPC stream messages sent per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - grpc_client_msg_sent_total
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: grpc
+        -
+          uuid: 0850afe759684950be79135ed4f32c79
+          name: 'Kubernetes API: gRPCs client started, rate'
+          type: DEPENDENT
+          key: kubernetes.api.grpc_client_started.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of RPCs started per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - grpc_client_started_total
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: grpc
+        -
+          uuid: 187702b1c3a24d07aaf9cc07fa359095
+          name: 'Kubernetes API: Fds max'
+          type: DEPENDENT
+          key: kubernetes.api.max_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum allowed open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_max_fds
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: fds
+        -
+          uuid: 41f802305a234b1ab9fb0e89d1e40290
+          name: 'Kubernetes API: Fds open'
+          type: DEPENDENT
+          key: kubernetes.api.open_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_open_fds
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: fds
+        -
+          uuid: 53fd5211b6da47d3b3fc87ab8a2d0c33
+          name: 'Kubernetes API: Resident memory, bytes'
+          type: DEPENDENT
+          key: kubernetes.api.process_resident_memory_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Resident memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_resident_memory_bytes
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 010a983426c9407eb4b6bf7822b411ce
+          name: 'Kubernetes API: Virtual memory, bytes'
+          type: DEPENDENT
+          key: kubernetes.api.process_virtual_memory_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Virtual memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_virtual_memory_bytes
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 3f15d60ef7cb4a068424d5835d04a817
+          name: 'Kubernetes API: HTTP requests: 2xx, rate'
+          type: DEPENDENT
+          key: kubernetes.api.rest_client_requests_total_200.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of HTTP requests with 2xx status code per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'rest_client_requests_total{code =~ "2.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 2xx
+        -
+          uuid: 450607dda045428fb6d4a96ca8888c19
+          name: 'Kubernetes API: HTTP requests: 3xx, rate'
+          type: DEPENDENT
+          key: kubernetes.api.rest_client_requests_total_300.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of HTTP requests with 3xx status code per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'rest_client_requests_total{code =~ "3.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 3xx
+        -
+          uuid: f11b87e0bc5a41ff956391b6cb7115c5
+          name: 'Kubernetes API: HTTP requests: 4xx, rate'
+          type: DEPENDENT
+          key: kubernetes.api.rest_client_requests_total_400.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of HTTP requests with 4xx status code per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'rest_client_requests_total{code =~ "4.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 4xx
+        -
+          uuid: 2588c2332fea48f8bae414e8b7c42184
+          name: 'Kubernetes API: HTTP requests: 5xx, rate'
+          type: DEPENDENT
+          key: kubernetes.api.rest_client_requests_total_500.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of HTTP requests with 5xx status code per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'rest_client_requests_total{code =~ "5.."}'
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: kubernetes.api.get_metrics
+          tags:
+            -
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 5xx
+          triggers:
+            -
+              uuid: 4c79888da91448738092c86e5f427a6a
+              expression: 'min(/Kubernetes API server by HTTP/kubernetes.api.rest_client_requests_total_500.rate,5m)>{$KUBE.API.HTTP.CLIENT.ERROR}'
+              name: 'Kubernetes API: Too many client errors'
+              event_name: 'Kubernetes API: Too many client errors (over {$KUBE.API.HTTP.CLIENT.ERROR} for 5m)'
+              priority: WARNING
+              description: '"Kubernetes API client is experiencing high error rate (with 5xx HTTP code).'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      discovery_rules:
+        -
+          uuid: 22c5e2a84d9542c1905d0c20f4ca6700
+          name: 'Watchers metrics discovery'
+          type: DEPENDENT
+          key: kubernetes.api.apiserver_registered_watchers.discovery
+          delay: '0'
+          description: 'Discovery watchers by kind.'
+          item_prototypes:
+            -
+              uuid: 09d0815f893c42c1b95721f7f908940a
+              name: 'Kubernetes API: Watchers: {#KIND}'
+              type: DEPENDENT
+              key: 'kubernetes.api.apiserver_registered_watchers["{#KIND}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of currently registered watchers for a given resource.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'apiserver_registered_watchers{kind = "{#KIND}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: watchers
+                -
+                  tag: kind
+                  value: '{#KIND}'
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'apiserver_registered_watchers{kind =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var kind = item.labels.kind;
+                      if (!(lookup[kind])) {
+                          lookup[kind] = 1;
+                          result.push({ '{#KIND}': kind });
+                      }
+                  });
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 45ad0dd7331d4b9391d26b78838b0433
+          name: 'Authentication requests discovery'
+          type: DEPENDENT
+          key: kubernetes.api.authenticated_user_requests.discovery
+          delay: '0'
+          description: 'Discovery authentication attempts by name.'
+          item_prototypes:
+            -
+              uuid: 6950d30d0b1d4162acee45f184453fbd
+              name: 'Kubernetes API: Authenticated requests: {#NAME}, rate'
+              type: DEPENDENT
+              key: 'kubernetes.api.authenticated_user_requests.rate["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Counter of authenticated requests broken out by username per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'authenticated_user_requests{result = "{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: authentication
+                -
+                  tag: name
+                  value: '{#NAME}'
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'authenticated_user_requests{username =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var name = item.labels.username;
+                      if (!(lookup[result])) {
+                          lookup[name] = 1;
+                          result.push({ '{#NAME}': name });
+                      }
+                  });
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: ca23c310c71f4e88891ceae883527389
+          name: 'Authentication attempts discovery'
+          type: DEPENDENT
+          key: kubernetes.api.authentication_attempts.discovery
+          delay: '0'
+          description: 'Discovery authentication attempts by result.'
+          item_prototypes:
+            -
+              uuid: d9ddaa016a7c4ca381fbe857959dd0fd
+              name: 'Kubernetes API: Authentication attempts: {#RESULT}, rate'
+              type: DEPENDENT
+              key: 'kubernetes.api.authentication_attempts.rate["{#RESULT}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Authentication attempts by result per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'authentication_attempts{result = "{#RESULT}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: authentication
+                -
+                  tag: result
+                  value: '{#RESULT}'
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'authentication_attempts{result =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var result_api = item.labels.result;
+                      if (!(lookup[result])) {
+                          lookup[result_api] = 1;
+                          result.push({ '{#RESULT}': result_api });
+                      }
+                  });
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 0821009ea3be43e089247e843723577f
+          name: 'Client certificate expiration histogram'
+          type: DEPENDENT
+          key: kubernetes.api.certificate_expiration.discovery
+          delay: '0'
+          description: 'Discovery raw data of client certificate expiration'
+          item_prototypes:
+            -
+              uuid: b69600f22c7b42b48f8601ada06a5a9f
+              name: 'Kubernetes API: Client certificate expiration, p1'
+              type: CALCULATED
+              key: 'kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)'
+              description: '1 percentile of of the remaining lifetime on the certificate used to authenticate a request.'
+              tags:
+                -
+                  tag: component
+                  value: client-certificate
+              trigger_prototypes:
+                -
+                  uuid: 1371958c0339430b8a333851766c01c0
+                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
+                  name: 'Kubernetes API: Kubernetes client certificate expires soon'
+                  priority: WARNING
+                  description: 'A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: 132d58724bd141afa3f28101326fe922
+                  expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < {$KUBE.API.CERT.EXPIRATION}*24*60*60'
+                  name: 'Kubernetes API: Kubernetes client certificate is expiring'
+                  event_name: 'Kubernetes API: Kubernetes client certificate expires in {$KUBE.API.CERT.EXPIRATION} days'
+                  priority: WARNING
+                  description: 'A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.'
+                  dependencies:
+                    -
+                      name: 'Kubernetes API: Kubernetes client certificate expires soon'
+                      expression: 'last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 860cc40806254564bddb3617b8b75e74
+              name: 'Kubernetes API: Certificate expiration seconds bucket, {#LE}'
+              type: DEPENDENT
+              key: 'kubernetes.api.client_certificate_expiration_seconds_bucket[{#LE}]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              description: 'Distribution of the remaining lifetime on the certificate used to authenticate a request.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'apiserver_client_certificate_expiration_seconds_bucket{le = "{#LE}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: client-certificate
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~ "apiserver_client_certificate_expiration_seconds_*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      if (item.name === "apiserver_client_certificate_expiration_seconds_count"){
+                          result.push({
+                              '{#TYPE}': 'totals',
+                              '{#SINGLETON}': ''
+                          });
+                  
+                        }
+                      else if  (item.name === "apiserver_client_certificate_expiration_seconds_bucket"){
+                          result.push({
+                              '{#TYPE}': 'buckets',
+                              '{#LE}': item.labels.le
+                          });
+                      }
+                  });
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          overrides:
+            -
+              name: 'bucket item'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: buckets
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: 'total item'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: totals
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          uuid: 8dcd7c95a9364efdb2fe64c651360ad4
+          name: 'Etcd objects metrics discovery'
+          type: DEPENDENT
+          key: kubernetes.api.etcd_object_counts.discovery
+          delay: '0'
+          description: 'Discovery etcd objects by resource.'
+          item_prototypes:
+            -
+              uuid: 75c15b57189d4cbeb6ed6397fc377e2a
+              name: 'Kubernetes API: etcd objects: {#RESOURCE}'
+              type: DEPENDENT
+              key: 'kubernetes.api.etcd_object_counts["{#RESOURCE}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of stored objects at the time of last check split by kind.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'etcd_object_counts{ resource = "{#RESOURCE}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: etcd
+                -
+                  tag: resource
+                  value: '{#RESOURCE}'
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'etcd_object_counts{resource =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var resource = item.labels.resource;
+                      if (!(lookup[resource])) {
+                          lookup[resource] = 1;
+                          result.push({ '{#RESOURCE}': resource });
+                      }
+                  });
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 099e6ff46075457cba6b669a5880ceef
+          name: 'gRPC completed requests discovery'
+          type: DEPENDENT
+          key: kubernetes.api.grpc_client_handled.discovery
+          delay: '0'
+          description: 'Discovery grpc completed requests by grpc code.'
+          item_prototypes:
+            -
+              uuid: 690dc00ad92d44d0b9bc7db58c07bd8f
+              name: 'Kubernetes API: gRPCs completed: {#GRPC_CODE}, rate'
+              type: DEPENDENT
+              key: 'kubernetes.api.grpc_client_handled_total.rate["{#GRPC_CODE}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of RPCs completed by the client regardless of success or failure per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'grpc_client_handled_total{grpc_code = "{#GRPC_CODE}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: grpc
+                -
+                  tag: grpc-code
+                  value: '{#GRPC_CODE}'
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'grpc_client_handled_total{grpc_code =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var grpc_code = item.labels.grpc_code;
+                      if (!(lookup[grpc_code])) {
+                          lookup[grpc_code] = 1;
+                          result.push({ '{#GRPC_CODE}': grpc_code });
+                      }
+                  });
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 948e1d84d44642a78f59c92271a21a68
+          name: 'Requests inflight discovery'
+          type: DEPENDENT
+          key: kubernetes.api.inflight_requests.discovery
+          delay: '0'
+          description: 'Discovery requests inflight by kind.'
+          item_prototypes:
+            -
+              uuid: 5076679154cc464ebab0b678f65c8853
+              name: 'Kubernetes API: Requests current: {#KIND}'
+              type: DEPENDENT
+              key: 'kubernetes.api.current_inflight_requests["{#KIND}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Maximal number of currently used inflight request limit of this apiserver per request kind in last second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'apiserver_current_inflight_requests{request_kind = "{#KIND}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: kind
+                  value: '{#KIND}'
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'apiserver_current_inflight_requests{request_kind =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var request_kind = item.labels.request_kind;
+                      if (!(lookup[request_kind])) {
+                          lookup[request_kind] = 1;
+                          result.push({ '{#KIND}': request_kind });
+                      }
+                  });
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 7cd3ef5e2c874db18088b3531c944b25
+          name: 'Long-running requests'
+          type: DEPENDENT
+          key: kubernetes.api.longrunning_gauge.discovery
+          delay: '0'
+          description: 'Discovery of long-running requests by verb, resource and scope.'
+          item_prototypes:
+            -
+              uuid: feee53d3fc69401ba359ecd97788e552
+              name: 'Kubernetes API: Long-running ["{#VERB}"] requests ["{#RESOURCE}"]: {#SCOPE}'
+              type: DEPENDENT
+              key: 'kubernetes.api.longrunning_gauge["{#RESOURCE}","{#SCOPE}","{#VERB}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Gauge of all active long-running apiserver requests broken out by verb, resource and scope. Not all requests are tracked this way.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'apiserver_longrunning_gauge{resource = "{#RESOURCE}", scope = "{#SCOPE}", verb = "{#VERB}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: resource
+                  value: '{#RESOURCE}'
+                -
+                  tag: scope
+                  value: '{#SCOPE}'
+                -
+                  tag: verb
+                  value: '{#VERB}'
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'apiserver_longrunning_gauge{resource =~ ".*", scope =~ ".*", verb =~ ".*"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var request_kind = item.labels.resource + item.labels.scope + item.labels.verb;
+                      if (!(lookup[request_kind])) {
+                          lookup[request_kind] = 1;
+                          result.push({
+                              '{#RESOURCE}': item.labels.resource,
+                              '{#SCOPE}': item.labels.scope,
+                              '{#VERB}': item.labels.verb
+                          });
+                      }
+                  });
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 7c5ffdbafc5e4e349cc62ed0d0c0f20f
+          name: 'Request duration histogram'
+          type: DEPENDENT
+          key: kubernetes.api.requests_bucket.discovery
+          delay: '0'
+          description: 'Discovery raw data and percentile items of request duration.'
+          item_prototypes:
+            -
+              uuid: 5135a1bc92514c79965edea9d7d2a47e
+              name: 'Kubernetes API: ["{#VERB}"] Requests bucket: {#LE}'
+              type: DEPENDENT
+              key: 'kubernetes.api.request_duration_seconds_bucket[{#LE},"{#VERB}"]'
+              delay: '0'
+              history: 1h
+              trends: '0'
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              description: 'Response latency distribution in seconds for each verb.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'apiserver_request_duration_seconds_bucket{le="{#LE}",verb="{#VERB}"}'
+                    - function
+                    - sum
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: verb
+                  value: '{#VERB}'
+            -
+              uuid: a4f39bb87ef248edbb578c0c89baba46
+              name: 'Kubernetes API: ["{#VERB}"] Requests, p50'
+              type: CALCULATED
+              key: 'kubernetes.api.request_duration_seconds_p50["{#VERB}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,50)'
+              description: '50 percentile of response latency distribution in seconds for each verb.'
+              tags:
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: verb
+                  value: '{#VERB}'
+            -
+              uuid: 12d65aff584e459586284967e570fc0a
+              name: 'Kubernetes API: ["{#VERB}"] Requests, p90'
+              type: CALCULATED
+              key: 'kubernetes.api.request_duration_seconds_p90["{#VERB}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,90)'
+              description: '90 percentile of response latency distribution in seconds for each verb.'
+              tags:
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: verb
+                  value: '{#VERB}'
+            -
+              uuid: 3e900f1e4cab4edba4d068f1b6759428
+              name: 'Kubernetes API: ["{#VERB}"] Requests, p95'
+              type: CALCULATED
+              key: 'kubernetes.api.request_duration_seconds_p95["{#VERB}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,95)'
+              description: '95 percentile of response latency distribution in seconds for each verb.'
+              tags:
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: verb
+                  value: '{#VERB}'
+            -
+              uuid: a34c3c5f5f844c46a4d3f148cacd3fd3
+              name: 'Kubernetes API: ["{#VERB}"] Requests, p99'
+              type: CALCULATED
+              key: 'kubernetes.api.request_duration_seconds_p99["{#VERB}"]'
+              history: 7d
+              discover: NO_DISCOVER
+              value_type: FLOAT
+              units: s
+              params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,99)'
+              description: '99 percentile of response latency distribution in seconds for each verb.'
+              tags:
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: verb
+                  value: '{#VERB}'
+          graph_prototypes:
+            -
+              uuid: a974cb068f184b7385bf5eb2e4ba084a
+              name: 'Kubernetes API: ["{#VERB}"] Requests latency'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'Kubernetes API server by HTTP'
+                    key: 'kubernetes.api.request_duration_seconds_p90["{#VERB}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'Kubernetes API server by HTTP'
+                    key: 'kubernetes.api.request_duration_seconds_p95["{#VERB}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'Kubernetes API server by HTTP'
+                    key: 'kubernetes.api.request_duration_seconds_p99["{#VERB}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'Kubernetes API server by HTTP'
+                    key: 'kubernetes.api.request_duration_seconds_p50["{#VERB}"]'
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~ "apiserver_request_duration_*", verb =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      lookup_histogram = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      if (item.name === 'apiserver_request_duration_seconds_count') {
+                          var label_verb = item.labels.verb;
+                          if (lookup[label_verb]) {
+                              return;
+                          }
+                          lookup[label_verb] = 1;
+                          result.push({
+                              '{#TYPE}': 'totals',
+                              '{#VERB}': label_verb
+                          });
+                  
+                        }
+                      else if  (item.name === 'apiserver_request_duration_seconds_bucket') {
+                          var labels = item.labels.verb + item.labels.le;
+                  
+                          if (lookup_histogram[labels]) {
+                              return;
+                          }
+                  
+                          lookup_histogram[labels] = 1;
+                          result.push({
+                              '{#TYPE}': 'buckets',
+                              '{#VERB}': item.labels.verb,
+                              '{#LE}': item.labels.le
+                          });
+                      }
+                  });
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          overrides:
+            -
+              name: 'bucket item'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: buckets
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: 'total item'
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: totals
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: NOT_LIKE
+                  value: bucket
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          uuid: d015cafd6e9f4707bb78125ff17cc679
+          name: 'Workqueue metrics discovery'
+          type: DEPENDENT
+          key: kubernetes.api.workqueue.discovery
+          delay: '0'
+          description: 'Discovery workqueue metrics by name.'
+          item_prototypes:
+            -
+              uuid: cf58e773a5684eafa74b56ed43490148
+              name: 'Kubernetes API: ["{#NAME}"] Workqueue adds total, rate'
+              type: DEPENDENT
+              key: 'kubernetes.api.workqueue_adds_total.rate["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of adds handled by workqueue per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'workqueue_adds_total{name = "{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+            -
+              uuid: 4fe45ff01cdf4bdf85e74a52d2d3b917
+              name: 'Kubernetes API: ["{#NAME}"] Workqueue depth'
+              type: DEPENDENT
+              key: 'kubernetes.api.workqueue_depth["{#NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Current depth of workqueue.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'workqueue_depth{name = "{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kubernetes.api.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: workqueue
+                -
+                  tag: workqueue
+                  value: '{#NAME}'
+          master_item:
+            key: kubernetes.api.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'workqueue_adds_total{name =~ ".*"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var name = item.labels.name;
+                      if (!(lookup[name])) {
+                          lookup[name] = 1;
+                          result.push({ '{#NAME}': name });
+                      }
+                  });
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: 'kubernetes api server'
+      macros:
+        -
+          macro: '{$KUBE.API.CERT.EXPIRATION}'
+          value: '7'
+          description: 'Number of days for alert of client certificate used for trigger'
+        -
+          macro: '{$KUBE.API.HTTP.CLIENT.ERROR}'
+          value: '2'
+          description: 'Maximum number of HTTP client requests failures used for trigger'
+        -
+          macro: '{$KUBE.API.HTTP.SERVER.ERROR}'
+          value: '2'
+          description: 'Maximum number of HTTP client requests failures used for trigger'
+        -
+          macro: '{$KUBE.API.SERVER.URL}'
+          value: 'http://localhost:8086/metrics'
+          description: 'instance URL'
+        -
+          macro: '{$KUBE.API.TOKEN}'
+          description: 'API Authorization Token'
+  graphs:
+    -
+      uuid: 749ed49ec625449db0a345d639f7d8fd
+      name: 'Kubernetes API: HTTP requests rate'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Kubernetes API server by HTTP'
+            key: kubernetes.api.apiserver_request_total_200.rate
+        -
+          color: 1A7C11
+          item:
+            host: 'Kubernetes API server by HTTP'
+            key: kubernetes.api.rest_client_requests_total_200.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Kubernetes API server by HTTP'
+            key: kubernetes.api.apiserver_request_total_300.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Kubernetes API server by HTTP'
+            key: kubernetes.api.rest_client_requests_total_300.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Kubernetes API server by HTTP'
+            key: kubernetes.api.apiserver_request_total_400.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Kubernetes API server by HTTP'
+            key: kubernetes.api.rest_client_requests_total_400.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Kubernetes API server by HTTP'
+            key: kubernetes.api.apiserver_request_total_500.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Kubernetes API server by HTTP'
+            key: kubernetes.api.rest_client_requests_total_500.rate
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Kubernetes API server by HTTP'
+            key: kubernetes.api.apiserver_request_total_0.rate

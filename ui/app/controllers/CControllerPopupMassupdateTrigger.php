@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ class CControllerPopupMassupdateTrigger extends CController {
 				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 				'context' => $this->getInput('context'),
 				'location_url' => $this->hasInput('prototype')
-					? (new CUrl('disc_prototypes.php'))
+					? (new CUrl('trigger_prototypes.php'))
 						->setArgument('parent_discoveryid', $this->getInput('parent_discoveryid', 0))
 						->setArgument('context', $this->getInput('context'))
 						->getUrl()

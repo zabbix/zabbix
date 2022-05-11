@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,9 @@
 #ifndef ZABBIX_DB_H
 #define ZABBIX_DB_H
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
-#include "zbxeval.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -65,8 +63,6 @@ typedef enum
 }
 zbx_graph_item_type;
 
-struct	_DC_TRIGGER;
-
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
 #define ZBX_DB_CONNECT_ONCE	2
@@ -78,7 +74,7 @@ struct	_DC_TRIGGER;
 
 #define TRIGGER_OPDATA_LEN		255
 #define TRIGGER_URL_LEN			255
-#define TRIGGER_DESCRIPTION_LEN		2048
+#define TRIGGER_DESCRIPTION_LEN		255
 #define TRIGGER_EXPRESSION_LEN		2048
 #define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
 #if defined(HAVE_ORACLE)
@@ -342,6 +338,7 @@ typedef struct
 {
 	zbx_uint64_t		serviceid;
 	char			*name;
+	char			*description;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
 	zbx_vector_tags_t	service_tags;
@@ -489,6 +486,7 @@ typedef struct
 	unsigned char	pause_suppressed;
 	unsigned char	recovery;
 	unsigned char	status;
+	unsigned char	notify_if_canceled;
 }
 DB_ACTION;
 
@@ -558,8 +556,6 @@ char	*zbx_db_get_schema_esc(void);
  * Type: ZBX_GRAPH_ITEMS                                                      *
  *                                                                            *
  * Purpose: represent graph item data                                         *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 typedef struct
@@ -928,7 +924,7 @@ typedef struct
 	unsigned char		operator;
 	unsigned char		status;
 	unsigned char		severity;
-	unsigned char		inventory_mode;
+	signed char		inventory_mode;
 	unsigned char		discover;
 }
 zbx_lld_override_operation_t;

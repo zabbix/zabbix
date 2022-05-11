@@ -1,0 +1,2401 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-21T13:07:34Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 4958b76448d74ff1b6d7d6280449beee
+      template: 'Proxmox VE by HTTP'
+      name: 'Proxmox VE by HTTP'
+      description: 'Template tooling version used: 0.41'
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 75f8f8c507774f529ade4bc4255f5fd2
+          name: 'Proxmox: API service status'
+          type: SCRIPT
+          key: proxmox.api.available
+          delay: 5m
+          history: 7d
+          params: |
+            try {
+              var params = JSON.parse(value);
+              var req = new HttpRequest();
+              req.addHeader('Authorization: PVEAPIToken=' + params.token + '=' + params.secret);
+              req.get(encodeURI('https://' + params.url + ':' + params.port + '/api2/json/version'));  
+            } catch (error) {
+                Zabbix.log(3, "Proxmox API failed: " + params.url + " Error: " + error);
+                if (!Number.isInteger(error))
+                    return 520;
+            }
+            return req.getStatus();
+          description: 'Get API service status.'
+          valuemap:
+            name: 'HTTP response status code'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          timeout: 10s
+          parameters:
+            -
+              name: token
+              value: '{$PVE.TOKEN.ID}'
+            -
+              name: secret
+              value: '{$PVE.TOKEN.SECRET}'
+            -
+              name: url
+              value: '{HOST.CONN}'
+            -
+              name: port
+              value: '{$PVE.URL.PORT}'
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: 7ef8290fd6e242339d0e56d5e8eedb1a
+              expression: 'last(/Proxmox VE by HTTP/proxmox.api.available) <> 200'
+              name: 'Proxmox: API service not available'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The API service is not available. Check your network and authorization settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 4fe4fa1323cd481f8aff3bfb716eeae2
+          name: 'Proxmox: Get cluster resources'
+          type: HTTP_AGENT
+          key: proxmox.cluster.resources
+          delay: 5m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Resources index.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'Error getting data'
+          url: 'https://{HOST.CONN}:{$PVE.URL.PORT}/api2/json/cluster/resources'
+          headers:
+            -
+              name: Authorization
+              value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 6e6a5046b8154bafad375813ca210e1f
+          name: 'Proxmox: Get cluster status'
+          type: HTTP_AGENT
+          key: proxmox.cluster.status
+          delay: 5m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get cluster status information.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: 'Error getting data'
+          url: 'https://{HOST.CONN}:{$PVE.URL.PORT}/api2/json/cluster/status'
+          headers:
+            -
+              name: Authorization
+              value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
+          tags:
+            -
+              tag: component
+              value: raw
+      discovery_rules:
+        -
+          uuid: e01bb8d7614144ba82e31d91618dee31
+          name: 'Cluster discovery'
+          type: DEPENDENT
+          key: proxmox.cluster.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#RESOURCE.TYPE}'
+                value: ^cluster$
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: 4b5d9197cfa042ceac1415a524912b63
+              name: 'Proxmox: Cluster [{#RESOURCE.NAME}]: Quorate'
+              type: DEPENDENT
+              key: 'proxmox.cluster.quorate[{#RESOURCE.NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Indicates if there is a majority of nodes online to make decisions.'
+              valuemap:
+                name: 'Cluster quorate'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data.[?(@.name == ''{#RESOURCE.NAME}'' && @.type == ''cluster'')].quorate.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: proxmox.cluster.status
+              tags:
+                -
+                  tag: cluster
+                  value: '{#RESOURCE.NAME}'
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: 142e02d47b8a4ac9a9ad28b68b097ebd
+                  expression: 'last(/Proxmox VE by HTTP/proxmox.cluster.quorate[{#RESOURCE.NAME}]) <> 1'
+                  name: 'Proxmox: Cluster [{#RESOURCE.NAME}] not quorum'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: HIGH
+                  description: 'Proxmox VE use a quorum-based technique to provide a consistent state among all cluster nodes.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+          master_item:
+            key: proxmox.cluster.status
+          lld_macro_paths:
+            -
+              lld_macro: '{#RESOURCE.NAME}'
+              path: $.name
+            -
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
+        -
+          uuid: 78a4018328954d408e415aa0ce7ce41c
+          name: 'LXC discovery'
+          type: DEPENDENT
+          key: proxmox.lxc.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#RESOURCE.TYPE}'
+                value: ^lxc$
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: dda211b14d7b4c419196a98ee5153307
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: CPU usage'
+              type: DEPENDENT
+              key: 'proxmox.lxc.cpu[{#LXC.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'CPU load.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.cpu
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '100'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.lxc.status[{#LXC.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: lxc
+                  value: '{#LXC.ID}'
+                -
+                  tag: name
+                  value: '{#LXC.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: c0436342a19d4d6482fac70d2f04f530
+                  expression: 'min(/Proxmox VE by HTTP/proxmox.lxc.cpu[{#LXC.ID}],5m) > {$PVE.LXC.CPU.PUSE.MAX.WARN:"{#LXC.ID}"}'
+                  name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high CPU usage'
+                  event_name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high CPU usage (over {$PVE.LXC.CPU.PUSE.MAX.WARN:"{#LXC.ID}"}% use)'
+                  opdata: 'Current use: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU usage.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 8bc1bb78bf1340f3ab8d9f888d081e23
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk read, rate'
+              type: DEPENDENT
+              key: 'proxmox.lxc.diskread[{#LXC.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Disk read.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.diskread
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.lxc.status[{#LXC.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: lxc
+                  value: '{#LXC.ID}'
+                -
+                  tag: name
+                  value: '{#LXC.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: cee89da9e4a842228b30cc708e4d7745
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk write, rate'
+              type: DEPENDENT
+              key: 'proxmox.lxc.diskwrite[{#LXC.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Disk write.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.diskwrite
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.lxc.status[{#LXC.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: lxc
+                  value: '{#LXC.ID}'
+                -
+                  tag: name
+                  value: '{#LXC.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 686490c2a07f4a859bc7f1d56056cc5e
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Memory total'
+              type: DEPENDENT
+              key: 'proxmox.lxc.maxmem[{#LXC.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Total memory in Bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.maxmem
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.lxc.status[{#LXC.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: lxc
+                  value: '{#LXC.ID}'
+                -
+                  tag: name
+                  value: '{#LXC.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: a60eaec875d347bd9247a174ba84f21e
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Memory usage'
+              type: DEPENDENT
+              key: 'proxmox.lxc.mem[{#LXC.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Used memory in Bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.mem
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.lxc.status[{#LXC.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: lxc
+                  value: '{#LXC.ID}'
+                -
+                  tag: name
+                  value: '{#LXC.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: b19b6b5895d64ed9b4942f955e66dc81
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Incoming data, rate'
+              type: DEPENDENT
+              key: 'proxmox.lxc.netin[{#LXC.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: bps
+              description: 'Incoming data rate.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.netin
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.lxc.status[{#LXC.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: lxc
+                  value: '{#LXC.ID}'
+                -
+                  tag: name
+                  value: '{#LXC.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 5ac20ae95e664a3cb62b58cde4f67471
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Outgoing data, rate'
+              type: DEPENDENT
+              key: 'proxmox.lxc.netout[{#LXC.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: bps
+              description: 'Outgoing data rate.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.netout
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.lxc.status[{#LXC.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: lxc
+                  value: '{#LXC.ID}'
+                -
+                  tag: name
+                  value: '{#LXC.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 58efec1a4bb94bfab59d5985d036811e
+              name: 'Proxmox: LXC [{#LXC.NAME}/{#LXC.NAME}]: Status'
+              type: HTTP_AGENT
+              key: 'proxmox.lxc.status[{#LXC.ID}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Read LXC status.'
+              url: 'https://{HOST.CONN}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/{#LXC.ID}/status/current'
+              headers:
+                -
+                  name: Authorization
+                  value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
+              uuid: bd213f6de4db4e1e84894b80acffa330
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Uptime'
+              type: DEPENDENT
+              key: 'proxmox.lxc.uptime[{#LXC.ID}]'
+              delay: '0'
+              history: 2w
+              trends: 0d
+              units: uptime
+              description: 'System uptime in ''N days, hh:mm:ss'' format.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.uptime
+              master_item:
+                key: 'proxmox.lxc.status[{#LXC.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: 0e55935a79b94bc096b6213d500f4f59
+                  expression: 'last(/Proxmox VE by HTTP/proxmox.lxc.uptime[{#LXC.ID}])<10m'
+                  name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME}]: has been restarted'
+                  event_name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME}]: has been restarted (uptime < 10m)'
+                  priority: INFO
+                  description: 'Uptime is less than 10 minutes'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 535f521800564b0f83211740aabbc137
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Status'
+              type: DEPENDENT
+              key: 'proxmox.lxc.vmstatus[{#LXC.ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.status
+              master_item:
+                key: 'proxmox.lxc.status[{#LXC.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: 71623950edf44bcb9453b2e8e63cb97b
+                  expression: 'last(/Proxmox VE by HTTP/proxmox.lxc.vmstatus[{#LXC.ID}])<>"running"'
+                  name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Not running'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'LXC state is not "running".'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+          trigger_prototypes:
+            -
+              uuid: f59e43f9de01419897aec1b9d4539b48
+              expression: 'min(/Proxmox VE by HTTP/proxmox.lxc.mem[{#LXC.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.lxc.maxmem[{#LXC.ID}]) * 100 >{$PVE.LXC.MEMORY.PUSE.MAX.WARN:"{#LXC.ID}"}'
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high memory usage'
+              event_name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high memory usage (over {$PVE.LXC.MEMORY.PUSE.MAX.WARN:"{#LXC.ID}"}% use)'
+              opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Memory usage.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: faad4c399e6047ea9fd95ffea40ce511
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: CPU usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.lxc.cpu[{#LXC.ID}]'
+            -
+              uuid: 2a850f53e5064ee3b4fb99aa191d411d
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.lxc.diskwrite[{#LXC.ID}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.lxc.diskread[{#LXC.ID}]'
+            -
+              uuid: 54e79a1949ed40988a3901acf21bc3af
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Memory usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.lxc.mem[{#LXC.ID}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.lxc.maxmem[{#LXC.ID}]'
+            -
+              uuid: c6f2970f22294c7d8de7548a177596de
+              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Network usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.lxc.netin[{#LXC.ID}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.lxc.netout[{#LXC.ID}]'
+          master_item:
+            key: proxmox.cluster.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#LXC.ID}'
+              path: $.id
+            -
+              lld_macro: '{#LXC.NAME}'
+              path: $.name
+            -
+              lld_macro: '{#NODE.NAME}'
+              path: $.node
+            -
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
+        -
+          uuid: ba55f69b12ee46faa319203483d8008f
+          name: 'Node discovery'
+          type: DEPENDENT
+          key: proxmox.node.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#RESOURCE.TYPE}'
+                value: ^node$
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: c5e50056abda49f190e21f46f8cf7379
+              name: 'Proxmox: Node [{#NODE.NAME}]: CPU, usage'
+              type: DEPENDENT
+              key: 'proxmox.node.cpu[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'CPU usage.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.cpu
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '100'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 84041dcb7c84426dad538ab32375fdb1
+                  expression: 'min(/Proxmox VE by HTTP/proxmox.node.cpu[{#NODE.NAME}],5m) > {$PVE.CPU.PUSE.MAX.WARN:"{#NODE.NAME}"}'
+                  name: 'Proxmox: Node [{#NODE.NAME}] high CPU usage'
+                  event_name: 'Proxmox: Node [{#NODE.NAME}] high CPU usage (over {$PVE.CPU.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
+                  opdata: 'Current use: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU usage.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 78e02931cf5c4c93b9c0092bd407a897
+              name: 'Proxmox: Node [{#NODE.NAME}]: CPU, iowait'
+              type: DEPENDENT
+              key: 'proxmox.node.iowait[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'CPU iowait time.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.iowait
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '100'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: c31b9d3f9f4d4f6fa5611038bb9a8401
+              name: 'Proxmox: Node [{#NODE.NAME}]: Kernel version'
+              type: DEPENDENT
+              key: 'proxmox.node.kernelversion[{#NODE.NAME}]'
+              delay: '0'
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'Kernel version info.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.kversion
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'proxmox.node.status[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: 4020236474e840acb1bc480eb8c52a1f
+                  expression: 'last(/Proxmox VE by HTTP/proxmox.node.kernelversion[{#NODE.NAME}],#1)<>last(/Proxmox VE by HTTP/proxmox.node.kernelversion[{#NODE.NAME}],#2) and length(last(/Proxmox VE by HTTP/proxmox.node.kernelversion[{#NODE.NAME}]))>0'
+                  name: 'Proxmox: Node [{#NODE.NAME}]: Kernel version has changed'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'Firmware version has changed. Ack to close'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 155bcbfd12f54614ab55d29e0fb5c2aa
+              name: 'Proxmox: Node [{#NODE.NAME}]: CPU, loadavg'
+              type: DEPENDENT
+              key: 'proxmox.node.loadavg[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'CPU average load.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.loadavg
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '100'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 59aab7121b1f4ff0b98a38cc75f39fb3
+              name: 'Proxmox: Node [{#NODE.NAME}]: Localtime'
+              type: DEPENDENT
+              key: 'proxmox.node.localtime[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              units: unixtime
+              description: 'Seconds since 1970-01-01 00:00:00 (local time).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.localtime
+              master_item:
+                key: 'proxmox.node.time[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 0bb66733d10843438a090bf39eae92e2
+              name: 'Proxmox: Node [{#NODE.NAME}]: Memory, total'
+              type: DEPENDENT
+              key: 'proxmox.node.memtotal[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Memory total.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.memtotal
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 04a2028e5d6640958da01c372f4407ec
+              name: 'Proxmox: Node [{#NODE.NAME}]: Memory, used'
+              type: DEPENDENT
+              key: 'proxmox.node.memused[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Memory usage.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.memused
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 892f3b733a25475cb8fe30eeca3750f2
+              name: 'Proxmox: Node [{#NODE.NAME}]: Incoming data, rate'
+              type: DEPENDENT
+              key: 'proxmox.node.netin[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: bps
+              description: 'Network usage.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.netin
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 3048c6c023bc4fb58a8710d7306052fb
+              name: 'Proxmox: Node [{#NODE.NAME}]: Outgoing data, rate'
+              type: DEPENDENT
+              key: 'proxmox.node.netout[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: bps
+              description: 'Network usage.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.netout
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: b8c3ff9544d5490286c668d3320d2ee0
+              name: 'Proxmox: Node [{#NODE.NAME}]: Status'
+              type: DEPENDENT
+              key: 'proxmox.node.online[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Indicates if the node is online or offline.'
+              valuemap:
+                name: 'Node online'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data.[?(@.name == ''{#NODE.NAME}'' && @.type == ''node'')].online.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: proxmox.cluster.status
+              tags:
+                -
+                  tag: component
+                  value: cluster
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 41b7efb8822948b08de8adace2e124a9
+                  expression: 'last(/Proxmox VE by HTTP/proxmox.node.online[{#NODE.NAME}]) <> 1'
+                  name: 'Proxmox: Node [{#NODE.NAME}] offline'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: HIGH
+                  description: 'Node offline.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: f220249168d947b6b8b99c068af35650
+              name: 'Proxmox: Node [{#NODE.NAME}]: PVE version'
+              type: DEPENDENT
+              key: 'proxmox.node.pveversion[{#NODE.NAME}]'
+              delay: '0'
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'PVE manager version.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.pveversion
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: 'proxmox.node.status[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: 5b92af55dbd84181bcab0f39e6effbe0
+                  expression: 'last(/Proxmox VE by HTTP/proxmox.node.pveversion[{#NODE.NAME}],#1)<>last(/Proxmox VE by HTTP/proxmox.node.pveversion[{#NODE.NAME}],#2) and length(last(/Proxmox VE by HTTP/proxmox.node.pveversion[{#NODE.NAME}]))>0'
+                  name: 'Proxmox: Node [{#NODE.NAME}]: PVE manager has changed'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: INFO
+                  description: 'Firmware version has changed. Ack to close'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 067954795121482093dd7967c6ca6ede
+              name: 'Proxmox: Node [{#NODE.NAME}]: Root filesystem, total'
+              type: DEPENDENT
+              key: 'proxmox.node.roottotal[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Root filesystem total.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.roottotal
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 2beadf6ba8b04a21b008ddf63bd2fa6b
+              name: 'Proxmox: Node [{#NODE.NAME}]: Root filesystem, used'
+              type: DEPENDENT
+              key: 'proxmox.node.rootused[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Root filesystem usage.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.rootused
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: fa2a60a98fd4445eadff4398ae6872bd
+              name: 'Proxmox: Node [{#NODE.NAME}]: RRD statistics'
+              type: HTTP_AGENT
+              key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Read node RRD statistics.'
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var rrd_data = JSON.parse(value).data;
+                      return JSON.stringify(rrd_data[rrd_data.length - 2])
+              url: 'https://{HOST.CONN}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/rrddata'
+              query_fields:
+                -
+                  name: timeframe
+                  value: hour
+                -
+                  name: cf
+                  value: AVERAGE
+              headers:
+                -
+                  name: Authorization
+                  value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
+              uuid: c1ea4d4f83114c9b96fe81069602f060
+              name: 'Proxmox: Node [{#NODE.NAME}]: Status'
+              type: HTTP_AGENT
+              key: 'proxmox.node.status[{#NODE.NAME}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Read node status.'
+              url: 'https://{HOST.CONN}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/status'
+              headers:
+                -
+                  name: Authorization
+                  value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
+              uuid: 0dce6e5edd6d4ddab69932796b4301c0
+              name: 'Proxmox: Node [{#NODE.NAME}]: Swap filesystem, total'
+              type: DEPENDENT
+              key: 'proxmox.node.swaptotal[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Swap total.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.swaptotal
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 5f42addb719a412da6fd448d38d1a7d0
+              name: 'Proxmox: Node [{#NODE.NAME}]: Swap filesystem, used'
+              type: DEPENDENT
+              key: 'proxmox.node.swapused[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Swap used.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.swapused
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.node.rrd[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 42d7b4ff315a4cfa9af1aed5e141661d
+              name: 'Proxmox: Node [{#NODE.NAME}]: Time zone'
+              type: DEPENDENT
+              key: 'proxmox.node.timezone[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Time zone.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.timezone
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'proxmox.node.time[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: c0c03653a0af426b8f61c77cabab38a4
+              name: 'Proxmox: Node [{#NODE.NAME}]: Time'
+              type: HTTP_AGENT
+              key: 'proxmox.node.time[{#NODE.NAME}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Read server time and time zone settings.'
+              url: 'https://{HOST.CONN}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/time'
+              headers:
+                -
+                  name: Authorization
+                  value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
+              uuid: fc7f5811d338484bba5393a8a5718f67
+              name: 'Proxmox: Node [{#NODE.NAME}]: Uptime'
+              type: DEPENDENT
+              key: 'proxmox.node.uptime[{#NODE.NAME}]'
+              delay: '0'
+              history: 2w
+              trends: 0d
+              units: uptime
+              description: 'System uptime in ''N days, hh:mm:ss'' format.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.uptime
+              master_item:
+                key: 'proxmox.node.status[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: 529b69b98a86409d914d3464569b7901
+                  expression: 'last(/Proxmox VE by HTTP/proxmox.node.uptime[{#NODE.NAME}])<10m'
+                  name: 'Proxmox: Node [{#NODE.NAME}]: has been restarted'
+                  event_name: 'Proxmox: Node [{#NODE.NAME}]: has been restarted (uptime < 10m)'
+                  priority: INFO
+                  description: 'Uptime is less than 10 minutes'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 384d479a04f044b192a74743f0a459b4
+              name: 'Proxmox: Node [{#NODE.NAME}]: Time'
+              type: DEPENDENT
+              key: 'proxmox.node.utctime[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              units: unixtime
+              description: 'Seconds since 1970-01-01 00:00:00 UTC.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.time
+              master_item:
+                key: 'proxmox.node.time[{#NODE.NAME}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+          trigger_prototypes:
+            -
+              uuid: a0445b4e1ffd451595ecea0468b4a6a6
+              expression: 'min(/Proxmox VE by HTTP/proxmox.node.memused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.memtotal[{#NODE.NAME}]) * 100 >{$PVE.MEMORY.PUSE.MAX.WARN:"{#NODE.NAME}"}'
+              name: 'Proxmox: Node [{#NODE.NAME}] high memory usage'
+              event_name: 'Proxmox: Node [{#NODE.NAME}] high memory usage (over {$PVE.MEMORY.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
+              opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Memory usage.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 3f88526e10a14319983fe14621ef10f9
+              expression: 'min(/Proxmox VE by HTTP/proxmox.node.rootused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.roottotal[{#NODE.NAME}]) * 100 >{$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}'
+              name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage'
+              event_name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.ROOT.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
+              opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Root filesystem space usage.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: f38ccc2e0e40430e801bf98b488e12e4
+              expression: 'min(/Proxmox VE by HTTP/proxmox.node.swapused[{#NODE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) * 100 > {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"} and last(/Proxmox VE by HTTP/proxmox.node.swaptotal[{#NODE.NAME}]) > 0'
+              name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage'
+              event_name: 'Proxmox: Node [{#NODE.NAME}] high root filesystem space usage (over {$PVE.SWAP.PUSE.MAX.WARN:"{#NODE.NAME}"}% use)'
+              opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'This trigger is ignored, if there is no swap configured.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+          graph_prototypes:
+            -
+              uuid: 6c4fddd2a12d4e87987e47611e4a925f
+              name: 'Proxmox: Node [{#NODE.NAME}]: CPU usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.cpu[{#NODE.NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.iowait[{#NODE.NAME}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: F63100
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.loadavg[{#NODE.NAME}]'
+            -
+              uuid: 0d59c329f12b494ebc8ff458a6b4714a
+              name: 'Proxmox: Node [{#NODE.NAME}]: Memory usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.memused[{#NODE.NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.memtotal[{#NODE.NAME}]'
+            -
+              uuid: f07213b83a964aac9f51e2857936bef2
+              name: 'Proxmox: Node [{#NODE.NAME}]: Network usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.netin[{#NODE.NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.netout[{#NODE.NAME}]'
+            -
+              uuid: f24340ea09324dd594f84c140f2797cc
+              name: 'Proxmox: Node [{#NODE.NAME}]: Root filesystem usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.rootused[{#NODE.NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.roottotal[{#NODE.NAME}]'
+            -
+              uuid: f47c4c734737403d97a630f5f10b7d84
+              name: 'Proxmox: Node [{#NODE.NAME}]: Swap usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.swapused[{#NODE.NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.swaptotal[{#NODE.NAME}]'
+          master_item:
+            key: proxmox.cluster.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#NODE.NAME}'
+              path: $.node
+            -
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
+        -
+          uuid: 31aa7234aa294fce8f4735a9216ddf31
+          name: 'QEMU discovery'
+          type: DEPENDENT
+          key: proxmox.qemu.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#RESOURCE.TYPE}'
+                value: ^qemu$
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: 196bf027d77742ea8960e350d9ea579e
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: CPU usage'
+              type: DEPENDENT
+              key: 'proxmox.qemu.cpu[{#QEMU.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'CPU load.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.cpu
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '100'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: name
+                  value: '{#QEMU.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+                -
+                  tag: qemu
+                  value: '{#QEMU.ID}'
+              trigger_prototypes:
+                -
+                  uuid: 84ed68d7cf2b48a48fc44e9c7a0d9b92
+                  expression: 'min(/Proxmox VE by HTTP/proxmox.qemu.cpu[{#QEMU.ID}],5m) > {$PVE.VM.CPU.PUSE.MAX.WARN:"{#QEMU.ID}"}'
+                  name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high CPU usage'
+                  event_name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high CPU usage (over {$PVE.VM.CPU.PUSE.MAX.WARN:"{#QEMU.ID}"}% use)'
+                  opdata: 'Current use: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU usage.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: ffd3c0a6e9764d9ea0091d2fcf0234e2
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Disk read, rate'
+              type: DEPENDENT
+              key: 'proxmox.qemu.diskread[{#QEMU.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Disk read.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.diskread
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: name
+                  value: '{#QEMU.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+                -
+                  tag: qemu
+                  value: '{#QEMU.ID}'
+            -
+              uuid: 7c02301822414849b8dc38ae26c74a7b
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Disk write, rate'
+              type: DEPENDENT
+              key: 'proxmox.qemu.diskwrite[{#QEMU.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Disk write.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.diskwrite
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: name
+                  value: '{#QEMU.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+                -
+                  tag: qemu
+                  value: '{#QEMU.ID}'
+            -
+              uuid: 3c46d7e2f07049fc8f749157cf5627e9
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Memory total'
+              type: DEPENDENT
+              key: 'proxmox.qemu.maxmem[{#QEMU.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Total memory in Bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.maxmem
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: name
+                  value: '{#QEMU.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+                -
+                  tag: qemu
+                  value: '{#QEMU.ID}'
+            -
+              uuid: 9f4402482af549288f32f108ab801950
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Memory usage'
+              type: DEPENDENT
+              key: 'proxmox.qemu.mem[{#QEMU.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'Used memory in Bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.mem
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: name
+                  value: '{#QEMU.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+                -
+                  tag: qemu
+                  value: '{#QEMU.ID}'
+            -
+              uuid: c3cb5366103743c2823f522482e9f2e4
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Incoming data, rate'
+              type: DEPENDENT
+              key: 'proxmox.qemu.netin[{#QEMU.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: bps
+              description: 'Incoming data rate.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.netin
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: name
+                  value: '{#QEMU.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+                -
+                  tag: qemu
+                  value: '{#QEMU.ID}'
+            -
+              uuid: 2cd398f1b9814551a7fad7e2bc66f6af
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Outgoing data, rate'
+              type: DEPENDENT
+              key: 'proxmox.qemu.netout[{#QEMU.ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: bps
+              description: 'Outgoing data rate.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.netout
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: name
+                  value: '{#QEMU.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+                -
+                  tag: qemu
+                  value: '{#QEMU.ID}'
+            -
+              uuid: a3562f2f48834a88842da612fb6f464c
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: Status'
+              type: HTTP_AGENT
+              key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Read VM status.'
+              url: 'https://{HOST.CONN}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/{#QEMU.ID}/status/current'
+              headers:
+                -
+                  name: Authorization
+                  value: 'PVEAPIToken={$PVE.TOKEN.ID}={$PVE.TOKEN.SECRET}'
+              tags:
+                -
+                  tag: component
+                  value: raw
+            -
+              uuid: 77ba70e0ce6f486585f870d3b57033ba
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Uptime'
+              type: DEPENDENT
+              key: 'proxmox.qemu.uptime[{#QEMU.ID}]'
+              delay: '0'
+              history: 2w
+              trends: 0d
+              units: uptime
+              description: 'System uptime in ''N days, hh:mm:ss'' format.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.uptime
+              master_item:
+                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: d4ba1faeb67940a192c1b50460793813
+                  expression: 'last(/Proxmox VE by HTTP/proxmox.qemu.uptime[{#QEMU.ID}])<10m'
+                  name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: has been restarted'
+                  event_name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: has been restarted (uptime < 10m)'
+                  priority: INFO
+                  description: 'Uptime is less than 10 minutes'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 9b6de7e610c64950a3b477b9dc666751
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Status'
+              type: DEPENDENT
+              key: 'proxmox.qemu.vmstatus[{#QEMU.ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.data.status
+              master_item:
+                key: 'proxmox.qemu.status[{#QEMU.ID}]'
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: 8f57d13f278b459299c565846b4091f5
+                  expression: 'last(/Proxmox VE by HTTP/proxmox.qemu.vmstatus[{#QEMU.ID}])<>"running"'
+                  name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Not running'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'VM state is not "running".'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+          trigger_prototypes:
+            -
+              uuid: 5305bf2b71aa4b74917379c6e1b3c065
+              expression: 'min(/Proxmox VE by HTTP/proxmox.qemu.mem[{#QEMU.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.qemu.maxmem[{#QEMU.ID}]) * 100 >{$PVE.VM.MEMORY.PUSE.MAX.WARN:"{#QEMU.ID}"}'
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high memory usage'
+              event_name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})] high memory usage (over {$PVE.VM.MEMORY.PUSE.MAX.WARN:"{#QEMU.ID}"}% use)'
+              opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Memory usage.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: 602ae1d9d65149ada7aa56cc2d7d9309
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: CPU usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.cpu[{#QEMU.ID}]'
+            -
+              uuid: 391421ce25c74c14abe35723965f3357
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Disk usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.diskwrite[{#QEMU.ID}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.diskread[{#QEMU.ID}]'
+            -
+              uuid: 8522e98f30104f67bfdd1aff8b94d280
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Memory usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.mem[{#QEMU.ID}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.maxmem[{#QEMU.ID}]'
+            -
+              uuid: 391421ce25c74c14abe35723965f3357
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Network usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.netin[{#QEMU.ID}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.netout[{#QEMU.ID}]'
+          master_item:
+            key: proxmox.cluster.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#NODE.NAME}'
+              path: $.node
+            -
+              lld_macro: '{#QEMU.ID}'
+              path: $.id
+            -
+              lld_macro: '{#QEMU.NAME}'
+              path: $.name
+            -
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
+        -
+          uuid: 61faca6204854bc4af8dc6c5c63ddcd1
+          name: 'Storage discovery'
+          type: DEPENDENT
+          key: proxmox.storage.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#RESOURCE.TYPE}'
+                value: ^storage$
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: c803813b43f24390b7e0d79fda824a54
+              name: 'Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}]: Content'
+              type: DEPENDENT
+              key: 'proxmox.node.content[{#NODE.NAME},{#STORAGE.NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Allowed storage content types.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.id == "storage/{#NODE.NAME}/{#STORAGE.NAME}")].content.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: proxmox.cluster.resources
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: name
+                  value: '{#STORAGE.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 0edb3506231648c9820103a337486d63
+              name: 'Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}]: Used'
+              type: DEPENDENT
+              key: 'proxmox.node.disk[{#NODE.NAME},{#STORAGE.NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Used disk space in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.id == "storage/{#NODE.NAME}/{#STORAGE.NAME}")].disk.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: proxmox.cluster.resources
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: name
+                  value: '{#STORAGE.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: ced02242ff46454f9c49f3d44bf0de9a
+              name: 'Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}]: Size'
+              type: DEPENDENT
+              key: 'proxmox.node.maxdisk[{#NODE.NAME},{#STORAGE.NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Storage size in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.id == "storage/{#NODE.NAME}/{#STORAGE.NAME}")].maxdisk.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+              master_item:
+                key: proxmox.cluster.resources
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: name
+                  value: '{#STORAGE.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 4360858342254aecba7a77eb315cc2bb
+              name: 'Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}]: Type'
+              type: DEPENDENT
+              key: 'proxmox.node.plugintype[{#NODE.NAME},{#STORAGE.NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'More specific type, if available.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.id == "storage/{#NODE.NAME}/{#STORAGE.NAME}")].plugintype.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: proxmox.cluster.resources
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: name
+                  value: '{#STORAGE.NAME}'
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+          trigger_prototypes:
+            -
+              uuid: 404d9a8a6fa54d8c880006c9ec32f55a
+              expression: 'min(/Proxmox VE by HTTP/proxmox.node.disk[{#NODE.NAME},{#STORAGE.NAME}],5m) / last(/Proxmox VE by HTTP/proxmox.node.maxdisk[{#NODE.NAME},{#STORAGE.NAME}]) * 100 >{$PVE.STORAGE.PUSE.MAX.WARN:"{#NODE.NAME}/{#STORAGE.NAME}"}'
+              name: 'Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}] high filesystem space usage'
+              event_name: 'Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}] high filesystem space usage (over {$PVE.STORAGE.PUSE.MAX.WARN:"{#NODE.NAME}/{#STORAGE.NAME}"}% use)'
+              opdata: 'Current use: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Root filesystem space usage.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+          graph_prototypes:
+            -
+              uuid: 726dbf7dd13b40c8b240cb58f753a9bf
+              name: 'Proxmox: Storage [{#NODE.NAME}/{#STORAGE.NAME}]: Usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.disk[{#NODE.NAME},{#STORAGE.NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.node.maxdisk[{#NODE.NAME},{#STORAGE.NAME}]'
+          master_item:
+            key: proxmox.cluster.resources
+          lld_macro_paths:
+            -
+              lld_macro: '{#NODE.NAME}'
+              path: $.node
+            -
+              lld_macro: '{#RESOURCE.TYPE}'
+              path: $.type
+            -
+              lld_macro: '{#STORAGE.NAME}'
+              path: $.storage
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: proxmox
+      macros:
+        -
+          macro: '{$PVE.CPU.PUSE.MAX.WARN}'
+          value: '90'
+          description: 'Maximum used CPU in percentage.'
+        -
+          macro: '{$PVE.LXC.CPU.PUSE.MAX.WARN}'
+          value: '90'
+          description: 'Maximum used CPU in percentage.'
+        -
+          macro: '{$PVE.LXC.MEMORY.PUSE.MAX.WARN}'
+          value: '90'
+          description: 'Maximum used memory in percentage.'
+        -
+          macro: '{$PVE.MEMORY.PUSE.MAX.WARN}'
+          value: '90'
+          description: 'Maximum used memory in percentage.'
+        -
+          macro: '{$PVE.ROOT.PUSE.MAX.WARN}'
+          value: '90'
+          description: 'Maximum used root space in percentage.'
+        -
+          macro: '{$PVE.STORAGE.PUSE.MAX.WARN}'
+          value: '90'
+          description: 'Maximum used storage space in percentage.'
+        -
+          macro: '{$PVE.SWAP.PUSE.MAX.WARN}'
+          value: '90'
+          description: 'Maximum used swap space in percentage.'
+        -
+          macro: '{$PVE.TOKEN.ID}'
+          value: USER@REALM!TOKENID
+          description: 'API tokens allow stateless access to most parts of the REST API by another system, software or API client.'
+        -
+          macro: '{$PVE.TOKEN.SECRET}'
+          value: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+          description: 'Secret key.'
+        -
+          macro: '{$PVE.URL.PORT}'
+          value: '8006'
+          description: 'The API uses the HTTPS protocol and the server listens to port 8006 by default.'
+        -
+          macro: '{$PVE.VM.CPU.PUSE.MAX.WARN}'
+          value: '90'
+          description: 'Maximum used CPU in percentage.'
+        -
+          macro: '{$PVE.VM.MEMORY.PUSE.MAX.WARN}'
+          value: '90'
+          description: 'Maximum used memory in percentage.'
+      valuemaps:
+        -
+          uuid: d4bbd08f3a324a57af97a17f819cb3f3
+          name: 'Cluster quorate'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'Yes'
+            -
+              value: '0'
+              newvalue: 'No'
+        -
+          uuid: 87034fae192c44dba6c8bb568cd90bbd
+          name: 'HTTP response status code'
+          mappings:
+            -
+              value: '100'
+              newvalue: Continue
+            -
+              value: '101'
+              newvalue: 'Switching Protocols'
+            -
+              value: '102'
+              newvalue: Processing
+            -
+              value: '200'
+              newvalue: OK
+            -
+              value: '201'
+              newvalue: Created
+            -
+              value: '202'
+              newvalue: Accepted
+            -
+              value: '203'
+              newvalue: 'Non-Authoritative Information'
+            -
+              value: '204'
+              newvalue: 'No Content'
+            -
+              value: '205'
+              newvalue: 'Reset Content'
+            -
+              value: '206'
+              newvalue: 'Partial Content'
+            -
+              value: '207'
+              newvalue: Multi-Status
+            -
+              value: '208'
+              newvalue: 'Already Reported'
+            -
+              value: '226'
+              newvalue: 'IM Used'
+            -
+              value: '300'
+              newvalue: 'Multiple Choices'
+            -
+              value: '301'
+              newvalue: 'Moved Permanently'
+            -
+              value: '302'
+              newvalue: Found
+            -
+              value: '303'
+              newvalue: 'See Other'
+            -
+              value: '304'
+              newvalue: 'Not Modified'
+            -
+              value: '305'
+              newvalue: 'Use Proxy'
+            -
+              value: '306'
+              newvalue: 'Switch Proxy'
+            -
+              value: '307'
+              newvalue: 'Temporary Redirect'
+            -
+              value: '308'
+              newvalue: 'Permanent Redirect/Resume Incomplete'
+            -
+              value: '400'
+              newvalue: 'Bad Request'
+            -
+              value: '401'
+              newvalue: Unauthorized
+            -
+              value: '402'
+              newvalue: 'Payment Required'
+            -
+              value: '403'
+              newvalue: Forbidden
+            -
+              value: '404'
+              newvalue: 'Not Found'
+            -
+              value: '405'
+              newvalue: 'Method Not Allowed'
+            -
+              value: '406'
+              newvalue: 'Not Acceptable'
+            -
+              value: '407'
+              newvalue: 'Proxy Authentication Required'
+            -
+              value: '408'
+              newvalue: 'Request Timeout'
+            -
+              value: '409'
+              newvalue: Conflict
+            -
+              value: '410'
+              newvalue: Gone
+            -
+              value: '411'
+              newvalue: 'Length Required'
+            -
+              value: '412'
+              newvalue: 'Precondition Failed'
+            -
+              value: '413'
+              newvalue: 'Payload Too Large'
+            -
+              value: '414'
+              newvalue: 'Request-URI Too Long'
+            -
+              value: '415'
+              newvalue: 'Unsupported Media Type'
+            -
+              value: '416'
+              newvalue: 'Requested Range Not Satisfiable'
+            -
+              value: '417'
+              newvalue: 'Expectation Failed'
+            -
+              value: '418'
+              newvalue: 'I''m a Teapot'
+            -
+              value: '419'
+              newvalue: 'Authentication Timeout'
+            -
+              value: '420'
+              newvalue: 'Method Failure/Enhance Your Calm'
+            -
+              value: '421'
+              newvalue: 'Misdirected Request'
+            -
+              value: '422'
+              newvalue: 'Unprocessable Entity'
+            -
+              value: '423'
+              newvalue: Locked
+            -
+              value: '424'
+              newvalue: 'Failed Dependency'
+            -
+              value: '426'
+              newvalue: 'Upgrade Required'
+            -
+              value: '428'
+              newvalue: 'Precondition Required'
+            -
+              value: '429'
+              newvalue: 'Too Many Requests'
+            -
+              value: '431'
+              newvalue: 'Request Header Fields Too Large'
+            -
+              value: '440'
+              newvalue: 'Login Timeout'
+            -
+              value: '444'
+              newvalue: 'No Response'
+            -
+              value: '449'
+              newvalue: 'Retry With'
+            -
+              value: '450'
+              newvalue: 'Blocked by Windows Parental Controls'
+            -
+              value: '451'
+              newvalue: 'Unavailable for Legal Reasons/Redirect'
+            -
+              value: '494'
+              newvalue: 'Request Header Too Large'
+            -
+              value: '495'
+              newvalue: 'Cert Error'
+            -
+              value: '496'
+              newvalue: 'No Cert'
+            -
+              value: '497'
+              newvalue: 'HTTP to HTTPS'
+            -
+              value: '498'
+              newvalue: 'Token Expired/Invalid'
+            -
+              value: '499'
+              newvalue: 'Client Closed Request/Token Required'
+            -
+              value: '500'
+              newvalue: 'Internal Server Error'
+            -
+              value: '501'
+              newvalue: 'Not Implemented'
+            -
+              value: '502'
+              newvalue: 'Bad Gateway'
+            -
+              value: '503'
+              newvalue: 'Service Unavailable'
+            -
+              value: '504'
+              newvalue: 'Gateway Timeout'
+            -
+              value: '505'
+              newvalue: 'HTTP Version Not Supported'
+            -
+              value: '506'
+              newvalue: 'Variant Also Negotiates'
+            -
+              value: '507'
+              newvalue: 'Insufficient Storage'
+            -
+              value: '508'
+              newvalue: 'Loop Detected'
+            -
+              value: '509'
+              newvalue: 'Bandwidth Limit Exceeded'
+            -
+              value: '510'
+              newvalue: 'Not Extended'
+            -
+              value: '511'
+              newvalue: 'Network Authentication Required'
+            -
+              value: '520'
+              newvalue: 'Unknown Error'
+            -
+              value: '598'
+              newvalue: 'Network Read Timeout Error'
+            -
+              value: '599'
+              newvalue: 'Network Connect Timeout Error'
+        -
+          uuid: 99c0bc65efb34d298586320bdcf14209
+          name: 'Node online'
+          mappings:
+            -
+              value: '1'
+              newvalue: Online
+            -
+              value: '0'
+              newvalue: Offline

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #include "zbxhttp.h"
 #include "zbxjson.h"
 #include "log.h"
+#include "dbcache.h"
+
 #ifdef HAVE_LIBCURL
 
 #define HTTP_REQUEST_GET	0
@@ -189,7 +191,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	struct curl_slist	*headers_slist = NULL;
 	struct zbx_json		json;
 	zbx_http_response_t	body = {0}, header = {0};
-	size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
+	zbx_curl_cb_t		curl_body_cb;
 	char			application_json[] = {"Content-Type: application/json"};
 	char			application_xml[] = {"Content-Type: application/xml"};
 

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T08:05:23Z'
+  version: '6.0'
+  date: '2022-04-06T19:33:19Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -14,9 +14,12 @@ zabbix_export:
         Overview:
         Template receives data via HTTP Agent.
         Setup:
-        Create a new host. 
+        Create a new host.
         Define macros according to your Sharepoint web portal.
         It is recommended to fill in the values of the filter macros to avoid getting redundant data.
+        
+        
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -151,8 +154,8 @@ zabbix_export:
               value: '{$SHAREPOINT.USER}'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: cd47c3d00ce545b0a557e0e68c89d53e
           name: 'Sharepoint: Get directory structure: Status'
@@ -178,8 +181,11 @@ zabbix_export:
             key: sharepoint.get_dir
           tags:
             -
-              tag: Application
-              value: Sharepoint
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: ed1d66a1410e4af79af462e749ce979b
@@ -187,6 +193,10 @@ zabbix_export:
               name: 'Sharepoint: Error getting directory structure.'
               priority: WARNING
               description: 'Error getting directory structure. Check the Zabbix server log for more details.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: b2daa471665541168b2a394b9b226d73
           name: 'Sharepoint: Get directory structure: Exec time'
@@ -211,14 +221,18 @@ zabbix_export:
             key: sharepoint.get_dir
           tags:
             -
-              tag: Application
-              value: Sharepoint
+              tag: component
+              value: performance
           triggers:
             -
               uuid: 9e5bcc08d5f040de86afa38f5a653dd7
               expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.time)>2000'
               name: 'Sharepoint: Server responds slowly to API request'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 7b59d767712f49b3bbc17947999ca944
           name: 'Sharepoint: Health score'
@@ -250,14 +264,18 @@ zabbix_export:
           request_method: HEAD
           tags:
             -
-              tag: Application
-              value: Sharepoint
+              tag: component
+              value: health
           triggers:
             -
               uuid: 3a0451e3edda4a73aded57aa254fd813
               expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALT_SCORE}"'
               name: 'Sharepoint: Bad health score'
               priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
       discovery_rules:
         -
           uuid: 0fe7e8e5480a42b7903cb7ac9bf931cc
@@ -392,8 +410,11 @@ zabbix_export:
                 key: sharepoint.get_dir
               tags:
                 -
-                  tag: Application
-                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
+                  tag: component
+                  value: storage
+                -
+                  tag: full-path
+                  value: '{#SHAREPOINT.LLD.FULL_PATH}'
             -
               uuid: b230bfba317e4d2eb2c6a816bd357d71
               name: 'Sharepoint: Modified ({#SHAREPOINT.LLD.FULL_PATH})'
@@ -419,8 +440,11 @@ zabbix_export:
                 key: sharepoint.get_dir
               tags:
                 -
-                  tag: Application
-                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
+                  tag: component
+                  value: storage
+                -
+                  tag: full-path
+                  value: '{#SHAREPOINT.LLD.FULL_PATH}'
               trigger_prototypes:
                 -
                   uuid: d1683e2fcdda45969ff451e43ae696c2
@@ -430,6 +454,10 @@ zabbix_export:
                   priority: INFO
                   description: 'Updated date of modification of folder / file'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 68c3d2d2b33a494ab85ca6b883398fbb
               name: 'Sharepoint: Size ({#SHAREPOINT.LLD.FULL_PATH})'
@@ -455,8 +483,11 @@ zabbix_export:
                 key: sharepoint.get_dir
               tags:
                 -
-                  tag: Application
-                  value: 'Sharepoint object [{#SHAREPOINT.LLD.FULL_PATH}]"'
+                  tag: component
+                  value: storage
+                -
+                  tag: full-path
+                  value: '{#SHAREPOINT.LLD.FULL_PATH}'
           parameters:
             -
               name: password
@@ -475,6 +506,16 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: microsoft
+        -
+          tag: target
+          value: sharepoint
       macros:
         -
           macro: '{$SHAREPOINT.GET_INTERVAL}'
@@ -482,34 +523,36 @@ zabbix_export:
         -
           macro: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.MATCHES}'
           value: ^/
-          description: 'Filter of discoverable dictionaries by full path'
+          description: 'Filter of discoverable dictionaries by full path.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered dictionaries by full path'
+          description: 'Filter to exclude discovered dictionaries by full path.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable dictionaries by name'
+          description: 'Filter of discoverable dictionaries by name.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered dictionaries by name'
+          description: 'Filter to exclude discovered dictionaries by name.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.TYPE.MATCHES}'
           value: FOLDER
-          description: 'Filter of discoverable types'
+          description: 'Filter of discoverable types.'
         -
           macro: '{$SHAREPOINT.LLD.FILTER.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered types'
+          description: 'Filter to exclude discovered types.'
         -
           macro: '{$SHAREPOINT.LLD_INTERVAL}'
           value: 3h
         -
           macro: '{$SHAREPOINT.MAX_HEALT_SCORE}'
           value: '5'
-          description: 'Must be in the range from 0 to 10 in details: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-wsshp/c60ddeb6-4113-4a73-9e97-26b5c3907d33'
+          description: |
+            Must be in the range from 0 to 10
+            in details: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-wsshp/c60ddeb6-4113-4a73-9e97-26b5c3907d33
         -
           macro: '{$SHAREPOINT.PASSWORD}'
           type: SECRET_TEXT

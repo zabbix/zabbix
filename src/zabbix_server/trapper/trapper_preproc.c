@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,22 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxjson.h"
-#include "zbxalgo.h"
+#include "trapper_preproc.h"
+
 #include "preproc.h"
 #include "../preprocessor/preproc_history.h"
-
 #include "trapper_auth.h"
-#include "trapper_preproc.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1
 
 extern int	CONFIG_DOUBLE_PRECISION;
 
 /******************************************************************************
- *                                                                            *
- * Function: trapper_parse_preproc_test                                       *
  *                                                                            *
  * Purpose: parses preprocessing test request                                 *
  *                                                                            *
@@ -229,8 +224,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: trapper_preproc_test_run                                         *
- *                                                                            *
  * Purpose: executes preprocessing test request                               *
  *                                                                            *
  * Parameters: jp    - [IN] the request                                       *
@@ -399,8 +392,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_trapper_preproc_test                                         *
  *                                                                            *
  * Purpose: processes preprocessing test request                              *
  *                                                                            *

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@ $(document).ready(function() {
 		}
 
 		let debug = JSON.parse($('#debug').val()),
-			$content = $('<div/>'),
-			$logitems = $('<div/>', {class: 'logitems'}),
-			$footer = $('<div/>', {class: 'logtotalms'});
+			$content = $('<div>'),
+			$logitems = $('<div>', {class: 'logitems'}),
+			$footer = $('<div>', {class: 'logtotalms'});
 
 		debug.logs.forEach(function (entry) {
-			$('<pre/>')
+			$('<pre>')
 				.text(entry.ms + ' ' + entry.level + ' ' + entry.message)
 				.appendTo($logitems);
 		});
@@ -46,7 +46,7 @@ $(document).ready(function() {
 		overlayDialogue({
 			'title': <?= json_encode(_('Script execution log')) ?>,
 			'content': $content,
-			'class': 'modal-popup modal-popup-generic debug-modal',
+			'class': 'modal-popup modal-popup-generic debug-modal position-middle',
 			'footer': $footer,
 			'buttons': [
 				{

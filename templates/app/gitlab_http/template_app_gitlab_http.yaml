@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-15T14:16:46Z'
+  version: '6.0'
+  date: '2022-04-06T19:27:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,11 +16,11 @@ zabbix_export:
         To access the metrics, the client IP address must be explicitly allowed. See https://docs.gitlab.com/ee/administration/monitoring/ip_whitelist.html.
         
         Don't forget change macros {$GITLAB.URL}.
-        Some metrics may not be collected depending on your Gitlab instance version and configuration. See (Gitlab’s documentation[)https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html] for further information about its metric collection.
+        Some metrics may not be collected depending on your Gitlab instance version and configuration. See (Gitlab's documentation[)https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html] for further information about its metric collection.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -47,8 +47,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: cache
         -
           uuid: 9c507412d4544a37bdad49ba47c48302
           name: 'GitLab: Cache: Operations rate, total'
@@ -71,8 +71,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: cache
         -
           uuid: 2d46dc855ca741839cfe1a19e0dc892f
           name: 'GitLab: Database: Connection pool, busy'
@@ -90,8 +90,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: database
         -
           uuid: 6ee7a1d3ab20463d83602b751381d821
           name: 'GitLab: Database: Connection pool, current'
@@ -109,8 +109,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: database
         -
           uuid: 561a1f54c98d4a2b828fe644961404be
           name: 'GitLab: Database: Connection pool, dead'
@@ -128,8 +128,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: database
         -
           uuid: 3a0b5c8de88b41fa9ebf6f3fca63833e
           name: 'GitLab: Database: Connection pool, idle'
@@ -147,8 +147,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: database
         -
           uuid: fd1458232de34981a9a00be820e123f1
           name: 'GitLab: Database: Connection pool, size'
@@ -166,8 +166,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: database
         -
           uuid: 501a2f646ced4207a32a24e900310440
           name: 'GitLab: Database: Connection pool, waiting'
@@ -185,8 +185,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: database
         -
           uuid: 71a5f82d11914b12a86008bfd488fb1e
           name: 'GitLab: Version'
@@ -210,16 +210,21 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: application
           triggers:
             -
               uuid: 88d7ceb3a683436da666e8802b2d29b5
               expression: 'last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0'
-              name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
+              name: 'GitLab: Version has changed'
+              event_name: 'GitLab: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'GitLab version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 3e409938aba24445a11012bcbf8aa113
           name: 'GitLab: User CAPTCHA logins failed, total'
@@ -238,8 +243,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: sessions
         -
           uuid: 2aa509b84dc14026b8ff8ed473add2d2
           name: 'GitLab: Get instance metrics'
@@ -260,8 +265,8 @@ zabbix_export:
           url: '{$GITLAB.URL}/-/metrics'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: 3ff4d9793af94d339ca225aaf9200554
           name: 'GitLab: HTTP requests rate, 4xx'
@@ -286,8 +291,11 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 4xx
         -
           uuid: d0fa18012d6a4b0ba6620b0ef6cb9aef
           name: 'GitLab: HTTP requests rate, 5xx'
@@ -312,15 +320,23 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: requests
+            -
+              tag: http-code
+              value: 5xx
           triggers:
             -
               uuid: 7021e3b0b49a4990a1d8ce356b7ae130
               expression: 'min(/GitLab by HTTP/gitlab.http.requests.5xx.rate,5m)>{$GITLAB.HTTP.FAIL.MAX.WARN}'
-              name: 'GitLab: Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)'''
+              name: 'GitLab: Too many HTTP requests failures'
+              event_name: 'GitLab: Too many HTTP requests failures (over {$GITLAB.HTTP.FAIL.MAX.WARN} for 5m)'''
               priority: WARNING
               description: '"Too many requests failed on GitLab instance with 5xx HTTP code"'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 2d739e4bedb24b50ab6adfdfdeb39da9
           name: 'GitLab: HTTP requests rate, total'
@@ -344,8 +360,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: requests
         -
           uuid: c48920e302ff4b9ab16f45b67775b440
           name: 'GitLab: Application server status'
@@ -377,11 +393,10 @@ zabbix_export:
               parameters:
                 - 30m
           url: '{$GITLAB.URL}/-/liveness'
-          status_codes: ''
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: health
           triggers:
             -
               uuid: 2f1eb8d6c89a4d8cbda0e951d3f6a109
@@ -389,6 +404,10 @@ zabbix_export:
               name: 'GitLab: Liveness check was failed'
               priority: HIGH
               description: 'The application server is not running or Rails Controllers are deadlocked.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 7ef7142babfd4bc2b5b25be541c0511f
           name: 'GitLab: Pipelines: Auto DevOps pipelines, total'
@@ -407,8 +426,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: pipelines
         -
           uuid: 0ffa0a5c108644508252a03469e4f394
           name: 'GitLab: Pipelines: Auto DevOps pipelines, failed'
@@ -427,8 +446,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: pipelines
         -
           uuid: f4265a3167a245c4998958106f6ee265
           name: 'GitLab: Pipelines: Created, total'
@@ -447,8 +466,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: pipelines
         -
           uuid: 23cb22f8f81e461c86f72a92cdfde7a5
           name: 'GitLab: Pipelines: CI/CD creation duration'
@@ -469,8 +488,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: pipelines
         -
           uuid: 91c3acbb82524244a1ac400587641ffa
           name: 'GitLab: Pipelines: Pipelines: CI/CD creation count'
@@ -490,8 +509,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: pipelines
         -
           uuid: c80453c338814951a9e97d9f37e7d68f
           name: 'GitLab: Pipelines: Processing events, total'
@@ -510,8 +529,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: pipelines
         -
           uuid: 794a8d7f474d490c96e714dac810140d
           name: 'GitLab: Instance readiness check'
@@ -545,8 +564,8 @@ zabbix_export:
           url: '{$GITLAB.URL}/-/readiness'
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: health
           triggers:
             -
               uuid: 11ff325698534dcd8bbaa12c86704069
@@ -557,6 +576,10 @@ zabbix_export:
                 -
                   name: 'GitLab: Liveness check was failed'
                   expression: 'last(/GitLab by HTTP/gitlab.liveness)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 173b8d5e108f471fbf4c1267dcb9cc37
           name: 'GitLab: Redis: Client exceptions rate, cache'
@@ -580,15 +603,20 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: redis
           triggers:
             -
               uuid: a7e460f174fd4e16b2358fd3867390b4
               expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
-              name: 'GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
+              name: 'GitLab: Too many Redis cache client exceptions'
+              event_name: 'GitLab: Too many Redis cache client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: '"Too many  Redis client exceptions during  to requests to  Redis instance cache."'
+              description: '"Too many  Redis client exceptions during the requests to  Redis instance cache."'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 0bff591252dc4cc497527afb1f7d96b2
           name: 'GitLab: Redis: Client exceptions rate, queues'
@@ -612,15 +640,20 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: redis
           triggers:
             -
               uuid: 36ec79901f324f27992ea68274eedb71
               expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
-              name: 'GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
+              name: 'GitLab: Too many Redis queues client exceptions'
+              event_name: 'GitLab: Too many Redis queues client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: '"Too many  Redis client exceptions during  to requests to  Redis instance queues."'
+              description: '"Too many  Redis client exceptions during the requests to  Redis instance queues."'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 800b429ea1d044e6a685bc51706f8547
           name: 'GitLab: Redis: client exceptions rate, shared_state'
@@ -644,15 +677,20 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: redis
           triggers:
             -
               uuid: b475d6ecbc564f9b8f7fe9b24bcdf013
               expression: 'min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}'
-              name: 'GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
+              name: 'GitLab: Too many Redis shared_state client exceptions'
+              event_name: 'GitLab: Too many Redis shared_state client exceptions (over {$GITLAB.REDIS.FAIL.MAX.WARN} for 5m)'
               priority: WARNING
-              description: '"Too many  Redis client exceptions during  to requests to  Redis instance shared_state."'
+              description: '"Too many  Redis client exceptions during the requests to  Redis instance shared_state."'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 7dcc638e1c174dd5975f85551211a3ba
           name: 'GitLab: Redis: Client requests rate, cache'
@@ -677,8 +715,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: redis
         -
           uuid: f613303925db46958d181c379e22f942
           name: 'GitLab: Redis: Client requests rate, queues'
@@ -703,8 +741,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: redis
         -
           uuid: 3ae46654b46e4c769a7308879bc64890
           name: 'GitLab: Redis: Client requests rate, shared_state'
@@ -729,8 +767,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: redis
         -
           uuid: 950d48c3b5034e769b2bf6a7110ece02
           name: 'GitLab: Ruby: File descriptors opened, avg'
@@ -749,8 +787,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: fds
         -
           uuid: 67ed35c3f5f444b2b10fb462838758ac
           name: 'GitLab: Ruby: File descriptors opened, max'
@@ -769,8 +807,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: fds
         -
           uuid: b1576e2b47bd448293c3e88885bfc87e
           name: 'GitLab: Ruby: File descriptors opened, min'
@@ -789,8 +827,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: fds
         -
           uuid: 98feff3bfe0d4a9ea88733ae8fef8769
           name: 'GitLab: Ruby: CPU  usage per second'
@@ -815,8 +853,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: cpu
         -
           uuid: 91ed44c1738745119e892eadb88b417f
           name: 'GitLab: Ruby: File descriptors, max'
@@ -835,8 +873,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: fds
         -
           uuid: 8de84a159b864ed791c07835aa0ec39a
           name: 'GitLab: Ruby: RSS memory, avg'
@@ -846,7 +884,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: "Average RSS\tMemory usage in bytes."
+          description: 'Average RSS Memory usage in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -856,8 +894,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: memory
         -
           uuid: 27285f7d3c344d68b7945edde3cb8ecf
           name: 'GitLab: Ruby: RSS memory, max'
@@ -867,7 +905,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: "Maxinun RSS\tMemory usage in bytes."
+          description: 'Maximum RSS Memory usage in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -877,8 +915,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: memory
         -
           uuid: 0cf8d21bcb8d4fb7880784dc82ba8229
           name: 'GitLab: Ruby: RSS memory, min'
@@ -888,7 +926,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: B
-          description: "Minimum RSS\tMemory usage in bytes."
+          description: 'Minimum RSS Memory usage in bytes.'
           preprocessing:
             -
               type: JSONPATH
@@ -898,8 +936,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: memory
         -
           uuid: 68267621a5e14494bf57225e71e05ff4
           name: 'GitLab: Ruby: First process start time'
@@ -922,8 +960,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: application
         -
           uuid: be88084e9b544af68f78c013caf6b59a
           name: 'GitLab: Ruby: Last process start time'
@@ -946,8 +984,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: application
         -
           uuid: f23849bd9716444f8bf65d3964e3be15
           name: 'GitLab: Ruby: Running_threads'
@@ -965,13 +1003,14 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: system
           triggers:
             -
               uuid: e24496a9499447b2bbdf70f85bbf2113
               expression: 'nodata(/GitLab by HTTP/gitlab.ruby.threads_running,30m)=1'
-              name: 'GitLab: Failed to fetch info data (or no data for 30m)'
+              name: 'GitLab: Failed to fetch info data'
+              event_name: 'GitLab: Failed to fetch info data (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for metrics for the last 30 minutes'
               manual_close: 'YES'
@@ -979,6 +1018,10 @@ zabbix_export:
                 -
                   name: 'GitLab: Liveness check was failed'
                   expression: 'last(/GitLab by HTTP/gitlab.liveness)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 56af56ccc23d44bcb636871229fbcde2
           name: 'GitLab: User CAPTCHA logins, total'
@@ -997,8 +1040,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: sessions
         -
           uuid: 95deb1dc93d34935930b154d1222c8a4
           name: 'GitLab: Transactions per second'
@@ -1023,8 +1066,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: transactions
         -
           uuid: d1a346edc81d487da115105333e8992d
           name: 'GitLab: Upload file does not exist'
@@ -1037,14 +1080,14 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - "$[?(@.name==\"upload_file_does_not_exist\t\")].value.first()"
+                - '$[?(@.name=="upload_file_does_not_exist")].value.first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: application
         -
           uuid: 62c9c5a8886e431bb04c40a8045fe207
           name: 'GitLab: User logins, total'
@@ -1063,8 +1106,8 @@ zabbix_export:
             key: gitlab.get_metrics
           tags:
             -
-              tag: Application
-              value: GitLab
+              tag: component
+              value: sessions
       discovery_rules:
         -
           uuid: acd3e31daa8f497bb1ce0f91d104d928
@@ -1091,8 +1134,8 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
             -
               uuid: 14194f273b4e47d98cfdcbefff64cc68
               name: 'GitLab: Idle threads'
@@ -1110,8 +1153,8 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
             -
               uuid: 33a1be2938e24ce2a3fb650efa4f98d6
               name: 'GitLab: Killer terminations, total'
@@ -1130,8 +1173,8 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
             -
               uuid: 7d93438afd73422d90b03e78b1c0f998
               name: 'GitLab: Max threads'
@@ -1149,8 +1192,8 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
             -
               uuid: fe381c99c2464e95bac63da2df994b8a
               name: 'GitLab: Pool capacity'
@@ -1168,8 +1211,8 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
             -
               uuid: 8c375d8323f9459a8b2a6254b7afed5b
               name: 'GitLab: Queued connections'
@@ -1187,14 +1230,19 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
               trigger_prototypes:
                 -
                   uuid: 356c8dc915d84382b3f8dfe45b901f46
                   expression: 'min(/GitLab by HTTP/gitlab.puma.queued_connections[{#SINGLETON}],15m)>{$GITLAB.PUMA.QUEUE.MAX.WARN}'
-                  name: 'GitLab: Puma is queueing requests (over {$GITLAB.PUMA.QUEUE.MAX.WARN}% for 15m)'
+                  name: 'GitLab: Puma is queueing requests'
+                  event_name: 'GitLab: Puma is queueing requests (over {$GITLAB.PUMA.QUEUE.MAX.WARN}% for 15m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 02b27e8a68884f399a8359ed6967d614
               name: 'GitLab: Running threads'
@@ -1212,8 +1260,8 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
             -
               uuid: b43e4275dd64427bb6eb4890c556c513
               name: 'GitLab: Running workers'
@@ -1231,8 +1279,8 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
             -
               uuid: 0169db2581ba48579edc911cad4b41d7
               name: 'GitLab: Stale workers'
@@ -1250,8 +1298,8 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
             -
               uuid: 19e0149a6de846c7a39b305037469ecb
               name: 'GitLab: Workers'
@@ -1269,14 +1317,19 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Puma stats'
+                  tag: component
+                  value: puma
           trigger_prototypes:
             -
               uuid: b69fe81449bd4b6cb6dfddeb333e8898
               expression: 'min(/GitLab by HTTP/gitlab.puma.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.puma.max_threads[{#SINGLETON}])*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}'
-              name: 'GitLab: Puma instance thread utilization is too high (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
+              name: 'GitLab: Puma instance thread utilization is too high'
+              event_name: 'GitLab: Puma instance thread utilization is too high (over {$GITLAB.PUMA.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           url: '{$GITLAB.URL}/-/metrics'
           preprocessing:
             -
@@ -1312,8 +1365,8 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Unicorn stats'
+                  tag: component
+                  value: unicorn
             -
               uuid: 31e0f545c6c6428c8f9f46426cb97ca7
               name: 'GitLab: Unicorn: Queued connections'
@@ -1331,14 +1384,19 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Unicorn stats'
+                  tag: component
+                  value: unicorn
               trigger_prototypes:
                 -
                   uuid: 84142d0996c0420c8b07c7e17d1b9a47
                   expression: 'min(/GitLab by HTTP/gitlab.unicorn.queued_connections[{#SINGLETON}],5m)>{$GITLAB.UNICORN.QUEUE.MAX.WARN}'
-                  name: 'GitLab: Unicorn is queueing requests (over {$GITLAB.UNICORN.QUEUE.MAX.WARN}% for 5m)'
+                  name: 'GitLab: Unicorn is queueing requests'
+                  event_name: 'GitLab: Unicorn is queueing requests (over {$GITLAB.UNICORN.QUEUE.MAX.WARN}% for 5m)'
                   priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
             -
               uuid: 44a12fd548b742069cae53a78f7f8ab0
               name: 'GitLab: Unicorn: Workers'
@@ -1356,14 +1414,19 @@ zabbix_export:
                 key: gitlab.get_metrics
               tags:
                 -
-                  tag: Application
-                  value: 'GitLab: Unicorn stats'
+                  tag: component
+                  value: unicorn
           trigger_prototypes:
             -
               uuid: 731bf8eb456c49739a3fcd7aec24c7d7
               expression: 'min(/GitLab by HTTP/gitlab.unicorn.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.unicorn.unicorn_workers[{#SINGLETON}])*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}'
-              name: 'GitLab: Unicorn worker utilization is too high (over {$GITLAB.UNICORN.UTILIZATION.MAX.WARN}% for 5m)'
+              name: 'GitLab: Unicorn worker utilization is too high'
+              event_name: 'GitLab: Unicorn worker utilization is too high (over {$GITLAB.UNICORN.UTILIZATION.MAX.WARN}% for 5m)'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: capacity
           url: '{$GITLAB.URL}/-/metrics'
           preprocessing:
             -
@@ -1375,6 +1438,13 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+      tags:
+        -
+          tag: class
+          value: application
+        -
+          tag: target
+          value: gitlab
       macros:
         -
           macro: '{$GITLAB.HTTP.FAIL.MAX.WARN}'
@@ -1423,8 +1493,13 @@ zabbix_export:
     -
       uuid: 4ac37991b2ca4edd9329fff1e752b05b
       expression: 'min(/GitLab by HTTP/gitlab.ruby.file_descriptors.max,5m)/last(/GitLab by HTTP/gitlab.ruby.process_max_fds)*100>{$GITLAB.OPEN.FDS.MAX.WARN}'
-      name: 'GitLab: Current number of open files is too high (over {$GITLAB.OPEN.FDS.MAX.WARN}% for 5m)'
+      name: 'GitLab: Current number of open files is too high'
+      event_name: 'GitLab: Current number of open files is too high (over {$GITLAB.OPEN.FDS.MAX.WARN}% for 5m)'
       priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
   graphs:
     -
       uuid: f6c30e56b54e478ea2708e302197b83b

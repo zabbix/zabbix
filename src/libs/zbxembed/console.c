@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,17 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "console.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxjson.h"
-#include "zbxembed.h"
 #include "embed.h"
 #include "duktape.h"
-#include "console.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: es_console_dtor                                                  *
  *                                                                            *
  * Purpose: console destructor                                                *
  *                                                                            *
@@ -40,8 +38,6 @@ static duk_ret_t	es_console_dtor(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_console_ctor                                                  *
  *                                                                            *
  * Purpose: console constructor                                               *
  *                                                                            *
@@ -60,8 +56,6 @@ static duk_ret_t	es_console_ctor(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_log_message                                                   *
  *                                                                            *
  * Purpose: Write message to centralized Zabbix log                           *
  *                                                                            *
@@ -121,8 +115,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: es_console_log                                                   *
- *                                                                            *
  * Purpose: console.log method                                                *
  *                                                                            *
  ******************************************************************************/
@@ -133,8 +125,6 @@ static duk_ret_t	es_console_log(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
- * Function: es_console_warn                                                  *
- *                                                                            *
  * Purpose: console.warn method                                               *
  *                                                                            *
  ******************************************************************************/
@@ -144,8 +134,6 @@ static duk_ret_t	es_console_warn(duk_context *ctx)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: es_console_error                                                 *
  *                                                                            *
  * Purpose: console.error method                                              *
  *                                                                            *

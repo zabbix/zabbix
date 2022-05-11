@@ -403,5 +403,3 @@ out:
     pattern: inf
     op: ==
 ...
-
-

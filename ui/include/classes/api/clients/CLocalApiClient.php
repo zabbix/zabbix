@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -165,7 +165,8 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		if (strlen($auth) == 64) {
-			return $this->tokenAuthentication($auth);
+			$this->tokenAuthentication($auth);
+			return;
 		}
 
 		$user = $this->serviceFactory->getObject('user')->checkAuthentication(['sessionid' => $auth]);

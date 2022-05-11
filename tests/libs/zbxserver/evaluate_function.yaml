@@ -2100,6 +2100,33 @@ out:
   return: SUCCEED
   value: 34.751499
 ---
+test case: Evaluate stddevpop(6m) FLOAT 135.190000
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 135.190000
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 122.200000
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 66.700000
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 58.990000
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 40.000000
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 47.420000
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: stddevpop
+  params: 6m
+out:
+  return: SUCCEED
+  value: 36.723065
+---
 test case: Evaluate stddevpop(6m) UINT64 26, 12, 16, 56, 112, 24
 in:
   history:

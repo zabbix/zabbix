@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,6 +68,19 @@ trait CastableTrait {
 	}
 
 	/**
+	 * Cast object to List element.
+	 *
+	 * @deprecated List element is present only in IPMI tab of host configuration form.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CListElement
+	 */
+	public function asList($options = []) {
+		return $this->cast(CListElement::class, $options);
+	}
+
+	/**
 	 * Cast object to Dropdown element.
 	 *
 	 * @param array $options    additional casting options
@@ -76,17 +89,6 @@ trait CastableTrait {
 	 */
 	public function asDropdown($options = []) {
 		return $this->cast(CDropdownElement::class, $options);
-	}
-
-	/**
-	 * Cast object to ZDropdown element.
-	 *
-	 * @param array $options    additional casting options
-	 *
-	 * @return CZDropdownElement
-	 */
-	public function asZDropdown($options = []) {
-		return $this->cast(CZDropdownElement::class, $options);
 	}
 
 	/**

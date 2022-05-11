@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,17 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "logfiles.h"
+
 #include "log.h"
 #include "sysinfo.h"
+#include "cfg.h"
+#include "zbxregexp.h"
+
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "symbols.h"
 #	include "zbxtypes.h"	/* ssize_t */
 #endif /* _WINDOWS */
 
-#define MAX_LEN_MD5	512	/* maximum size of the initial part of the file to calculate MD5 sum for */
+#define MAX_LEN_MD5	512	/* maximum size of the first and the last blocks of the file to calculate MD5 sum for */
 
 #define ZBX_SAME_FILE_ERROR	-1
 #define ZBX_SAME_FILE_NO	0
@@ -46,8 +49,6 @@ extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
- * Function: split_string                                                     *
- *                                                                            *
  * Purpose: separates given string to two parts by given delimiter in string  *
  *                                                                            *
  * Parameters:                                                                *
@@ -58,8 +59,6 @@ extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
  *                                                                            *
  * Return value: SUCCEED - on splitting without errors                        *
  *               FAIL - on splitting with errors                              *
- *                                                                            *
- * Author: Dmitry Borovikov, Aleksandrs Saveljevs                             *
  *                                                                            *
  * Comments: Memory for "part1" and "part2" is allocated only on SUCCEED.     *
  *                                                                            *
@@ -100,8 +99,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: split_filename                                                   *
- *                                                                            *
  * Purpose: separates full-path file name into directory and file name regexp *
  *          parts                                                             *
  *                                                                            *
@@ -115,8 +112,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - on successful splitting                            *
  *               FAIL - on unable to split sensibly                           *
- *                                                                            *
- * Author: Dmitry Borovikov                                                   *
  *                                                                            *
  * Comments: Allocates memory for "directory" and "filename_regexp" only on   *
  *           SUCCEED. On FAIL memory, allocated for "directory" and           *
@@ -235,13 +230,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: file_start_md5                                                   *
- *                                                                            *
- * Purpose: calculate the MD5 sum of the first block of the file              *
+ * Purpose: calculate the MD5 sum of the specified part of the file           *
  *                                                                            *
  * Parameters:                                                                *
  *     f        - [IN] file descriptor                                        *
- *     length   - [IN] length of the block in bytes. Maximum is 512 bytes.    *
+ *     offset   - [IN] start position of the part                             *
+ *     length   - [IN] length of the part in bytes. Maximum is 512 bytes.     *
  *     md5buf   - [OUT] output buffer, MD5_DIGEST_SIZE-bytes long, where the  *
  *                calculated MD5 sum is placed                                *
  *     filename - [IN] file name, used in error logging                       *
@@ -250,7 +244,8 @@ out:
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *filename, char **err_msg)
+static int	file_part_md5(int f, size_t offset, int length, md5_byte_t *md5buf, const char *filename,
+		char **err_msg)
 {
 	md5_state_t	state;
 	char		buf[MAX_LEN_MD5];
@@ -258,15 +253,15 @@ static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *fil
 
 	if (MAX_LEN_MD5 < length)
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "Length %d exceeds maximum MD5 fragment length of %d.", length,
+		*err_msg = zbx_dsprintf(*err_msg, "Length %d exceeds maximum MD5 fragment length %d.", length,
 				MAX_LEN_MD5);
 		return FAIL;
 	}
 
-	if ((zbx_offset_t)-1 == zbx_lseek(f, 0, SEEK_SET))
+	if ((zbx_offset_t)-1 == zbx_lseek(f, offset, SEEK_SET))
 	{
-		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to 0 for file \"%s\": %s", filename,
-				zbx_strerror(errno));
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_SIZE_T " for file \"%s\": %s",
+				(zbx_fs_size_t)offset, filename, zbx_strerror(errno));
 		return FAIL;
 	}
 
@@ -295,8 +290,6 @@ static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *fil
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 /******************************************************************************
- *                                                                            *
- * Function: file_id                                                          *
  *                                                                            *
  * Purpose: get Microsoft Windows file device ID, 64-bit FileIndex or         *
  *          128-bit FileId                                                    *
@@ -376,8 +369,6 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 
 /******************************************************************************
  *                                                                            *
- * Function: set_use_ino_by_fs_type                                           *
- *                                                                            *
  * Purpose: find file system type and set 'use_ino' parameter                 *
  *                                                                            *
  * Parameters:                                                                *
@@ -436,8 +427,6 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 
 /******************************************************************************
  *                                                                            *
- * Function: print_logfile_list                                               *
- *                                                                            *
  * Purpose: write logfile list into log for debugging                         *
  *                                                                            *
  * Parameters:                                                                *
@@ -447,29 +436,30 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
  ******************************************************************************/
 static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_num)
 {
-	int	i;
-
-	for (i = 0; i < logfiles_num; i++)
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64 " processed_size:"
-				ZBX_FS_UI64 " seq:%d copy_of:%d incomplete:%d dev:" ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64
-				" ino_lo:" ZBX_FS_UI64
-				" md5size:%d md5buf:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-				i, logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
-				logfiles[i].processed_size, logfiles[i].seq, logfiles[i].copy_of,
-				logfiles[i].incomplete, logfiles[i].dev, logfiles[i].ino_hi, logfiles[i].ino_lo,
-				logfiles[i].md5size, logfiles[i].md5buf[0], logfiles[i].md5buf[1],
-				logfiles[i].md5buf[2], logfiles[i].md5buf[3], logfiles[i].md5buf[4],
-				logfiles[i].md5buf[5], logfiles[i].md5buf[6], logfiles[i].md5buf[7],
-				logfiles[i].md5buf[8], logfiles[i].md5buf[9], logfiles[i].md5buf[10],
-				logfiles[i].md5buf[11], logfiles[i].md5buf[12], logfiles[i].md5buf[13],
-				logfiles[i].md5buf[14], logfiles[i].md5buf[15]);
+		int	i;
+
+		for (i = 0; i < logfiles_num; i++)
+		{
+			char	first_buf[ZBX_MD5_PRINT_BUF_LEN], last_buf[ZBX_MD5_PRINT_BUF_LEN];
+
+			zbx_md5buf2str(logfiles[i].first_block_md5, first_buf);
+			zbx_md5buf2str(logfiles[i].last_block_md5, last_buf);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "   nr:%d filename:'%s' mtime:%d size:" ZBX_FS_UI64
+					" processed_size:" ZBX_FS_UI64 " seq:%d copy_of:%d incomplete:%d dev:"
+					ZBX_FS_UI64 " ino_hi:" ZBX_FS_UI64 " ino_lo:" ZBX_FS_UI64 " md5_block_size:%d"
+					" first_block_md5:%s last_block_offset:" ZBX_FS_UI64 " last_block_md5:%s", i,
+					logfiles[i].filename, logfiles[i].mtime, logfiles[i].size,
+					logfiles[i].processed_size, logfiles[i].seq, logfiles[i].copy_of,
+					logfiles[i].incomplete, logfiles[i].dev, logfiles[i].ino_hi, logfiles[i].ino_lo,
+					logfiles[i].md5_block_size, first_buf, logfiles[i].last_block_offset, last_buf);
+		}
 	}
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: compare_file_places                                              *
  *                                                                            *
  * Purpose: compare device numbers and inode numbers of 2 files               *
  *                                                                            *
@@ -502,8 +492,6 @@ static int	compare_file_places(const struct st_logfile *old_file, const struct s
 
 /******************************************************************************
  *                                                                            *
- * Function: open_file_helper                                                 *
- *                                                                            *
  * Purpose: open specified file for reading                                   *
  *                                                                            *
  * Parameters: pathname - [IN] full pathname of file                          *
@@ -524,13 +512,13 @@ static int	open_file_helper(const char *pathname, char **err_msg)
 
 /******************************************************************************
  *                                                                            *
- * Function: close_file_helper                                                *
- *                                                                            *
  * Purpose: close specified file                                              *
  *                                                                            *
  * Parameters: fd       - [IN] file descriptor to close                       *
  *             pathname - [IN] pathname of file, used for error reporting     *
  *             err_msg  - [IN/OUT] error message why file could not be closed *
+ *                             unless an earlier error has been already       *
+ *                             reported                                       *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -540,28 +528,27 @@ static int	close_file_helper(int fd, const char *pathname, char **err_msg)
 	if (0 == close(fd))
 		return SUCCEED;
 
-	*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", pathname, zbx_strerror(errno));
+	if (NULL == *err_msg)
+		*err_msg = zbx_dsprintf(NULL, "Cannot close file \"%s\": %s", pathname, zbx_strerror(errno));
 
 	return FAIL;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: examine_md5_and_place                                            *
+ * Purpose: from MD5 sums of blocks and places of 2 files make a conclusion   *
+ *          is it the same file, a pair 'original/copy' or 2 different files  *
  *                                                                            *
- * Purpose: from MD5 sums of initial blocks and places of 2 files make        *
- *          a conclusion is it the same file, a pair 'original/copy' or       *
- *          2 different files                                                 *
- *                                                                            *
- * Parameters:  buf1          - [IN] MD5 sum of initial block of he 1st file  *
- *              buf2          - [IN] MD5 sum of initial block of he 2nd file  *
+ * Parameters:  buf1          - [IN] MD5 sum of block in the 1st file         *
+ *              buf2          - [IN] MD5 sum of block in the 2nd file         *
+ *              size          - [IN] size of MD5 sum                          *
  *              is_same_place - [IN] equality of file places                  *
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - they are 2 different files                *
  *               ZBX_SAME_FILE_YES - 2 files are (assumed) to be the same     *
  *               ZBX_SAME_FILE_COPY - one file is copy of the other           *
  *                                                                            *
- * Comments: in case files places are unknown but MD5 sums of initial blocks  *
+ * Comments: in case files places are unknown but MD5 sums of block pairs     *
  *           match it is assumed to be the same file                          *
  *                                                                            *
  ******************************************************************************/
@@ -583,8 +570,6 @@ static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: is_same_file_logcpt                                              *
  *                                                                            *
  * Purpose: find out if a file from the old list and a file from the new list *
  *          could be the same file or copy in case of copy/truncate rotation  *
@@ -614,13 +599,12 @@ static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2,
 static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino,
 		const struct st_logfile *new_files, int num_new, char **err_msg)
 {
-	int		is_same_place, ret = ZBX_SAME_FILE_NO, found_matching_md5 = 0, same_name_in_new_list = 0, i, f;
-	md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
+	int	is_same_place, ret = ZBX_SAME_FILE_NO, found_matching_md5 = 0, same_name_in_new_list = 0, i, f;
 
 	if (old_file->mtime > new_file->mtime)
 		return ZBX_SAME_FILE_NO;
 
-	if (-1 == old_file->md5size || -1 == new_file->md5size)
+	if (-1 == old_file->md5_block_size || -1 == new_file->md5_block_size)
 	{
 		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
 		return ZBX_SAME_FILE_NO;
@@ -628,27 +612,57 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 
 	is_same_place = compare_file_places(old_file, new_file, use_ino);
 
-	if (old_file->md5size == new_file->md5size)
+	if (old_file->md5_block_size == new_file->md5_block_size &&
+			old_file->last_block_offset == new_file->last_block_offset)
 	{
-		return examine_md5_and_place(old_file->md5buf, new_file->md5buf, sizeof(new_file->md5buf),
-				is_same_place);
+		if (ZBX_SAME_FILE_NO == (ret = examine_md5_and_place(old_file->first_block_md5,
+				new_file->first_block_md5, sizeof(new_file->first_block_md5), is_same_place)))
+		{
+			return ret;
+		}
+
+		return examine_md5_and_place(old_file->last_block_md5, new_file->last_block_md5,
+				sizeof(new_file->last_block_md5), is_same_place);
 	}
 
-	if (0 == old_file->md5size || 0 == new_file->md5size)
+	if (0 == old_file->md5_block_size || 0 == new_file->md5_block_size)
 		return ZBX_SAME_FILE_NO;
 
-	/* MD5 sums have been calculated from initial blocks of different sizes */
+	/* MD5 sums have been calculated from blocks of different sizes or last blocks offsets differ */
 
-	if (old_file->md5size < new_file->md5size)
+	if (old_file->md5_block_size < new_file->md5_block_size ||
+			(old_file->md5_block_size == new_file->md5_block_size &&
+			old_file->last_block_offset != new_file->last_block_offset))
 	{
+		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
+
 		if (-1 == (f = open_file_helper(new_file->filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED == file_start_md5(f, old_file->md5size, md5tmp, new_file->filename, err_msg))
-			ret = examine_md5_and_place(old_file->md5buf, md5tmp, sizeof(md5tmp), is_same_place);
-		else
+		if (SUCCEED != file_part_md5(f, 0, old_file->md5_block_size, md5tmp, new_file->filename, err_msg))
+		{
 			ret = ZBX_SAME_FILE_ERROR;
+			goto clean1;
+		}
 
+		if (ZBX_SAME_FILE_NO == (ret = examine_md5_and_place(old_file->first_block_md5, md5tmp, sizeof(md5tmp),
+				is_same_place)))
+		{
+			goto clean1;
+		}
+
+		if (0 < old_file->last_block_offset)
+		{
+			if (SUCCEED != file_part_md5(f, old_file->last_block_offset, old_file->md5_block_size, md5tmp,
+					new_file->filename, err_msg))
+			{
+				ret = ZBX_SAME_FILE_ERROR;
+				goto clean1;
+			}
+
+			ret = examine_md5_and_place(old_file->last_block_md5, md5tmp, sizeof(md5tmp), is_same_place);
+		}
+clean1:
 		if (0 != close(f) && ZBX_SAME_FILE_ERROR != ret)
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s",
@@ -659,10 +673,10 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 		return ret;
 	}
 
-	/* old_file->md5size > new_file->md5size. */
+	/* Remaining case: old_file->md5_block_size > new_file->md5_block_size */
 
-	/* Now it is necessary to read the first 'new_file->md5size' bytes of */
-	/* the old file to calculate MD5 sum to compare. Unfortunately we     */
+	/* Now it is necessary to read the first 'new_file->md5_block_size' bytes */
+	/* of the old file to calculate MD5 sum to compare. Unfortunately we  */
 	/* cannot reliably use 'old_file->filename' to open the file because: */
 	/*    - being from the old list it might be no longer available,      */
 	/*    - it can have a different name in the new file list;            */
@@ -671,7 +685,9 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 
 	for (i = 0; i < num_new; i++)
 	{
-		if ((zbx_uint64_t)new_file->md5size > new_files[i].size)
+		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
+
+		if ((zbx_uint64_t)new_file->md5_block_size > new_files[i].size)
 			continue;
 
 		if (0 == strcmp(old_file->filename, new_file->filename) ||
@@ -684,17 +700,34 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 		if (-1 == (f = open_file_helper(new_files[i].filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED == file_start_md5(f, new_file->md5size, md5tmp, new_files[i].filename, err_msg))
+		if (SUCCEED != file_part_md5(f, 0, new_file->md5_block_size, md5tmp, new_files[i].filename, err_msg))
 		{
-			ret = examine_md5_and_place(new_file->md5buf, md5tmp, sizeof(md5tmp),
-					compare_file_places(old_file, new_files + i, use_ino));
-
-			if (ZBX_SAME_FILE_YES == ret || ZBX_SAME_FILE_COPY == ret)
-				found_matching_md5 = 1;
-		}
-		else
 			ret = ZBX_SAME_FILE_ERROR;
+			goto clean2;
+		}
 
+		if (ZBX_SAME_FILE_NO == (ret = examine_md5_and_place(new_file->first_block_md5, md5tmp, sizeof(md5tmp),
+				compare_file_places(old_file, new_files + i, use_ino))))
+		{
+			goto clean2;
+		}
+
+		if (0 < new_file->last_block_offset)
+		{
+			if (SUCCEED != file_part_md5(f, new_file->last_block_offset, new_file->md5_block_size, md5tmp,
+					new_files[i].filename, err_msg))
+			{
+				ret = ZBX_SAME_FILE_ERROR;
+				goto clean2;
+			}
+
+			ret = examine_md5_and_place(new_file->last_block_md5, md5tmp, sizeof(md5tmp),
+					compare_file_places(old_file, new_files + i, use_ino));
+		}
+
+		if (ZBX_SAME_FILE_YES == ret || ZBX_SAME_FILE_COPY == ret)
+			found_matching_md5 = 1;
+clean2:
 		if (0 != close(f) && ZBX_SAME_FILE_ERROR != ret)
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new_files[i].filename,
@@ -708,19 +741,38 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 
 	if (0 == found_matching_md5 && 0 == same_name_in_new_list)
 	{
+		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
+
 		/* last try - opening file with the name from the old list */
 
 		if (-1 == (f = open_file_helper(old_file->filename, err_msg)))
 			return ZBX_SAME_FILE_NO;	/* not an error if it is no longer available */
 
-		if (SUCCEED == file_start_md5(f, new_file->md5size, md5tmp, old_file->filename, err_msg))
+		if (SUCCEED != file_part_md5(f, 0, new_file->md5_block_size, md5tmp, old_file->filename, err_msg))
 		{
-			ret = examine_md5_and_place(new_file->md5buf, md5tmp, sizeof(md5tmp),
+			ret = ZBX_SAME_FILE_NO;
+			goto clean3;
+		}
+
+		if (ZBX_SAME_FILE_NO == (ret = examine_md5_and_place(new_file->first_block_md5, md5tmp, sizeof(md5tmp),
+				compare_file_places(old_file, new_file, use_ino))))
+		{
+			goto clean3;
+		}
+
+		if (0 < new_file->last_block_offset)
+		{
+			if (SUCCEED != file_part_md5(f, new_file->last_block_offset, new_file->md5_block_size, md5tmp,
+					old_file->filename, err_msg))
+			{
+				ret = ZBX_SAME_FILE_NO;
+				goto clean3;
+			}
+
+			ret = examine_md5_and_place(new_file->last_block_md5, md5tmp, sizeof(md5tmp),
 					compare_file_places(old_file, new_file, use_ino));
 		}
-		else
-			ret = ZBX_SAME_FILE_NO;
-
+clean3:
 		if (0 != close(f))
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", old_file->filename,
@@ -733,8 +785,6 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: is_same_file_logrt                                               *
  *                                                                            *
  * Purpose: find out if a file from the old list and a file from the new list *
  *          could be the same file in case of simple rotation                 *
@@ -753,8 +803,8 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
  *               ZBX_SAME_FILE_YES - it could be the same file,               *
- *               ZBX_SAME_FILE_ERROR - error.                                 *
- *               ZBX_SAME_FILE_RETRY - retry on the next check                *
+ *               ZBX_SAME_FILE_ERROR - error,                                 *
+ *               ZBX_SAME_FILE_RETRY - retry on the next check.               *
  *                                                                            *
  * Comments: In some cases we can say that it IS NOT the same file.           *
  *           We can never say that it IS the same file and it has not been    *
@@ -771,27 +821,75 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 
 	if (ZBX_FILE_PLACE_OTHER == compare_file_places(old_file, new_file, use_ino))
 	{
-		/* files cannot reside on different devices or occupy different inodes */
+		/* files cannot reside on different devices or occupy different inodes and be the same */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old_file->size > new_file->size)
+	if (old_file->size > new_file->size || old_file->processed_size > new_file->size)
 	{
 		/* File size cannot decrease. Truncating or replacing a file with a smaller one */
 		/* counts as 2 different files. */
 		return ZBX_SAME_FILE_NO;
 	}
 
+	/* the old file and the new file occupy the same device and inode (index), */
+	/* the new file is not smaller than the old one */
+
 	if (old_file->size == new_file->size && old_file->mtime < new_file->mtime)
 	{
-		/* Depending on file system it's possible that stat() was called */
-		/* between mtime and file size update. In this situation we will */
-		/* get a file with the old size and a new mtime.                 */
+		int	same_first_block = 0, same_last_block = 0;
+
+		if (0 < old_file->md5_block_size && old_file->md5_block_size == new_file->md5_block_size)
+		{
+			if (0 != memcmp(old_file->first_block_md5, new_file->first_block_md5,
+					sizeof(new_file->first_block_md5)))
+			{
+				return ZBX_SAME_FILE_NO;
+			}
+
+			same_first_block = 1;
+
+			if (old_file->last_block_offset == new_file->last_block_offset)
+			{
+				if (0 != memcmp(old_file->last_block_md5, new_file->last_block_md5,
+						sizeof(new_file->last_block_md5)))
+				{
+					return ZBX_SAME_FILE_NO;
+				}
+
+				same_last_block = 1;
+			}
+		}
+
+		/* There is one problematic case: log file size stays the same   */
+		/* but its modification time (mtime) changes. This can be caused */
+		/* by 3 scenarios:                                               */
+		/*   1) the log file is rewritten with the same content at the   */
+		/*     same location on disk. Very rare but possible.            */
+		/*   2) depending on file system it's possible that stat() was   */
+		/*     called between mtime and file size update. In this        */
+		/*     situation the agent registers a file with the old size    */
+		/*     and a new mtime.                                          */
+		/*   3) application somehow "touch"-es the log file: mtime       */
+		/*     increases, size does not.                                 */
+		/*                                                               */
+		/* Agent cannot distinguish between these cases. Only users      */
+		/* familiar with their applications and log file rotation can    */
+		/* know which scenario takes place with which log file.          */
+		/* Most users would choose "noreread" option (it is not enabled  */
+		/* by default!) to handle it as the same log file without no     */
+		/* new records to report.                                        */
+		/* Some users might want to handle it as a new log file (it is   */
+		/* the default setting) (e.g. for log*.count[] purpose).         */
+
+		if (0 != same_first_block && 0 != same_last_block && ZBX_LOG_ROTATION_NO_REREAD == options)
+			return ZBX_SAME_FILE_YES;
+
 		/* On the first try we assume it's the same file, just its size  */
 		/* has not been changed yet.                                     */
 		/* If the size has not changed on the next check, then we assume */
 		/* that some tampering was done and to be safe we will treat it  */
-		/* as a different file.                                          */
+		/* as a different file unless "noreread" option is specified.    */
 		if (0 == old_file->retry)
 		{
 			if (ZBX_LOG_ROTATION_NO_REREAD != options)
@@ -817,29 +915,38 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (-1 == old_file->md5size || -1 == new_file->md5size)
+	if (-1 == old_file->md5_block_size || -1 == new_file->md5_block_size)
 	{
 		/* Cannot compare MD5 sums. Assume two different files - reporting twice is better than skipping. */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old_file->md5size > new_file->md5size)
+	if (old_file->md5_block_size > new_file->md5_block_size)
 	{
 		/* file initial block size from which MD5 sum is calculated cannot decrease */
 		return ZBX_SAME_FILE_NO;
 	}
 
-	if (old_file->md5size == new_file->md5size)
+	if (old_file->md5_block_size == new_file->md5_block_size)
 	{
-		if (0 != memcmp(old_file->md5buf, new_file->md5buf, sizeof(new_file->md5buf)))	/* MD5 sums differ */
+		if (0 != memcmp(old_file->first_block_md5, new_file->first_block_md5,
+				sizeof(new_file->first_block_md5)))
+		{
 			return ZBX_SAME_FILE_NO;
+		}
 
-		return ZBX_SAME_FILE_YES;
+		if (old_file->last_block_offset == new_file->last_block_offset &&
+				0 == memcmp(old_file->last_block_md5, new_file->last_block_md5,
+				sizeof(new_file->last_block_md5)))
+		{
+			return ZBX_SAME_FILE_YES;
+		}
 	}
 
-	if (0 < old_file->md5size)
+	if (0 < old_file->md5_block_size)
 	{
-		/* MD5 for the old file has been calculated from a smaller block than for the new file */
+		/* MD5 for the old file has been calculated from a smaller block or */
+		/* with a different offset than for the new file */
 
 		int		f, ret;
 		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
@@ -847,22 +954,41 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 		if (-1 == (f = open_file_helper(new_file->filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
 
-		if (SUCCEED == file_start_md5(f, old_file->md5size, md5tmp, new_file->filename, err_msg))
+		if (SUCCEED != file_part_md5(f, 0, old_file->md5_block_size, md5tmp, new_file->filename, err_msg))
 		{
-			ret = (0 == memcmp(old_file->md5buf, &md5tmp, sizeof(md5tmp))) ? ZBX_SAME_FILE_YES :
-					ZBX_SAME_FILE_NO;
-		}
-		else
 			ret = ZBX_SAME_FILE_ERROR;
+			goto clean;
+		}
 
-		if (0 != close(f))
+		if (0 != memcmp(old_file->first_block_md5, md5tmp, sizeof(md5tmp)))
 		{
-			if (ZBX_SAME_FILE_ERROR != ret)
-			{
-				*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new_file->filename,
-						zbx_strerror(errno));
-				ret = ZBX_SAME_FILE_ERROR;
-			}
+			ret = ZBX_SAME_FILE_NO;
+			goto clean;
+		}
+
+		if (0 == old_file->last_block_offset)
+		{
+			ret = ZBX_SAME_FILE_YES;
+			goto clean;
+		}
+
+		if (SUCCEED != file_part_md5(f, old_file->last_block_offset, old_file->md5_block_size, md5tmp,
+				new_file->filename, err_msg))
+		{
+			ret = ZBX_SAME_FILE_ERROR;
+			goto clean;
+		}
+
+		if (0 == memcmp(old_file->last_block_md5, md5tmp, sizeof(md5tmp)))
+			ret = ZBX_SAME_FILE_YES;
+		else
+			ret = ZBX_SAME_FILE_NO;
+clean:
+		if (0 != close(f) && ZBX_SAME_FILE_ERROR != ret)
+		{
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", new_file->filename,
+					zbx_strerror(errno));
+			ret = ZBX_SAME_FILE_ERROR;
 		}
 
 		return ret;
@@ -872,8 +998,6 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: cross_out                                                        *
  *                                                                            *
  * Purpose: fill the given row and column with '0' except the element at the  *
  *          cross point and protected columns and protected rows              *
@@ -928,8 +1052,6 @@ static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, const
 
 /******************************************************************************
  *                                                                            *
- * Function: is_uniq_row                                                      *
- *                                                                            *
  * Purpose: check if there is only one element '1' or '2' in the given row    *
  *                                                                            *
  * Parameters:                                                                *
@@ -969,8 +1091,6 @@ static int	is_uniq_row(const char * const arr, int n_cols, int row)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: is_uniq_col                                                      *
  *                                                                            *
  * Purpose: check if there is only one element '1' or '2' in the given column *
  *                                                                            *
@@ -1013,8 +1133,6 @@ static int	is_uniq_col(const char * const arr, int n_rows, int n_cols, int col)
 
 /******************************************************************************
  *                                                                            *
- * Function: is_old2new_unique_mapping                                        *
- *                                                                            *
  * Purpose: check if 'old2new' array has only unique mappings                 *
  *                                                                            *
  * Parameters:                                                                *
@@ -1051,8 +1169,6 @@ static int	is_old2new_unique_mapping(const char * const old2new, int num_old, in
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: resolve_old2new                                                  *
  *                                                                            *
  * Purpose: resolve non-unique mappings                                       *
  *                                                                            *
@@ -1207,8 +1323,6 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
 
 /******************************************************************************
  *                                                                            *
- * Function: create_old2new_and_copy_of                                       *
- *                                                                            *
  * Purpose: allocate and fill an array of possible mappings from the old log  *
  *          files to the new log files                                        *
  *                                                                            *
@@ -1292,8 +1406,6 @@ static char	*create_old2new_and_copy_of(zbx_log_rotation_options_t rotation_type
 
 /******************************************************************************
  *                                                                            *
- * Function: find_old2new                                                     *
- *                                                                            *
  * Purpose: find a mapping from old to new file                               *
  *                                                                            *
  * Parameters:                                                                *
@@ -1323,8 +1435,6 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
 
 /******************************************************************************
  *                                                                            *
- * Function: add_logfile                                                      *
- *                                                                            *
  * Purpose: adds information of a logfile to the list of logfiles             *
  *                                                                            *
  * Parameters: logfiles - pointer to the list of logfiles                     *
@@ -1333,13 +1443,11 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
  *             filename - name of a logfile (with full path)                  *
  *             st - structure returned by stat()                              *
  *                                                                            *
- * Author: Dmitry Borovikov                                                   *
- *                                                                            *
  ******************************************************************************/
 static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
 		zbx_stat_t *st)
 {
-	int	i = 0, cmp = 0;
+	int	i = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' mtime:%d size:" ZBX_FS_UI64, __func__, filename,
 			(int)st->st_mtime, (zbx_uint64_t)st->st_size);
@@ -1377,7 +1485,9 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 		if (st->st_mtime == (*logfiles)[i].mtime)
 		{
-			if (0 > (cmp = strcmp(filename, (*logfiles)[i].filename)))
+			int	cmp = strcmp(filename, (*logfiles)[i].filename);
+
+			if (0 > cmp)
 				continue;	/* (2) sort by descending name */
 
 			if (0 == cmp)
@@ -1403,18 +1513,20 @@ static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *
 
 	(*logfiles)[i].filename = zbx_strdup(NULL, filename);
 	(*logfiles)[i].mtime = (int)st->st_mtime;
-	(*logfiles)[i].md5size = -1;
 	(*logfiles)[i].seq = 0;
+	(*logfiles)[i].retry = 0;
 	(*logfiles)[i].incomplete = 0;
 	(*logfiles)[i].copy_of = -1;
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)		/* on MS Windows these attributes are not initialized here */
 	(*logfiles)[i].dev = (zbx_uint64_t)st->st_dev;
 	(*logfiles)[i].ino_lo = (zbx_uint64_t)st->st_ino;
 	(*logfiles)[i].ino_hi = 0;
 #endif
 	(*logfiles)[i].size = (zbx_uint64_t)st->st_size;
 	(*logfiles)[i].processed_size = 0;
-	(*logfiles)[i].retry = 0;
+	(*logfiles)[i].md5_block_size = -1;
+	(*logfiles)[i].last_block_offset = 0;
+	/* 'first_block_md5' and 'last_block_md5' are not initialized here */
 
 	++(*logfiles_num);
 out:
@@ -1422,8 +1534,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: destroy_logfile_list                                             *
  *                                                                            *
  * Purpose: release resources allocated to a logfile list                     *
  *                                                                            *
@@ -1450,8 +1560,6 @@ void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: pick_logfile                                                     *
  *                                                                            *
  * Purpose: checks if the specified file meets requirements and adds it to    *
  *          the logfile list                                                  *
@@ -1496,8 +1604,6 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
 
 /******************************************************************************
  *                                                                            *
- * Function: pick_logfiles                                                    *
- *                                                                            *
  * Purpose: find logfiles in a directory and put them into a list             *
  *                                                                            *
  * Parameters:                                                                *
@@ -1518,7 +1624,7 @@ static void	pick_logfile(const char *directory, const char *filename, int mtime,
  *                                                                            *
  * Comments: This is a helper function for make_logfile_list()                *
  *                                                                            *
- * Comments: Thead-safety - readdir() is a gray area, supposed to work on     *
+ * Comments: Thread-safety - readdir() is a gray area, supposed to work on    *
  *           modern implementations when the directory stream is not shared   *
  *           between threads.                                                 *
  *                                                                            *
@@ -1528,14 +1634,12 @@ static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *r
 {
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	int			ret = FAIL;
-	char			*find_path = NULL, *file_name_utf8;
-	wchar_t			*find_wpath = NULL;
 	intptr_t		find_handle;
 	struct _wfinddata_t	find_data;
 
 	/* "open" Windows directory */
-	find_path = zbx_dsprintf(find_path, "%s*", directory);
-	find_wpath = zbx_utf8_to_unicode(find_path);
+	char	*find_path = zbx_dsprintf(NULL, "%s*", directory);
+	wchar_t	*find_wpath = zbx_utf8_to_unicode(find_path);
 
 	if (-1 == (find_handle = _wfindfirst(find_wpath, &find_data)))
 	{
@@ -1551,7 +1655,8 @@ static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *r
 
 	do
 	{
-		file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
+		char	*file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
+
 		pick_logfile(directory, file_name_utf8, mtime, re, logfiles, logfiles_alloc, logfiles_num);
 		zbx_free(file_name_utf8);
 	}
@@ -1584,9 +1689,7 @@ clean:
 	*use_ino = 1;
 
 	while (NULL != (d_ent = readdir(dir)))
-	{
 		pick_logfile(directory, d_ent->d_name, mtime, re, logfiles, logfiles_alloc, logfiles_num);
-	}
 
 	if (-1 == closedir(dir))
 	{
@@ -1599,8 +1702,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: compile_filename_regexp                                          *
  *                                                                            *
  * Purpose: compile regular expression                                        *
  *                                                                            *
@@ -1621,6 +1722,7 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regular expression describing filename pattern: %s",
 				regexp_err);
+		zbx_regexp_err_msg_free(regexp_err);
 		return FAIL;
 	}
 
@@ -1628,8 +1730,6 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: fill_file_details                                                *
  *                                                                            *
  * Purpose: fill-in MD5 sums, device and inode numbers for files in the list  *
  *                                                                            *
@@ -1645,9 +1745,9 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
  *                                                                            *
  ******************************************************************************/
 #if defined(_WINDOWS) || defined(__MINGW32__)
-static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, int use_ino, char **err_msg)
+static int	fill_file_details(struct st_logfile *logfiles, int logfiles_num, int use_ino, char **err_msg)
 #else
-static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, char **err_msg)
+static int	fill_file_details(struct st_logfile *logfiles, int logfiles_num, char **err_msg)
 #endif
 {
 	int	i, ret = SUCCEED;
@@ -1658,15 +1758,32 @@ static int	fill_file_details(struct st_logfile **logfiles, int logfiles_num, cha
 	for (i = 0; i < logfiles_num; i++)
 	{
 		int			f;
-		struct st_logfile	*p = *logfiles + i;
+		struct st_logfile	*p = logfiles + i;
 
 		if (-1 == (f = open_file_helper(p->filename, err_msg)))
 			return FAIL;
 
-		p->md5size = (zbx_uint64_t)MAX_LEN_MD5 > p->size ? (int)p->size : MAX_LEN_MD5;
+		/* get MD5 sums of the first and the last blocks */
 
-		if (SUCCEED != (ret = file_start_md5(f, p->md5size, p->md5buf, p->filename, err_msg)))
+		p->md5_block_size = (int)MIN(MAX_LEN_MD5, p->size);
+
+		if (SUCCEED != (ret = file_part_md5(f, 0, p->md5_block_size, p->first_block_md5, p->filename,
+				err_msg)))
+		{
 			goto clean;
+		}
+
+		if (0 < (p->last_block_offset = p->size - (size_t)p->md5_block_size))
+		{
+			if (SUCCEED != (ret = file_part_md5(f, p->last_block_offset, p->md5_block_size,
+					p->last_block_md5, p->filename, err_msg)))
+			{
+				goto clean;
+			}
+		}
+		else	/* file is small, set the last block MD5 equal to the first block's one */
+			memcpy(p->last_block_md5, p->first_block_md5, sizeof(p->last_block_md5));
+
 #if defined(_WINDOWS) || defined(__MINGW32__)
 		ret = file_id(f, use_ino, &p->dev, &p->ino_lo, &p->ino_hi, p->filename, err_msg);
 #endif	/*_WINDOWS*/
@@ -1679,8 +1796,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: make_logfile_list                                                *
  *                                                                            *
  * Purpose: select log files to be analyzed and make a list, set 'use_ino'    *
  *          parameter                                                         *
@@ -1772,6 +1887,8 @@ static int	make_logfile_list(unsigned char flags, const char *filename, int mtim
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "insufficient access rights (no \"execute\" permission) "
 						"to directory \"%s\": %s", directory, zbx_strerror(errno));
+				/* No access could be a transient condition if file rotation is manipulating */
+				/* directories. Therefore 'ret' is not set to FAIL or ZBX_NO_FILE_ERROR here. */
 			}
 			else
 			{
@@ -1791,12 +1908,17 @@ clean1:
 			goto clean;
 	}
 	else
+	{
 		THIS_SHOULD_NEVER_HAPPEN;
+		*err_msg = zbx_dsprintf(*err_msg, "%s(): internal error: invalid flags:%hhu", __func__, flags);
+		ret = FAIL;
+		goto clean;
+	}
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-	ret = fill_file_details(logfiles, *logfiles_num, *use_ino, err_msg);
+	ret = fill_file_details(*logfiles, *logfiles_num, *use_ino, err_msg);
 #else
-	ret = fill_file_details(logfiles, *logfiles_num, err_msg);
+	ret = fill_file_details(*logfiles, *logfiles_num, err_msg);
 #endif
 clean:
 	if ((FAIL == ret || ZBX_NO_FILE_ERROR == ret) && NULL != *logfiles)
@@ -1880,18 +2002,28 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
+static int	zbx_match_log_rec(const zbx_vector_ptr_t *regexps, const char *value, const char *pattern,
+		const char *output_template, char **output, char **err_msg)
+{
+	int	ret;
+
+	if (FAIL == (ret = regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template, output)))
+		*err_msg = zbx_dsprintf(*err_msg, "cannot compile regular expression");
+
+	return ret;	/* ZBX_REGEXP_MATCH, ZBX_REGEXP_NO_MATCH or FAIL */
+}
+
 /******************************************************************************
- *                                                                            *
- * Function: zbx_read2                                                        *
  *                                                                            *
  * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int *mtime, int *big_rec,
-		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
+static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
+		const int *mtime, int *big_rec, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		zbx_vector_ptr_t *addrs, const char *hostname, const char *key,
-		zbx_uint64_t *lastlogsize_sent, int *mtime_sent)
+		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
+		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
+		zbx_vector_pre_persistent_t *prep_vec, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -1900,13 +2032,15 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 	char				*p_start, *p, *p_nl, *p_next, *item_value = NULL;
 	size_t				szbyte;
 	zbx_offset_t			offset;
-	int				send_err;
-	zbx_uint64_t			lastlogsize1;
+	const int			is_count_item = (0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags)) ? 1 : 0;
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	int				prep_vec_idx = -1;	/* index in 'prep_vec' vector */
+#endif
+	zbx_uint64_t			processed_size;
 
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4 bytes for every character. To send */
 						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
 						/* required. */
-
 	if (NULL == buf)
 		buf = (char *)zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
 
@@ -1929,9 +2063,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 			goto out;
 		}
 
-		nbytes = (int)read(fd, buf, (size_t)BUF_SIZE);
-
-		if (-1 == nbytes)
+		if (-1 == (nbytes = (int)read(fd, buf, (size_t)BUF_SIZE)))
 		{
 			/* error on read */
 			*big_rec = 0;
@@ -1954,7 +2086,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 		if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
 		{
 			if (p_end > p)
-				*incomplete = 1;
+				logfile->incomplete = 1;
 
 			if (BUF_SIZE > nbytes)
 			{
@@ -1977,6 +2109,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 					/* database). */
 
 					char	*value;
+					int	send_err;
 
 					buf[BUF_SIZE] = '\0';
 
@@ -1990,21 +2123,47 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 							" will be analyzed, the rest will be ignored while Zabbix agent"
 							" is running.", value);
 
-					lastlogsize1 = (size_t)offset + (size_t)nbytes;
+					processed_size = (size_t)offset + (size_t)nbytes;
 					send_err = FAIL;
 
-					if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log[] or logrt[] */
+					regexp_ret = zbx_match_log_rec(regexps, value, pattern,
+							(0 == is_count_item) ? output_template : NULL,
+							(0 == is_count_item) ? &item_value : NULL, err_msg);
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
+							ZBX_REGEXP_NO_MATCH == regexp_ret))
 					{
-						if (ZBX_REGEXP_MATCH == (regexp_ret = regexp_sub_ex(regexps, value,
-								pattern, ZBX_CASE_SENSITIVE, output_template,
-								&item_value)))
+						/* Prepare 'prep_vec' element even if the current record won't match. */
+						/* Its mtime and lastlogsize could be sent to server later as */
+						/* metadata update, then a persistent file should be written. */
+						/* 'prep_vec' can be emptied at any call to process_value() which */
+						/* calls send_buffer(), so be ready to reinitialize. */
+						if (-1 == prep_vec_idx || 0 == prep_vec->values_num)
 						{
-							if (SUCCEED == (send_err = process_value(addrs, hostname, key,
-									item_value, ITEM_STATE_NORMAL,
-									&lastlogsize1, mtime, NULL, NULL, NULL, NULL,
+							prep_vec_idx = zbx_find_or_create_prep_vec_element(prep_vec,
+									key, persistent_file_name);
+							zbx_init_prep_vec_data(logfile,
+									prep_vec->values + prep_vec_idx);
+						}
+
+						zbx_update_prep_vec_data(logfile, processed_size,
+								prep_vec->values + prep_vec_idx);
+					}
+#else
+					ZBX_UNUSED(persistent_file_name);
+					ZBX_UNUSED(prep_vec);
+#endif
+					if (ZBX_REGEXP_MATCH == regexp_ret)
+					{
+						if (0 == is_count_item)		/* log[] or logrt[] */
+						{
+							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
+									hostname, key, item_value, ITEM_STATE_NORMAL,
+									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT)))
 							{
-								*lastlogsize_sent = lastlogsize1;
+								*lastlogsize_sent = processed_size;
+
 								if (NULL != mtime_sent)
 									*mtime_sent = *mtime;
 
@@ -2015,20 +2174,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 							{
 								zbx_free(item_value);
 
+								if ('\0' != *encoding)
+									zbx_free(value);
+
 								/* Sending of buffer failed. */
 								/* Try to resend it in the next check. */
 								ret = SUCCEED;
 								goto out;
 							}
 						}
-					}
-					else	/* log.count[] or logrt.count[] */
-					{
-						if (ZBX_REGEXP_MATCH == (regexp_ret = regexp_sub_ex(regexps, value,
-								pattern, ZBX_CASE_SENSITIVE, NULL, NULL)))
-						{
+						else	/* log.count[] or logrt.count[] */
 							(*s_count)--;
-						}
 					}
 
 					if ('\0' != *encoding)
@@ -2036,17 +2192,16 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 					if (FAIL == regexp_ret)
 					{
-						*err_msg = zbx_dsprintf(*err_msg, "cannot compile regular expression");
 						ret = FAIL;
 						goto out;
 					}
 
 					(*p_count)--;
 
-					if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags) ||
+					if (0 != is_count_item ||
 							ZBX_REGEXP_NO_MATCH == regexp_ret || SUCCEED == send_err)
 					{
-						*lastlogsize = lastlogsize1;
+						*lastlogsize = processed_size;
 						*big_rec = 1;	/* ignore the rest of this record */
 					}
 				}
@@ -2062,7 +2217,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 		{
 			/* the "newline" was found, so there is at least one complete record */
 			/* (or trailing part of a large record) in the buffer */
-			*incomplete = 0;
+			logfile->incomplete = 0;
 
 			for (;;)
 			{
@@ -2076,6 +2231,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 				if (0 == *big_rec)
 				{
 					char	*value;
+					int	send_err;
 
 					*p_nl = '\0';
 
@@ -2084,21 +2240,44 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 					else
 						value = p_start;
 
-					lastlogsize1 = (size_t)offset + (size_t)(p_next - buf);
+					processed_size = (size_t)offset + (size_t)(p_next - buf);
 					send_err = FAIL;
 
-					if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))   /* log[] or logrt[] */
+					regexp_ret = zbx_match_log_rec(regexps, value, pattern,
+							(0 == is_count_item) ? output_template : NULL,
+							(0 == is_count_item) ? &item_value : NULL, err_msg);
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
+							ZBX_REGEXP_NO_MATCH == regexp_ret))
 					{
-						if (ZBX_REGEXP_MATCH == (regexp_ret = regexp_sub_ex(regexps, value,
-								pattern, ZBX_CASE_SENSITIVE, output_template,
-								&item_value)))
+						/* Prepare 'prep_vec' element even if the current record won't match. */
+						/* Its mtime and lastlogsize could be sent to server later as */
+						/* metadata update, then a persistent file should be written. */
+						/* 'prep_vec' can be emptied at any call to process_value() which */
+						/* calls send_buffer(), so be ready to reinitialize. */
+						if (-1 == prep_vec_idx || 0 == prep_vec->values_num)
 						{
-							if (SUCCEED == (send_err = process_value(addrs, hostname, key,
-									item_value, ITEM_STATE_NORMAL,
-									&lastlogsize1, mtime, NULL, NULL, NULL, NULL,
+							prep_vec_idx = zbx_find_or_create_prep_vec_element(prep_vec,
+									key, persistent_file_name);
+							zbx_init_prep_vec_data(logfile,
+									prep_vec->values + prep_vec_idx);
+						}
+
+						zbx_update_prep_vec_data(logfile, processed_size,
+								prep_vec->values + prep_vec_idx);
+					}
+#endif
+					if (ZBX_REGEXP_MATCH == regexp_ret)
+					{
+						if (0 == is_count_item)		/* log[] or logrt[] */
+						{
+							if (SUCCEED == (send_err = process_value(addrs, agent2_result,
+									hostname, key, item_value, ITEM_STATE_NORMAL,
+									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT)))
 							{
-								*lastlogsize_sent = lastlogsize1;
+								*lastlogsize_sent = processed_size;
+
 								if (NULL != mtime_sent)
 									*mtime_sent = *mtime;
 
@@ -2109,20 +2288,17 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 							{
 								zbx_free(item_value);
 
+								if ('\0' != *encoding)
+									zbx_free(value);
+
 								/* Sending of buffer failed. */
 								/* Try to resend it in the next check. */
 								ret = SUCCEED;
 								goto out;
 							}
 						}
-					}
-					else	/* log.count[] or logrt.count[] */
-					{
-						if (ZBX_REGEXP_MATCH == (regexp_ret = regexp_sub_ex(regexps, value,
-								pattern, ZBX_CASE_SENSITIVE, NULL, NULL)))
-						{
+						else	/* log.count[] or logrt.count[] */
 							(*s_count)--;
-						}
 					}
 
 					if ('\0' != *encoding)
@@ -2130,17 +2306,16 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 					if (FAIL == regexp_ret)
 					{
-						*err_msg = zbx_dsprintf(*err_msg, "cannot compile regular expression");
 						ret = FAIL;
 						goto out;
 					}
 
 					(*p_count)--;
 
-					if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags) ||
+					if (0 != is_count_item ||
 							ZBX_REGEXP_NO_MATCH == regexp_ret || SUCCEED == send_err)
 					{
-						*lastlogsize = lastlogsize1;
+						*lastlogsize = processed_size;
 					}
 				}
 				else
@@ -2159,7 +2334,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
 					if (p_end > p)
-						*incomplete = 1;
+						logfile->incomplete = 1;
 
 					if ((zbx_offset_t)-1 == zbx_lseek(fd, *lastlogsize, SEEK_SET))
 					{
@@ -2172,7 +2347,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 						break;
 				}
 				else
-					*incomplete = 0;
+					logfile->incomplete = 0;
 			}
 		}
 	}
@@ -2184,15 +2359,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_log                                                      *
- *                                                                            *
  * Purpose: Match new records in logfile with regexp, transmit matching       *
  *          records to Zabbix server                                          *
  *                                                                            *
  * Parameters:                                                                *
  *     flags           - [IN] bit flags with item type: log, logrt, log.count *
  *                       or logrt.count                                       *
- *     filename        - [IN] logfile name                                    *
+ *     logfile         - [IN/OUT] logfile attributes                          *
  *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
  *     mtime           - [IN/OUT] file modification time for reporting to     *
  *                       server                                               *
@@ -2202,11 +2375,6 @@ out:
  *                       jump to the end                                      *
  *     big_rec         - [IN/OUT] state variable to remember whether a long   *
  *                       record is being processed                            *
- *     incomplete      - [OUT] 0 - the last record ended with a newline,      *
- *                       1 - there was no newline at the end of the last      *
- *                       record.                                              *
- *     err_msg         - [IN/OUT] error message why an item became            *
- *                       NOTSUPPORTED                                         *
  *     encoding        - [IN] text string describing encoding.                *
  *                       See function find_cr_lf_szbyte() for supported       *
  *                       encodings.                                           *
@@ -2218,17 +2386,22 @@ out:
  *     p_count         - [IN/OUT] limit of records to be processed            *
  *     s_count         - [IN/OUT] limit of records to be sent to server       *
  *     process_value   - [IN] pointer to function process_value()             *
- *     server          - [IN] server to send data to                          *
- *     port            - [IN] port to send data to                            *
+ *     addrs           - [IN] vector for passing server and port where to     *
+ *                            send data                                       *
+ *     agent2_result   - [IN] address of buffer where to store matching log   *
+ *                            records (used only in Agent2)                   *
  *     hostname        - [IN] hostname the data comes from                    *
  *     key             - [IN] item key the data belongs to                    *
  *     processed_bytes - [OUT] number of processed bytes in logfile           *
  *     seek_offset     - [IN] position to seek in file                        *
+ *     persistent_file_name - [IN] name of file for saving persistent data    *
+ *     prep_vec        - [IN/OUT] vector with data for writing into           *
+ *                                persistent files                            *
+ *     err_msg         - [IN/OUT] error message why an item became            *
+ *                       NOTSUPPORTED                                         *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *           This function does not deal with log file rotation.              *
@@ -2236,19 +2409,21 @@ out:
  *           Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
+static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
-		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
-		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		zbx_vector_ptr_t *addrs, const char *hostname, const char *key,
-		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset)
+		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
+		int *p_count, int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
+		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
+		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
+		char **err_msg)
 {
 	int	f, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d seek_offset:"
-			ZBX_FS_UI64, __func__, filename, *lastlogsize, NULL != mtime ? *mtime : 0, seek_offset);
+			ZBX_FS_UI64, __func__, logfile->filename, *lastlogsize, NULL != mtime ? *mtime : 0,
+			seek_offset);
 
-	if (-1 == (f = open_file_helper(filename, err_msg)))
+	if (-1 == (f = open_file_helper(logfile->filename, err_msg)))
 		goto out;
 
 	if ((zbx_offset_t)-1 != zbx_lseek(f, seek_offset, SEEK_SET))
@@ -2256,9 +2431,9 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		*lastlogsize = seek_offset;
 		*skip_old_data = 0;
 
-		if (SUCCEED == (ret = zbx_read2(f, flags, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding,
-				regexps, pattern, output_template, p_count, s_count, process_value, addrs,
-				hostname, key, lastlogsize_sent, mtime_sent)))
+		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
+				pattern, output_template, p_count, s_count, process_value, addrs, agent2_result,
+				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -2266,14 +2441,14 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 	else
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64 " in file \"%s\": %s",
-				seek_offset, filename, zbx_strerror(errno));
+				seek_offset, logfile->filename, zbx_strerror(errno));
 	}
 
-	if (SUCCEED != close_file_helper(f, filename, err_msg))
+	if (SUCCEED != close_file_helper(f, logfile->filename, err_msg))
 		ret = FAIL;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d ret:%s"
-			" processed_bytes:" ZBX_FS_UI64, __func__, filename, *lastlogsize,
+			" processed_bytes:" ZBX_FS_UI64, __func__, logfile->filename, *lastlogsize,
 			NULL != mtime ? *mtime : 0, zbx_result_string(ret),
 			SUCCEED == ret ? *processed_bytes : (zbx_uint64_t)0);
 
@@ -2377,29 +2552,53 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
 	}
 }
 
-static int	files_start_with_same_md5(const struct st_logfile *log1, const struct st_logfile *log2)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare MD5 sums of first and last blocks between 2 files. If MD5 *
+ *          sums have been calculated for blocks of different sizes or        *
+ *          offsets then open the log file with larger size of blocks and get *
+ *          MD5 for the smaller size                                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     log1 - [IN] log file 1 attributes                                      *
+ *     log2 - [IN] log file 2 attributes                                      *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ * Comments: Use this function to compare log files from the 'new' file list. *
+ *           DO NOT use it with a file which belongs to the 'old' list (the   *
+ *           old file name now could point to different file)                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	files_have_same_blocks_md5(const struct st_logfile *log1, const struct st_logfile *log2)
 {
-	if (-1 == log1->md5size || -1 == log2->md5size)
+	if (-1 == log1->md5_block_size || -1 == log2->md5_block_size)
 		return FAIL;
 
-	if (log1->md5size == log2->md5size)	/* this works for empty files, too */
+	if (log1->md5_block_size == log2->md5_block_size)	/* this works for empty files, too */
 	{
-		if (0 == memcmp(log1->md5buf, log2->md5buf, sizeof(log1->md5buf)))
-			return SUCCEED;
-		else
+		if (0 != memcmp(log1->first_block_md5, log2->first_block_md5, sizeof(log1->first_block_md5)))
 			return FAIL;
+
+		if (log1->last_block_offset == log2->last_block_offset)
+		{
+			if (0 != memcmp(log1->last_block_md5, log2->last_block_md5, sizeof(log1->last_block_md5)))
+				return FAIL;
+
+			return SUCCEED;
+		}
 	}
 
-	/* we have MD5 sums, but they are calculated from blocks of different sizes */
+	/* we have MD5 sums but they were calculated from blocks of different sizes or offsets */
 
-	if (0 < log1->md5size && 0 < log2->md5size)
+	if (0 < log1->md5_block_size && 0 < log2->md5_block_size)
 	{
 		const struct st_logfile	*file_smaller, *file_larger;
 		int			fd, ret = FAIL;
 		char			*err_msg = NULL;		/* required, but not used */
 		md5_byte_t		md5tmp[MD5_DIGEST_SIZE];
 
-		if (log1->md5size < log2->md5size)
+		if (log1->md5_block_size < log2->md5_block_size)
 		{
 			file_smaller = log1;
 			file_larger = log2;
@@ -2413,12 +2612,27 @@ static int	files_start_with_same_md5(const struct st_logfile *log1, const struct
 		if (-1 == (fd = zbx_open(file_larger->filename, O_RDONLY)))
 			return FAIL;
 
-		if (SUCCEED == file_start_md5(fd, file_smaller->md5size, md5tmp, "", &err_msg))
+		if (SUCCEED != file_part_md5(fd, 0, file_smaller->md5_block_size, md5tmp, "", &err_msg))
+			goto clean;
+
+		if (0 != memcmp(file_smaller->first_block_md5, md5tmp, sizeof(md5tmp)))
+			goto clean;
+
+		if (0 == file_smaller->last_block_offset)
 		{
-			if (0 == memcmp(file_smaller->md5buf, md5tmp, sizeof(md5tmp)))
-				ret = SUCCEED;
+			ret = SUCCEED;
+			goto clean;
 		}
 
+		if (SUCCEED != file_part_md5(fd, file_smaller->last_block_offset, file_smaller->md5_block_size, md5tmp,
+				"", &err_msg))
+		{
+			goto clean;
+		}
+
+		if (0 == memcmp(file_smaller->last_block_md5, md5tmp, sizeof(md5tmp)))
+			ret = SUCCEED;
+clean:
 		zbx_free(err_msg);
 		close(fd);
 
@@ -2439,7 +2653,7 @@ static void	handle_multiple_copies(struct st_logfile *logfiles, int logfiles_num
 
 	for (j = i + 1; j < logfiles_num; j++)
 	{
-		if (SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
+		if (SUCCEED == files_have_same_blocks_md5(logfiles + i, logfiles + j))
 		{
 			/* logfiles[i] and logfiles[j] are original and copy (or vice versa). */
 			/* If logfiles[i] has been at least partially processed then transfer its */
@@ -2487,7 +2701,7 @@ static void	delay_update_if_copies(struct st_logfile *logfiles, int logfiles_num
 			if (0 == logfiles[j].size)
 				continue;
 
-			if (SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
+			if (SUCCEED == files_have_same_blocks_md5(logfiles + i, logfiles + j))
 			{
 				int	more_processed;
 
@@ -2530,7 +2744,7 @@ static zbx_uint64_t	max_processed_size_in_copies(const struct st_logfile *logfil
 
 	for (j = 0; j < logfiles_num; j++)
 	{
-		if (i != j && SUCCEED == files_start_with_same_md5(logfiles + i, logfiles + j))
+		if (i != j && SUCCEED == files_have_same_blocks_md5(logfiles + i, logfiles + j))
 		{
 			/* logfiles[i] and logfiles[j] are original and copy (or vice versa). */
 			if (max_processed < logfiles[j].processed_size)
@@ -2542,8 +2756,6 @@ static zbx_uint64_t	max_processed_size_in_copies(const struct st_logfile *logfil
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: calculate_delay                                                  *
  *                                                                            *
  * Purpose: calculate delay based on number of processed and remaining bytes, *
  *          and processing time                                               *
@@ -2627,8 +2839,6 @@ static void	jump_remaining_bytes_logrt(struct st_logfile *logfiles, int logfiles
 
 /******************************************************************************
  *                                                                            *
- * Function: adjust_position_after_jump                                       *
- *                                                                            *
  * Purpose:                                                                   *
  *    After jumping over a number of bytes we "land" most likely somewhere in *
  *    the middle of log file line. This function tries to adjust position to  *
@@ -2653,7 +2863,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 	const char	*cr, *lf, *p_end;
 	char		*p, *p_next;
 	zbx_uint64_t	lastlogsize_tmp, lastlogsize_aligned, lastlogsize_org, seek_pos, remainder;
-	char   		buf[32 * ZBX_KIBIBYTE];		/* buffer must be of size multiple of 4 as some character */
+	char		buf[32 * ZBX_KIBIBYTE];		/* buffer must be of size multiple of 4 as some character */
 							/* encodings use 4 bytes for every character */
 
 	if (-1 == (fd = open_file_helper(logfile->filename, err_msg)))
@@ -2751,8 +2961,8 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 
 		if (NULL != buf_find_newline(p, &p_next, p_end, cr, lf, szbyte))
 		{
-			/* Found the beginning of line. It may not be the one closest to place we jumped to */
-			/* (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */
+			/* Found the beginning of line. It may not be the closest beginning of line to the place  */
+			/* we jumped to (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */
 
 			*lastlogsize = seek_pos + (zbx_uint64_t)(p_next - buf);
 			logfile->processed_size = *lastlogsize;
@@ -2797,8 +3007,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: jump_ahead                                                       *
  *                                                                            *
  * Purpose: move forward to a new position in the log file list               *
  *                                                                            *
@@ -2963,8 +3171,6 @@ static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int
 
 /******************************************************************************
  *                                                                            *
- * Function: update_new_list_from_old                                         *
- *                                                                            *
  * Comments: Thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
@@ -3013,8 +3219,6 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
 
 /******************************************************************************
  *                                                                            *
- * Function: process_logrt                                                    *
- *                                                                            *
  * Purpose: Find new records in logfiles                                      *
  *                                                                            *
  * Parameters:                                                                *
@@ -3047,8 +3251,10 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     p_count          - [IN/OUT] limit of records to be processed           *
  *     s_count          - [IN/OUT] limit of records to be sent to server      *
  *     process_value    - [IN] pointer to function process_value()            *
- *     server           - [IN] server to send data to                         *
- *     port             - [IN] port to send data to                           *
+ *     addrs            - [IN] vector for passing server and port where to    *
+ *                             to send data                                   *
+ *     agent2_result    - [IN] address of buffer where to store matching log  *
+ *                             records (used only in Agent2)                  *
  *     hostname         - [IN] hostname the data comes from                   *
  *     key              - [IN] item key the data belongs to                   *
  *     jumped           - [OUT] flag to indicate that a jump took place       *
@@ -3056,6 +3262,9 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     start_time       - [IN/OUT] start time of check                        *
  *     processed_bytes  - [IN/OUT] number of bytes processed                  *
  *     rotation_type    - [IN] simple rotation or copy/truncate rotation      *
+ *     persistent_file_name - [IN] name of file for saving persistent data    *
+ *     prep_vec         - [IN/OUT] vector with data for writing into          *
+ *                                 persistent files                           *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -3063,14 +3272,15 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  * Comments: Supposed to be thread-safe, see pick_logfiles() comments.        *
  *                                                                            *
  ******************************************************************************/
-int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
+static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
-		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, const int *logfiles_num_old,
+		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int logfiles_num_old,
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
-		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, const char *hostname,
-		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes,
-		zbx_log_rotation_options_t rotation_type)
+		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *hostname, const char *key, int *jumped, float max_delay, double *start_time,
+		zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
+		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec)
 {
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
@@ -3094,7 +3304,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				zabbix_log(LOG_LEVEL_DEBUG, "%s(): no files, setting skip_old_data to 0", __func__);
 			}
 
-			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == *logfiles_num_old)
+			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) && 0 == logfiles_num_old)
 			{
 				/* Both the old and the new log file lists are empty. That means the agent has not */
 				/* seen any log files for this logrt[] item since started. If log files appear later */
@@ -3131,8 +3341,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	else
 		start_idx = 0;
 
-	if (0 < *logfiles_num_old && 0 < logfiles_num && SUCCEED != update_new_list_from_old(rotation_type,
-			*logfiles_old, *logfiles_num_old, logfiles, logfiles_num, *use_ino, &seq, &start_idx,
+	if (0 < logfiles_num_old && 0 < logfiles_num && SUCCEED != update_new_list_from_old(rotation_type,
+			*logfiles_old, logfiles_num_old, logfiles, logfiles_num, *use_ino, &seq, &start_idx,
 			lastlogsize, err_msg))
 	{
 		destroy_logfile_list(&logfiles, &logfiles_alloc, &logfiles_num);
@@ -3146,7 +3356,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() old file list:", __func__);
 		if (NULL != *logfiles_old)
-			print_logfile_list(*logfiles_old, *logfiles_num_old);
+			print_logfile_list(*logfiles_old, logfiles_num_old);
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 
@@ -3272,11 +3482,11 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 
 			if (0 != process_this_file)
 			{
-				ret = process_log(flags, logfiles[i].filename, lastlogsize, mtime, lastlogsize_sent,
-						mtime_sent, skip_old_data, big_rec, &logfiles[i].incomplete, err_msg,
-						encoding, regexps, pattern, output_template, p_count, s_count,
-						process_value, addrs, hostname, key, &processed_bytes_tmp,
-						seek_offset);
+				ret = process_log(flags, logfiles + i, lastlogsize, mtime, lastlogsize_sent,
+						mtime_sent, skip_old_data, big_rec, encoding, regexps, pattern,
+						output_template, p_count, s_count, process_value, addrs, agent2_result,
+						hostname, key, &processed_bytes_tmp, seek_offset, persistent_file_name,
+						prep_vec, err_msg);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
 				/* we do not check for errors here */
@@ -3342,7 +3552,61 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	*logfiles_num_new = logfiles_num;
 
 	if (0 < logfiles_num)
+	{
+		/* Try to update MD5 sums of initial blocks if they were calculated for small blocks. */
+		/* Log file processing has been done. Errors here only prevent updating MD5 sums for */
+		/* a single file but do not affect function return value. */
+		char	*err_tmp = NULL;
+		int	k;
+
+		for (k = 0; k < logfiles_num; k++)
+		{
+			if (MAX_LEN_MD5 > logfiles[k].md5_block_size &&
+					logfiles[k].size > (zbx_uint64_t)logfiles[k].md5_block_size)
+			{
+				int		f, new_md5_block_size = (int)MIN(MAX_LEN_MD5, logfiles[k].size);
+				size_t		new_last_block_offset;
+				md5_byte_t	new_first_block_md5[MD5_DIGEST_SIZE],
+						new_last_block_md5[MD5_DIGEST_SIZE];
+
+				if (-1 == (f = zbx_open(logfiles[k].filename, O_RDONLY)))
+					continue;
+
+				if (SUCCEED != file_part_md5(f, 0, new_md5_block_size, new_first_block_md5,
+						logfiles[k].filename, &err_tmp))
+				{
+					zbx_free(err_tmp);
+					goto clean;
+				}
+
+				if (0 < (new_last_block_offset = logfiles[k].size - (size_t)new_md5_block_size))
+				{
+					if (SUCCEED != file_part_md5(f, new_last_block_offset,
+							new_md5_block_size, new_last_block_md5, logfiles[k].filename,
+							&err_tmp))
+					{
+						zbx_free(err_tmp);
+						goto clean;
+					}
+				}
+				else	/* file is small, set the last block MD5 equal to the first block's one */
+					memcpy(new_last_block_md5, new_first_block_md5, sizeof(new_last_block_md5));
+
+				logfiles[k].md5_block_size = new_md5_block_size;
+				logfiles[k].last_block_offset = new_last_block_offset;
+
+				memcpy(logfiles[k].first_block_md5, new_first_block_md5,
+						sizeof(logfiles[k].first_block_md5));
+				memcpy(logfiles[k].last_block_md5, new_last_block_md5,
+						sizeof(logfiles[k].last_block_md5));
+clean:
+				if (0 != close(f))
+					continue;
+			}
+		}
+
 		*logfiles_new = logfiles;
+	}
 out:
 	if (0.0f != max_delay)
 	{
@@ -3373,9 +3637,9 @@ static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *
 	}
 
 	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags))
-		max_parameter_num = 7;	/* log.count or logrt.count */
+		max_parameter_num = 8;	/* log.count or logrt.count */
 	else
-		max_parameter_num = 8;	/* log or logrt */
+		max_parameter_num = 9;	/* log or logrt */
 
 	if (max_parameter_num < parameter_num)
 	{
@@ -3387,8 +3651,6 @@ static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: init_max_lines_per_sec                                           *
  *                                                                            *
  * Comments: thread-safe if CONFIG_MAX_LINES_PER_SECOND is updated when log   *
  *           checks are not running                                           *
@@ -3502,9 +3764,57 @@ err:
 	return FAIL;
 }
 
+static int	init_persistent_dir_parameter(const char *server, unsigned short port, const char *item_key,
+		int is_count_item, const AGENT_REQUEST *request, char **persistent_file_name, char **error)
+{
+	/* <persistent_dir> is parameter 8 for log[], logrt[], but parameter 7 for log.count[], logrt.count[] */
+	/* (here counting starts from 0) */
+
+	const int	persistent_dir_param_nr = (0 == is_count_item) ? 8 : 7;
+	char		*persistent_dir;
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	char		*persistent_serv_dir;
+#endif
+
+	if (NULL == (persistent_dir = get_rparam(request, persistent_dir_param_nr)) || '\0' == *persistent_dir)
+		return SUCCEED;
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	ZBX_UNUSED(server);
+	ZBX_UNUSED(port);
+	ZBX_UNUSED(item_key);
+	ZBX_UNUSED(persistent_file_name);
+
+	*error = zbx_dsprintf(*error, "The %s parameter (persistent directory) is not supported on Microsoft Windows.",
+			(8 == persistent_dir_param_nr) ? "ninth" : "eighth");
+	return FAIL;
+#else
+	if (NULL != *persistent_file_name)	/* name is set, so all preparation has been done earlier */
+		return SUCCEED;
+
+	/* set up directory for persistent file */
+
+	if (SUCCEED != is_ascii_string(persistent_dir))		/* reject non-ASCII directory name */
+	{
+		*error = zbx_dsprintf(*error, "Invalid %s parameter. It contains non-ASCII characters.",
+				(8 == persistent_dir_param_nr) ? "ninth" : "eighth");
+		return FAIL;
+	}
+
+	if (NULL == (persistent_serv_dir = zbx_create_persistent_server_directory(persistent_dir, server, port, error)))
+		return FAIL;
+
+	*persistent_file_name = zbx_make_persistent_file_name(persistent_serv_dir, item_key);
+
+	zbx_free(persistent_serv_dir);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): set persistent_file_name:[%s]", __func__, *persistent_file_name);
+
+	return SUCCEED;
+#endif
+}
+
 /******************************************************************************
- *                                                                            *
- * Function: process_log_check                                                *
  *                                                                            *
  * Comments: Function body is thread-safe if CONFIG_HOSTNAME is not updated   *
  *           while log checks are running. Uses callback function             *
@@ -3513,9 +3823,9 @@ err:
  *           comments.                                                        *
  *                                                                            *
  ******************************************************************************/
-int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
-		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
-		char **error)
+int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
+		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -3535,10 +3845,10 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 	init_request(&request);
 
 	/* Expected parameters by item: */
-	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>] 8 params */
-	/* log.count  [file,       <regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>] 7 params */
-	/* logrt      [file_regexp,<regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>] 8 params */
-	/* logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>] 7 params */
+	/* log        [file,       <regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>,<persistent_dir>] 9 params */
+	/* log.count  [file,       <regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>,<persistent_dir>] 8 params */
+	/* logrt      [file_regexp,<regexp>,<encoding>,<maxlines>,    <mode>,<output>,<maxdelay>, <options>,<persistent_dir>] 9 params */
+	/* logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,         <maxdelay>, <options>,<persistent_dir>] 8 params */
 
 	if (SUCCEED != parse_item_key(metric->key, &request))
 	{
@@ -3610,6 +3920,22 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 	if (SUCCEED != init_rotation_type(metric->flags, &request, &rotation_type, error))
 		goto out;
 
+	/* parameter 'persistent_dir' */
+	if (NULL != addrs)	/* When process_log_check() is called in C agent it receives 'addrs' argument with  */
+				/* server hostname or IP address and port number where to send matching records.    */
+				/* When process_log_check() is called in Agent2 (Golang) the 'addrs' argument is    */
+				/* NULL and the 'agent2_result' argument is used to pass an address of buffer where */
+				/* to store the matching records in memory. Currently Agent2 does not support       */
+				/* persistent files therefore skip init_persistent_dir_parameter().                 */
+	{
+		if (SUCCEED != init_persistent_dir_parameter(((zbx_addr_t *)addrs->values[0])->ip,
+				((zbx_addr_t *)addrs->values[0])->port, metric->key, is_count_item, &request,
+				&metric->persistent_file_name, error))
+		{
+			goto out;
+		}
+	}
+
 	/* jumping over fast growing log files is not supported with 'copytruncate' */
 	if (ZBX_LOG_ROTATION_LOGCPT == rotation_type && 0.0f != max_delay)
 	{
@@ -3646,12 +3972,89 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 		/* not be sent to server. */
 	}
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	/* recover state from persistent file only if agent has no already established state */
+	if (0 != (ZBX_METRIC_FLAG_NEW & metric->flags) && NULL != metric->persistent_file_name &&
+			0 == metric->logfiles_num)
+	{
+		/* try to restore state from persistent file */
+		char	*err_msg = NULL;
+		char	buf[MAX_STRING_LEN];
+
+		if (SUCCEED == zbx_read_persistent_file(metric->persistent_file_name, buf, sizeof(buf), &err_msg))
+		{
+			zbx_uint64_t	processed_size_tmp = 0;
+			int		mtime_tmp = 0;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): item \"%s\": persistent file \"%s\" found, data:[%s]",
+					__func__, metric->key, metric->persistent_file_name, buf);
+
+			if (SUCCEED == zbx_restore_file_details(buf, &metric->logfiles, &metric->logfiles_num,
+					&processed_size_tmp, &mtime_tmp, &err_msg))
+			{
+				/* If 'lastlogsize' value from server is not equal to 'processed_size' from   */
+				/* persistent file then give priority to persistent file to prevent unwanted  */
+				/* re-reading of log file records. */
+				/* For 'mtime' give priority to persistent file only if server sent a smaller */
+				/* 'mtime' value' (unusual case, it should not happen). The value of 'mtime'  */
+				/* from server larger than 'mtime' from persistent file most likely means     */
+				/* that some other agent instance has analyzed log files up to server-supplied */
+				/* 'mtime' and the current instance needs not to start analysis from 'mtime'  */
+				/* restored from persistent file. */
+
+				if (metric->lastlogsize != processed_size_tmp || metric->mtime < mtime_tmp)
+				{
+					char	*msg = NULL;
+					size_t	msg_alloc = 0, msg_offset = 0;
+
+					zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): item \"%s\":"
+							" overriding", __func__, metric->key);
+
+					if (metric->lastlogsize != processed_size_tmp)
+					{
+						zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset,
+								" lastlogsize: " ZBX_FS_UI64 " -> " ZBX_FS_UI64,
+								metric->lastlogsize, processed_size_tmp);
+
+						metric->lastlogsize = processed_size_tmp;
+					}
+
+					if (metric->mtime < mtime_tmp)
+					{
+						zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset,
+								" mtime: %d -> %d",
+								metric->mtime, mtime_tmp);
+
+						metric->mtime = mtime_tmp;
+					}
+
+					zabbix_log(LOG_LEVEL_WARNING, "%s from persistent file", msg);
+
+					zbx_free(msg);
+				}
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "%s(): item \"%s\": persistent file \"%s\" restore error:"
+						" %s", __func__, metric->key, metric->persistent_file_name, err_msg);
+				zbx_free(err_msg);
+			}
+		}
+		else
+		{
+			/* persistent file errors are not fatal */
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): item \"%s\": persistent file [%s] does not exist or error:"
+					" %s", __func__, metric->key, metric->persistent_file_name, err_msg);
+			zbx_free(err_msg);
+		}
+	}
+#endif
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
-			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
-			output_template, &p_count, &s_count, process_value_cb, addrs, CONFIG_HOSTNAME,
+			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
+			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, CONFIG_HOSTNAME,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
-			rotation_type);
+			rotation_type, metric->persistent_file_name, prep_vec);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
@@ -3677,7 +4080,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *regexps, ZBX_AC
 
 			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
 
-			if (SUCCEED == process_value_cb(addrs, CONFIG_HOSTNAME, metric->key_orig, buf,
+			if (SUCCEED == process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
 					metric->flags | ZBX_METRIC_FLAG_PERSISTENT) || 0 != jumped)
 			{
@@ -3738,4 +4141,26 @@ out:
 	free_request(&request);
 
 	return ret;
+}
+
+struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *logfiles, int logfiles_num)
+{
+	int	i, max_seq = -1, last_file_idx = 0;
+
+	if (1 == logfiles_num)
+		return logfiles;
+
+	/* The last (at least partially) processed file is the one with the maximum 'seq' value. */
+	/* If no any file is processed then return pointer to the list first element. */
+
+	for (i = 0; i < logfiles_num; i++)
+	{
+		if (max_seq < logfiles[i].seq)
+		{
+			max_seq = logfiles[i].seq;
+			last_file_idx = i;
+		}
+	}
+
+	return logfiles + last_file_idx;
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -453,19 +453,23 @@
 
 				if (ms.options.popup.parameters !== undefined) {
 					ms.select_button.on('click', function(event) {
-						var popup_options = ms.options.popup.parameters;
+						var parameters = ms.options.popup.parameters;
 
 						if (ms.options.popup.filter_preselect_fields) {
-							popup_options = jQuery.extend(popup_options, getFilterPreselectField($obj, MS_ACTION_POPUP));
+							parameters = jQuery.extend(parameters, getFilterPreselectField($obj, MS_ACTION_POPUP));
 						}
 
-						if (typeof popup_options['disable_selected'] !== 'undefined' && popup_options['disable_selected']) {
-							popup_options['disableids'] = Object.keys(ms.values.selected);
+						if (typeof parameters['disable_selected'] !== 'undefined' && parameters['disable_selected']) {
+							parameters['disableids'] = Object.keys(ms.values.selected);
 						}
 
-						// Click used instead focus because in patternselect listen only click.
+						// Click used instead focus because in patternselect only click is listened for.
 						$('input[type="text"]', $obj).click();
-						return PopUp('popup.generic', popup_options, null, event.target);
+
+						return PopUp('popup.generic', parameters, {
+							dialogue_class: 'modal-popup-generic',
+							trigger_element: event.target
+						});
 					});
 				}
 
@@ -875,7 +879,6 @@
 		var ms = $obj.data('multiSelect'),
 			is_new = item.isNew || false,
 			prefix = item.prefix || '',
-			search = ms.values.search.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/[*]/g, '\\\*?'),
 			$li = $('<li>', {
 				'data-id': item.id,
 				'data-label': prefix + item.name
@@ -893,11 +896,38 @@
 		}
 
 		// Highlight matched.
-		$li
-			.append(item.name.replace(new RegExp(search, 'gi'), function(match) {
-				return '<span' + (!is_new ? ' class="suggest-found"' : '') + '>' + match + '</span>';
-			}))
-			.toggleClass('suggest-new', is_new);
+		if (ms.values.search !== item.name) {
+			var text = item.name.toLowerCase(),
+				search = ms.values.search.toLowerCase().replace(/[*]+/g, ''),
+				start = 0,
+				end = 0;
+
+			while (search !== '' && text.indexOf(search, end) > -1) {
+				end = text.indexOf(search, end);
+
+				if (end > start) {
+					$li.append(document.createTextNode(item.name.substring(start, end)));
+				}
+
+				$li.append($('<span>', {
+					class: !is_new ? 'suggest-found' : '',
+					text: item.name.substring(end, end + search.length)
+				})).toggleClass('suggest-new', is_new);
+
+				end += search.length;
+				start = end;
+			}
+
+			if (end < item.name.length) {
+				$li.append(document.createTextNode(item.name.substring(end, item.name.length)));
+			}
+		}
+		else {
+			$li.append($('<span>', {
+				class: !is_new ? 'suggest-found' : '',
+				text: item.name
+			})).toggleClass('suggest-new', is_new);
+		}
 
 		$('ul', ms.values.available_div).append($li);
 	}

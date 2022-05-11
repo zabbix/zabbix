@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 41-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,8 +111,6 @@ class testServiceRoles extends CIntegrationTest {
 		$response = $this->call('service.create', [
 			'name' => 'Parent',
 			'algorithm' => 1,
-			'goodsla' => 99.99,
-			'showsla' => 0,
 			'weight' => 0,
 			'sortorder' => 0
 		]);
@@ -124,8 +122,6 @@ class testServiceRoles extends CIntegrationTest {
 		$response = $this->call('service.create', [
 			'name' => 'Child 1',
 			'algorithm' => 1,
-			'goodsla' => 99.99,
-			'showsla' => 0,
 			'weight' => 0,
 			'sortorder' => 0,
 			'tags' => [
@@ -150,8 +146,6 @@ class testServiceRoles extends CIntegrationTest {
 		$response = $this->call('service.create', [
 			'name' => 'Child 2',
 			'algorithm' => 1,
-			'goodsla' => 99.99,
-			'showsla' => 0,
 			'weight' => 0,
 			'sortorder' => 0,
 			'parents' => [
@@ -166,8 +160,6 @@ class testServiceRoles extends CIntegrationTest {
 		$response = $this->call('service.create', [
 			'name' => 'Child 1-1',
 			'algorithm' => 1,
-			'goodsla' => 99.99,
-			'showsla' => 0,
 			'weight' => 0,
 			'sortorder' => 0,
 			'parents' => [
@@ -555,7 +547,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
-			'goodsla' => 33.3
+			'sortorder' => 1
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertCount(1, $response['result']['serviceids']);
@@ -581,7 +573,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
-			'goodsla' => 31.3
+			'sortorder' => 1
 		], 'Cannot update service "Parent": read-write access to the service is required.');
 
 		$response = $this->call('service.get', [
@@ -635,7 +627,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
-			'goodsla' => 33.3
+			'sortorder' => 1
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertCount(1, $response['result']['serviceids']);
@@ -657,7 +649,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('service.update', [
 			'serviceid' => self::$parent_serviceid,
-			'goodsla' => 31.3
+			'sortorder' => 1
 		], 'Cannot update service "Parent": read-write access to the service is required.');
 
 		$response = $this->call('service.get', [
@@ -716,7 +708,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('service.update', [
 			'serviceid' => self::$child1_1_serviceid,
-			'goodsla' => 33.3
+			'sortorder' => 1
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
 		$this->assertCount(1, $response['result']['serviceids']);
@@ -743,7 +735,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('service.update', [
 			'serviceid' => self::$child1_1_serviceid,
-			'goodsla' => 31.3
+			'sortorder' => 1
 		], 'Cannot update service "Child 1-1": read-write access to the service is required.');
 
 		$response = $this->call('service.get', [
@@ -776,7 +768,7 @@ class testServiceRoles extends CIntegrationTest {
 
 		$response = $this->call('service.update', [
 			'serviceid' => self::$child1_1_serviceid,
-			'goodsla' => 31.3
+			'sortorder' => 1
 		], 'Cannot update service "Child 1-1": read-write access to the service is required.');
 
 		$response = $this->call('service.get', [

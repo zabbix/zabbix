@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -332,7 +332,7 @@ class CScreenProblem extends CScreenBase {
 
 		if ($show_opdata && $data['triggers']) {
 			$items = API::Item()->get([
-				'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+				'output' => ['itemid', 'name', 'value_type', 'units'],
 				'selectValueMap' => ['mappings'],
 				'triggerids' => array_keys($data['triggers']),
 				'webitems' => true,
@@ -586,11 +586,6 @@ class CScreenProblem extends CScreenBase {
 			// Sort items.
 			if ($filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE) {
 				$data['triggers'] = CMacrosResolverHelper::sortItemsByExpressionOrder($data['triggers']);
-
-				foreach ($data['triggers'] as &$trigger) {
-					$trigger['items'] = CMacrosResolverHelper::resolveItemNames($trigger['items']);
-				}
-				unset($trigger);
 			}
 		}
 
@@ -700,8 +695,8 @@ class CScreenProblem extends CScreenBase {
 			if ($clock < $today) {
 				$breakpoint = _('Today');
 			}
-			elseif (strftime('%H', $last_clock) != strftime('%H', $clock)) {
-				$breakpoint = strftime('%H:00', $last_clock);
+			elseif (date('H', $last_clock) != date('H', $clock)) {
+				$breakpoint = date('H:00', $last_clock);
 			}
 		}
 		elseif ($last_clock >= $yesterday) {
@@ -710,10 +705,10 @@ class CScreenProblem extends CScreenBase {
 			}
 		}
 		elseif ($last_clock >= $this_year && $clock < $this_year) {
-			$breakpoint = strftime('%Y', $last_clock);
+			$breakpoint = date('Y', $last_clock);
 		}
-		elseif (strftime('%Y%m', $last_clock) != strftime('%Y%m', $clock)) {
-			$breakpoint = getMonthCaption(strftime('%m', $last_clock));
+		elseif (date('Ym', $last_clock) != date('Ym', $clock)) {
+			$breakpoint = getMonthCaption(date('m', $last_clock));
 		}
 
 		if ($breakpoint !== null) {
@@ -832,20 +827,20 @@ class CScreenProblem extends CScreenBase {
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
-				if ($this->data['filter']['show_tags'] == PROBLEMS_SHOW_TAGS_NONE) {
+				if ($this->data['filter']['show_tags'] == SHOW_TAGS_NONE) {
 					$tags_header = null;
 				}
 				else {
 					$tags_header = (new CColHeader(_('Tags')));
 
 					switch ($this->data['filter']['show_tags']) {
-						case PROBLEMS_SHOW_TAGS_1:
+						case SHOW_TAGS_1:
 							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
 							break;
-						case PROBLEMS_SHOW_TAGS_2:
+						case SHOW_TAGS_2:
 							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
 							break;
-						case PROBLEMS_SHOW_TAGS_3:
+						case SHOW_TAGS_3:
 							$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
 							break;
 					}
@@ -898,7 +893,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($this->data['filter']['show_tags']) {
 				$tags = makeTags($data['problems'], true, 'eventid', $this->data['filter']['show_tags'],
-					array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [],
+					array_key_exists('tags', $this->data['filter']) ? $this->data['filter']['tags'] : [], null,
 					$this->data['filter']['tag_name_format'], $this->data['filter']['tag_priority']
 				);
 			}
@@ -1009,7 +1004,7 @@ class CScreenProblem extends CScreenBase {
 				if ($this->data['filter']['compact_view'] && $this->data['filter']['show_suppressed']
 						&& count($info_icons) > 1) {
 					$cell_info = (new CButton(null))
-						->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+						->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
 						->addStyle('margin-left: -3px;')
 						->setHint(makeInformationList($info_icons));
 				}
@@ -1112,10 +1107,10 @@ class CScreenProblem extends CScreenBase {
 					$show_recovery_data ? $cell_status : null,
 					$cell_info,
 					$this->data['filter']['compact_view']
-						? (new CDiv($triggers_hosts[$trigger['triggerid']]))->addClass('action-container')
+						? (new CDiv($triggers_hosts[$trigger['triggerid']]))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 						: $triggers_hosts[$trigger['triggerid']],
 					$this->data['filter']['compact_view']
-						? (new CDiv($description))->addClass('action-container')
+						? (new CDiv($description))->addClass(ZBX_STYLE_ACTION_CONTAINER)
 						: $description,
 					($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? $opdata : null,
 					($problem['r_eventid'] != 0)
@@ -1292,7 +1287,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($html) {
 				$hint_table->addRow([
-					new CCol($item['name_expanded']),
+					new CCol($item['name']),
 					new CCol(
 						($last_value['clock'] !== null)
 							? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])

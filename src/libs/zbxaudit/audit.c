@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "audit.h"
+
 #include "log.h"
 #include "zbxjson.h"
 #include "dbcache.h"
 
-#include "audit.h"
-
-#define AUDIT_USERID	0
-#define AUDIT_USERNAME	"System"
-#define AUDIT_IP	""
+#define AUDIT_USERID		__UINT64_C(0)
+#define AUDIT_USERID_SQL	"null"
+#define AUDIT_USERNAME		"System"
+#define AUDIT_IP		""
 
 static int		audit_mode;
 static zbx_hashset_t	zbx_audit;
@@ -159,8 +160,6 @@ static void	delete_json(struct zbx_json *json, const char *audit_op, const char 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_auditlog_global_script                                       *
  *                                                                            *
  * Purpose: record global script execution results into audit log             *
  *                                                                            *
@@ -371,8 +370,8 @@ int	zbx_audit_flush_once(void)
 
 		ret = DBexecute_once("insert into auditlog (auditid,userid,username,"
 				"clock,action,ip,%s,resourcename,resourcetype,recordsetid,details) values"
-				" ('%s',%d,'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
-				pfield, (*audit_entry)->audit_cuid, AUDIT_USERID, AUDIT_USERNAME, (int)time(NULL),
+				" ('%s'," AUDIT_USERID_SQL ",'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
+				pfield, (*audit_entry)->audit_cuid, AUDIT_USERNAME, (int)time(NULL),
 				(*audit_entry)->audit_action, AUDIT_IP, pvalue, name_esc, (*audit_entry)->resource_type,
 				recsetid_cuid, 0 == strcmp(details_esc, "{}") ? "" : details_esc);
 
@@ -665,5 +664,3 @@ void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const
 
 	va_end(args);
 }
-
-

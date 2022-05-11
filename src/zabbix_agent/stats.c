@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "stats.h"
-#include "log.h"
-#include "zbxconf.h"
 
-#ifndef _WINDOWS
-#	include "diskdevices.h"
-#endif
-#include "cfg.h"
+#include "log.h"
+
 #include "mutexs.h"
 
 #ifdef _WINDOWS
@@ -35,11 +30,6 @@
 extern int get_cpu_num_win32(void);
 #else
 #	include "daemon.h"
-#	include "ipc.h"
-#endif
-
-#if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
-#	include "zbxkstat.h"
 #endif
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
@@ -56,14 +46,10 @@ zbx_mutex_t		diskstats_lock = ZBX_MUTEX_NULL;
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_cpu_num                                                  *
- *                                                                            *
  * Purpose: returns the number of processors which are currently online       *
  *          (i.e., available).                                                *
  *                                                                            *
  * Return value: number of CPUs                                               *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_get_cpu_num(void)
@@ -130,11 +116,7 @@ return_one:
 
 /******************************************************************************
  *                                                                            *
- * Function: init_collector_data                                              *
- *                                                                            *
  * Purpose: Allocate memory for collector                                     *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Unix version allocates memory as shared.                         *
  *                                                                            *
@@ -223,11 +205,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: free_collector_data                                              *
- *                                                                            *
  * Purpose: Free memory allocated for collector                               *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *
@@ -265,8 +243,6 @@ void	free_collector_data(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: diskstat_shm_init                                                *
- *                                                                            *
  * Purpose: Allocate shared memory for collecting disk statistics             *
  *                                                                            *
  ******************************************************************************/
@@ -301,8 +277,6 @@ void	diskstat_shm_init(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diskstat_shm_reattach                                            *
  *                                                                            *
  * Purpose: If necessary, reattach to disk statistics shared memory segment.  *
  *                                                                            *
@@ -343,8 +317,6 @@ void	diskstat_shm_reattach(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: diskstat_shm_extend                                              *
  *                                                                            *
  * Purpose: create a new, larger disk statistics shared memory segment and    *
  *          copy data from the old one.                                       *
@@ -417,11 +389,7 @@ void	diskstat_shm_extend(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: collector_thread                                                 *
- *                                                                            *
  * Purpose: Collect system information                                        *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "evalfunc_common.h"
+
 #include "common.h"
 #include "log.h"
 #include "zbxtrends.h"
-
-#include "evalfunc_common.h"
 
 const char	*zbx_type_string(zbx_value_type_t type)
 {
@@ -101,8 +101,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_function_parameter_hist_range                                *
- *                                                                            *
  * Purpose: get the value of sec|num + timeshift trigger function parameter   *
  *                                                                            *
  * Parameters: from           - [IN] the function calculation time            *
@@ -168,12 +166,6 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() invalid timeshift value:%s", __func__,
 					zbx_strerror(errno));
-			goto out;
-		}
-
-		if (end >= from)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() timeshift produced time in future", __func__);
 			goto out;
 		}
 

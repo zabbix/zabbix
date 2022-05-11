@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ static void	mock_accept(zbx_socket_t *s)
 			break;
 		default:
 			fail_msg("Unexpected family");
+			return;
 	}
 
 	if (1 != inet_pton(s->peer_info.ss_family, (peer = zbx_mock_get_parameter_string("in.peer")), buf))

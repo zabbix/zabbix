@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,12 +50,6 @@ class CGraphManager {
 		} while ($parent_graphids);
 
 		$del_graphids = array_keys($del_graphids);
-
-		DB::delete('profiles', [
-			'idx' => 'web.favorite.graphids',
-			'source' => 'graphid',
-			'value_id' => $del_graphids
-		]);
 
 		DB::delete('profiles', [
 			'idx' => 'web.latest.graphid',

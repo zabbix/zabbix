@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYSINFO_COMMON_FILE_H
 #define ZABBIX_SYSINFO_COMMON_FILE_H
 
-#include "sysinfo.h"
+#include "module.h"
 
 #define MAX_FILE_LEN (1024 * 1024)
 

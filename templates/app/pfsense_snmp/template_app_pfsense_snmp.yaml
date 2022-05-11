@@ -1,0 +1,4002 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-13T22:23:06Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 16f281aeb8904d3db8b66dda94611fcc
+      template: 'PFSense SNMP'
+      name: 'PFSense SNMP'
+      description: |
+        Template for monitoring pfSense by SNMP
+        Setup:
+          1. Enable SNMP daemon at Services in pfSense web interface https://docs.netgate.com/pfsense/en/latest/services/snmp.html
+          2. Setup firewall rule to get access from Zabbix proxy or Zabbix server by SNMP https://docs.netgate.com/pfsense/en/latest/firewall/index.html#managing-firewall-rules
+          3. Link template to the host
+        
+        
+        MIBs used:
+        BEGEMOT-PF-MIB
+        HOST-RESOURCES-MIB
+        SNMPv2-MIB
+        UCD-DISKIO-MIB
+        UCD-SNMP-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 2257828f22fd4b5ea7ffffc1c4296674
+          name: 'PFSense: ICMP ping'
+          type: SIMPLE
+          key: icmpping
+          history: 7d
+          description: |
+            Host accessibility by ICMP.
+            0 - ICMP ping fails.
+            1 - ICMP ping successful.
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 8bf17f0b4f0642d48d76ea3add39ae23
+              expression: 'max(/PFSense SNMP/icmpping,#3)=0'
+              name: 'PFSense: Unavailable by ICMP ping'
+              priority: HIGH
+              description: 'Last three attempts returned timeout.  Please check device connectivity.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: b70284fd74b246da83e262ed66449612
+          name: 'PFSense: ICMP loss'
+          type: SIMPLE
+          key: icmppingloss
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: 'Percentage of lost packets.'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: e02cf70bf2744d61abf8d770cc568867
+              expression: 'min(/PFSense SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/PFSense SNMP/icmppingloss,5m)<100'
+              name: 'PFSense: High ICMP ping loss'
+              opdata: 'Loss: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'ICMP packets loss detected.'
+              dependencies:
+                -
+                  name: 'PFSense: Unavailable by ICMP ping'
+                  expression: 'max(/PFSense SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: d1493a3c5a634ffb99aa031d134d07ad
+          name: 'PFSense: ICMP response time'
+          type: SIMPLE
+          key: icmppingsec
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'ICMP ping response time (in seconds).'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 364ec24b0c88416fb2575a6b06340ec7
+              expression: 'avg(/PFSense SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}'
+              name: 'PFSense: High ICMP ping response time'
+              opdata: 'Value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Average ICMP response time is too big.'
+              dependencies:
+                -
+                  name: 'PFSense: Unavailable by ICMP ping'
+                  expression: 'max(/PFSense SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: a2a331bc385344a1877a45f3887b7d91
+          name: 'PFSense: DHCP server status'
+          type: SNMP_AGENT
+          snmp_oid: '.1.3.6.1.2.1.25.4.2.1.7["index",".1.3.6.1.2.1.25.4.2.1.2","dhcpd"]'
+          key: pfsense.dhcpd.status
+          history: 7d
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The status of DHCP server process.
+          valuemap:
+            name: 'Services status'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          tags:
+            -
+              tag: component
+              value: application
+          triggers:
+            -
+              uuid: 80fc3672290d45d49c250ccc120f3606
+              expression: 'last(/PFSense SNMP/pfsense.dhcpd.status)=0'
+              name: 'PFSense: DHCP server is not running'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Please check DHCP server settings https://docs.netgate.com/pfsense/en/latest/services/dhcp/index.html'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 6a03330a20354f76b8496b9a8eac0c0a
+          name: 'PFSense: DNS server status'
+          type: SNMP_AGENT
+          snmp_oid: '.1.3.6.1.2.1.25.4.2.1.7["index",".1.3.6.1.2.1.25.4.2.1.2","unbound"]'
+          key: pfsense.dns.status
+          history: 7d
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The status of DNS server process.
+          valuemap:
+            name: 'Services status'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          tags:
+            -
+              tag: component
+              value: application
+          triggers:
+            -
+              uuid: 67b862f6aa3a4833af44d513aad517b5
+              expression: 'last(/PFSense SNMP/pfsense.dns.status)=0'
+              name: 'PFSense: DNS server is not running'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Please check DNS server settings https://docs.netgate.com/pfsense/en/latest/services/dns/index.html'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 18a8140ca46a47e0b4a3612be5338ada
+          name: 'PFSense: State of nginx process'
+          type: SNMP_AGENT
+          snmp_oid: '.1.3.6.1.2.1.25.4.2.1.7["index",".1.3.6.1.2.1.25.4.2.1.2","nginx"]'
+          key: pfsense.nginx.status
+          history: 7d
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            The status of nginx process.
+          valuemap:
+            name: 'Services status'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          tags:
+            -
+              tag: component
+              value: application
+          triggers:
+            -
+              uuid: 9f7a47055ee64edcbb70b047a35f7774
+              expression: 'last(/PFSense SNMP/pfsense.nginx.status)=0'
+              name: 'PFSense: Web server is not running'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Please check nginx service status.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 3739cb57166343e3955d00fa31d55bd3
+          name: 'PFSense: Packets with bad offset'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.2.0
+          key: pfsense.packets.bad.offset
+          history: 7d
+          value_type: FLOAT
+          units: pps
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 519dbf4fa71b48e8b70c1260caffea14
+          name: 'PFSense: Fragmented packets'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.3.0
+          key: pfsense.packets.fragment
+          history: 7d
+          value_type: FLOAT
+          units: pps
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: d4a0686adfa7421ea472e64d94bee70b
+          name: 'PFSense: Packets matched a filter rule'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.1.0
+          key: pfsense.packets.match
+          history: 7d
+          value_type: FLOAT
+          units: pps
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: ca30df62467645b6a04f791bf22d7b91
+          name: 'PFSense: Packets dropped due to memory limitation'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.6.0
+          key: pfsense.packets.mem.drop
+          history: 7d
+          value_type: FLOAT
+          units: pps
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 82360caa98ca4f209499db3c55b0c330
+          name: 'PFSense: Normalized packets'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.5.0
+          key: pfsense.packets.normalize
+          history: 7d
+          value_type: FLOAT
+          units: pps
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: cf4fbeeb1a6a4d9dbb69adf90b54de3a
+          name: 'PFSense: Short packets'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.2.4.0
+          key: pfsense.packets.short
+          history: 7d
+          value_type: FLOAT
+          units: pps
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            True if the packet was logged with the specified packet filter reason code. The known codes are: match, bad-offset, fragment, short, normalize, and memory.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 600896282920468baf2e47ab75ee9b31
+          name: 'PFSense: Packet filter running status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.1.1.0
+          key: pfsense.pf.status
+          history: 7d
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            True if packet filter is currently enabled.
+          valuemap:
+            name: 'SNMPv2-TC::TruthValue'
+          tags:
+            -
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: 4a7ff4c437054ce88c6c069ffcb6434f
+              expression: 'last(/PFSense SNMP/pfsense.pf.status)<>1'
+              name: 'PFSense: Packet filter is not running'
+              opdata: 'Current running state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Please check PF status.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 6d0cf4a1a284453991e12daf921fed9a
+          name: 'PFSense: Firewall rules count'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.12325.1.200.1.11.1.0
+          key: pfsense.rules.count
+          history: 7d
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            The number of labeled filter rules on this system.
+          tags:
+            -
+              tag: component
+              value: firewall
+        -
+          uuid: c13b50c508e04851baf09c1c865241fc
+          name: 'PFSense: Source tracking table current'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.4.1.0
+          key: pfsense.source.tracking.table.count
+          history: 7d
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            Number of entries in the source tracking table.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 58e12f73fd4243a89d62bbdc7e307cf9
+          name: 'PFSense: Source tracking table limit'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.5.2.0
+          key: pfsense.source.tracking.table.limit
+          history: 7d
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            Maximum number of 'sticky-address' or 'source-track' rules in the ruleset.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 8fb3a344b39241bbb3bf78092fa17ec8
+          name: 'PFSense: Source tracking table utilization in %'
+          type: CALCULATED
+          key: pfsense.source.tracking.table.pused
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: 'last(//pfsense.source.tracking.table.count) * 100 / last(//pfsense.source.tracking.table.limit)'
+          description: 'Utilization of source tracking table in %.'
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 7983ee28646d4327ae0814c88c7b213f
+              expression: 'min(/PFSense SNMP/pfsense.source.tracking.table.pused,#3)>{$SOURCE.TRACKING.TABLE.UTIL.MAX}'
+              name: 'PFSense: Source tracking table usage is high'
+              event_name: 'PFSense: Source tracking table usage more than {$SOURCE.TRACKING.TABLE.UTIL.MAX}.'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Please check the number of sticky connections https://docs.netgate.com/pfsense/en/latest/monitoring/status/firewall-states-sources.html'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+        -
+          uuid: f0eab94d244b46c29363b630850ed709
+          name: 'PFSense: States table current'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.3.1.0
+          key: pfsense.state.table.count
+          history: 7d
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            Number of entries in the state table.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 8500a1db240b48d7bca514371a89c641
+          name: 'PFSense: States table limit'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.12325.1.200.1.5.1.0
+          key: pfsense.state.table.limit
+          history: 7d
+          description: |
+            MIB: BEGEMOT-PF-MIB
+            Maximum number of 'keep state' rules in the ruleset.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 5e96cadaafca4e51ad62dba4fec5220a
+          name: 'PFSense: States table utilization in %'
+          type: CALCULATED
+          key: pfsense.state.table.pused
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: 'last(//pfsense.state.table.count) * 100 / last(//pfsense.state.table.limit)'
+          description: 'Utilization of state table in %.'
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: ce0e7dec597e4148abd9b699c787decd
+              expression: 'min(/PFSense SNMP/pfsense.state.table.pused,#3)>{$STATE.TABLE.UTIL.MAX}'
+              name: 'PFSense: State table usage is high'
+              event_name: 'PFSense: State table usage more than {$STATE.TABLE.UTIL.MAX}.'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Please check the number of connections https://docs.netgate.com/pfsense/en/latest/config/advanced-firewall-nat.html#config-advanced-firewall-maxstates'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+        -
+          uuid: ef15deb6c36945b281a152e2af39dd1d
+          name: 'PFSense: System contact details'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.4.0
+          key: system.contact
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 44da130c834d476b884a5cfec2ef53cd
+          name: 'PFSense: Interrupts per second'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.11.59.0
+          key: system.cpu.intr
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            Number of interrupts processed.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 2d426f9553de4c01bf3e92b72a0ef8d5
+          name: 'PFSense: Load average (1m avg)'
+          type: SNMP_AGENT
+          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-1"]'
+          key: system.cpu.load.avg1
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            The 1 minute load averages.
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 371cfe5f4cc64582a7d9dacba183c0ea
+          name: 'PFSense: Load average (5m avg)'
+          type: SNMP_AGENT
+          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-5"]'
+          key: system.cpu.load.avg5
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            The 5 minutes load averages.
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: e160d773f3814cba89c8729f2b0354f8
+          name: 'PFSense: Load average (15m avg)'
+          type: SNMP_AGENT
+          snmp_oid: '1.3.6.1.4.1.2021.10.1.3["index","1.3.6.1.4.1.2021.10.1.2", "Load-15"]'
+          key: system.cpu.load.avg15
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            The 15 minutes load averages.
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 8b9cc8b5ab164399a56169ed0603a804
+          name: 'PFSense: Number of CPUs'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]'
+          key: system.cpu.num
+          history: 7d
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD.
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //count the number of cores
+                  return JSON.parse(value).length;
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: c476e9b090284cb6aaee6cd3fdcd1b88
+          name: 'PFSense: Context switches per second'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.11.60.0
+          key: system.cpu.switches
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: UCD-SNMP-MIB
+            Number of context switches.
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: e7038a49caec4d5293ceb2a18c1d839e
+          name: 'PFSense: System description'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: system.descr
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            System description of the host.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: cec39a0105434fbeb30529763a7298bb
+          name: 'PFSense: System location'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.6.0
+          key: system.location
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The physical location of this node. If the location is unknown, the value is the zero-length string.
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 8c3afc62530e457da1e2d057c96fc442
+          name: 'PFSense: System name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.5.0
+          key: system.name
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            System host name.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: d00224077a90496099c2622e3c662624
+              expression: 'last(/PFSense SNMP/system.name,#1)<>last(/PFSense SNMP/system.name,#2) and length(last(/PFSense SNMP/system.name))>0'
+              name: 'PFSense: System name has changed'
+              event_name: 'PFSense: System name has changed (new name: {ITEM.VALUE})'
+              priority: INFO
+              description: 'System name has changed. Ack to close.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: security
+        -
+          uuid: 6f1d5a86066d4f669a8c11f77fbc078d
+          name: 'PFSense: System object ID'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.2.0
+          key: system.objectid
+          delay: 15m
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: SNMPv2-MIB
+            The vendor authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining what kind of box is being managed.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 163e057ff21a40cba86fe7ac023d83b1
+          name: 'PFSense: Free swap space'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.4.0
+          key: system.swap.free
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The amount of swap space currently unused or available.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
+        -
+          uuid: db5dabf90df84ea19e1e164204eeefdc
+          name: 'PFSense: Free swap space in %'
+          type: CALCULATED
+          key: system.swap.pfree
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: 'last(//system.swap.free)/last(//system.swap.total)*100'
+          description: 'The free space of swap volume/file in percent.'
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 3a7282d75aea46a38def8dbb5e5018eb
+          name: 'PFSense: Total swap space'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.3.0
+          key: system.swap.total
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The total amount of swap space configured for this host.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+            -
+              tag: component
+              value: storage
+        -
+          uuid: 0979a3c35bf347a38b2c5a9dbc423325
+          name: 'PFSense: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.25.1.1.0
+          key: system.uptime
+          delay: 30s
+          history: 7d
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: SNMPv2-MIB
+            System uptime in 'N days, hh:mm:ss' format.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: 9da88806fff147f8aa7a79e526f0f7d1
+              expression: 'last(/PFSense SNMP/system.uptime)<10m'
+              name: 'PFSense: has been restarted'
+              event_name: 'PFSense: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 1cc1e018e6364da1bc7264501e668ce8
+          name: 'PFSense: Available memory'
+          type: CALCULATED
+          key: vm.memory.available
+          history: 7d
+          units: B
+          params: last(//vm.memory.free)+last(//vm.memory.buffers)+last(//vm.memory.cached)
+          description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 8d421b71ea5f453d9079596617b64d1f
+          name: 'PFSense: Memory (buffers)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.14.0
+          key: vm.memory.buffers
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The total amount of real or virtual memory currently allocated for use as memory buffers.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 83ae273de74b4779a66553e976d5fa6e
+          name: 'PFSense: Memory (cached)'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.15.0
+          key: vm.memory.cached
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The total amount of real or virtual memory currently allocated for use as cached memory.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 4efc067cae354030a8cbd1054671bdf7
+          name: 'PFSense: Free memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.6.0
+          key: vm.memory.free
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            The amount of real/physical memory currently unused or available.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 84705a5340d149cf8a0792a1eb997c8e
+          name: 'PFSense: Total memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2021.4.5.0
+          key: vm.memory.total
+          history: 7d
+          units: B
+          description: |
+            MIB: UCD-SNMP-MIB
+            Total memory in Bytes.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1024'
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: d0da8070297d49c3a44aeec984abd085
+          name: 'PFSense: Memory utilization'
+          type: CALCULATED
+          key: vm.memory.util
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: '(last(//vm.memory.total)-(last(//vm.memory.free)+last(//vm.memory.buffers)+last(//vm.memory.cached)))/last(//vm.memory.total)*100'
+          description: 'Please note that memory utilization is a rough estimate, since memory available is calculated as free+buffers+cached, which is not 100% accurate, but the best we can get using SNMP.'
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: 786ef350e20f4dfc9371a54e4ffeda63
+              expression: 'min(/PFSense SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+              name: 'PFSense: High memory utilization'
+              event_name: 'PFSense: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              dependencies:
+                -
+                  name: 'PFSense: Lack of available memory'
+                  expression: 'min(/PFSense SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/PFSense SNMP/vm.memory.total)>0'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 585c88310a704e119aa5fc7f7f9c3804
+          name: 'PFSense: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          description: |
+            Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - not available
+            1 - available
+            2 - unknown
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: d06bdb79a48c438798286a89680eb3e1
+              expression: 'max(/PFSense SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'PFSense: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              dependencies:
+                -
+                  name: 'PFSense: Unavailable by ICMP ping'
+                  expression: 'max(/PFSense SNMP/icmpping,#3)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      discovery_rules:
+        -
+          uuid: 47e148e6760145cc9288fa6b4e8d0013
+          name: 'CPU discovery'
+          type: DEPENDENT
+          key: cpu.discovery
+          delay: '0'
+          description: 'This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That''s the only reason why LLD is used.'
+          item_prototypes:
+            -
+              uuid: 404e2eab283f4c79a6c2c52684d363c8
+              name: 'PFSense: CPU idle time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.11.0
+              key: 'system.cpu.idle[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The time the CPU has spent doing nothing.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: 57a73880d8ff4779a2bbe9d774ad3fc8
+              name: 'PFSense: CPU interrupt time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.56.0
+              key: 'system.cpu.interrupt[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The amount of time the CPU has been servicing hardware interrupts.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: 01e84522bcfd4cc2834c6c196e887563
+              name: 'PFSense: CPU iowait time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.54.0
+              key: 'system.cpu.iowait[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                Amount of time the CPU has been waiting for I/O to complete.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: 4eb44b0d8aa2440480c92b880196ba72
+              name: 'PFSense: CPU nice time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.51.0
+              key: 'system.cpu.nice[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The time the CPU has spent running users' processes that have been niced.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: 4b412b3f128746c69364590965c02eea
+              name: 'PFSense: CPU system time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.52.0
+              key: 'system.cpu.system[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The time the CPU has spent running the kernel and its processes.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: 922ad22eed7f427e8560942941a427ba
+              name: 'PFSense: CPU user time'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.2021.11.50.0
+              key: 'system.cpu.user[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                The time the CPU has spent running users' processes that are not niced.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //to get utilization in %, divide by N, where N is number of cores.
+                      return value/{#CPU.COUNT}
+              tags:
+                -
+                  tag: component
+                  value: cpu
+            -
+              uuid: cae6db6f7aae4ecdaac3e451eee5eacb
+              name: 'PFSense: CPU utilization'
+              type: DEPENDENT
+              key: 'system.cpu.util[{#SNMPINDEX}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'CPU utilization in %.'
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      //Calculate utilization
+                      return (100 - value)
+              master_item:
+                key: 'system.cpu.idle[{#SNMPINDEX}]'
+              tags:
+                -
+                  tag: component
+                  value: cpu
+              trigger_prototypes:
+                -
+                  uuid: 76857a00f1fe4d639dbb5cfe775f36d6
+                  expression: 'min(/PFSense SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  name: 'PFSense: High CPU utilization'
+                  event_name: 'PFSense: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  dependencies:
+                    -
+                      name: 'PFSense: Load average is too high'
+                      expression: |
+                        min(/PFSense SNMP/system.cpu.load.avg1,5m)/last(/PFSense SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
+                        and last(/PFSense SNMP/system.cpu.load.avg5)>0
+                        and last(/PFSense SNMP/system.cpu.load.avg15)>0
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+          graph_prototypes:
+            -
+              uuid: 2b2dd0814a1e479fb9faa178b10ce83e
+              name: 'PFSense: CPU usage{#SINGLETON}'
+              type: STACKED
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'system.cpu.system[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'system.cpu.user[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'system.cpu.nice[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'system.cpu.iowait[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'system.cpu.interrupt[{#SNMPINDEX}]'
+            -
+              uuid: 3131a60ebd384c79991ba2d6a3e3cf31
+              name: 'PFSense: CPU utilization{#SINGLETON}'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'system.cpu.util[{#SNMPINDEX}]'
+          master_item:
+            key: system.cpu.num
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  //count the number of CPU cores
+                  return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])
+        -
+          uuid: 441ad463ea5544f89cb56b0b8f7763f9
+          name: 'Network interfaces discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          key: net.if.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#IFADMINSTATUS}'
+                value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              -
+                macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              -
+                macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              -
+                macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#IFALIAS}'
+                value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.MATCHES}'
+                formulaid: K
+              -
+                macro: '{#IFTYPE}'
+                value: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: L
+          description: 'Discovering interfaces from IF-MIB.'
+          item_prototypes:
+            -
+              uuid: b20cd75f9b8543c894862003121893c1
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 traffic blocked'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.8["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.in.block.v4.bps[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                IPv4 bits per second blocked coming in on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 850a471b36de4bcebf9d8831f52953de
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 packets blocked'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.12["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.in.block.v4.pps[{#SNMPINDEX}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                The number of IPv4 packets blocked coming in on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 96de779174c8486d97269a43f0d4a8f4
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 traffic blocked'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.16["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.in.block.v6.bps[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                IPv6 bits per second blocked coming in on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 2582b09afee14e658c9c9c8b845818b9
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 packets blocked'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.20["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.in.block.v6.pps[{#SNMPINDEX}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                The number of IPv6 packets blocked coming in on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: eea8bd3342824bed8b4e3768c069e8b3
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              key: 'net.if.in.discards[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of inbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 4915f853f848404988ce7ae3a22e7991
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              key: 'net.if.in.errors[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: f5cbc2b7d91f4fa5aab8eb96d8a0550f
+                  expression: 'min(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/PFSense SNMP/net.if.in.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate'
+                  event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High input error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  opdata: 'errors in: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+                  dependencies:
+                    -
+                      name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: fcda9fb8fff14106940543836177e3e3
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 traffic passed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.7["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.in.pass.v4.bps[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                IPv4 bits per second passed coming in on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: a895016cc42341729beb3ec41e30e1dc
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv4 packets passed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.11["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.in.pass.v4.pps[{#SNMPINDEX}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                The number of IPv4 packets passed coming in on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 1ed0a16478074997a3254fd1025a438d
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 traffic passed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.15["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.in.pass.v6.bps[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                IPv6 bits per second passed coming in on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 5eb85cf165424dde93e028468c310593
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound IPv6 packets passed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.19["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.in.pass.v6.pps[{#SNMPINDEX}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                The number of IPv6 packets passed coming in on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 4fefa40765144566a5c507ef19f884d6
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Bits received'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              key: 'net.if.in[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: b9c94af7fae9462a9659261366c03e4f
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 traffic blocked'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.10["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.out.block.v4.bps[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                IPv4 bits per second blocked going out on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 03c616505a6746ffa8027efd95aad00d
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 packets blocked'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.14["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.out.block.v4.pps[{#SNMPINDEX}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                The number of IPv4 packets blocked going out on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: c81392868fe04ba5bd82dcffa3065e73
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 traffic blocked'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.18["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.out.block.v6.bps[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                IPv6 bits per second blocked going out on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 41a658c922614223b5473eb4e01a3336
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 packets blocked'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.22["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.out.block.v6.pps[{#SNMPINDEX}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                The number of IPv6 packets blocked going out on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: feb327e6f99e41c3a0194d1578a46e50
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packets discarded'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              key: 'net.if.out.discards[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The number of outbound packets which were chosen to be discarded
+                even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.
+                One possible reason for discarding such a packet could be to free up buffer space.
+                Discontinuities in the value of this counter can occur at re-initialization of the management system,
+                and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 72d053e5bf3b4330a99382b8a2efcdf7
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packets with errors'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              key: 'net.if.out.errors[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 5fb5f37490d04dbc8e0553c6aa881547
+                  expression: 'min(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/PFSense SNMP/net.if.out.errors[{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate'
+                  event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate ( > {$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+                  opdata: 'errors out: {ITEM.LASTVALUE2}'
+                  priority: WARNING
+                  description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.'
+                  dependencies:
+                    -
+                      name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                      expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 29e2a5d7299b4419bbb29a98c068d46f
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 traffic passed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.9["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.out.pass.v4.bps[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                IPv4 bits per second passed going out on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: e073f3fd38ed4aeaba85dfa5b74cc066
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv4 packets passed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.13["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.out.pass.v4.pps[{#SNMPINDEX}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                The number of IPv4 packets passed going out on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 3b472db1999640c3a0ef0c75ddae7940
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 traffic passed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.17["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.out.pass.v6.bps[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                IPv6 bits per second passed going out on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: a5ba6a1a6dbf4788b77eee825f85eed1
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound IPv6 packets passed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.21["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.out.pass.v6.pps[{#SNMPINDEX}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                The number of IPv6 packets passed going out on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: afd513d29ecc4360ab0baf0a7ae3bb53
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Bits sent'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              key: 'net.if.out[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: ecde40c612da452599e2e7b2f1979e83
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Rules references count'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.12325.1.200.1.8.2.1.6["index",".1.3.6.1.4.1.12325.1.200.1.8.2.1.2","{#IFDESCR}"]'
+              key: 'net.if.rules.refs[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: BEGEMOT-PF-MIB
+                The number of rules referencing this interface.
+              tags:
+                -
+                  tag: component
+                  value: firewall
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: eb2f06d673094e10bab8e1d774b26997
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Speed'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              key: 'net.if.speed[{#SNMPINDEX}]'
+              history: 7d
+              units: bps
+              description: |
+                MIB: IF-MIB
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: 2af41422c46141fba0432818b076bca3
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Operational status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              key: 'net.if.status[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The current operational state of the interface.
+                - The testing(3) state indicates that no operational packet scan be passed
+                - If ifAdminStatus is down(2) then ifOperStatus should be down(2)
+                - If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic
+                - It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)
+                - It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state
+                - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
+              valuemap:
+                name: 'IF-MIB::ifOperStatus'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+              trigger_prototypes:
+                -
+                  uuid: d4392162d62541aeb148718ddd7f5d57
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. Can be triggered if operations status is down.
+                    2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 86f6e925d8a64e31a44b5338c92b31ec
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Interface type'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              key: 'net.if.type[{#SNMPINDEX}]'
+              history: 7d
+              description: |
+                MIB: IF-MIB
+                The type of interface.
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
+                through updating the syntax of the IANAifType textual convention.
+              valuemap:
+                name: 'IF-MIB::ifType'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#IFALIAS}'
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+          trigger_prototypes:
+            -
+              uuid: eb3090605ba14407a91736ac9768d65a
+              expression: |
+                change(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
+                and (
+                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=6 or
+                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=7 or
+                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=11 or
+                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=62 or
+                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=69 or
+                last(/PFSense SNMP/net.if.type[{#SNMPINDEX}])=117
+                )
+                and
+                (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])<>2)
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: |
+                (change(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0 and last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}],#2)>0) or
+                (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before'
+              opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
+              priority: INFO
+              description: 'This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.'
+              dependencies:
+                -
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: 90c99a9c4ce44b3ca929c4b3200286fb
+              expression: |
+                (avg(/PFSense SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/PFSense SNMP/net.if.in[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage'
+              event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High inbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              opdata: 'In: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              dependencies:
+                -
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 6be52ce31bab4250b421de1bfe84263c
+              expression: |
+                (avg(/PFSense SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])) and
+                last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])>0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/PFSense SNMP/net.if.out[{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/PFSense SNMP/net.if.speed[{#SNMPINDEX}])'
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage'
+              event_name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage ( > {$IF.UTIL.MAX:"{#IFNAME}"}% )'
+              opdata: 'Out: {ITEM.LASTVALUE1}, speed: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The network interface utilization is close to its estimated maximum bandwidth.'
+              dependencies:
+                -
+                  name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Link down'
+                  expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (last(/PFSense SNMP/net.if.status[{#SNMPINDEX}])=2)'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: 4679de2da218418e9564f0cc5a13e31a
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packet filter traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.pass.v4.bps[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: F63100
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.block.v4.bps[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: 2774A4
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.pass.v6.bps[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.block.v6.bps[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: 6C59DC
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.pass.v4.pps[{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: FC6EA3
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.block.v4.pps[{#SNMPINDEX}]'
+                -
+                  sortorder: '6'
+                  color: AC8C14
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.pass.v6.pps[{#SNMPINDEX}]'
+                -
+                  sortorder: '7'
+                  color: 611F27
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.block.v6.pps[{#SNMPINDEX}]'
+            -
+              uuid: 3acc01b7ad11441ca2ea4dab13274efa
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: 2774A4
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.errors[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.errors[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.discards[{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.in.discards[{#SNMPINDEX}]'
+            -
+              uuid: 58b7aa7618274c9e9285d4c0b63c2ca8
+              name: 'PFSense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packet filter traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.pass.v4.bps[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: F63100
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.block.v4.bps[{#SNMPINDEX}]'
+                -
+                  sortorder: '2'
+                  color: 2774A4
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.pass.v6.bps[{#SNMPINDEX}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.block.v6.bps[{#SNMPINDEX}]'
+                -
+                  sortorder: '4'
+                  color: 6C59DC
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.pass.v4.pps[{#SNMPINDEX}]'
+                -
+                  sortorder: '5'
+                  color: FC6EA3
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.block.v4.pps[{#SNMPINDEX}]'
+                -
+                  sortorder: '6'
+                  color: AC8C14
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.pass.v6.pps[{#SNMPINDEX}]'
+                -
+                  sortorder: '7'
+                  color: 611F27
+                  yaxisside: RIGHT
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'net.if.out.block.v6.pps[{#SNMPINDEX}]'
+        -
+          uuid: 2ee60ad904ba45348f5e42b02f27aa98
+          name: 'Block devices discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#DEVNAME},1.3.6.1.4.1.2021.13.15.1.1.2]'
+          key: vfs.dev.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#DEVNAME}'
+                value: '{$VFS.DEV.DEVNAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#DEVNAME}'
+                value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable).'
+          item_prototypes:
+            -
+              uuid: afda1ff507ea43f39dceaf76f3552690
+              name: 'PFSense: [{#DEVNAME}]: Disk read rate'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.5.{#SNMPINDEX}'
+              key: 'vfs.dev.read.rate[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '!r/s'
+              description: |
+                MIB: UCD-DISKIO-MIB
+                The number of read accesses from this device since boot.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
+            -
+              uuid: 180555ff64304d15bd17b9d58cfc91ed
+              name: 'PFSense: [{#DEVNAME}]: Disk utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.9.{#SNMPINDEX}'
+              key: 'vfs.dev.util[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-DISKIO-MIB
+                The 1 minute average load of disk (%).
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
+            -
+              uuid: 35777597864a4db0ad063c609c3dbee3
+              name: 'PFSense: [{#DEVNAME}]: Disk write rate'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.6.{#SNMPINDEX}'
+              key: 'vfs.dev.write.rate[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '!w/s'
+              description: |
+                MIB: UCD-DISKIO-MIB
+                The number of write accesses from this device since boot.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: disk
+                  value: '{#DEVNAME}'
+          graph_prototypes:
+            -
+              uuid: 68683d3f206245639c89bda5da17e0d3
+              name: 'PFSense: [{#DEVNAME}]: Disk read/write rates'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'vfs.dev.read.rate[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'vfs.dev.write.rate[{#SNMPINDEX}]'
+        -
+          uuid: 8c6084603d134d1e96aeff663fc0045d
+          name: 'Mounted filesystem discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#FSNAME},.1.3.6.1.2.1.25.3.8.1.2,{#FSTYPE},.1.3.6.1.2.1.25.3.8.1.4]'
+          key: vfs.fs.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'HOST-RESOURCES-MIB::hrFS discovery with filter.'
+          item_prototypes:
+            -
+              uuid: 73c51f990076413f959abe81cdcd5225
+              name: 'PFSense: [{#FSNAME}]: Free inodes in %'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.9.1.10["index","1.3.6.1.4.1.2021.9.1.2","{#FSNAME}"]'
+              key: 'vfs.fs.inode.pfree[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                If having problems collecting this item make sure access to UCD-SNMP-MIB is allowed.
+              preprocessing:
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return (100-value);'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 55324e1072f34c5fbc67a7f0566f64d6
+                  expression: 'min(/PFSense SNMP/vfs.fs.inode.pfree[{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                  name: 'PFSense: [{#FSNAME}]: Running out of free inodes'
+                  event_name: 'PFSense: [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}%)'
+                  opdata: 'Free inodes: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    It may become impossible to write to disk if there are no index nodes left.
+                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: 48917b7fd7cd4e16a7746ce9cf88a7b6
+                  expression: 'min(/PFSense SNMP/vfs.fs.inode.pfree[{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}'
+                  name: 'PFSense: [{#FSNAME}]: Running out of free inodes'
+                  event_name: 'PFSense: [{#FSNAME}]: Running out of free inodes (free < {$VFS.FS.INODE.PFREE.MIN.WARN:"{#FSNAME}"}%)'
+                  opdata: 'Free inodes: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: |
+                    It may become impossible to write to disk if there are no index nodes left.
+                    As symptoms, 'No space left on device' or 'Disk is full' errors may be seen even though free space is available.
+                  dependencies:
+                    -
+                      name: 'PFSense: [{#FSNAME}]: Running out of free inodes'
+                      expression: 'min(/PFSense SNMP/vfs.fs.inode.pfree[{#SNMPINDEX}],5m)<{$VFS.FS.INODE.PFREE.MIN.CRIT:"{#FSNAME}"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+            -
+              uuid: 51fa616aa3ee4d3ca1371d0d455244eb
+              name: 'PFSense: [{#FSNAME}]: Space utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.9.1.9["index","1.3.6.1.4.1.2021.9.1.2","{#FSNAME}"]'
+              key: 'vfs.fs.pused[{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: UCD-SNMP-MIB
+                If having problems collecting this item make sure access to UCD-SNMP-MIB is allowed.
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: f5f253e700f742579a4f91d3061a816e
+              name: 'PFSense: [{#FSNAME}]: Total space'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.9.1.6["index","1.3.6.1.4.1.2021.9.1.2","{#FSNAME}"]'
+              key: 'vfs.fs.total[{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: UCD-SNMP-MIB
+                If having problems collecting this item make sure access to UCD-SNMP-MIB is allowed.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: eaf1ed2e94cc41f69fda97778f27628c
+              name: 'PFSense: [{#FSNAME}]: Used space'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2021.9.1.8["index","1.3.6.1.4.1.2021.9.1.2","{#FSNAME}"]'
+              key: 'vfs.fs.used[{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: UCD-SNMP-MIB
+                If having problems collecting this item make sure access to UCD-SNMP-MIB is allowed.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1024'
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+          trigger_prototypes:
+            -
+              uuid: 711e2c5b136e4a51a2fb745d847a9fc5
+              expression: |
+                last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
+              name: 'PFSense: [{#FSNAME}]: Disk space is critically low'
+              event_name: 'PFSense: [{#FSNAME}]: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
+              priority: AVERAGE
+              description: |
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}.
+                Second condition should be one of the following:
+                  - The disk free space is less than {$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}.
+                  - The disk will be full in less than 24 hours.
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
+            -
+              uuid: ef0273e1092a40ff888e0ea87c859abb
+              expression: |
+                last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
+              name: 'PFSense: [{#FSNAME}]: Disk space is low'
+              event_name: 'PFSense: [{#FSNAME}]: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+              opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
+              priority: WARNING
+              description: |
+                Two conditions should match: First, space utilization should be above {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}.
+                Second condition should be one of the following:
+                  - The disk free space is less than {$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}.
+                  - The disk will be full in less than 24 hours.
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'PFSense: [{#FSNAME}]: Disk space is critically low'
+                  expression: |
+                    last(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/PFSense SNMP/vfs.fs.total[{#SNMPINDEX}])-last(/PFSense SNMP/vfs.fs.used[{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/PFSense SNMP/vfs.fs.pused[{#SNMPINDEX}],1h,100)<1d)
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: capacity
+          graph_prototypes:
+            -
+              uuid: af57ea943b0f45f6b03028ef48c07605
+              name: 'PFSense: [{#FSNAME}]: Disk space usage'
+              width: '600'
+              height: '340'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: '969696'
+                  calc_fnc: LAST
+                  type: GRAPH_SUM
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'vfs.fs.total[{#SNMPINDEX}]'
+                -
+                  sortorder: '1'
+                  color: C80000
+                  calc_fnc: LAST
+                  item:
+                    host: 'PFSense SNMP'
+                    key: 'vfs.fs.used[{#SNMPINDEX}]'
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: pfsense
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+          description: 'Threshold of CPU utilization for warning trigger in %.'
+        -
+          macro: '{$ICMP_LOSS_WARN}'
+          value: '20'
+          description: 'Threshold of ICMP packets loss for warning trigger in %.'
+        -
+          macro: '{$ICMP_RESPONSE_TIME_WARN}'
+          value: '0.15'
+          description: 'Threshold of average ICMP response time for warning trigger in seconds.'
+        -
+          macro: '{$IF.ERRORS.WARN}'
+          value: '2'
+          description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
+        -
+          macro: '{$IF.UTIL.MAX}'
+          value: '90'
+          description: 'Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.'
+        -
+          macro: '{$IFCONTROL}'
+          value: '1'
+          description: 'Macro for operational state of the interface for link down trigger. Can be used with interface name as context.'
+        -
+          macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
+          value: '1.5'
+          description: 'Load per CPU considered sustainable. Tune if needed.'
+        -
+          macro: '{$MEMORY.AVAILABLE.MIN}'
+          value: 20M
+          description: 'Threshold of available memory for trigger in bytes.'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+          description: 'Threshold of memory utilization for trigger in %'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
+          value: '^.*'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
+          value: ^2$
+          description: 'Ignore down(2) administrative status'
+        -
+          macro: '{$NET.IF.IFALIAS.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFALIAS.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFDESCR.MATCHES}'
+          value: '.*'
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFNAME.MATCHES}'
+          value: '^em[0-9]+$'
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
+          value: ^$
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+          value: '^.*$'
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+          value: ^6$
+          description: 'Ignore notPresent(6)'
+        -
+          macro: '{$NET.IF.IFTYPE.MATCHES}'
+          value: '.*'
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$NET.IF.IFTYPE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro used in filters of network interfaces discovery rule.'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP availability trigger.'
+        -
+          macro: '{$SOURCE.TRACKING.TABLE.UTIL.MAX}'
+          value: '90'
+          description: 'Threshold of source tracking table utilization trigger in %.'
+        -
+          macro: '{$STATE.TABLE.UTIL.MAX}'
+          value: '90'
+          description: 'Threshold of state table utilization trigger in %.'
+        -
+          macro: '{$SWAP.PFREE.MIN.WARN}'
+          value: '50'
+          description: 'Threshold of free swap space for warning trigger in %.'
+        -
+          macro: '{$VFS.DEV.DEVNAME.MATCHES}'
+          value: .+
+          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
+          value: '^(loop[0-9]*|sd[a-z][0-9]+|nbd[0-9]+|sr[0-9]+|fd[0-9]+|dm-[0-9]+|ram[0-9]+|ploop[a-z0-9]+|md[0-9]*|hcp[0-9]*|cd[0-9]*|pass[0-9]*|zram[0-9]*)'
+          description: 'This macro is used in block devices discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$VFS.FS.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the filesystem utilization.'
+        -
+          macro: '{$VFS.FS.FSNAME.MATCHES}'
+          value: .+
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+          value: ^(/dev|/sys|/run|/var/run|/proc|.+/shm$)
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$VFS.FS.FSTYPE.MATCHES}'
+          value: '.*(9.3|hrFSBerkeleyFFS)$'
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+          value: ^\s$
+          description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+        -
+          macro: '{$VFS.FS.INODE.PFREE.MIN.CRIT}'
+          value: '10'
+          description: 'Threshold of inodes usage for average severity trigger in %. Can be used with filesystem name as context.'
+        -
+          macro: '{$VFS.FS.INODE.PFREE.MIN.WARN}'
+          value: '20'
+          description: 'Threshold of inodes usage for warning trigger in %. Can be used with filesystem name as context.'
+        -
+          macro: '{$VFS.FS.PUSED.MAX.CRIT}'
+          value: '90'
+          description: 'Threshold of filesystem used space for average severity trigger in %. Can be used with filesystem name as context.'
+        -
+          macro: '{$VFS.FS.PUSED.MAX.WARN}'
+          value: '80'
+          description: 'Threshold of used filesystem space for warning trigger in %. Can be used with filesystem name as context.'
+      valuemaps:
+        -
+          uuid: 2216d8afb349448394590770ff99e56a
+          name: 'IF-MIB::ifOperStatus'
+          mappings:
+            -
+              value: '1'
+              newvalue: up
+            -
+              value: '2'
+              newvalue: down
+            -
+              value: '3'
+              newvalue: testing
+            -
+              value: '4'
+              newvalue: unknown
+            -
+              value: '5'
+              newvalue: dormant
+            -
+              value: '6'
+              newvalue: notPresent
+            -
+              value: '7'
+              newvalue: lowerLayerDown
+        -
+          uuid: 3165b9b6c79e446f9d1029571518004e
+          name: 'IF-MIB::ifType'
+          mappings:
+            -
+              value: '1'
+              newvalue: other
+            -
+              value: '2'
+              newvalue: regular1822
+            -
+              value: '3'
+              newvalue: hdh1822
+            -
+              value: '4'
+              newvalue: ddnX25
+            -
+              value: '5'
+              newvalue: rfc877x25
+            -
+              value: '6'
+              newvalue: ethernetCsmacd
+            -
+              value: '7'
+              newvalue: iso88023Csmacd
+            -
+              value: '8'
+              newvalue: iso88024TokenBus
+            -
+              value: '9'
+              newvalue: iso88025TokenRing
+            -
+              value: '10'
+              newvalue: iso88026Man
+            -
+              value: '11'
+              newvalue: starLan
+            -
+              value: '12'
+              newvalue: proteon10Mbit
+            -
+              value: '13'
+              newvalue: proteon80Mbit
+            -
+              value: '14'
+              newvalue: hyperchannel
+            -
+              value: '15'
+              newvalue: fddi
+            -
+              value: '16'
+              newvalue: lapb
+            -
+              value: '17'
+              newvalue: sdlc
+            -
+              value: '18'
+              newvalue: ds1
+            -
+              value: '19'
+              newvalue: e1
+            -
+              value: '20'
+              newvalue: basicISDN
+            -
+              value: '21'
+              newvalue: primaryISDN
+            -
+              value: '22'
+              newvalue: propPointToPointSerial
+            -
+              value: '23'
+              newvalue: ppp
+            -
+              value: '24'
+              newvalue: softwareLoopback
+            -
+              value: '25'
+              newvalue: eon
+            -
+              value: '26'
+              newvalue: ethernet3Mbit
+            -
+              value: '27'
+              newvalue: nsip
+            -
+              value: '28'
+              newvalue: slip
+            -
+              value: '29'
+              newvalue: ultra
+            -
+              value: '30'
+              newvalue: ds3
+            -
+              value: '31'
+              newvalue: sip
+            -
+              value: '32'
+              newvalue: frameRelay
+            -
+              value: '33'
+              newvalue: rs232
+            -
+              value: '34'
+              newvalue: para
+            -
+              value: '35'
+              newvalue: arcnet
+            -
+              value: '36'
+              newvalue: arcnetPlus
+            -
+              value: '37'
+              newvalue: atm
+            -
+              value: '38'
+              newvalue: miox25
+            -
+              value: '39'
+              newvalue: sonet
+            -
+              value: '40'
+              newvalue: x25ple
+            -
+              value: '41'
+              newvalue: iso88022llc
+            -
+              value: '42'
+              newvalue: localTalk
+            -
+              value: '43'
+              newvalue: smdsDxi
+            -
+              value: '44'
+              newvalue: frameRelayService
+            -
+              value: '45'
+              newvalue: v35
+            -
+              value: '46'
+              newvalue: hssi
+            -
+              value: '47'
+              newvalue: hippi
+            -
+              value: '48'
+              newvalue: modem
+            -
+              value: '49'
+              newvalue: aal5
+            -
+              value: '50'
+              newvalue: sonetPath
+            -
+              value: '51'
+              newvalue: sonetVT
+            -
+              value: '52'
+              newvalue: smdsIcip
+            -
+              value: '53'
+              newvalue: propVirtual
+            -
+              value: '54'
+              newvalue: propMultiplexor
+            -
+              value: '55'
+              newvalue: ieee80212
+            -
+              value: '56'
+              newvalue: fibreChannel
+            -
+              value: '57'
+              newvalue: hippiInterface
+            -
+              value: '58'
+              newvalue: frameRelayInterconnect
+            -
+              value: '59'
+              newvalue: aflane8023
+            -
+              value: '60'
+              newvalue: aflane8025
+            -
+              value: '61'
+              newvalue: cctEmul
+            -
+              value: '62'
+              newvalue: fastEther
+            -
+              value: '63'
+              newvalue: isdn
+            -
+              value: '64'
+              newvalue: v11
+            -
+              value: '65'
+              newvalue: v36
+            -
+              value: '66'
+              newvalue: g703at64k
+            -
+              value: '67'
+              newvalue: g703at2mb
+            -
+              value: '68'
+              newvalue: qllc
+            -
+              value: '69'
+              newvalue: fastEtherFX
+            -
+              value: '70'
+              newvalue: channel
+            -
+              value: '71'
+              newvalue: ieee80211
+            -
+              value: '72'
+              newvalue: ibm370parChan
+            -
+              value: '73'
+              newvalue: escon
+            -
+              value: '74'
+              newvalue: dlsw
+            -
+              value: '75'
+              newvalue: isdns
+            -
+              value: '76'
+              newvalue: isdnu
+            -
+              value: '77'
+              newvalue: lapd
+            -
+              value: '78'
+              newvalue: ipSwitch
+            -
+              value: '79'
+              newvalue: rsrb
+            -
+              value: '80'
+              newvalue: atmLogical
+            -
+              value: '81'
+              newvalue: ds0
+            -
+              value: '82'
+              newvalue: ds0Bundle
+            -
+              value: '83'
+              newvalue: bsc
+            -
+              value: '84'
+              newvalue: async
+            -
+              value: '85'
+              newvalue: cnr
+            -
+              value: '86'
+              newvalue: iso88025Dtr
+            -
+              value: '87'
+              newvalue: eplrs
+            -
+              value: '88'
+              newvalue: arap
+            -
+              value: '89'
+              newvalue: propCnls
+            -
+              value: '90'
+              newvalue: hostPad
+            -
+              value: '91'
+              newvalue: termPad
+            -
+              value: '92'
+              newvalue: frameRelayMPI
+            -
+              value: '93'
+              newvalue: x213
+            -
+              value: '94'
+              newvalue: adsl
+            -
+              value: '95'
+              newvalue: radsl
+            -
+              value: '96'
+              newvalue: sdsl
+            -
+              value: '97'
+              newvalue: vdsl
+            -
+              value: '98'
+              newvalue: iso88025CRFPInt
+            -
+              value: '99'
+              newvalue: myrinet
+            -
+              value: '100'
+              newvalue: voiceEM
+            -
+              value: '101'
+              newvalue: voiceFXO
+            -
+              value: '102'
+              newvalue: voiceFXS
+            -
+              value: '103'
+              newvalue: voiceEncap
+            -
+              value: '104'
+              newvalue: voiceOverIp
+            -
+              value: '105'
+              newvalue: atmDxi
+            -
+              value: '106'
+              newvalue: atmFuni
+            -
+              value: '107'
+              newvalue: atmIma
+            -
+              value: '108'
+              newvalue: pppMultilinkBundle
+            -
+              value: '109'
+              newvalue: ipOverCdlc
+            -
+              value: '110'
+              newvalue: ipOverClaw
+            -
+              value: '111'
+              newvalue: stackToStack
+            -
+              value: '112'
+              newvalue: virtualIpAddress
+            -
+              value: '113'
+              newvalue: mpc
+            -
+              value: '114'
+              newvalue: ipOverAtm
+            -
+              value: '115'
+              newvalue: iso88025Fiber
+            -
+              value: '116'
+              newvalue: tdlc
+            -
+              value: '117'
+              newvalue: gigabitEthernet
+            -
+              value: '118'
+              newvalue: hdlc
+            -
+              value: '119'
+              newvalue: lapf
+            -
+              value: '120'
+              newvalue: v37
+            -
+              value: '121'
+              newvalue: x25mlp
+            -
+              value: '122'
+              newvalue: x25huntGroup
+            -
+              value: '123'
+              newvalue: trasnpHdlc
+            -
+              value: '124'
+              newvalue: interleave
+            -
+              value: '125'
+              newvalue: fast
+            -
+              value: '126'
+              newvalue: ip
+            -
+              value: '127'
+              newvalue: docsCableMaclayer
+            -
+              value: '128'
+              newvalue: docsCableDownstream
+            -
+              value: '129'
+              newvalue: docsCableUpstream
+            -
+              value: '130'
+              newvalue: a12MppSwitch
+            -
+              value: '131'
+              newvalue: tunnel
+            -
+              value: '132'
+              newvalue: coffee
+            -
+              value: '133'
+              newvalue: ces
+            -
+              value: '134'
+              newvalue: atmSubInterface
+            -
+              value: '135'
+              newvalue: l2vlan
+            -
+              value: '136'
+              newvalue: l3ipvlan
+            -
+              value: '137'
+              newvalue: l3ipxvlan
+            -
+              value: '138'
+              newvalue: digitalPowerline
+            -
+              value: '139'
+              newvalue: mediaMailOverIp
+            -
+              value: '140'
+              newvalue: dtm
+            -
+              value: '141'
+              newvalue: dcn
+            -
+              value: '142'
+              newvalue: ipForward
+            -
+              value: '143'
+              newvalue: msdsl
+            -
+              value: '144'
+              newvalue: ieee1394
+            -
+              value: '145'
+              newvalue: if-gsn
+            -
+              value: '146'
+              newvalue: dvbRccMacLayer
+            -
+              value: '147'
+              newvalue: dvbRccDownstream
+            -
+              value: '148'
+              newvalue: dvbRccUpstream
+            -
+              value: '149'
+              newvalue: atmVirtual
+            -
+              value: '150'
+              newvalue: mplsTunnel
+            -
+              value: '151'
+              newvalue: srp
+            -
+              value: '152'
+              newvalue: voiceOverAtm
+            -
+              value: '153'
+              newvalue: voiceOverFrameRelay
+            -
+              value: '154'
+              newvalue: idsl
+            -
+              value: '155'
+              newvalue: compositeLink
+            -
+              value: '156'
+              newvalue: ss7SigLink
+            -
+              value: '157'
+              newvalue: propWirelessP2P
+            -
+              value: '158'
+              newvalue: frForward
+            -
+              value: '159'
+              newvalue: rfc1483
+            -
+              value: '160'
+              newvalue: usb
+            -
+              value: '161'
+              newvalue: ieee8023adLag
+            -
+              value: '162'
+              newvalue: bgppolicyaccounting
+            -
+              value: '163'
+              newvalue: frf16MfrBundle
+            -
+              value: '164'
+              newvalue: h323Gatekeeper
+            -
+              value: '165'
+              newvalue: h323Proxy
+            -
+              value: '166'
+              newvalue: mpls
+            -
+              value: '167'
+              newvalue: mfSigLink
+            -
+              value: '168'
+              newvalue: hdsl2
+            -
+              value: '169'
+              newvalue: shdsl
+            -
+              value: '170'
+              newvalue: ds1FDL
+            -
+              value: '171'
+              newvalue: pos
+            -
+              value: '172'
+              newvalue: dvbAsiIn
+            -
+              value: '173'
+              newvalue: dvbAsiOut
+            -
+              value: '174'
+              newvalue: plc
+            -
+              value: '175'
+              newvalue: nfas
+            -
+              value: '176'
+              newvalue: tr008
+            -
+              value: '177'
+              newvalue: gr303RDT
+            -
+              value: '178'
+              newvalue: gr303IDT
+            -
+              value: '179'
+              newvalue: isup
+            -
+              value: '180'
+              newvalue: propDocsWirelessMaclayer
+            -
+              value: '181'
+              newvalue: propDocsWirelessDownstream
+            -
+              value: '182'
+              newvalue: propDocsWirelessUpstream
+            -
+              value: '183'
+              newvalue: hiperlan2
+            -
+              value: '184'
+              newvalue: propBWAp2Mp
+            -
+              value: '185'
+              newvalue: sonetOverheadChannel
+            -
+              value: '186'
+              newvalue: digitalWrapperOverheadChannel
+            -
+              value: '187'
+              newvalue: aal2
+            -
+              value: '188'
+              newvalue: radioMAC
+            -
+              value: '189'
+              newvalue: atmRadio
+            -
+              value: '190'
+              newvalue: imt
+            -
+              value: '191'
+              newvalue: mvl
+            -
+              value: '192'
+              newvalue: reachDSL
+            -
+              value: '193'
+              newvalue: frDlciEndPt
+            -
+              value: '194'
+              newvalue: atmVciEndPt
+            -
+              value: '195'
+              newvalue: opticalChannel
+            -
+              value: '196'
+              newvalue: opticalTransport
+            -
+              value: '197'
+              newvalue: propAtm
+            -
+              value: '198'
+              newvalue: voiceOverCable
+            -
+              value: '199'
+              newvalue: infiniband
+            -
+              value: '200'
+              newvalue: teLink
+            -
+              value: '201'
+              newvalue: q2931
+            -
+              value: '202'
+              newvalue: virtualTg
+            -
+              value: '203'
+              newvalue: sipTg
+            -
+              value: '204'
+              newvalue: sipSig
+            -
+              value: '205'
+              newvalue: docsCableUpstreamChannel
+            -
+              value: '206'
+              newvalue: econet
+            -
+              value: '207'
+              newvalue: pon155
+            -
+              value: '208'
+              newvalue: pon622
+            -
+              value: '209'
+              newvalue: bridge
+            -
+              value: '210'
+              newvalue: linegroup
+            -
+              value: '211'
+              newvalue: voiceEMFGD
+            -
+              value: '212'
+              newvalue: voiceFGDEANA
+            -
+              value: '213'
+              newvalue: voiceDID
+            -
+              value: '214'
+              newvalue: mpegTransport
+            -
+              value: '215'
+              newvalue: sixToFour
+            -
+              value: '216'
+              newvalue: gtp
+            -
+              value: '217'
+              newvalue: pdnEtherLoop1
+            -
+              value: '218'
+              newvalue: pdnEtherLoop2
+            -
+              value: '219'
+              newvalue: opticalChannelGroup
+            -
+              value: '220'
+              newvalue: homepna
+            -
+              value: '221'
+              newvalue: gfp
+            -
+              value: '222'
+              newvalue: ciscoISLvlan
+            -
+              value: '223'
+              newvalue: actelisMetaLOOP
+            -
+              value: '224'
+              newvalue: fcipLink
+            -
+              value: '225'
+              newvalue: rpr
+            -
+              value: '226'
+              newvalue: qam
+            -
+              value: '227'
+              newvalue: lmp
+            -
+              value: '228'
+              newvalue: cblVectaStar
+            -
+              value: '229'
+              newvalue: docsCableMCmtsDownstream
+            -
+              value: '230'
+              newvalue: adsl2
+            -
+              value: '231'
+              newvalue: macSecControlledIF
+            -
+              value: '232'
+              newvalue: macSecUncontrolledIF
+            -
+              value: '233'
+              newvalue: aviciOpticalEther
+            -
+              value: '234'
+              newvalue: atmbond
+            -
+              value: '235'
+              newvalue: voiceFGDOS
+            -
+              value: '236'
+              newvalue: mocaVersion1
+            -
+              value: '237'
+              newvalue: ieee80216WMAN
+            -
+              value: '238'
+              newvalue: adsl2plus
+            -
+              value: '239'
+              newvalue: dvbRcsMacLayer
+            -
+              value: '240'
+              newvalue: dvbTdm
+            -
+              value: '241'
+              newvalue: dvbRcsTdma
+            -
+              value: '242'
+              newvalue: x86Laps
+            -
+              value: '243'
+              newvalue: wwanPP
+            -
+              value: '244'
+              newvalue: wwanPP2
+            -
+              value: '245'
+              newvalue: voiceEBS
+            -
+              value: '246'
+              newvalue: ifPwType
+            -
+              value: '247'
+              newvalue: ilan
+            -
+              value: '248'
+              newvalue: pip
+            -
+              value: '249'
+              newvalue: aluELP
+            -
+              value: '250'
+              newvalue: gpon
+            -
+              value: '251'
+              newvalue: vdsl2
+            -
+              value: '252'
+              newvalue: capwapDot11Profile
+            -
+              value: '253'
+              newvalue: capwapDot11Bss
+            -
+              value: '254'
+              newvalue: capwapWtpVirtualRadio
+            -
+              value: '255'
+              newvalue: bits
+            -
+              value: '256'
+              newvalue: docsCableUpstreamRfPort
+            -
+              value: '257'
+              newvalue: cableDownstreamRfPort
+            -
+              value: '258'
+              newvalue: vmwareVirtualNic
+            -
+              value: '259'
+              newvalue: ieee802154
+            -
+              value: '260'
+              newvalue: otnOdu
+            -
+              value: '261'
+              newvalue: otnOtu
+            -
+              value: '262'
+              newvalue: ifVfiType
+            -
+              value: '263'
+              newvalue: g9981
+            -
+              value: '264'
+              newvalue: g9982
+            -
+              value: '265'
+              newvalue: g9983
+            -
+              value: '266'
+              newvalue: aluEpon
+            -
+              value: '267'
+              newvalue: aluEponOnu
+            -
+              value: '268'
+              newvalue: aluEponPhysicalUni
+            -
+              value: '269'
+              newvalue: aluEponLogicalLink
+            -
+              value: '270'
+              newvalue: aluGponOnu
+            -
+              value: '271'
+              newvalue: aluGponPhysicalUni
+            -
+              value: '272'
+              newvalue: vmwareNicTeam
+            -
+              value: '277'
+              newvalue: docsOfdmDownstream
+            -
+              value: '278'
+              newvalue: docsOfdmaUpstream
+            -
+              value: '279'
+              newvalue: gfast
+            -
+              value: '280'
+              newvalue: sdci
+            -
+              value: '281'
+              newvalue: xboxWireless
+            -
+              value: '282'
+              newvalue: fastdsl
+            -
+              value: '283'
+              newvalue: docsCableScte55d1FwdOob
+            -
+              value: '284'
+              newvalue: docsCableScte55d1RetOob
+            -
+              value: '285'
+              newvalue: docsCableScte55d2DsOob
+            -
+              value: '286'
+              newvalue: docsCableScte55d2UsOob
+            -
+              value: '287'
+              newvalue: docsCableNdf
+            -
+              value: '288'
+              newvalue: docsCableNdr
+            -
+              value: '289'
+              newvalue: ptm
+            -
+              value: '290'
+              newvalue: ghn
+        -
+          uuid: fc5652614ee94cd8b437b3058886e857
+          name: 'Services status'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not running'
+            -
+              value: '2'
+              newvalue: running
+        -
+          uuid: c3c721156c624317af993e1a263c16bc
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: f6bb441b7a65446c96c546bd3f3140ee
+          name: 'SNMPv2-TC::TruthValue'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'true'
+            -
+              value: '2'
+              newvalue: 'false'
+        -
+          uuid: d553e33d8b104a5e89d88500e85fa5fc
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+  triggers:
+    -
+      uuid: fe568255690f4125847230be3ba88f54
+      expression: 'min(/PFSense SNMP/system.swap.pfree,5m)<{$SWAP.PFREE.MIN.WARN} and last(/PFSense SNMP/system.swap.total)>0'
+      name: 'PFSense: High swap space usage'
+      event_name: 'PFSense: High swap space usage (less than {$SWAP.PFREE.MIN.WARN}% free)'
+      opdata: 'Free: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
+      priority: WARNING
+      description: 'This trigger is ignored, if there is no swap configured.'
+      dependencies:
+        -
+          name: 'PFSense: High memory utilization'
+          expression: 'min(/PFSense SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+        -
+          name: 'PFSense: Lack of available memory'
+          expression: 'min(/PFSense SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/PFSense SNMP/vm.memory.total)>0'
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
+    -
+      uuid: d890efaff23f49e8ba05d22390f9e21b
+      expression: 'min(/PFSense SNMP/vm.memory.available,5m)<{$MEMORY.AVAILABLE.MIN} and last(/PFSense SNMP/vm.memory.total)>0'
+      name: 'PFSense: Lack of available memory'
+      event_name: 'PFSense: Lack of available memory (<{$MEMORY.AVAILABLE.MIN} of {ITEM.VALUE2})'
+      opdata: 'Available: {ITEM.LASTVALUE1}, total: {ITEM.LASTVALUE2}'
+      priority: AVERAGE
+      description: 'The system is running out of memory.'
+      tags:
+        -
+          tag: scope
+          value: capacity
+        -
+          tag: scope
+          value: performance
+    -
+      uuid: ffbe648f887744de91a6e1206518fc74
+      expression: |
+        min(/PFSense SNMP/system.cpu.load.avg1,5m)/last(/PFSense SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
+        and last(/PFSense SNMP/system.cpu.load.avg5)>0
+        and last(/PFSense SNMP/system.cpu.load.avg15)>0
+      name: 'PFSense: Load average is too high'
+      event_name: 'PFSense: Load average is too high (per CPU load over {$LOAD_AVG_PER_CPU.MAX.WARN} for 5m)'
+      opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
+      priority: AVERAGE
+      description: 'Per CPU load average is too high. Your system may be slow to respond.'
+      tags:
+        -
+          tag: scope
+          value: performance
+  graphs:
+    -
+      uuid: 7fdf3de55e6b48abb9c6fbbf4a0f4ceb
+      name: 'PFSense: CPU jumps'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'PFSense SNMP'
+            key: system.cpu.switches
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'PFSense SNMP'
+            key: system.cpu.intr
+    -
+      uuid: f282a7c00c5a451e93c1a62939999041
+      name: 'PFSense: Memory usage'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'PFSense SNMP'
+            key: vm.memory.total
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'PFSense SNMP'
+            key: vm.memory.available
+    -
+      uuid: 38b05f5d70f84ac69220e93bc9636b76
+      name: 'PFSense: Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'PFSense SNMP'
+            key: vm.memory.util
+    -
+      uuid: cd45a63b52d7470db6b4574027433c8e
+      name: 'PFSense: Packet filter reason codes'
+      type: STACKED
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'PFSense SNMP'
+            key: pfsense.packets.match
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'PFSense SNMP'
+            key: pfsense.packets.bad.offset
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'PFSense SNMP'
+            key: pfsense.packets.fragment
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'PFSense SNMP'
+            key: pfsense.packets.short
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'PFSense SNMP'
+            key: pfsense.packets.normalize
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'PFSense SNMP'
+            key: pfsense.packets.mem.drop
+    -
+      uuid: 33a80d114d82400ebe2b3583726a5526
+      name: 'PFSense: Swap usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'PFSense SNMP'
+            key: system.swap.free
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'PFSense SNMP'
+            key: system.swap.total
+    -
+      uuid: d1e3ad2d98bd42a0bdd8435e94c15c3c
+      name: 'PFSense: System load'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'PFSense SNMP'
+            key: system.cpu.load.avg1
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'PFSense SNMP'
+            key: system.cpu.load.avg5
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'PFSense SNMP'
+            key: system.cpu.load.avg15
+        -
+          sortorder: '3'
+          color: A54F10
+          yaxisside: RIGHT
+          item:
+            host: 'PFSense SNMP'
+            key: system.cpu.num

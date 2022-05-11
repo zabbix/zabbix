@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -176,10 +176,10 @@ class CTag extends CObject {
 	 * @param string				$styles				Custom css styles.
 	 *													Syntax:
 	 *														property1: value1; property2: value2; property(n): value(n)
-	 *
+	 * @param int					$delay				Delay in milliseconds before showing hintbox.
 	 * @return CTag
 	 */
-	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '') {
+	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '', $delay = null) {
 		$this->hint = (new CDiv($text))
 			->addClass('hint-box')
 			->setAttribute('style', 'display: none;');
@@ -189,11 +189,17 @@ class CTag extends CObject {
 		if ($span_class !== '') {
 			$this->setAttribute('data-hintbox-class', $span_class);
 		}
+
 		if ($styles !== '') {
 			$this->setAttribute('data-hintbox-style', $styles);
 		}
+
 		if ($freeze_on_click) {
 			$this->setAttribute('data-hintbox-static', '1');
+		}
+
+		if ($delay !== null) {
+			$this->setAttribute('data-hintbox-delay', $delay);
 		}
 
 		return $this;

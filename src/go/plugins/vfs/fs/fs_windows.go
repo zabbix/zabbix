@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ package vfsfs
 import (
 	"syscall"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/plugin"
 )
 
 func getMountPaths() (paths []string, err error) {
@@ -33,7 +33,7 @@ func getMountPaths() (paths []string, err error) {
 	if h, err = windows.FindFirstVolume(&volume[0], uint32(len(volume))); err != nil {
 		return
 	}
-	defer windows.FindClose(h)
+	defer windows.FindVolumeClose(h)
 
 	var result []string
 	var size uint32

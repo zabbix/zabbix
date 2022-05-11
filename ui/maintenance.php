@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -132,20 +132,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$absolute_time_parser->parse(getRequest('active_till'));
 	$active_till_date = $absolute_time_parser->getDateTime(true);
 
-	if (!validateDateInterval($active_since_date->format('Y'), $active_since_date->format('m'),
-			$active_since_date->format('d'))) {
-		info(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('Active since')));
-		$result = false;
-	}
-
-	if (!validateDateInterval($active_till_date->format('Y'), $active_till_date->format('m'),
-			$active_till_date->format('d'))) {
-		info(_s('"%1$s" must be between 1970.01.01 and 2038.01.18.', _('Active till')));
-		$result = false;
-	}
-
 	if ($result) {
 		$timeperiods = getRequest('timeperiods', []);
+		$type_fields = [
+			TIMEPERIOD_TYPE_ONETIME => ['start_date'],
+			TIMEPERIOD_TYPE_DAILY => ['start_time', 'every'],
+			TIMEPERIOD_TYPE_WEEKLY => ['start_time', 'every', 'dayofweek'],
+			TIMEPERIOD_TYPE_MONTHLY => ['start_time', 'every', 'day', 'dayofweek', 'month']
+		];
 
 		foreach ($timeperiods as &$timeperiod) {
 			if ($timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_ONETIME) {
@@ -154,6 +148,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					->getDateTime(true)
 					->getTimestamp();
 			}
+
+			$timeperiod = array_intersect_key($timeperiod,
+				array_flip(['period', 'timeperiod_type']) + array_flip($type_fields[$timeperiod['timeperiod_type']])
+			);
 		}
 		unset($timeperiod);
 
@@ -163,9 +161,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'description' => getRequest('description'),
 			'active_since' => $active_since_date->getTimestamp(),
 			'active_till' => $active_till_date->getTimestamp(),
-			'timeperiods' => $timeperiods,
-			'hostids' => getRequest('hostids', []),
-			'groupids' => getRequest('groupids', [])
+			'groups' => zbx_toObject(getRequest('groupids', []), 'groupid'),
+			'hosts' => zbx_toObject(getRequest('hostids', []), 'hostid'),
+			'timeperiods' => $timeperiods
 		];
 
 		if ($maintenance['maintenance_type'] != MAINTENANCE_TYPE_NODATA) {

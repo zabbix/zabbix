@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,14 +23,15 @@ import (
 	"errors"
 	"strings"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // Options is a plugin configuration
 type Options struct {
-	Endpoint string `conf:"default=unix:///var/run/docker.sock"`
-	Timeout  int    `conf:"optional,range=1:30"`
+	plugin.SystemOptions `conf:"optional"`
+	Endpoint             string `conf:"default=unix:///var/run/docker.sock"`
+	Timeout              int    `conf:"optional,range=1:30"`
 }
 
 // Configure implements the Configurator interface.

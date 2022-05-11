@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,11 +34,15 @@ require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
 require_once dirname(__FILE__).'/testItemRate.php';
 require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
+require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
+require_once dirname(__FILE__).'/testTriggerState.php';
+
+use PHPUnit\Framework\TestSuite;
 
 class IntegrationTests {
 	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('Integration');
+		$suite = new TestSuite('Integration');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
@@ -55,7 +59,9 @@ class IntegrationTests {
 		$suite->addTestSuite('testAgentItems');
 		$suite->addTestSuite('testItemRate');
 		$suite->addTestSuite('testHistoryValueDuplicates');
+		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
+		$suite->addTestSuite('testTriggerState');
 
 		return $suite;
 	}

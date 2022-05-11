@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ class CControllerProxyEdit extends CController {
 			'form_refresh' => 0
 		];
 
-		// get values from the dabatase
+		// get values from the database
 		if ($this->getInput('proxyid', 0)) {
 			$data['proxyid'] = $this->getInput('proxyid');
 

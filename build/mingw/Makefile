@@ -24,6 +24,7 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo.o \
 	$(OUTPUTDIR)\vector.o \
 	$(OUTPUTDIR)\zbxregexp.o \
+	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
 	$(OUTPUTDIR)\file.o \
 	$(OUTPUTDIR)\alias.o \
@@ -75,8 +76,15 @@ ifneq ("$(OPENSSL)", "")
 endif
 
 ifneq ("$(PCRE)", "")
-	CFLAGS := $(CFLAGS) -I$(PCRE)\include
+	CFLAGS := $(CFLAGS) -DPCRE_STATIC -I$(PCRE)\include -DHAVE_PCRE_H=1
 	LDFLAGS := $(LDFLAGS) -L$(PCRE)\lib
+	TAGS := $(TAGS) pcre
+endif
+
+ifneq ("$(PCRE2)", "")
+	CFLAGS := $(CFLAGS) -DPCRE2_STATIC -I$(PCRE2)\include -DHAVE_PCRE2_H=1
+	LDFLAGS := $(LDFLAGS) -L$(PCRE2)\lib
+	TAGS := $(TAGS) pcre2
 endif
 
 CGO_CFLAGS += $(CFLAGS)
@@ -161,7 +169,10 @@ $(OUTPUTDIR)\algodefs.o: $(TOPDIR)\src\libs\zbxalgo\algodefs.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\zbxregexp.o: $(TOPDIR)\src\libs\zbxregexp\zbxregexp.c
-	$(CC) $(CFLAGS) -DUNICODE -DPCRE_STATIC -c $^ -o $@
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\persistent_state.o: $(TOPDIR)\src\zabbix_agent\logfiles\persistent_state.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\logfiles.o: $(TOPDIR)\src\zabbix_agent\logfiles\logfiles.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@

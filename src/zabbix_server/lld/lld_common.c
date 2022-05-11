@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,21 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "lld.h"
 #include "log.h"
 #include "db.h"
 
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_item.h"
 #include "../../libs/zbxaudit/audit_graph.h"
 #include "../../libs/zbxaudit/audit_trigger.h"
 
-/******************************************************************************
- *                                                                            *
- * Function: lld_field_str_rollback                                           *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
 void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
 {
 	if (0 == (*flags & flag))
@@ -45,25 +38,6 @@ void	lld_field_str_rollback(char **field, char **field_orig, zbx_uint64_t *flags
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_field_uint64_rollback                                        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-void	lld_field_uint64_rollback(zbx_uint64_t *field, zbx_uint64_t *field_orig, zbx_uint64_t *flags, zbx_uint64_t flag)
-{
-	if (0 == (*flags & flag))
-		return;
-
-	*field = *field_orig;
-	*field_orig = 0;
-	*flags &= ~flag;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_end_of_life                                                  *
- *                                                                            *
  * Purpose: calculate when to delete lost resources in an overflow-safe way   *
  *                                                                            *
  ******************************************************************************/
@@ -73,8 +47,6 @@ int	lld_end_of_life(int lastcheck, int lifetime)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_remove_lost_objects                                          *
  *                                                                            *
  * Purpose: updates lastcheck and ts_delete fields; removes lost resources    *
  *                                                                            *

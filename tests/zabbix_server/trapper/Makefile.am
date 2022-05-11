@@ -30,6 +30,7 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
+	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
@@ -47,7 +48,9 @@ zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=DBget_user_by_active_session \
 	-Wl,--wrap=DBget_user_by_auth_token \
 	-Wl,--wrap=zbx_user_init \
-	-Wl,--wrap=zbx_user_free
+	-Wl,--wrap=zbx_user_free \
+	-Wl,--wrap=init_result \
+	-Wl,--wrap=free_result
 
 zbx_trapper_preproc_test_run_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@

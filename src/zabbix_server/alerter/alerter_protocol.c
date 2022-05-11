@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "alerter_protocol.h"
+
 #include "log.h"
 #include "zbxserialize.h"
-#include "zbxalgo.h"
-#include "zbxipcservice.h"
-#include "zbxalert.h"
-#include "db.h"
-
-#include "alerter_protocol.h"
 
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {
@@ -43,8 +38,6 @@ void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_am_db_alert_free                                             *
  *                                                                            *
  * Purpose: frees the alert object                                            *
  *                                                                            *
@@ -770,11 +763,6 @@ void	zbx_alerter_deserialize_ids(const unsigned char *data, zbx_uint64_t **ids, 
 		data += zbx_deserialize_value(data, &(*ids)[i]);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_serialize_diag_stats                                 *
- *                                                                            *
- ******************************************************************************/
 zbx_uint32_t	zbx_alerter_serialize_diag_stats(unsigned char **data, zbx_uint64_t alerts_num)
 {
 	zbx_uint32_t	data_len = 0;
@@ -786,21 +774,11 @@ zbx_uint32_t	zbx_alerter_serialize_diag_stats(unsigned char **data, zbx_uint64_t
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_deserialize_diag_stats                               *
- *                                                                            *
- ******************************************************************************/
 static void	zbx_alerter_deserialize_diag_stats(const unsigned char *data, zbx_uint64_t *alerts_num)
 {
 	(void)zbx_deserialize_value(data, alerts_num);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_serialize_top_request                                *
- *                                                                            *
- ******************************************************************************/
 static zbx_uint32_t	zbx_alerter_serialize_top_request(unsigned char **data, int limit)
 {
 	zbx_uint32_t	len;
@@ -811,21 +789,11 @@ static zbx_uint32_t	zbx_alerter_serialize_top_request(unsigned char **data, int 
 	return len;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_deserialize_top_request                              *
- *                                                                            *
- ******************************************************************************/
 void	zbx_alerter_deserialize_top_request(const unsigned char *data, int *limit)
 {
 	(void)zbx_deserialize_value(data, limit);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_serialize_top_mediatypes_result                      *
- *                                                                            *
- ******************************************************************************/
 zbx_uint32_t	zbx_alerter_serialize_top_mediatypes_result(unsigned char **data, zbx_am_mediatype_t **mediatypes,
 		int mediatypes_num)
 {
@@ -855,11 +823,6 @@ zbx_uint32_t	zbx_alerter_serialize_top_mediatypes_result(unsigned char **data, z
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_deserialize_top_mediatypes_result                    *
- *                                                                            *
- ******************************************************************************/
 static void	zbx_alerter_deserialize_top_mediatypes_result(const unsigned char *data,
 		zbx_vector_uint64_pair_t *mediatypes)
 {
@@ -884,11 +847,6 @@ static void	zbx_alerter_deserialize_top_mediatypes_result(const unsigned char *d
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_serialize_top_sources_result                         *
- *                                                                            *
- ******************************************************************************/
 zbx_uint32_t	zbx_alerter_serialize_top_sources_result(unsigned char **data, zbx_am_source_stats_t **sources,
 		int sources_num)
 {
@@ -922,11 +880,6 @@ zbx_uint32_t	zbx_alerter_serialize_top_sources_result(unsigned char **data, zbx_
 	return data_len;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_deserialize_top_sources_result                       *
- *                                                                            *
- ******************************************************************************/
 static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data, zbx_vector_ptr_t *sources)
 {
 	int	i, sources_num;
@@ -939,7 +892,7 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
 
 		for (i = 0; i < sources_num; i++)
 		{
-			zbx_am_source_stats_t	*source;;
+			zbx_am_source_stats_t	*source;
 
 			source = (zbx_am_source_stats_t *)zbx_malloc(NULL, sizeof(zbx_am_source_stats_t));
 			data += zbx_deserialize_value(data, &source->source);
@@ -952,8 +905,6 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_get_diag_stats                                       *
  *                                                                            *
  * Purpose: get alerter manager diagnostic statistics                         *
  *                                                                            *
@@ -975,8 +926,6 @@ int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_get_top_mediatypes                                   *
  *                                                                            *
  * Purpose: get the top N mediatypes by the number of queued alerts           *
  *                                                                            *
@@ -1011,8 +960,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_get_top_sources                                      *
  *                                                                            *
  * Purpose: get the top N sources by the number of queued alerts              *
  *                                                                            *
@@ -1172,8 +1119,6 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, DB_MEDIATY
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_begin_dispatch                                       *
- *                                                                            *
  * Purpose: begin data dispatch                                               *
  *                                                                            *
  * Parameters: dispatch     - [IN] the dispatcher                             *
@@ -1235,8 +1180,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_alerter_send_dispatch                                        *
- *                                                                            *
  * Purpose: dispatch data                                                     *
  *                                                                            *
  * Parameters: dispatch   - [IN] the dispatcher                               *
@@ -1278,8 +1221,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_alerter_end_dispatch                                         *
  *                                                                            *
  * Purpose: finish data dispatch                                              *
  *                                                                            *

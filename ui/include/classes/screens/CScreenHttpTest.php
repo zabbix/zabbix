@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -119,7 +119,9 @@ class CScreenHttpTest extends CScreenBase {
 
 		foreach ($httptests as $key => $httptest) {
 			if (array_key_exists('lastfailedstep', $httptest) && $httptest['lastfailedstep'] !== null) {
-				$lastcheck = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httptest['lastcheck']);
+				$lastcheck = (new CSpan(zbx_date2age($httptest['lastcheck'])))
+					->addClass(ZBX_STYLE_CURSOR_POINTER)
+					->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httptest['lastcheck']), '', true, '', 0);
 
 				if ($httptest['lastfailedstep'] != 0) {
 					$httpstep = get_httpstep_by_no($httptest['httptestid'], $httptest['lastfailedstep']);

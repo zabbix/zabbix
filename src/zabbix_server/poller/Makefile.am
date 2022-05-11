@@ -31,9 +31,9 @@ libzbxpoller_a_SOURCES = \
 	checks_telnet.h \
 	poller.c \
 	poller.h
-	
+
 libzbxpoller_server_a_SOURCES = \
- 	checks_internal.h \
+	checks_internal.h \
 	checks_internal_server.c
 
 libzbxpoller_proxy_a_SOURCES = \

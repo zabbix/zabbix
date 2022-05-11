@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 use Facebook\WebDriver\WebDriverBy;
@@ -30,7 +30,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 	private $selector = 'xpath://form[@name="triggersForm"]/table[@class="list-table"]';
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	public static function data() {

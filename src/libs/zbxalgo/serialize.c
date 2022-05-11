@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "string.h"
+#include "zbxtypes.h"
 #include "zbxserialize.h"
+
 /******************************************************************************
- *                                                                            *
- * Function: zbx_serialize_uint31_compact                                     *
  *                                                                            *
  * Purpose: serialize 31 bit unsigned integer into utf-8 like byte stream     *
  *                                                                            *
@@ -62,8 +62,6 @@ zbx_uint32_t	zbx_serialize_uint31_compact(unsigned char *ptr, zbx_uint32_t value
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_deserialize_uint31_compact                                   *
  *                                                                            *
  * Purpose: deserialize 31 bit unsigned integer from utf-8 like byte stream   *
  *                                                                            *

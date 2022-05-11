@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,13 @@ abstract class CItemGeneral extends CApiService {
 		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+	];
+
+	public const INTERFACE_TYPES_BY_PRIORITY = [
+		INTERFACE_TYPE_AGENT,
+		INTERFACE_TYPE_SNMP,
+		INTERFACE_TYPE_JMX,
+		INTERFACE_TYPE_IPMI
 	];
 
 	const ERROR_EXISTS_TEMPLATE = 'existsTemplate';
@@ -312,10 +319,13 @@ abstract class CItemGeneral extends CApiService {
 					$item['hostid'] = $fullItem['hostid'];
 				}
 
-				// if a templated item is being assigned to an interface with a different type, ignore it
+				// If a templated item is being assigned to an interface with a different type, ignore it.
 				$itemInterfaceType = itemTypeInterface($dbItems[$item['itemid']]['type']);
-				if ($fullItem['templateid'] && isset($item['interfaceid']) && isset($interfaces[$item['interfaceid']])
-						&& $itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
+
+				if ($itemInterfaceType !== INTERFACE_TYPE_ANY && $itemInterfaceType !== INTERFACE_TYPE_OPT
+						&& $fullItem['templateid']
+						&& array_key_exists('interfaceid', $item) && array_key_exists($item['interfaceid'], $interfaces)
+						&& $interfaces[$item['interfaceid']]['type'] != $itemInterfaceType) {
 
 					unset($item['interfaceid']);
 				}
@@ -349,7 +359,7 @@ abstract class CItemGeneral extends CApiService {
 			if ($fullItem['type'] == ITEM_TYPE_CALCULATED) {
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'params' =>		['type' => API_CALC_FORMULA, 'flags' => $this instanceof CItemPrototype ? API_ALLOW_LLD_MACRO : 0, 'length' => DB::getFieldLength('items', 'params')],
-					'value_type' =>	['type' => API_INT32, 'in' => ITEM_VALUE_TYPE_UINT64.','.ITEM_VALUE_TYPE_FLOAT]
+					'value_type' =>	['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])]
 				]];
 
 				$data = array_intersect_key($item, $api_input_rules['fields']);
@@ -408,25 +418,29 @@ abstract class CItemGeneral extends CApiService {
 				$item['trends'] = '0';
 			}
 
-			// check if the item requires an interface
+			// Check if the item requires an interface.
 			if ($host['status'] == HOST_STATUS_TEMPLATE) {
 				unset($item['interfaceid']);
 			}
 			else {
-				$itemInterfaceType = itemTypeInterface($fullItem['type']);
+				$item_interface_type = itemTypeInterface($fullItem['type']);
 
-				if ($itemInterfaceType !== false) {
+				if ($item_interface_type !== false) {
 					if (!array_key_exists('interfaceid', $fullItem) || !$fullItem['interfaceid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
+						if ($item_interface_type != INTERFACE_TYPE_OPT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('No interface found.'));
+						}
 					}
-					elseif (!isset($interfaces[$fullItem['interfaceid']]) || bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
+					elseif (!array_key_exists($fullItem['interfaceid'], $interfaces)
+							|| bccomp($interfaces[$fullItem['interfaceid']]['hostid'], $fullItem['hostid']) != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses host interface from non-parent host.'));
 					}
-					elseif ($itemInterfaceType !== INTERFACE_TYPE_ANY && $interfaces[$fullItem['interfaceid']]['type'] != $itemInterfaceType) {
+					elseif ($item_interface_type !== INTERFACE_TYPE_ANY && $item_interface_type !== INTERFACE_TYPE_OPT
+							&& $interfaces[$fullItem['interfaceid']]['type'] != $item_interface_type) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Item uses incorrect interface type.'));
 					}
 				}
-				// no interface required, just set it to null
+				// No interface required, just set it to zero.
 				else {
 					$item['interfaceid'] = 0;
 				}
@@ -713,6 +727,31 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Return first main interface matched from list of preferred types, or NULL.
+	 *
+	 * @param array $interfaces  An array of interfaces to choose from.
+	 *
+	 * @return ?array
+	 */
+	public static function findInterfaceByPriority(array $interfaces): ?array {
+		$interface_by_type = [];
+
+		foreach ($interfaces as $interface) {
+			if ($interface['main'] == INTERFACE_PRIMARY) {
+				$interface_by_type[$interface['type']] = $interface;
+			}
+		}
+
+		foreach (self::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
+			if (array_key_exists($interface_type, $interface_by_type)) {
+				return $interface_by_type[$interface_type];
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Returns the interface that best matches the given item.
 	 *
 	 * @param array $item_type  An item type
@@ -723,27 +762,24 @@ abstract class CItemGeneral extends CApiService {
 	 *							false, if the item does not need an interface
 	 */
 	public static function findInterfaceForItem($item_type, array $interfaces) {
-		$interface_by_type = [];
-		foreach ($interfaces as $interface) {
-			if ($interface['main'] == 1) {
-				$interface_by_type[$interface['type']] = $interface;
-			}
-		}
-
-		// find item interface type
 		$type = itemTypeInterface($item_type);
 
-		// the item can use any interface
-		if ($type == INTERFACE_TYPE_ANY) {
-			$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
-			foreach ($interface_types as $interface_type) {
-				if (array_key_exists($interface_type, $interface_by_type)) {
-					return $interface_by_type[$interface_type];
-				}
-			}
+		if ($type == INTERFACE_TYPE_OPT) {
+			return false;
+		}
+		elseif ($type == INTERFACE_TYPE_ANY) {
+			return self::findInterfaceByPriority($interfaces);
 		}
 		// the item uses a specific type of interface
 		elseif ($type !== false) {
+			$interface_by_type = [];
+
+			foreach ($interfaces as $interface) {
+				if ($interface['main'] == INTERFACE_PRIMARY) {
+					$interface_by_type[$interface['type']] = $interface;
+				}
+			}
+
 			return array_key_exists($type, $interface_by_type) ? $interface_by_type[$type] : [];
 		}
 		// the item does not need an interface
@@ -1052,6 +1088,10 @@ abstract class CItemGeneral extends CApiService {
 
 				if ($chd_item !== null) {
 					$new_item['itemid'] = $chd_item['itemid'];
+
+					if ($new_item['type'] == ITEM_TYPE_HTTPAGENT) {
+						$new_item['interfaceid'] = null;
+					}
 				}
 				else {
 					unset($new_item['itemid']);
@@ -1501,6 +1541,18 @@ abstract class CItemGeneral extends CApiService {
 									'params', _('first parameter is expected')
 								));
 							}
+							elseif (!array_key_exists(1, $params)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('second parameter is expected')
+								));
+							}
+							elseif (!array_key_exists(2, $params)
+									&& ($params[1] === ZBX_PREPROC_PROMETHEUS_LABEL
+										|| $params[1] === ZBX_PREPROC_PROMETHEUS_FUNCTION)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+									'params', _('third parameter is expected')
+								));
+							}
 
 							if ($prometheus_pattern_parser->parse($params[0]) != CParser::PARSE_SUCCESS) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
@@ -1508,11 +1560,45 @@ abstract class CItemGeneral extends CApiService {
 								));
 							}
 
-							if ($params[1] !== ''
-									&& $prometheus_output_parser->parse($params[1]) != CParser::PARSE_SUCCESS) {
+							if (!in_array($params[1], [ZBX_PREPROC_PROMETHEUS_VALUE, ZBX_PREPROC_PROMETHEUS_LABEL,
+									ZBX_PREPROC_PROMETHEUS_FUNCTION])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
-									'params', _('invalid Prometheus output')
+									'params', _('invalid aggregation method')
 								));
+							}
+
+							switch ($params[1]) {
+								case ZBX_PREPROC_PROMETHEUS_VALUE:
+									if (array_key_exists(2, $params) && $params[2] !== '') {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.', 'params',
+												_('invalid Prometheus output')
+											)
+										);
+									}
+									break;
+
+								case ZBX_PREPROC_PROMETHEUS_LABEL:
+									if ($prometheus_output_parser->parse($params[2]) != CParser::PARSE_SUCCESS) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.', 'params',
+												_('invalid Prometheus output')
+											)
+										);
+									}
+									break;
+
+								case ZBX_PREPROC_PROMETHEUS_FUNCTION:
+									if (!in_array($params[2], [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN,
+											ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG,
+											ZBX_PREPROC_PROMETHEUS_COUNT])) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('Incorrect value for field "%1$s": %2$s.', 'params',
+												_('unsupported Prometheus function')
+											)
+										);
+									}
+									break;
 							}
 						}
 						// Prometheus to JSON can be empty and has only one parameter.
@@ -2520,6 +2606,10 @@ abstract class CItemGeneral extends CApiService {
 			$rules['interfaceid'] = [
 				'type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY
 			];
+
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				unset($rules['interfaceid']['flags']);
+			}
 		}
 
 		if (array_key_exists('trapper_hosts', $item) && $item['trapper_hosts'] !== ''
@@ -2850,5 +2940,34 @@ abstract class CItemGeneral extends CApiService {
 				));
 			}
 		}
+	}
+
+	/**
+	 * Normalize preprocessing step parameters.
+	 *
+	 * @param array  $preprocessing                   Preprocessing steps.
+	 * @param string $preprocessing[<num>]['params']  Preprocessing step parameters.
+	 * @param int    $preprocessing[<num>]['type']    Preprocessing step type.
+	 *
+	 * @return array
+	 */
+	protected function normalizeItemPreprocessingSteps(array $preprocessing): array {
+		foreach ($preprocessing as &$step) {
+			$step['params'] = str_replace("\r\n", "\n", $step['params']);
+			$params = explode("\n", $step['params']);
+
+			switch ($step['type']) {
+				case ZBX_PREPROC_PROMETHEUS_PATTERN:
+					if (!array_key_exists(2, $params)) {
+						$params[2] = '';
+					}
+					break;
+			}
+
+			$step['params'] = implode("\n", $params);
+		}
+		unset($step);
+
+		return $preprocessing;
 	}
 }

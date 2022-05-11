@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,3 +298,11 @@ zbx_subarray_push($this->data['scenario_tab_data']['agent_visibility'], ZBX_AGEN
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $http_form->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

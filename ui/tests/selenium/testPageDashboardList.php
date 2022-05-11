@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class testPageDashboardList extends CWebTest {
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 15
+					'result_count' => 16
 				]
 			],
 			[
@@ -85,7 +85,7 @@ class testPageDashboardList extends CWebTest {
 					'fields' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 14
+					'result_count' => 15
 				]
 			],
 			[
@@ -103,7 +103,7 @@ class testPageDashboardList extends CWebTest {
 						'Name' => 'widget',
 						'Show' => 'Created by me'
 					],
-					'result_count' => 8
+					'result_count' => 9
 				]
 			],
 			[

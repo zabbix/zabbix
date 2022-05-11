@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -376,7 +376,7 @@ jQuery(function($) {
 		}
 
 		prevent_click = true;
-		noclick_area = $('<div/>')
+		noclick_area = $('<div>')
 			.css({
 				position: 'absolute',
 				top: 0,
@@ -389,7 +389,7 @@ jQuery(function($) {
 			.insertAfter(parent);
 
 		selection = {
-			dom: $('<div class="graph-selection"/>')
+			dom: $('<div>', {class: 'graph-selection'})
 				.css({
 					position: 'absolute',
 					top: data.top,
@@ -615,7 +615,7 @@ var timeControl = {
 
 		if (img.length == 0) {
 			window.flickerfreeScreen.setElementProgressState(obj.id, true);
-			img = jQuery('<img/>', {id: id}).appendTo(('#'+obj.containerid)).on('load', function() {
+			img = jQuery('<img>', {id: id}).appendTo(('#'+obj.containerid)).on('load', function() {
 				window.flickerfreeScreen.setElementProgressState(obj.id, false);
 				img.closest('.dashboard-grid-widget').trigger('load.image', {imageid: id});
 			});
@@ -653,9 +653,9 @@ var timeControl = {
 		url.setArgument('to', obj.timeline.to);
 
 		var container = jQuery('#' + obj.containerid),
-			clone = jQuery('<img/>', {
+			clone = jQuery('<img>', {
 				id: img.attr('id'),
-				'class': img.attr('class')
+				class: img.attr('class')
 			})
 			.one('load', function() {
 				img.closest('.dashboard-grid-widget').trigger('load.image', {imageid: img.attr('id')});

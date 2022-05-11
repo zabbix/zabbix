@@ -1,0 +1,247 @@
+// Widget configuration.
+
+form.dashboard-grid-widget-item {
+	.field-group-description,
+	.field-group-value,
+	.field-group-time,
+	.field-group-change-indicator {
+		display: grid;
+		grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+		align-items: center;
+		column-gap: 10px;
+		row-gap: 5px;
+
+		label {
+			text-align: right;
+		}
+
+		hr {
+			grid-column: 1 / -1;
+			margin: 0;
+			width: 100%;
+			border: solid $table-border-color;
+			border-width: 1px 0 0 0;
+		}
+
+		.field-fluid {
+			grid-column: 2 / -1;
+		}
+
+		.offset-3 {
+			grid-column-start: 3;
+		}
+
+		.field-size {
+			input {
+				margin-right: 5px;
+			}
+		}
+
+		.form-field {
+			line-height: 24px;
+		}
+	}
+
+	.field-group-description {
+		.form-field:nth-child(1) {
+			grid-column: 1 / -1;
+		}
+	}
+
+	.field-group-value {
+		grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+
+		.units-show {
+			display: flex;
+
+			label[for='units'] {
+				width: 100%;
+			}
+		}
+	}
+
+	.field-group-change-indicator {
+		grid-template-columns: repeat(3, max-content 96px);
+	}
+
+	.field-group-change-indicator .input-color-picker {
+		display: block;
+	}
+
+	.table-forms {
+		.table-forms-td-left {
+			label.widget-item-label {
+				margin-top: 6px;
+			}
+		}
+	}
+}
+
+// Widget view.
+
+div.dashboard-grid-widget-item {
+	$line-height: 1.14;
+
+	box-sizing: border-box;
+	height: 100%;
+	padding: 10px;
+	overflow-x: hidden;
+
+	@extend %webkit-scrollbar;
+
+	a {
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		color: inherit;
+
+		&:focus,
+		&:hover,
+		&:visited {
+			border: none;
+		}
+
+		> div {
+			display: flex;
+			flex: 1 1 calc(100% / 3);
+		}
+	}
+
+	.item-description,
+	.item-value,
+	.item-time {
+		flex: 1 1 auto;
+		max-width: 100%;
+	}
+
+	.item-value {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0 5px;
+
+		> .units {
+			&:first-child,
+			&:last-child {
+				flex: 0 0 100%;
+			}
+
+			&:first-child {
+				margin-bottom: -0.07em;
+			}
+
+			&:last-child {
+				margin-top: -0.07em;
+			}
+		}
+
+		&.type-text {
+			min-width: 0;
+
+			.item-value-content {
+				min-width: 0;
+			}
+		}
+	}
+
+	.item-value-content {
+		display: flex;
+		align-items: baseline;
+		overflow: hidden;
+	}
+
+	.item-description,
+	.item-time,
+	.type-text .value {
+		display: block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.item-description,
+	.value,
+	.decimals,
+	.units,
+	.item-time {
+		font-size: calc(var(--content-height) * var(--widget-item-font) / #{$line-height});
+		line-height: $line-height;
+	}
+
+	.units,
+	.change-indicator {
+		&:not(:last-child) {
+			margin-right: 5px;
+		}
+
+		&:not(:first-child) {
+			margin-left: 5px;
+		}
+	}
+
+	.svg-arrow {
+		height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / #{$line-height});
+	}
+
+	.item-value-no-data {
+		color: $font-alt-color;
+	}
+
+	.left {
+		justify-content: flex-start;
+		max-width: max-content;
+		margin-right: auto;
+	}
+
+	.center {
+		justify-content: center;
+	}
+
+	.right {
+		justify-content: flex-end;
+		max-width: max-content;
+		margin-left: auto;
+	}
+
+	.top {
+		align-self: flex-start;
+	}
+
+	.middle {
+		align-self: center;
+	}
+
+	.bottom {
+		align-self: flex-end;
+	}
+
+	.bold {
+		font-weight: bold;
+	}
+}
+
+.dashboard-grid-widget-item {
+	.svg-arrow-up {
+		fill: $arrow-fill-up;
+	}
+
+	.svg-arrow-down {
+		fill: $arrow-fill-down;
+	}
+
+	.svg-arrow-up-down {
+		fill: $arrow-fill-up-down;
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-grid-widget-item {
+		a {
+			&:link {
+				border-bottom: none;
+			}
+		}
+	}
+}

@@ -1,6 +1,5 @@
 # LIBLDAP_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Eugene Grigorjev <eugene@zabbix.com>   Feb-02-2007
 #
 # Checks for ldap.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-ldap or --without-ldap.
@@ -111,6 +110,12 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                 AC_MSG_RESULT(yes)
                 LDAP_CPPFLAGS="-I$LDAP_INCDIR"
                 LDAP_LDFLAGS="-L$LDAP_LIBDIR"
+
+                ldap_ver=$(strings `find $LDAP_LIBDIR -name libldap.so` | grep OpenLDAP | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | tr -d '.')
+                if test -n "$ldap_ver" && test "$ldap_ver" -ge 261; then
+                        AC_DEFINE(HAVE_LDAP_SOURCEIP, 1, [Define to 1 if SourceIP is supported.])
+                fi
+
                 LDAP_LIBS="-lldap -llber $LDAP_LIBS"
 
                 if test "x$enable_static" = "xyes"; then

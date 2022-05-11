@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #define ZABBIX_VECTORIMPL_H
 
 #define	ZBX_VECTOR_ARRAY_GROWTH_FACTOR	3/2
+
+#include "log.h"
 
 #define	ZBX_VECTOR_IMPL(__id, __type)										\
 														\

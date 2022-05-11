@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -334,17 +334,17 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		}
 	}
 
-	function openAddfromPopup(elm) {
+	function openAddfromPopup(element) {
 		let disable_names = [];
-		let valuemap_table = elm.closest('table');
+		let valuemap_table = element.closest('table');
 
-		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => disable_names.push(elm.value));
+		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((element) => disable_names.push(element.value));
 		PopUp('popup.generic', {
 			srctbl: 'valuemaps',
 			srcfld1: 'valuemapid',
 			disable_names: disable_names,
 			editable: true
-		}, null, elm);
+		}, {dialogue_class: 'modal-popup-generic', trigger_element: element});
 	}
 
 	function toggleVisible(obj, data_type) {
@@ -356,36 +356,6 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	toggleVisible(obj, obj.querySelector('[name=valuemap_massupdate]:checked').value);
 })();
-
-function visibility_status_changeds(value, obj_id, replace_to) {
-	const obj = document.getElementById(obj_id);
-	if (obj === null) {
-		throw `Cannot find objects with name [${obj_id}]`;
-	}
-
-	if (replace_to && replace_to != '') {
-		if (obj.originalObject) {
-			const old_obj = obj.originalObject;
-			old_obj.originalObject = obj;
-			obj.parentNode.replaceChild(old_obj, obj);
-		}
-		else if (!value) {
-			const new_obj = document.createElement('span');
-			new_obj.setAttribute('name', obj.name);
-			new_obj.setAttribute('id', obj.id);
-
-			new_obj.innerHTML = replace_to;
-			new_obj.originalObject = obj;
-			obj.parentNode.replaceChild(new_obj, obj);
-		}
-		else {
-			throw 'Missing originalObject for restoring';
-		}
-	}
-	else {
-		obj.style.visibility = value ? 'visible' : 'hidden';
-	}
-}
 
 if (!CR && !GK) {
 	$("textarea[maxlength]").bind("paste contextmenu change keydown keypress keyup", function() {
@@ -421,7 +391,7 @@ function submitPopup(overlay) {
 		overlayDialogue({
 			'title': <?= json_encode(_('Warning')) ?>,
 			'type': 'popup',
-			'class': 'modal-popup modal-popup-medium',
+			'class': 'position-middle',
 			'content': $('<span>').text(warning_message),
 			'buttons': [
 				{

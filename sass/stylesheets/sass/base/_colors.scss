@@ -146,6 +146,7 @@ $msg-warning-border-color: #ffd788 !default;
 $btn-font-color: #ffffff !default;
 $btn-bg-color: #0275b8 !default;
 $btn-border-color: #0275b8 !default;
+$btn-border-focus-color: rgba(#1e87e3, .35) !default;
 
 $btn-alt-font-color: #0275b8 !default;
 $btn-alt-bg-color: transparent !default;
@@ -223,3 +224,8 @@ $diff-removed-bg-color: $lighter-red !default;
 // Text
 $text-placeholder-color: #ffffff !default;
 $text-placeholder-bg-color: $ui-bg-selected-color !default;
+
+// Change indicators.
+$arrow-fill-up: #3DC51D;
+$arrow-fill-down: #FC5A5A;
+$arrow-fill-up-down: #3DC51D;

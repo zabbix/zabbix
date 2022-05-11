@@ -1,0 +1,53 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:40Z'
+  groups:
+    -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    -
+      uuid: c3ca7daa5168458f8a00852652a7f99d
+      template: 'HTTPS Service'
+      name: 'HTTPS Service'
+      description: |
+        Template module for monitoring HTTPS service
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: 7164297bdfa54a5b897fc908bdcfb86c
+          name: 'HTTPS service is running'
+          type: SIMPLE
+          key: 'net.tcp.service[https]'
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 6aa24949292e406b9bb917f641f3da79
+              expression: 'max(/HTTPS Service/net.tcp.service[https],#3)=0'
+              name: 'HTTPS service is down on {HOST.NAME}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      valuemaps:
+        -
+          uuid: 3fea65dd433444ac86936134d0a28fd2
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up

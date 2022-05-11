@@ -105,8 +105,6 @@ static const char	*ipc_get_path(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_make_path                                                    *
- *                                                                            *
  * Purpose: makes socket path from the service name                           *
  *                                                                            *
  * Parameters: service_name - [IN] the service name                           *
@@ -167,8 +165,6 @@ static const char	*ipc_make_path(const char *service_name, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_write_data                                                   *
- *                                                                            *
  * Purpose: writes data to a socket                                           *
  *                                                                            *
  * Parameters: fd        - [IN] the socket file descriptor                    *
@@ -185,7 +181,8 @@ static const char	*ipc_make_path(const char *service_name, char **error)
 static int	ipc_write_data(int fd, const unsigned char *data, zbx_uint32_t size, zbx_uint32_t *size_sent)
 {
 	zbx_uint32_t	offset = 0;
-	int		n, ret = SUCCEED;
+	int		ret = SUCCEED;
+	ssize_t		n;
 
 	while (offset != size)
 	{
@@ -203,6 +200,7 @@ static int	ipc_write_data(int fd, const unsigned char *data, zbx_uint32_t size, 
 			ret = FAIL;
 			break;
 		}
+
 		offset += n;
 	}
 
@@ -212,8 +210,6 @@ static int	ipc_write_data(int fd, const unsigned char *data, zbx_uint32_t size, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_read_data                                                    *
  *                                                                            *
  * Purpose: reads data from a socket                                          *
  *                                                                            *
@@ -256,8 +252,6 @@ static int	ipc_read_data(int fd, unsigned char *buffer, zbx_uint32_t size, zbx_u
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_read_data_full                                               *
- *                                                                            *
  * Purpose: reads data from a socket until the requested data has been read   *
  *                                                                            *
  * Parameters: fd        - [IN] the socket file descriptor                    *
@@ -299,8 +293,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_socket_write_message                                         *
  *                                                                            *
  * Purpose: writes IPC message to socket                                      *
  *                                                                            *
@@ -351,8 +343,6 @@ static int	ipc_socket_write_message(zbx_ipc_socket_t *csocket, zbx_uint32_t code
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_read_buffer                                                  *
  *                                                                            *
  * Purpose: reads message header and data from buffer                         *
  *                                                                            *
@@ -410,8 +400,6 @@ static int	ipc_read_buffer(zbx_uint32_t *header, unsigned char **data, zbx_uint3
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_message_is_completed                                         *
- *                                                                            *
  * Purpose: checks if IPC message has been completed                          *
  *                                                                            *
  * Parameters: header   - [IN] the message header                             *
@@ -434,8 +422,6 @@ static int	ipc_message_is_completed(const zbx_uint32_t *header, zbx_uint32_t rx_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_socket_read_message                                          *
  *                                                                            *
  * Purpose: reads IPC message from buffered client socket                     *
  *                                                                            *
@@ -514,8 +500,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_client_free_event                                            *
- *                                                                            *
  * Purpose: frees client's libevent event                                     *
  *                                                                            *
  * Parameters: client - [IN] the client                                       *
@@ -537,8 +521,6 @@ static void	ipc_client_free_events(zbx_ipc_client_t *client)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_client_free                                                  *
  *                                                                            *
  * Purpose: frees IPC service client                                          *
  *                                                                            *
@@ -571,8 +553,6 @@ static void	ipc_client_free(zbx_ipc_client_t *client)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_client_push_rx_message                                       *
- *                                                                            *
  * Purpose: adds message to received messages queue                           *
  *                                                                            *
  * Parameters: client - [IN] the client to read                               *
@@ -593,8 +573,6 @@ static void	ipc_client_push_rx_message(zbx_ipc_client_t *client)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_client_pop_tx_message                                        *
  *                                                                            *
  * Purpose: prepares to send the next message in send queue                   *
  *                                                                            *
@@ -619,8 +597,6 @@ static void	ipc_client_pop_tx_message(zbx_ipc_client_t *client)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_client_read                                                  *
  *                                                                            *
  * Purpose: reads data from IPC service client                                *
  *                                                                            *
@@ -656,8 +632,6 @@ static int	ipc_client_read(zbx_ipc_client_t *client)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_client_write                                                 *
  *                                                                            *
  * Purpose: writes queued data to IPC service client                          *
  *                                                                            *
@@ -714,8 +688,6 @@ static int	ipc_client_write(zbx_ipc_client_t *client)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_service_pop_client                                           *
- *                                                                            *
  * Purpose: gets the next client with messages/closed socket from recv queue  *
  *                                                                            *
  * Parameters: service - [IN] the IPC service                                 *
@@ -734,8 +706,6 @@ static zbx_ipc_client_t	*ipc_service_pop_client(zbx_ipc_service_t *service)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_service_push_client                                          *
  *                                                                            *
  * Purpose: pushes client to the recv queue if needed                         *
  *                                                                            *
@@ -760,8 +730,6 @@ static void	ipc_service_push_client(zbx_ipc_service_t *service, zbx_ipc_client_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_service_add_client                                           *
  *                                                                            *
  * Purpose: adds a new IPC service client                                     *
  *                                                                            *
@@ -814,8 +782,6 @@ static void	ipc_service_add_client(zbx_ipc_service_t *service, int fd)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_service_remove_client                                        *
- *                                                                            *
  * Purpose: removes IPC service client                                        *
  *                                                                            *
  * Parameters: service - [IN] the IPC service                                 *
@@ -834,8 +800,6 @@ static void	ipc_service_remove_client(zbx_ipc_service_t *service, zbx_ipc_client
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_client_by_id                                             *
  *                                                                            *
  * Purpose: to find connected client when only it's ID is known               *
  *                                                                            *
@@ -863,8 +827,6 @@ zbx_ipc_client_t	*zbx_ipc_client_by_id(const zbx_ipc_service_t *service, zbx_uin
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_client_read_event_cb                                         *
- *                                                                            *
  * Purpose: service client read event libevent callback                       *
  *                                                                            *
  ******************************************************************************/
@@ -885,8 +847,6 @@ static void	ipc_client_read_event_cb(evutil_socket_t fd, short what, void *arg)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_client_write_event_cb                                        *
  *                                                                            *
  * Purpose: service client write event libevent callback                      *
  *                                                                            *
@@ -910,8 +870,6 @@ static void	ipc_client_write_event_cb(evutil_socket_t fd, short what, void *arg)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_async_socket_write_event_cb                                  *
  *                                                                            *
  * Purpose: asynchronous socket write event libevent callback                 *
  *                                                                            *
@@ -938,8 +896,6 @@ static void	ipc_async_socket_write_event_cb(evutil_socket_t fd, short what, void
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_async_socket_read_event_cb                                   *
- *                                                                            *
  * Purpose: asynchronous socket read event libevent callback                  *
  *                                                                            *
  ******************************************************************************/
@@ -959,8 +915,6 @@ static void	ipc_async_socket_read_event_cb(evutil_socket_t fd, short what, void 
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_async_socket_timer_cb                                        *
- *                                                                            *
  * Purpose: timer callback                                                    *
  *                                                                            *
  ******************************************************************************/
@@ -975,8 +929,6 @@ static void	ipc_async_socket_timer_cb(evutil_socket_t fd, short what, void *arg)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_service_accept                                               *
  *                                                                            *
  * Purpose: accepts a new client connection                                   *
  *                                                                            *
@@ -1006,8 +958,6 @@ static void	ipc_service_accept(zbx_ipc_service_t *service)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_message_create                                               *
  *                                                                            *
  * Purpose: creates IPC message                                               *
  *                                                                            *
@@ -1040,8 +990,6 @@ static zbx_ipc_message_t	*ipc_message_create(zbx_uint32_t code, const unsigned c
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_service_event_log                                            *
- *                                                                            *
  * Purpose: libevent logging callback                                         *
  *                                                                            *
  ******************************************************************************/
@@ -1073,8 +1021,6 @@ static void ipc_service_event_log_cb(int severity, const char *msg)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_service_init_libevent                                        *
- *                                                                            *
  * Purpose: initialize libevent library                                       *
  *                                                                            *
  ******************************************************************************/
@@ -1085,8 +1031,6 @@ static void	ipc_service_init_libevent(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_service_free_libevent                                        *
- *                                                                            *
  * Purpose: uninitialize libevent library                                     *
  *                                                                            *
  ******************************************************************************/
@@ -1095,8 +1039,6 @@ static void	ipc_service_free_libevent(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_service_client_connected_cb                                  *
  *                                                                            *
  * Purpose: libevent listener callback                                        *
  *                                                                            *
@@ -1113,8 +1055,6 @@ static void	ipc_service_client_connected_cb(evutil_socket_t fd, short what, void
 
 /******************************************************************************
  *                                                                            *
- * Function: ipc_service_timer_cb                                             *
- *                                                                            *
  * Purpose: timer callback                                                    *
  *                                                                            *
  ******************************************************************************/
@@ -1126,8 +1066,6 @@ static void	ipc_service_timer_cb(evutil_socket_t fd, short what, void *arg)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: ipc_check_running_service                                        *
  *                                                                            *
  * Purpose: checks if an IPC service is already running                       *
  *                                                                            *
@@ -1153,8 +1091,6 @@ static int	ipc_check_running_service(const char *service_name)
  */
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_socket_open                                              *
  *                                                                            *
  * Purpose: opens socket to an IPC service listening on the specified path    *
  *                                                                            *
@@ -1216,8 +1152,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_socket_close                                             *
- *                                                                            *
  * Purpose: closes socket to an IPC service                                   *
  *                                                                            *
  * Parameters: csocket - [IN/OUT] the IPC socket to close                     *
@@ -1237,8 +1171,6 @@ void	zbx_ipc_socket_close(zbx_ipc_socket_t *csocket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_socket_write                                             *
  *                                                                            *
  * Purpose: writes a message to IPC service                                   *
  *                                                                            *
@@ -1272,8 +1204,6 @@ int	zbx_ipc_socket_write(zbx_ipc_socket_t *csocket, zbx_uint32_t code, const uns
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_socket_read                                              *
  *                                                                            *
  * Purpose: reads a message from IPC service                                  *
  *                                                                            *
@@ -1328,8 +1258,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_socket_connected                                         *
- *                                                                            *
  * Purpose: check if socket is opened                                         *
  *                                                                            *
  * Parameters: csocket      - [OUT] the IPC socket to the service             *
@@ -1344,8 +1272,6 @@ int	zbx_ipc_socket_connected(const zbx_ipc_socket_t *csocket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_message_free                                             *
  *                                                                            *
  * Purpose: frees the resources allocated to store IPC message data           *
  *                                                                            *
@@ -1363,8 +1289,6 @@ void	zbx_ipc_message_free(zbx_ipc_message_t *message)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_message_clean                                            *
- *                                                                            *
  * Purpose: frees the resources allocated to store IPC message data           *
  *                                                                            *
  * Parameters: message - [IN] the message to clean                            *
@@ -1377,8 +1301,6 @@ void	zbx_ipc_message_clean(zbx_ipc_message_t *message)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_message_init                                             *
- *                                                                            *
  * Purpose: initializes IPC message                                           *
  *                                                                            *
  * Parameters: message - [IN] the message to initialize                       *
@@ -1390,8 +1312,6 @@ void	zbx_ipc_message_init(zbx_ipc_message_t *message)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_message_format                                           *
  *                                                                            *
  * Purpose: formats message to readable format for debug messages             *
  *                                                                            *
@@ -1428,8 +1348,6 @@ void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_message_copy                                             *
- *                                                                            *
  * Purpose: copies ipc message                                                *
  *                                                                            *
  * Parameters: dst - [IN] the destination message                             *
@@ -1449,8 +1367,6 @@ void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src)
  */
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_service_init_env                                         *
  *                                                                            *
  * Purpose: initializes IPC service environment                               *
  *                                                                            *
@@ -1517,8 +1433,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_service_free_env                                         *
- *                                                                            *
  * Purpose: frees IPC service environment                                     *
  *                                                                            *
  ******************************************************************************/
@@ -1527,10 +1441,7 @@ void	zbx_ipc_service_free_env(void)
 	ipc_service_free_libevent();
 }
 
-
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_service_start                                            *
  *                                                                            *
  * Purpose: starts IPC service on the specified path                          *
  *                                                                            *
@@ -1617,8 +1528,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_service_close                                            *
- *                                                                            *
  * Purpose: closes IPC service and frees the resources allocated by it        *
  *                                                                            *
  * Parameters: service - [IN/OUT] the IPC service                             *
@@ -1648,8 +1557,6 @@ void	zbx_ipc_service_close(zbx_ipc_service_t *service)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_service_recv                                             *
  *                                                                            *
  * Purpose: receives ipc message from a connected client                      *
  *                                                                            *
@@ -1731,8 +1638,6 @@ int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeo
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_client_send                                              *
- *                                                                            *
  * Purpose: Sends IPC message to client                                       *
  *                                                                            *
  * Parameters: client - [IN] the IPC client                                   *
@@ -1782,8 +1687,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_client_close                                             *
  *                                                                            *
  * Purpose: closes client socket and frees resources allocated for client     *
  *                                                                            *
@@ -1836,8 +1739,6 @@ void	*zbx_ipc_client_get_userdata(zbx_ipc_client_t *client)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_async_socket_open                                        *
  *                                                                            *
  * Purpose: opens asynchronous socket to IPC service client                   *
  *                                                                            *
@@ -1896,8 +1797,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_async_socket_close                                       *
- *                                                                            *
  * Purpose: closes asynchronous IPC socket and frees allocated resources      *
  *                                                                            *
  * Parameters: asocket - [IN] the asynchronous IPC socket                     *
@@ -1917,8 +1816,6 @@ void	zbx_ipc_async_socket_close(zbx_ipc_async_socket_t *asocket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_async_socket_send                                        *
  *                                                                            *
  * Purpose: Sends message through asynchronous IPC socket                     *
  *                                                                            *
@@ -1948,8 +1845,6 @@ int	zbx_ipc_async_socket_send(zbx_ipc_async_socket_t *asocket, zbx_uint32_t code
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_async_socket_recv                                        *
  *                                                                            *
  * Purpose: receives message through asynchronous IPC socket                  *
  *                                                                            *
@@ -2023,8 +1918,6 @@ int	zbx_ipc_async_socket_recv(zbx_ipc_async_socket_t *asocket, int timeout, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_async_socket_flush                                       *
- *                                                                            *
  * Purpose: flushes unsent through asynchronous IPC socket                    *
  *                                                                            *
  * Parameters: asocket - [IN] the asynchronous IPC service socket             *
@@ -2092,8 +1985,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ipc_async_socket_check_unsent                                *
- *                                                                            *
  * Purpose: check if there are data to be sent                                *
  *                                                                            *
  * Parameters: asocket - [IN] the asynchronous IPC service socket             *
@@ -2108,8 +1999,6 @@ int	zbx_ipc_async_socket_check_unsent(zbx_ipc_async_socket_t *asocket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_async_socket_connected                                   *
  *                                                                            *
  * Purpose: check if socket is connected                                      *
  *                                                                            *
@@ -2128,8 +2017,6 @@ int	zbx_ipc_async_socket_connected(zbx_ipc_async_socket_t *asocket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ipc_async_exchange                                           *
  *                                                                            *
  * Purpose: connect, send message and receive response in a given timeout     *
  *                                                                            *

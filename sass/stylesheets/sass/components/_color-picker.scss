@@ -1,0 +1,94 @@
+.color-picker,
+.color-picker-dialogue {
+	.color-picker-preview {
+		position: relative;
+		background: url($sprite-path) no-repeat -323px -411px;
+		border: 1px solid $form-border-color;
+		color: $font-color;
+	}
+
+	.use-default {
+		background: none;
+
+		&::after {
+			content: attr(data-use-default);
+			position: absolute;
+			top: 0;
+			right: 0;
+			left: 0;
+			text-align: center;
+			line-height: 22px;
+		}
+	}
+}
+
+.color-picker {
+	display: inline-block;
+	line-height: 24px;
+
+	.color-picker-preview {
+		padding: 0;
+		background-position: -321px -409px;
+		width: 24px;
+		vertical-align: top;
+	}
+
+	input:disabled + button {
+		pointer-events: none;
+		background: $form-disabled-font-color !important;
+		border-color: $form-disabled-font-color;
+	}
+}
+
+.color-picker-dialogue {
+	> div {
+		&:first-of-type {
+			margin-bottom: 5px;
+		}
+
+		&:not(:first-of-type) {
+			button {
+				padding: 0;
+				width: 20px;
+				min-height: 20px;
+				border: 1px solid $ui-bg-color;
+				border-radius: 0;
+				vertical-align: middle;
+				transition: none;
+
+				&:hover,
+				&:focus {
+					border-color: $form-border-focus-color;
+					box-shadow: inset 0 0 0 1px $ui-bg-color;
+				}
+
+				&:active {
+					box-shadow: inset 0 0 0 2px $ui-bg-color;
+				}
+			}
+		}
+	}
+
+	.color-picker-input {
+		position: relative;
+		display: inline-block;
+		margin-right: 3px;
+
+		.color-picker-preview {
+			position: absolute;
+			top: 2px;
+			left: 2px;
+			width: 18px;
+			height: 18px;
+
+			&:after {
+				line-height: 18px;
+			}
+		}
+
+		input {
+			padding-left: 25px;
+		}
+	}
+}
+

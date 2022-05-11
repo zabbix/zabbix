@@ -146,6 +146,7 @@ tests/libs/zbxcommon/zbx_dyn_escape_string
 tests/libs/zbxcommon/zbx_get_report_nextcheck
 tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
+tests/libs/zbxcommon/zbx_get_week_number
 tests/libs/zbxcommon/zbx_interval_preproc
 tests/libs/zbxcommon/zbx_json_to_xml
 tests/libs/zbxcommon/zbx_ltrim_utf8
@@ -223,6 +224,7 @@ tests/libs/zbxcommon/zbx_tm_add
 tests/libs/zbxcommon/zbx_tm_sub
 tests/libs/zbxcommon/zbx_tm_round_up
 tests/libs/zbxcommon/zbx_tm_round_down
+tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range
 tests/libs/zbxsysinfo/process_http
 tests/zabbix_server/preprocessor/item_preproc_csv_to_json
