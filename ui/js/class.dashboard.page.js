@@ -1183,7 +1183,7 @@ class CDashboardPage extends CBaseComponent {
 		};
 
 		const allocatePos = (widget, pos) => {
-			for (const [_, w_data] of this._widgets) {
+			for (const [w, w_data] of this._widgets) {
 				w_data.pos = w_data.original_pos;
 			}
 
