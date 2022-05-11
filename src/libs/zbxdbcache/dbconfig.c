@@ -6201,7 +6201,11 @@ out:
 	FINISH_SYNC;
 
 	if (ZBX_DB_OK != DBcommit())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Configuration cache has not been fully initialized because of database"
+				" errors. Full database scan will be attempted on next sync.");
 		ret = FAIL;
+	}
 
 	if (SUCCEED == ret)
 	{
