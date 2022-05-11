@@ -173,6 +173,7 @@ type procStatus struct {
 	IoWritesOp    int64   `json:"io_write_op"`
 	IoOtherB      int64   `json:"io_other_b"`
 	IoOtherOp     int64   `json:"io_other_op"`
+	User          string  `json:"user"`
 }
 
 type procSummary struct {
@@ -198,6 +199,7 @@ type thread struct {
 	PPid          uint32  `json:"ppid"`
 	Name          string  `json:"name"`
 	Tid           uint32  `json:"tid"`
+	User          string  `json:"user"`
 }
 
 var attrMap map[string]infoAttr = map[string]infoAttr{
@@ -418,16 +420,13 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		if name != "" && procName != name {
 			continue
 		}
-
-		if userName != "" {
-			var uname string
-			uname, err = getProcessUsername(pe.ProcessID)
-			if strings.ToUpper(uname) != userName {
-				continue
-			}
+		var uname string
+		uname, err = getProcessUsername(pe.ProcessID)
+		if userName != "" && strings.ToUpper(uname) != userName {
+			continue
 		}
 
-		proc := procStatus{Pid: pe.ProcessID, PPid: pe.ParentProcessID, Name: procName, Threads: pe.Threads}
+		proc := procStatus{Pid: pe.ProcessID, PPid: pe.ParentProcessID, Name: procName, Threads: pe.Threads, User: uname}
 
 		// process might not exist anymore already, skipping silently
 		h, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, pe.ProcessID)
@@ -492,7 +491,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		for procerr = windows.Thread32First(ht, &te); procerr == nil; procerr = windows.Thread32Next(ht, &te) {
 			for _, proc := range array {
 				if te.OwnerProcessID == proc.Pid {
-					threadArray = append(threadArray, thread{proc.Pid, proc.PPid, proc.Name, te.ThreadID})
+					threadArray = append(threadArray, thread{proc.Pid, proc.PPid, proc.Name, te.ThreadID, proc.User})
 					break
 				}
 			}
