@@ -1788,4 +1788,9 @@ typedef enum
 	ERR_Z3008
 }
 zbx_err_codes_t;
+
+/* host macro discovery mode */
+#define ZBX_MACRO_DISCOVERY_AUTOMATIC	0
+#define ZBX_MACRO_DISCOVERY_MANUAL	1
+
 #endif

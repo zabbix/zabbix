@@ -2028,7 +2028,7 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 }
 
 static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostmacroid, const char *macro,
-		const char *value, const char *description, unsigned char type)
+		const char *value, const char *description, unsigned char type, unsigned char macro_discovery)
 {
 	zbx_lld_hostmacro_t	*hostmacro;
 	int			i;
@@ -2040,6 +2040,13 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 		/* check if host macro has already been added */
 		if (0 == hostmacro->hostmacroid && 0 == strcmp(hostmacro->macro, macro))
 		{
+			if (ZBX_MACRO_DISCOVERY_MANUAL == macro_discovery)
+			{
+				lld_hostmacro_free(hostmacro);
+				zbx_vector_ptr_remove(hostmacros, i);
+				return;
+			}
+
 			hostmacro->hostmacroid = hostmacroid;
 			if (0 != strcmp(hostmacro->value, value))
 			{
@@ -2139,7 +2146,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 		size_t	sql_alloc = 0, sql_offset = 0;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select hostmacroid,hostid,macro,value,description,type"
+				"select hostmacroid,hostid,macro,value,description,type,macro_discovery"
 				" from hostmacro"
 				" where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
@@ -2150,7 +2157,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 
 		while (NULL != (row = DBfetch(result)))
 		{
-			unsigned char	type;
+			unsigned char	type, macro_discovery;
 
 			ZBX_STR2UINT64(hostid, row[1]);
 
@@ -2164,8 +2171,10 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 
 			ZBX_STR2UINT64(hostmacroid, row[0]);
 			ZBX_STR2UCHAR(type, row[5]);
+			ZBX_STR2UCHAR(macro_discovery, row[6]);
 
-			lld_hostmacro_make(&host->new_hostmacros, hostmacroid, row[2], row[3], row[4], type);
+			lld_hostmacro_make(&host->new_hostmacros, hostmacroid, row[2], row[3], row[4], type,
+					macro_discovery);
 		}
 		DBfree_result(result);
 	}
