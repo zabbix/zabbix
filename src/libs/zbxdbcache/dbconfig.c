@@ -6209,14 +6209,10 @@ out:
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED == zbx_dbsync_env_prepare_changelog(changelog_sync_mode))
-		{
-			WRLOCK_CACHE;
+		if (ZBX_DBSYNC_INIT != changelog_sync_mode)
 			zbx_dbsync_env_flush_changelog();
-			UNLOCK_CACHE;
-		}
-
-		sync_status = ZBX_DBSYNC_STATUS_INITIALIZED;
+		else
+			sync_status = ZBX_DBSYNC_STATUS_INITIALIZED;
 	}
 
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_MACROS)))

@@ -83,7 +83,6 @@ typedef struct
 	zbx_hashset_t			changelog;
 
 	zbx_dbsync_journal_t		journals[ZBX_DBSYNC_OBJ_COUNT];
-	zbx_vector_dbsync_changelog_t	changelog_queue;
 }
 zbx_dbsync_env_t;
 
@@ -427,8 +426,6 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 
 	zbx_hashset_create(&dbsync_env.strpool, 100, dbsync_strpool_hash_func, dbsync_strpool_compare_func);
 
-	zbx_vector_dbsync_changelog_create(&dbsync_env.changelog_queue);
-
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 		zbx_dbsync_journal_init(&dbsync_env.journals[i]);
 
@@ -506,7 +503,7 @@ void	zbx_dbsync_env_set_sync(int object, const zbx_dbsync_t *sync)
 	dbsync_env.journals[ZBX_DBSYNC_JOURNAL(object)].sync = sync;
 }
 
-static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
+static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal, zbx_vector_dbsync_changelog_t *queue)
 {
 	zbx_vector_uint64_t	objectids;
 	int			i;
@@ -528,37 +525,27 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 		if (FAIL != zbx_vector_uint64_bsearch(&objectids, journal->changelog.values[i].objectid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
-			zbx_vector_dbsync_changelog_append(&dbsync_env.changelog_queue,
-					journal->changelog.values[i].changelog);
+			zbx_vector_dbsync_changelog_append(queue, journal->changelog.values[i].changelog);
 		}
 	}
 
 	zbx_vector_uint64_destroy(&objectids);
 }
 
-int	zbx_dbsync_env_prepare_changelog(unsigned char mode)
-{
-	size_t	i;
-
-	if (ZBX_DBSYNC_INIT == mode)
-		return FAIL;
-
-	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
-		dbsync_env_flush_journal(&dbsync_env.journals[i]);
-
-	return (0 == dbsync_env.changelog_queue.values_num ? FAIL : SUCCEED);
-
-}
-
 void	zbx_dbsync_env_flush_changelog(void)
 {
-	int	i;
+	int				i;
+	zbx_vector_dbsync_changelog_t	queue;
 
-	for (i = 0; i < dbsync_env.changelog_queue.values_num; i++)
-	{
-		zbx_hashset_insert(&dbsync_env.changelog, &dbsync_env.changelog_queue.values[i],
-				sizeof(zbx_dbsync_changelog_t));
-	}
+	zbx_vector_dbsync_changelog_create(&queue);
+
+	for (i = 0; i < (int)ARRSIZE(dbsync_env.journals); i++)
+		dbsync_env_flush_journal(&dbsync_env.journals[i], &queue);
+
+	for (i = 0; i < queue.values_num; i++)
+		zbx_hashset_insert(&dbsync_env.changelog, &queue.values[i], sizeof(zbx_dbsync_changelog_t));
+
+	zbx_vector_dbsync_changelog_destroy(&queue);
 }
 
 void	zbx_dbsync_env_clear(void)
@@ -570,7 +557,6 @@ void	zbx_dbsync_env_clear(void)
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 		zbx_dbsync_journal_destroy(&dbsync_env.journals[i]);
 
-	zbx_vector_dbsync_changelog_destroy(&dbsync_env.changelog_queue);
 }
 
 /******************************************************************************
