@@ -31,7 +31,8 @@ class CControllerTemplateGroupList extends CController {
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
 			'sort' =>			'in name',
-			'sortorder' =>		'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN
+			'sortorder' =>		'in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
+			'page' =>			'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -89,13 +90,7 @@ class CControllerTemplateGroupList extends CController {
 		]);
 		order_result($groups, $sort_field, $sort_order);
 
-		if (hasRequest('page')) {
-			$page_num = getRequest('page', 1);
-		}
-		else {
-			$page_num = CPagerHelper::loadPage('templategroup.list');
-		}
-
+		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('templategroup.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $groups, $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
