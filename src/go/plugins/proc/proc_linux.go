@@ -798,7 +798,6 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 		return nil, errors.New("Too many parameters.")
 	}
 
-	//_ = uid
 	array := make([]procStatus, 0)
 	threadArray := make([]thread, 0)
 	summaryArray := make([]procSummary, 0)
