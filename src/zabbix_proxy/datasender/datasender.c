@@ -28,6 +28,7 @@
 #include "zbxtasks.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
+#include "zbxavailability.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -49,6 +50,7 @@ extern unsigned int	configured_tls_connect_mode;
 #define ZBX_DATASENDER_DB_UPDATE	(ZBX_DATASENDER_HISTORY | ZBX_DATASENDER_DISCOVERY |		\
 					ZBX_DATASENDER_AUTOREGISTRATION | ZBX_DATASENDER_TASKS |	\
 					ZBX_DATASENDER_TASKS_RECV)
+
 
 /******************************************************************************
  *                                                                            *
@@ -83,7 +85,7 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
+static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t *last_conn_time)
 {
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 
@@ -91,7 +93,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_tasks;
 	int			availability_ts, history_records = 0, discovery_records = 0,
-				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay;
+				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay,
+				host_avail_records = 0;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
 	char			*error = NULL, *buffer = NULL;
@@ -123,6 +126,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		areg_records = proxy_get_areg_data(&j, &areg_lastid, &more_areg);
 		if (0 != areg_records)
 			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
+
+		host_avail_records = proxy_get_host_active_availability(&j);
 
 		if (ZBX_PROXY_DATA_MORE != more_history && ZBX_PROXY_DATA_MORE != more_discovery &&
 						ZBX_PROXY_DATA_MORE != more_areg)
@@ -187,6 +192,9 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 				configured_tls_connect_mode, CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING))
 		{
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+			if (*last_conn_time + ZBX_PROXY_ACTIVE_CHECK_AVAIL_TIMEOUT >= time(NULL))
+				zbx_availability_send(ZBX_IPC_AVAILMAN_PROXY_FLUSH_ALL_HOSTS, NULL, 0, NULL);
 			goto clean;
 		}
 
@@ -194,6 +202,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 		upload_state = zbx_put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
 		get_hist_upload_state(sock.buffer, hist_upload_state);
+
+		*last_conn_time = time(NULL);
 
 		if (SUCCEED != upload_state)
 		{
@@ -273,7 +283,7 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:0x" ZBX_FS_UX64, __func__,
 			zbx_result_string(upload_state), *more, flags);
 
-	return history_records + discovery_records + areg_records;
+	return history_records + discovery_records + areg_records + host_avail_records;
 }
 
 /******************************************************************************
@@ -285,6 +295,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 {
 	int		records = 0, hist_upload_state = ZBX_PROXY_UPLOAD_ENABLED, more;
 	double		time_start, time_diff = 0.0, time_now;
+	time_t		last_conn_time;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -302,6 +313,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	last_conn_time = time(NULL);
+
 	while (ZBX_IS_RUNNING())
 	{
 		time_now = zbx_time();
@@ -315,7 +328,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		do
 		{
-			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state);
+			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state, &last_conn_time);
 
 			time_now = zbx_time();
 			time_diff = time_now - time_start;
@@ -328,6 +341,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		if (ZBX_PROXY_DATA_MORE != more)
 			zbx_sleep_loop(ZBX_TASK_UPDATE_FREQUENCY);
+
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

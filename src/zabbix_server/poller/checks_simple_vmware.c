@@ -35,8 +35,11 @@
 #define ZBX_DATASTORE_COUNTER_USED		0x02
 #define ZBX_DATASTORE_COUNTER_PROVISIONED	0x04
 
-#define ZBX_IF_DIRECTION_IN	0
-#define ZBX_IF_DIRECTION_OUT	1
+#define ZBX_DATASTORE_DIRECTION_READ		0
+#define ZBX_DATASTORE_DIRECTION_WRITE		1
+
+#define ZBX_IF_DIRECTION_IN			0
+#define ZBX_IF_DIRECTION_OUT			1
 
 static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 {
@@ -106,6 +109,31 @@ static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, 
 		return NULL;
 
 	return dss->values[i];
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return pointer to DVSwitch data from vector with uuid             *
+ *                                                                            *
+ * Parameters: dvss - [IN] the vector with all DVSwitches                     *
+ *             uuid - [IN] the id of dvswitch                                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *        zbx_vmware_dvswitch_t* - the operation has completed successfully   *
+ *        NULL                    - the operation has failed                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_t *dvss, const char *uuid)
+{
+	zbx_vmware_dvswitch_t	dvs_cmp;
+	int			i;
+
+	dvs_cmp.uuid = (char *)uuid;
+
+	if (FAIL == (i = zbx_vector_vmware_dvswitch_bsearch(dvss, &dvs_cmp, vmware_dvs_uuid_compare)))
+		return NULL;
+
+	return dvss->values[i];
 }
 
 static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service, const char *uuid)
@@ -919,6 +947,20 @@ out:
 	return ret;
 }
 
+int	check_vcenter_hv_connectionstate(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_CONNECTIONSTATE, result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -1250,6 +1292,20 @@ int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, cons
 	return ret;
 }
 
+int	check_vcenter_hv_hw_serialnumber(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_SERIALNUMBER, result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -1485,6 +1541,20 @@ int	check_vcenter_hv_sensors_get(AGENT_REQUEST *request, const char *username, c
 	return ret;
 }
 
+int	check_vcenter_hv_hw_sensors_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ret = get_vcenter_hvprop(request, username, password, ZBX_VMWARE_HVPROP_HW_SENSOR, result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -1616,6 +1686,119 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 	return	check_vcenter_hv_network_common(request, username, password, result, ZBX_IF_DIRECTION_OUT, __func__);
 }
 
+int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int			i, ret = SYSINFO_RET_FAIL;
+	const char		*url, *uuid;
+	struct zbx_json		json_data;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_pnic_t	*nic;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < hv->pnics.values_num; i++)
+	{
+		nic = hv->pnics.values[i];
+
+		zbx_json_addobject(&json_data, NULL);
+		zbx_json_addstring(&json_data, "{#IFNAME}", nic->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#IFDRIVER}", ZBX_NULL2EMPTY_STR(nic->driver), ZBX_JSON_TYPE_STRING);
+		zbx_json_adduint64(&json_data, "{#IFSPEED}", nic->speed);
+		zbx_json_addstring(&json_data, "{#IFDUPLEX}", ZBX_DUPLEX_FULL == nic->duplex ? "full" : "half",
+				ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#IFMAC}", ZBX_NULL2EMPTY_STR(nic->mac), ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(&json_data);
+	}
+
+	zbx_json_close(&json_data);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+	zbx_json_free(&json_data);
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), ret: %s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int			i, ret = SYSINFO_RET_FAIL;
+	const char		*url, *uuid, *if_name;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_pnic_t	nic_cmp;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	if_name = get_rparam(request, 2);
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	nic_cmp.name = (char *)if_name;
+
+	if (FAIL == (i = zbx_vector_vmware_pnic_bsearch(&hv->pnics, &nic_cmp, vmware_pnic_compare)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown physical network interface name"));
+		goto out;
+	}
+
+	SET_UI64_RESULT(result, hv->pnics.values[i]->speed);
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), ret: %s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -1722,18 +1905,23 @@ out:
 	return ret;
 }
 
-static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
-		const char *perfcounter, zbx_uint64_t access_filter, AGENT_RESULT *result)
+#define DATASTORE_METRIC_MODE_LATENCY		0
+#define	DATASTORE_METRIC_MODE_MAX_LATENCY	1
+#define DATASTORE_METRIC_MODE_RPS		2
+
+static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char *username, const char *password,
+		int direction, AGENT_RESULT *result)
 {
-	const char		*url, *mode, *uuid, *name;
+	const char		*url, *mode, *hv_uuid, *ds_name, *perfcounter;
+	zbx_uint64_t		access_filter;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_datastore_t	*datastore;
 	zbx_vmware_dsname_t	dsnames_cmp;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			i, metric_mode, ret = SYSINFO_RET_FAIL;
 	zbx_str_uint64_pair_t	uuid_cmp = {.value = 0};
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() perfcounter:%s", __func__, perfcounter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (3 > request->nparam || request->nparam > 4)
 	{
@@ -1742,11 +1930,19 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	}
 
 	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
-	name = get_rparam(request, 2);
+	hv_uuid = get_rparam(request, 1);
+	ds_name = get_rparam(request, 2);
 	mode = get_rparam(request, 3);
 
-	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency"))
+	if (NULL == mode || '\0' == *mode || (0 == strcmp(mode, "latency")))
+	{
+		metric_mode = DATASTORE_METRIC_MODE_LATENCY;
+	}
+	else if (0 == strcmp(mode, "rps"))
+	{
+		metric_mode = DATASTORE_METRIC_MODE_RPS;
+	}
+	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		goto out;
@@ -1757,13 +1953,13 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
 	}
 
-	datastore = ds_get(&service->data->datastores, name);
+	datastore = ds_get(&service->data->datastores, ds_name);
 
 	if (NULL == datastore)
 	{
@@ -1796,6 +1992,39 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 		goto unlock;
 	}
 
+	switch (direction)
+	{
+		case ZBX_DATASTORE_DIRECTION_READ:
+			access_filter = ZBX_VMWARE_DS_READ_FILTER;
+
+			switch (metric_mode)
+			{
+				case DATASTORE_METRIC_MODE_RPS:
+					perfcounter = "datastore/numberReadAveraged[average]";
+					break;
+				default:
+					perfcounter = "datastore/totalReadLatency[average]";
+			}
+			break;
+		case ZBX_DATASTORE_DIRECTION_WRITE:
+			access_filter = ZBX_VMWARE_DS_WRITE_FILTER;
+
+			switch (metric_mode)
+			{
+				case DATASTORE_METRIC_MODE_RPS:
+					perfcounter = "datastore/numberWriteAveraged[average]";
+					break;
+				default:
+					perfcounter = "datastore/totalWriteLatency[average]";
+			}
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto unlock;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfcounter:%s", __func__, perfcounter);
+
 	if (access_filter != (datastore->hv_uuids_access.values[i].value & access_filter))
 	{
 		zbx_uint64_t	mi = datastore->hv_uuids_access.values[i].value;
@@ -1808,8 +2037,8 @@ static int	check_vcenter_hv_datastore_latency(AGENT_REQUEST *request, const char
 		goto unlock;
 	}
 
-	ret = vmware_service_get_counter_value_by_path(service, "HostSystem", hv->id, perfcounter, datastore->uuid, 1,
-			result);
+	ret = vmware_service_get_counter_value_by_path(service, ZBX_VMWARE_SOAP_HV, hv->id, perfcounter,
+			datastore->uuid, 1, result);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -1818,18 +2047,199 @@ out:
 	return ret;
 }
 
+static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *username, const char *password,
+		int direction, AGENT_RESULT *result)
+{
+	const char		*url, *mode, *ds_name, *perfcounter;
+	zbx_vmware_service_t	*service;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_datastore_t	*datastore;
+	int			i, metric_mode, ret = SYSINFO_RET_FAIL, unit, count = 0, ds_count = 0;
+	zbx_uint64_t		access_filter, counterid, value = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 > request->nparam || request->nparam > 3)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	ds_name = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
+
+	if (NULL == mode || '\0' == *mode || (0 == strcmp(mode, "latency")))
+	{
+		metric_mode = DATASTORE_METRIC_MODE_LATENCY;
+	}
+	else if (0 == strcmp(mode, "maxlatency"))
+	{
+		metric_mode = DATASTORE_METRIC_MODE_MAX_LATENCY;
+	}
+	else if (0 == strcmp(mode, "rps"))
+	{
+		metric_mode = DATASTORE_METRIC_MODE_RPS;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	datastore = ds_get(&service->data->datastores, ds_name);
+
+	if (NULL == datastore)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+		goto unlock;
+	}
+
+	if (NULL == datastore->uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+		goto unlock;
+	}
+
+	switch (direction)
+	{
+		case ZBX_DATASTORE_DIRECTION_READ:
+			access_filter = ZBX_VMWARE_DS_READ_FILTER;
+
+			switch (metric_mode)
+			{
+				case DATASTORE_METRIC_MODE_RPS:
+					perfcounter = "datastore/numberReadAveraged[average]";
+					break;
+				default:
+					perfcounter = "datastore/totalReadLatency[average]";
+			}
+			break;
+		case ZBX_DATASTORE_DIRECTION_WRITE:
+			access_filter = ZBX_VMWARE_DS_WRITE_FILTER;
+
+			switch (metric_mode)
+			{
+				case DATASTORE_METRIC_MODE_RPS:
+					perfcounter = "datastore/numberWriteAveraged[average]";
+					break;
+				default:
+					perfcounter = "datastore/totalWriteLatency[average]";
+			}
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto unlock;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): perfcounter:%s", __func__, perfcounter);
+
+	if (FAIL == zbx_vmware_service_get_counterid(service, perfcounter, &counterid, &unit))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
+		goto unlock;
+	}
+
+	for (i = 0; i < datastore->hv_uuids_access.values_num; i++)
+	{
+		if (access_filter != (datastore->hv_uuids_access.values[i].value & access_filter))
+		{
+			zbx_uint64_t	mi = datastore->hv_uuids_access.values[i].value;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "Datastore %s is not available for hypervisor %s: %s",
+					datastore->name, datastore->hv_uuids_access.values[i].name,
+					0 == (ZBX_VMWARE_DS_MOUNTED & mi) ? "unmounted" : (
+					0 == (ZBX_VMWARE_DS_ACCESSIBLE & mi) ? "inaccessible" : (
+					ZBX_VMWARE_DS_READ == (ZBX_VMWARE_DS_READWRITE & mi)? "readOnly" :
+					"unknown")));
+			continue;
+		}
+
+		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids_access.values[i].name)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+			goto unlock;
+		}
+
+		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
+				counterid, datastore->uuid, 1, unit, result)))
+		{
+			char	*err, *msg = *GET_MSG_RESULT(result);
+
+			*msg = (char)tolower(*msg);
+			err = zbx_dsprintf(NULL, "Counter %s for datastore %s is not available for hypervisor %s: %s",
+					perfcounter, datastore->name,
+					ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]), msg);
+			UNSET_MSG_RESULT(result);
+			SET_MSG_RESULT(result, err);
+			goto unlock;
+		}
+
+		ds_count++;
+
+		if (0 == ISSET_VALUE(result))
+			continue;
+
+		if (DATASTORE_METRIC_MODE_MAX_LATENCY != metric_mode)
+		{
+			value += *GET_UI64_RESULT(result);
+			count++;
+		}
+		else if (value < *GET_UI64_RESULT(result))
+			value = *GET_UI64_RESULT(result);
+
+		UNSET_UI64_RESULT(result);
+	}
+
+	if (0 == ds_count)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastores available."));
+		goto unlock;
+	}
+
+	if (DATASTORE_METRIC_MODE_MAX_LATENCY != metric_mode && 0 != count)
+		value = value / count;
+
+	SET_UI64_RESULT(result, value);
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+#undef DATASTORE_METRIC_MODE_LATENCY
+#undef DATASTORE_METRIC_MODE_MAX_LATENCY
+#undef DATASTORE_METRIC_MODE_RPS
+
 int	check_vcenter_hv_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_hv_datastore_latency(request, username, password, "datastore/totalReadLatency[average]",
-			ZBX_VMWARE_DS_READ_FILTER, result);
+	return check_vcenter_hv_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
 }
 
 int	check_vcenter_hv_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_hv_datastore_latency(request, username, password, "datastore/totalWriteLatency[average]",
-			ZBX_VMWARE_DS_WRITE_FILTER, result);
+	return check_vcenter_hv_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
+}
+
+int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return check_vcenter_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_READ, result);
+}
+
+int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return check_vcenter_datastore_metrics(request, username, password, ZBX_DATASTORE_DIRECTION_WRITE, result);
 }
 
 static int	check_vcenter_hv_datastore_size_vsphere(int mode, const zbx_vmware_datastore_t *datastore,
@@ -2503,124 +2913,48 @@ out:
 	return ret;
 }
 
-static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *username, const char *password,
-		const char *perfcounter, zbx_uint64_t access_filter, AGENT_RESULT *result)
+int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
 {
-	const char		*url, *mode, *name;
+	const char		*url;
+	int			i, ret = SYSINFO_RET_FAIL;
 	zbx_vmware_service_t	*service;
-	zbx_vmware_hv_t		*hv;
-	zbx_vmware_datastore_t	*datastore;
-	int			i, ret = SYSINFO_RET_FAIL, count = 0, ds_count = 0, unit;
-	zbx_uint64_t		latency = 0, counterid;
-	unsigned char		is_maxlatency = 0;
+	struct zbx_json		json_data;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() perfcounter:%s", __func__, perfcounter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 > request->nparam || request->nparam > 3)
+	if (1 != request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 
 	url = get_rparam(request, 0);
-	name = get_rparam(request, 1);
-	mode = get_rparam(request, 2);
-
-	if (NULL != mode && '\0' != *mode && 0 != strcmp(mode, "latency") && 0 != strcmp(mode, "maxlatency"))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		goto out;
-	}
-
-	if (NULL != mode && 0 == strcmp(mode, "maxlatency"))
-		is_maxlatency = 1;
 
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	datastore = ds_get(&service->data->datastores, name);
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	if (NULL == datastore)
+	for (i = 0; i < service->data->dvswitches.values_num; i++)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
-		goto unlock;
+		zbx_vmware_dvswitch_t	*dvswitch = (zbx_vmware_dvswitch_t *)service->data->dvswitches.values[i];
+
+		zbx_json_addobject(&json_data, NULL);
+		zbx_json_addstring(&json_data, "{#DVSWITCH.UUID}", dvswitch->uuid, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DVSWITCH.NAME}", dvswitch->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json_data);
 	}
 
-	if (NULL == datastore->uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-		goto unlock;
-	}
+	zbx_json_close(&json_data);
 
-	if (FAIL == zbx_vmware_service_get_counterid(service, perfcounter, &counterid, &unit))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
-		goto unlock;
-	}
+	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
 
-	for (i = 0; i < datastore->hv_uuids_access.values_num; i++)
-	{
-		if (access_filter != (datastore->hv_uuids_access.values[i].value & access_filter))
-		{
-			zbx_uint64_t	mi = datastore->hv_uuids_access.values[i].value;
+	zbx_json_free(&json_data);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "Datastore %s is not available for hypervisor %s: %s",
-					datastore->name, datastore->hv_uuids_access.values[i].name,
-					0 == (ZBX_VMWARE_DS_MOUNTED & mi) ? "unmounted" : (
-					0 == (ZBX_VMWARE_DS_ACCESSIBLE & mi) ? "inaccessible" : (
-					ZBX_VMWARE_DS_READ == (ZBX_VMWARE_DS_READWRITE & mi)? "readOnly" :
-					"unknown")));
-			continue;
-		}
-
-		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids_access.values[i].name)))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-			goto unlock;
-		}
-
-		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
-				counterid, datastore->uuid, 1, unit, result)))
-		{
-			char	*err, *msg = *GET_MSG_RESULT(result);
-
-			*msg = (char)tolower(*msg);
-			err = zbx_dsprintf(NULL, "Counter %s for datastore %s is not available for hypervisor %s: %s",
-					perfcounter, datastore->name,
-					ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NAME]), msg);
-			UNSET_MSG_RESULT(result);
-			SET_MSG_RESULT(result, err);
-			goto unlock;
-		}
-
-		ds_count++;
-
-		if (0 == ISSET_VALUE(result))
-			continue;
-
-		if (0 == is_maxlatency)
-		{
-			latency += *GET_UI64_RESULT(result);
-			count++;
-		}
-		else if (latency < *GET_UI64_RESULT(result))
-			latency = *GET_UI64_RESULT(result);
-
-		UNSET_UI64_RESULT(result);
-	}
-
-	if (0 == ds_count)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No datastores available."));
-		goto unlock;
-	}
-
-	if (0 == is_maxlatency && 0 != count)
-		latency = latency / count;
-
-	SET_UI64_RESULT(result, latency);
+	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -2629,18 +2963,240 @@ out:
 	return ret;
 }
 
-int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
+static int	dvs_param_validate(zbx_vector_custquery_param_t *query_params, unsigned int vc_version)
 {
-	return check_vcenter_datastore_latency(request, username, password, "datastore/totalReadLatency[average]",
-			ZBX_VMWARE_DS_READ_FILTER, result);
+	int	i;
+
+	for (i = 0; i < query_params->values_num; i++)
+	{
+		zbx_vmware_custquery_param_t	*p = &query_params->values[i];
+
+		if (0 == strcmp("active", p->name) || 0 == strcmp("connected", p->name) ||
+				0 == strcmp("inside", p->name) || 0 == strcmp("nsxPort", p->name) ||
+				0 == strcmp("uplinkPort", p->name))
+		{
+			if (0 != strcmp("true", p->value) && 0 != strcmp("false", p->value))
+				return FAIL;
+		}
+		else if (0 != strcmp("host", p->name) && 0 != strcmp("portgroupKey", p->name) &&
+				0 != strcmp("portKey", p->name))
+		{
+			return FAIL;
+		}
+
+		if (0 == strcmp("host", p->name) && vc_version < 65)
+			return FAIL;
+
+		if (0 == strcmp("nsxPort", p->name) && vc_version < 70)
+			return FAIL;
+	}
+
+	return SUCCEED;
 }
 
-int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
+static int	custquery_param_create(const char *key, zbx_vector_custquery_param_t *query_params)
+{
+	char				*left, *right, *src;
+	zbx_vmware_custquery_param_t	param = {NULL, NULL};
+	int				ret = SUCCEED;
+
+	if ('\0' == *key)
+		return ret;
+
+	src = zbx_strdup(NULL, key);
+
+	while (1)
+	{
+		zbx_strsplit_first(src, ',', &left, &right);
+
+		if (NULL == left || '\0' == *left)
+		{
+			ret = FAIL;
+			break;
+		}
+
+		zbx_strsplit_first(left, ':', &param.name, &param.value);
+
+		if (NULL == param.name || '\0' == *param.name || NULL == param.value)
+		{
+			ret = FAIL;
+			break;
+		}
+
+		zbx_vector_custquery_param_append(query_params, param);
+		param.name = NULL;
+		param.value = NULL;
+
+		if (NULL == right || '\0' == *right)
+			break;
+
+		zbx_free(src);
+		src = right;
+		right = NULL;
+		zbx_free(left);
+	}
+
+	zbx_free(param.name);
+	zbx_free(param.value);
+	zbx_free(left);
+	zbx_free(right);
+	zbx_free(src);
+
+	return ret;
+}
+
+int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_datastore_latency(request, username, password, "datastore/totalWriteLatency[average]",
-			ZBX_VMWARE_DS_WRITE_FILTER, result);
+	const char			*mode, *url, *uuid, *key, *type = ZBX_VMWARE_SOAP_DVS;
+	int				ret = SYSINFO_RET_FAIL;
+	zbx_vmware_service_t		*service;
+	zbx_vmware_dvswitch_t		*dvs;
+	zbx_vmware_cust_query_t		*custom_query;
+	zbx_vector_custquery_param_t	query_params;
+	zbx_vmware_custom_query_type_t	query_type = VMWARE_DVSWITCH_FETCH_DV_PORTS;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_custquery_param_create(&query_params);
+
+	if (2 > request->nparam || request->nparam > 4)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	key = get_rparam(request, 2);
+	mode = get_rparam(request, 3);
+
+	if (NULL == mode)
+	{
+		mode = "state";
+	}
+	else if (0 != strcmp(mode, "state") && 0 != strcmp(mode, "full"))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
+		goto out;
+	}
+
+	if (NULL == key)
+		key = "";
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (dvs = dvs_get(&service->data->dvswitches, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown DVSwitch uuid."));
+		goto unlock;
+	}
+
+	if (NULL == (custom_query = zbx_vmware_service_get_cust_query(service, type, dvs->id, key, query_type, mode))
+			&& (SUCCEED != custquery_param_create(key, &query_params)
+			|| SUCCEED != dvs_param_validate(&query_params,
+			service->major_version * 10 + service->minor_version)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL,
+				"Unknown format of vmware DistributedVirtualSwitchPortCriteria."));
+		goto unlock;
+	}
+
+	/* FAIL is returned if custom query exists */
+	if (NULL == custom_query && SUCCEED == zbx_vmware_service_add_cust_query(service, type, dvs->id, key,
+			query_type, mode, &query_params))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+	else if (NULL == custom_query)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown DVSwitch query."));
+		goto unlock;
+	}
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_ERROR))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, custom_query->error));
+		goto unlock;
+	}
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_READY))
+		SET_STR_RESULT(result, zbx_strdup(NULL, custom_query->value));
+
+	if (0 != (custom_query->state & ZBX_VMWARE_CQ_PAUSED))
+		custom_query->state &= ~(unsigned char)ZBX_VMWARE_CQ_PAUSED;
+
+	custom_query->last_pooled = time(NULL);
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zbx_vector_custquery_param_clear_ext(&query_params, zbx_vmware_cq_param_free);
+	zbx_vector_custquery_param_destroy(&query_params);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_vm_attribute(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_vm_t			*vm;
+	zbx_vmware_custom_attr_t	custom_attr;
+	const char			*url, *vm_uuid, *attr_name;
+	int				index, ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	vm_uuid = get_rparam(request, 1);
+	attr_name = get_rparam(request, 2);
+
+	if ('\0' == *vm_uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (vm = service_vm_get(service, vm_uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	custom_attr.name = (char *)attr_name;
+
+	if (FAIL == (index = zbx_vector_vmware_custom_attr_bsearch(&vm->custom_attrs, &custom_attr,
+			vmware_custom_attr_compare_name)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Custom attribute is not available."));
+		goto unlock;
+	}
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, vm->custom_attrs.values[index]->value));
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
 }
 
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
@@ -2826,7 +3382,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 		AGENT_RESULT *result)
 {
 	struct zbx_json		json_data;
-	const char		*url, *vm_name, *hv_name;
+	const char		*url, *vm_name, *hv_name, *hv_uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_vm_t		*vm;
@@ -2871,6 +3427,9 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			if (NULL == (hv_name = hv->props[ZBX_VMWARE_HVPROP_NAME]))
 				continue;
 
+			if (NULL == (hv_uuid = hv->props[ZBX_VMWARE_HVPROP_HW_UUID]))
+				continue;
+
 			for (j = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
 				j < service->data->datastores.values_num; j++)
 			{
@@ -2896,6 +3455,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.ID}", vm->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#VM.NAME}", vm_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#HV.NAME}", hv_name, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#HV.UUID}", hv_uuid, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#HV.ID}", hv->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATACENTER.NAME}", hv->datacenter_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#CLUSTER.NAME}",
 					NULL != cluster ? cluster->name : "", ZBX_JSON_TYPE_STRING);
@@ -2914,6 +3475,12 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "{#VM.FOLDER}",
 					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_FOLDER]), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&json_data, "{#VM.SNAPSHOT.COUNT}", vm->snapshot_count);
+			zbx_json_addstring(&json_data, "{#VM.TOOLS.STATUS}",
+					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS]),
+					ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "{#VM.POWERSTATE}",
+					ZBX_NULL2EMPTY_STR(vm->props[ZBX_VMWARE_VMPROP_POWER_STATE]),
+					ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATASTORE.NAME}", datastore->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
 
@@ -2938,7 +3505,22 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				else
 					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", "", ZBX_JSON_TYPE_STRING);
 			}
+			else
+				zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", "", ZBX_JSON_TYPE_STRING);
 
+			zbx_json_addarray(&json_data, "vm.customattribute");
+
+			for (j = 0; j < vm->custom_attrs.values_num; j++)
+			{
+				zbx_json_addobject(&json_data, NULL);
+				zbx_json_addstring(&json_data, "name",
+						vm->custom_attrs.values[j]->name, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "value",
+						vm->custom_attrs.values[j]->value, ZBX_JSON_TYPE_STRING);
+				zbx_json_close(&json_data);
+			}
+
+			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
 	}
@@ -3175,9 +3757,36 @@ int	check_vcenter_vm_snapshot_get(AGENT_REQUEST *request, const char *username, 
 	return ret;
 }
 
+typedef void	(*vmpropfunc_t)(struct zbx_json *j, zbx_vmware_dev_t *dev);
+
+static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, zbx_vmware_dev_t *dev)
+{
+	zbx_json_addstring(j, "{#IFNAME}", ZBX_NULL2EMPTY_STR(dev->instance), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFDESC}", ZBX_NULL2EMPTY_STR(dev->label), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFMAC}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFMAC]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFCONNECTED}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED]),
+			ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(j, "{#IFTYPE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFTYPE]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFBACKINGDEVICE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFDVSWITCH.UUID}", ZBX_NULL2EMPTY_STR(
+			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFDVSWITCH.PORTGROUP}", ZBX_NULL2EMPTY_STR(
+			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP]), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFDVSWITCH.PORT}", ZBX_NULL2EMPTY_STR(
+			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT]), ZBX_JSON_TYPE_STRING);
+}
+
+static void	check_vcenter_vm_discovery_disk_props_cb(struct zbx_json *j, zbx_vmware_dev_t *dev)
+{
+	zbx_json_addstring(j, "{#DISKNAME}", ZBX_NULL2EMPTY_STR(dev->instance), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#DISKDESC}", ZBX_NULL2EMPTY_STR(dev->label), ZBX_JSON_TYPE_STRING);
+}
+
 static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result, int dev_type, const char *json_name, const char *json_desc,
-		const char *func_parent)
+		AGENT_RESULT *result, int dev_type, const char *func_parent, vmpropfunc_t props_cb)
 {
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
@@ -3223,12 +3832,12 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 		if (dev_type != dev->type)
 			continue;
 
-		zbx_json_addobject(&json_data, NULL);
-		zbx_json_addstring(&json_data, json_name, dev->instance, ZBX_JSON_TYPE_STRING);
-		if (NULL != dev->label)
-			zbx_json_addstring(&json_data, json_desc, dev->label, ZBX_JSON_TYPE_STRING);
-
-		zbx_json_close(&json_data);
+		if (NULL != props_cb)
+		{
+			zbx_json_addobject(&json_data, NULL);
+			props_cb(&json_data, dev);
+			zbx_json_close(&json_data);
+		}
 	}
 
 	zbx_json_close(&json_data);
@@ -3250,8 +3859,8 @@ out:
 int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_NIC,
-			"{#IFNAME}", "{#IFDESC}", __func__);
+	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_NIC, __func__,
+			check_vcenter_vm_discovery_nic_props_cb);
 }
 
 static int	check_vcenter_vm_common(AGENT_REQUEST *request, const char *username, const char *password,
@@ -3333,6 +3942,20 @@ int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, co
 			"net/transmitted[average]",  __func__);
 }
 
+int	check_vcenter_vm_state(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	int ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ret = get_vcenter_vmprop(request, username, password, ZBX_VMWARE_VMPROP_STATE, result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -3375,6 +3998,80 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 	return ret;
 }
 
+int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t	*service;
+	zbx_vmware_vm_t		*vm = NULL;
+	int			propid, ret = SYSINFO_RET_FAIL;
+	const char		*url, *uuid, *mode, *value;
+
+	if (3 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
+
+	if ('\0' == *uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	if (NULL == mode || '\0' == *mode)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+	else if (0 == strcmp(mode, "version"))
+	{
+		propid = ZBX_VMWARE_VMPROP_TOOLS_VERSION;
+	}
+	else if (0 == strcmp(mode, "status"))
+	{
+		propid = ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter value."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	if (NULL == (value = vm->props[propid]))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Value is not available."));
+		goto unlock;
+	}
+
+	if (ZBX_VMWARE_VMPROP_TOOLS_VERSION == propid)
+		SET_UI64_RESULT(result, atoi(value));
+	else
+		SET_STR_RESULT(result, zbx_strdup(NULL, value));
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -3392,8 +4089,8 @@ int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const 
 int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_DISK,
-			"{#DISKNAME}", "{#DISKDESC}", __func__);
+	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_DISK, __func__,
+			check_vcenter_vm_discovery_disk_props_cb);
 }
 
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,

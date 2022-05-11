@@ -331,6 +331,14 @@ msgstr "עשר שניות"
 msgid "100 busiest triggers"
 msgstr "100 ההקפצות העסוקות ביותר"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:184
+msgid "12-hour"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:183
+msgid "24-hour"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
 msgstr "‎24×7"
@@ -675,6 +683,10 @@ msgstr "פעיל"
 msgctxt "maintenance status"
 msgid "Active"
 msgstr "פעיל"
+
+#: include/hosts.inc.php:497
+msgid "Active checks"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -1164,6 +1176,10 @@ msgstr "כמות הזיכרון הפיזי של האורח שהוחלף בשטח
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "כמות הזיכרון הפיזי שנצרך לטובת גיבוי עמודי הזיכרון הפיזי של המערכת האורחת, <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח של המכונה הווירטואלית ב־VMware"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:73
+msgid "Analog"
+msgstr ""
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
@@ -3657,6 +3673,10 @@ msgstr "יש ללחוץ כדי לצפות או לערוך"
 msgid "Clock"
 msgstr "שעון"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:72
+msgid "Clock type"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:139
 #: app/views/administration.mediatype.edit.php:365
@@ -5524,6 +5544,10 @@ msgstr "קריטריונים לייחודיות התקן"
 msgid "Digest"
 msgstr "תקציר"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:74
+msgid "Digital"
+msgstr ""
+
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
 msgstr "תיקייה"
@@ -5784,6 +5808,10 @@ msgstr "גילוי מאגרי נתונים של VMware,‏ <url> כתובת שי
 #: include/classes/data/CItemData.php:1282
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "גילוי מאגרי נתונים של hypervisor VMWare,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח ה־VMware hypervisor. מחזירה JSON"
+
+#: include/classes/data/CItemData.php:1379
+msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1306
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
@@ -7176,6 +7204,11 @@ msgstr "גודל גופן"
 #: app/views/popup.httpstep.php:85
 msgid "Form data"
 msgstr "נתוני טופס"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:182
+#: include/classes/widgets/forms/CWidgetFormClock.php:242
+msgid "Format"
+msgstr ""
 
 #: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
 #: include/views/configuration.item.prototype.edit.php:707
@@ -11002,6 +11035,10 @@ msgstr "בטעינה…"
 #: app/controllers/CControllerWidgetClockView.php:123
 msgid "Local"
 msgstr "מקומי"
+
+#: include/classes/widgets/fields/CWidgetFieldTimeZone.php:58
+msgid "Local default"
+msgstr ""
 
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
@@ -15961,6 +15998,10 @@ msgstr "טלפון ב׳ של איש קשר משני"
 msgid "Secondary POC screen name"
 msgstr "שם תצוגה של איש קשר משני"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:173
+msgid "Seconds"
+msgstr ""
+
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
 msgstr "טקסט סודי"
@@ -16392,6 +16433,10 @@ msgstr "שיתוף"
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "לאפשרות השיתוף „%1$s” חסר הערך למפה „%2$s”."
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:243
+msgid "Short"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:154
 #: app/partials/monitoring.problem.filter.php:222
@@ -19183,6 +19228,14 @@ msgstr "מאפיין שם משתמש"
 msgid "Users"
 msgstr "משתמשים"
 
+#: include/classes/data/CItemData.php:1255
+msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1259
+msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1702
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "סטטיסטיקת זיכרון מטמון של VMware. המצבים האפשריים הם: total,‏ free,‏ pfree,‏ used ו־pused."
@@ -19194,6 +19247,10 @@ msgstr "מודד ביצועי קלאסטר VMware,‏ <url> - כתובת שיר�
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "מצב קלאסטר VMware,‏ <url> - כתובת שירות VMware,‏ <name> - שם קלאסטר VMware"
+
+#: include/classes/data/CItemData.php:1251
+msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
@@ -19236,6 +19293,10 @@ msgstr "גודל הזיכרון המנופח של ה־Hypervisor של VMware,‏
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "שם הקלאסטר של ה־hypervisor מבית VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
 
+#: include/classes/data/CItemData.php:1275
+msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr "שם חווה (datacenter) של VMware hypervisor,‏ <url> - כתובת שירות VMware,‏ <uuid> שם מארח של hypervisor של VMWare. מחזירה מחרוזת"
@@ -19268,6 +19329,10 @@ msgstr "שם ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMwa
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "סטטיסטיקת קלט הרשת של ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware,‏ <mode>‏ - bps/בתים לשנייה"
 
+#: include/classes/data/CItemData.php:1387
+msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "סטטיסטיקת פלט הרשת של ה־hypervisor של VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware,‏ <mode>‏ - bps/בתים לשנייה"
@@ -19287,6 +19352,14 @@ msgstr "דגם מעבד של ה־hypervisor מבית VMware,‏ <url> כתובת
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "ניצול תהליך hypervisor של VMware בהרץ,‏ <url> כתובת שירות ה־VMware,‏ <uuid> - שם מארח ה־hypervisor מבית VMware"
+
+#: include/classes/data/CItemData.php:1351
+msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1355
+msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19332,6 +19405,10 @@ msgstr "שטח האחסון הבלתי מוקצה במכונה וירטואלי�
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון דחוס של מכונה וירטואלית ב־VMware,‏ <url> כתובת שירות ה־VMware,‏ <uuid> שם המארח של המכונה הווירטואלית ב־VMware"
 
+#: include/classes/data/CItemData.php:1431
+msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr "שם של חוות (datacenter) של מכונה וירטואליתVMware,‏ <url> - כתובת שירותVMware,‏ <uuid> - שם מארח המכונה הווירטואלית ב־VMware. מחזירה מחרוזת"
@@ -19343,6 +19420,10 @@ msgstr "סטטיסטיקת קריאה מהתקן כונן של מכונה ויר
 #: include/classes/data/CItemData.php:1558
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "סטטיסטיקת כתיבה להתקן כונן של מכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם מארח המכונה הווירטואלית ב־VMware,‏ <instance> - מופע של התקן כונן, <mode>‏ - bps/ops - בתים/פעולות לשנייה"
+
+#: include/classes/data/CItemData.php:1439
+msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1566
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -19396,9 +19477,21 @@ msgstr "ניצולת מעבד במכונה וירטואלית של VMWare בהר
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון שיתופי במכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
 
+#: include/classes/data/CItemData.php:1555
+msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1559
+msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "גודל זיכרון החלפה במכונה וירטואלית של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - שם המארח של המכונה הווירטואלית ב־VMware"
+
+#: include/classes/data/CItemData.php:1591
+msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"

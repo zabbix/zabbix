@@ -380,7 +380,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'sla' => [
 				'title' => _('SLA'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'slaid,name',
 				'form' => [
 					'name' => 'slaform',

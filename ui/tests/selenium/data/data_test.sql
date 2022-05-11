@@ -2027,8 +2027,8 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99912, 99054, 4)
 
 -- Dashboard for problem hosts widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1000, 'Dashboard for Problem hosts widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1000, 1000);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10000, 1000, 'problemhosts', '', 0, 0, 8, 8);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1234, 1000);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10000, 1234, 'problemhosts', '', 0, 0, 8, 8);
 INSERT INTO profiles (profileid,userid,idx,value_id,value_str,source,type) VALUES (4, 1, 'web.dashboard.dashboardid', 1,'','', 1);
 
 -- testPageAvailabilityReport SLA reports
@@ -2105,11 +2105,11 @@ INSERT INTO users_groups (id, usrgrpid, userid) VALUES (92, 7, 91);
 
 -- testHostAvailabilityWidget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1010, 'Dashboard for Host availability widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1010, 1010);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10001, 1010, 'hostavail', 'Reference HA widget', 0, 0, 6, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10002, 1010, 'hostavail', 'Reference HA widget to delete', 0, 3, 6, 3);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (8900, 10002, 2, 'groupids', 0, 4);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (8901, 10002, 0, 'layout', 1);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1345, 1010);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10001, 1345, 'hostavail', 'Reference HA widget', 0, 0, 6, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10002, 1345, 'hostavail', 'Reference HA widget to delete', 0, 3, 6, 3);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1234, 10002, 2, 'groupids', 0, 4);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1235, 10002, 0, 'layout', 1);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50015,'Group for Host availability widget',0);
 INSERT INTO hstgrp (groupid,name,internal) VALUES (50016,'Group in maintenance for Host availability widget',0);
 
@@ -2176,10 +2176,10 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (9
 
 -- testPageTriggerUrl
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1020, 'Dashboard for Trigger overview widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1020, 1020);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10003, 1020, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (8902, 10003, 0, 'style', 1);
-INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (8903, 10003, 2, 'groupids', 0, 50011);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1567, 1020);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10003, 1567, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1345, 10003, 0, 'style', 1);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1346, 10003, 2, 'groupids', 0, 50011);
 
 -- Dashboard for sharing testing
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1210, 'Testing share dashboard', 9, 0);
@@ -2190,9 +2190,9 @@ INSERT INTO dashboard_user (dashboard_userid, dashboardid, userid, permission) V
 
 -- Dashboard for graph widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1030, 'Dashboard for graph widgets', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1030, 1030);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10004, 1030, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10005, 1030, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1568, 1030);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10004, 1568, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10005, 1568, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
 -- widget "Test cases for simple update and deletion"
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90006, 10005, 0, 'righty', 0, '');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (90008, 10005, 1, 'ds.hosts.0.0', 0, 'Host*');
@@ -2224,10 +2224,10 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 
 -- testProblemsBySeverityWidget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1040, 'Dashboard for Problems by severity', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1040, 1040);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10006, 1040, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10007, 1040, 'problemsbysv', 'Reference PBS widget to delete', 12, 0, 6, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10009, 1040, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1569, 1040);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10006, 1569, 'problemsbysv', 'Reference widget', 0, 0, 12, 5);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10007, 1569, 'problemsbysv', 'Reference PBS widget to delete', 12, 0, 6, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10009, 1569, 'problemsbysv', 'Totals reference PBS widget to delete',18, 0, 6, 3);
 INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 80137, 0, 'show_type', 1);
 INSERT INTO widget_field (widgetid, widget_fieldid, type, name, value_int) VALUES (10009, 80138, 0, 'layout', 1);
 
@@ -2371,10 +2371,10 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700039, 7
 INSERT INTO graphs_items (gitemid, graphid, itemid, sortorder) VALUES (700040, 700031, 99106, 1);
 
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1050, 'Dashboard for Dynamic item', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1050, 1050);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10010, 1050, 'graph', '', 0, 0, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10011, 1050, 'graph', '', 8, 0, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10012, 1050, 'graph', '', 16, 0, 8, 3);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1570, 1050);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10010, 1570, 'graph', '', 0, 0, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10011, 1570, 'graph', '', 8, 0, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10012, 1570, 'graph', '', 16, 0, 8, 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90035, 10010, 0, 'source_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90036, 10010, 4, 'itemid', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90037, 10011, 0, 'source_type', 1);
@@ -2383,11 +2383,11 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90040, 10012, 0, 'source_type', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90041, 10012, 4, 'itemid', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90042, 10012, 0, 'dynamic', 1);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10013, 1050, 'graph', '', 0, 3, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10014, 1050, 'graph', '', 8, 3, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10015, 1050, 'graph', '', 16, 3, 8, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10016, 1050, 'graph', '', 0, 6, 10, 3);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10017, 1050, 'graph', '', 10, 6, 10, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10013, 1570, 'graph', '', 0, 3, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10014, 1570, 'graph', '', 8, 3, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10015, 1570, 'graph', '', 16, 3, 8, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10016, 1570, 'graph', '', 0, 6, 10, 3);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10017, 1570, 'graph', '', 10, 6, 10, 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90043, 10013, 6, 'graphid', 0, 700027);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90044, 10014, 6, 'graphid', 0, 700026);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90045, 10014, 0, 'dynamic', 1);
@@ -2397,10 +2397,10 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90049, 10016, 0, 'dynamic', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90050, 10017, 6, 'graphid', 0, 700031);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90051, 10017, 0, 'dynamic', 1);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10018, 1050, 'plaintext', '', 0, 9, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10019, 1050, 'plaintext', '', 8, 9, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10020, 1050, 'plaintext', '', 16, 9, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10021, 1050, 'plaintext', '', 0, 11, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10018, 1570, 'plaintext', '', 0, 9, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10019, 1570, 'plaintext', '', 8, 9, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10020, 1570, 'plaintext', '', 16, 9, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10021, 1570, 'plaintext', '', 0, 11, 8, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90052, 10018, 4, 'itemids', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90053, 10019, 4, 'itemids', 0, 99103);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90054, 10019, 0, 'dynamic', 1);
@@ -2409,17 +2409,17 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90057, 10021, 4, 'itemids', 0, 99103);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90058, 10021, 4, 'itemids', 0, 99104);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90059, 10021, 0, 'dynamic', 1);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10022, 1050, 'url', 'Dynamic URL', 0, 13, 11, 4);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10022, 1570, 'url', 'Dynamic URL', 0, 13, 11, 4);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90060, 10022, 0, 'dynamic', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_str) VALUES (90061, 10022, 1, 'url', 'iframe.php?name={HOST.NAME}');
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10023, 1050, 'graphprototype', '', 0, 17, 9, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10024, 1050, 'graphprototype', '', 9, 17, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10025, 1050, 'graphprototype', '', 17, 17, 7, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10026, 1050, 'graphprototype', '', 0, 19, 8, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10027, 1050, 'graphprototype', '', 8, 19, 9, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10028, 1050, 'graphprototype', '', 17, 19, 7, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10029, 1050, 'graphprototype', '', 0, 21, 11, 2);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10030, 1050, 'graphprototype', '', 11, 21, 11, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10023, 1570, 'graphprototype', '', 0, 17, 9, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10024, 1570, 'graphprototype', '', 9, 17, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10025, 1570, 'graphprototype', '', 17, 17, 7, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10026, 1570, 'graphprototype', '', 0, 19, 8, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10027, 1570, 'graphprototype', '', 8, 19, 9, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10028, 1570, 'graphprototype', '', 17, 19, 7, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10029, 1570, 'graphprototype', '', 0, 21, 11, 2);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10030, 1570, 'graphprototype', '', 11, 21, 11, 2);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90062, 10023, 0, 'source_type', 3);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90063, 10023, 5, 'itemid', 0, 99109);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90064, 10024, 0, 'dynamic', 1);

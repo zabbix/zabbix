@@ -51,11 +51,14 @@
 #include "zbxcrypto.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
-#include "../zabbix_server/availability/avail_manager.h"
+#include "zbxavailability.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxdiag.h"
 #include "diag/diag_proxy.h"
 #include "zbxrtc.h"
+#include "../zabbix_server/availability/avail_manager.h"
+#include "zbxserver.h"
+#include "stats/zabbix_stats.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -1365,6 +1368,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
+	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
 	zbx_diag_init(diag_add_section_info);
 
 	for (i = 0; i < threads_num; i++)

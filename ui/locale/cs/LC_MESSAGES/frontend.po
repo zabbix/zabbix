@@ -348,6 +348,14 @@ msgstr "10 sekund"
 msgid "100 busiest triggers"
 msgstr "100 nejčastějších spouštěčů"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:184
+msgid "12-hour"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:183
+msgid "24-hour"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
 msgstr ""
@@ -697,6 +705,10 @@ msgstr "Aktivní"
 msgctxt "maintenance status"
 msgid "Active"
 msgstr "Aktivní"
+
+#: include/hosts.inc.php:497
+msgid "Active checks"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -1185,6 +1197,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:73
+msgid "Analog"
 msgstr ""
 
 #: app/partials/popup.operations.php:240
@@ -3738,6 +3754,10 @@ msgstr "Kliknout pro zobrazení či úpravu"
 msgid "Clock"
 msgstr "Hodiny"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:72
+msgid "Clock type"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:139
 #: app/views/administration.mediatype.edit.php:365
@@ -5599,6 +5619,10 @@ msgstr "Jedinečný identifikátor zařízení"
 msgid "Digest"
 msgstr ""
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:74
+msgid "Digital"
+msgstr ""
+
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
 msgstr ""
@@ -5858,6 +5882,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1282
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1379
+msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1306
@@ -7256,6 +7284,11 @@ msgstr "Velikost písma"
 #: app/views/popup.httpstep.php:85
 msgid "Form data"
 msgstr "Formulářová data"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:182
+#: include/classes/widgets/forms/CWidgetFormClock.php:242
+msgid "Format"
+msgstr ""
 
 #: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
 #: include/views/configuration.item.prototype.edit.php:707
@@ -11100,6 +11133,10 @@ msgstr ""
 #: app/controllers/CControllerWidgetClockView.php:123
 msgid "Local"
 msgstr "Lokální"
+
+#: include/classes/widgets/fields/CWidgetFieldTimeZone.php:58
+msgid "Local default"
+msgstr ""
 
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
@@ -16078,6 +16115,10 @@ msgstr "Sekundární POC telefon B"
 msgid "Secondary POC screen name"
 msgstr "Sekundární POC jméno obrazovky"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:173
+msgid "Seconds"
+msgstr ""
+
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
 msgstr ""
@@ -16511,6 +16552,10 @@ msgstr "Sdílení"
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Chybějící sdílení \"%1$s\" v hodnotě pro mapu \"%2$s\"."
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:243
+msgid "Short"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:154
 #: app/partials/monitoring.problem.filter.php:222
@@ -19314,6 +19359,14 @@ msgstr ""
 msgid "Users"
 msgstr "Uživatelé"
 
+#: include/classes/data/CItemData.php:1255
+msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1259
+msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1702
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware statistiky cache. Platné módy jsou: total, free, pfree, used a pused."
@@ -19325,6 +19378,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware stav klastru, <url> - URL VMware služby, <name> - VMware jméno klastru"
+
+#: include/classes/data/CItemData.php:1251
+msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
@@ -19367,6 +19424,10 @@ msgstr "VMware velikost balloned paměti, <url> - URL VMware služby, <uuid> - V
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware klastr jméno, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
+#: include/classes/data/CItemData.php:1275
+msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
@@ -19399,6 +19460,10 @@ msgstr "VMware jméno, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware vstupní síťové statistiky, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <mode> - bps"
 
+#: include/classes/data/CItemData.php:1387
+msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware výstupní síťové statistiky, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <mode> - bps"
@@ -19418,6 +19483,14 @@ msgstr "VMware model procesoru, <url> - URL VMware služby, <uuid> - VMware jmé
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware využití procesoru v Hz, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
+
+#: include/classes/data/CItemData.php:1351
+msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1355
+msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19463,6 +19536,10 @@ msgstr "VMware použitý úložný prostor virtuálním strojem, <url> - URL VMw
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost komprimované paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1431
+msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
@@ -19474,6 +19551,10 @@ msgstr "VMware statistika čtení disků virtuálního stroje, <url> - URL VMwar
 #: include/classes/data/CItemData.php:1558
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware statistika zápisů disků virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - instance disku, <mode> - bps/ops - bytes/operations za sekundu"
+
+#: include/classes/data/CItemData.php:1439
+msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1566
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -19527,9 +19608,21 @@ msgstr "VMware využití procesoru virtuálního stroje v Hz, <url> - URL VMware
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost zdílené paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1555
+msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1559
+msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost swapovací paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
+
+#: include/classes/data/CItemData.php:1591
+msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
