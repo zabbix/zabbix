@@ -24,7 +24,7 @@
 
 ZBX_VECTOR_IMPL(var, zbx_variant_t)
 
-void	*zbx_variant_data_bin_copy(const void *bin)
+static void	*zbx_variant_data_bin_copy(const void *bin)
 {
 	zbx_uint32_t		size;
 	void	*value_bin;
