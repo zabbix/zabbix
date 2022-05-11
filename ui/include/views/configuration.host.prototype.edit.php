@@ -180,7 +180,7 @@ $host_tab
 
 // Existing groups.
 $host_tab->addRow(
-	(new CLabel(_('Groups'), 'group_links__ms'))->setAsteriskMark(),
+	(new CLabel(_('Host groups'), 'group_links__ms'))->setAsteriskMark(),
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',
