@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -207,8 +207,6 @@ static void	zbx_yaml_replace_node_rec(yaml_document_t *doc, yaml_node_t *parent,
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_yaml_replace_node                                            *
- *                                                                            *
  * Purpose: replaces node occurrences in mappings and sequences with the new  *
  *          node index                                                        *
  *                                                                            *
@@ -239,8 +237,6 @@ static void	zbx_yaml_replace_node(yaml_document_t *doc, int old_index, int new_i
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_yaml_include_rec                                             *
  *                                                                            *
  * Purpose: recursively include yaml documents from first level 'include'     *
  *          mapping scalar value or sequence                                  *
@@ -280,8 +276,6 @@ static void	zbx_yaml_include_rec(yaml_document_t *doc, int *index)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_yaml_check_include                                           *
  *                                                                            *
  * Purpose: includes another yaml document if include tag is set              *
  *                                                                            *
@@ -976,8 +970,6 @@ zbx_mock_error_t	zbx_mock_int(zbx_mock_handle_t object, int *value)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_mock_string_ex                                               *
  *                                                                            *
  * Purpose: return string object contents                                     *
  *                                                                            *

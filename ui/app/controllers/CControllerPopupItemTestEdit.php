@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,6 +75,11 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'verify_peer'			=> 'in 0,1'
 		];
 
+		if (getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+			unset($fields['interfaceid']);
+			unset($_REQUEST['interfaceid']);
+		}
+
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
@@ -99,6 +104,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			 */
 			$steps = $this->getInput('steps', []);
 			if ($ret && $steps) {
+				$steps = normalizeItemPreprocessingSteps($steps);
 				$steps_validation_response = $this->preproc_item->validateItemPreprocessingSteps($steps);
 				if ($steps_validation_response !== true) {
 					error($steps_validation_response);
@@ -136,6 +142,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		// Work with preprocessing steps.
 		$preprocessing_steps_input = $this->getInput('steps', []);
+		$preprocessing_steps_input = normalizeItemPreprocessingSteps($preprocessing_steps_input);
 		$preprocessing_steps = [];
 		foreach ($preprocessing_steps_input as $preproc) {
 			if ($preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
@@ -191,20 +198,33 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 								break;
 
 							case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
-								foreach ($token['data']['parameters'][0]['data']['filter']['tokens'] as $filter_token) {
-									switch ($filter_token['type']) {
-										case CFilterParser::TOKEN_TYPE_USER_MACRO:
-											$texts_support_user_macros[] = $filter_token['match'];
+								foreach ($token['data']['parameters'] as $parameter) {
+									switch ($parameter['type']) {
+										case CHistFunctionParser::PARAM_TYPE_QUERY:
+											foreach ($parameter['data']['filter']['tokens'] as $filter_token) {
+												switch ($filter_token['type']) {
+													case CFilterParser::TOKEN_TYPE_USER_MACRO:
+														$texts_support_user_macros[] = $filter_token['match'];
+														break;
+
+													case CFilterParser::TOKEN_TYPE_LLD_MACRO:
+														$texts_support_lld_macros[] = $filter_token['match'];
+														break;
+
+													case CFilterParser::TOKEN_TYPE_STRING:
+														$text = CFilterParser::unquoteString($filter_token['match']);
+														$texts_support_user_macros[] = $text;
+														$texts_support_lld_macros[] = $text;
+														break;
+												}
+											}
 											break;
 
-										case CFilterParser::TOKEN_TYPE_LLD_MACRO:
-											$texts_support_lld_macros[] = $filter_token['match'];
-											break;
-
-										case CFilterParser::TOKEN_TYPE_STRING:
-											$text = CFilterParser::unquoteString($filter_token['match']);
-											$texts_support_user_macros[] = $text;
-											$texts_support_lld_macros[] = $text;
+										case CHistFunctionParser::PARAM_TYPE_PERIOD:
+										case CHistFunctionParser::PARAM_TYPE_QUOTED:
+										case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
+											$texts_support_user_macros[] = $parameter['match'];
+											$texts_support_lld_macros[] = $parameter['match'] ;
 											break;
 									}
 								}

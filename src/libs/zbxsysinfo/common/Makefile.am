@@ -5,8 +5,8 @@ noinst_LIBRARIES = libcommonsysinfo.a libcommonsysinfo_http.a libcommonsysinfo_h
 libcommonsysinfo_a_CFLAGS = -I@top_srcdir@/src/zabbix_agent/
 
 libcommonsysinfo_a_SOURCES = \
-	common.c \
-	common.h \
+	zbxsysinfo_common.c \
+	zbxsysinfo_common.h \
 	cpu.c \
 	cpu.h \
 	dir.c \

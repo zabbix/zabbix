@@ -33,7 +33,7 @@
 .
 .  hy \\n(HY
 ..
-.TH ZABBIX_JS 1 "2019\-01\-29" Zabbix
+.TH ZABBIX_JS 1 "2022\-01\-06" Zabbix
 .SH NAME
 zabbix_js \- Zabbix JS utility
 .SH SYNOPSIS

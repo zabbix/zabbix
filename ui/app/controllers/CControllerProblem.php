@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ abstract class CControllerProblem extends CController {
 		'inventory' => [],
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
-		'show_tags' => PROBLEMS_SHOW_TAGS_3,
+		'show_tags' => SHOW_TAGS_3,
 		'show_suppressed' => 0,
 		'unacknowledged' => 0,
 		'compact_view' => 0,
@@ -48,7 +48,7 @@ abstract class CControllerProblem extends CController {
 		'details' => 0,
 		'highlight_row' => 0,
 		'show_opdata' => OPERATIONAL_DATA_SHOW_NONE,
-		'tag_name_format' => PROBLEMS_TAG_NAME_FULL,
+		'tag_name_format' => TAG_NAME_FULL,
 		'tag_priority' => '',
 		'page' => null,
 		'sort' => 'clock',

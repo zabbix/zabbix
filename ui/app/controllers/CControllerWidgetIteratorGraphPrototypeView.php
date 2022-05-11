@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 	protected function doGraphPrototype(array $fields) {
 		$options = [
 			'output' => ['graphid', 'name'],
-			'selectHosts' => ['name'],
+			'selectHosts' => ['hostid', 'name'],
 			'selectDiscoveryRule' => ['hostid']
 		];
 
@@ -161,9 +161,12 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 			$widget_name = $this->getInput('name');
 		}
 		else {
+			$host_names = array_column($graph_prototype['hosts'], 'name', 'hostid');
+			$host_name = $host_names[$graph_prototype['discoveryRule']['hostid']];
+
 			$widget_name = $is_template_dashboard
 				? $graph_prototype['name']
-				: $graph_prototype['hosts'][0]['name'].NAME_DELIMITER.$graph_prototype['name'];
+				: $host_name.NAME_DELIMITER.$graph_prototype['name'];
 		}
 
 		return [
@@ -229,7 +232,7 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 		// Do not collect items while editing a template dashboard.
 		if (!$is_template_dashboard || $this->hasInput('dynamic_hostid')) {
 			$items_created_all = API::Item()->get([
-				'output' => ['itemid', 'name', 'key_', 'hostid'],
+				'output' => ['itemid', 'name'],
 				'hostids' => [$item_prototype['discoveryRule']['hostid']],
 				'selectItemDiscovery' => ['itemid', 'parent_itemid'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
@@ -242,10 +245,10 @@ class CControllerWidgetIteratorGraphPrototypeView extends CControllerWidgetItera
 					$items_created[] = $item;
 				}
 			}
-			foreach (CMacrosResolverHelper::resolveItemNames($items_created) as $item) {
+			foreach ($items_created as $item) {
 				$items_collected[$item['itemid']] = $is_template_dashboard
-					? $item['name_expanded']
-					: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name_expanded'];
+					? $item['name']
+					: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 			}
 			natsort($items_collected);
 		}

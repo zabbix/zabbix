@@ -1,0 +1,53 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:41Z'
+  groups:
+    -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    -
+      uuid: ae6029df63724ff4a15819939ef74edd
+      template: 'HTTP Service'
+      name: 'HTTP Service'
+      description: |
+        Template module for monitoring HTTP service
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: 5cf1d86051e34f47aec2bb0d97cf6b44
+          name: 'HTTP service is running'
+          type: SIMPLE
+          key: 'net.tcp.service[http]'
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: b299d73cebcd430c8bfc54cf9b84e853
+              expression: 'max(/HTTP Service/net.tcp.service[http],#3)=0'
+              name: 'HTTP service is down on {HOST.NAME}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      valuemaps:
+        -
+          uuid: 2ad1e9aeb097470ba36a09c56c67eadd
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up

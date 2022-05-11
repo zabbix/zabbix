@@ -1,0 +1,53 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:45Z'
+  groups:
+    -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    -
+      uuid: 7fc69c6afd334bcab0a133174983939f
+      template: 'Telnet Service'
+      name: 'Telnet Service'
+      description: |
+        Template module for monitoring telnet service
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: 55990514600a4a998dbc4bdd94edbcb2
+          name: 'Telnet service is running'
+          type: SIMPLE
+          key: 'net.tcp.service[telnet]'
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 7135280c598548e6bf17fd1909d4281a
+              expression: 'max(/Telnet Service/net.tcp.service[telnet],#3)=0'
+              name: 'Telnet service is down on {HOST.NAME}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      valuemaps:
+        -
+          uuid: 1d4d40a040d84b0eae345be144dee1b7
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up

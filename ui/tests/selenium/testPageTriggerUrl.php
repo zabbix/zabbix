@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ class testPageTriggerUrl extends CWebTest {
 	 * Check trigger url in Trigger overview widget.
 	 */
 	public function testPageTriggerUrl_TriggerOverviewWidget($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=102');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10220');
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget('Group to check Overview');
 
@@ -134,7 +134,7 @@ class testPageTriggerUrl extends CWebTest {
 			// Check Url of each link.
 			foreach ($data['links'] as $link => $url) {
 				$this->assertTrue($popup->hasItems($link));
-				$this->assertContains($url, $popup->getItem($link)->getAttribute('href'));
+				$this->assertStringContainsString($url, $popup->getItem($link)->getAttribute('href'));
 			}
 			if ($trigger_overview) {
 				$this->assertTrue($popup->hasItems('Acknowledge'));
@@ -156,6 +156,6 @@ class testPageTriggerUrl extends CWebTest {
 
 		// Check opened page.
 		$this->assertEquals('Event details', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-		$this->assertContains($data['links']['Trigger URL'], $this->page->getCurrentUrl());
+		$this->assertStringContainsString($data['links']['Trigger URL'], $this->page->getCurrentUrl());
 	}
 }

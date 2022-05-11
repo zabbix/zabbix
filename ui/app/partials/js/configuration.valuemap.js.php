@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 		let valuemap_table = event.target.closest('table');
 
 		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => valuemap_names.push(elm.value));
-		PopUp("popup.valuemap.edit", {valuemap_names: valuemap_names}, null, event.target);
+		PopUp('popup.valuemap.edit', {valuemap_names}, {trigger_element: event.target});
 	}
 })();
 </script>
@@ -77,7 +77,7 @@ var AddValueMap = class {
 	createNameCell() {
 		const cell = document.createElement('td');
 		const link = document.createElement('a');
-		link.innerText = this.data.name;
+		link.textContent = this.data.name;
 		link.classList.add('wordwrap');
 		link.href = 'javascript:void(0);';
 		link.addEventListener('click', (e) => {
@@ -89,7 +89,7 @@ var AddValueMap = class {
 					valuemap_names.push(element.value);
 				}
 			});
-			PopUp('popup.valuemap.edit', {...this.data, valuemap_names, edit: 1}, null, e.target);
+			PopUp('popup.valuemap.edit', {...this.data, valuemap_names, edit: 1}, {trigger_element: e.target});
 		});
 
 		cell.appendChild(this.createHiddenInput('[name]', this.data.name));
@@ -103,7 +103,7 @@ var AddValueMap = class {
 		const btn = document.createElement('button');
 		btn.type = 'button';
 		btn.classList.add('btn-link', 'element-table-remove');
-		btn.innerHTML = <?= json_encode(_('Remove')) ?>;
+		btn.textContent = <?= json_encode(_('Remove')) ?>;
 		btn.addEventListener('click', () => this.row.remove());
 
 		cell.appendChild(btn);

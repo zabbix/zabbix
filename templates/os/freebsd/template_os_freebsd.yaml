@@ -1,0 +1,967 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:27:27Z'
+  groups:
+    -
+      uuid: 846977d1dfed4968bc5f8bdb363285bc
+      name: 'Templates/Operating systems'
+  templates:
+    -
+      uuid: a3dc630729e443139f4e608954fa6e19
+      template: 'FreeBSD by Zabbix agent'
+      name: 'FreeBSD by Zabbix agent'
+      description: |
+        Official FreeBSD template. Requires agent of Zabbix 6.0 or newer.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Operating systems'
+      items:
+        -
+          uuid: 74bc1a15ef314d5f9b26332531885c0d
+          name: 'Host name of Zabbix agent running'
+          key: agent.hostname
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: da59d099f7614653b37b8eaaa518ebd2
+          name: 'Zabbix agent ping'
+          key: agent.ping
+          history: 7d
+          description: 'The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.'
+          valuemap:
+            name: 'Zabbix agent ping status'
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: e2b84269401e41acb973bc29666b9e7a
+          name: 'Version of Zabbix agent running'
+          key: agent.version
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: application
+        -
+          uuid: d1b2d3cc2b7e44af8f9bfee11e04bf21
+          name: 'Maximum number of opened files'
+          key: kernel.maxfiles
+          delay: 1h
+          history: 1w
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: 00f035b7890d4227a84a942ba5730df3
+              expression: 'last(/FreeBSD by Zabbix agent/kernel.maxfiles)<1024'
+              name: 'Configured max number of opened files is too low on {HOST.NAME}'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 58244a8e72694ffcbba5a78a910ae818
+          name: 'Maximum number of processes'
+          key: kernel.maxproc
+          delay: 1h
+          history: 1w
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
+          tags:
+            -
+              tag: component
+              value: os
+            -
+              tag: component
+              value: processes
+          triggers:
+            -
+              uuid: 0d2417112c1e4ef38a4b763872cbb18b
+              expression: 'last(/FreeBSD by Zabbix agent/kernel.maxproc)<256'
+              name: 'Configured max number of processes is too low on {HOST.NAME}'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 448c6de07b244281a4b1defe2e811773
+          name: 'Number of running processes'
+          key: 'proc.num[,,run]'
+          history: 1w
+          description: 'Number of processes in running state.'
+          tags:
+            -
+              tag: component
+              value: os
+            -
+              tag: component
+              value: processes
+          triggers:
+            -
+              uuid: 837fdc71174246d987a6f7f277d65f6c
+              expression: 'avg(/FreeBSD by Zabbix agent/proc.num[,,run],5m)>30'
+              name: 'Too many processes running on {HOST.NAME}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 5fd5b351d8214eac8f4f4649594c27eb
+          name: 'Number of processes'
+          key: 'proc.num[]'
+          history: 1w
+          description: 'Total number of processes in any state.'
+          tags:
+            -
+              tag: component
+              value: os
+            -
+              tag: component
+              value: processes
+          triggers:
+            -
+              uuid: 0d5ac85120734fa98d3eef01b6f4033b
+              expression: 'avg(/FreeBSD by Zabbix agent/proc.num[],5m)>300'
+              name: 'Too many processes on {HOST.NAME}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 4a533b30c43e42fb8c9eabada0817186
+          name: 'Host boot time'
+          key: system.boottime
+          delay: 10m
+          history: 1w
+          units: unixtime
+          tags:
+            -
+              tag: component
+              value: os
+        -
+          uuid: db555e8318cf4e7aa7beb85aa0250697
+          name: 'Interrupts per second'
+          key: system.cpu.intr
+          history: 1w
+          units: ips
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 2336b2ec03a846f3bed1e64384b2532e
+          name: 'Processor load (1 min average per core)'
+          key: 'system.cpu.load[percpu,avg1]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 8c339065ecc54b7d8c2e4405f2149f27
+              expression: 'avg(/FreeBSD by Zabbix agent/system.cpu.load[percpu,avg1],5m)>5'
+              name: 'Processor load is too high on {HOST.NAME}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: de68f40fc96648c0925c1f6a4ca6776e
+          name: 'Processor load (5 min average per core)'
+          key: 'system.cpu.load[percpu,avg5]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: ad9ebf859f7346ca885c1edcb7333d78
+          name: 'Processor load (15 min average per core)'
+          key: 'system.cpu.load[percpu,avg15]'
+          history: 1w
+          value_type: FLOAT
+          description: 'The processor load is calculated as system CPU load divided by number of CPU cores.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 0a140185a5114dd29451bfac68abdde5
+          name: 'Context switches per second'
+          key: system.cpu.switches
+          history: 1w
+          units: sps
+          preprocessing:
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 7612803821c845889bda84b7f1ac9ae5
+          name: 'CPU idle time'
+          key: 'system.cpu.util[,idle]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent doing nothing.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: f2acc3cd432546e5a223095a0ea2f096
+          name: 'CPU interrupt time'
+          key: 'system.cpu.util[,interrupt]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The amount of time the CPU has been servicing hardware interrupts.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: efa92492bec0437ba74f47d694500cab
+          name: 'CPU nice time'
+          key: 'system.cpu.util[,nice]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent running users'' processes that have been niced.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: c9479b02b04141128b1ce7c8f3726c09
+          name: 'CPU system time'
+          key: 'system.cpu.util[,system]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent running the kernel and its processes.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 1f3bc82009e04b59845a0e15004637ad
+          name: 'CPU user time'
+          key: 'system.cpu.util[,user]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'The time the CPU has spent running users'' processes that are not niced.'
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: c17d001bd20a4732b8ef487366c6aa42
+          name: 'Host name'
+          key: system.hostname
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          description: 'System host name.'
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: f48fb8ce1229492dae62de362c8c9539
+              expression: 'last(/FreeBSD by Zabbix agent/system.hostname,#1)<>last(/FreeBSD by Zabbix agent/system.hostname,#2)'
+              name: 'Hostname was changed on {HOST.NAME}'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 4095ed7d606a47439294097a98af2c4f
+          name: 'Host local time'
+          key: system.localtime
+          history: 1w
+          units: unixtime
+          tags:
+            -
+              tag: component
+              value: os
+        -
+          uuid: 63fc1259011f4250901889979cdf472c
+          name: 'Free swap space'
+          key: 'system.swap.size[,free]'
+          history: 1w
+          units: B
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 187d11e610b94b468d18b88ca38f2c32
+          name: 'Free swap space in %'
+          key: 'system.swap.size[,pfree]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: a125b6786d55426eb19afe284cee1f76
+              expression: 'last(/FreeBSD by Zabbix agent/system.swap.size[,pfree])<50'
+              name: 'Lack of free swap space on {HOST.NAME}'
+              priority: WARNING
+              description: 'It probably means that the systems requires more physical memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 9647b0b857074c4b9c14f15bb04af096
+          name: 'Total swap space'
+          key: 'system.swap.size[,total]'
+          delay: 1h
+          history: 1w
+          units: B
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: 4523ae069e0b4e16bcb5182c6dbf63f2
+          name: 'System information'
+          key: system.uname
+          delay: 1h
+          history: 1w
+          trends: '0'
+          value_type: CHAR
+          description: 'The information as normally returned by ''uname -a''.'
+          inventory_link: OS
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: ea2f9c186798420da781bd835fa0eaed
+              expression: 'last(/FreeBSD by Zabbix agent/system.uname,#1)<>last(/FreeBSD by Zabbix agent/system.uname,#2)'
+              name: 'Host information was changed on {HOST.NAME}'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: a49b956d592c4e2ba41caac3671e009f
+          name: 'System uptime'
+          key: system.uptime
+          delay: 10m
+          history: 1w
+          units: uptime
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: 809e57eb897b43fb8538e76ec7dd6602
+              expression: 'change(/FreeBSD by Zabbix agent/system.uptime)<0'
+              name: '{HOST.NAME} has just been restarted'
+              priority: INFO
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: fec3e877764e4bfd98e77da9d8c73606
+          name: 'Number of logged in users'
+          key: system.users.num
+          history: 1w
+          description: 'Number of users who are currently logged in.'
+          tags:
+            -
+              tag: component
+              value: os
+        -
+          uuid: 2bb327cd5f8c49d9b680142825b9c030
+          name: 'Checksum of /etc/passwd'
+          key: 'vfs.file.cksum[/etc/passwd,sha256]'
+          delay: 1h
+          history: 1w
+          tags:
+            -
+              tag: component
+              value: security
+          triggers:
+            -
+              uuid: 27b4e5de411949a4befa7171a2af6441
+              expression: 'last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/FreeBSD by Zabbix agent/vfs.file.cksum[/etc/passwd,sha256],#2)'
+              name: '/etc/passwd has been changed on {HOST.NAME}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: security
+        -
+          uuid: 561c7a383b944bca9ec5f7c44e322fed
+          name: 'Available memory'
+          key: 'vm.memory.size[available]'
+          history: 1w
+          units: B
+          description: 'Available memory is defined as free+cached+buffers memory.'
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: f8fcce1904ab46088fa80433b85f2e83
+              expression: 'last(/FreeBSD by Zabbix agent/vm.memory.size[available])<20M'
+              name: 'Lack of available memory on server {HOST.NAME}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: ffa54e82b7914672a3f7134134ac2638
+          name: 'Total memory'
+          key: 'vm.memory.size[total]'
+          delay: 1h
+          history: 1w
+          units: B
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: cbfaa94dc7bc4606a792aaf357054075
+          name: 'Zabbix agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,agent,available]'
+          history: 7d
+          description: 'Monitoring agent availability status'
+          valuemap:
+            name: zabbix.host.available
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: fd9d36aaedff45f59017b1e714a5db69
+              expression: 'max(/FreeBSD by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              priority: AVERAGE
+              description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      discovery_rules:
+        -
+          uuid: cac3466488a544198f766d1152878456
+          name: 'Network interface discovery'
+          key: net.if.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#IFNAME}'
+                value: '@Network interfaces for discovery'
+                formulaid: A
+          description: 'Discovery of network interfaces as defined in global regular expression "Network interfaces for discovery".'
+          item_prototypes:
+            -
+              uuid: b1f9e472c6ed467d8cb0cc1739c39b59
+              name: 'Network interfaces: Incoming network traffic on {#IFNAME}'
+              key: 'net.if.in[{#IFNAME}]'
+              history: 1w
+              units: bps
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+            -
+              uuid: ac93068d05084aa0a32a1bee78df3bd8
+              name: 'Network interfaces: Outgoing network traffic on {#IFNAME}'
+              key: 'net.if.out[{#IFNAME}]'
+              history: 1w
+              units: bps
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '8'
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: interface
+                  value: '{#IFNAME}'
+          graph_prototypes:
+            -
+              uuid: 1f52d0c9ee934eb3a5198ab53fdf4679
+              name: 'Network interfaces: Network traffic on {#IFNAME}'
+              ymin_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 00AA00
+                  item:
+                    host: 'FreeBSD by Zabbix agent'
+                    key: 'net.if.in[{#IFNAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 3333FF
+                  item:
+                    host: 'FreeBSD by Zabbix agent'
+                    key: 'net.if.out[{#IFNAME}]'
+        -
+          uuid: 4fd60a606c6343e9a7d7808d1d1f6008
+          name: 'Mounted filesystem discovery'
+          key: vfs.fs.discovery
+          delay: 1h
+          filter:
+            conditions:
+              -
+                macro: '{#FSTYPE}'
+                value: '@File systems for discovery'
+                formulaid: A
+          description: 'Discovery of file systems of different types as defined in global regular expression "File systems for discovery".'
+          item_prototypes:
+            -
+              uuid: a5cdfe771122483fa1a88b2ea5c26b36
+              name: 'Filesystems: Free inodes on {#FSNAME} (percentage)'
+              key: 'vfs.fs.inode[{#FSNAME},pfree]'
+              history: 1w
+              value_type: FLOAT
+              units: '%'
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 2b87c38f49b146f1b801319d03a19dc3
+                  expression: 'last(/FreeBSD by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree])<20'
+                  name: 'Filesystems: Free inodes is less than 20% on volume {#FSNAME}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 2ed6230d292a4037b67fe549c719e7ee
+              name: 'Filesystems: Free disk space on {#FSNAME}'
+              key: 'vfs.fs.size[{#FSNAME},free]'
+              history: 1w
+              units: B
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: aa0dd0eb957a4485b1a62f715381019a
+              name: 'Filesystems: Free disk space on {#FSNAME} (percentage)'
+              key: 'vfs.fs.size[{#FSNAME},pfree]'
+              history: 1w
+              value_type: FLOAT
+              units: '%'
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+              trigger_prototypes:
+                -
+                  uuid: 01ea8e7f30564586af3b48adb3c930c1
+                  expression: 'last(/FreeBSD by Zabbix agent/vfs.fs.size[{#FSNAME},pfree])<20'
+                  name: 'Filesystems: Free disk space is less than 20% on volume {#FSNAME}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 6daede58ae8f4e42a4aa2539a552ab08
+              name: 'Filesystems: Total disk space on {#FSNAME}'
+              key: 'vfs.fs.size[{#FSNAME},total]'
+              delay: 1h
+              history: 1w
+              units: B
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+            -
+              uuid: 6efb08c26e1b439181a17d462ec1dab8
+              name: 'Filesystems: Used disk space on {#FSNAME}'
+              key: 'vfs.fs.size[{#FSNAME},used]'
+              history: 1w
+              units: B
+              tags:
+                -
+                  tag: component
+                  value: filesystem
+                -
+                  tag: filesystem
+                  value: '{#FSNAME}'
+          graph_prototypes:
+            -
+              uuid: 5f8ff96d3ea744bba849c9dc1464632f
+              name: 'Filesystems: Disk space usage {#FSNAME}'
+              width: '600'
+              height: '340'
+              show_work_period: 'NO'
+              show_triggers: 'NO'
+              type: PIE
+              show_3d: 'YES'
+              graph_items:
+                -
+                  color: C80000
+                  type: GRAPH_SUM
+                  item:
+                    host: 'FreeBSD by Zabbix agent'
+                    key: 'vfs.fs.size[{#FSNAME},total]'
+                -
+                  sortorder: '1'
+                  color: 00C800
+                  item:
+                    host: 'FreeBSD by Zabbix agent'
+                    key: 'vfs.fs.size[{#FSNAME},free]'
+      tags:
+        -
+          tag: class
+          value: os
+        -
+          tag: target
+          value: freebsd
+      macros:
+        -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 3m
+          description: 'Timeout after which agent is considered unavailable. Works only for agents reachable from Zabbix server/proxy (passive mode).'
+      dashboards:
+        -
+          uuid: 618c8fc9d4b640999b3389960f5bead4
+          name: 'System performance'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU load'
+                        host: 'FreeBSD by Zabbix agent'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'CPU utilization'
+                        host: 'FreeBSD by Zabbix agent'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Memory usage'
+                        host: 'FreeBSD by Zabbix agent'
+                -
+                  type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    -
+                      type: INTEGER
+                      name: source_type
+                      value: '0'
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Swap usage'
+                        host: 'FreeBSD by Zabbix agent'
+      valuemaps:
+        -
+          uuid: 9c02af203e354ac6ac87a742e85f683b
+          name: zabbix.host.available
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: b82f35541efe4fc1a432c049eba5d082
+          name: 'Zabbix agent ping status'
+          mappings:
+            -
+              value: '1'
+              newvalue: Up
+  graphs:
+    -
+      uuid: 3ed928729f2d41139a42ca3ee0204551
+      name: 'CPU jumps'
+      graph_items:
+        -
+          color: '009900'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: system.cpu.switches
+        -
+          sortorder: '1'
+          color: '000099'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: system.cpu.intr
+    -
+      uuid: ac8b187522904c0880ea16a2b8727dfc
+      name: 'CPU load'
+      ymin_type_1: FIXED
+      graph_items:
+        -
+          color: '009900'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.cpu.load[percpu,avg1]'
+        -
+          sortorder: '1'
+          color: '000099'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.cpu.load[percpu,avg5]'
+        -
+          sortorder: '2'
+          color: '990000'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.cpu.load[percpu,avg15]'
+    -
+      uuid: ecdccd78d75d4255948995b510acfefb
+      name: 'CPU utilization'
+      show_triggers: 'NO'
+      type: STACKED
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: FILLED_REGION
+          color: '009999'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.cpu.util[,interrupt]'
+        -
+          sortorder: '1'
+          drawtype: FILLED_REGION
+          color: '990099'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.cpu.util[,nice]'
+        -
+          sortorder: '2'
+          drawtype: FILLED_REGION
+          color: '990000'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.cpu.util[,system]'
+        -
+          sortorder: '3'
+          drawtype: FILLED_REGION
+          color: '000099'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.cpu.util[,user]'
+        -
+          sortorder: '4'
+          drawtype: FILLED_REGION
+          color: '009900'
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.cpu.util[,idle]'
+    -
+      uuid: 191f6c7b63204fd091d2e82c4f4b678a
+      name: 'Memory usage'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 00C800
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'vm.memory.size[available]'
+    -
+      uuid: 23ade54acd87415080578379ab2cca6b
+      name: 'Swap usage'
+      width: '600'
+      height: '340'
+      show_work_period: 'NO'
+      show_triggers: 'NO'
+      type: PIE
+      show_3d: 'YES'
+      graph_items:
+        -
+          color: AA0000
+          type: GRAPH_SUM
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.swap.size[,total]'
+        -
+          sortorder: '1'
+          color: 00AA00
+          item:
+            host: 'FreeBSD by Zabbix agent'
+            key: 'system.swap.size[,free]'

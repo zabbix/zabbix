@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,6 +71,12 @@ class CMacroParser extends CParser {
 		}
 		if (array_key_exists('ref_type', $options)) {
 			$this->options['ref_type'] = $options['ref_type'];
+		}
+
+		if (is_array($this->options['macros'])) {
+			usort($this->options['macros'], static function (string $a, string $b) {
+				return strlen($b) <=> strlen($a);
+			});
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,21 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxconf.h"
 
-#include "cfg.h"
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
+
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #endif
-#include "comms.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: load_aliases                                                     *
  *                                                                            *
  * Purpose: load aliases from configuration                                   *
  *                                                                            *
@@ -75,8 +71,6 @@ void	load_aliases(char **lines)
 
 /******************************************************************************
  *                                                                            *
- * Function: load_user_parameters                                             *
- *                                                                            *
  * Purpose: load user parameters from configuration                           *
  *                                                                            *
  * Parameters: lines - user parameter entries from configuration file         *
@@ -84,8 +78,6 @@ void	load_aliases(char **lines)
  *                                                                            *
  * Return value: SUCCEED - successfully loaded user parameters                *
  *               FAIL    - failed to load user parameters                     *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  * Comments: calls add_user_parameter() for each entry                        *
  *                                                                            *
@@ -117,8 +109,6 @@ int	load_user_parameters(char **lines, char **err)
 
 /******************************************************************************
  *                                                                            *
- * Function: load_key_access_rule                                             *
- *                                                                            *
  * Purpose: Adds key access rule from configuration                           *
  *                                                                            *
  * Parameters: value - [IN] key access rule parameter value                   *
@@ -126,8 +116,6 @@ int	load_user_parameters(char **lines, char **err)
  *                                                                            *
  * Return value: SUCCEED - successful execution                               *
  *               FAIL    - failed to add rule                                 *
- *                                                                            *
- * Author: Andrejs Tumilovics                                                 *
  *                                                                            *
  ******************************************************************************/
 int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
@@ -147,18 +135,10 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 #ifdef _WINDOWS
 /******************************************************************************
  *                                                                            *
- * Function: load_perf_counters                                               *
- *                                                                            *
  * Purpose: load performance counters from configuration                      *
  *                                                                            *
  * Parameters: def_lines - array of PerfCounter configuration entries         *
  *             eng_lines - array of PerfCounterEn configuration entries       *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void	load_perf_counters(const char **def_lines, const char **eng_lines)
@@ -239,8 +219,6 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 #else
 /******************************************************************************
  *                                                                            *
- * Function: load_config_user_params                                          *
- *                                                                            *
  * Purpose: load user parameters from configuration file                      *
  *                                                                            *
  ******************************************************************************/
@@ -260,8 +238,6 @@ static int	load_config_user_params(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: reload_user_parameters                                           *
- *                                                                            *
  * Purpose: reload user parameters                                            *
  *                                                                            *
  * Parameters: process_type - process type                                    *
@@ -270,9 +246,9 @@ static int	load_config_user_params(void)
  ******************************************************************************/
 void	reload_user_parameters(unsigned char process_type, int process_num)
 {
-	char	*error = NULL;
+	char		*error = NULL;
+	ZBX_METRIC	*metrics_fallback = NULL;
 
-	remove_user_parameters();
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 
 	if (FAIL == load_config_user_params())
@@ -282,14 +258,19 @@ void	reload_user_parameters(unsigned char process_type, int process_num)
 		goto out;
 	}
 
+	get_metrics_copy(&metrics_fallback);
+	remove_user_parameters();
+
 	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], stopped at: %s",
+		set_metrics(metrics_fallback);
+		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], %s",
 				get_process_type_string(process_type), process_num, error);
 		zbx_free(error);
 		goto out;
 	}
 
+	free_metrics_ext(&metrics_fallback);
 	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
 			process_num);
 out:

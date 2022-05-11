@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "cpustat.h"
+
 #include "common.h"
 #include "stats.h"
-#include "cpustat.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
 /* defined in sysinfo lib */
@@ -317,7 +318,7 @@ int	get_cpu_perf_counter_value(int cpu_num, int interval, double *value, char **
 {
 	int	idx;
 
-	/* For Windows we identify CPU by it's index in cpus array, which is CPU ID + 1. */
+	/* For Windows we identify CPU by its index in cpus array, which is CPU ID + 1. */
 	/* At index 0 we keep information about all CPUs. */
 
 	if (ZBX_CPUNUM_ALL == cpu_num)
@@ -1307,8 +1308,6 @@ static int	get_cpu_status(int pc_status)
 #endif	/* _WINDOWS */
 
 /******************************************************************************
- *                                                                            *
- * Function: get_cpus                                                         *
  *                                                                            *
  * Purpose: Retrieve list of available CPUs in the collector                  *
  *                                                                            *

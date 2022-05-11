@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,12 +95,10 @@ class COverlayDialogElement extends CElement {
 
 	/**
 	 * Close overlay dialog.
-	 *
-	 * @return $this
 	 */
 	public function close() {
 		$this->query('class:overlay-close-btn')->one()->click();
-		return $this->ensureNotPresent();
+		$this->ensureNotPresent();
 	}
 
 	/**
@@ -109,5 +107,12 @@ class COverlayDialogElement extends CElement {
 	public static function ensureNotPresent() {
 		(new CElementQuery('xpath', '//*['.CXPathHelper::fromClass('overlay-dialogue-body').' or '.
 				CXPathHelper::fromClass('overlay-bg').']'))->waitUntilNotVisible();
+	}
+
+	/**
+	 * Scroll the dialog to the top position.
+	 */
+	public function scrollToTop() {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)', [$this->getContent()]);
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,11 +31,11 @@ import (
 
 	"encoding/binary"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	named "github.com/BurntSushi/locker"
 	"github.com/goburrow/modbus"
 	mblib "github.com/goburrow/modbus"
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
 )
 
 // Plugin -

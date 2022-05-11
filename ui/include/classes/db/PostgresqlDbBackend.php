@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -239,14 +239,16 @@ class PostgresqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function init() {
-		$schema_set = DBexecute('SET search_path='.zbx_dbstr($this->schema), true);
+		global $DB;
 
-		if(!$schema_set) {
-			$this->setError(pg_last_error());
+		$schema_set = DBexecute('SET search_path='.zbx_dbstr($this->schema));
+
+		if (!$schema_set) {
+			$this->setError(pg_last_error($DB['DB']));
 			return false;
 		}
 
-		$pgsql_version = pg_parameter_status('server_version');
+		$pgsql_version = pg_parameter_status($DB['DB'], 'server_version');
 
 		if ($pgsql_version !== false && (int) $pgsql_version >= 9) {
 			// change the output format for values of type bytea from hex (the default) to escape

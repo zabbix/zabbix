@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "zbxalgo.h"
 #include "db.h"
 #include "dbcache.h"
 #include "zbxhistory.h"
+
 #include "history.h"
 
 typedef struct
@@ -96,8 +96,6 @@ static zbx_vc_history_table_t	vc_history_tables[] = {
 
 /************************************************************************************
  *                                                                                  *
- * Function: sql_writer_init                                                        *
- *                                                                                  *
  * Purpose: initializes sql writer for a new batch of history values                *
  *                                                                                  *
  ************************************************************************************/
@@ -112,8 +110,6 @@ static void	sql_writer_init(void)
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: sql_writer_release                                                     *
  *                                                                                  *
  * Purpose: releases initialized sql writer by freeing allocated resources and      *
  *          setting its state to uninitialized.                                     *
@@ -138,8 +134,6 @@ static void	sql_writer_release(void)
 
 /************************************************************************************
  *                                                                                  *
- * Function: sql_writer_add_dbinsert                                                *
- *                                                                                  *
  * Purpose: adds bulk insert data to be flushed later                               *
  *                                                                                  *
  * Parameters: db_insert - [IN] bulk insert data                                    *
@@ -152,8 +146,6 @@ static void	sql_writer_add_dbinsert(zbx_db_insert_t *db_insert)
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: sql_writer_flush                                                       *
  *                                                                                  *
  * Purpose: flushes bulk insert data into database                                  *
  *                                                                                  *
@@ -200,13 +192,6 @@ static int	sql_writer_flush(void)
  *                                                                                                                *
  ******************************************************************************************************************/
 
-typedef void (*add_history_func_t)(const zbx_vector_ptr_t *history);
-
-/******************************************************************************
- *                                                                            *
- * Function: add_history_dbl                                                  *
- *                                                                            *
- ******************************************************************************/
 static void	add_history_dbl(const zbx_vector_ptr_t *history)
 {
 	int		i;
@@ -228,12 +213,7 @@ static void	add_history_dbl(const zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: add_history_uint                                                 *
- *                                                                            *
- ******************************************************************************/
-static void	add_history_uint(zbx_vector_ptr_t *history)
+static void	add_history_uint(const zbx_vector_ptr_t *history)
 {
 	int		i;
 	zbx_db_insert_t	*db_insert;
@@ -254,12 +234,7 @@ static void	add_history_uint(zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: add_history_str                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	add_history_str(zbx_vector_ptr_t *history)
+static void	add_history_str(const zbx_vector_ptr_t *history)
 {
 	int		i;
 	zbx_db_insert_t	*db_insert;
@@ -280,12 +255,7 @@ static void	add_history_str(zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: add_history_text                                                 *
- *                                                                            *
- ******************************************************************************/
-static void	add_history_text(zbx_vector_ptr_t *history)
+static void	add_history_text(const zbx_vector_ptr_t *history)
 {
 	int		i;
 	zbx_db_insert_t	*db_insert;
@@ -306,12 +276,7 @@ static void	add_history_text(zbx_vector_ptr_t *history)
 	sql_writer_add_dbinsert(db_insert);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: add_history_log                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	add_history_log(zbx_vector_ptr_t *history)
+static void	add_history_log(const zbx_vector_ptr_t *history)
 {
 	int			i;
 	zbx_db_insert_t	*db_insert;
@@ -345,8 +310,6 @@ static void	add_history_log(zbx_vector_ptr_t *history)
 
 /*********************************************************************************
  *                                                                               *
- * Function: db_read_values_by_time                                              *
- *                                                                               *
  * Purpose: reads item history data from database                                *
  *                                                                               *
  * Parameters:  itemid        - [IN] the itemid                                  *
@@ -366,7 +329,7 @@ static int	db_read_values_by_time(zbx_uint64_t itemid, int value_type, zbx_vecto
 		int seconds, int end_timestamp)
 {
 	char			*sql = NULL;
-	size_t	 		sql_alloc = 0, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
@@ -415,8 +378,6 @@ out:
 
 /************************************************************************************
  *                                                                                  *
- * Function: db_read_values_by_count                                                *
- *                                                                                  *
  * Purpose: reads item history data from database                                   *
  *                                                                                  *
  * Parameters:  itemid        - [IN] the itemid                                     *
@@ -442,7 +403,7 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 		int count, int end_timestamp)
 {
 	char			*sql = NULL;
-	size_t	 		sql_alloc = 0, sql_offset;
+	size_t			sql_alloc = 0, sql_offset;
 	int			clock_to, clock_from, step = 0, ret = FAIL;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -495,7 +456,6 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 		step++;
 	}
 
-
 	if (0 < count)
 	{
 		/* no more data in database, return success */
@@ -522,8 +482,6 @@ out:
 
 /************************************************************************************
  *                                                                                  *
- * Function: db_read_values_by_time_and_count                                       *
- *                                                                                  *
  * Purpose: reads item history data from database                                   *
  *                                                                                  *
  * Parameters:  itemid        - [IN] the itemid                                     *
@@ -546,7 +504,7 @@ static int	db_read_values_by_time_and_count(zbx_uint64_t itemid, int value_type,
 {
 	int			ret = FAIL;
 	char			*sql = NULL;
-	size_t	 		sql_alloc = 0, sql_offset;
+	size_t			sql_alloc = 0, sql_offset;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vc_history_table_t	*table = &vc_history_tables[value_type];
@@ -620,8 +578,6 @@ out:
 
 /************************************************************************************
  *                                                                                  *
- * Function: sql_destroy                                                            *
- *                                                                                  *
  * Purpose: destroys history storage interface                                      *
  *                                                                                  *
  * Parameters:  hist    - [IN] the history storage interface                        *
@@ -633,8 +589,6 @@ static void	sql_destroy(zbx_history_iface_t *hist)
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: sql_get_values                                                         *
  *                                                                                  *
  * Purpose: gets item history data from history storage                             *
  *                                                                                  *
@@ -666,8 +620,6 @@ static int	sql_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int st
 
 /************************************************************************************
  *                                                                                  *
- * Function: sql_add_values                                                         *
- *                                                                                  *
  * Purpose: sends history data to the storage                                       *
  *                                                                                  *
  * Parameters:  hist    - [IN] the history storage interface                        *
@@ -687,17 +639,12 @@ static int	sql_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *his
 	}
 
 	if (0 != h_num)
-	{
-		add_history_func_t	add_history_func = (add_history_func_t)hist->data;
-		add_history_func(history);
-	}
+		hist->data.sql_history_func(history);
 
 	return h_num;
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: sql_flush                                                              *
  *                                                                                  *
  * Purpose: flushes the history data to storage                                     *
  *                                                                                  *
@@ -715,8 +662,6 @@ static int	sql_flush(zbx_history_iface_t *hist)
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: zbx_history_sql_init                                                   *
  *                                                                                  *
  * Purpose: initializes history storage interface                                   *
  *                                                                                  *
@@ -742,19 +687,19 @@ int	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type, ch
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			hist->data = (void *)add_history_dbl;
+			hist->data.sql_history_func = add_history_dbl;
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			hist->data = (void *)add_history_uint;
+			hist->data.sql_history_func = add_history_uint;
 			break;
 		case ITEM_VALUE_TYPE_STR:
-			hist->data = (void *)add_history_str;
+			hist->data.sql_history_func = add_history_str;
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
-			hist->data = (void *)add_history_text;
+			hist->data.sql_history_func = add_history_text;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			hist->data = (void *)add_history_log;
+			hist->data.sql_history_func = add_history_log;
 			break;
 	}
 

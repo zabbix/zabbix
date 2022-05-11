@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_queue_ptr_values_num                                         *
- *                                                                            *
  * Purpose: calculates the number of values in queue                          *
  *                                                                            *
  * Parameters: queue - [IN] the queue                                         *
@@ -43,8 +41,6 @@ int	zbx_queue_ptr_values_num(zbx_queue_ptr_t *queue)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_queue_ptr_reserve                                            *
  *                                                                            *
  * Purpose: reserves space in queue for additional values                     *
  *                                                                            *
@@ -76,8 +72,6 @@ void	zbx_queue_ptr_reserve(zbx_queue_ptr_t *queue, int num)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_queue_ptr_compact                                            *
  *                                                                            *
  * Purpose: compacts queue by freeing unused space                            *
  *                                                                            *
@@ -116,8 +110,6 @@ void	zbx_queue_ptr_compact(zbx_queue_ptr_t *queue)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_queue_ptr_create                                             *
- *                                                                            *
  * Purpose: creates queue                                                     *
  *                                                                            *
  * Parameters: queue - [IN] the queue                                         *
@@ -130,8 +122,6 @@ void	zbx_queue_ptr_create(zbx_queue_ptr_t *queue)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_queue_ptr_destroy                                            *
- *                                                                            *
  * Purpose: destroys queue                                                    *
  *                                                                            *
  * Parameters: queue - [IN] the queue                                         *
@@ -143,8 +133,6 @@ void	zbx_queue_ptr_destroy(zbx_queue_ptr_t *queue)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_queue_ptr_push                                               *
  *                                                                            *
  * Purpose: pushes value in the queue                                         *
  *                                                                            *
@@ -162,8 +150,6 @@ void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *value)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_queue_ptr_pop                                                *
  *                                                                            *
  * Purpose: pops value in the queue                                           *
  *                                                                            *
@@ -193,8 +179,6 @@ void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_queue_ptr_remove_value                                       *
  *                                                                            *
  * Purpose: removes specified value from queue                                *
  *                                                                            *

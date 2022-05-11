@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,8 @@ $triggersForm = (new CForm('post', $url))
 	->addVar('toggle_expression_constructor', '')
 	->addVar('toggle_recovery_expression_constructor', '')
 	->addVar('remove_expression', '')
-	->addVar('remove_recovery_expression', '');
+	->addVar('remove_recovery_expression', '')
+	->addVar('backurl', $data['backurl']);
 
 $discovered_trigger = false;
 
@@ -149,8 +150,11 @@ $expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.json_encode($popup_options).
-			',{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}), null, this);'
+		->onClick(
+			'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode($popup_options).',
+					{expression: jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()}
+				), {dialogue_class: "modal-popup-generic"}
+			);'
 		)
 		->setEnabled(!$readonly)
 		->removeId()
@@ -285,8 +289,11 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('return PopUp("popup.testtriggerexpr",{expression: this.form.elements["expression"].value}, null,'.
-					'this);')
+		->onClick(
+			'return PopUp("popup.testtriggerexpr", {expression: this.form.elements["expression"].value}, {
+				dialogue_class: "modal-popup-generic"
+			});'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId();
 
@@ -349,9 +356,11 @@ $recovery_expression_row = [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.triggerexpr",jQuery.extend('.
-			json_encode($popup_options).
-				',{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}), null, this);'
+		->onClick(
+			'return PopUp("popup.triggerexpr", jQuery.extend('.json_encode($popup_options).',
+					{expression: jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()}
+				), {dialogue_class: "modal-popup-generic"}
+			);'
 		)
 		->setEnabled(!$readonly)
 		->removeId()
@@ -483,8 +492,11 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('return PopUp("popup.testtriggerexpr",'.
-			'{expression: this.form.elements["recovery_expression"].value}, null, this);')
+		->onClick(
+			'return PopUp("popup.testtriggerexpr", {expression: this.form.elements["recovery_expression"].value}, {
+				dialogue_class: "modal-popup-generic"
+			});'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId();
 
@@ -588,7 +600,7 @@ $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
 	->setId('dependency-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Name'), $discovered_trigger ? null : _('Action')]);
+	->setHeader([_('Name'), $readonly ? null : _('Action')]);
 
 foreach ($data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
@@ -606,10 +618,10 @@ foreach ($data['db_dependencies'] as $dependency) {
 					->setArgument('context', $data['context'])
 			))->setTarget('_blank'),
 			(new CCol(
-				$discovered_trigger
+				$readonly
 					? null
 					: (new CButton('remove', _('Remove')))
-						->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
+						->onClick('view.removeDependency('.json_encode($dependency['triggerid']).')')
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -620,11 +632,11 @@ foreach ($data['db_dependencies'] as $dependency) {
 $dependenciesFormList->addRow(_('Dependencies'),
 	(new CDiv([
 		$dependenciesTable,
-		$discovered_trigger
+		$readonly
 			? null
 			: (new CButton('bnt1', _('Add')))
-				->onClick('return PopUp("popup.generic",'.
-					json_encode([
+				->onClick(
+					'return PopUp("popup.generic", '.json_encode([
 						'srctbl' => 'triggers',
 						'srcfld1' => 'triggerid',
 						'reference' => 'deptrigger',
@@ -632,7 +644,7 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						'multiselect' => '1',
 						'with_triggers' => '1',
 						'noempty' => '1'
-					]).', null, this);'
+					]).', {dialogue_class: "modal-popup-generic"});'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 	]))
@@ -641,21 +653,28 @@ $dependenciesFormList->addRow(_('Dependencies'),
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList, TAB_INDICATOR_DEPENDENCY);
 
+$cancelButton = $data['backurl'] !== null
+	? new CButtonCancel(null, "redirect('".$data['backurl']."');")
+	: new CButtonCancel(url_param('context'));
+
 // Append buttons to form list.
 if (!empty($data['triggerid'])) {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
-			(new CButtonDelete(_('Delete trigger?'), url_params(['form', 'hostid', 'triggerid', 'context']), 'context'))
-				->setEnabled(!$data['limited']),
-			new CButtonCancel(url_param('context'))
+			(new CButtonDelete(
+				_('Delete trigger?'),
+				url_params(['form', 'hostid', 'triggerid', 'context', 'backurl']),
+				'context'
+			))->setEnabled(!$data['limited']),
+			$cancelButton
 		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('context'))]
+		[$cancelButton]
 	));
 }
 
@@ -665,3 +684,11 @@ $triggersForm->addItem($triggersTab);
 $widget->addItem($triggersForm);
 
 $widget->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $triggersForm->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

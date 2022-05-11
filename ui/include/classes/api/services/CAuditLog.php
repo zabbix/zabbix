@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class CAuditLog extends CApiService {
 			CAudit::RESOURCE_ITEM, CAudit::RESOURCE_ITEM_PROTOTYPE, CAudit::RESOURCE_IT_SERVICE,
 			CAudit::RESOURCE_MACRO, CAudit::RESOURCE_MAINTENANCE, CAudit::RESOURCE_MAP, CAudit::RESOURCE_MEDIA_TYPE,
 			CAudit::RESOURCE_MODULE, CAudit::RESOURCE_PROXY, CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO,
-			CAudit::RESOURCE_SCHEDULED_REPORT, CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SETTINGS,
+			CAudit::RESOURCE_SCHEDULED_REPORT, CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SETTINGS, CAudit::RESOURCE_SLA,
 			CAudit::RESOURCE_TEMPLATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TRIGGER,
 			CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER, CAudit::RESOURCE_USER_GROUP,
 			CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP, CAudit::RESOURCE_HA_NODE

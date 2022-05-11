@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,13 @@
 
 
 class CWidgetConfig {
+
+	/**
+	 * Array of deprecated widgets constants.
+	 */
+	public const DEPRECATED_WIDGETS = [
+		WIDGET_DATA_OVER
+	];
 
 	/**
 	 * Classifier for non-template dashboards.
@@ -49,6 +56,7 @@ class CWidgetConfig {
 			WIDGET_FAV_GRAPHS			=> _('Favorite graphs'),
 			WIDGET_FAV_MAPS				=> _('Favorite maps'),
 			WIDGET_GEOMAP				=> _('Geomap'),
+			WIDGET_ITEM					=> _('Item value'),
 			WIDGET_GRAPH				=> _('Graph (classic)'),
 			WIDGET_GRAPH_PROTOTYPE		=> _('Graph prototype'),
 			WIDGET_HOST_AVAIL			=> _('Host availability'),
@@ -58,11 +66,13 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> _('Problem hosts'),
 			WIDGET_PROBLEMS				=> _('Problems'),
 			WIDGET_PROBLEMS_BY_SV		=> _('Problems by severity'),
+			WIDGET_SLA_REPORT			=> _('SLA report'),
 			WIDGET_SVG_GRAPH			=> _('Graph'),
 			WIDGET_SYSTEM_INFO			=> _('System information'),
 			WIDGET_TRIG_OVER			=> _('Trigger overview'),
 			WIDGET_URL					=> _('URL'),
-			WIDGET_WEB					=> _('Web monitoring')
+			WIDGET_WEB					=> _('Web monitoring'),
+			WIDGET_TOP_HOSTS			=> _('Top hosts')
 		];
 
 		$types = array_filter($types,
@@ -91,6 +101,7 @@ class CWidgetConfig {
 			WIDGET_FAV_GRAPHS			=> 'CWidget',
 			WIDGET_FAV_MAPS				=> 'CWidget',
 			WIDGET_GEOMAP				=> 'CWidgetGeoMap',
+			WIDGET_ITEM					=> 'CWidgetItem',
 			WIDGET_GRAPH				=> 'CWidgetGraph',
 			WIDGET_GRAPH_PROTOTYPE		=> 'CWidgetGraphPrototype',
 			WIDGET_HOST_AVAIL			=> 'CWidget',
@@ -100,11 +111,13 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> 'CWidget',
 			WIDGET_PROBLEMS				=> 'CWidgetProblems',
 			WIDGET_PROBLEMS_BY_SV		=> 'CWidgetProblemsBySv',
+			WIDGET_SLA_REPORT			=> 'CWidget',
 			WIDGET_SVG_GRAPH			=> 'CWidgetSvgGraph',
 			WIDGET_SYSTEM_INFO			=> 'CWidget',
 			WIDGET_TRIG_OVER			=> 'CWidgetTrigerOver',
 			WIDGET_URL					=> 'CWidget',
-			WIDGET_WEB					=> 'CWidget'
+			WIDGET_WEB					=> 'CWidget',
+			WIDGET_TOP_HOSTS			=> 'CWidget'
 		];
 	}
 
@@ -159,6 +172,7 @@ class CWidgetConfig {
 			WIDGET_FAV_GRAPHS			=> ['width' => 4,	'height' => 3],
 			WIDGET_FAV_MAPS				=> ['width' => 4,	'height' => 3],
 			WIDGET_GEOMAP				=> ['width' => 12,	'height' => 5],
+			WIDGET_ITEM					=> ['width' => 4,	'height' => 3],
 			WIDGET_GRAPH				=> ['width' => 12,	'height' => 5],
 			WIDGET_GRAPH_PROTOTYPE		=> ['width' => 16,	'height' => 5],
 			WIDGET_HOST_AVAIL			=> ['width' => 6,	'height' => 3],
@@ -168,11 +182,13 @@ class CWidgetConfig {
 			WIDGET_PROBLEM_HOSTS		=> ['width' => 12,	'height' => 5],
 			WIDGET_PROBLEMS				=> ['width' => 12,	'height' => 5],
 			WIDGET_PROBLEMS_BY_SV		=> ['width' => 12,	'height' => 5],
+			WIDGET_SLA_REPORT			=> ['width' => 12,	'height' => 5],
 			WIDGET_SVG_GRAPH			=> ['width' => 12,	'height' => 5],
 			WIDGET_SYSTEM_INFO			=> ['width' => 12,	'height' => 5],
 			WIDGET_TRIG_OVER			=> ['width' => 12,	'height' => 5],
 			WIDGET_URL					=> ['width' => 12,	'height' => 5],
-			WIDGET_WEB					=> ['width' => 6,	'height' => 3]
+			WIDGET_WEB					=> ['width' => 6,	'height' => 3],
+			WIDGET_TOP_HOSTS			=> ['width' => 12,	'height' => 5]
 		];
 	}
 
@@ -198,8 +214,7 @@ class CWidgetConfig {
 				'js_class' => $js_clases[$type],
 				'iterator' => self::isIterator($type),
 				'reference_field' => self::getReferenceField($type),
-				'foreign_reference_fields' => self::getForeignReferenceFields($type),
-				'dialogue_stick_to_top' => self::getDialogueStickToTop($type)
+				'foreign_reference_fields' => self::getForeignReferenceFields($type)
 			];
 		}
 
@@ -226,6 +241,7 @@ class CWidgetConfig {
 					case WIDGET_CLOCK:
 					case WIDGET_GRAPH:
 					case WIDGET_GRAPH_PROTOTYPE:
+					case WIDGET_ITEM:
 					case WIDGET_PLAIN_TEXT:
 					case WIDGET_URL:
 						return true;
@@ -249,11 +265,13 @@ class CWidgetConfig {
 		switch ($type) {
 			case WIDGET_ACTION_LOG:
 			case WIDGET_DATA_OVER:
+			case WIDGET_TOP_HOSTS:
 			case WIDGET_DISCOVERY:
 			case WIDGET_GEOMAP:
 			case WIDGET_GRAPH:
 			case WIDGET_GRAPH_PROTOTYPE:
 			case WIDGET_PLAIN_TEXT:
+			case WIDGET_ITEM:
 			case WIDGET_PROBLEM_HOSTS:
 			case WIDGET_PROBLEMS:
 			case WIDGET_PROBLEMS_BY_SV:
@@ -271,6 +289,7 @@ class CWidgetConfig {
 			case WIDGET_SYSTEM_INFO:
 				return 15 * SEC_PER_MIN;
 
+			case WIDGET_SLA_REPORT:
 			case WIDGET_URL:
 				return 0;
 		}
@@ -337,23 +356,6 @@ class CWidgetConfig {
 	}
 
 	/**
-	 * Check if widget dialogue should be sticked to top instead of being centered vertically.
-	 *
-	 * @param string $type  Widget type - 'WIDGET_*' constant.
-	 *
-	 * @return bool
-	 */
-	public static function getDialogueStickToTop(string $type): bool {
-		switch ($type) {
-			case WIDGET_SVG_GRAPH:
-				return true;
-
-			default:
-				return false;
-		}
-	}
-
-	/**
 	 * Check if widget has padding or not.
 	 *
 	 * @static
@@ -386,6 +388,7 @@ class CWidgetConfig {
 					return $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
 
 				case WIDGET_GRAPH_PROTOTYPE:
+				case WIDGET_ITEM:
 				case WIDGET_URL:
 					return false;
 
@@ -462,6 +465,9 @@ class CWidgetConfig {
 			case WIDGET_PROBLEMS_BY_SV:
 				return new CWidgetFormProblemsBySv($data, $templateid);
 
+			case WIDGET_SLA_REPORT:
+				return new CWidgetFormSlaReport($data, $templateid);
+
 			case WIDGET_SVG_GRAPH:
 				return new CWidgetFormSvgGraph($data, $templateid);
 
@@ -476,6 +482,12 @@ class CWidgetConfig {
 
 			case WIDGET_WEB:
 				return new CWidgetFormWeb($data, $templateid);
+
+			case WIDGET_ITEM:
+				return new CWidgetFormItem($data, $templateid);
+
+			case WIDGET_TOP_HOSTS:
+				return new CWidgetFormTopHosts($data, $templateid);
 
 			default:
 				return new CWidgetForm($data, $templateid, $type);

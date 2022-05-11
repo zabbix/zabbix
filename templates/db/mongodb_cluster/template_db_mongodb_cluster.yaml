@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-05-11T14:37:54Z'
+  version: '6.0'
+  date: '2022-04-06T19:33:11Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -8,8 +8,8 @@ zabbix_export:
   templates:
     -
       uuid: d38b271797bd41f2ad8c79d83b9d8d9c
-      template: 'MongoDB cluster by Zabbix Agent 2'
-      name: 'MongoDB cluster by Zabbix Agent 2'
+      template: 'MongoDB cluster by Zabbix agent 2'
+      name: 'MongoDB cluster by Zabbix agent 2'
       description: |
         Get MongoDB metrics from plugin for the zabbix-agent2.
           1. Setup and configure zabbix-agent2 compiled with the MongoDB monitoring plugin.
@@ -20,7 +20,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/420659-discussion-thread-for-official-zabbix-template-db-mongodb
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Databases
@@ -41,13 +41,12 @@ zabbix_export:
                 - |
                   data = JSON.parse(value)
                   return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTime.ts)/Math.pow(2,32);
-                  
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: configserver
         -
           uuid: fccb23cdee01483cabe6ef14a532664b
           name: 'MongoDB cluster: Connections, active'
@@ -56,7 +55,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: |
-            "The number of active client connections to the server. 
+            "The number of active client connections to the server.
             Active client connections refers to client connections that currently have operations in progress.
             Available starting in  4.0.7, 0 for older versions."
           preprocessing:
@@ -70,8 +69,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
         -
           uuid: 1f881cbd515d462eb5839fe4e1e21ee1
           name: 'MongoDB cluster: Connections, available'
@@ -89,17 +88,22 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
           triggers:
             -
               uuid: eae86b6f98db49099259a466b78d1c59
-              expression: 'max(/MongoDB cluster by Zabbix Agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
-              name: 'MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
+              expression: 'max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
+              name: 'MongoDB cluster: Available connections is low'
+              event_name: 'MongoDB cluster: Available connections less then {$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
               priority: WARNING
               description: |
                 "Too few available connections.
                 Consider this value in combination with the value of connections current to understand the connection load on the database"
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 087d1a405b7a456692a52b0d20c43eb3
           name: 'MongoDB cluster: Connections, current'
@@ -108,7 +112,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           description: |
-            "The number of incoming connections from clients to the database server. 
+            "The number of incoming connections from clients to the database server.
             This number includes the current shell session"
           preprocessing:
             -
@@ -119,8 +123,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
         -
           uuid: 18ed07f0efb54f55970483d15613d320
           name: 'MongoDB cluster: New connections, rate'
@@ -143,8 +147,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
         -
           uuid: 281e5a1a19dc402a992331252b27ee63
           name: 'MongoDB cluster: Connection pool: available'
@@ -162,8 +166,8 @@ zabbix_export:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
         -
           uuid: 58522550e8bc4f479681d961ba789b92
           name: 'MongoDB cluster: Connection pool: client connections'
@@ -181,8 +185,8 @@ zabbix_export:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
         -
           uuid: 9b9d601d2d5c4d8da5d97c2785d8e0fa
           name: 'MongoDB cluster: Connection pool: created, rate'
@@ -205,8 +209,8 @@ zabbix_export:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
         -
           uuid: 9394a15a25e342688335b7d83db25b2d
           name: 'MongoDB cluster: Connection pool: in use'
@@ -224,8 +228,8 @@ zabbix_export:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
         -
           uuid: 22c66363ffae4ae2b436a26b8ecca3ab
           name: 'MongoDB cluster: Connection pool: refreshing'
@@ -243,8 +247,8 @@ zabbix_export:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
         -
           uuid: 55dbfe5d52c44954b9e5669a043f10b4
           name: 'MongoDB cluster: Connection pool: scoped'
@@ -262,8 +266,8 @@ zabbix_export:
             key: 'mongodb.connpool.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: connections
         -
           uuid: f34fcc3866b446748b7a8d11311edd82
           name: 'MongoDB cluster: Get mongodb.connpool.stats'
@@ -274,8 +278,11 @@ zabbix_export:
           description: 'Returns current info about connpool.stats.'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: connections
+            -
+              tag: component
+              value: raw
         -
           uuid: 22ca0c06006b49009f25fcd829f1b5bf
           name: 'MongoDB cluster: Cursor: open pinned'
@@ -293,8 +300,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: cursors
         -
           uuid: 45bfa997dab9498e8e3851de750e21a2
           name: 'MongoDB cluster: Cursor: open total'
@@ -312,14 +319,19 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: cursors
           triggers:
             -
               uuid: 67db1f543818476ca0b07e2cc1709452
-              expression: 'min(/MongoDB cluster by Zabbix Agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
-              name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
+              expression: 'min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}'
+              name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients'
+              event_name: 'MongoDB cluster: Too many cursors opened by MongoDB for clients (over {$MONGODB.CURSOR.OPEN.MAX.WARN} in 5m)'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 5d3a3c724a6a45fb99a0af5330bf9cf2
           name: 'MongoDB cluster: Cursor: timed out, rate'
@@ -342,14 +354,19 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: cursors
           triggers:
             -
               uuid: 5ea8cf9c955940a6a580cd6f4bb2cc78
-              expression: 'min(/MongoDB cluster by Zabbix Agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
-              name: 'MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
+              expression: 'min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}'
+              name: 'MongoDB cluster: Too many cursors are timing out'
+              event_name: 'MongoDB cluster: Too many cursors are timing out (over {$MONGODB.CURSOR.TIMEOUT.MAX.WARN} per second in 5m)'
               priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 110685e463e141ca800b2638e3532d51
           name: 'MongoDB cluster: Jumbo chunks'
@@ -358,8 +375,8 @@ zabbix_export:
           description: 'Total number of ''jumbo'' chunks in the mongo cluster.'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: application
         -
           uuid: fa28a98992e74cdf8c54b4faa01de89a
           name: 'MongoDB cluster: Last seen configserver'
@@ -376,13 +393,12 @@ zabbix_export:
                 - |
                   data = JSON.parse(value)
                   return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
-                  
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: configserver
         -
           uuid: df2423ff36e24357809c7a7211144898
           name: 'MongoDB cluster: Architecture'
@@ -405,8 +421,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: application
         -
           uuid: f6a06e0d7cf84cc1a40d8d2dcde7b01a
           name: 'MongoDB cluster: Memory: resident'
@@ -429,8 +445,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: memory
         -
           uuid: 2c5548ae9c614efb81e58a2e4ec3d3e4
           name: 'MongoDB cluster: Memory: virtual'
@@ -453,8 +469,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: memory
         -
           uuid: 16925e0ca40747d1818e512962d31a83
           name: 'MongoDB cluster: Cursor: open no timeout'
@@ -472,8 +488,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: cursors
         -
           uuid: 59481dcb9b5a487985297e2f41f72dd1
           name: 'MongoDB cluster: Bytes in, rate'
@@ -496,8 +512,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: network
         -
           uuid: 13cba18ba344440bba4371585fd8e4c0
           name: 'MongoDB cluster: Bytes out, rate'
@@ -521,8 +537,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: network
         -
           uuid: eb821875b59c4bf8bc98f9afec146e88
           name: 'MongoDB cluster: Requests, rate'
@@ -546,8 +562,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: network
         -
           uuid: b98fb6d98b9a4282ba0b2d9770722035
           name: 'MongoDB cluster: Operations: command'
@@ -572,8 +588,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: operations
         -
           uuid: f4e917e9cdd3439abbe6ea7b9a9034b7
           name: 'MongoDB cluster: Operations: delete'
@@ -582,7 +598,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: '"The number of delete operations the mongos instance per second."'
+          description: 'The number of delete operations the mongos instance per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -596,8 +612,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: operations
         -
           uuid: 165d5a180ed541ba9a19916134962368
           name: 'MongoDB cluster: Operations: getmore, rate'
@@ -622,8 +638,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: operations
         -
           uuid: 021a00004efe434a9b2f316c0d25c175
           name: 'MongoDB cluster: Operations: insert, rate'
@@ -632,7 +648,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: '"The number of insert operations received the mongos instance per second."'
+          description: 'The number of insert operations received the mongos instance per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -646,8 +662,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: operations
         -
           uuid: 0866b3b6bc1748a98e8bfd9308152304
           name: 'MongoDB cluster: Operations: query, rate'
@@ -656,7 +672,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: '"The number of queries received the mongos instance per second."'
+          description: 'The number of queries received the mongos instance per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -670,8 +686,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: operations
         -
           uuid: 329e6d41de1c47dba8f3f9d287c93eda
           name: 'MongoDB cluster: Operations: update, rate'
@@ -680,7 +696,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: '"The number of update operations the mongos instance per second."'
+          description: 'The number of update operations the mongos instance per second.'
           preprocessing:
             -
               type: JSONPATH
@@ -694,8 +710,8 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: operations
         -
           uuid: ff979eb9ba4a4420a753913df5431219
           name: 'MongoDB cluster: Ping'
@@ -712,15 +728,19 @@ zabbix_export:
                 - 30m
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: health
           triggers:
             -
               uuid: cd74289970204ca281c5bc7d5c695e95
-              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
+              expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
               name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
               priority: HIGH
               description: 'Connection to mongos proxy instance is currently unavailable.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: b8c6dadff060447e9718b49fdc796d8d
           name: 'MongoDB cluster: Get server status'
@@ -731,8 +751,8 @@ zabbix_export:
           description: 'The mongos statistic'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
         -
           uuid: e88da2ca6ccc4fdfa256fa51e050792d
           name: 'MongoDB cluster: Uptime'
@@ -751,27 +771,37 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: application
           triggers:
             -
               uuid: ee70d6da232a4068b574c9c147c622c9
-              expression: 'nodata(/MongoDB cluster by Zabbix Agent 2/mongodb.uptime,10m)=1'
-              name: 'MongoDB cluster: Failed to fetch info data (or no data for 10m)'
+              expression: 'nodata(/MongoDB cluster by Zabbix agent 2/mongodb.uptime,10m)=1'
+              name: 'MongoDB cluster: Failed to fetch info data'
+              event_name: 'MongoDB cluster: Failed to fetch info data (or no data for 10m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 10 minutes'
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'MongoDB cluster: Connection to mongos proxy is unavailable'
-                  expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
+                  expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: notice
             -
               uuid: 99ff438a7e3e4b0a8190b2ab9f41f076
-              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.uptime)<10m'
-              name: 'MongoDB cluster: has been restarted (uptime < 10m)'
+              expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.uptime)<10m'
+              name: 'MongoDB cluster: has been restarted'
+              event_name: 'MongoDB cluster: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: dda1722d6e6b4189978fd44ace0f8f86
           name: 'MongoDB cluster: Mongos version'
@@ -795,16 +825,21 @@ zabbix_export:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
             -
-              tag: Application
-              value: 'MongoDB sharded cluster'
+              tag: component
+              value: application
           triggers:
             -
               uuid: 921ee489887943838d69558f103ad646
-              expression: 'last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix Agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix Agent 2/mongodb.version))>0'
-              name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
+              expression: 'last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix agent 2/mongodb.version))>0'
+              name: 'MongoDB cluster: Version has changed'
+              event_name: 'MongoDB cluster: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'MongoDB cluster version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: eb57a506cc5640a79e6df51179321ba0
@@ -826,7 +861,7 @@ zabbix_export:
                   name: 'MongoDB sharded cluster/{#REPLICASET}'
               templates:
                 -
-                  name: 'MongoDB node by Zabbix Agent 2'
+                  name: 'MongoDB node by Zabbix agent 2'
               macros:
                 -
                   macro: '{$MONGODB.CONNSTRING}'
@@ -882,8 +917,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: objects
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 59465dc6e9384c7baf1a6239a6c66f0e
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped'
@@ -913,8 +954,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: application
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 03b8eb71502a4805902f7a5856e7c7b6
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Objects, count'
@@ -932,8 +979,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: objects
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 2a78fa441bef4523bd0fee4934fc7b55
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped, max number'
@@ -953,8 +1006,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: application
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 294985df777b42e0a56a229366bbac5d
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Capped, max size'
@@ -974,8 +1033,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 8da7cc960e8d42ccb3efe065fff5f0e9
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Indexes'
@@ -993,8 +1058,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: application
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 191a21d9a1b94b238009e31433dbaa38
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Size'
@@ -1013,8 +1084,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: aa964be0bc5c4318bc92c3192c269d8e
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Get collection stats {#DBNAME}.{#COLLECTION}'
@@ -1025,8 +1102,14 @@ zabbix_export:
               description: 'Returns a variety of storage statistics for a given collection.'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: ef82b9f814cd4917b3714e73d7ac87ac
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Storage size'
@@ -1045,8 +1128,14 @@ zabbix_export:
                 key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}.{#COLLECTION}'
+                  tag: collection
+                  value: '{#COLLECTION}'
+                -
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
         -
           uuid: 25ece32c5f764461913f605ba3d7736a
           name: 'Database discovery'
@@ -1086,8 +1175,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}'
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 98c9e25c24b146aeaec4953913bb720a
               name: 'MongoDB {#DBNAME}: Extents'
@@ -1106,8 +1198,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}'
+                  tag: component
+                  value: collections
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: cfb3598af7f14911965d548ea815cb33
               name: 'MongoDB {#DBNAME}: Size, file'
@@ -1127,8 +1222,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}'
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 1716a51105f2415eb179a43022656e4a
               name: 'MongoDB {#DBNAME}: Size, index'
@@ -1147,8 +1245,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}'
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: f28f2df7b1e64aea99b20ca8deda2a25
               name: 'MongoDB {#DBNAME}: Objects, count'
@@ -1166,8 +1267,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}'
+                  tag: component
+                  value: objects
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: ed3076f82f494b6e953a9a5a3199df06
               name: 'MongoDB {#DBNAME}: Objects, avg size'
@@ -1187,8 +1291,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}'
+                  tag: component
+                  value: objects
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: 7fbc424bca06451d9ed1fe689ea81bf9
               name: 'MongoDB {#DBNAME}: Get db stats {#DBNAME}'
@@ -1196,11 +1303,17 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Returns statistics reflecting the database system’s state.'
+              description: 'Returns statistics reflecting the database system''s state.'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: database
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: database
+                  value: '{#DBNAME}'
             -
               uuid: ae54fbae851b4b5a949611420fbc8ce0
               name: 'MongoDB {#DBNAME}: Size, storage'
@@ -1219,8 +1332,11 @@ zabbix_export:
                 key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'MongoDB sharded cluster: {#DBNAME}'
+                  tag: component
+                  value: disk
+                -
+                  tag: database
+                  value: '{#DBNAME}'
           graph_prototypes:
             -
               uuid: 44e0e02d1e9a420b9dc917d8cf4bf983
@@ -1229,25 +1345,25 @@ zabbix_export:
                 -
                   color: 1A7C11
                   item:
-                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    host: 'MongoDB cluster by Zabbix agent 2'
                     key: 'mongodb.db.index_size["{#DBNAME}"]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
-                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    host: 'MongoDB cluster by Zabbix agent 2'
                     key: 'mongodb.db.storage_size["{#DBNAME}"]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
-                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    host: 'MongoDB cluster by Zabbix agent 2'
                     key: 'mongodb.db.file_size["{#DBNAME}"]'
                 -
                   sortorder: '3'
                   color: A54F10
                   item:
-                    host: 'MongoDB cluster by Zabbix Agent 2'
+                    host: 'MongoDB cluster by Zabbix agent 2'
                     key: 'mongodb.db.data_size["{#DBNAME}"]'
         -
           uuid: a8bcea1509974c0f9d0051591e92cd5a
@@ -1269,12 +1385,19 @@ zabbix_export:
                   name: 'MongoDB sharded cluster/{#ID}'
               templates:
                 -
-                  name: 'MongoDB node by Zabbix Agent 2'
+                  name: 'MongoDB node by Zabbix agent 2'
               macros:
                 -
                   macro: '{$MONGODB.CONNSTRING}'
                   value: '{#MONGOD_URI}'
                   description: 'Connection string in the URI format (password is not used).'
+      tags:
+        -
+          tag: class
+          value: database
+        -
+          tag: target
+          value: mongodb-cluster
       macros:
         -
           macro: '{$MONGODB.CONNS.AVAILABLE.MIN.WARN}'
@@ -1343,31 +1466,31 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.available
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.refreshing
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.in_use
         -
           sortorder: '3'
           color: A54F10
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.scoped
         -
           sortorder: '4'
           color: FC6EA3
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connection_pool.client
     -
       uuid: 71a5a2d563d64bceacd564fe25b4d49e
@@ -1376,19 +1499,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connections.available
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connections.active
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connections.current
         -
           sortorder: '3'
@@ -1396,7 +1519,7 @@ zabbix_export:
           color: A54F10
           yaxisside: RIGHT
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.connections.rate
     -
       uuid: b4277ddaf3c5486cacba0f9b7208c5b2
@@ -1405,19 +1528,19 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.cursor.open.total
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.cursor.open.pinned
         -
           sortorder: '2'
           color: F63100
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.metrics.cursor.open.no_timeout
     -
       uuid: d612246739784b9b9403dee6024493ce
@@ -1426,13 +1549,13 @@ zabbix_export:
         -
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.network.bytes_out.rate
         -
           sortorder: '1'
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.network.bytes_in.rate
     -
       uuid: 4228deefccae4cd2959b183ba3e36295
@@ -1442,40 +1565,40 @@ zabbix_export:
           drawtype: BOLD_LINE
           color: 1A7C11
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.query.rate
         -
           sortorder: '1'
           drawtype: BOLD_LINE
           color: 2774A4
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.insert.rate
         -
           sortorder: '2'
           drawtype: BOLD_LINE
           color: F63100
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.getmore.rate
         -
           sortorder: '3'
           drawtype: BOLD_LINE
           color: A54F10
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.update.rate
         -
           sortorder: '4'
           drawtype: BOLD_LINE
           color: FC6EA3
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.delete.rate
         -
           sortorder: '5'
           drawtype: BOLD_LINE
           color: 6C59DC
           item:
-            host: 'MongoDB cluster by Zabbix Agent 2'
+            host: 'MongoDB cluster by Zabbix agent 2'
             key: mongodb.opcounters.command.rate

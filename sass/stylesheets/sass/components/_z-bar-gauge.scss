@@ -1,0 +1,13 @@
+z-bar-gauge {
+	position: relative;
+	display: block;
+	height: 24px;
+
+	&::part(bar) {
+		position: absolute;
+		top: 0;
+		left: 0;
+		border: 1px solid $form-border-color;
+		border-radius: 3px;
+	}
+}

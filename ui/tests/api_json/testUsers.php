@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -421,7 +421,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '2',
-					'username' => 'Try rename guest'
+					'username' => 'Try to rename guest'
 				]],
 				'expected_error' => 'Cannot rename guest user.'
 			],
@@ -529,7 +529,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '1',
-					'username' => 'Try add user to group with disabled GUI access',
+					'username' => 'Try to add user to group with disabled GUI access',
 					'usrgrps' => [
 						['usrgrpid' => '12']
 					]
@@ -539,7 +539,7 @@ class testUsers extends CAPITest {
 			[
 				'user' => [[
 					'userid' => '1',
-					'username' => 'Try add user to a disabled group',
+					'username' => 'Try to add user to a disabled group',
 					'usrgrps' => [
 						['usrgrpid' => '9']
 					]
@@ -831,7 +831,7 @@ class testUsers extends CAPITest {
 					],
 					'lang' => '123456'
 				],
-				'expected_error' => 'Invalid parameter "/1/lang": value must be one of "default", "en_US", "bg_BG", "ca_ES", "zh_CN", "zh_TW", "cs_CZ", "nl_NL", "fi_FI", "fr_FR", "ka_GE", "de_DE", "el_GR", "he_IL", "hu_HU", "id_ID", "it_IT", "ko_KR", "ja_JP", "lv_LV", "lt_LT", "nb_NO", "fa_IR", "pl_PL", "pt_BR", "pt_PT", "ro_RO", "ru_RU", "sk_SK", "es_ES", "sv_SE", "tr_TR", "uk_UA", "vi_VN".'
+				'expected_error' => 'Invalid parameter "/1/lang": value must be one of "default", "en_GB", "en_US", "bg_BG", "ca_ES", "zh_CN", "zh_TW", "cs_CZ", "nl_NL", "fi_FI", "fr_FR", "ka_GE", "de_DE", "el_GR", "he_IL", "hu_HU", "id_ID", "it_IT", "ko_KR", "ja_JP", "lv_LV", "lt_LT", "nb_NO", "fa_IR", "pl_PL", "pt_BR", "pt_PT", "ro_RO", "ru_RU", "sk_SK", "es_ES", "sv_SE", "tr_TR", "uk_UA", "vi_VN".'
 			],
 			// Check user properties, theme.
 			[

@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-18T08:43:35Z'
+  version: '6.0'
+  date: '2022-04-06T19:27:17Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/426752-discussion-thread-for-official-zabbix-dell-templates
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Server hardware'
@@ -43,8 +43,8 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: 520e12fd48354982a1180e6a354b87e8
@@ -54,6 +54,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 4dc37ed556bc4b1eaa9f6dda13f92b69
           name: 'Dell R740: Hardware model name'
@@ -78,8 +82,8 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
         -
           uuid: dedcc98a60f14af3b86abcd6f2f3d0dd
           name: 'Dell R740: Hardware serial number'
@@ -104,16 +108,21 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: system
           triggers:
             -
               uuid: e3efa58c32b044d18675046006c69167
               expression: 'last(/DELL PowerEdge R740 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R740 by HTTP/dell.server.hw.serialnumber,#2) and length(last(/DELL PowerEdge R740 by HTTP/dell.server.hw.serialnumber))>0'
-              name: 'Dell R740: Device has been replaced (new serial number received)'
+              name: 'Dell R740: Device has been replaced'
+              event_name: 'Dell R740: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: de8e4b6e40494ad99ce592dc884ef4e2
           name: 'Dell R740: Overall system health status'
@@ -137,8 +146,11 @@ zabbix_export:
             key: dell.server.system.get
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
           triggers:
             -
               uuid: 53eb2e16dc2b4b81806c826771da9e78
@@ -147,6 +159,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
             -
               uuid: bce115852baf4fd5a3ddb3245b768eab
               expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.status,,"like","Warning")=1'
@@ -158,6 +174,10 @@ zabbix_export:
                 -
                   name: 'Dell R740: Server is in a critical state'
                   expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.status,,"like","Critical")=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: cac6e14aa5d34d4e90747ab19da6a53f
           name: 'Dell R740: Get system'
@@ -267,12 +287,11 @@ zabbix_export:
                   result.firmware = getField(response.body, 'FirmwareVersion', '');
                   
                   return JSON.stringify(result);
-                  
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1'
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: system
         -
           uuid: b622113d9f1d4fd5a7ce594831c7ef79
           name: 'Dell R740: Redfish API'
@@ -288,8 +307,11 @@ zabbix_export:
             name: zabbix.host.available
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: health
+            -
+              tag: component
+              value: system
           triggers:
             -
               uuid: 7da220a774f147b789c7b24d182c617e
@@ -297,6 +319,10 @@ zabbix_export:
               name: 'Dell R740: Redfish API service is unavailable'
               priority: HIGH
               description: 'The service is unavailable or does not accept TCP connections.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: c302f1ed021e4b64b76b947d805dcd9b
@@ -333,8 +359,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: battery
+                -
+                  tag: component
+                  value: diskarray
               trigger_prototypes:
                 -
                   uuid: c2b65e66222d49ed9f068217a164a6ef
@@ -343,6 +372,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: ebe5e46ada29484da840f1eb70a9e43c
                   expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Warning")=1'
@@ -354,6 +387,10 @@ zabbix_export:
                     -
                       name: 'Dell R740: {#BATTERY_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -455,7 +492,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -495,8 +531,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: diskarray
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: b95c92e679ec4f54a83d48f416d2f384
@@ -505,6 +544,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 1251507dfe0c4b5287121436b1869205
                   expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Warning")=1'
@@ -516,6 +559,10 @@ zabbix_export:
                     -
                       name: 'Dell R740: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
                       expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -618,7 +665,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -649,8 +695,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: raw
             -
               uuid: 60d2040a401c47d9b69029a219cb9462
               name: 'Dell R740: {#SENSOR_NAME} Speed'
@@ -669,8 +718,8 @@ zabbix_export:
                 key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
             -
               uuid: 9dc84d5ddd3b4d78b3e507c1814f4a36
               name: 'Dell R740: {#SENSOR_NAME} Status'
@@ -694,8 +743,8 @@ zabbix_export:
                 key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
               trigger_prototypes:
                 -
                   uuid: 17598a47dfdc41558ab171a306c06685
@@ -704,6 +753,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: ab2cfb7eeb8b439f8149814c986e2d46
                   expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Warning")=1'
@@ -715,6 +768,10 @@ zabbix_export:
                     -
                       name: 'Dell R740: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
             -
@@ -798,7 +855,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -829,8 +885,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: raw
             -
               uuid: fa4bb348dec44c77b899b3530433c0a4
               name: 'Dell R740: {#IFNAME} Status'
@@ -854,8 +913,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
               trigger_prototypes:
                 -
                   uuid: 9a08ad3f597549f0841678ba572669c4
@@ -864,6 +923,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: d7f205844d7a4ed3a34405aa184faa1d
                   expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Warning")=1'
@@ -875,6 +938,10 @@ zabbix_export:
                     -
                       name: 'Dell R740: {#IFNAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 9ff8f42adeba42b190977c17e84724d0
               name: 'Dell R740: {#IFNAME} Speed'
@@ -897,8 +964,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
             -
               uuid: 0e1f393e8d7c4d1b8310d4ff412a2038
               name: 'Dell R740: {#IFNAME} State'
@@ -922,8 +989,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
             -
               uuid: cd7710d6215642c1a3c7407f2e36ce54
               name: 'Dell R740: {#IFNAME} Link status'
@@ -947,8 +1014,8 @@ zabbix_export:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Network interfaces'
+                  tag: component
+                  value: network
               trigger_prototypes:
                 -
                   uuid: 6372dcbe18034e92b89c7e2503a378cb
@@ -962,10 +1029,14 @@ zabbix_export:
                     This trigger expression works as follows:
                     1. Can be triggered if operations status is down.
                     2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    3. Condition of difference between last and previous value - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters'
           preprocessing:
             -
@@ -1069,7 +1140,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1100,8 +1170,14 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: storage
             -
               uuid: e3192cd20f22474da4633e4490263fe0
               name: 'Dell R740: {#DISK_NAME} Media type'
@@ -1125,8 +1201,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 9f1f10f849354710beae460913f74904
               name: 'Dell R740: {#DISK_NAME} Model name'
@@ -1150,8 +1229,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: 7c2345256bf644fca96c8e6e21dfef05
               name: 'Dell R740: {#DISK_NAME} Serial number'
@@ -1175,16 +1257,24 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: f1c78511b2ec49c29bf1e31d05826b98
                   expression: 'last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0'
-                  name: 'Dell R740: {#DISK_NAME} has been replaced (new serial number received)'
+                  name: 'Dell R740: {#DISK_NAME} has been replaced'
+                  event_name: 'Dell R740: {#DISK_NAME} has been replaced (new serial number received)'
                   priority: INFO
                   description: '{#DISK_NAME} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 63f8f9da0eda4dc7a4149566c45c469a
               name: 'Dell R740: {#DISK_NAME} Size'
@@ -1208,8 +1298,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
             -
               uuid: c5f2b3a8b47d45a887ea2e17f18b860d
               name: 'Dell R740: {#DISK_NAME} Status'
@@ -1233,8 +1326,11 @@ zabbix_export:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Physical disks'
+                  tag: component
+                  value: physicaldisk
+                -
+                  tag: component
+                  value: storage
               trigger_prototypes:
                 -
                   uuid: c8a872dca90e4d6aaa5422726779acbd
@@ -1243,6 +1339,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: aafddfabfc9c4866b60c8e2a9b267c85
                   expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Warning")=1'
@@ -1254,6 +1354,10 @@ zabbix_export:
                     -
                       name: 'Dell R740: {#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -1357,7 +1461,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1388,8 +1491,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: psu
+                -
+                  tag: component
+                  value: raw
             -
               uuid: 97d10c59c9df4873bb46d5f0cf95de0a
               name: 'Dell R740: {#SENSOR_NAME} Status'
@@ -1413,8 +1519,8 @@ zabbix_export:
                 key: 'dell.server.sensor.psu.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: psu
               trigger_prototypes:
                 -
                   uuid: 0ad250b5037247ab971a266319989ec4
@@ -1423,6 +1529,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 6ca3f32810a04df2bed7e64df008451f
                   expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Warning")=1'
@@ -1434,6 +1544,10 @@ zabbix_export:
                     -
                       name: 'Dell R740: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
             -
@@ -1531,7 +1645,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1562,8 +1675,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: temperature
             -
               uuid: 850ed07a6b2d43bbbe6df4cfde47832f
               name: 'Dell R740: {#SENSOR_NAME} Status'
@@ -1587,8 +1703,8 @@ zabbix_export:
                 key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: 32134fb04cb3457abc98803d79007ea4
@@ -1597,6 +1713,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: f16bf4a4d5e140f7a6c1ea9112752710
                   expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Warning")=1'
@@ -1608,6 +1728,10 @@ zabbix_export:
                     -
                       name: 'Dell R740: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: db13798bbf784d39a00e523cc933685c
               name: 'Dell R740: {#SENSOR_NAME} Value'
@@ -1627,8 +1751,8 @@ zabbix_export:
                 key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: temperature
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
             -
@@ -1726,7 +1850,6 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1757,8 +1880,11 @@ zabbix_export:
               url: '{$API.URL}{#ODATA}'
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: e4a484a80c714e56be916d48056d5fb7
               name: 'Dell R740: {#DISK_NAME} RAID status'
@@ -1782,8 +1908,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: 6bb29c04737a47cdafdc491a89e590c6
               name: 'Dell R740: {#DISK_NAME} Read policy'
@@ -1807,8 +1936,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: b2b9444b7a544f61bbdc4ba8f954d5f9
               name: 'Dell R740: {#DISK_NAME} Size'
@@ -1832,8 +1964,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: a661f20d119743bd814111d54e3bfb2f
               name: 'Dell R740: {#DISK_NAME} Current state'
@@ -1857,8 +1992,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
             -
               uuid: a822bc4d25734b6da03376b2de72c033
               name: 'Dell R740: {#DISK_NAME} Status'
@@ -1882,8 +2020,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
               trigger_prototypes:
                 -
                   uuid: 61f1fea5489a436790791636b3797837
@@ -1892,6 +2033,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
                 -
                   uuid: 13929a816d8c4cb6abc24c681a154205
                   expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Warning")=1'
@@ -1903,6 +2048,10 @@ zabbix_export:
                     -
                       name: 'Dell R740: {#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R740 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: f2d6a2c3178e42f69e67de65239e3a59
               name: 'Dell R740: {#DISK_NAME} Write policy'
@@ -1926,8 +2075,11 @@ zabbix_export:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
                 -
-                  tag: Application
-                  value: 'Virtual disks'
+                  tag: component
+                  value: storage
+                -
+                  tag: component
+                  value: virtualdisk
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
             -
@@ -2031,11 +2183,20 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-                  
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: dell
+        -
+          tag: target
+          value: 'dell poweredge'
       macros:
         -
           macro: '{$API.PASSWORD}'

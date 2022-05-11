@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,8 +80,7 @@ void	zbx_mock_test_entry(void **state)
 	int				start_detect_period, end_detect_period, detect_period_season_shift, err,
 					detect_period, start_evaluate_period, end_evaluate_period, evaluate_seconds = 0,
 					evaluate_nvalues = 0;
-	zbx_uint64_t			deviations_count;
-	double				result;
+	double				deviations_count, result;
 	char				*error = NULL, *evaluate_period = NULL;
 	const char			*params, *dev_alg = NULL;
 	DC_ITEM				item;
@@ -105,7 +104,7 @@ void	zbx_mock_test_entry(void **state)
 	item.itemid = ds_item->itemid;
 	item.value_type = ds_item->value_type;
 
-	deviations_count = zbx_mock_get_parameter_uint64("in.deviations_count");
+	deviations_count = zbx_mock_get_parameter_float("in.deviations_count");
 	dev_alg = zbx_mock_get_parameter_string("in.dev_alg");
 	handle = zbx_mock_get_parameter_handle("in");
 	zbx_vcmock_set_time(handle, "time");

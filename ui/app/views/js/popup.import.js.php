@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ function isDeleteMissingChecked(import_overlay) {
 
 function confirmSubmit(import_overlay, compare_overlay) {
 	overlayDialogue({
+		class: 'position-middle',
 		content: jQuery('<span>')
 					.text(<?= json_encode(_('Delete all elements that are not present in the import file?')) ?>),
 		buttons: [
@@ -94,7 +95,7 @@ function openImportComparePopup(overlay) {
 		else {
 			overlayDialogue({
 				title: response.header,
-				class: `modal-popup${response.no_changes ? '' : ' modal-popup-fullscreen'}`,
+				class: response.no_changes ? 'position-middle' : 'modal-popup modal-popup-fullscreen',
 				content: response.body,
 				buttons: response.buttons,
 				script_inline: response.script_inline,
@@ -143,6 +144,7 @@ function submitImportPopup(overlay) {
 function updateWarning(obj, content) {
 	if (jQuery(obj).is(':checked')) {
 		overlayDialogue({
+			class: 'position-middle',
 			content: jQuery('<span>').text(content),
 			buttons: [
 				{

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,18 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trapper_auth.h"
+
 #include <string.h>
-#include "common.h"
 #include "db.h"
 #include "log.h"
 #include "sha512crypt.h"
-#include "zbxjson.h"
-
-#include "trapper_auth.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: format_auth_token_hash                                           *
  *                                                                            *
  * Purpose: takes a string token, hashes it with sha-512 and then formats the *
  *          resulting binary into the printable hex string                    *
@@ -58,8 +54,6 @@ static void	format_auth_token_hash(const char *auth_token, char *hash_res_string
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_user_from_json                                           *
  *                                                                            *
  * Purpose: authenticate and initialize user data from the supplied json      *
  *                                                                            *

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -276,9 +276,9 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_left'));
-		$this->zbxTestAssertElementValue('percent_left', '4.00');
+		$this->zbxTestAssertElementValue('percent_left', '4');
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
-		$this->zbxTestAssertElementValue('percent_right', '5.00');
+		$this->zbxTestAssertElementValue('percent_right', '5');
 		$this->zbxTestDropdownAssertSelected('ymin_type', 'Calculated');
 		$this->zbxTestDropdownAssertSelected('ymax_type', 'Calculated');
 		$this->zbxTestTextPresent('Parent graphs');
@@ -513,9 +513,9 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_left'));
-		$this->zbxTestAssertElementValue('percent_left', '4.00');
+		$this->zbxTestAssertElementValue('percent_left', '4');
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
-		$this->zbxTestAssertElementValue('percent_right', '5.00');
+		$this->zbxTestAssertElementValue('percent_right', '5');
 		$this->zbxTestDropdownAssertSelected('ymin_type', 'Calculated');
 		$this->zbxTestDropdownAssertSelected('ymax_type', 'Calculated');
 		$this->zbxTestTextPresent($this->hostName.': itemDiscovery');

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -593,7 +593,7 @@ class testFormUser extends CWebTest {
 			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
 			$this->page->userLogin($data['fields']['Username'], $password);
 			// Verification of URL after login.
-			$this->assertContains($data['fields']['URL (after login)'], $this->page->getCurrentURL());
+			$this->assertStringContainsString($data['fields']['URL (after login)'], $this->page->getCurrentURL());
 			// Verification of the number of rows per page parameter.
 			$rows = $this->query('name:frm_maps')->asTable()->waitUntilVisible()->one()->getRows();
 			$this->assertEquals($data['fields']['Rows per page'], $rows->count());
@@ -1009,12 +1009,12 @@ class testFormUser extends CWebTest {
 			$this->page->logout();
 
 			// Attempt to sign in with old password.
-			$this->page->userLogin($data['username'],$data['old_password']);
+			$this->page->userLogin($data['username'], $data['old_password']);
 			$message = $this->query('class:red')->one()->getText();
 			$this->assertEquals($message, $data['error_message']);
 
 			// Sign in with new password.
-			$this->page->userLogin($data['username'],$data['new_password']);
+			$this->page->userLogin($data['username'], $data['new_password']);
 			$attempt_message = CMessageElement::find()->one();
 			$this->assertTrue($attempt_message->hasLine($data['attempt_message']));
 			$this->page->logout();
@@ -1140,7 +1140,7 @@ class testFormUser extends CWebTest {
 		$form_create->fill($data);
 		$this->query('button:Cancel')->one()->click();
 		$cancel_url = $this->page->getCurrentURL();
-		$this->assertContains('zabbix.php?action=user.list', $cancel_url);
+		$this->assertStringContainsString('zabbix.php?action=user.list', $cancel_url);
 		$this->assertEquals($user_hash, CDBHelper::getHash($sql_users));
 
 		// Check Cancellation when updating users.

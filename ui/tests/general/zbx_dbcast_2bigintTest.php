@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,9 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/db.inc.php';
 
 
-class zbx_dbcast_2bigintTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class zbx_dbcast_2bigintTest extends TestCase {
 
 	/**
 	 * Possible test values.

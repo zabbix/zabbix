@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: read_registry_value                                              *
- *                                                                            *
  * Purpose: read value from Windows registry                                  *
  *                                                                            *
  ******************************************************************************/
@@ -47,8 +45,6 @@ static wchar_t	*read_registry_value(HKEY hKey, LPCTSTR name)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_win_getversion                                               *
  *                                                                            *
  * Purpose: get Windows version information                                   *
  *                                                                            *

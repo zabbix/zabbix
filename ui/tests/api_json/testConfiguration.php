@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -673,7 +673,7 @@ class testConfiguration extends CAPITest {
 
 		// Condition for different error message text.
 		if (array_key_exists('error_contains', $data)) {
-			$this->assertContains($data['error_contains'], $result['error']['data']);
+			$this->assertStringContainsString($data['error_contains'], $result['error']['data']);
 		}
 		else {
 			$this->assertSame($data['error'], $result['error']['data']);

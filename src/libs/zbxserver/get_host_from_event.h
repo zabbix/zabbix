@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #ifndef ZABBIX_GET_HOST_FROM_EVENT_H
 #define ZABBIX_GET_HOST_FROM_EVENT_H
+
+#include "dbcache.h"
 
 int	get_host_from_event(const DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len);
 

@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,10 +23,6 @@
  * @var CView $this
  */
 
-// Visibility box javascript is already added. It should not be added in popup response.
-define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
-define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', 1);
-
 // Create form.
 $form = (new CForm())
 	->setId('massupdate-form')
@@ -40,9 +36,49 @@ $form = (new CForm())
 /*
  * Template tab
  */
-$template_form_list = new CFormList('template-form-list');
+$template_tab = new CFormList('template-form-list');
 
-$template_form_list
+$link_templates = (new CTable())
+	->addRow(
+		(new CRadioButtonList('mass_action_tpls', ZBX_ACTION_ADD))
+			->addValue(_('Link'), ZBX_ACTION_ADD)
+			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
+			->addValue(_('Unlink'), ZBX_ACTION_REMOVE)
+			->setModern(true)
+	)
+	->addRow([
+		(new CMultiSelect([
+			'name' => 'linked_templates[]',
+			'object_name' => 'templates',
+			'data' => [],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'templates',
+					'srcfld1' => 'hostid',
+					'srcfld2' => 'host',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'linked_templates_'
+				]
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	])
+	->addRow([
+		(new CList())
+			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			->addItem((new CCheckBox('mass_clear_tpls'))
+				->setLabel(_('Clear when unlinking'))
+			)
+	]);
+
+$template_tab->addRow(
+	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-div', _('Original')))
+		->setLabel(_('Link templates')),
+	(new CDiv($link_templates))
+		->setId('linked-templates-div')
+		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
+$template_tab
 	->addRow(
 		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
 			->setLabel(_('Host groups'))
@@ -78,55 +114,7 @@ $template_form_list
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	);
 
-/*
- * Linked templates tab
- */
-$linked_templates_form_list = new CFormList('linked-templates-form-list');
-
-$new_template_table = (new CTable())
-	->addRow(
-		(new CRadioButtonList('mass_action_tpls', ZBX_ACTION_ADD))
-			->addValue(_('Link'), ZBX_ACTION_ADD)
-			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
-			->addValue(_('Unlink'), ZBX_ACTION_REMOVE)
-			->setModern(true)
-	)
-	->addRow([
-		(new CMultiSelect([
-			'name' => 'linked_templates[]',
-			'object_name' => 'templates',
-			'data' => [],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'templates',
-					'srcfld1' => 'hostid',
-					'srcfld2' => 'host',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'linked_templates_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addRow([
-		(new CList())
-			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
-			->addItem((new CCheckBox('mass_clear_tpls'))
-				->setLabel(_('Clear when unlinking'))
-			)
-	]);
-
-$linked_templates_form_list->addRow(
-	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-div', _('Original')))
-		->setLabel(_('Link templates')),
-	(new CDiv($new_template_table))
-		->setId('linked-templates-div')
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-);
-
-/*
- * Tags tab
- */
-$tags_form_list = (new CFormList('tags-form-list'))
+$tags_tab = (new CFormList('tags-form-list'))
 	->addRow(
 		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
 		(new CDiv([
@@ -144,9 +132,8 @@ $tags_form_list = (new CFormList('tags-form-list'))
 
 // Append tabs to the form.
 $tabs = (new CTabView())
-	->addTab('template_tab', _('Template'), $template_form_list)
-	->addTab('linked_templates_tab', _('Linked templates'), $linked_templates_form_list)
-	->addTab('tags_tab', _('Tags'), $tags_form_list)
+	->addTab('template_tab', _('Template'), $template_tab)
+	->addTab('tags_tab', _('Tags'), $tags_tab)
 	->setSelected(0);
 
 // Macros.

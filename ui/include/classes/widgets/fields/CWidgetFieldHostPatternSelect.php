@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ class CWidgetFieldHostPatternSelect extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this->setDefault([]);
-		$this->placeholder = null;
 
 		/*
 		 * Set validation rules bypassing a parent::setSaveType to skip validation of length.

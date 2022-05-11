@@ -1,8 +1,9 @@
+//go:build !windows
 // +build !windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +30,7 @@ import (
 	"strconv"
 	"syscall"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Export -
@@ -88,20 +89,20 @@ func (p *Plugin) exportOwner(params []string) (result interface{}, err error) {
 		ret = strconv.FormatUint(uint64(stat.Gid), 10)
 	case "username":
 		u := strconv.FormatUint(uint64(stat.Uid), 10)
-		usr, err := user.LookupId(u)
-		if err != nil {
-			return nil, zbxerr.New(fmt.Sprintf("Cannot obtain %s user information", path)).Wrap(err)
-		}
 
-		ret = usr.Username
+		if usr, er := user.LookupId(u); er == nil {
+			ret = usr.Username
+		} else {
+			ret = u
+		}
 	case "groupname":
 		g := strconv.FormatUint(uint64(stat.Gid), 10)
-		group, err := user.LookupGroupId(g)
-		if err != nil {
-			return nil, zbxerr.New(fmt.Sprintf("Cannot obtain %s group information", path)).Wrap(err)
-		}
 
-		ret = group.Name
+		if group, er := user.LookupGroupId(g); er == nil {
+			ret = group.Name
+		} else {
+			ret = g
+		}
 	}
 
 	return ret, nil

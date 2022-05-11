@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@
 #include "common.h"
 #include "log.h"
 #include "zbxalgo.h"
-#include "zbxserver.h"
+#include "zbxeval.h"
+#include "zbxvariant.h"
+
 #include "eval.h"
 
 /* exit code in addition to SUCCEED/FAIL */
@@ -47,8 +49,6 @@ typedef enum
 zbx_function_trim_optype_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: variant_convert_suffixed_num                                     *
  *                                                                            *
  * Purpose: convert variant string value containing suffixed number to        *
  *          floating point variant value                                      *
@@ -82,8 +82,6 @@ static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_op_unary                                            *
  *                                                                            *
  * Purpose: evaluate unary operator                                           *
  *                                                                            *
@@ -151,15 +149,13 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_op_logic_err                                        *
- *                                                                            *
  * Purpose: evaluate logical or/and operator with one operand being error     *
  *                                                                            *
  * Parameters: token  - [IN] the operator token                               *
  *             value  - [IN] the other operand                                *
  *             result - [OUT] the resulting value                             *
  *                                                                            *
- * Return value: SUCCEED - the oeprator was evaluated successfully            *
+ * Return value: SUCCEED - the operator was evaluated successfully            *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -200,8 +196,6 @@ static int	eval_execute_op_logic_err(const zbx_eval_token_t *token, const zbx_va
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_variant_compare                                             *
- *                                                                            *
  * Purpose: compare two variant values supporting suffixed numbers            *
  *                                                                            *
  * Return value: <0 - the first value is less than the second                 *
@@ -232,8 +226,6 @@ static int	eval_variant_compare(const zbx_variant_t *left, const zbx_variant_t *
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_op_binary                                           *
  *                                                                            *
  * Purpose: evaluate binary operator                                          *
  *                                                                            *
@@ -408,8 +400,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_suffixed_number_parse                                       *
- *                                                                            *
  * Purpose: check if the value is suffixed number and return the suffix if    *
  *          exists                                                            *
  *                                                                            *
@@ -440,8 +430,6 @@ int	 eval_suffixed_number_parse(const char *value, char *suffix)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_push_value                                          *
  *                                                                            *
  * Purpose: push value in output stack                                        *
  *                                                                            *
@@ -527,8 +515,6 @@ static int	eval_execute_push_value(const zbx_eval_context_t *ctx, const zbx_eval
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_push_null                                           *
- *                                                                            *
  * Purpose: push null value in output stack                                   *
  *                                                                            *
  * Parameters: output   - [IN/OUT] the output value stack                     *
@@ -543,8 +529,6 @@ static void	eval_execute_push_null(zbx_vector_var_t *output)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_compare_token                                               *
  *                                                                            *
  * Purpose: check if expression fragment matches the specified text           *
  *                                                                            *
@@ -571,8 +555,6 @@ int	eval_compare_token(const zbx_eval_context_t *ctx, const zbx_strloc_t *loc, c
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_function_return                                             *
- *                                                                            *
  * Purpose: handle function return                                            *
  *                                                                            *
  * Parameters: args_num - [IN] the number of function arguments               *
@@ -596,8 +578,6 @@ static void	eval_function_return(zbx_uint32_t args_num, zbx_variant_t *value, zb
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_validate_function_args                                      *
  *                                                                            *
  * Purpose: validate function arguments                                       *
  *                                                                            *
@@ -661,8 +641,6 @@ static const char	*eval_type_desc(unsigned char type)
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_convert_function_arg                                        *
- *                                                                            *
  * Purpose: convert function argument to the specified type                   *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -697,8 +675,6 @@ static int	eval_convert_function_arg(const zbx_eval_context_t *ctx, const zbx_ev
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_prepare_math_function_args                                  *
  *                                                                            *
  * Purpose: validate and prepare (convert to floating values) math function   *
  *          arguments                                                         *
@@ -767,8 +743,6 @@ static int	eval_prepare_math_function_args(const zbx_eval_context_t *ctx, const 
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_min                                        *
- *                                                                            *
  * Purpose: evaluate min() function                                           *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -822,8 +796,6 @@ static int	eval_execute_function_min(const zbx_eval_context_t *ctx, const zbx_ev
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_max                                        *
  *                                                                            *
  * Purpose: evaluate max() function                                           *
  *                                                                            *
@@ -879,8 +851,6 @@ static int	eval_execute_function_max(const zbx_eval_context_t *ctx, const zbx_ev
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_sum                                        *
- *                                                                            *
  * Purpose: evaluate sum() function                                           *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -924,8 +894,6 @@ static int	eval_execute_function_sum(const zbx_eval_context_t *ctx, const zbx_ev
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_avg                                        *
  *                                                                            *
  * Purpose: evaluate avg() function                                           *
  *                                                                            *
@@ -975,8 +943,6 @@ static int	eval_execute_function_avg(const zbx_eval_context_t *ctx, const zbx_ev
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_abs                                     *
- *                                                                            *
  * Purpose: evaluate abs() function                                        *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -1012,8 +978,6 @@ static int	eval_execute_function_abs(const zbx_eval_context_t *ctx, const zbx_ev
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_length                                     *
  *                                                                            *
  * Purpose: evaluate length() function                                        *
  *                                                                            *
@@ -1055,8 +1019,6 @@ static int	eval_execute_function_length(const zbx_eval_context_t *ctx, const zbx
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_date                                       *
- *                                                                            *
  * Purpose: evaluate date() function                                          *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -1097,8 +1059,6 @@ static int	eval_execute_function_date(const zbx_eval_context_t *ctx, const zbx_e
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_time                                       *
- *                                                                            *
  * Purpose: evaluate time() function                                          *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -1138,8 +1098,6 @@ static int	eval_execute_function_time(const zbx_eval_context_t *ctx, const zbx_e
 }
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_now                                        *
- *                                                                            *
  * Purpose: evaluate now() function                                           *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -1169,8 +1127,6 @@ static int	eval_execute_function_now(const zbx_eval_context_t *ctx, const zbx_ev
 	return SUCCEED;
 }
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_dayofweek                                  *
  *                                                                            *
  * Purpose: evaluate dayofweek() function                                     *
  *                                                                            *
@@ -1212,8 +1168,6 @@ static int	eval_execute_function_dayofweek(const zbx_eval_context_t *ctx, const 
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_dayofmonth                                 *
- *                                                                            *
  * Purpose: evaluate dayofmonth() function                                    *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -1253,8 +1207,6 @@ static int	eval_execute_function_dayofmonth(const zbx_eval_context_t *ctx, const
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_bitwise                                    *
  *                                                                            *
  * Purpose: evaluate bitand(), bitor(), bitxor(), bitlshift(),                *
  *          bitrshift() functions                                             *
@@ -1319,8 +1271,6 @@ static int	eval_execute_function_bitwise(const zbx_eval_context_t *ctx, const zb
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_bitnot                                     *
- *                                                                            *
  * Purpose: evaluate bitnot() function                                        *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -1360,8 +1310,6 @@ static int	eval_execute_function_bitnot(const zbx_eval_context_t *ctx, const zbx
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_left                                       *
  *                                                                            *
  * Purpose: evaluate left() function                                          *
  *                                                                            *
@@ -1447,8 +1395,6 @@ static int	eval_validate_statistical_function_args(const zbx_eval_context_t *ctx
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_statistical_function                                *
- *                                                                            *
  * Purpose: common operations for aggregate function calculation              *
  *                                                                            *
  * Parameters: ctx       - [IN] the evaluation context                        *
@@ -1484,8 +1430,6 @@ static int	eval_execute_statistical_function(const zbx_eval_context_t *ctx, cons
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_right                                      *
  *                                                                            *
  * Purpose: evaluate right() function                                         *
  *                                                                            *
@@ -1544,8 +1488,6 @@ static int	eval_execute_function_right(const zbx_eval_context_t *ctx, const zbx_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_mid                                        *
  *                                                                            *
  * Purpose: evaluate mid() function                                           *
  *                                                                            *
@@ -1614,8 +1556,6 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_trim                                       *
  *                                                                            *
  * Purpose: evaluate trim(), rtrim(), ltrim() functions                       *
  *                                                                            *
@@ -1688,8 +1628,6 @@ static int	eval_execute_function_trim(const zbx_eval_context_t *ctx, const zbx_e
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_concat                                     *
- *                                                                            *
  * Purpose: evaluate concat() function                                        *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -1704,11 +1642,11 @@ static int	eval_execute_function_trim(const zbx_eval_context_t *ctx, const zbx_e
 static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	int		ret;
-	zbx_variant_t	*str1, *str2, value;
-	char		*strval;
+	int		i, ret;
+	zbx_variant_t	value;
+	char		*result = NULL;
 
-	if (2 != token->opt)
+	if (2 > token->opt)
 	{
 		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
 				ctx->expression + token->loc.l);
@@ -1718,25 +1656,28 @@ static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx
 	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
 		return ret;
 
-	str1 = &output->values[output->values_num - 2];
-	str2 = &output->values[output->values_num - 1];
-
-	if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, str1, error) ||
-			SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, str2, error))
+	for (i = output->values_num - (int)token->opt; i < output->values_num; i++)
 	{
-		return FAIL;
+		zbx_variant_t	*arg;
+
+		arg = &output->values[i];
+
+		if (SUCCEED != eval_convert_function_arg(ctx, token, ZBX_VARIANT_STR, arg, error))
+		{
+			zbx_free(result);
+			return FAIL;
+		}
+
+		result = zbx_strdcat(result, zbx_variant_value_desc(arg));
 	}
 
-	strval = zbx_strdup(NULL, str1->data.str);
-	zbx_variant_set_str(&value, zbx_strdcat(strval, str2->data.str));
-	eval_function_return(2, &value, output);
+	zbx_variant_set_str(&value, result);
+	eval_function_return(token->opt, &value, output);
 
 	return SUCCEED;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_insert                                     *
  *                                                                            *
  * Purpose: evaluate insert() function                                        *
  *                                                                            *
@@ -1812,8 +1753,6 @@ static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_replace                                    *
- *                                                                            *
  * Purpose: evaluate replace() function                                       *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -1879,8 +1818,6 @@ static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zb
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_repeat                                     *
- *                                                                            *
  * Purpose: evaluate repeat() function                                        *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -1943,8 +1880,6 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_bytelength                                 *
- *                                                                            *
  * Purpose: evaluate bytelength() function                                    *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -2004,8 +1939,6 @@ static int	eval_execute_function_bytelength(const zbx_eval_context_t *ctx, const
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_bitlength                                  *
- *                                                                            *
  * Purpose: evaluate bitlength() function                                     *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -2064,8 +1997,6 @@ static int	eval_execute_function_bitlength(const zbx_eval_context_t *ctx, const 
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_char                                       *
- *                                                                            *
  * Purpose: evaluate char() function                                          *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -2113,8 +2044,6 @@ static int	eval_execute_function_char(const zbx_eval_context_t *ctx, const zbx_e
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_function_ascii                                      *
- *                                                                            *
  * Purpose: evaluate ascii() function                                         *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -2144,7 +2073,7 @@ static int	eval_execute_function_ascii(const zbx_eval_context_t *ctx, const zbx_
 
 	arg = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR) || 0 > *arg->data.str)
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR))
 	{
 		*error = zbx_dsprintf(*error, "invalid function argument at \"%s\"", ctx->expression + token->loc.l);
 		return FAIL;
@@ -2157,8 +2086,6 @@ static int	eval_execute_function_ascii(const zbx_eval_context_t *ctx, const zbx_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_between                                    *
  *                                                                            *
  * Purpose: evaluate between() function                                       *
  *                                                                            *
@@ -2202,8 +2129,6 @@ static int	eval_execute_function_between(const zbx_eval_context_t *ctx, const zb
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_in                                         *
  *                                                                            *
  * Purpose: evaluate in() function                                            *
  *                                                                            *
@@ -2294,8 +2219,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_function_histogram_quantile                         *
  *                                                                            *
  * Purpose: evaluate histogram_quantile() function                            *
  *                                                                            *
@@ -2425,8 +2348,6 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_cb_function                                         *
- *                                                                            *
  * Purpose: evaluate function by calling custom callback (if configured)      *
  *                                                                            *
  * Parameters: ctx         - [IN] the evaluation context                      *
@@ -2496,8 +2417,6 @@ static double	eval_math_func_signum(double x)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_math_function_single_param                          *
  *                                                                            *
  * Purpose: evaluate mathematical function by calling passed function         *
  *          with 1 double argument                                            *
@@ -2580,8 +2499,6 @@ static double	eval_math_func_truncate(double n, double decimal_points)
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_math_function_double_param                          *
- *                                                                            *
  * Purpose: evaluate mathematical function by calling passed function         *
  *          with 2 double arguments                                           *
  *                                                                            *
@@ -2649,8 +2566,6 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_math_function_return_value                          *
  *                                                                            *
  * Purpose: evaluate mathematical function that returns constant value        *
  *                                                                            *
@@ -2726,8 +2641,6 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute_common_function                                     *
  *                                                                            *
  * Purpose: evaluate common function                                          *
  *                                                                            *
@@ -2902,8 +2815,6 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_execute_history_function                                    *
- *                                                                            *
  * Purpose: evaluate history function                                         *
  *                                                                            *
  * Parameters: ctx    - [IN] the evaluation context                           *
@@ -2934,8 +2845,6 @@ static int	eval_execute_history_function(const zbx_eval_context_t *ctx, const zb
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_throw_exception                                             *
- *                                                                            *
  * Purpose: throw exception by returning the specified error                  *
  *                                                                            *
  * Parameters: output - [IN/OUT] the output value stack                       *
@@ -2959,8 +2868,6 @@ static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: eval_execute                                                     *
  *                                                                            *
  * Purpose: evaluate pre-parsed expression                                    *
  *                                                                            *
@@ -3082,8 +2989,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: eval_init_execute_context                                        *
- *                                                                            *
  * Purpose: initialize execution context                                      *
  *                                                                            *
  * Parameters: ctx             - [IN] the evaluation context                  *
@@ -3109,8 +3014,6 @@ static void	eval_init_execute_context(zbx_eval_context_t *ctx, const zbx_timespe
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_eval_execute                                                 *
- *                                                                            *
  * Purpose: evaluate parsed expression                                        *
  *                                                                            *
  * Parameters: ctx   - [IN] the evaluation context                            *
@@ -3130,8 +3033,6 @@ int	zbx_eval_execute(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_vari
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_eval_execute_ext                                             *
  *                                                                            *
  * Purpose: evaluate parsed expression with callback for custom function      *
  *          processing                                                        *

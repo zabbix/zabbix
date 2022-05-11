@@ -34,8 +34,9 @@
 /*****************************************************************************/
 /* Includes:                                                                 */
 /*****************************************************************************/
-#include <string.h> // CBC mode, for memset
 #include "aes.h"
+
+#include <string.h> // CBC mode, for memset
 
 /*****************************************************************************/
 /* Defines:                                                                  */
@@ -564,4 +565,3 @@ void AES_CTR_xcrypt_buffer(struct AES_ctx *ctx, uint8_t *buf, size_t length)
 }
 
 #endif // #if defined(CTR) && (CTR == 1)
-

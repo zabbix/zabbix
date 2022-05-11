@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ typedef struct
 						/* items. Used for measuring duration of checks. */
 	zbx_uint64_t		processed_bytes;	/* number of processed bytes for log[], log.count[], logrt[], */
 							/* logrt.count[] items */
+	char			*persistent_file_name;	/* not used on Microsoft Windows */
 }
 ZBX_ACTIVE_METRIC;
 

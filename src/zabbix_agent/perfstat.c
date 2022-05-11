@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "stats.h"
 #include "perfstat.h"
+
+#include "stats.h"
 #include "alias.h"
 #include "log.h"
 #include "mutexs.h"
@@ -75,7 +75,7 @@ static void	deactivate_perf_counter(zbx_perf_counter_data_t *counter)
 
 /******************************************************************************
  *                                                                            *
- * Comments: if the specified counter exists or a new is successfully         *
+ * Comments: if the specified counter exists or the new one is successfully   *
  *           added, a pointer to that counter is returned, NULL otherwise     *
  *                                                                            *
  ******************************************************************************/
@@ -164,8 +164,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: extend_perf_counter_interval                                     *
- *                                                                            *
  * Purpose: extends the performance counter buffer to store the new data      *
  *          interval                                                          *
  *                                                                            *
@@ -211,8 +209,6 @@ static void	free_object_names(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: set_object_names                                                 *
  *                                                                            *
  * Purpose: obtains PDH object localized names and associates them with       *
  *          English names, to be used by perf_instance_en.discovery           *
@@ -627,8 +623,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_perf_counter_value_by_name                                   *
- *                                                                            *
  * Purpose: gets average named performance counter value                      *
  *                                                                            *
  * Parameters: name  - [IN] the performance counter name                      *
@@ -706,8 +700,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_perf_counter_value_by_path                                   *
- *                                                                            *
  * Purpose: gets average performance counter value                            *
  *                                                                            *
  * Parameters: counterpath - [IN] the performance counter path                *
@@ -777,8 +769,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_perf_counter_value                                           *
  *                                                                            *
  * Purpose: gets average value of the specified performance counter interval  *
  *                                                                            *
@@ -878,8 +868,6 @@ static wchar_t	*get_object_name(char *eng_name)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_object_name_local                                            *
  *                                                                            *
  * Purpose: get localized name of the object                                  *
  *                                                                            *

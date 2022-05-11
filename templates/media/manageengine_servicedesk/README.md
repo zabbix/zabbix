@@ -86,4 +86,4 @@ Examples:<br>
 For more information see [Zabbix](https://www.zabbix.com/documentation/6.0/manual/config/notifications) and [ManageEngine ServiceDesk](https://www.manageengine.com/products/service-desk/support.html) documentations.
 
 ## Supported versions
-Zabbix 5.4 and higher
+Zabbix 6.0 and higher

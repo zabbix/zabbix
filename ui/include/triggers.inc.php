@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -532,11 +532,12 @@ function getTriggersOverviewData(array $groupids, array $host_options = [], arra
 		'show_suppressed' => ZBX_PROBLEM_SUPPRESSED_FALSE
 	];
 
-	$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
-
+	$limit = 0;
 	do {
+		$limit += (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
+
 		$db_hosts = API::Host()->get(['limit' => $limit + 1] + $host_options);
-		$fetch_hosts = (count($db_hosts) > $limit);
+		$fetch_more = (count($db_hosts) > $limit);
 
 		$db_triggers = getTriggersWithActualSeverity([
 			'hostids' => array_keys($db_hosts)
@@ -554,11 +555,7 @@ function getTriggersOverviewData(array $groupids, array $host_options = [], arra
 		}
 
 		$db_hosts = array_intersect_key($db_hosts, $represented_hosts);
-
-		$fetch_hosts &= (count($db_hosts) < $limit);
-		$limit += (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
-
-	} while ($fetch_hosts);
+	} while ($fetch_more && count($db_hosts) < $limit);
 
 	CArrayHelper::sort($db_hosts, [
 		['field' => 'name', 'order' => ZBX_SORT_UP]
@@ -1047,8 +1044,7 @@ function analyzeExpression(string $expression, int $type, string &$error = null)
  * @return array  Array containing the trigger expression formula as the first element and an array describing the
  *                expression tree as the second.
  */
-function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null,
-		$type) {
+function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level, $operator, $type) {
 	$treeList = [];
 	$outline = '';
 
@@ -1642,6 +1638,8 @@ function get_item_function_info(string $expr) {
 
 	$hist_functions = [
 		'avg' => $rules['numeric_as_float'],
+		'baselinedev' => $rules['numeric_as_float'],
+		'baselinewma' => $rules['numeric_as_float'],
 		'change' => $rules['numeric'] + $rules['string_as_0or1'],
 		'count' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
 		'changecount' => $rules['numeric_as_uint'] + $rules['string_as_uint'],
@@ -1658,6 +1656,8 @@ function get_item_function_info(string $expr) {
 		'mad' => $rules['numeric_as_float'],
 		'max' => $rules['numeric'],
 		'min' => $rules['numeric'],
+		'monodec' => $rules['numeric_as_uint'],
+		'monoinc' => $rules['numeric_as_uint'],
 		'nodata' => $rules['numeric_as_0or1'] + $rules['string_as_0or1'],
 		'percentile' => $rules['numeric'],
 		'rate' => $rules['numeric'],
@@ -2406,7 +2406,7 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 				$table->addRow($description);
 			}
 
-			$result[] = (new CSpan())
+			$result[] = (new CLink())
 				->addClass($class)
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint($table, '', $freeze_on_click);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -345,9 +345,9 @@
 	}
 
 	/**
-	 * @param {Node} return_focus
+	 * @param {Node} trigger_element
 	 */
-	OperationViewMessage.prototype.showUserPopup = function(return_focus) {
+	OperationViewMessage.prototype.showUserPopup = function(trigger_element) {
 		PopUp('popup.generic', {
 			'srctbl': 'users',
 			'srcfld1': 'userid',
@@ -355,13 +355,13 @@
 			'dstfrm': 'popup.operation',
 			'dstfld1': 'operation-message-users-footer',
 			'multiselect': '1'
-		}, null, return_focus);
+		}, {dialogue_class: 'modal-popup-generic', trigger_element});
 	};
 
 	/**
-	 * @param {Node} return_focus
+	 * @param {Node} trigger_element
 	 */
-	OperationViewMessage.prototype.showUserGroupPopup = function(return_focus) {
+	OperationViewMessage.prototype.showUserGroupPopup = function(trigger_element) {
 		PopUp('popup.generic', {
 			'srctbl': 'usrgrp',
 			'srcfld1': 'usrgrpid',
@@ -369,7 +369,7 @@
 			'dstfrm': 'popup.operation',
 			'dstfld1': 'operation-message-user-groups-footer',
 			'multiselect': '1'
-		}, null, return_focus);
+		}, {dialogue_class: 'modal-popup-generic', trigger_element});
 	};
 
 	/**
@@ -624,7 +624,7 @@
 	OperationViewType.prototype.setConfig = function(conf) {
 		const {options, selected} = conf;
 		if (options.length == 1) {
-			const $hidden_input = $('<input />', {type: 'hidden', name: this.$select.attr('name'), value: selected});
+			const $hidden_input = $('<input>', {type: 'hidden', name: this.$select.attr('name'), value: selected});
 			this.$select.replaceWith([options[0].name, $hidden_input]);
 		}
 		else {
@@ -829,13 +829,13 @@
 	};
 
 	/**
-	 * @param {Node} return_focus
+	 * @param {Node} trigger_element
 	 */
-	OperationViewCondition.prototype.showConditionsPopup = function(return_focus) {
+	OperationViewCondition.prototype.showConditionsPopup = function(trigger_element) {
 		PopUp('popup.condition.operations', {
 			'type': operation_details.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 			'source': operation_details.EVENT_SOURCE_TRIGGERS
-		}, null, return_focus);
+		}, {dialogue_class: 'modal-popup-medium', trigger_element: trigger_element});
 	};
 
 	/**
@@ -958,13 +958,13 @@
 	};
 
 	/**
-	 * @param {Node}   return_focus  The node a popup returns focus to when it closes.
+	 * @param {Node}   trigger_element  The node a popup returns focus to when it closes.
 	 * @param {number} eventsource
 	 * @param {number} recovery_phase
 	 * @param {number} actionid
 	 */
-	function OperationPopup(return_focus, eventsource, recovery_phase, actionid) {
-		this.return_focus = return_focus;
+	function OperationPopup(trigger_element, eventsource, recovery_phase, actionid) {
+		this.trigger_element = trigger_element;
 		this.eventsource = eventsource;
 		this.recovery_phase = recovery_phase;
 		this.actionid = actionid;
@@ -1079,7 +1079,7 @@
 			title: t('Cancel'),
 			class: 'btn-alt',
 			cancel: true,
-			action: () => this.return_focus.focus()
+			action: () => this.trigger_element.focus()
 		}];
 
 		this.view.setConfig(res.popup_config);

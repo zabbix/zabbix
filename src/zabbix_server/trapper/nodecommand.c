@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,23 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
+#include "nodecommand.h"
+
 #include "zbxserver.h"
-#include "db.h"
 #include "log.h"
+#include "trapper_auth.h"
+
 #include "../scripts/scripts.h"
 #include "../../libs/zbxaudit/audit.h"
-
-#include "trapper_auth.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 
-#include "nodecommand.h"
-
 /******************************************************************************
- *                                                                            *
- * Function: execute_remote_script                                            *
  *                                                                            *
  * Purpose: execute remote command and wait for the result                    *
  *                                                                            *
@@ -187,8 +182,6 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_check_event_end_recovery_event                               *
- *                                                                            *
  * Purpose: check if the specified event id corresponds to a problem event    *
  *          caused by a trigger, find its recovery event (if it exists)       *
  *                                                                            *
@@ -224,8 +217,6 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: execute_script                                                   *
  *                                                                            *
  * Purpose: executing command                                                 *
  *                                                                            *
@@ -490,8 +481,6 @@ fail:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: node_process_command                                             *
  *                                                                            *
  * Purpose: process command received from the frontend                        *
  *                                                                            *

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,20 +88,20 @@
 				recipient = document.createElement('a');
 				recipient.href = 'javascript:void(0);';
 				recipient.addEventListener('click', (event) => {
-					const popup_options = Object.assign(this.data, {
+					const parameters = Object.assign(this.data, {
 						edit: 1,
 						old_recipientid: this.data.recipientid
 					});
 
 					if (this.data.recipient_type == <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>) {
-						popup_options.exclude = recipient.parentNode.parentNode.querySelector('[name*=exclude]').value;
-						popup_options.userids = Array.from(userids);
+						parameters.exclude = recipient.parentNode.parentNode.querySelector('[name*=exclude]').value;
+						parameters.userids = Array.from(userids);
 					}
 					else {
-						popup_options.usrgrpids = Array.from(usrgrpids);
+						parameters.usrgrpids = Array.from(usrgrpids);
 					}
 
-					PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
+					PopUp('popup.scheduledreport.subscription.edit', parameters, {trigger_element: event.target});
 				});
 			}
 			else {
@@ -112,7 +112,7 @@
 				}
 			}
 
-			recipient.innerHTML = this.data.recipient_name;
+			recipient.textContent = this.data.recipient_name;
 			recipient.setAttribute('title', this.data.recipient_name);
 
 			cell.appendChild(icon);
@@ -129,7 +129,7 @@
 			const cell = document.createElement('td');
 			const span = document.createElement('span');
 
-			span.innerHTML = this.data.creator_name;
+			span.textContent = this.data.creator_name;
 			span.setAttribute('title', this.data.creator_name);
 
 			if (this.data.creator_type == <?= ZBX_REPORT_CREATOR_TYPE_RECIPIENT ?> || this.data.creator_inaccessible) {
@@ -162,12 +162,12 @@
 					const input = status.parentNode.querySelector('[name*=exclude]');
 
 					if (input.value == <?= ZBX_REPORT_EXCLUDE_USER_TRUE ?>) {
-						status.innerHTML = <?= json_encode(_('Include')) ?>;
+						status.textContent = <?= json_encode(_('Include')) ?>;
 						status.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN ?>');
 						input.value = <?= ZBX_REPORT_EXCLUDE_USER_FALSE ?>
 					}
 					else {
-						status.innerHTML = <?= json_encode(_('Exclude')) ?>;
+						status.textContent = <?= json_encode(_('Exclude')) ?>;
 						status.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED ?>');
 						input.value = <?= ZBX_REPORT_EXCLUDE_USER_TRUE ?>
 					}
@@ -178,11 +178,11 @@
 			}
 
 			if (this.data.exclude == <?= ZBX_REPORT_EXCLUDE_USER_FALSE ?>) {
-				status.innerHTML = <?= json_encode(_('Include')) ?>;
+				status.textContent = <?= json_encode(_('Include')) ?>;
 				status.classList.add('<?= ZBX_STYLE_GREEN ?>');
 			}
 			else {
-				status.innerHTML = <?= json_encode(_('Exclude')) ?>;
+				status.textContent = <?= json_encode(_('Exclude')) ?>;
 				status.classList.add('<?= ZBX_STYLE_RED ?>');
 			}
 
@@ -198,7 +198,7 @@
 
 			btn.type = 'button';
 			btn.classList.add('<?= ZBX_STYLE_BTN_LINK ?>');
-			btn.innerHTML = <?= json_encode(_('Remove')) ?>;
+			btn.textContent = <?= json_encode(_('Remove')) ?>;
 
 			if (allowed_edit) {
 				btn.addEventListener('click', () => {
@@ -239,12 +239,10 @@
 			}
 
 			elem.addEventListener('click', (event) => {
-				const popup_options = {
+				PopUp('popup.scheduledreport.subscription.edit', {
 					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>,
 					userids: Array.from(userids)
-				};
-
-				PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
+				}, {trigger_element: event.target});
 			});
 		}
 
@@ -256,12 +254,10 @@
 			}
 
 			elem.addEventListener('click', (event) => {
-				const popup_options = {
+				PopUp('popup.scheduledreport.subscription.edit', {
 					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP ?>,
 					usrgrpids: Array.from(usrgrpids)
-				};
-
-				PopUp('popup.scheduledreport.subscription.edit', popup_options, null, event.target);
+				}, {trigger_element: event.target});
 			});
 		}
 	}

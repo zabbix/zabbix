@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -687,7 +687,7 @@ class CTrigger extends CTriggerGeneral {
 			: ['editable' => true];
 
 		$triggers = $this->get([
-			'output' => ['triggerid', 'description', 'flags'],
+			'output' => ['triggerid', 'description', 'templateid', 'flags'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
 		] + $permission_check);
@@ -697,6 +697,12 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		foreach ($triggers as $trigger) {
+			if ($trigger['templateid'] && !$inherited) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update dependencies of inherited trigger "%1$s".',
+					$trigger['description']
+				));
+			}
+
 			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update "%2$s" for a discovered trigger "%1$s".',
 					$trigger['description'], 'dependencies'
@@ -812,7 +818,7 @@ class CTrigger extends CTriggerGeneral {
 			: ['editable' => true];
 
 		$triggers = $this->get([
-			'output' => ['triggerid', 'description', 'flags'],
+			'output' => ['triggerid', 'description', 'templateid', 'flags'],
 			'triggerids' => $triggerids,
 			'preservekeys' => true
 		] + $permission_check);
@@ -826,6 +832,12 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		foreach ($triggers as $trigger) {
+			if ($trigger['templateid'] && !$inherited) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update dependencies of inherited trigger "%1$s".',
+					$trigger['description']
+				));
+			}
+
 			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update "%2$s" for a discovered trigger "%1$s".',
 					$trigger['description'], 'dependencies'
@@ -889,9 +901,10 @@ class CTrigger extends CTriggerGeneral {
 
 		$parentTriggers = $this->get([
 			'output' => ['triggerid'],
+			'selectDependencies' => ['triggerid'],
 			'hostids' => $templateIds,
 			'preservekeys' => true,
-			'selectDependencies' => ['triggerid']
+			'nopermissions' => true
 		]);
 
 		if ($parentTriggers) {
@@ -923,10 +936,10 @@ class CTrigger extends CTriggerGeneral {
 						}
 					}
 				}
-				$this->deleteDependencies($childTriggers);
+				$this->deleteDependencies($childTriggers, true);
 
 				if ($newDependencies) {
-					$this->addDependencies($newDependencies);
+					$this->addDependencies($newDependencies, true);
 				}
 			}
 		}

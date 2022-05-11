@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,7 +31,9 @@ abstract class CDashboardGeneral extends CApiService {
 		ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => 'value_itemid',
 		ZBX_WIDGET_FIELD_TYPE_GRAPH => 'value_graphid',
 		ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => 'value_graphid',
-		ZBX_WIDGET_FIELD_TYPE_MAP => 'value_sysmapid'
+		ZBX_WIDGET_FIELD_TYPE_MAP => 'value_sysmapid',
+		ZBX_WIDGET_FIELD_TYPE_SERVICE => 'value_serviceid',
+		ZBX_WIDGET_FIELD_TYPE_SLA => 'value_slaid'
 	];
 
 	protected const WIDGET_FIELD_TYPE_COLUMNS = [
@@ -222,7 +224,8 @@ abstract class CDashboardGeneral extends CApiService {
 				if ($widgetids) {
 					$options = [
 						'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
-							'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid'
+							'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
+							'value_slaid', 'value_sysmapid'
 						],
 						'filter' => ['widgetid' => $widgetids]
 					];
@@ -371,7 +374,9 @@ abstract class CDashboardGeneral extends CApiService {
 			ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => [],
 			ZBX_WIDGET_FIELD_TYPE_GROUP => [],
 			ZBX_WIDGET_FIELD_TYPE_HOST => [],
-			ZBX_WIDGET_FIELD_TYPE_MAP => []
+			ZBX_WIDGET_FIELD_TYPE_MAP => [],
+			ZBX_WIDGET_FIELD_TYPE_SERVICE => [],
+			ZBX_WIDGET_FIELD_TYPE_SLA => []
 		];
 
 		foreach ($dashboards as $dashboard) {
@@ -587,6 +592,42 @@ abstract class CDashboardGeneral extends CApiService {
 				if (!array_key_exists($sysmapid, $db_sysmaps)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Map with ID "%1$s" is not available.', $sysmapid)
+					);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_SERVICE]) {
+			$serviceids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_SERVICE]);
+
+			$db_services = API::Service()->get([
+				'output' => [],
+				'serviceids' => $serviceids,
+				'preservekeys' => true
+			]);
+
+			foreach ($serviceids as $serviceid) {
+				if (!array_key_exists($serviceid, $db_services)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Service with ID "%1$s" is not available.', $serviceid)
+					);
+				}
+			}
+		}
+
+		if ($ids[ZBX_WIDGET_FIELD_TYPE_SLA]) {
+			$slaids = array_keys($ids[ZBX_WIDGET_FIELD_TYPE_SLA]);
+
+			$db_slas = API::Sla()->get([
+				'output' => [],
+				'slaids' => $slaids,
+				'preservekeys' => true
+			]);
+
+			foreach ($slaids as $slaid) {
+				if (!array_key_exists($slaid, $db_slas)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('SLA with ID "%1$s" is not available.', $slaid)
 					);
 				}
 			}
@@ -971,7 +1012,8 @@ abstract class CDashboardGeneral extends CApiService {
 
 						$db_widget_fields = DB::select('widget_field', [
 							'output' => ['widget_fieldid', 'widgetid', 'type', 'name', 'value_int', 'value_str',
-								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_sysmapid'
+								'value_groupid', 'value_hostid', 'value_itemid', 'value_graphid', 'value_serviceid',
+								'value_slaid', 'value_sysmapid'
 							],
 							'filter' => [
 								'widgetid' => array_keys($db_widgets),

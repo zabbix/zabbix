@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -153,9 +153,9 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_header']);
 		$error = $this->zbxTestGetText('//ul[@class=\'list-dashed msg-details-border\']');
-		$this->assertContains($data['error_message'], $error);
+		$this->assertStringContainsString($data['error_message'], $error);
 
-		if 	(array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
+		if (array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
 			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
@@ -656,7 +656,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation');
 		$error = $this->zbxTestGetText('//ul[@class=\'list-dashed msg-details-border\']');
-		$this->assertContains($data['error_message'], $error);
+		$this->assertStringContainsString($data['error_message'], $error);
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(0, CDBHelper::getCount($sql));

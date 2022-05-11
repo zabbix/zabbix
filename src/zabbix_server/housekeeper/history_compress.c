@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxdb.h"
-#include "dbcache.h"
-#include "log.h"
 #include "history_compress.h"
+
+#include "log.h"
 
 #if defined(HAVE_POSTGRESQL)
 
@@ -62,8 +60,6 @@ static unsigned char	compression_status_cache = 0;
 static int		compress_older_cache = 0;
 
 /******************************************************************************
- *                                                                            *
- * Function: hk_check_table_segmentation                                      *
  *                                                                            *
  * Purpose: check that hypertables are segmented by itemid                    *
  *                                                                            *
@@ -114,8 +110,6 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_get_table_compression_age                                     *
- *                                                                            *
  * Purpose: returns data compression age configured for hypertable            *
  *                                                                            *
  * Parameters: table_name - [IN] hypertable name                              *
@@ -156,8 +150,6 @@ static int	hk_get_table_compression_age(const char *table_name)
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_check_table_compression_age                                   *
- *                                                                            *
  * Purpose: ensures that table compression is configured to specified age     *
  *                                                                            *
  * Parameters: table_name - [IN] hypertable name                              *
@@ -192,8 +184,6 @@ static void	hk_check_table_compression_age(const char *table_name, int age)
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_history_enable_compression                                    *
- *                                                                            *
  * Purpose: turns table compression on for items older than specified age     *
  *                                                                            *
  * Parameters: age - [IN] compression age                                     *
@@ -218,8 +208,6 @@ static void	hk_history_enable_compression(int age)
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_history_disable_compression                                   *
- *                                                                            *
  * Purpose: turns table compression off                                       *
  *                                                                            *
  ******************************************************************************/
@@ -243,8 +231,6 @@ static void	hk_history_disable_compression(void)
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: hk_history_compression_init                                      *
  *                                                                            *
  * Purpose: initializing compression for history/trends tables                *
  *                                                                            *
@@ -318,8 +304,6 @@ void	hk_history_compression_init(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: hk_history_compression_update                                    *
  *                                                                            *
  * Purpose: history compression settings periodic update                      *
  *                                                                            *
