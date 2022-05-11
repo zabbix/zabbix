@@ -178,17 +178,7 @@ $templates_field_items[] = (new CMultiSelect([
 
 $host_tab
 	->addItem([
-		new CLabel([
-			_('Templates'),
-			$host_is_discovered
-				? makeHelpIcon([
-					(new CList([
-						_('Templates linked by host discovery cannot be unlinked.'),
-						_('Use host prototype configuration form to remove automatically linked templates on upcoming discovery.')
-					]))
-				])
-				: null
-		]),
+		new CLabel(_('Templates'), 'add_templates__ms'),
 		(new CFormField(
 			(count($templates_field_items) > 1)
 				? (new CDiv($templates_field_items))->addClass('linked-templates')
@@ -356,6 +346,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 		$input_field = (new CTextArea('host_inventory['.$field_name.']', $data['host']['inventory'][$field_name]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
+
 	else {
 		$input_field = (new CTextBox('host_inventory['.$field_name.']', $data['host']['inventory'][$field_name]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
@@ -395,7 +386,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 	}
 
 	$inventory_tab->addItem([
-		new CLabel($inventory_field['title']),
+		new CLabel($inventory_field['title'], 'host_inventory['.$field_name.']'),
 		new CFormField([$input_field, $inventory_item])
 	]);
 }
