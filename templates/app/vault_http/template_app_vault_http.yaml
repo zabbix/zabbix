@@ -1,0 +1,3209 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:35:48Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 2f82248e411340429d390e8389850401
+      template: 'HashiCorp Vault by HTTP'
+      name: 'HashiCorp Vault by HTTP'
+      description: |
+        Get HashiCorp Vault metrics from Vault API HTTP Prometheus metrics endpoint.
+        
+        Some metrics may not be collected depending on your Vault instance version and configuration.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: cd948f4219164c77a17b56f1b01767d0
+          name: 'Vault: Check mountpoint discovery'
+          type: DEPENDENT
+          key: vault.check_mountpoint_discovery
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~"^vault_rollback_attempt_(?:.+?)_count$"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var name,
+                      output = [];
+                  
+                  JSON.parse(value).forEach(function (v) {
+                      if (name = v.name.match(/^vault_(rollback_attempt|route_rollback)_(.+?)_count$/)) {
+                          output.push(
+                              {
+                                  '{#MOUNTPOINT}': name[2].replace(/_/g, '/'),
+                                  '{#PATTERN_C}': 'vault_' + name[1] + '_' + name[2] + '_count',
+                                  '{#PATTERN_Q}': 'vault_' + name[1] + '_' + name[2]
+                              }
+                          );
+                      }
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 15m
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: discovery
+            -
+              tag: component
+              value: mountpoint
+        -
+          uuid: 940cacdb967c40a1b9fba1c143c8589b
+          name: 'Vault: Check replication discovery'
+          type: DEPENDENT
+          key: vault.check_replication_discovery
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~"^replication_(?:.+)$"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value !== "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 15m
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: discovery
+            -
+              tag: component
+              value: replication
+        -
+          uuid: f9c8f0ec3a5640af8464f69d1cebbd42
+          name: 'Vault: Check storage discovery'
+          type: DEPENDENT
+          key: vault.check_storage_discovery
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~"^vault_(?:.+)_(?:get|put|list|delete)_count$"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var name,
+                      output = [];
+                  
+                  JSON.parse(value).forEach(function (v) {
+                      if (name = v.name.match(/^vault_((?!barrier).+?)_(get|put|list|delete)_count$/)) {
+                          output.push(
+                              {
+                                  '{#STORAGE}': name[1],
+                                  '{#OPERATION}': name[2].toUpperCase(),
+                                  '{#PATTERN_C}': 'vault_' + name[1] + '_' + name[2] + '_count',
+                                  '{#PATTERN_Q}': 'vault_' + name[1] + '_' + name[2]
+                              }
+                          );
+                      }
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 15m
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: discovery
+            -
+              tag: component
+              value: storage
+        -
+          uuid: febb5558b1944187a0ac6e87ed153267
+          name: 'Vault: Check WAL discovery'
+          type: DEPENDENT
+          key: vault.check_wal_discovery
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - '{__name__=~"^vault_wal_(?:.+)$"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(value !== "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 15m
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: discovery
+            -
+              tag: component
+              value: wal
+        -
+          uuid: 9607f909cfed4515bed2e0ea16749e0d
+          name: 'Vault: Clear metrics'
+          type: DEPENDENT
+          key: vault.clear_metrics
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.errors
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.get_metrics
+          tags:
+            -
+              tag: component
+              value: metrics
+            -
+              tag: component
+              value: raw
+        -
+          uuid: a78063c1186540fb88d3b958b14250bf
+          name: 'Vault: Get health'
+          type: HTTP_AGENT
+          key: vault.get_health
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"healthcheck": 0}'
+          url: '{$VAULT.API.SCHEME}://{$VAULT.HOST}:{$VAULT.API.PORT}/v1/sys/health'
+          status_codes: '200,429,472,473,503,501'
+          headers:
+            -
+              name: X-Vault-Token
+              value: '{$VAULT.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: raw
+        -
+          uuid: f92c90b99edc42d9b170d775c714fa0a
+          name: 'Vault: Get leader'
+          type: HTTP_AGENT
+          key: vault.get_leader
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          url: '{$VAULT.API.SCHEME}://{$VAULT.HOST}:{$VAULT.API.PORT}/v1/sys/leader'
+          headers:
+            -
+              name: X-Vault-Token
+              value: '{$VAULT.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: leader
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 4ccc4256252f4345a264db340f4ddbf5
+          name: 'Vault: Get metrics'
+          type: HTTP_AGENT
+          key: vault.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          url: '{$VAULT.API.SCHEME}://{$VAULT.HOST}:{$VAULT.API.PORT}/v1/sys/metrics?format=prometheus'
+          status_codes: '200,503,403'
+          headers:
+            -
+              name: X-Vault-Token
+              value: '{$VAULT.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: metrics
+            -
+              tag: component
+              value: raw
+        -
+          uuid: cf264b78e4c44d49a81eac141a86d011
+          name: 'Vault: Get metrics error'
+          type: DEPENDENT
+          key: vault.get_metrics.error
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Get metrics error.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.errors[0]'
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_metrics
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: metrics
+          triggers:
+            -
+              uuid: a43a4139d225461289d16b7a78002cb0
+              expression: 'length(last(/HashiCorp Vault by HTTP/vault.get_metrics.error))>0'
+              name: 'Vault: Failed to get metrics'
+              event_name: 'Vault: Failed to get metrics (error: {ITEM.VALUE})'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Vault: Vault server is sealed'
+                  expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: e8cb015d45ad4e3b9f87d3cbbae3a980
+          name: 'Vault: Get tokens'
+          type: SCRIPT
+          key: vault.get_tokens
+          delay: 15m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var params = JSON.parse(value);
+            
+            params['url'] = params.scheme + '://'
+                + params.host + ':'
+                + params.port + '/v1/auth/token/lookup-accessor';
+            
+            var request = new HttpRequest(),
+                output = [];
+            
+            request.addHeader('X-Vault-Token: ' + params.token);
+            
+            params.accessors.trim().split(/\x20+/).forEach(function (accessor) {
+                if (!accessor) {
+                    return;
+                }
+            
+                var response,
+                    data = {},
+                    error_msg = '';
+            
+                try {
+                    response = request.post(params.url, JSON.stringify({ accessor: accessor }));
+                    Zabbix.log(4, '[ Vault API ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from Vault API. Check debug log for more information.';
+                        }
+                    }
+            
+                    if (request.getStatus() !== 200) {
+                        throw response.errors && response.errors[0] || JSON.stringify(response);
+                    }
+            
+                    if (typeof response !== 'object' || typeof response.data === 'undefined') {
+                        throw 'Cannot lookup token from Vault API. Check debug log for more information.';
+                    }
+            
+                    data = response.data;
+                }
+                catch (error) {
+                    error_msg = error;
+                }
+            
+                output.push({
+                    'accessor': accessor,
+                    'token_name': data.display_name || 'null',
+                    'ttl': data.ttl || 0,
+                    'has_ttl': !!data.expire_time,
+                    'error': error_msg.toString()
+                });
+            });
+            
+            return JSON.stringify(output);
+          description: 'Get information about tokens via their accessors. Accessors are defined in the macro "{$VAULT.TOKEN.ACCESSORS}".'
+          parameters:
+            -
+              name: host
+              value: '{$VAULT.HOST}'
+            -
+              name: accessors
+              value: '{$VAULT.TOKEN.ACCESSORS}'
+            -
+              name: token
+              value: '{$VAULT.TOKEN}'
+            -
+              name: scheme
+              value: '{$VAULT.API.SCHEME}'
+            -
+              name: port
+              value: '{$VAULT.API.PORT}'
+          tags:
+            -
+              tag: component
+              value: raw
+            -
+              tag: component
+              value: tokens
+        -
+          uuid: df395f64c8fc45d2a9442bb655474b4a
+          name: 'Vault: Healthcheck'
+          type: DEPENDENT
+          key: vault.health.check
+          delay: '0'
+          history: 7d
+          description: 'Vault healthcheck.'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.healthcheck
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '1'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: 93b4ae5089834a87ae41091fc9773501
+              expression: 'last(/HashiCorp Vault by HTTP/vault.health.check)=0'
+              name: 'Vault: Vault server is not responding'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 05c46e931d29415f9a6a32f4dadd1eed
+          name: 'Vault: Initialized'
+          type: DEPENDENT
+          key: vault.health.initialized
+          delay: '0'
+          history: 7d
+          description: 'Initialization status.'
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.initialized
+              error_handler: DISCARD_VALUE
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 75a3c56f1bb24646927cf9b490471cae
+          name: 'Vault: Performance standby'
+          type: DEPENDENT
+          key: vault.health.performance_standby
+          delay: '0'
+          history: 7d
+          description: 'Performance standby status.'
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.performance_standby
+              error_handler: DISCARD_VALUE
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 488a43102a304f7ab4d2586088a2fded
+          name: 'Vault: Disaster Recovery replication'
+          type: DEPENDENT
+          key: vault.health.replication_dr_mode
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            Disaster recovery replication mode
+            https://www.vaultproject.io/docs/enterprise/replication
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.replication_dr_mode
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 509982bde325478a9d77f99c256f1068
+          name: 'Vault: Performance replication'
+          type: DEPENDENT
+          key: vault.health.replication_performance_mode
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            Performance replication mode
+            https://www.vaultproject.io/docs/enterprise/replication
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.replication_performance_mode
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: e6d2183bb8b14fa3a647d5cea1f56d4c
+          name: 'Vault: Sealed'
+          type: DEPENDENT
+          key: vault.health.sealed
+          delay: '0'
+          history: 7d
+          description: 'Seal status.'
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.sealed
+              error_handler: DISCARD_VALUE
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: 3f4ebf7094914c219ac32132400f90c8
+              expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
+              name: 'Vault: Vault server is sealed'
+              priority: AVERAGE
+              description: 'https://www.vaultproject.io/docs/concepts/seal'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 0641c979cf774d97a9bc52dbaffe8a0f
+          name: 'Vault: Standby'
+          type: DEPENDENT
+          key: vault.health.standby
+          delay: '0'
+          history: 7d
+          description: 'Standby status.'
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.standby
+              error_handler: DISCARD_VALUE
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: e7e79cc09faa409dbe3fa74e1db4cb5f
+          name: 'Vault: Version'
+          type: DEPENDENT
+          key: vault.health.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Server version.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.version
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_health
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: ee9a561165b847c2a0719a767e5c4fe9
+              expression: 'last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2) and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0'
+              name: 'Vault: Version has changed'
+              event_name: 'Vault: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Vault version has changed. Ack to close.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 77da3cf43b0d4a449399f3de6d5e8477
+          name: 'Vault: HA enabled'
+          type: DEPENDENT
+          key: vault.leader.ha_enabled
+          delay: '0'
+          history: 7d
+          description: 'HA enabled status.'
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.ha_enabled
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_leader
+          tags:
+            -
+              tag: component
+              value: leader
+        -
+          uuid: ea6a7f625c144dc6beff71d3a19004ab
+          name: 'Vault: Is leader'
+          type: DEPENDENT
+          key: vault.leader.is_self
+          delay: '0'
+          history: 7d
+          description: 'Leader status.'
+          valuemap:
+            name: 'Vault flag'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.is_self
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.get_leader
+          tags:
+            -
+              tag: component
+              value: leader
+        -
+          uuid: f23cbc80bf2d4064bf45cc27f6ec752e
+          name: 'Vault: Audit log request failures, rate'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.request.failure.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of audit log request failures.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_audit_log_request_failure
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: audit_log
+        -
+          uuid: 33f2ce934ae5451dace5f880b3a2e6b7
+          name: 'Vault: Audit log requests, rate'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.request.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of all audit log requests across all audit log devices.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_audit_log_request_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: audit_log
+        -
+          uuid: 6b8b37e62e374bc38994c5dcc6f0fc6d
+          name: 'Vault: Audit log response failures, rate'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.response.failure.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of audit log response failures.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_audit_log_response_failure
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: audit_log
+        -
+          uuid: c336a5cecd4641b58be6ab1ba511f6ef
+          name: 'Vault: Audit log response, rate'
+          type: DEPENDENT
+          key: vault.metrics.audit.log.response.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: rps
+          description: 'Number of audit log responses across all audit log devices.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_audit_log_response_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: audit_log
+        -
+          uuid: e1d11f77e8394b22b88ddcf9a1b8159b
+          name: 'Vault: Barrier DELETE ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.barrier.delete.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of DELETE operations at the barrier.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_barrier_delete_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: barrier
+        -
+          uuid: 8a854323d051485091917391c630cc28
+          name: 'Vault: Barrier LIST ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.barrier.list.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of LIST operations at the barrier.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_barrier_list_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: barrier
+        -
+          uuid: 1dbf0413b1574f6e9b04abe5d06ab8aa
+          name: 'Vault: Barrier PUT ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.barrier.put.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of PUT operations at the barrier.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_barrier_put_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: barrier
+        -
+          uuid: f0069229811749e5b399f1214176ae11
+          name: 'Vault: Cache hit, rate'
+          type: DEPENDENT
+          key: vault.metrics.cache.hit.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times a value was retrieved from the LRU cache.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_cache_hit
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: cache
+        -
+          uuid: 4df07a4ea4a048c7bc11b21b56cf96c6
+          name: 'Vault: Cache miss, rate'
+          type: DEPENDENT
+          key: vault.metrics.cache.miss.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times a value was not in the LRU cache. The results in a read from the configured storage.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_cache_miss
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: cache
+        -
+          uuid: d99841c57aa349ae8676072e12add35c
+          name: 'Vault: Cache write, rate'
+          type: DEPENDENT
+          key: vault.metrics.cache.write.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of times a value was written to the LRU cache.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_cache_write
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: cache
+        -
+          uuid: 004f1eebd08c46d4bbdab7a6c6e3f3ec
+          name: 'Vault: Check token, rate'
+          type: DEPENDENT
+          key: vault.metrics.core.check.token.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of token checks handled by Vault core.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_check_token_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+        -
+          uuid: 77bf09bd2b554e5a8d0dde53045f05c7
+          name: 'Vault: Fetch ACL and token, rate'
+          type: DEPENDENT
+          key: vault.metrics.core.fetch.acl_and_token
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of ACL and corresponding token entry fetches handled by Vault core.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_fetch_acl_and_token_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+        -
+          uuid: 4ddf18c7768147a396fe13608b5508fb
+          name: 'Vault: Requests, rate'
+          type: DEPENDENT
+          key: vault.metrics.core.handle.request
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of requests handled by Vault core.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_handle_request_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+        -
+          uuid: 2aa54d38cc2541e3ae4df89e86d63d20
+          name: 'Vault: Leadership setup failed, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.leadership.setup_failed
+          delay: '0'
+          history: 7d
+          description: 'Cluster leadership setup failures which have occurred in a highly available Vault cluster.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_core_leadership_setup_failed
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_core_leadership_setup_failed")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+          triggers:
+            -
+              uuid: c68ab0c784314291bde1cc8693fd5959
+              expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
+              name: 'Vault: High frequency of leadership setup failures'
+              event_name: 'Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h)'
+              priority: AVERAGE
+              description: 'There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: f0ca68774b5842d7803d2c2619958184
+          name: 'Vault: Leadership setup lost, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.leadership_lost
+          delay: '0'
+          history: 7d
+          description: 'Cluster leadership losses which have occurred in a highly available Vault cluster.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_core_leadership_lost_count
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_core_leadership_lost_count")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+          triggers:
+            -
+              uuid: 8d7f4f51272a4ce5a3a7ab9642e51d63
+              expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
+              name: 'Vault: High frequency of leadership losses'
+              event_name: 'Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h)'
+              priority: AVERAGE
+              description: 'There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 2bdb273b513d4a06914cd6ea11ac2368
+          name: 'Vault: Post-unseal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.post_unseal
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by post-unseal operations handled by Vault core.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_post_unseal_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+        -
+          uuid: 81738d2323a94aa8a7f2b1d9721ac9f9
+          name: 'Vault: Pre-seal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.pre_seal
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by pre-seal operations.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_pre_seal_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+        -
+          uuid: 42d7e5c3d5b24a65b9821e1aaf0df2a0
+          name: 'Vault: Seal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.seal
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Duration of time taken by seal operations.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_seal_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+        -
+          uuid: 95f6ab7294c547e7976a292447ef31fb
+          name: 'Vault: Internal seal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.seal_internal
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by internal seal operations.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_seal_internal_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+        -
+          uuid: e0ecf5aa8c2a4e0886b5a12588839efd
+          name: 'Vault: Requested seal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.seal_with_request
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by requested seal operations.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_seal_with_request_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+        -
+          uuid: 1d66f20a1d594b4fa7c81849b83a4ef9
+          name: 'Vault: Leadership step downs, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.step_down
+          delay: '0'
+          history: 7d
+          description: 'Cluster leadership step down.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_core_step_down_count
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_core_step_down_count")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+          triggers:
+            -
+              uuid: 5f2895eb5a94441f858c573584ec8b19
+              expression: '(max(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h))>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
+              name: 'Vault: High frequency of leadership step downs'
+              event_name: 'Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h)'
+              priority: AVERAGE
+              description: 'There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 075c83114d1746b6b773579404e0268d
+          name: 'Vault: Unseal ops, counter'
+          type: DEPENDENT
+          key: vault.metrics.core.unseal
+          delay: '0'
+          history: 7d
+          description: 'Duration of time taken by unseal operations.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_core_unseal_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: core
+        -
+          uuid: 5edebc9e295844ee8716d2b17152bdd9
+          name: 'Vault: Fetch lease times, counter'
+          type: DEPENDENT
+          key: vault.metrics.expire.fetch.lease.times
+          delay: '0'
+          history: 7d
+          description: 'Time taken to fetch lease times.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_fetch_lease_times_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: 7f3ab929e48848e294cfa68b8e1783ad
+          name: 'Vault: Fetch lease times by token, counter'
+          type: DEPENDENT
+          key: vault.metrics.expire.fetch.lease.times.by_token
+          delay: '0'
+          history: 7d
+          description: 'Time taken to fetch lease times by token.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_fetch_lease_times_by_token_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: 66f1855a47624f10ae69735053e326f1
+          name: 'Vault: Number of expiring leases'
+          type: DEPENDENT
+          key: vault.metrics.expire.num_leases
+          delay: '0'
+          history: 7d
+          description: 'Number of all leases which are eligible for eventual expiry.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_num_leases
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: b160780f06c846809f7aca043777754f
+          name: 'Vault: Register ops, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.register
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken for register operations.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_register_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: 89dcbfb69b8a44dcbf330d16d292ec1b
+          name: 'Vault: Register auth ops, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.register.auth
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken for register authentication operations which create lease entries without lease ID.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_register_auth_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: 2d418cd62ada44c6bd527db8da0731e1
+          name: 'Vault: Expire renew, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.renew
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to renew a lease.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_renew_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: 091c66e0f2794a72a97ddfc3a7142b72
+          name: 'Vault: Renew token, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.renew_token
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to renew a token which does not need to invoke a logical backend.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_renew_token_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: 21a1b8470a31484da1e3fd76d3c8094b
+          name: 'Vault: Expire revoke, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to revoke a token.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_revoke_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: bc023bdad9504a86b17d2308db62e98f
+          name: 'Vault: Revoke secrets by token, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.by_token
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to revoke all secrets issued with a given token.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_revoke_by_token_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: 6bed679f33b4415d833cb5033c5f824c
+          name: 'Vault: Expire revoke force, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.force
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to forcibly revoke a token.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_revoke_force_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: 93041bd251d148c39e6e2e162f6f1078
+          name: 'Vault: Expire revoke prefix, count'
+          type: DEPENDENT
+          key: vault.metrics.expire.revoke.prefix
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Tokens revoke on a prefix.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_expire_revoke_prefix_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: expire
+        -
+          uuid: 5c3e5032315e466e81fca67ea880b33a
+          name: 'Vault: Policy DELETE ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.policy.delete_policy.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of operations to delete a policy.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_policy_delete_policy_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: policy
+        -
+          uuid: bd790a83c48e4ea6bcc9271703036101
+          name: 'Vault: Policy GET ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.policy.get_policy.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of operations to get a policy.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_policy_get_policy_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: policy
+        -
+          uuid: 6650bc3487934dcebc2e1f4da2e1db13
+          name: 'Vault: Policy LIST ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.policy.list_policies.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of operations to list policies.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_policy_list_policies_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: policy
+        -
+          uuid: c8010706f8274e898812b722a82e9add
+          name: 'Vault: Policy SET ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.policy.set_policy.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of operations to set a policy.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_policy_set_policy_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: policy
+        -
+          uuid: d7602cb55879403982afeabecb4c130a
+          name: 'Vault: Process CPU seconds, total'
+          type: DEPENDENT
+          key: vault.metrics.process.cpu.seconds.total
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Total user and system CPU time spent in seconds.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_cpu_seconds_total
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: process
+        -
+          uuid: 095af4564c5445c0be7ad38811404535
+          name: 'Vault: Open file descriptors, max'
+          type: DEPENDENT
+          key: vault.metrics.process.max.fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum number of open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_max_fds
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: process
+        -
+          uuid: 0b2c6c947c46409b93acea8e67a0f058
+          name: 'Vault: Open file descriptors, current'
+          type: DEPENDENT
+          key: vault.metrics.process.open.fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_open_fds
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: process
+        -
+          uuid: ddd6b5b8206442a7b5f0026e82bc2bd2
+          name: 'Vault: Process resident memory'
+          type: DEPENDENT
+          key: vault.metrics.process.resident_memory.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Resident memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_resident_memory_bytes
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: process
+        -
+          uuid: 241f8503d30c41df9e902cf31ddf715e
+          name: 'Vault: Uptime'
+          type: DEPENDENT
+          key: vault.metrics.process.uptime
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'Server uptime.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_start_time_seconds
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Math.floor(Date.now()/1000 - Number(value));'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: process
+          triggers:
+            -
+              uuid: a60eed70ecbc44fa935ec87d83fe4793
+              expression: 'last(/HashiCorp Vault by HTTP/vault.metrics.process.uptime)<10m'
+              name: 'Vault: has been restarted'
+              event_name: 'Vault: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: bf3a561bc96b46fc9a818a9f43c57be5
+          name: 'Vault: Process virtual memory, current'
+          type: DEPENDENT
+          key: vault.metrics.process.virtual_memory.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Virtual memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_virtual_memory_bytes
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: process
+        -
+          uuid: 17c568d745534c218dc292043234b215
+          name: 'Vault: Process virtual memory, max'
+          type: DEPENDENT
+          key: vault.metrics.process.virtual_memory.max.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Maximum amount of virtual memory available in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_virtual_memory_max_bytes
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: process
+        -
+          uuid: 58e6fbc8a6084008b08c7fc03ad4a703
+          name: 'Vault: Runtime allocated bytes'
+          type: DEPENDENT
+          key: vault.metrics.runtime.alloc.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Number of bytes allocated by the Vault process. This could burst from time to time, but should return to a steady state value.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_alloc_bytes
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: runtime
+        -
+          uuid: 3b2208b0248b4288ad91a8a5e3090b29
+          name: 'Vault: Runtime freed objects'
+          type: DEPENDENT
+          key: vault.metrics.runtime.free.count
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of freed objects.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_free_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: runtime
+        -
+          uuid: c1a159a37d4e4130a4a19d0ded2b0b72
+          name: 'Vault: Runtime heap objects'
+          type: DEPENDENT
+          key: vault.metrics.runtime.heap.objects
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of objects on the heap. This is a good general memory pressure indicator worth establishing a baseline and thresholds for alerting.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_heap_objects
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: runtime
+        -
+          uuid: f8f0f80be7514fe5b085f04858ac4d7a
+          name: 'Vault: Runtime malloc count'
+          type: DEPENDENT
+          key: vault.metrics.runtime.malloc.count
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Cumulative count of allocated heap objects.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_malloc_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: runtime
+        -
+          uuid: b728e92f88db47308272eff7e3bb8c08
+          name: 'Vault: Runtime num goroutines'
+          type: DEPENDENT
+          key: vault.metrics.runtime.num_goroutines
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of goroutines. This serves as a general system load indicator worth establishing a baseline and thresholds for alerting.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_num_goroutines
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: runtime
+        -
+          uuid: 9af322bade374b45b78d949e632747a8
+          name: 'Vault: Runtime sys bytes'
+          type: DEPENDENT
+          key: vault.metrics.runtime.sys.bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Number of bytes allocated to Vault. This includes what is being used by Vault''s heap and what has been reclaimed but not given back to the operating system.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_sys_bytes
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: runtime
+        -
+          uuid: 38f50f3173c346cebe6e321347e0270f
+          name: 'Vault: Runtime GC runs, total'
+          type: DEPENDENT
+          key: vault.metrics.runtime.total.gc.runs
+          delay: '0'
+          history: 7d
+          description: 'Total number of garbage collection runs since Vault was last started.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_total_gc_runs
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: runtime
+        -
+          uuid: 20f0708b63784c4190e8e6256f2d57f3
+          name: 'Vault: Secret kv entries'
+          type: DEPENDENT
+          key: vault.metrics.secret.kv.count
+          delay: '0'
+          history: 7d
+          description: 'Number of entries in each key-value secret engine.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_secret_kv_count
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_secret_kv_count")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: secret
+        -
+          uuid: 568b4b77ae58468da7bb407d349bd330
+          name: 'Vault: Token secret lease creation, rate'
+          type: DEPENDENT
+          key: vault.metrics.secret.lease.creation.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Counts the number of leases created by secret engines.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_secret_lease_creation
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_secret_lease_creation")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: secret
+        -
+          uuid: 37576dbac47349fca97fe27c4906124d
+          name: 'Vault: Token count, total'
+          type: DEPENDENT
+          key: vault.metrics.token
+          delay: '0'
+          history: 7d
+          description: 'Total number of service tokens available for use; counts all un-expired and un-revoked tokens in Vault''s token store. This measurement is performed every 10 minutes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_count
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_count")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: 4c7ae38abae146fdbaf334501b3644f1
+          name: 'Vault: Token count by auth, total'
+          type: DEPENDENT
+          key: vault.metrics.token.by_auth
+          delay: '0'
+          history: 7d
+          description: 'Total number of service tokens that were created by a auth method.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_count_by_auth
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_count_by_auth")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: 2f9011a7dd6f4b078402dbb50256ee0a
+          name: 'Vault: Token count by policy, total'
+          type: DEPENDENT
+          key: vault.metrics.token.by_policy
+          delay: '0'
+          history: 7d
+          description: 'Total number of service tokens that have a policy attached.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_count_by_policy
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_count_by_policy")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: c5b512233ae745c390d85e604bf7449e
+          name: 'Vault: Token count by ttl, total'
+          type: DEPENDENT
+          key: vault.metrics.token.by_ttl
+          delay: '0'
+          history: 7d
+          description: 'Number of service tokens, grouped by the TTL range they were assigned at creation.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_count_by_ttl
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_count_by_ttl")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: 1a203f57eb0647ca98a848913bb5b707
+          name: 'Vault: Token create, count'
+          type: DEPENDENT
+          key: vault.metrics.token.create
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The time taken to create a token.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_create_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: 0033d69a310041e58107e06a296492bd
+          name: 'Vault: Token createAccessor, count'
+          type: DEPENDENT
+          key: vault.metrics.token.createAccessor
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The time taken to create a token accessor.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_createAccessor_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: 3c73e0cdfe4147abb86ce939189e4cec
+          name: 'Vault: Token creation, rate'
+          type: DEPENDENT
+          key: vault.metrics.token.creation.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of service or batch tokens created.'
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - vault_token_creation
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="vault_token_creation")].value.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: ad0c38837e774d9b8164bad51ae9fd4c
+          name: 'Vault: Token lookup, rate'
+          type: DEPENDENT
+          key: vault.metrics.token.lookup.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of token look up.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_lookup_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: 0d30ca2565b24659839e7e31fc8f6739
+          name: 'Vault: Token revoke, count'
+          type: DEPENDENT
+          key: vault.metrics.token.revoke
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The time taken to look up a token.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_revoke_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: c851263be6d94ab39b548a57bbad4eab
+          name: 'Vault: Token revoke tree, count'
+          type: DEPENDENT
+          key: vault.metrics.token.revoke.tree
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to revoke a token tree.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_revoke_tree_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: 830ff368911c4532b10ff1e8c6c9e59b
+          name: 'Vault: Token store, count'
+          type: DEPENDENT
+          key: vault.metrics.token.store
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Time taken to store an updated token entry without writing to the secondary index.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_token_store_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: token
+        -
+          uuid: 2f0e733e6b1c406b88d012e727ab0169
+          name: 'Vault: Runtime GC pause, total'
+          type: DEPENDENT
+          key: vault.metrics.total.gc.pause
+          delay: '0'
+          history: 7d
+          units: s
+          description: 'The total garbage collector pause time since Vault was last started.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_runtime_total_gc_pause_ns
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1.0E-9'
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: runtime
+        -
+          uuid: f616fbcd3d20456bb34cde735cf7fad5
+          name: 'Vault: Barrier GET ops, rate'
+          type: DEPENDENT
+          key: vault.metrics.vault.barrier.get.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of GET operations at the barrier.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - vault_barrier_get_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: vault.clear_metrics
+          tags:
+            -
+              tag: component
+              value: barrier
+      discovery_rules:
+        -
+          uuid: ca7bbea60da54770b164ee11d9cd325f
+          name: 'Mountpoint metrics discovery'
+          type: DEPENDENT
+          key: vault.mountpoint.discovery
+          delay: '0'
+          description: 'Mountpoint metrics discovery.'
+          item_prototypes:
+            -
+              uuid: 3956d1e526d944c7b68d09a1cf52f11e
+              name: 'Vault: Rollback attempt [{#MOUNTPOINT}] ops, rate'
+              type: DEPENDENT
+              key: 'vault.metrics.rollback.attempt.rate[{#MOUNTPOINT}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of operations to perform a rollback operation on the given mount point.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_C}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: mountpoint
+                -
+                  tag: mountpoint
+                  value: '{#MOUNTPOINT}'
+            -
+              uuid: e0a4232e6a20433ba26e4313ff9ec1bc
+              name: 'Vault: Route rollback [{#MOUNTPOINT}] ops, rate'
+              type: DEPENDENT
+              key: 'vault.metrics.route.rollback.rate[{#MOUNTPOINT}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of operations to dispatch a rollback operation to a backend, and for that backend to process it. Rollback operations are automatically scheduled to clean up partial errors.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_C}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: mountpoint
+                -
+                  tag: mountpoint
+                  value: '{#MOUNTPOINT}'
+          master_item:
+            key: vault.check_mountpoint_discovery
+        -
+          uuid: f2015f2394a64e7e923a2030400bcd69
+          name: 'Replication metrics discovery'
+          type: DEPENDENT
+          key: vault.replication.discovery
+          delay: '0'
+          description: 'Discovery for replication metrics.'
+          item_prototypes:
+            -
+              uuid: af047eca9606472680288e5b5703bca9
+              name: 'Vault: Stream WAL guard found, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.logshipper.streamWALs.guard_found[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is matched/found.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - logshipper_streamWALs_guard_found
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: replication
+            -
+              uuid: df61d6db369540fd9934648189e9175a
+              name: 'Vault: Stream WAL missing guard, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.logshipper.streamWALs.missing_guard[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of incidences where the starting Merkle Tree index used to begin streaming WAL entries is not matched/found.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - logshipper_streamWALs_missing_guard
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: replication
+            -
+              uuid: 288ffb2cd8bc45f39a7e6d98a2100022
+              name: 'Vault: Last remote WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.fsm.last_remote_wal[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The index of the last remote WAL.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_fsm_last_remote_wal
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: replication
+            -
+              uuid: ca9c56e53093436f99a6a80f499aac45
+              name: 'Vault: Merkle commit index{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.merkle.commit_index[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The last committed index in the Merkle Tree.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_merkle_commit_index
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: replication
+            -
+              uuid: 854a4541b78c4df6b9d4971d71c7df49
+              name: 'Vault: Last DR WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.wal.last_dr_wal[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The index of the last DR WAL.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_wal_last_dr_wal
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: replication
+            -
+              uuid: 5aed3273a8c24236817f8bd3b5860f87
+              name: 'Vault: Last performance WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.wal.last_performance_wal[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The index of the last Performance WAL.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_wal_last_performance_wal
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: replication
+            -
+              uuid: f5bcef9569f44212b813cc0ec821b1ea
+              name: 'Vault: Last WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.replication.wal.last_wal[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The index of the last WAL.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - replication_wal_last_wal
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: replication
+          master_item:
+            key: vault.check_replication_discovery
+        -
+          uuid: ef703fedc3b347e9bb878d159d6756d8
+          name: 'Storage metrics discovery'
+          type: DEPENDENT
+          key: vault.storage.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#STORAGE}'
+                value: '{$VAULT.LLD.FILTER.STORAGE.MATCHES}'
+                formulaid: A
+          description: 'Storage backend metrics discovery.'
+          item_prototypes:
+            -
+              uuid: 0cdb0bcf0ff448ff8c5d673f9b66d17a
+              name: 'Vault: Storage [{#STORAGE}] {#OPERATION} ops, rate'
+              type: DEPENDENT
+              key: 'vault.metrics.storage.rate[{#STORAGE}, {#OPERATION}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of a {#OPERATION} operation against the {#STORAGE} storage backend.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - '{#PATTERN_C}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: operation
+                  value: '{#OPERATION}'
+                -
+                  tag: storage
+                  value: '{#STORAGE}'
+          master_item:
+            key: vault.check_storage_discovery
+        -
+          uuid: d580dee4c0bc4a0db91c9c5af70965af
+          name: 'Token metrics discovery'
+          type: DEPENDENT
+          key: vault.tokens.discovery
+          delay: '0'
+          description: 'Tokens metrics discovery.'
+          item_prototypes:
+            -
+              uuid: 9a9359e74c3a48b1bbada84d772e665a
+              name: 'Vault: Token [{#TOKEN_NAME}] error'
+              type: DEPENDENT
+              key: 'vault.token_via_accessor.error["{#ACCESSOR}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Token lookup error text.'
+              valuemap:
+                name: 'Vault flag'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.accessor == "{#ACCESSOR}")].error.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: vault.get_tokens
+              tags:
+                -
+                  tag: component
+                  value: token
+                -
+                  tag: token
+                  value: '{#TOKEN_NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 8cd5d903d4e74974a8469554b737ee3d
+                  expression: 'length(last(/HashiCorp Vault by HTTP/vault.token_via_accessor.error["{#ACCESSOR}"]))>0'
+                  name: 'Vault: Token [{#TOKEN_NAME}] lookup error occurred'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Vault: Vault server is sealed'
+                      expression: 'last(/HashiCorp Vault by HTTP/vault.health.sealed)=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: caa3f9ca96b14b929dd75238602fead9
+              name: 'Vault: Token [{#TOKEN_NAME}] has TTL'
+              type: DEPENDENT
+              key: 'vault.token_via_accessor.has_ttl["{#ACCESSOR}"]'
+              delay: '0'
+              history: 7d
+              description: 'The Token has TTL.'
+              valuemap:
+                name: 'Vault flag'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.accessor == "{#ACCESSOR}")].has_ttl.first()'
+                -
+                  type: BOOL_TO_DECIMAL
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: vault.get_tokens
+              tags:
+                -
+                  tag: component
+                  value: token
+                -
+                  tag: token
+                  value: '{#TOKEN_NAME}'
+            -
+              uuid: 0f872d9d811c44f6a9a9f8f5089ca0a1
+              name: 'Vault: Token [{#TOKEN_NAME}] TTL'
+              type: DEPENDENT
+              key: 'vault.token_via_accessor.ttl["{#ACCESSOR}"]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'The TTL period of the token.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.accessor == "{#ACCESSOR}")].ttl.first()'
+              master_item:
+                key: vault.get_tokens
+              tags:
+                -
+                  tag: component
+                  value: token
+                -
+                  tag: token
+                  value: '{#TOKEN_NAME}'
+          trigger_prototypes:
+            -
+              uuid: f4f0db7e26d9470a86d11e86d1ae26e2
+              expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}'
+              name: 'Vault: Token [{#TOKEN_NAME}] will expire soon'
+              event_name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT})'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: security
+            -
+              uuid: 0e2143a2a46d44778db34ac9af69bbfc
+              expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.WARN}'
+              name: 'Vault: Token [{#TOKEN_NAME}] will expire soon'
+              event_name: 'Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.WARN})'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Vault: Token [{#TOKEN_NAME}] will expire soon'
+                  expression: 'last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: security
+          master_item:
+            key: vault.get_tokens
+          lld_macro_paths:
+            -
+              lld_macro: '{#ACCESSOR}'
+              path: $.accessor
+            -
+              lld_macro: '{#TOKEN_NAME}'
+              path: $.token_name
+        -
+          uuid: ce7b2bb4c09c42d5a4b9e92c1c3dee23
+          name: 'WAL metrics discovery'
+          type: DEPENDENT
+          key: vault.wal.discovery
+          delay: '0'
+          description: 'Discovery for WAL metrics.'
+          item_prototypes:
+            -
+              uuid: 7e21309d1778466cae08e6424108d0e9
+              name: 'Vault: Delete WALs, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.deletewals[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to delete a Write Ahead Log (WAL).'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_deletewals_count
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: wal
+            -
+              uuid: 80d5a79d35bc4b3a970f311b0c8c3fbf
+              name: 'Vault: Flush ready WAL, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.flushready[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to flush a ready Write Ahead Log (WAL) to storage.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_flushready_count
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: wal
+            -
+              uuid: daee033751164b6591d326d2d59b7e3a
+              name: 'Vault: GC deleted WAL{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.gc.deleted[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of Write Ahead Logs (WAL) deleted during each garbage collection run.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_gc_deleted
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: wal
+            -
+              uuid: b45b43ac739246719e517d04eb384787
+              name: 'Vault: WALs on disk, total{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.gc.total[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total Number of Write Ahead Logs (WAL) on disk.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_gc_total
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: wal
+            -
+              uuid: b1e306d6136a4b6d933bd2154b3d5d6e
+              name: 'Vault: Load WALs, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.loadWAL[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to load a Write Ahead Log (WAL).'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_loadWAL_count
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: wal
+            -
+              uuid: de8fea26aa1546d2bdf1ec7dd5205a3b
+              name: 'Vault: Persist WALs, count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'vault.metrics.wal.persistwals[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Time taken to persist a Write Ahead Log (WAL).'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - vault_wal_persistwals_count
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: vault.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: wal
+          master_item:
+            key: vault.check_wal_discovery
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: vault
+      macros:
+        -
+          macro: '{$VAULT.API.PORT}'
+          value: '8200'
+          description: 'Vault port.'
+        -
+          macro: '{$VAULT.API.SCHEME}'
+          value: http
+          description: 'Vault API scheme.'
+        -
+          macro: '{$VAULT.HOST}'
+          value: '<PUT YOUR VAULT HOST>'
+          description: 'Vault host name.'
+        -
+          macro: '{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}'
+          value: '5'
+          description: 'Maximum number of Vault leadership losses.'
+        -
+          macro: '{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}'
+          value: '5'
+          description: 'Maximum number of Vault leadership setup failed.'
+        -
+          macro: '{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}'
+          value: '5'
+          description: 'Maximum number of Vault leadership step downs.'
+        -
+          macro: '{$VAULT.LLD.FILTER.STORAGE.MATCHES}'
+          value: .+
+          description: 'Filter of discoverable storage backends.'
+        -
+          macro: '{$VAULT.OPEN.FDS.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of used file descriptors for trigger expression.'
+        -
+          macro: '{$VAULT.TOKEN}'
+          value: '<PUT YOUR AUTH TOKEN>'
+          description: 'Vault auth token.'
+        -
+          macro: '{$VAULT.TOKEN.ACCESSORS}'
+          description: 'Vault accessors separated by spaces for monitoring token expiration time.'
+        -
+          macro: '{$VAULT.TOKEN.TTL.MIN.CRIT}'
+          value: 3d
+          description: 'Token TTL critical threshold.'
+        -
+          macro: '{$VAULT.TOKEN.TTL.MIN.WARN}'
+          value: 7d
+          description: 'Token TTL warning threshold.'
+      valuemaps:
+        -
+          uuid: 547a6b8002d44a8f8f363023c6097b1e
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up
+        -
+          uuid: 46edbd58c7384b53bb31775244c23343
+          name: 'Vault flag'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'False'
+            -
+              value: '1'
+              newvalue: 'True'
+  triggers:
+    -
+      uuid: ebe6f65e82ed4f00bd7c5be30841a25c
+      expression: 'min(/HashiCorp Vault by HTTP/vault.metrics.process.open.fds,5m)/last(/HashiCorp Vault by HTTP/vault.metrics.process.max.fds)*100>{$VAULT.OPEN.FDS.MAX.WARN}'
+      name: 'Vault: Current number of open files is too high'
+      event_name: 'Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m)'
+      priority: WARNING
+      tags:
+        -
+          tag: scope
+          value: capacity
+  graphs:
+    -
+      uuid: b4fc517d099340558fe813c6fb8c6be2
+      name: 'Vault: Cache rate'
+      graph_items:
+        -
+          drawtype: BOLD_LINE
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.cache.hit.rate
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.cache.miss.rate
+        -
+          sortorder: '2'
+          drawtype: BOLD_LINE
+          color: F63100
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.cache.write.rate
+    -
+      uuid: 81fa6888cef7496eb46a15f11e8a238c
+      name: 'Vault: Expiring leases'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.expire.num_leases
+    -
+      uuid: a96e30071bef4da6839e405ae5b183c5
+      name: 'Vault: K/V secret engine entries'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.secret.kv.count
+    -
+      uuid: e7e470ee9e914d4d9fc81b598889f873
+      name: 'Vault: Requests rate'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 34bdeb
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.core.handle.request
+    -
+      uuid: 2e4eda3a71b74e14a0c4843a96a53dbc
+      name: 'Vault: Runtime memory'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.runtime.alloc.bytes
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.process.resident_memory.bytes
+        -
+          sortorder: '2'
+          drawtype: BOLD_LINE
+          color: F63100
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.process.virtual_memory.bytes
+    -
+      uuid: db2043aa454a440995a178e342d3eca5
+      name: 'Vault: Token checks'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.core.check.token.rate
+    -
+      uuid: 39770778f73c49b0a333d313b76f4020
+      name: 'Vault: Token lookup'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.token.lookup.rate
+    -
+      uuid: 6b23dff0bd364416b520cca9dab56b47
+      name: 'Vault: Tokens count'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Vault by HTTP'
+            key: vault.metrics.token

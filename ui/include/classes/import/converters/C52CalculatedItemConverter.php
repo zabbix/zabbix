@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,8 +95,8 @@ class C52CalculatedItemConverter extends C52TriggerExpressionConverter {
 	}
 
 	/**
-	 * Check if each particular host reference would be linked through at least one functions according the new trigger
-	 * expression syntax.
+	 * Check if each particular host reference would be linked through at least one functions according to the new
+	 * trigger expression syntax.
 	 *
 	 * @param array $tokens
 	 *

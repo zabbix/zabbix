@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,13 +112,11 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	}
 
 	/**
-	 * Function makes field specific validation for values set using self::setValue().
+	 * @param bool $strict
 	 *
-	 * @param  bool $strict    Either to make a strict validation.
-	 *
-	 * @return array $errors   List of errors found during validation.
+	 * @return array
 	 */
-	public function validate($strict = false) {
+	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 		$value = $this->getValue();
 		$label = ($this->label === null) ? $this->name : $this->label;

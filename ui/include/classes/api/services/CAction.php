@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2520,6 +2520,10 @@ class CAction extends CApiService {
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_TRIGGERS)],
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_SERVICE)],
 											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'notify_if_canceled' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_NOTIFY_IF_CANCELED_FALSE, ACTION_NOTIFY_IF_CANCELED_TRUE])],
+											['else' => true, 'type' => API_UNEXPECTED]
 			]]
 		]];
 
@@ -2561,7 +2565,9 @@ class CAction extends CApiService {
 		}
 
 		$db_actions = $this->get([
-			'output' => ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed'],
+			'output' => ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed',
+				'notify_if_canceled'
+			],
 			'actionids' => array_column($actions, 'actionid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -2610,6 +2616,10 @@ class CAction extends CApiService {
 			'update_operations' =>		['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_TRIGGERS)],
 											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_SERVICE)],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'notify_if_canceled' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_NOTIFY_IF_CANCELED_FALSE, ACTION_NOTIFY_IF_CANCELED_TRUE])],
 											['else' => true, 'type' => API_UNEXPECTED]
 			]]
 		]];

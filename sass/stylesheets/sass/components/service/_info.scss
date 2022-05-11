@@ -21,6 +21,18 @@
 		}
 	}
 
+	.service-info-value {
+		.service-info-value-sla {
+			display: inline-block;
+			word-break: break-word;
+			line-height: 18px;
+
+			&:not(:last-child) {
+				margin-right: 10px;
+			}
+		}
+	}
+
 	.service-name {
 		padding-bottom: 5px;
 		font-size: $font-h2-size;

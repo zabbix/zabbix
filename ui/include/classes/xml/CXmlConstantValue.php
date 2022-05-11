@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -356,6 +356,7 @@ class CXmlConstantValue {
 	const DASHBOARD_WIDGET_TYPE_CLOCK = WIDGET_CLOCK;
 	const DASHBOARD_WIDGET_TYPE_GRAPH_CLASSIC = WIDGET_GRAPH;
 	const DASHBOARD_WIDGET_TYPE_GRAPH_PROTOTYPE = WIDGET_GRAPH_PROTOTYPE;
+	const DASHBOARD_WIDGET_TYPE_ITEM = WIDGET_ITEM;
 	const DASHBOARD_WIDGET_TYPE_PLAIN_TEXT = WIDGET_PLAIN_TEXT;
 	const DASHBOARD_WIDGET_TYPE_URL = WIDGET_URL;
 

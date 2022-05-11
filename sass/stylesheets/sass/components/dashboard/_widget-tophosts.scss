@@ -1,0 +1,37 @@
+// Widget configuration.
+
+form.dashboard-grid-widget-tophosts {
+	$width-small: 150px;
+
+	#list_columns .text {
+		@extend %overflow-ellipsis;
+		max-width: $width-small;
+	}
+
+	#column {
+		max-width: $width-small;
+	}
+}
+
+// Widget view.
+
+div.dashboard-grid-widget-tophosts {
+	$bar-gauge-height: 20px;
+
+	.list-table th.center {
+		text-align: center;
+	}
+
+	td {
+		line-height: $bar-gauge-height;
+	}
+
+	.link-action {
+		white-space: nowrap;
+	}
+
+	z-bar-gauge {
+		min-width: 64px;
+		height: $bar-gauge-height;
+	}
+}

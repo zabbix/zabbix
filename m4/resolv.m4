@@ -1,6 +1,5 @@
 # LIBRESOLV_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Alexander Vladishev                      Dec-16-2009
 #
 # Checks for DNS functions.
 

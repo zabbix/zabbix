@@ -110,5 +110,53 @@ in:
   base: m
 out:
   time: 2020-09-01 00:01:00 +03:00
+---
+test case: 2021-01-01 12:00:00 +02:00 / i
+in:
+  timezone: :Europe/Riga
+  time: 2021-01-01 12:00:00 +02:00
+  base: i
+out:
+  time: 2019-12-30 00:00:00 +02:00
+---
+test case: 2021-01-10 12:00:00 +02:00 / i
+in:
+  timezone: :Europe/Riga
+  time: 2021-01-10 12:00:00 +02:00
+  base: i
+out:
+  time: 2021-01-04 00:00:00 +02:00
+---
+test case: 2021-07-01 12:00:00 +03:00 / i
+in:
+  timezone: :Europe/Riga
+  time: 2021-07-01 12:00:00 +03:00
+  base: i
+out:
+  time: 2021-01-04 00:00:00 +02:00
+---
+test case: 2021-12-31 12:00:00 +02:00 / i
+in:
+  timezone: :Europe/Riga
+  time: 2021-12-31 12:00:00 +03:00
+  base: i
+out:
+  time: 2021-01-04 00:00:00 +02:00
+---
+test case: 2022-01-02 12:00:00 +02:00 / i
+in:
+  timezone: :Europe/Riga
+  time: 2022-01-02 12:00:00 +03:00
+  base: i
+out:
+  time: 2021-01-04 00:00:00 +02:00
+---
+test case: 2022-01-03 12:00:00 +02:00 / i
+in:
+  timezone: :Europe/Riga
+  time: 2022-01-03 12:00:00 +03:00
+  base: i
+out:
+  time: 2022-01-03 00:00:00 +02:00
 ...
 

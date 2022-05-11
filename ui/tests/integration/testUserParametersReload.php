@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for user parameters reload
  *
  * @required-components server, agent, agent2
- * @configurationDataProvider serverConfigurationProvider, agentConfigurationProvider
+ * @configurationDataProvider configurationProvider
  * @backup items, history_str
  * @hosts agentd, agent2
  */
@@ -65,7 +65,7 @@ class testUserParametersReload extends CIntegrationTest {
 	public function prepareData() {
 		// Create host "agentd" and "agent2".
 		$hosts = [];
-		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 => 53] as $component => $port) {
+		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 => self::AGENT2_PORT_SUFFIX] as $component => $port) {
 			$hosts[] = [
 				'host' => $component,
 				'interfaces' => [
@@ -143,85 +143,81 @@ class testUserParametersReload extends CIntegrationTest {
 	 *
 	 * @return array
 	 */
-	public function serverConfigurationProvider() {
+	public function configurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'UnreachablePeriod' => 25,
-				'UnavailableDelay' => 15,
-				'UnreachableDelay' => 5
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname' => self::COMPONENT_AGENT
+			],
+			self::COMPONENT_AGENT2 => [
+				'Hostname' => self::COMPONENT_AGENT2,
+				'Plugins.Uptime.Capacity' => '10'
 			]
 		];
 	}
 
 	/**
-	 * Component configuration provider for agent related tests.
+	 * Component configuration provider.
 	 *
 	 * @return array
 	 */
-	public function agentConfigurationProvider() {
+	public function configurationProvider_singleParam() {
 		return [
 			self::COMPONENT_AGENT => [
-				'Hostname' => self::COMPONENT_AGENT,
-				'UserParameter' => self::ITEM_NAME_01.',echo 01'
+				'UserParameter' => self::ITEM_NAME_01.',echo singleParam.01'
 			],
 			self::COMPONENT_AGENT2 => [
-				'Hostname' => self::COMPONENT_AGENT2,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.'53',
-				'Plugins.Uptime.Capacity' => '10',
-				'UserParameter' => self::ITEM_NAME_01.',echo 01'
+				'UserParameter' => self::ITEM_NAME_01.',echo singleParam.01'
 			]
 		];
 	}
 
 	/**
 	 * Check reloaded user parameters (usrprm01 only)
+	 *
+	 * @configurationDataProvider configurationProvider_singleParam
 	 */
 	public function testUserParametersReload_singleParam() {
-		$config = [
-			self::COMPONENT_AGENT => [
-				'UserParameter' => self::ITEM_NAME_01.',echo 01'
-			],
-			self::COMPONENT_AGENT2 => [
-				'UserParameter' => self::ITEM_NAME_01.',echo 01'
-			]
-		];
-
-		$this->executeUserParamReload($config);
-
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL);
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'singleParam.01');
 			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
 		}
 	}
 
 	/**
-	 * Check reloaded user parameters (usrprm01 and usrprm01)
+	 * Component configuration provider.
+	 *
+	 * @return array
 	 */
-	public function testUserParametersReload_multipleParams() {
-		// Currently multiple identical configuration parameters are not allowed, so use include instead
-		$config = [
+	public function configurationProvider_multipleParams() {
+		return [
 			self::COMPONENT_AGENT => [
-				'UserParameter' => self::ITEM_NAME_01.',echo 01',
-				'Include' => PHPUNIT_CONFIG_DIR.self::COMPONENT_AGENT.'_usrprm.conf'
+				'UserParameter' => [
+					self::ITEM_NAME_01.',echo multipleParams.01',
+					self::ITEM_NAME_02.',echo multipleParams.02'
+				]
 			],
 			self::COMPONENT_AGENT2 => [
-				'UserParameter' => self::ITEM_NAME_01.',echo 01',
-				'Include' => PHPUNIT_CONFIG_DIR.self::COMPONENT_AGENT2.'_usrprm.conf'
+				'UserParameter' => [
+					self::ITEM_NAME_01.',echo multipleParams.01',
+					self::ITEM_NAME_02.',echo multipleParams.02'
+				]
 			]
 		];
+	}
 
+	/**
+	 * Check reloaded user parameters (usrprm01 and usrprm01)
+	 *
+	 * @configurationDataProvider configurationProvider_multipleParams
+	 */
+	public function testUserParametersReload_multipleParams() {
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			if (file_put_contents(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf', 'UserParameter='.self::ITEM_NAME_02.',echo 02') === false) {
-				throw new Exception('Failed to create include configuration file');
-			}
-		}
-
-		$this->executeUserParamReload($config);
-
-		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL);
-			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NORMAL);
-			$this->assertTrue(@unlink(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf'));
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'multipleParams.01');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NORMAL, 'multipleParams.02');
 		}
 	}
 
@@ -229,8 +225,6 @@ class testUserParametersReload extends CIntegrationTest {
 	 * Check reloaded user parameters (no user parameters)
 	 */
 	public function testUserParametersReload_noParams() {
-		$this->executeUserParamReload();
-
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
 			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED);
 			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
@@ -238,60 +232,32 @@ class testUserParametersReload extends CIntegrationTest {
 	}
 
 	/**
-	 * Update configuration file and reload user parameters.
-	 *
-	 * @param array $config		user parameters
-	 */
-	public function executeUserParamReload($config = null) {
-		$def_config = self::getDefaultComponentConfiguration();
-
-		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			if ($config !== null) {
-				$config[$component] = array_merge($config[$component], $def_config[$component]);
-			}
-			else {
-				$config = $def_config;
-			}
-			$this->prepareComponentConfiguration($component, $config);
-			$this->reloadUserParameters($component);
-		}
-
-		sleep(self::USER_PARAM_RELOAD_DELAY);
-	}
-
-	/**
-	 * Reload user parameters.
-	 *
-	 * @static
-	 *
-	 * @param string $component	component
-	 */
-	public static function reloadUserParameters($component) {
-		$return = null;
-		$output = null;
-		$suffix = ' -R userparameter_reload > /dev/null 2>&1';
-
-		exec(PHPUNIT_BINARY_DIR.'zabbix_'.$component.$suffix, $output, $return);
-
-		if ($return !== 0) {
-			throw new Exception('Failed to reload user parameters');
-		}
-
-		return $output;
-	}
-
-	/**
 	 * Check item state.
 	 *
-	 * @param string $name		item name
-	 * @param integer $state	item state
+	 * @param string $name
+	 * @param int    $state
+	 * @param string $lastvalue
 	 */
-	public function checkItemState($name, $state) {
-		$response = $this->call('item.get', [
-			'itemids' => self::$itemids[$name],
-			'output' => ['state']
-		]);
+	public function checkItemState(string $name, int $state, string $lastvalue = null) {
+		$wait_iterations = 5;
+		$wait_iteration_delay = 1;
 
-		$this->assertEquals($state, $response['result'][0]['state'], 'User parameter failed to reload, item name: '.$name);
+		for ($r = 0; $r < $wait_iterations; $r++) {
+			$item = $this->call('item.get', [
+				'output' => ['state', 'lastvalue'],
+				'itemids' => self::$itemids[$name]
+			])['result'][0];
+
+			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED || $lastvalue === $item['lastvalue'])) {
+				break;
+			}
+
+			sleep($wait_iteration_delay);
+		}
+
+		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, item name: '.$name);
+		if ($state == ITEM_STATE_NORMAL) {
+			$this->assertSame($lastvalue, $item['lastvalue'], 'User parameter failed to reload, item name: '.$name);
+		}
 	}
 }

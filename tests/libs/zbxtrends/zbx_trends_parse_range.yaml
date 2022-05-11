@@ -394,4 +394,14 @@ out:
   start: 2020-09-07 00:00:00.000000000 +03:00
   end:   2020-09-07 00:00:00.000000000 +03:00
   return: SUCCEED
+---
+test case: Valid shift '0h'
+in:
+  param: 1h:now-0h
+  timezone: :Europe/Riga
+  time: 2020-09-01 00:00:00.000000000 +03:00
+out:
+  start: 2020-08-31 23:00:00.000000000 +03:00
+  end: 2020-08-31 23:00:00.000000000 +03:00
+  return: SUCCEED
 ...

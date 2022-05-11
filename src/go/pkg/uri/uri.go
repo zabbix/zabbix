@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,9 +97,18 @@ func (u *URI) Addr() string {
 
 // String reassembles the URI to a valid URI string.
 func (u *URI) String() string {
+	return u.string(u.rawQuery)
+}
+
+// NoQueryString reassembles the URI to a valid URI string with no query.
+func (u *URI) NoQueryString() string {
+	return u.string("")
+}
+
+func (u *URI) string(query string) string {
 	t := &url.URL{
 		Scheme:   u.scheme,
-		RawQuery: u.rawQuery,
+		RawQuery: query,
 	}
 
 	if u.socket != "" {

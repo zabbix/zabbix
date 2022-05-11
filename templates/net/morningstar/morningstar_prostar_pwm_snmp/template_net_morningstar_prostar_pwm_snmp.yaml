@@ -1,0 +1,1394 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:13Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 24bed6339f0a492fab86fe757394b937
+      template: 'Morningstar ProStar PWM SNMP'
+      name: 'Morningstar ProStar PWM SNMP'
+      description: |
+        MIBs used:
+        PROSTAR-PWM
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 953fb8b3c23f420bb6132874ce3e33e2
+          name: 'Array: Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.31.0
+          key: 'array.voltage[arrayVoltage.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Array Voltage
+            Scaling Factor:1.0
+            Units:V
+            Range:[0, 80]
+            Modbus address:0x0013
+          tags:
+            -
+              tag: component
+              value: array
+        -
+          uuid: a80ad3ace9b14446bc5fd5d6aaa5af87
+          name: 'Battery: Battery Voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.30.0
+          key: 'battery.voltage.discovery[batteryTerminalVoltage.0]'
+          delay: 15m
+          history: '0'
+          value_type: FLOAT
+          units: V
+          description: 'MIB: PROSTAR-PWM'
+          tags:
+            -
+              tag: component
+              value: battery
+            -
+              tag: component
+              value: discovery
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 148008b117c94155ba81600e3050ab25
+          name: 'Battery: Charge Current'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.33.0
+          key: 'charge.current[chargeCurrent.0]'
+          history: 7d
+          value_type: FLOAT
+          units: A
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Charge Current
+            Scaling Factor:1.0
+            Units:A
+            Range:[0, 40]
+            Modbus address:0x0011
+          tags:
+            -
+              tag: component
+              value: battery
+        -
+          uuid: a7ae2d3b911e4bb5a7eeb770470245a5
+          name: 'Battery: Charge State'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.45.0
+          key: 'charge.state[chargeState.0]'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Control State
+            Modbus address:0x0021
+            
+            0: Start
+            1: NightCheck
+            2: Disconnect
+            3: Night
+            4: Fault
+            5: Bulk
+            6: Pwm
+            7: Float
+            8: Equalize
+          valuemap:
+            name: 'ProStar PWM charge state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: battery
+          triggers:
+            -
+              uuid: f12fc2c1a7a142a287304c18bafa1181
+              expression: 'last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
+              name: 'Battery: Device charge in critical state'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: adf8cf02aa1e42fa84e1f11ddae4df01
+              expression: 'last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}'
+              name: 'Battery: Device charge in warning state'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Battery: Device charge in critical state'
+                  expression: 'last(/Morningstar ProStar PWM SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 8acd2e7944694a828cf9b739b75513d9
+          name: 'Counter: Charge Amp-hours'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.49.0
+          key: 'counter.charge_amp_hours[ahChargeResettable.0]'
+          history: 7d
+          value_type: FLOAT
+          units: Ah
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Ah Charge (Resettable)
+            Scaling Factor:0.1
+            Units:Ah
+            Range:[0.0, 4294967294]
+            Modbus addresses:H=0x0026 L=0x0027
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+          tags:
+            -
+              tag: component
+              value: counter
+        -
+          uuid: 0e7124df3f2b4298b1a13576d0b2d5e7
+          name: 'Counter: Charge KW-hours'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.51.0
+          key: 'counter.charge_kw_hours[kwhChargeResettable.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '!kWh'
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Kilowatt Hours Charge (Resettable)
+            Scaling Factor:1.0
+            Units:kWh
+            Range:[0.0, 65535]
+            Modbus address:0x002A
+          tags:
+            -
+              tag: component
+              value: counter
+        -
+          uuid: 104a7db1c27d40b3bbee506f7f922393
+          name: 'Counter: Load Amp-hours'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.56.0
+          key: 'counter.load_amp_hours[ahLoadResettable.0]'
+          history: 7d
+          value_type: FLOAT
+          units: Ah
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Ah Load (Resettable)
+            Scaling Factor:0.1
+            Units:Ah
+            Range:[0.0, 4294967294]
+            Modbus addresses:H=0x0032 L=0x0033
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+          tags:
+            -
+              tag: component
+              value: counter
+        -
+          uuid: dcade8607cf142a2b88333f9880448fc
+          name: 'Load: Current'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.34.0
+          key: 'load.current[loadCurrent.0]'
+          history: 7d
+          value_type: FLOAT
+          units: A
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Load Current
+            Scaling Factor:1.0
+            Units:A
+            Range:[0, 60]
+            Modbus address:0x0016
+          tags:
+            -
+              tag: component
+              value: load
+        -
+          uuid: 14b3ca3869374f54a467e5e9017f918a
+          name: 'Load: State'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.53.0
+          key: 'load.state[loadState.0]'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Load State
+            Modbus address:0x002E
+            
+            0: Start
+            1: Normal
+            2: LvdWarning
+            3: Lvd
+            4: Fault
+            5: Disconnect
+            6: NormalOff
+            7: Override
+            8: NotUsed
+          valuemap:
+            name: 'ProStar PWM load state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: load
+          triggers:
+            -
+              uuid: 7a8bf4420b6b48ab8a5bc999eecae760
+              expression: 'last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+              name: 'Load: Device load in critical state'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 5152f9cd4ee34be485f3cb0a0f60afd5
+              expression: 'last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}'
+              name: 'Load: Device load in warning state'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Load: Device load in critical state'
+                  expression: 'last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar PWM SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: cccc0976a62b47b1a558d521704c125d
+          name: 'Load: Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.32.0
+          key: 'load.voltage[loadVoltage.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Load Voltage
+            Scaling Factor:1.0
+            Units:V
+            Range:[0, 80]
+            Modbus address:0x0014
+          tags:
+            -
+              tag: component
+              value: load
+        -
+          uuid: 7c1c1e03425c4b4bb176cf45458b916a
+          name: 'Status: Alarms'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.59.0
+          key: 'status.alarms[alarms.0]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Alarms
+            Modbus addresses:H=0x0038 L=0x0039
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var FIELDS = [
+                    'rtsOpen',
+                    'rtsShorted',
+                    'rtsDisconnected',
+                    'heatsinkTempSensorOpen',
+                    'heatsinkTempSensorShorted',
+                    'heatsinkTempLimit',
+                    'currentLimit',
+                    'currentMeasurementError',
+                    'batterySenseOutOfRange',
+                    'batterySenseDisconnected',
+                    'uncalibrated',
+                    'batteryTempOutOfRange',
+                    'fp10SupplyOutOfRange',
+                    'mosfetOpen',
+                    'arrayCurrentOffset',
+                    'loadCurrentOffset',
+                    'p33SupplyOutOfRange',
+                    'p12SupplyOutOfRange',
+                    'hightInputVoltageLimit',
+                    'controllerReset',
+                    'loadLvd',
+                    'logTimeout',
+                    'eepromAccessFailure'
+                  ];
+                  
+                  var flags = parseInt(value.replace(/\x20/g, ''), 16),
+                    result = [];
+                  
+                  for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
+                      if (flags & f) {
+                          result.push(FIELDS[i]);
+                      }
+                  }
+                  
+                  return result.length ? result.join('\n') : 'No alarms';
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 67fd46f034c3486e9af3cabfc5dc8056
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2'
+              name: 'Status: Device has "arrayCurrentOffset" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 31cc0b05b83045de80a7d07f26545010
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2'
+              name: 'Status: Device has "batterySenseDisconnected" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 9e498d21bc7f4ca1937f1628f4b1ea55
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2'
+              name: 'Status: Device has "batterySenseOutOfRange" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 8a09c7609f9a45cea5b217757a7d2e5e
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","batteryTempOutOfRange")=2'
+              name: 'Status: Device has "batteryTempOutOfRange" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: b173b8ca12f8464aae6476009b4c89e8
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2'
+              name: 'Status: Device has "controllerReset" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: cdbac88810ff49caa35771e661d8b312
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
+              name: 'Status: Device has "currentLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 7758388df28d4540ba393f4423fef00a
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2'
+              name: 'Status: Device has "currentMeasurementError" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: a56fef1f61c44ba884ec448b0d306c1d
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2'
+              name: 'Status: Device has "eepromAccessFailure" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: fefea5daa03d453c8c5148ddb39997f9
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2'
+              name: 'Status: Device has "fp10SupplyOutOfRange" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: c252c82aff2a4ac680965115cb2fab64
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2'
+              name: 'Status: Device has "heatsinkTempLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 5b93a0a09a62481d8096ec743c2ceaff
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
+              name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: f28e5143a238470ba93c1345c814f87d
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
+              name: 'Status: Device has "heatsinkTempSensorShorted" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 75c84ef378984fca854b34a8ef79668c
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2'
+              name: 'Status: Device has "hightInputVoltageLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 5c1551f7e2be40e0b8b50ed263f8e293
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2'
+              name: 'Status: Device has "loadCurrentOffset" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 665117c5b9b64ea09a1d661e9c40fc43
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2'
+              name: 'Status: Device has "loadLvd" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: b89c002c859c419ea748b43d575e9e27
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2'
+              name: 'Status: Device has "logTimeout" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 17f51e7b248b4e63934e8b529b85b2ef
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2'
+              name: 'Status: Device has "mosfetOpen" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 75e23772250741d0b1fc1ddff2a72ef6
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2'
+              name: 'Status: Device has "p12SupplyOutOfRange" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: fc374c9ac9fa4f979fbff9f7c7d83565
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2'
+              name: 'Status: Device has "p33SupplyOutOfRange" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: fbec2a1fdbe54d8da352471acf67bad1
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
+              name: 'Status: Device has "rtsDisconnected" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 915da6e7b1cd410da9a6c68e3b4abd85
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
+              name: 'Status: Device has "rtsShorted" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: e8bf2213a5444e2c9923b6f093d43f75
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
+              name: 'Status: Device has "uncalibrated" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 2517d96e51c14372a0336c9a6ed5d078
+          name: 'Status: Array Faults'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.46.0
+          key: 'status.array_faults[arrayFaults.0]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Array Faults
+            Modbus address:0x0022
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var FIELDS = [
+                    'overcurrent',
+                    'mosfetSShorted',
+                    'software',
+                    'batteryHvd',
+                    'arrayHvd',
+                    'customSettingsEdit',
+                    'rtsShorted',
+                    'rtsNoLongerValid',
+                    'localTempSensorDamaged',
+                    'batteryLowVoltageDisconnect',
+                    'slaveTimeout',
+                    'dipSwitchChanged',
+                    'p3Fault',
+                  ];
+                  
+                  var flags = parseInt(value.replace(/\x20/g, ''), 16),
+                    result = [];
+                  
+                  for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
+                      if (flags & f) {
+                          result.push(FIELDS[i]);
+                      }
+                  }
+                  
+                  return result.length ? result.join('\n') : 'No faults';
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: b2ff69793e124031a79a668b03678fac
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2'
+              name: 'Status: Device has "arrayHvd" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: a4ca36ccaa9d45ceb79303afef1c49f0
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2'
+              name: 'Status: Device has "batteryHvd" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: f4d1120afb13456b9d45f8795dbc30b7
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2'
+              name: 'Status: Device has "batteryLowVoltageDisconnect" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 9e5f2c575945458ea8a39f33cb23b833
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2'
+              name: 'Status: Device has "customSettingsEdit" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: fd904f4469324784ac2c469e64069f94
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2'
+              name: 'Status: Device has "dipSwitchChanged" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 62076ce0967049c8bde39f71afcb85d9
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2'
+              name: 'Status: Device has "localTempSensorDamaged" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: ea8487afe1c14bc08f3d9fd7f75d208f
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2'
+              name: 'Status: Device has "mosfetSShorted" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: b0bb139541ae493bafc40dac9074d898
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2'
+              name: 'Status: Device has "overcurrent" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 8af94d7ff1a84e18b10122b0e3743d45
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","p3Fault")=2'
+              name: 'Status: Device has "p3Fault" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: b41cb2e05acb40f59efa50a25f66cd62
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2'
+              name: 'Status: Device has "rtsNoLongerValid" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: d99c3f126c7e480cb4fcc705349eb61d
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2'
+              name: 'Status: Device has "rtsShorted" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 711b28f19cb74c0faeef73263ca1fb8f
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2'
+              name: 'Status: Device has "slaveTimeout" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: e4a261d750d546c7b5d5067dd9a0ec25
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2'
+              name: 'Status: Device has "software" array faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 1cd47d04af104cb9ab1cd7dc745a6aea
+          name: 'Status: Load Faults'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.54.0
+          key: 'status.load_faults[loadFaults.0]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Load Faults
+            Modbus address:0x002F
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var FIELDS = [
+                    'externalShortCircuit',
+                    'overcurrent',
+                    'mosfetShorted',
+                    'software',
+                    'loadHvd',
+                    'highTempDisconnect',
+                    'dipSwitchChanged',
+                    'customSettingsEdit',
+                    'p3Fault'
+                  ];
+                  
+                  var flags = parseInt(value.replace(/\x20/g, ''), 16),
+                    result = [];
+                  
+                  for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
+                      if (flags & f) {
+                          result.push(FIELDS[i]);
+                      }
+                  }
+                  
+                  return result.length ? result.join('\n') : 'No faults';
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 99ab5f0d3014459a8cd7d137d3a1f688
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2'
+              name: 'Status: Device has "customSettingsEdit" load faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 77752192092f4f1caceef19c3c164b72
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2'
+              name: 'Status: Device has "dipSwitchChanged" load faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: d2e55501d89844aeb47f7887a11754a9
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2'
+              name: 'Status: Device has "externalShortCircuit" load faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: a6548502cfc4406098ba3129af8efcb5
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2'
+              name: 'Status: Device has "highTempDisconnect" load faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 6e8f0127bc7b42dea9d867ab174f458c
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2'
+              name: 'Status: Device has "loadHvd" load faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 2a303d4712e244a9b051fb1b0247fac5
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2'
+              name: 'Status: Device has "mosfetShorted" load faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 5720e2e15e5f42099fd7de361f62c99a
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2'
+              name: 'Status: Device has "overcurrent" load faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 2f522d50a8124ed2a8af4d7b6417c31c
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","p3Fault")=2'
+              name: 'Status: Device has "p3Fault" load faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: e75abe852b9c4e1d91a1f8f83622ef64
+              expression: 'count(/Morningstar ProStar PWM SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2'
+              name: 'Status: Device has "software" load faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 42f6a75d923d4262b37d85c4f7d1d322
+          name: 'Status: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: status.uptime
+          history: 7d
+          units: uptime
+          description: 'Device uptime in seconds'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: dea364bf454746bca6be38d7e0759d06
+              expression: 'last(/Morningstar ProStar PWM SNMP/status.uptime)<10m'
+              name: 'Status: Device has been restarted'
+              event_name: 'Status: Device has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 16c1444a745a47e59fd22bd1a64baef3
+              expression: 'nodata(/Morningstar ProStar PWM SNMP/status.uptime,5m)=1'
+              name: 'Status: Failed to fetch data'
+              event_name: 'Status: Failed to fetch data (or no data for 5m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 5 minutes'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: f4b7bfb000754a17b4719863d3755519
+          name: 'Battery: Target Voltage'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.48.0
+          key: 'target.voltage[targetVoltage.0]'
+          history: 7d
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Target Regulation Voltage
+            Scaling Factor:1.0
+            Units:V
+            Range:[0.0, 80.0]
+            Modbus address:0x0024
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: battery
+        -
+          uuid: 13d3479a7b5940b5a53d5f13bea9e2d1
+          name: 'Temperature: Ambient'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.40.0
+          key: 'temp.ambient[ambientTemperature.0]'
+          history: 7d
+          value_type: FLOAT
+          units: C
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Ambient Temperature
+            Scaling Factor:1.0
+            Units:deg C
+            Range:[-128, 127]
+            Modbus address:0x001C
+          tags:
+            -
+              tag: component
+              value: temperature
+        -
+          uuid: 39763f7fccd94aefb720a34871c0962b
+          name: 'Temperature: Battery'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.39.0
+          key: 'temp.battery[batteryTemperature.0]'
+          history: 7d
+          value_type: FLOAT
+          units: C
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Battery Temperature
+            Scaling Factor:1.0
+            Units:deg C
+            Range:[-128, 127]
+            Modbus address:0x001B
+          tags:
+            -
+              tag: component
+              value: temperature
+          triggers:
+            -
+              uuid: 46eb3a0e80294a4db8324d56337ed712
+              expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+              name: 'Temperature: Critically high battery temperature'
+              event_name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: c3f3ba5b2cab4481bb62fa8527554e96
+              expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+              name: 'Temperature: Critically low battery temperature'
+              event_name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 80aaf1de029b4d6eadce9f2a946f6dde
+              expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
+              name: 'Temperature: High battery temperature'
+              event_name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Temperature: Critically high battery temperature'
+                  expression: 'min(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: cf1db336ea124f9a9fd6eb367f93f0e8
+              expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
+              name: 'Temperature: Low battery temperature'
+              event_name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Temperature: Critically low battery temperature'
+                  expression: 'max(/Morningstar ProStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 1d13bd3ea24a4fcab3cd5b7586e6033a
+          name: 'Temperature: Heatsink'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.6.38.0
+          key: 'temp.heatsink[heatsinkTemperature.0]'
+          history: 7d
+          value_type: FLOAT
+          units: C
+          description: |
+            MIB: PROSTAR-PWM
+            Description:Heatsink Temperature
+            Scaling Factor:1.0
+            Units:deg C
+            Range:[-128, 127]
+            Modbus address:0x001A
+          tags:
+            -
+              tag: component
+              value: temperature
+      discovery_rules:
+        -
+          uuid: 17148797def9484ba26b0afdcc44bfd5
+          name: 'Battery voltage discovery'
+          type: DEPENDENT
+          key: battery.voltage.discovery
+          delay: '0'
+          description: 'Discovery for battery voltage triggers'
+          item_prototypes:
+            -
+              uuid: 6e4ed5ae449c48eeb328d30b76d083a2
+              name: 'Battery: Voltage{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.6.30.0
+              key: 'battery.voltage[batteryTerminalVoltage.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: PROSTAR-PWM
+                Description:Control State
+                Modbus address:0x0021
+              tags:
+                -
+                  tag: component
+                  value: battery
+              trigger_prototypes:
+                -
+                  uuid: e89cf2b8066840c2876642f0d8db1edd
+                  expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                  name: 'Battery: Critically high battery voltage'
+                  event_name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: 8356aba9afb242b09902873a5f0e1d47
+                  expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                  name: 'Battery: Critically low battery voltage'
+                  event_name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: 77f130af976c43edb8c823de5cbd57b2
+                  expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
+                  name: 'Battery: High battery voltage'
+                  event_name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Battery: Critically high battery voltage'
+                      expression: 'min(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: 6c288c8b28db4f8e95c8ad2aa8b838ef
+                  expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
+                  name: 'Battery: Low battery voltage'
+                  event_name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Battery: Critically low battery voltage'
+                      expression: 'max(/Morningstar ProStar PWM SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+          graph_prototypes:
+            -
+              uuid: 8ecd4f88627a4dadb132fdbb6d911b6b
+              name: 'Voltage: Battery/Load{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Morningstar ProStar PWM SNMP'
+                    key: 'battery.voltage[batteryTerminalVoltage.0{#SINGLETON}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Morningstar ProStar PWM SNMP'
+                    key: 'load.voltage[loadVoltage.0]'
+          master_item:
+            key: 'battery.voltage.discovery[batteryTerminalVoltage.0]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var v_range = [
+                        [[0, 18], [12, 15, 11.5, 15.5]],
+                        [[18, 36], [24, 30, 23, 31]],
+                        [[36, 99], [48, 60, 46, 62]],
+                    ],
+                    result = [];
+                  
+                  for (var idx in v_range) {
+                      if (v_range[idx][0][0] < value && value <= v_range[idx][0][1]) {
+                          result = [{
+                              '{#VOLTAGE.MIN.WARN}': parseInt({$VOLTAGE.MIN.WARN}) || v_range[idx][1][0],
+                              '{#VOLTAGE.MAX.WARN}': parseInt({$VOLTAGE.MAX.WARN}) || v_range[idx][1][1],
+                              '{#VOLTAGE.MIN.CRIT}': parseInt({$VOLTAGE.MIN.CRIT}) || v_range[idx][1][2],
+                              '{#VOLTAGE.MAX.CRIT}': parseInt({$VOLTAGE.MAX.CRIT}) || v_range[idx][1][3],
+                              '{#SINGLETON}': ''
+                          }];
+                          break;
+                      }
+                  }
+                  
+                  return JSON.stringify(result);
+      tags:
+        -
+          tag: class
+          value: power
+        -
+          tag: target
+          value: morningstar
+      macros:
+        -
+          macro: '{$BATTERY.TEMP.MAX.CRIT}'
+          value: '60'
+          description: 'Battery high temperature critical value'
+        -
+          macro: '{$BATTERY.TEMP.MAX.WARN}'
+          value: '45'
+          description: 'Battery high temperature warning value'
+        -
+          macro: '{$BATTERY.TEMP.MIN.CRIT}'
+          value: '-20'
+          description: 'Battery low temperature critical value'
+        -
+          macro: '{$BATTERY.TEMP.MIN.WARN}'
+          value: '0'
+          description: 'Battery low temperature warning value'
+        -
+          macro: '{$CHARGE.STATE.CRIT}'
+          value: '4'
+          description: fault
+        -
+          macro: '{$CHARGE.STATE.WARN}'
+          value: '2'
+          description: disconnect
+        -
+          macro: '{$LOAD.STATE.CRIT:"fault"}'
+          value: '4'
+          description: fault
+        -
+          macro: '{$LOAD.STATE.CRIT:"lvd"}'
+          value: '3'
+          description: lvd
+        -
+          macro: '{$LOAD.STATE.WARN:"disconnect"}'
+          value: '5'
+          description: disconnect
+        -
+          macro: '{$LOAD.STATE.WARN:"lvdWarning"}'
+          value: '2'
+          description: lvdWarning
+        -
+          macro: '{$LOAD.STATE.WARN:"override"}'
+          value: '7'
+          description: override
+        -
+          macro: '{$VOLTAGE.MAX.CRIT}'
+        -
+          macro: '{$VOLTAGE.MAX.WARN}'
+        -
+          macro: '{$VOLTAGE.MIN.CRIT}'
+        -
+          macro: '{$VOLTAGE.MIN.WARN}'
+      valuemaps:
+        -
+          uuid: f94eb6ad54c44281878c7c018c6209d1
+          name: 'ProStar PWM charge state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Start
+            -
+              value: '1'
+              newvalue: NightCheck
+            -
+              value: '2'
+              newvalue: Disconnect
+            -
+              value: '3'
+              newvalue: Night
+            -
+              value: '4'
+              newvalue: Fault
+            -
+              value: '5'
+              newvalue: Bulk
+            -
+              value: '6'
+              newvalue: Pwm
+            -
+              value: '7'
+              newvalue: Float
+            -
+              value: '8'
+              newvalue: Equalize
+        -
+          uuid: f0be8765c74e4c4788d4ff99a6c5ccd4
+          name: 'ProStar PWM load state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Start
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: LvdWarning
+            -
+              value: '3'
+              newvalue: Lvd
+            -
+              value: '4'
+              newvalue: Fault
+            -
+              value: '5'
+              newvalue: Disconnect
+            -
+              value: '6'
+              newvalue: NormalOff
+            -
+              value: '7'
+              newvalue: Override
+            -
+              value: '8'
+              newvalue: NotUsed
+  graphs:
+    -
+      uuid: 730d1e1e43224d1ea7b08f53988a7a60
+      name: 'Array: Voltage'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar ProStar PWM SNMP'
+            key: 'array.voltage[arrayVoltage.0]'
+    -
+      uuid: 252a40cfba4242deac69f8ed77a04b84
+      name: 'Current: Charge/Load'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar ProStar PWM SNMP'
+            key: 'charge.current[chargeCurrent.0]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Morningstar ProStar PWM SNMP'
+            key: 'load.current[loadCurrent.0]'
+    -
+      uuid: 94e4d2db752b4c54a8b497516b515fe0
+      name: 'Temperature: Ambient/Battery/Heatsink'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar ProStar PWM SNMP'
+            key: 'temp.ambient[ambientTemperature.0]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Morningstar ProStar PWM SNMP'
+            key: 'temp.battery[batteryTemperature.0]'
+        -
+          sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: F63100
+          item:
+            host: 'Morningstar ProStar PWM SNMP'
+            key: 'temp.heatsink[heatsinkTemperature.0]'

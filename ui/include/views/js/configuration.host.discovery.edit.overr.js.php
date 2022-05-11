@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 /**
  * @var CView $this
  */
-insert_javascript_for_visibilitybox();
 ?>
 <script type="text/x-jquery-tmpl" id="lldoverride-row-templated">
 	<?= (new CRow([
@@ -658,7 +657,7 @@ insert_javascript_for_visibilitybox();
 	}
 
 	/**
-	 * Opens popup for a override.
+	 * Opens popup for an override.
 	 *
 	 * @param {number} no
 	 */
@@ -667,7 +666,7 @@ insert_javascript_for_visibilitybox();
 	};
 
 	/**
-	 * This object represents a override of web scenario.
+	 * This object represents an override of web scenario.
 	 *
 	 * @param {object} data  Optional override initial data.
 	 */
@@ -708,10 +707,10 @@ insert_javascript_for_visibilitybox();
 	 * Opens override popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
-	 * @param {number} step     Override index.
-	 * @param {object} refocus  A node to set focus to, when popup is closed.
+	 * @param {number} step             Override index.
+	 * @param {Node}   trigger_element  A node to set focus to, when popup is closed.
 	 */
-	Override.prototype.open = function(no, refocus) {
+	Override.prototype.open = function(no, trigger_element) {
 		return PopUp('popup.lldoverride', {
 			no:                 no,
 			templated:          lldoverrides.templated,
@@ -723,7 +722,7 @@ insert_javascript_for_visibilitybox();
 			overrides_filters:  this.data.overrides_filters,
 			operations:         this.data.operations,
 			overrides_names:    lldoverrides.overrides.getOverrideNames()
-		}, null, refocus);
+		}, {dialogue_class: 'modal-popup-generic', trigger_element});
 	};
 
 	/**
@@ -788,7 +787,7 @@ insert_javascript_for_visibilitybox();
 			.on('afteradd.dynamicRows', (event) => {
 				[...event.currentTarget.querySelectorAll('.js-operator')]
 					.pop()
-					.addEventListener('change', toggleConditionValue);
+					.addEventListener('change', view.toggleConditionValue);
 			})
 			.ready(function() {
 				jQuery('#overrideRow').toggle(jQuery('.form_row', jQuery('#overrides_filters')).length > 1);
@@ -810,7 +809,7 @@ insert_javascript_for_visibilitybox();
 		jQuery('#overrides-evaltype').trigger('change');
 
 		[...document.getElementById('overrides_filters').querySelectorAll('.js-operator')].map((elem) => {
-			elem.addEventListener('change', toggleConditionValue);
+			elem.addEventListener('change', view.toggleConditionValue);
 		});
 	};
 
@@ -1005,11 +1004,11 @@ insert_javascript_for_visibilitybox();
 	 * Opens override popup - edit or create form.
 	 * Note: a callback this.onStepOverlayReadyCb is called from within popup form once it is parsed.
 	 *
-	 * @param {number}  step     Override index.
-	 * @param {object}  refocus  A node to set focus to, when popup is closed.
+	 * @param {number} step             Override index.
+	 * @param {Node}   trigger_element  A node to set focus to, when popup is closed.
 	 */
-	Operation.prototype.open = function(no, refocus) {
-		var params = {
+	Operation.prototype.open = function(no, trigger_element) {
+		var parameters = {
 			no:                 no,
 			templated:          lldoverrides.templated,
 			operationobject:    this.data.operationobject,
@@ -1019,11 +1018,11 @@ insert_javascript_for_visibilitybox();
 
 		window.lldoverrides.actions.forEach(function(action) {
 			if (action in this.data) {
-				params[action] = this.data[action];
+				parameters[action] = this.data[action];
 			}
 		}.bind(this));
 
-		return PopUp('popup.lldoperation', params, null, refocus);
+		return PopUp('popup.lldoperation', parameters, {dialogue_class: 'modal-popup-generic', trigger_element});
 	};
 
 	/**

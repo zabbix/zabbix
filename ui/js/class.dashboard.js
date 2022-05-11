@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -934,7 +934,10 @@ class CDashboard extends CBaseComponent {
 			auto_start: this._data.auto_start
 		};
 
-		PopUp('dashboard.properties.edit', properties, 'dashboard_properties', document.activeElement);
+		PopUp('dashboard.properties.edit', properties, {
+			dialogueid: 'dashboard_properties',
+			dialogue_class: 'modal-popup-generic'
+		});
 	}
 
 	applyProperties() {
@@ -1000,7 +1003,10 @@ class CDashboard extends CBaseComponent {
 	editDashboardPageProperties(properties = {}) {
 		properties.dashboard_display_period = this._data.display_period;
 
-		PopUp('dashboard.page.properties.edit', properties, 'dashboard_page_properties', document.activeElement);
+		PopUp('dashboard.page.properties.edit', properties, {
+			dialogueid: 'dashboard_page_properties',
+			dialogue_class: 'modal-popup-generic'
+		});
 	}
 
 	applyDashboardPageProperties() {
@@ -1087,17 +1093,14 @@ class CDashboard extends CBaseComponent {
 		const overlay = PopUp('dashboard.widget.edit', {
 			templateid: this._data.templateid ?? undefined,
 			...properties
-		}, 'widget_properties', document.activeElement);
+		}, {
+			dialogueid: 'widget_properties',
+			dialogue_class: 'modal-popup-generic'
+		});
 
 		overlay.xhr.then(() => {
 			const form = overlay.$dialogue.$body[0].querySelector('form');
 			const original_properties = overlay.data.original_properties;
-			const dialogue_stick_to_top = this._widget_defaults[original_properties.type].dialogue_stick_to_top;
-
-			if (dialogue_stick_to_top !== overlay.$dialogue[0].classList.contains('sticked-to-top')) {
-				overlay.$dialogue[0].classList.toggle('sticked-to-top', dialogue_stick_to_top);
-				overlay.centerDialog();
-			}
 
 			if (original_properties.unique_id === null) {
 				this._new_widget_dashboard_page = this._selected_dashboard_page;

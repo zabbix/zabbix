@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1241,7 +1241,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix admin with read permissionss',
+					'name' => 'API create web as zabbix admin with read permissions',
 					'hostid' => '50012',
 					'steps' => [
 						[
@@ -1257,7 +1257,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix admin with read permissionss',
+					'name' => 'API update web as zabbix admin with read permissions',
 					'httptestid' => '15008'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -1273,7 +1273,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix admin with deny permissionss',
+					'name' => 'API create web as zabbix admin with deny permissions',
 					'hostid' => '50014',
 					'steps' => [
 						[
@@ -1289,7 +1289,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix admin with read permissionss',
+					'name' => 'API update web as zabbix admin with read permissions',
 					'httptestid' => '15009'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -1305,7 +1305,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix admin with none permissionss',
+					'name' => 'API create web as zabbix admin with none permissions',
 					'hostid' => '50010',
 					'steps' => [
 						[
@@ -1321,7 +1321,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix admin with none permissionss',
+					'name' => 'API update web as zabbix admin with none permissions',
 					'httptestid' => '15006'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -1369,7 +1369,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix user with read permissionss',
+					'name' => 'API create web as zabbix user with read permissions',
 					'hostid' => '50012',
 					'steps' => [
 						[
@@ -1385,7 +1385,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix user with read permissionss',
+					'name' => 'API update web as zabbix user with read permissions',
 					'httptestid' => '15008'
 				],
 				'expected_error' => 'No permissions to call "httptest.update".'
@@ -1401,7 +1401,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix admin with deny permissionss',
+					'name' => 'API create web as zabbix admin with deny permissions',
 					'hostid' => '50014',
 					'steps' => [
 						[
@@ -1417,7 +1417,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-user', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix user with read permissionss',
+					'name' => 'API update web as zabbix user with read permissions',
 					'httptestid' => '15009'
 				],
 				'expected_error' => 'No permissions to call "httptest.update".'
@@ -1433,7 +1433,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.create',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API create web as zabbix user with none permissionss',
+					'name' => 'API create web as zabbix user with none permissions',
 					'hostid' => '50010',
 					'steps' => [
 						[
@@ -1449,7 +1449,7 @@ class testWebScenario extends CAPITest {
 				'method' => 'httptest.update',
 				'login' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'httptest' => [
-					'name' => 'API update web as zabbix user with none permissionss',
+					'name' => 'API update web as zabbix user with none permissions',
 					'httptestid' => '15006'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
@@ -1638,7 +1638,7 @@ class testWebScenario extends CAPITest {
 					'Incorrect item count for web scenario [httpstepid='.$httptestid.'].');
 
 				foreach ($db_httptest_items as $db_httptest_item) {
-					$this->assertContains('"'.$db_httptest['name'].'"', $db_httptest_item['name']);
+					$this->assertStringContainsString('"'.$db_httptest['name'].'"', $db_httptest_item['name']);
 					$this->assertRegExp('/\['.preg_quote($db_httptest['name'],'/').'[,\]]/',
 						$db_httptest_item['key_']);
 
@@ -1684,11 +1684,11 @@ class testWebScenario extends CAPITest {
 
 					foreach ($db_httpstep['db_items'] as $db_httpstep_item) {
 						if (array_key_exists('name', $httptests[$key]) || array_key_exists('steps', $httptests[$key])) {
-							$this->assertContains('"'.$db_httptest['name'].'"', $db_httpstep_item['name']);
-							$this->assertContains('"'.$db_httpstep['name'].'"', $db_httpstep_item['name']);
+							$this->assertStringContainsString('"'.$db_httptest['name'].'"', $db_httpstep_item['name']);
+							$this->assertStringContainsString('"'.$db_httpstep['name'].'"', $db_httpstep_item['name']);
 						}
 
-						$this->assertContains('['.$db_httptest['name'].',', $db_httpstep_item['key_']);
+						$this->assertStringContainsString('['.$db_httptest['name'].',', $db_httpstep_item['key_']);
 						$this->assertRegExp('/,'.preg_quote($db_httpstep['name'],'/').'[,\]]/',
 							$db_httpstep_item['key_']);
 

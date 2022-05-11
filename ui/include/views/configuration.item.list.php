@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ $url = (new CUrl('items.php'))
 $itemForm = (new CForm('post', $url))
 	->setName('items')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], 'form_context');
 
 if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
@@ -76,7 +76,7 @@ $itemTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		_('Wizard'),
+		'',
 		($data['hostid'] == 0)
 			? ($data['context'] === 'host')
 				? _('Host')
@@ -124,10 +124,10 @@ foreach ($data['items'] as $item) {
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($item['master_item']['name_expanded']);
+			$description[] = CHtml::encode($item['master_item']['name']);
 		}
 		else {
-			$description[] = (new CLink(CHtml::encode($item['master_item']['name_expanded']),
+			$description[] = (new CLink(CHtml::encode($item['master_item']['name']),
 				(new CUrl('items.php'))
 					->setArgument('form', 'update')
 					->setArgument('hostid', $item['hostid'])
@@ -141,7 +141,7 @@ foreach ($data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(CHtml::encode($item['name_expanded']),
+	$description[] = new CLink(CHtml::encode($item['name']),
 		(new CUrl('items.php'))
 			->setArgument('form', 'update')
 			->setArgument('hostid', $item['hostid'])
@@ -170,6 +170,10 @@ foreach ($data['items'] as $item) {
 	// triggers info
 	$triggerHintTable = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
 
+	$backurl = (new CUrl('items.php'))
+		->setArgument('context', $data['context'])
+		->getUrl();
+
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $data['itemTriggers'][$trigger['triggerid']];
 
@@ -180,19 +184,15 @@ foreach ($data['items'] as $item) {
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
-		}
-		else {
-			$trigger_description[] = new CLink(
-				CHtml::encode($trigger['description']),
-				(new CUrl('triggers.php'))
-					->setArgument('form', 'update')
-					->setArgument('hostid', key($trigger['hosts']))
-					->setArgument('triggerid', $trigger['triggerid'])
-					->setArgument('context', $data['context'])
-			);
-		}
+		$trigger_description[] = new CLink(
+			CHtml::encode($trigger['description']),
+			(new CUrl('triggers.php'))
+				->setArgument('form', 'update')
+				->setArgument('hostid', key($trigger['hosts']))
+				->setArgument('triggerid', $trigger['triggerid'])
+				->setArgument('context', $data['context'])
+				->setArgument('backurl', $backurl)
+		);
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
@@ -230,14 +230,15 @@ foreach ($data['items'] as $item) {
 	}
 
 	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $item['itemid'], 'context' => $data['context']]));
+		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
+		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
+			'itemid' => $item['itemid'],
+			'context' => $data['context'],
+			'backurl' => $backurl
+		]));
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
-	}
-	else if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		$wizard = '';
 	}
 
 	// Hide zeros for trapper, SNMP trap and dependent items.
@@ -268,7 +269,7 @@ foreach ($data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
 		($data['hostid'] == 0) ? $item['host'] : null,
-		$description,
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		$triggerInfo,
 		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
@@ -307,7 +308,12 @@ $button_list += [
 	'item.masscopyto' => ['name' => _('Copy')],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
-			->onClick("return openMassupdatePopup(this, 'popup.massupdate.item');")
+			->onClick(
+				"openMassupdatePopup('popup.massupdate.item', {}, {
+					dialogue_class: 'modal-popup-preprocessing',
+					trigger_element: this
+				});"
+			)
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeAttribute('id')
 	],
@@ -323,3 +329,7 @@ $itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action',
 $widget->addItem($itemForm);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

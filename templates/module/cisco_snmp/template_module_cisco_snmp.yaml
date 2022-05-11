@@ -1,0 +1,813 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:49Z'
+  groups:
+    -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    -
+      uuid: 51af5cf9312b41d38ab22e02c9af6bbc
+      template: 'Cisco CISCO-ENVMON-MIB SNMP'
+      name: 'Cisco CISCO-ENVMON-MIB SNMP'
+      description: |
+        Template Cisco CISCO-ENVMON-MIB
+        
+        MIBs used:
+        CISCO-ENVMON-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      discovery_rules:
+        -
+          uuid: 31e5f90d88574fa0a35664e2c6b51e98
+          name: 'FAN Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.4.1.2]'
+          key: fan.discovery
+          delay: 1h
+          description: 'The table of fan status maintained by the environmental monitor.'
+          item_prototypes:
+            -
+              uuid: 62a05225a1634d7486fab92cf100544e
+              name: '{#SENSOR_INFO}: Fan status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.13.1.4.1.3.{#SNMPINDEX}'
+              key: 'sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: 'MIB: CISCO-ENVMON-MIB'
+              valuemap:
+                name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              tags:
+                -
+                  tag: component
+                  value: fan
+              trigger_prototypes:
+                -
+                  uuid: a9f5e9e2a65143298910e354e832bf2f
+                  expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"shutdown\"}")=1'
+                  name: '{#SENSOR_INFO}: Fan is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+                -
+                  uuid: 58cf2c24afd74e5cb048557e8e52138e
+                  expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"notFunctioning\"}")=1'
+                  name: '{#SENSOR_INFO}: Fan is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the fan unit'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Fan is in critical state'
+                      expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+        -
+          uuid: 932817396a5b47f29af28e439711ef59
+          name: 'PSU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.5.1.2]'
+          key: psu.discovery
+          delay: 1h
+          description: 'The table of power supply status maintained by the environmental monitor card.'
+          item_prototypes:
+            -
+              uuid: d500235d63ca41888585d267a7d82e2a
+              name: '{#SENSOR_INFO}: Power supply status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.13.1.5.1.3.{#SNMPINDEX}'
+              key: 'sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: 'MIB: CISCO-ENVMON-MIB'
+              valuemap:
+                name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              tags:
+                -
+                  tag: component
+                  value: power
+              trigger_prototypes:
+                -
+                  uuid: 5796e1e85ea949d0b86ce83f5daae958
+                  expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"shutdown\"}")=1'
+                  name: '{#SENSOR_INFO}: Power supply is in critical state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: 'Please check the power supply unit for errors'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+                -
+                  uuid: 93892fed243f4f0b8c26ab67fa6e1800
+                  expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"notFunctioning\"}")=1'
+                  name: '{#SENSOR_INFO}: Power supply is in warning state'
+                  opdata: 'Current state: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'Please check the power supply unit for errors'
+                  dependencies:
+                    -
+                      name: '{#SENSOR_INFO}: Power supply is in critical state'
+                      expression: 'count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"critical\"}")=1 or count(/Cisco CISCO-ENVMON-MIB SNMP/sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"shutdown\"}")=1'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+        -
+          uuid: e61bb682818b4f31a669acd31335160c
+          name: 'Temperature Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.13.1.3.1.2]'
+          key: temperature.discovery
+          delay: 1h
+          description: |
+            Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status
+            maintained by the environmental monitor.
+          item_prototypes:
+            -
+              uuid: 72f0970a636d44278b75f30a1dabfeb8
+              name: '{#SNMPVALUE}: Temperature status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}'
+              key: 'sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}]'
+              delay: 3m
+              history: 2w
+              trends: 0d
+              description: |
+                MIB: CISCO-ENVMON-MIB
+                The current state of the test point being instrumented.
+              valuemap:
+                name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              tags:
+                -
+                  tag: component
+                  value: temperature
+            -
+              uuid: 4859221e53d7485485db1c9060d7f705
+              name: '{#SNMPVALUE}: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}'
+              key: 'sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}]'
+              delay: 3m
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: CISCO-ENVMON-MIB
+                The current measurement of the test point being instrumented.
+              tags:
+                -
+                  tag: component
+                  value: temperature
+              trigger_prototypes:
+                -
+                  uuid: 2bb01154728b47c69514f7399f3bfabc
+                  expression: 'avg(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'min(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}+3'
+                  name: '{#SNMPVALUE}: Temperature is too low'
+                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                    -
+                      tag: scope
+                      value: performance
+          trigger_prototypes:
+            -
+              uuid: f356f7fbc2de423db3bac09bc4683ae2
+              expression: |
+                avg(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
+                or
+                last(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                or
+                last(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'max(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              name: '{#SNMPVALUE}: Temperature is above critical threshold'
+              event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP_CRIT:"{#SNMPVALUE}"}'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 2c151dd93b7f4096b9eb6c73c315ffec
+              expression: |
+                avg(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}
+                or
+                last(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_WARN_STATUS}
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'max(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_WARN:"{#SNMPVALUE}"}-3'
+              name: '{#SNMPVALUE}: Temperature is above warning threshold'
+              event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP_WARN:"{#SNMPVALUE}"}'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'This trigger uses temperature sensor values as well as temperature sensor status if available'
+              dependencies:
+                -
+                  name: '{#SNMPVALUE}: Temperature is above critical threshold'
+                  expression: |
+                    avg(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}
+                    or
+                    last(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_CRIT_STATUS}
+                    or
+                    last(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}])={$TEMP_DISASTER_STATUS}
+                  recovery_expression: 'max(/Cisco CISCO-ENVMON-MIB SNMP/sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT:"{#SNMPVALUE}"}-3'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+      macros:
+        -
+          macro: '{$FAN_CRIT_STATUS:"critical"}'
+          value: '3'
+        -
+          macro: '{$FAN_CRIT_STATUS:"shutdown"}'
+          value: '4'
+        -
+          macro: '{$FAN_WARN_STATUS:"notFunctioning"}'
+          value: '6'
+        -
+          macro: '{$FAN_WARN_STATUS:"warning"}'
+          value: '2'
+        -
+          macro: '{$PSU_CRIT_STATUS:"critical"}'
+          value: '3'
+        -
+          macro: '{$PSU_CRIT_STATUS:"shutdown"}'
+          value: '4'
+        -
+          macro: '{$PSU_WARN_STATUS:"notFunctioning"}'
+          value: '6'
+        -
+          macro: '{$PSU_WARN_STATUS:"warning"}'
+          value: '2'
+        -
+          macro: '{$TEMP_CRIT}'
+          value: '60'
+        -
+          macro: '{$TEMP_CRIT:"CPU"}'
+          value: '75'
+        -
+          macro: '{$TEMP_CRIT_LOW}'
+          value: '5'
+        -
+          macro: '{$TEMP_CRIT_STATUS}'
+          value: '3'
+        -
+          macro: '{$TEMP_DISASTER_STATUS}'
+          value: '4'
+        -
+          macro: '{$TEMP_WARN}'
+          value: '50'
+        -
+          macro: '{$TEMP_WARN:"CPU"}'
+          value: '70'
+        -
+          macro: '{$TEMP_WARN_STATUS}'
+          value: '2'
+      valuemaps:
+        -
+          uuid: 96da9a43fa60420696714c57d3e72f13
+          name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+          mappings:
+            -
+              value: '1'
+              newvalue: normal
+            -
+              value: '2'
+              newvalue: warning
+            -
+              value: '3'
+              newvalue: critical
+            -
+              value: '4'
+              newvalue: shutdown
+            -
+              value: '5'
+              newvalue: notPresent
+            -
+              value: '6'
+              newvalue: notFunctioning
+    -
+      uuid: d7c122cde75447248d4b1613cdc25d5b
+      template: 'Cisco CISCO-MEMORY-POOL-MIB SNMP'
+      name: 'Cisco CISCO-MEMORY-POOL-MIB SNMP'
+      description: |
+        Template Cisco CISCO-MEMORY-POOL-MIB
+        
+        MIBs used:
+        CISCO-MEMORY-POOL-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      discovery_rules:
+        -
+          uuid: d84cfe9db46d49c8971317f7e09d9537
+          name: 'Memory Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.48.1.1.1.2]'
+          key: memory.discovery
+          delay: 1h
+          description: |
+            Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
+            http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+          item_prototypes:
+            -
+              uuid: a88a818dfdf743408698d7a45bc29edc
+              name: '{#SNMPVALUE}: Free memory'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}'
+              key: 'vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: CISCO-MEMORY-POOL-MIB
+                Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool
+                Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: 32d6bbb06c624f9e9a236fb53507948c
+              name: '{#SNMPVALUE}: Used memory'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}'
+              key: 'vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: CISCO-MEMORY-POOL-MIB
+                Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.
+                Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: 5065203cb8244befadc54cdb004d4b40
+              name: '{#SNMPVALUE}: Memory utilization'
+              type: CALCULATED
+              key: 'vm.memory.util[vm.memory.util.{#SNMPINDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              params: 'last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}])/(last(//vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}])+last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]))*100'
+              description: 'Memory utilization in %'
+              tags:
+                -
+                  tag: component
+                  value: memory
+              trigger_prototypes:
+                -
+                  uuid: 74c44bdc890f467cb1a8cdc175a54a76
+                  expression: 'min(/Cisco CISCO-MEMORY-POOL-MIB SNMP/vm.memory.util[vm.memory.util.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
+                  name: '{#SNMPVALUE}: High memory utilization'
+                  event_name: '{#SNMPVALUE}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+                  priority: AVERAGE
+                  description: 'The system is running out of free memory.'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                    -
+                      tag: scope
+                      value: performance
+          graph_prototypes:
+            -
+              uuid: 754f4378d0fb43c288e891285efee8a5
+              name: '{#SNMPVALUE}: Memory utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco CISCO-MEMORY-POOL-MIB SNMP'
+                    key: 'vm.memory.util[vm.memory.util.{#SNMPINDEX}]'
+      macros:
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+    -
+      uuid: 3eadb8a2ad4a479cb59bfa6402deee3f
+      template: 'Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP'
+      name: 'Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP'
+      description: |
+        Template Module Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5
+        
+        MIBs used:
+        CISCO-PROCESS-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      discovery_rules:
+        -
+          uuid: 372b5656330f41d18ccf99ca89fa8504
+          name: 'CPU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.109.1.1.1.1.5]'
+          key: cpu.discovery
+          delay: 1h
+          description: |
+            If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable,
+            indexed with cpmCPUTotalIndex.
+            This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
+            like different CPU chips, group of CPUs, or CPUs in different modules/cards.
+            In case of a single CPU, cpmCPUTotalTable has only one entry.
+          item_prototypes:
+            -
+              uuid: b7a375f679024cb990ae97933e5f77d6
+              name: '{#SNMPVALUE}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.109.1.1.1.1.5.{#SNMPINDEX}'
+              key: 'system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]'
+              delay: 5m
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: CISCO-PROCESS-MIB
+                The overall CPU busy percentage in the last 5 minute
+                period. This object deprecates the avgBusy5 object from
+                the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+                by cpmCPUTotal5minRev which has the changed range
+                of value (0..100).
+                Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+              tags:
+                -
+                  tag: component
+                  value: cpu
+              trigger_prototypes:
+                -
+                  uuid: be863abc1e3440a9bd35c4db77f83961
+                  expression: 'min(/Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP/system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  name: '{#SNMPVALUE}: High CPU utilization'
+                  event_name: '{#SNMPVALUE}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+          graph_prototypes:
+            -
+              uuid: 8e045ff24e564afc9a55d4bd08529d22
+              name: '{#SNMPVALUE}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco CISCO-PROCESS-MIB IOS versions 12.0_3_T-12.2_3.5 SNMP'
+                    key: 'system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+    -
+      uuid: f934f5e71db642c689ed2f945f73ce6c
+      template: 'Cisco CISCO-PROCESS-MIB SNMP'
+      name: 'Cisco CISCO-PROCESS-MIB SNMP'
+      description: |
+        Template Cisco CISCO-PROCESS-MIB
+        
+        MIBs used:
+        CISCO-PROCESS-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      discovery_rules:
+        -
+          uuid: dc4773499a1d419caa5c2c96bd4afb7b
+          name: 'CPU Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.109.1.1.1.1.5]'
+          key: cpu.discovery
+          delay: 1h
+          description: |
+            If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable,
+            indexed with cpmCPUTotalIndex.
+            This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
+            like different CPU chips, group of CPUs, or CPUs in different modules/cards.
+            In case of a single CPU, cpmCPUTotalTable has only one entry.
+          item_prototypes:
+            -
+              uuid: 884048f6fc414188b58341ecaca9aea3
+              name: '#{#SNMPINDEX}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.9.9.109.1.1.1.1.8.{#SNMPINDEX}'
+              key: 'system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}]'
+              delay: 5m
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: CISCO-PROCESS-MIB
+                The cpmCPUTotal5minRev MIB object provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev . These MIB objects are not accurate because they look at CPU at one minute and five second intervals, respectively. These MIBs enable you to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500s, can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.
+                Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+              tags:
+                -
+                  tag: component
+                  value: cpu
+              trigger_prototypes:
+                -
+                  uuid: 52d3b9d4d52e4f289221f4b5ade177d7
+                  expression: 'min(/Cisco CISCO-PROCESS-MIB SNMP/system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
+                  name: '#{#SNMPINDEX}: High CPU utilization'
+                  event_name: '#{#SNMPINDEX}: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+          graph_prototypes:
+            -
+              uuid: 6fed03a2555949178f96550fcdb449ca
+              name: '#{#SNMPINDEX}: CPU utilization'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Cisco CISCO-PROCESS-MIB SNMP'
+                    key: 'system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}]'
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+    -
+      uuid: 90c99055648f40df8517005a7670158c
+      template: 'Cisco Inventory SNMP'
+      name: 'Cisco Inventory SNMP'
+      description: |
+        Template Cisco Inventory
+        
+        MIBs used:
+        ENTITY-MIB
+        SNMPv2-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: edb172996a954eb986c97bcfee052a36
+          name: 'Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.13.1
+          key: system.hw.model
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ENTITY-MIB'
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+        -
+          uuid: 3b54e3692fe643e99704767f9a58a1c2
+          name: 'Hardware serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.47.1.1.1.1.11.1
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: ENTITY-MIB'
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: 4100a7125272484c81c4f599eff82793
+              expression: 'last(/Cisco Inventory SNMP/system.hw.serialnumber,#1)<>last(/Cisco Inventory SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Inventory SNMP/system.hw.serialnumber))>0'
+              name: 'Device has been replaced'
+              event_name: 'Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Ack to close'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 51b1c178adff415bbe36a4363d6e06c1
+          name: 'Operating system'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.1.0
+          key: 'system.sw.os[sysDescr.0]'
+          delay: 1h
+          history: 2w
+          trends: '0'
+          value_type: CHAR
+          description: 'MIB: SNMPv2-MIB'
+          inventory_link: OS
+          preprocessing:
+            -
+              type: REGEX
+              parameters:
+                - 'Version (.+), RELEASE'
+                - \1
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            -
+              tag: component
+              value: os
+          triggers:
+            -
+              uuid: e417e0edd4eb417d99816dd9cf4f20e9
+              expression: 'last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0],#1)<>last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Cisco Inventory SNMP/system.sw.os[sysDescr.0]))>0'
+              name: 'Operating system description has changed'
+              priority: INFO
+              description: 'Operating system description has changed. Possible reasons that system has been updated or replaced. Ack to close.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+      discovery_rules:
+        -
+          uuid: 0908cfd197214f6c8092bbd426ef83bf
+          name: 'Entity Serial Numbers Discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_SN},1.3.6.1.2.1.47.1.1.1.1.11]'
+          key: entity_sn.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ENT_SN}'
+                value: .+
+                formulaid: B
+              -
+                macro: '{#ENT_CLASS}'
+                value: ^3$
+                formulaid: A
+          item_prototypes:
+            -
+              uuid: 3a6277e70ce6448b857bfc170ded8542
+              name: '{#ENT_NAME}: Hardware serial number'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+              key: 'system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]'
+              delay: 1h
+              history: 2w
+              trends: '0'
+              value_type: CHAR
+              description: 'MIB: ENTITY-MIB'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              tags:
+                -
+                  tag: component
+                  value: system
+              trigger_prototypes:
+                -
+                  uuid: ff15aaac7c4947b6a07a38dec4d1466d
+                  expression: 'last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Cisco Inventory SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0'
+                  name: '{#ENT_NAME}: Device has been replaced'
+                  event_name: '{#ENT_NAME}: Device has been replaced (new serial number received)'
+                  priority: INFO
+                  description: 'Device serial number has changed. Ack to close'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+    -
+      uuid: 1b0025aaf71f47ec91d08c17a399c6a6
+      template: 'Cisco OLD-CISCO-CPU-MIB SNMP'
+      name: 'Cisco OLD-CISCO-CPU-MIB SNMP'
+      description: |
+        Template Cisco OLD-CISCO-CPU-MIB
+        
+        MIBs used:
+        OLD-CISCO-CPU-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: 1b8784537cc04a939b8ceb26a5d3b5a1
+          name: 'CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.9.2.1.58
+          key: 'system.cpu.util[avgBusy5]'
+          delay: 5m
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: OLD-CISCO-CPU-MIB
+            5 minute exponentially-decayed moving average of the CPU busy percentage.
+            Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 0833b9a8f2ba4c009ca038cc409236d8
+              expression: 'min(/Cisco OLD-CISCO-CPU-MIB SNMP/system.cpu.util[avgBusy5],5m)>{$CPU.UTIL.CRIT}'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+  graphs:
+    -
+      uuid: c998de5517bd45f19719dbe7d6cb371e
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Cisco OLD-CISCO-CPU-MIB SNMP'
+            key: 'system.cpu.util[avgBusy5]'

@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ abstract class CConfigGeneralHelper {
 	abstract protected static function loadParams(?string $param = null, bool $is_global = false): void;
 
 	/**
-	 * Get value by parameter name of API object (load parameters if need).
+	 * Get value by parameter name of API object (load parameters if needed).
 	 *
 	 * @static
 	 *
@@ -50,7 +50,7 @@ abstract class CConfigGeneralHelper {
 	}
 
 	/**
-	 * Get values of all parameters of API object (load parameters if need).
+	 * Get values of all parameters of API object (load parameters if needed).
 	 *
 	 * @static
 	 *
@@ -63,7 +63,7 @@ abstract class CConfigGeneralHelper {
 	}
 
 	/**
-	 * Set value by parameter name of API object into $params (load parameters if need).
+	 * Set value by parameter name of API object into $params (load parameters if needed).
 	 *
 	 * @static
 	 *

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -251,9 +251,9 @@ class CMultiSelect extends CTag {
 					'with_monitored_triggers', 'noempty', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
 					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes', 'with_items',
 					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
-					'excludeids', 'disableids', 'enrich_parent_groups', 'orig_names', 'with_monitored_items',
+					'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'with_hosts_and_templates', 'user_type', 'disable_selected', 'hostids',
-					'with_inherited', 'context'
+					'with_inherited', 'context', 'enabled_only'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -390,10 +390,6 @@ class CMultiSelect extends CTag {
 					$autocomplete_parameters['enrich_parent_groups'] = true;
 				}
 
-				if (array_key_exists('orig_names', $parameters) && $parameters['orig_names']) {
-					$popup_parameters['orig_names'] = '1';
-				}
-
 				if (array_key_exists('user_type', $parameters) && $parameters['user_type']) {
 					$popup_parameters['user_type'] = (int) $parameters['user_type'];
 					$autocomplete_parameters['user_type'] = (int) $parameters['user_type'];
@@ -411,6 +407,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('context', $parameters)) {
 					$popup_parameters['context'] = $parameters['context'];
 					$autocomplete_parameters['context'] = $parameters['context'];
+				}
+
+				if (array_key_exists('enabled_only', $parameters) && $parameters['enabled_only']) {
+					$popup_parameters['enabled_only'] = '1';
+					$autocomplete_parameters['enabled_only'] = true;
 				}
 			}
 

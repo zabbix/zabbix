@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-07-08T14:51:22Z'
+  version: '6.0'
+  date: '2022-04-06T19:33:47Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -17,7 +17,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -82,8 +82,8 @@ zabbix_export:
                 key: 'systemd.unit.get["{#UNIT.NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Systemd service: {#UNIT.NAME}'
+                  tag: component
+                  value: service
               trigger_prototypes:
                 -
                   uuid: 5237bd423307449b8a58f692082d2a0a
@@ -91,6 +91,10 @@ zabbix_export:
                   name: '{#UNIT.NAME}: Service is not running'
                   priority: WARNING
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: bed610e6ce33494b817eb787e34e18c2
               name: '{#UNIT.NAME}: Load state'
@@ -114,8 +118,8 @@ zabbix_export:
                 key: 'systemd.unit.get["{#UNIT.NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Systemd service: {#UNIT.NAME}'
+                  tag: component
+                  value: service
             -
               uuid: f1174eb5abf74e028a75ab9bb8eec649
               name: '{#UNIT.NAME}: Unit file state'
@@ -139,8 +143,8 @@ zabbix_export:
                 key: 'systemd.unit.get["{#UNIT.NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Systemd service: {#UNIT.NAME}'
+                  tag: component
+                  value: service
             -
               uuid: a35992b54d944a389c1bb44748a37fdb
               name: '{#UNIT.NAME}: Active time'
@@ -161,21 +165,25 @@ zabbix_export:
                             return Math.floor(Date.now()/1000)-Number(data.ActiveEnterTimestamp)/1000000;
                           }
                         return null;
-                      
               master_item:
                 key: 'systemd.unit.get["{#UNIT.NAME}"]'
               tags:
                 -
-                  tag: Application
-                  value: 'Systemd service: {#UNIT.NAME}'
+                  tag: component
+                  value: service
               trigger_prototypes:
                 -
                   uuid: e2292c5ead924500a06d38b6356930c7
                   expression: 'last(/Systemd by Zabbix agent 2/systemd.service.uptime["{#UNIT.NAME}"])<10m'
-                  name: '{#UNIT.NAME}: has been restarted (uptime < 10m)'
+                  name: '{#UNIT.NAME}: has been restarted'
+                  event_name: '{#UNIT.NAME}: has been restarted (uptime < 10m)'
                   priority: INFO
                   description: 'Uptime is less than 10 minutes'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: bdb94d1182114985a8734de7d5d92380
               name: '{#UNIT.NAME}: Get unit info'
@@ -188,8 +196,11 @@ zabbix_export:
                  Unit description: {#UNIT.DESCRIPTION}.
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: unit
         -
           uuid: 5c337762ae7b43a98fcb9dc3102a8467
           name: 'Socket units discovery'
@@ -248,8 +259,8 @@ zabbix_export:
                 key: 'systemd.unit.get["{#UNIT.NAME}",Socket]'
               tags:
                 -
-                  tag: Application
-                  value: 'Systemd socket: {#UNIT.NAME}'
+                  tag: component
+                  value: socket
             -
               uuid: 258a899aba9546db956b8e235738bd89
               name: '{#UNIT.NAME}: Connections connected'
@@ -267,8 +278,8 @@ zabbix_export:
                 key: 'systemd.unit.get["{#UNIT.NAME}",Socket]'
               tags:
                 -
-                  tag: Application
-                  value: 'Systemd socket: {#UNIT.NAME}'
+                  tag: component
+                  value: socket
             -
               uuid: 83ffad5a484d48e388ac658511d4b803
               name: '{#UNIT.NAME}: Get unit info'
@@ -281,8 +292,18 @@ zabbix_export:
                  Unit description: {#UNIT.DESCRIPTION}.
               tags:
                 -
-                  tag: Application
-                  value: 'Zabbix raw items'
+                  tag: component
+                  value: raw
+                -
+                  tag: component
+                  value: socket
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: systemd
       macros:
         -
           macro: '{$SYSTEMD.ACTIVESTATE.SERVICE.MATCHES}'

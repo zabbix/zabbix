@@ -1,0 +1,3996 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:27:26Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 44c2c2d94a4447c6a924386640e4854a
+      template: 'F5 Big-IP SNMP'
+      name: 'F5 Big-IP SNMP'
+      description: |
+        MIBs used:
+        RFC1213-MIB
+        F5-BIGIP-LOCAL-MIB
+        F5-BIGIP-SYSTEM-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 907424caaf7c4b11b7a567db84ea1e17
+          name: 'F5 BIG-IP: Contact'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.4.0
+          key: bigip.contact
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The textual identification of the contact person
+            for this managed node, together with information
+            on how to contact this person.
+          inventory_link: CONTACT
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+        -
+          uuid: 0f7ecc11f860443582eb6dbe64b2bbb6
+          name: 'F5 BIG-IP: Failover status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.3375.2.1.14.3.1.0
+          key: bigip.failover
+          history: 7d
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The failover status ID on the system.
+            unknown - the failover status of the device is unknown;
+            offline - the device is offline;
+            forcedOffline - the device is forced offline;
+            standby - the device is standby;
+            active - the device is active.
+          valuemap:
+            name: 'SNMP sysCmFailoverStatusId'
+          tags:
+            -
+              tag: component
+              value: cluster
+          triggers:
+            -
+              uuid: f93a7ff7cc614c0b84789f325ebb662b
+              expression: 'count(/F5 Big-IP SNMP/bigip.failover,10m,"ne","3")>8 and count(/F5 Big-IP SNMP/bigip.failover,10m,"ne","4")>6'
+              name: 'F5 BIG-IP: Cluster not in sync'
+              event_name: 'F5 BIG-IP: Cluster not in sync: {ITEM.VALUE}'
+              opdata: '{ITEM.LASTVALUE}'
+              priority: WARNING
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 8ce387e2d78e42bfa6180b4b22096468
+          name: 'F5 BIG-IP: Location'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.6.0
+          key: bigip.location
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            The physical location of this node (e.g.,
+            `telephone closet, 3rd floor').
+          inventory_link: LOCATION
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+        -
+          uuid: d9bf23e66ae347eb8f6f58867cdc3ca7
+          name: 'F5 BIG-IP: Hardware model name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.1.0
+          key: bigip.model
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            A textual description of the entity.  This value
+            should include the full name and version
+            identification of the system's hardware type,
+            software operating-system, and networking
+            software.  It is mandatory that this only contain
+            printable ASCII characters.
+          inventory_link: MODEL
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+        -
+          uuid: 97d896e7b8ed422caf9c4ebf053bb8d9
+          name: 'F5 BIG-IP: Host name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.2.1.1.5.0
+          key: bigip.name
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: RFC1213-MIB
+            An administratively-assigned name for this
+            managed node.  By convention, this is the node's
+            fully-qualified domain name.
+          inventory_link: NAME
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+        -
+          uuid: 3d7299dcbfee4b4a8b39bbf8daa4a077
+          name: 'F5 BIG-IP: Product build'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.4.3.0
+          key: bigip.product.build
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The product build number.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+        -
+          uuid: 065a6b42397e40c3874cf4176bd0fa6b
+          name: 'F5 BIG-IP: Product build date'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.4.5.0
+          key: bigip.product.date
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The product build date.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+        -
+          uuid: 5b3c2a650f474a6da05262dc5b3634a9
+          name: 'F5 BIG-IP: Product edition'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.4.4.0
+          key: bigip.product.edition
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The product edition.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+        -
+          uuid: dd91be3044a2465781af744dc45dd06f
+          name: 'F5 BIG-IP: Product name'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.4.1.0
+          key: bigip.product.name
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The product name.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+        -
+          uuid: b670cf1b43d84b8784acfeaca1f01320
+          name: 'F5 BIG-IP: Product version'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.4.2.0
+          key: bigip.product.version
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The product version.
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+        -
+          uuid: a80409ff52bf4fe183a68ed257279db5
+          name: 'F5 BIG-IP: Chassis serial number'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.3.3.3.0
+          key: bigip.serialnumber
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            Serial number
+          inventory_link: SERIALNO_A
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          tags:
+            -
+              tag: component
+              value: inventory
+          triggers:
+            -
+              uuid: 8a55167ddebb43f2ac8f6d028aef87c2
+              expression: 'last(/F5 Big-IP SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP SNMP/bigip.serialnumber))>0'
+              name: 'F5 BIG-IP: Chassis has been replaced'
+              event_name: 'F5 BIG-IP: Chassis has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Chassis serial number has changed. Ack to close'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 46bf5611d32340fdb9129966cca2c5da
+          name: 'F5 BIG-IP: Sync Status'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.3375.2.1.14.1.1.0
+          key: bigip.syncstatus
+          history: 7d
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The sync status ID on the system.
+            unknown - the device is disconnected from the device group;
+            syncing - the device is joining the device group or has requested changes from device group or inconsistent with the group;
+            needManualSync - changes have been made on the device not syncd to the device group;
+            inSync - the device is consistent with the device group;
+            syncFailed - the device is inconsistent with the device group, requires user intervention;
+            syncDisconnected - the device is not connected to any peers;
+            standalone - the device is in a standalone configuration;
+            awaitingInitialSync - the device is waiting for initial sync;
+            incompatibleVersion - the device's version is incompatible with rest of the devices in the device group;
+            partialSync - some but not all devices successfully received the last sync.
+          valuemap:
+            name: 'SNMP sysCmSyncStatusId'
+          tags:
+            -
+              tag: component
+              value: cluster
+          triggers:
+            -
+              uuid: 098fe258e8cc4216b0c1800913ba8e18
+              expression: 'last(/F5 Big-IP SNMP/bigip.syncstatus)=2'
+              name: 'F5 BIG-IP: Changes have been made on the device not sync'
+              event_name: 'F5 BIG-IP: Changes have been made on the device not sync to the device group: {ITEM.VALUE}'
+              opdata: '{ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'Changes have been made on the device not sync to the device group, requires user intervention'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: eb3517626c6d425f9b88a2bc35641ab6
+              expression: 'last(/F5 Big-IP SNMP/bigip.syncstatus)=4'
+              name: 'F5 BIG-IP: The device is inconsistent with the device group'
+              event_name: 'F5 BIG-IP: The device is inconsistent with the device group: {ITEM.VALUE}'
+              opdata: '{ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'The device is inconsistent with the device group, requires user intervention'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 78d6c13d575a41a8b160bd4e2c0bea7b
+          name: 'F5 BIG-IP: TCP connections, CLOSE-WAIT/LAST-ACK'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.3.0
+          key: bigip.tcp.close_wait
+          history: 7d
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The number of current TCP connections in CLOSE-WAIT/LAST-ACK.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: e28c1bfcd63e4a5c8394680886395669
+          name: 'F5 BIG-IP: TCP connections, FIN-WAIT-1/CLOSING'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.4.0
+          key: bigip.tcp.fin1_wait
+          history: 7d
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The number of current TCP connections in FIN-WAIT-1/CLOSING.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 69576083e02c486998512c58ab2a6371
+          name: 'F5 BIG-IP: TCP connections, FIN-WAIT-2'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.20.0
+          key: bigip.tcp.fin2_wait
+          history: 7d
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The number of current TCP connections in FIN-WAIT-2.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: b58bae7e2e4f403ba7bce846ccf5228e
+          name: 'F5 BIG-IP: Open TCP connections'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.2.0
+          key: bigip.tcp.open
+          history: 7d
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The number of current open TCP connections.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: bd3982fd369142878ffb9530656556e3
+          name: 'F5 BIG-IP: TCP connections, TIME-WAIT'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.12.5.0
+          key: bigip.tcp.time_wait
+          history: 7d
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The number of current TCP connections in TIME-WAIT.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: 843e855fb10f4cb0be81953dd8dbb87e
+          name: 'F5 BIG-IP: Open UDP connections'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.1.2.13.2.0
+          key: bigip.udp.open
+          history: 7d
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The number of current open UDP connections.
+          tags:
+            -
+              tag: component
+              value: network
+        -
+          uuid: efb83b0cb4864b249ecf61b2f81ec468
+          name: 'F5 BIG-IP: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: .1.3.6.1.4.1.3375.2.1.6.6.0
+          key: bigip.uptime
+          delay: 30s
+          history: 2w
+          trends: 0d
+          units: uptime
+          description: |
+            MIB: F5-BIGIP-SYSTEM-MIB
+            The system up time in 1/100 seconds since boot.
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: system
+          triggers:
+            -
+              uuid: 551fd3b77d144ed58f138865e4862901
+              expression: 'last(/F5 Big-IP SNMP/bigip.uptime)<10m'
+              name: 'F5 BIG-IP: has been restarted'
+              event_name: 'F5 BIG-IP: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: c91416602a9c451ca0eb959073f65fb0
+          name: 'F5 BIG-IP: SNMP agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,snmp,available]'
+          history: 7d
+          valuemap:
+            name: 'SNMP available'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 9ec4425af8dd4cf59dcb3146e6a8263c
+              expression: 'max(/F5 Big-IP SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0'
+              name: 'F5 BIG-IP: No SNMP data collection'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      discovery_rules:
+        -
+          uuid: 9368bf7cbf0742e5af8e0b1200200a15
+          name: 'Blade temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#TEMP.INDEX},.1.3.6.1.4.1.3375.2.1.3.2.4.2.1.1,{#SLOT.INDEX},.1.3.6.1.4.1.3375.2.1.3.2.4.2.1.4,{#TEMP.LOCATION},.1.3.6.1.4.1.3375.2.1.3.2.4.2.1.3]'
+          key: bigip.blade.temp.discovery
+          delay: 1h
+          description: 'Containing information of blade temperature of the system'
+          item_prototypes:
+            -
+              uuid: 6e0239a64c2c43ee94e225efcf970ef1
+              name: 'F5 BIG-IP: Sensor [{#SLOT.INDEX}:{#TEMP.INDEX}]: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.4.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.blade.temp.value[{#SLOT.INDEX},{#TEMP.INDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                Location: {#TEMP.LOCATION}
+                The blade temperature (in Celsius) of the indexed sensor on the system.,
+                This is only supported for the platform where
+                the sensor data is available.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
+          graph_prototypes:
+            -
+              uuid: 1b43fb6913274a34ab6ad122d5db38ba
+              name: 'F5 BIG-IP: Sensor [{#SLOT.INDEX}:{#TEMP.INDEX}] temperature'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.blade.temp.value[{#SLOT.INDEX},{#TEMP.INDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 099e4de8464e49aca8e0d24b4276c804
+          name: 'Blade voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#VOLT.INDEX},.1.3.6.1.4.1.3375.2.1.3.2.5.2.1.1]'
+          key: bigip.blade.voltage.discovery
+          delay: 1h
+          description: 'A table containing information of blade voltage of the system.'
+          item_prototypes:
+            -
+              uuid: 6f7cf365f10440b18a08d63880356401
+              name: 'F5 BIG-IP: Voltage [{#VOLT.INDEX}]: Slot'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.5.2.1.3.{#SNMPINDEX}'
+              key: 'bigip.blade.voltage.slot[{#VOLT.INDEX}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The chassis slot number, if applicable.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
+            -
+              uuid: 1c0bf38bb0d3473cae285704ccd3ee0b
+              name: 'F5 BIG-IP: Voltage [{#VOLT.INDEX}]: Value'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.4.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.blade.voltage.value[{#VOLT.INDEX}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The blade voltage (in V) of the indexed sensor on the system.,
+                This is only supported for the platform where
+                the sensor data is available.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
+          graph_prototypes:
+            -
+              uuid: b5b1a26c3c9043d79eff63272c3e4b8d
+              name: 'F5 BIG-IP: Voltage [{#VOLT.INDEX}] value'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.blade.voltage.value[{#VOLT.INDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: dfdcfd160cfe4e798f29576280bf1627
+          name: 'Certificate discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#CERT.NAME},.1.3.6.1.4.1.3375.2.1.15.1.2.1.1]'
+          key: bigip.cert.discovery
+          delay: 1d
+          description: 'A table containing certificate configuration.'
+          item_prototypes:
+            -
+              uuid: d27c1c13d6984728aebacdcf26777025
+              name: 'F5 BIG-IP: Certificate [{#CERT.NAME}]: Expiration date'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.15.1.2.1.5.{#SNMPINDEX}'
+              key: 'bigip.cert.expiration.date[{#CERT.NAME}]'
+              delay: 12h
+              history: 7d
+              trends: '0'
+              units: unixtime
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The expiration date of the certificate in unix time.
+              tags:
+                -
+                  tag: certificate
+                  value: '{#CERT.NAME}'
+                -
+                  tag: component
+                  value: certificate
+              trigger_prototypes:
+                -
+                  uuid: 015ce3f5d10749aca1d871a1d26c51c5
+                  expression: 'last(/F5 Big-IP SNMP/bigip.cert.expiration.date[{#CERT.NAME}]) - 86400 * {$BIGIP.CERT.MIN} < now()'
+                  name: 'F5 BIG-IP: Certificate expires ({#CERT.NAME})'
+                  event_name: 'F5 BIG-IP: Less than {$BIGIP.CERT.MIN} days left until the certificate expires ({#CERT.NAME})'
+                  opdata: 'Expires: {ITEM.VALUE}'
+                  priority: WARNING
+                  description: 'Please check certificate'
+                  tags:
+                    -
+                      tag: scope
+                      value: security
+        -
+          uuid: 1bab90f9f015432c817cabebb98453af
+          name: 'Chassis fan discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#FAN.INDEX},.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.1]'
+          key: bigip.chassis.fan.discovery
+          delay: 1h
+          description: 'A table containing information of chassis fan status of the system'
+          item_prototypes:
+            -
+              uuid: 973e0443ecc84630afc327d1917d9e57
+              name: 'F5 BIG-IP: FAN [{#FAN.INDEX}]: Speed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.3.{#SNMPINDEX}'
+              key: 'bigip.chassis.fan.speed[{#FAN.INDEX}]'
+              delay: 5m
+              history: 7d
+              units: '!rpm'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The actual speed of the indexed chassis fan on the system.
+                This is only supported for the platform where the actual
+                fan speed data is available.
+                '0' means fan speed is unavailable while the associated chassis status is good.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
+            -
+              uuid: 13b1890ae83547d482c9130ea0ccf876
+              name: 'F5 BIG-IP: FAN [{#FAN.INDEX}]: Status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.chassis.fan.status[{#FAN.INDEX}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The status of the indexed chassis fan on the system.,
+                This is only supported for the platform where
+                the sensor data is available.
+                Possible values: 0 - bad, 1 - good, 2 - notpresent.
+              valuemap:
+                name: 'Chassis status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
+              trigger_prototypes:
+                -
+                  uuid: 546745f6edf7470896d5bf251d760dfe
+                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=0'
+                  name: 'F5 BIG-IP: Fan[{#FAN.INDEX}] is in critical state'
+                  priority: AVERAGE
+                  description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: d20c56720aa54efba37f5fcdfdde0225
+                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=2'
+                  name: 'F5 BIG-IP: Fan[{#FAN.INDEX}] is not present'
+                  priority: INFO
+                  description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+          graph_prototypes:
+            -
+              uuid: f0a043ed6fb249e489f143350b681a63
+              name: 'F5 BIG-IP: FAN [{#FAN.INDEX}] speed'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.chassis.fan.speed[{#FAN.INDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: ee07355820ae4281ba5c6b4640a9fcc4
+          name: 'Chassis power supply discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#POWER.INDEX},.1.3.6.1.4.1.3375.2.1.3.2.2.2.1.1]'
+          key: bigip.chassis.power.discovery
+          delay: 1h
+          description: 'A table containing information of chassis power supply status of the system.'
+          item_prototypes:
+            -
+              uuid: d72e501362eb4e70bb324d42d304b7a8
+              name: 'F5 BIG-IP: Power supply [{#POWER.INDEX}]: Status'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.2.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.chassis.power.status[{#POWER.INDEX}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The status of the indexed power supply on the system.,
+                This is only supported for the platform where
+                the sensor data is available.
+                Possible values: 0 - bad, 1 - good, 2 - notpresent.
+              valuemap:
+                name: 'Chassis status'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: power
+              trigger_prototypes:
+                -
+                  uuid: 1e85cee65875477b85f74aedba6e86c9
+                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=0'
+                  name: 'F5 BIG-IP: Power supply [{#POWER.INDEX}] is in critical state'
+                  priority: HIGH
+                  description: 'Please check the power supply unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 84469f28c4bf47f790a85b9f1f37cff0
+                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=2'
+                  name: 'F5 BIG-IP: Power supply [{#POWER.INDEX}] is not present'
+                  priority: INFO
+                  description: 'Please check the power supply unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 795b91aa746b43fdb8171cd30aa249ee
+          name: 'Chassis temperature discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#TEMP.INDEX},.1.3.6.1.4.1.3375.2.1.3.2.3.2.1.1]'
+          key: bigip.chassis.temp.discovery
+          delay: 1h
+          description: 'A table containing information of chassis temperature of the system'
+          item_prototypes:
+            -
+              uuid: e49355bacceb473eb9f548d044a9742b
+              name: 'F5 BIG-IP: Sensor [{#TEMP.INDEX}]: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.2.3.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.chassis.temp.value[{#TEMP.INDEX}]'
+              delay: 5m
+              history: 7d
+              value_type: FLOAT
+              units: °C
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The chassis temperature (in Celsius) of the indexed sensor on the system.,
+                This is only supported for the platform where
+                the sensor data is available.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
+              trigger_prototypes:
+                -
+                  uuid: 452167aafe594e3faa3748e6dc470fb1
+                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
+                  name: 'F5 BIG-IP: Chassis temperature'
+                  event_name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.HIGH} °C'
+                  opdata: '{ITEM.LASTVALUE}'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 00c0212fcb8049309bf0b3de2b2363b4
+                  expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.WARN}'
+                  name: 'F5 BIG-IP: Chassis temperature'
+                  event_name: 'F5 BIG-IP: Chassis temperature ({ITEM.LASTVALUE}) of sensor {#TEMP.INDEX} exceeds threshold of {$BIGIP.TEMP.WARN} °C'
+                  opdata: '{ITEM.LASTVALUE}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'F5 BIG-IP: Chassis temperature'
+                      expression: 'last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+          graph_prototypes:
+            -
+              uuid: ceea250c715948f3907290738451c328
+              name: 'F5 BIG-IP: Sensor [{#TEMP.INDEX}] temperature'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.chassis.temp.value[{#TEMP.INDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 1f27aaedf30243c2a704bf6350490d8c
+          name: 'CPU discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#HOST.ID},.1.3.6.1.4.1.3375.2.1.7.5.2.1.1,{#CPU.ID},.1.3.6.1.4.1.3375.2.1.7.5.2.1.3]'
+          key: bigip.cpu.discovery
+          delay: 1h
+          description: 'A table containing entries of system CPU usage information for a system.'
+          item_prototypes:
+            -
+              uuid: 7cf45a392cd7465988eb527de7b3ad63
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Idle, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.23.{#SNMPINDEX}'
+              key: 'bigip.cpu.idle.1m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor doing nothing for the associated host in the last one minute.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 12acd2da83b04353aca2bd3cff842c97
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Idle, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.31.{#SNMPINDEX}'
+              key: 'bigip.cpu.idle.5m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor doing nothing for the associated host in the last five minutes.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: dd169e972fe041cca93020b8a942a4d2
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Idle, avg 5s'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.15.{#SNMPINDEX}'
+              key: 'bigip.cpu.idle.5s[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor doing nothing for the associated host in the last five seconds.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 808a6933a1834291b80d0cb072dded09
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IO wait, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.26.{#SNMPINDEX}'
+              key: 'bigip.cpu.iowait.1m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor waiting for external I/O to complete for the associated host in the last one minute.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 6144e3ca25ac4f998559b860d059c385
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IO wait, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.34.{#SNMPINDEX}'
+              key: 'bigip.cpu.iowait.5m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor waiting for external I/O to complete for the associated host in the last five minutes.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: b4715714c727483fb3ca6004a829ac46
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IO wait, avg 5s'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.18.{#SNMPINDEX}'
+              key: 'bigip.cpu.iowait.5s[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor waiting for external I/O to complete for the associated host in the last five seconds.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 9f0f6dabac314744809a60161592a89f
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IRQ, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.24.{#SNMPINDEX}'
+              key: 'bigip.cpu.irq.1m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor servicing hardware interrupts for the associated host in the last one minute.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: f3d8ac2412ee4f0b88f264e590e278cb
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IRQ, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.32.{#SNMPINDEX}'
+              key: 'bigip.cpu.irq.5m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor servicing hardware interrupts for the associated host in the last five minutes.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 7bc53c5f9a7148759d426e8e5fd7f358
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: IRQ, avg 5s'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.16.{#SNMPINDEX}'
+              key: 'bigip.cpu.irq.5s[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor servicing hardware interrupts for the associated host in the last five seconds.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: b74f502d97f54041a4c129f5993e0967
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Nice, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.21.{#SNMPINDEX}'
+              key: 'bigip.cpu.nice.1m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor running niced processes for the associated host in the last one minute.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: bf51a4638db443a083ec19b934a6a915
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Nice, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.29.{#SNMPINDEX}'
+              key: 'bigip.cpu.nice.5m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor running niced processes for the associated host in the last five minutes.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 0046e43000b7477ea410970884829e5c
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Nice, avg 5s'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.13.{#SNMPINDEX}'
+              key: 'bigip.cpu.nice.5s[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor running niced processes for the associated host in the last five seconds.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: f2b1962e10b04dc28a124b91b7e9a235
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Soft IRQ, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.25.{#SNMPINDEX}'
+              key: 'bigip.cpu.spftirq.1m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor servicing soft interrupts for the associated host in the last one minute.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 56f459510e444326bba84ab12c4c232c
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Soft IRQ, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.33.{#SNMPINDEX}'
+              key: 'bigip.cpu.spftirq.5m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor servicing soft interrupts for the associated host in the last five minutes.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 8a6c086c524c4f5c93e66f9f453ed767
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Soft IRQ, avg 5s'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.17.{#SNMPINDEX}'
+              key: 'bigip.cpu.spftirq.5s[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor servicing soft interrupts for the associated host in the last five seconds.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 62e59d3a63014976a6c052ef259dbbc1
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Stolen, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.38.{#SNMPINDEX}'
+              key: 'bigip.cpu.stolen.1m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time 'stolen' from the specified processor for the associated host in the last one minute.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 757178b5d85041959609de5d38d93f20
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Stolen, avg 1s)'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.37.{#SNMPINDEX}'
+              key: 'bigip.cpu.stolen.1s[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time 'stolen' from the specified processor for the associated host in the last five seconds.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: c229331551284955befbed59fedae445
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Stolen, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.39.{#SNMPINDEX}'
+              key: 'bigip.cpu.stolen.5m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time 'stolen' from the specified processor for the associated host in the last five minutes.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 20a60cec7a50457a9c6c5a5e318b53e2
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: System, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.22.{#SNMPINDEX}'
+              key: 'bigip.cpu.system.1m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor servicing system calls for the associated host in the last one minute.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 9dc919dcc789473db23f989943f9a759
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: System, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.30.{#SNMPINDEX}'
+              key: 'bigip.cpu.system.5m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor servicing system calls for the associated host in the last five minutes.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 8b1bd4e936c149cfa44d8cf5d88bee4b
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: System, avg 5s'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.14.{#SNMPINDEX}'
+              key: 'bigip.cpu.system.5s[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor servicing system calls for the associated host in the last five seconds.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: e8f3b63e951d4de0b845647bcdd1524f
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Usage ratio, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.27.{#SNMPINDEX}'
+              key: 'bigip.cpu.usageratio.1m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                This is  average usage ratio of CPU for the associated host in the last one minute. It is calculated by
+                (sum of deltas for user, niced, system)/(sum of deltas of user, niced, system, idle, irq, softirq, and iowait),
+                where each delta is the difference for each stat over the last 5-second interval;
+                user:sysMultiHostCpuUser1m;
+                niced:sysMultiHostCpuNiced1m;
+                stolen:sysMultiHostCpuStolen1m;
+                system:sysMultiHostCpuSystem1m;
+                idle:sysMultiHostCpuIdle1m;
+                irq:sysMultiHostCpuIrq1m;
+                iowait:sysMultiHostCpuIowait1m
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 46e78b7f00904778abf5160fff93670a
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Usage ratio, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.35.{#SNMPINDEX}'
+              key: 'bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                This is  average usage ratio of CPU for the associated host in the last five minutes. It is calculated by
+                (sum of deltas for user, niced, system)/(sum of deltas of user, niced, system, idle, irq, softirq, and iowait),
+                where each delta is the difference for each stat over the last 5-second interval;
+                user:sysMultiHostCpuUser5m;
+                niced:sysMultiHostCpuNiced5m;
+                stolen:sysMultiHostCpuStolen5m;
+                system:sysMultiHostCpuSystem5m;
+                idle:sysMultiHostCpuIdle5m;
+                irq:sysMultiHostCpuIrq5m;
+                iowait:sysMultiHostCpuIowait5m
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+              trigger_prototypes:
+                -
+                  uuid: 1163080e05d3433f884773fe1ee0271a
+                  expression: 'last(/F5 Big-IP SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])>{$BIGIP.CPU.UTIL.WARN.MAX}'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/F5 Big-IP SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])<{$BIGIP.CPU.UTIL.WARN.MIN}'
+                  name: 'F5 BIG-IP: High CPU utilization'
+                  event_name: 'F5 BIG-IP: High CPU utilization (over {$BIGIP.CPU.UTIL.WARN.MAX}% for 5m)'
+                  priority: WARNING
+                  description: 'CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: e0e3bbd21d3e434c80e7bb1969388b27
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Usage ratio, avg 5s'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.19.{#SNMPINDEX}'
+              key: 'bigip.cpu.usageratio.5s[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                This is  average usage ratio of CPU for the associated host in the last five seconds. It is calculated by
+                (sum of deltas for user, niced, system)/(sum of deltas of user, niced, system, idle, irq, softirq, and iowait),
+                where each delta is the difference for each stat over the last 5-second interval;
+                user:sysMultiHostCpuUser5s;
+                niced:sysMultiHostCpuNiced5s;
+                stolen:sysMultiHostCpuStolen5s;
+                system:sysMultiHostCpuSystem5s;
+                idle:sysMultiHostCpuIdle5s;
+                irq:sysMultiHostCpuIrq5s;
+                iowait:sysMultiHostCpuIowait5s
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: beaece1c9eaa41768e7c05993d2f4b3b
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: User, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.20.{#SNMPINDEX}'
+              key: 'bigip.cpu.user.1m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor in user context for the associated host in the last one minute.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 7344ae137ef94f80a99865057c105d96
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: User, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.28.{#SNMPINDEX}'
+              key: 'bigip.cpu.user.5m[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor in user context for the associated host in the last five minutes.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+            -
+              uuid: 61176fa2de794fcf90f1eef2ead10df6
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: User, avg 5s'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.5.2.1.12.{#SNMPINDEX}'
+              key: 'bigip.cpu.user.5s[{#HOST.ID},{#CPU.ID}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The average time spent by the specified processor in user context for the associated host in the last five seconds.
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: cpu-id
+                  value: '{#CPU.ID}'
+                -
+                  tag: host-id
+                  value: '{#HOST.ID}'
+          graph_prototypes:
+            -
+              uuid: 64c251a6b0384d2ea7d5b498c7fe6422
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Usage ratio, avg 1m'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.user.1m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.nice.1m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.system.1m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.idle.1m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.irq.1m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.iowait.1m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '6'
+                  color: AC8C14
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.stolen.1m[{#HOST.ID},{#CPU.ID}]'
+            -
+              uuid: 3fd0ca58d8f14e06afa2c58f9d1b46f3
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Usage ratio, avg 5m'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.user.5m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.nice.5m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.system.5m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.idle.5m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.irq.5m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.iowait.5m[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '6'
+                  color: AC8C14
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.stolen.5m[{#HOST.ID},{#CPU.ID}]'
+            -
+              uuid: dba5e4f4c3714f438eacba4b213ce640
+              name: 'F5 BIG-IP: Host [{#HOST.ID}] CPU{#CPU.ID}: Usage ratio, avg 5s'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.user.5s[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.nice.5s[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.system.5s[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.idle.5s[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.irq.5s[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.iowait.5s[{#HOST.ID},{#CPU.ID}]'
+                -
+                  sortorder: '6'
+                  color: AC8C14
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.stolen.1s[{#HOST.ID},{#CPU.ID}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: a0bdcabc8c7c4a349a9c4711be33c417
+          name: 'CPU sensor discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#CPU.SENSOR.INDEX},.1.3.6.1.4.1.3375.2.1.3.6.2.1.1,{#CPU.SENSOR.SLOT},.1.3.6.1.4.1.3375.2.1.3.6.2.1.5,{#CPU.SENSOR.NAME},.1.3.6.1.4.1.3375.2.1.3.6.2.1.4]'
+          key: bigip.cpu.sensor.discovery
+          delay: 1h
+          description: 'A table containing information of CPU sensor status on the system.'
+          item_prototypes:
+            -
+              uuid: 065993688a2e4b0e8e88998d24193a85
+              name: 'F5 BIG-IP: Sensor [{#CPU.SENSOR.SLOT}:{#CPU.SENSOR.INDEX}]: FAN speed'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.6.2.1.3.{#SNMPINDEX}'
+              key: 'bigip.cpu.sensor.fan[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
+              delay: 5m
+              history: 7d
+              units: '!rpm'
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                CPU: {#CPU.SENSOR.NAME}
+                The fan speed (in RPM) of the indexed CPU on the system.,
+                This is only supported for the platform where
+                the sensor data is available.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
+            -
+              uuid: 03bd45f8a7004fd3a3d8b361a37547d3
+              name: 'F5 BIG-IP: Sensor [{#CPU.SENSOR.SLOT}:{#CPU.SENSOR.INDEX}]: Name'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.6.2.1.4.{#SNMPINDEX}'
+              key: 'bigip.cpu.sensor.name[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
+              delay: 1h
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                Identifier for the CPU.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: name
+                -
+                  tag: component
+                  value: sensor
+            -
+              uuid: 1ffd09c7d99843b88e259de3614d003a
+              name: 'F5 BIG-IP: Sensor [{#CPU.SENSOR.SLOT}:{#CPU.SENSOR.INDEX}]: Temperature'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.6.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.cpu.sensor.temperature[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
+              delay: 5m
+              history: 7d
+              units: °C
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                CPU: {#CPU.SENSOR.NAME}
+                The temperature of the indexed CPU on the system.
+                This is only supported for the platform where
+                the sensor data is available.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
+          graph_prototypes:
+            -
+              uuid: 714b13fd29ec47009f183d44ddaa8df6
+              name: 'F5 BIG-IP: Sensor [{#CPU.SENSOR.SLOT}:{#CPU.SENSOR.INDEX}] FAN speed'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.sensor.fan[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
+            -
+              uuid: be756734cec74d9fb427fb1d515c7888
+              name: 'F5 BIG-IP: Sensor [{#CPU.SENSOR.SLOT}:{#CPU.SENSOR.INDEX}] temperature'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.cpu.sensor.temperature[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 26027ab56e7841d1b73747935a5e6157
+          name: 'File system discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#PART.NAME},.1.3.6.1.4.1.3375.2.1.7.3.2.1.1]'
+          key: bigip.disktable.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#PART.NAME}'
+                value: '{$BIGIP.LLD.FILTER.PART.NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#PART.NAME}'
+                value: '{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'A table containing entries of system disk usage information.'
+          item_prototypes:
+            -
+              uuid: 4c86e62a1a1a4f3eb990b2f17f6191fd
+              name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Block size'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.disktable.blocksize[{#PART.NAME}]'
+              delay: 1h
+              history: 7d
+              units: B
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of bytes in the specified partition.
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
+            -
+              uuid: 8fd4ee3dc199419189daf478ff2dc01d
+              name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Free blocks'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.4.{#SNMPINDEX}'
+              key: 'bigip.disktable.freeblocks[{#PART.NAME}]'
+              delay: 1h
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of free blocks in the specified partition.
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
+            -
+              uuid: 5c0724be667946f192a46cc2a0584971
+              name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Free nodes'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.6.{#SNMPINDEX}'
+              key: 'bigip.disktable.freenodes[{#PART.NAME}]'
+              delay: 1h
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of free file nodes in the specified partition.
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
+            -
+              uuid: 50d267f74f9c476fac23884828f5275f
+              name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Total blocks'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.3.{#SNMPINDEX}'
+              key: 'bigip.disktable.totalblocks[{#PART.NAME}]'
+              delay: 1h
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of total blocks in the specified partition.
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
+            -
+              uuid: 49cd22a896d941a2b55f3ba6e95698b4
+              name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Total nodes'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.3.2.1.5.{#SNMPINDEX}'
+              key: 'bigip.disktable.totalnodes[{#PART.NAME}]'
+              delay: 1h
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of total file nodes in the specified partition.
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: mount-point
+                  value: '{#PART.NAME}'
+          trigger_prototypes:
+            -
+              uuid: 32b87997dc0b4967bdb158f1dc0baad2
+              expression: 'last(/F5 Big-IP SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100<{$BIGIP.FS.FREE.WARN.MIN:"{#PART.NAME}"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/F5 Big-IP SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100>{$BIGIP.FS.FREE.WARN.MAX:"{#PART.NAME}"}'
+              name: 'F5 BIG-IP: Low free space in file system [{#PART.NAME}]'
+              event_name: 'F5 BIG-IP: Low free space in file system [{#PART.NAME}] (less than {$BIGIP.FS.FREE.WARN.MIN}% for 5m)'
+              priority: WARNING
+              description: 'The system is running out of free space.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+          graph_prototypes:
+            -
+              uuid: ed63eb409eb2497bb9dc7721ac789022
+              name: 'F5 BIG-IP: Mount point [{#PART.NAME}]: Blocks'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.disktable.freeblocks[{#PART.NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.disktable.totalblocks[{#PART.NAME}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 8aeb7920d1fe4ba4884f92e45e711228
+          name: 'Memory discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#HOST.ID},.1.3.6.1.4.1.3375.2.1.7.4.2.1.1]'
+          key: bigip.memory.discovery
+          delay: 1h
+          description: 'Containing system statistics information of the memory usage'
+          item_prototypes:
+            -
+              uuid: 39b39f06ae574927b90dfe9235301788
+              name: 'F5 BIG-IP: Host [{#HOST.ID}]: Total other non-TMM memory'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.7.{#SNMPINDEX}'
+              key: 'bigip.memory.total.other[{#HOST.ID}]'
+              delay: 5m
+              history: 7d
+              units: B
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The total other non-TMM memory in bytes for the specified host.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: e01e3283d37a4ae09d62fbc679cc4dee
+              name: 'F5 BIG-IP: Host [{#HOST.ID}]: Total swap'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.9.{#SNMPINDEX}'
+              key: 'bigip.memory.total.swap[{#HOST.ID}]'
+              delay: 1d
+              history: 7d
+              units: B
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The total swap in bytes for the specified host.
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: d1ebd77bd2bc4d24b45b32eb6cda6722
+              name: 'F5 BIG-IP: Host [{#HOST.ID}]: Total memory'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.memory.total[{#HOST.ID}]'
+              delay: 1d
+              history: 7d
+              units: B
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The total host memory in bytes for the specified host.
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: 6c73ea2e54594a1ab6edbdc6de30f711
+              name: 'F5 BIG-IP: Host [{#HOST.ID}]: Used other non-TMM memory'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.8.{#SNMPINDEX}'
+              key: 'bigip.memory.used.other[{#HOST.ID}]'
+              delay: 5m
+              history: 7d
+              units: B
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The other non-TMM memory in bytes currently in use for the specified host.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: 3a9d6f2815644a4f93e008ccacbdb290
+              name: 'F5 BIG-IP: Host [{#HOST.ID}]: Used swap'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.10.{#SNMPINDEX}'
+              key: 'bigip.memory.used.swap[{#HOST.ID}]'
+              delay: 5m
+              history: 7d
+              units: B
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The swap in bytes currently in use for the specified host.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: memory
+            -
+              uuid: d5af8fa1079b4c0aa47b98e25a184af3
+              name: 'F5 BIG-IP: Host [{#HOST.ID}]: Used memory'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.7.4.2.1.3.{#SNMPINDEX}'
+              key: 'bigip.memory.used[{#HOST.ID}]'
+              delay: 5m
+              history: 7d
+              units: B
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The host memory in bytes currently in use for the specified host.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: memory
+          trigger_prototypes:
+            -
+              uuid: e72f446075214129ab1d6269fcd87051
+              expression: 'last(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}])*100>{$BIGIP.MEMORY.UTIL.WARN.MAX}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/F5 Big-IP SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total[{#HOST.ID}])*100<{$BIGIP.MEMORY.UTIL.WARN.MIN}'
+              name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}]'
+              event_name: 'F5 BIG-IP: High memory utilization in host [{#HOST.ID}] (over {$BIGIP.MEMORY.UTIL.WARN.MAX}%)'
+              priority: WARNING
+              description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 5cf3e1f819ee46f49ba89156c53274ec
+              expression: 'last(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MAX}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/F5 Big-IP SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MIN}'
+              name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}]'
+              event_name: 'F5 BIG-IP: High swap utilization in host [{#HOST.ID}] (over {$BIGIP.SWAP.UTIL.WARN.MAX}%)'
+              priority: WARNING
+              description: 'The system is running out of free swap memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+          graph_prototypes:
+            -
+              uuid: 3414dd36b37e434f9c28eacc0e8c58b9
+              name: 'F5 BIG-IP: Host [{#HOST.ID}]: Memory'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.memory.used[{#HOST.ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.memory.total[{#HOST.ID}]'
+            -
+              uuid: 4b7815c72f264209b288c019541a09e6
+              name: 'F5 BIG-IP: Host [{#HOST.ID}]: Swap'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.memory.used.swap[{#HOST.ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.memory.total.swap[{#HOST.ID}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 6fa254ddaea74df1928e3582b34c292d
+          name: 'Module discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#MODULE.NAME},.1.3.6.1.4.1.3375.2.1.11.1.2.1.1]'
+          key: bigip.module.discovery
+          delay: 1h
+          description: 'Resource allocation information about modules on the system'
+          item_prototypes:
+            -
+              uuid: 36a1032bb74145c8ae51dbb54ec988a2
+              name: 'F5 BIG-IP: Module [{#MODULE.NAME}]: CPU ratio'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.11.1.2.1.4.{#SNMPINDEX}'
+              key: 'bigip.module.cpu.ratio[{#MODULE.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The ratio of CPU to allocate to this module. Only valid if level is 'custom'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: module
+                -
+                  tag: module
+                  value: '{#MODULE.NAME}'
+            -
+              uuid: eaeb7bc1225b48689124c373b04fc56f
+              name: 'F5 BIG-IP: Module [{#MODULE.NAME}]: Disk ratio'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.11.1.2.1.5.{#SNMPINDEX}'
+              key: 'bigip.module.disk.ratio[{#MODULE.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The ratio of available disk space to allocate to this module. Only valid if level is 'custom'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: module
+                -
+                  tag: module
+                  value: '{#MODULE.NAME}'
+            -
+              uuid: b384a7e297f844c89cc40c486e0c69db
+              name: 'F5 BIG-IP: Module [{#MODULE.NAME}]: Memory ratio'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.11.1.2.1.3.{#SNMPINDEX}'
+              key: 'bigip.module.memory.ratio[{#MODULE.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The ratio of available memory to allocate. Only valid if level is 'custom'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: module
+                -
+                  tag: module
+                  value: '{#MODULE.NAME}'
+            -
+              uuid: 36dbc22d430e477ab2105323ad8b0850
+              name: 'F5 BIG-IP: Module [{#MODULE.NAME}]: Provision level'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.11.1.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.module.provision.level[{#MODULE.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The provisioning level indicates how the systems resources
+                are distributed amongst the modules
+                Possible values: 1 - none, 2 - minimum, 3 - nominal, 4 - dedicated, 5 - custom.
+              valuemap:
+                name: 'Module provision level'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: module
+                -
+                  tag: module
+                  value: '{#MODULE.NAME}'
+          graph_prototypes:
+            -
+              uuid: cfc1606bfbdd40b095620e32e646e2fd
+              name: 'F5 BIG-IP: Module [{#MODULE.NAME}] resource usage ratio'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.module.memory.ratio[{#MODULE.NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.module.cpu.ratio[{#MODULE.NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.module.disk.ratio[{#MODULE.NAME}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 053063ca377e4438bfa93d08a07adbe9
+          name: 'Network interface discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#IF.NAME},.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.1]'
+          key: bigip.net.discovery
+          delay: 1h
+          description: 'A table containing statistic information of the interfaces on the device.'
+          item_prototypes:
+            -
+              uuid: 87fd58c620c142a99dc810f13b3d109e
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Collisions'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.12.{#SNMPINDEX}'
+              key: 'bigip.net.collisions[{#IF.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of collisions on the specified interface, incremented by the
+                number of collisions experienced during transmissions of a frame
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: 1ddb57921289497fb2c2e4f047f58c02
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming traffic, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.3.{#SNMPINDEX}'
+              key: 'bigip.net.in.bytes.rate[{#IF.NAME}]'
+              history: 7d
+              units: Bps
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The rate of bytes received on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: 45342d637fa440f8b73968a14bf39374
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming packet drops'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.10.{#SNMPINDEX}'
+              key: 'bigip.net.in.drops[{#IF.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of packets dropped on ingress for various reasons on the specified interface.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: 5bc37dde99024866a2a5f97fbce15c2f
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming packet error'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.8.{#SNMPINDEX}'
+              key: 'bigip.net.in.error[{#IF.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of received packets that are either undersized,
+                oversized, or have FCS errors by the specified interface.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: 8aaff266f1b74a81a3eba46d321eb524
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming multicast packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.6.{#SNMPINDEX}'
+              key: 'bigip.net.in.multicast.rate[{#IF.NAME}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The rate of multicast packets received on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: 40e811829adc4715af4e10d223be3bc5
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.2.{#SNMPINDEX}'
+              key: 'bigip.net.in.pkts.rate[{#IF.NAME}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The rate of packets received on this interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: 202717aa54194cf882c86640e73b17af
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Incoming QnQ packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.13.{#SNMPINDEX}'
+              key: 'bigip.net.in.qq.rate[{#IF.NAME}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The rate of double tagged packets received on the specified interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: c98f48ddf6bc46f39ab9aec6cc249fa4
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing traffic, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.5.{#SNMPINDEX}'
+              key: 'bigip.net.out.bytes.rate[{#IF.NAME}]'
+              history: 7d
+              units: Bps
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The rate of bytes transmitted out of the specified interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: b19203459ac842e2b96eee75b6754eac
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing packet drops'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.11.{#SNMPINDEX}'
+              key: 'bigip.net.out.drops[{#IF.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of packets aged out or with excessive transmission
+                delays due to multiple deferrals on the specified interface.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: 1496879429724a6daee4b97fa162419b
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing packet error'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.9.{#SNMPINDEX}'
+              key: 'bigip.net.out.error[{#IF.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The number of excessive collisions, incremented for each
+                frame that experienced 16 collisions during transmission and
+                was aborted on the specified interface.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: 8ecd6a8dd5fa43c8b87a94119aac90b9
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing multicast packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.7.{#SNMPINDEX}'
+              key: 'bigip.net.out.multicast.rate[{#IF.NAME}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The rate of multicast packets transmitted out of the specified interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: fd4416466734469b85eec03c8e69185c
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.4.{#SNMPINDEX}'
+              key: 'bigip.net.out.pkts.rate[{#IF.NAME}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The rate of packets transmitted out of the specified interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: a4cb060cc3854aab9715c85174cc4933
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Outgoing QnQ packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.14.{#SNMPINDEX}'
+              key: 'bigip.net.out.qq.rate[{#IF.NAME}]'
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The rate of double tagged packets transmitted out of the specified interface.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+            -
+              uuid: 93a1107cb0ea44078f2ac04a7dc9e941
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]: Pause state'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.1.2.4.4.3.1.15.{#SNMPINDEX}'
+              key: 'bigip.net.pause[{#IF.NAME}]'
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-SYSTEM-MIB
+                The pause state of the specified interface.
+                none - no pause;
+                txrx - pause all data flow;
+                tx - pause outgoing data flow;
+                rx - pause incoming data flow.
+              valuemap:
+                name: 'Pause state'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: interface
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: interface
+                  value: 'port-{#IF.NAME}'
+          trigger_prototypes:
+            -
+              uuid: 2d9214768b684ba880703d738ac52099
+              expression: 'last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.in.error[{#IF.NAME}],#2) or last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}])>last(/F5 Big-IP SNMP/bigip.net.out.error[{#IF.NAME}],#2)'
+              name: 'F5 BIG-IP: There are errors on the network interface'
+              event_name: 'F5 BIG-IP: There are errors on the network interface ({#IF.NAME})'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: notice
+          graph_prototypes:
+            -
+              uuid: f784ab335a314bd7b328c0fe5053f5f7
+              name: 'F5 BIG-IP: Interface [{#IF.NAME}]'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.net.in.pkts.rate[{#IF.NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  yaxisside: RIGHT
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.net.in.bytes.rate[{#IF.NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.net.out.pkts.rate[{#IF.NAME}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.net.out.bytes.rate[{#IF.NAME}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.net.in.multicast.rate[{#IF.NAME}]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.net.out.multicast.rate[{#IF.NAME}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 4e93191505d148e98b915ed38a681a03
+          name: 'Node discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#NODE.NAME},.1.3.6.1.4.1.3375.2.2.4.2.3.1.20]'
+          key: bigip.node.discovery
+          delay: 1h
+          description: 'A table containing statistic information of node addresses.'
+          item_prototypes:
+            -
+              uuid: 6292623c4482485f9f866be8b7d39367
+              name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Current connections'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.9.{#SNMPINDEX}'
+              key: 'bigip.node.net.conn[{#NODE.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The current connections from server-side to the specified node address.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 9530c81b45c24ddda2440e2589964d28
+              name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Incoming traffic, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.4.{#SNMPINDEX}'
+              key: 'bigip.node.net.in.bytes.rate[{#NODE.NAME}]'
+              delay: 5m
+              history: 7d
+              units: Bps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of bytes received by the specified node address from server-side.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 8e7ae014ea73489b81de960acad301b8
+              name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Incoming packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.3.{#SNMPINDEX}'
+              key: 'bigip.node.net.in.pkts.rate[{#NODE.NAME}]'
+              delay: 5m
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of packets received by the specified node address from server-side.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 88ec665ad6eb43e88a3625b50e130e82
+              name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Outgoing traffic, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.6.{#SNMPINDEX}'
+              key: 'bigip.node.net.out.bytes.rate[{#NODE.NAME}]'
+              delay: 5m
+              history: 7d
+              units: Bps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of bytes sent to server-side from the specified node address.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 077bb28cd8a1429fb564786e7d150dbc
+              name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Outgoing packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.5.{#SNMPINDEX}'
+              key: 'bigip.node.net.out.pkts.rate[{#NODE.NAME}]'
+              delay: 5m
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of packets sent to server-side from the specified node address.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 5a0278f4cfd04611895207d9b7f3b13c
+              name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Current sessions'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.21.{#SNMPINDEX}'
+              key: 'bigip.node.net.sessions[{#NODE.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The number of current sessions going through the specified node address.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 15129cb2af84466d8c58641854ad0b54
+              name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Connections hit a rate limit'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.22.{#SNMPINDEX}'
+              key: 'bigip.node.overlimit[{#NODE.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The last recorded value for the number of connections to the node address when connections hit a rate limit;
+                this calculation is only maintained if rate limiting is configured for the node.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+            -
+              uuid: 6be4c0fd41d6459db5acd6c33461c7f9
+              name: 'F5 BIG-IP: Node [{#NODE.NAME}]: Duration of exceeding rate limit'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.4.2.3.1.23.{#SNMPINDEX}'
+              key: 'bigip.node.overtime[{#NODE.NAME}]'
+              delay: 5m
+              history: 7d
+              units: s
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                Duration of time in seconds the specified node address has exceeded the
+                configured connection rate limit.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: node
+                -
+                  tag: node
+                  value: '{#NODE.NAME}'
+          graph_prototypes:
+            -
+              uuid: 920bf6830fae4d168a3d9fc772a8f25c
+              name: 'F5 BIG-IP: Node [{#NODE.NAME}] network ratio'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.node.net.in.pkts.rate[{#NODE.NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  yaxisside: RIGHT
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.node.net.in.bytes.rate[{#NODE.NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.node.net.out.pkts.rate[{#NODE.NAME}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.node.net.out.bytes.rate[{#NODE.NAME}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 45e61df153b94d4bad42503e9221e44c
+          name: 'Pool discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#POOL.NAME},.1.3.6.1.4.1.3375.2.2.5.2.3.1.1]'
+          key: bigip.pool.discovery
+          delay: 1h
+          description: 'A table containing statistic information of pools.'
+          item_prototypes:
+            -
+              uuid: a2668f5ffc604a61953cb87f0afe4e6f
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Status available'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.3375.2.2.5.5.2.1.2.{#SNMPINDEX}'
+              key: 'bigip.pool.available[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                none(0),
+                green(1),
+                tyellow(2),
+                tred(3),
+                tblue(4),
+                tgrey(5)
+              valuemap:
+                name: 'SNMP ltmVsStatusAvailState'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 0b6e708075684cbab0d8c598f3467e0c
+                  expression: 'count(/F5 Big-IP SNMP/bigip.pool.available[{#POOL.NAME}],120m,"ne","1")>20'
+                  name: 'F5 BIG-IP: Pool {#POOL.NAME} is not available in some capacity: {ITEM.VALUE1}'
+                  opdata: '{ITEM.LASTVALUE}'
+                  priority: AVERAGE
+                  dependencies:
+                    -
+                      name: 'F5 BIG-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}'
+                      expression: 'count(/F5 Big-IP SNMP/bigip.pool.enabled[{#POOL.NAME}],120m,"ne","1")>4'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+            -
+              uuid: 391d21a1a44d49d4beb219b726e0f55e
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Status enabled'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.3375.2.2.5.5.2.1.3.{#SNMPINDEX}'
+              key: 'bigip.pool.enabled[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The activity status of the specified pool, as specified by the user.
+                none(0),
+                enabled(1),
+                disabled(2),
+                disabledbyparent(3)
+              valuemap:
+                name: 'SNMP ltmPoolStatusEnabledState'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 4d0431e2c4934f37be7302ffedd69e8a
+                  expression: 'count(/F5 Big-IP SNMP/bigip.pool.enabled[{#POOL.NAME}],120m,"ne","1")>4'
+                  name: 'F5 BIG-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}'
+                  opdata: '{ITEM.LASTVALUE}'
+                  priority: AVERAGE
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+            -
+              uuid: 0c53c6f3ab9e49b688a8e97252471ded
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Current connections'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.8.{#SNMPINDEX}'
+              key: 'bigip.pool.net.conn[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The current connections from server-side to the specified pool.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+            -
+              uuid: e6daed4f364c463dba542948b2272296
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Incoming traffic, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.3.{#SNMPINDEX}'
+              key: 'bigip.pool.net.in.bytes.rate[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              units: Bps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of bytes received by the specified pool from server-side.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+            -
+              uuid: b65e8d23fa3b4129936f0f3d7034c8a4
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Incoming packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.2.{#SNMPINDEX}'
+              key: 'bigip.pool.net.in.pkts.rate[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of packets received by the specified pool from server-side.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+            -
+              uuid: 6c58f56d63e34166b02ad7c31271e2bb
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Outgoing traffic, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.5.{#SNMPINDEX}'
+              key: 'bigip.pool.net.out.bytes.rate[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              units: Bps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of bytes sent to server-side from the specified pool.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+            -
+              uuid: e432732fc4dd478892c6d4bab3fbd11c
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Outgoing packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.4.{#SNMPINDEX}'
+              key: 'bigip.pool.net.out.pkts.rate[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of packets sent to server-side from the specified pool.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+            -
+              uuid: 068028e704f049b4b3daae524fe16d27
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Current sessions'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.31.{#SNMPINDEX}'
+              key: 'bigip.pool.net.sessions[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The number of current sessions going through the specified pool.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+            -
+              uuid: 6bacc7e284f14aa7804f69c8b2f744d4
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Age of the oldest queue entry'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.19.{#SNMPINDEX}'
+              key: 'bigip.pool.queue.age[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              units: s
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                Age of the oldest queue entry, max.
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+            -
+              uuid: 44ad195489cd46be87ae8cc029bcb480
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}]: Queue'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.5.2.3.1.18.{#SNMPINDEX}'
+              key: 'bigip.pool.queue[{#POOL.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                Number of connections currently in queue, sum.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: pool
+                -
+                  tag: pool
+                  value: '{#POOL.NAME}'
+          graph_prototypes:
+            -
+              uuid: a077af6d72a447a99a35f2daa8b0205e
+              name: 'F5 BIG-IP: Pool [{#POOL.NAME}] network ratio'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.pool.net.in.pkts.rate[{#POOL.NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  yaxisside: RIGHT
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.pool.net.in.bytes.rate[{#POOL.NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.pool.net.out.pkts.rate[{#POOL.NAME}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.pool.net.out.bytes.rate[{#POOL.NAME}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 6bb0a20248ba473b91a9b4a4261229a7
+          name: 'Virtual server discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#VSERVER.NAME},.1.3.6.1.4.1.3375.2.2.10.2.3.1.1]'
+          key: bigip.virtual_server.discovery
+          delay: 1h
+          description: 'A table containing information of virtual servers.'
+          item_prototypes:
+            -
+              uuid: 28ecf3f03cad44bda0e6243bb02e2ae4
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Current connections'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.12.{#SNMPINDEX}'
+              key: 'bigip.vserver.net.conn[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The current connections from client-side to the specified virtual server.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+            -
+              uuid: 206503cc777a4156a29f0687d8fb5a7c
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Incoming traffic, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7.{#SNMPINDEX}'
+              key: 'bigip.vserver.net.in.bytes.rate[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              units: Bps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of bytes received by the specified virtual server from client-side.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+            -
+              uuid: d8a36a30d99c44ca9b7172a5b66e74d6
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Incoming packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.6.{#SNMPINDEX}'
+              key: 'bigip.vserver.net.in.pkts.rate[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of packets received by the specified virtual server from client-side.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+            -
+              uuid: efeb720fb7e44d068572d59eff947bc6
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Outgoing traffic, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9.{#SNMPINDEX}'
+              key: 'bigip.vserver.net.out.bytes.rate[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              units: Bps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of bytes sent to client-side from the specified virtual server.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+            -
+              uuid: bd588ea58eb4420085691046fa0a1e3b
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Outgoing packet, rate'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.8.{#SNMPINDEX}'
+              key: 'bigip.vserver.net.out.pkts.rate[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              units: pps
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The rate of packets sent to client-side from the specified virtual server.
+              preprocessing:
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+            -
+              uuid: 01352ac9b6c24f13a6ceebac666026cb
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Connections hit a rate limit'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.34.{#SNMPINDEX}'
+              key: 'bigip.vserver.overlimit[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The last recorded value for the number of connections to the virtual server when connections hit a rate limit;
+                this calculation is only maintained if rate limiting is configured for the service.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+            -
+              uuid: baa7718513a54ae4a7bd669f9b652521
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Duration of exceeding rate limit'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.35.{#SNMPINDEX}'
+              key: 'bigip.vserver.overtime[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              units: s
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                Duration of time in seconds the specified virtual server has exceeded the configured connection rate limit.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+            -
+              uuid: 3e97e22368b84674a9720c3f076503c5
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 1m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.32.{#SNMPINDEX}'
+              key: 'bigip.vserver.usage.1m[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The percentage of time Virtual Server was busy over the last 1 minute.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+            -
+              uuid: 2c8c5e0e53e34e4ebc84ed9e5a8c4bd9
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 5m'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.33.{#SNMPINDEX}'
+              key: 'bigip.vserver.usage.5m[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The percentage of time Virtual Server was busy over the last 5 minutes.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+            -
+              uuid: d6079ebaebbb40d09386e2b1abcbe987
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}]: Usage ratio, avg 5s'
+              type: SNMP_AGENT
+              snmp_oid: '.1.3.6.1.4.1.3375.2.2.10.2.3.1.31.{#SNMPINDEX}'
+              key: 'bigip.vserver.usage.5s[{#VSERVER.NAME}]'
+              delay: 5m
+              history: 7d
+              units: '%'
+              description: |
+                MIB: F5-BIGIP-LOCAL-MIB
+                The percentage of time Virtual Server was busy over the last 5 seconds.
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: network
+                -
+                  tag: component
+                  value: virtual-server
+                -
+                  tag: virtual-server
+                  value: '{#VSERVER.NAME}'
+          graph_prototypes:
+            -
+              uuid: b49ee8a27f634c238317663d7cc9d426
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}] network'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.vserver.net.in.pkts.rate[{#VSERVER.NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  yaxisside: RIGHT
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.vserver.net.in.bytes.rate[{#VSERVER.NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.vserver.net.out.pkts.rate[{#VSERVER.NAME}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  yaxisside: RIGHT
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.vserver.net.out.bytes.rate[{#VSERVER.NAME}]'
+            -
+              uuid: 17d18d4117f943d18873972584f3374e
+              name: 'F5 BIG-IP: Virtual server [{#VSERVER.NAME}] usage ratio'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.vserver.usage.5s[{#VSERVER.NAME}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.vserver.usage.1m[{#VSERVER.NAME}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'F5 Big-IP SNMP'
+                    key: 'bigip.vserver.usage.5m[{#VSERVER.NAME}]'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: big-ip
+        -
+          tag: target
+          value: f5
+      macros:
+        -
+          macro: '{$BIGIP.CERT.MIN}'
+          value: '7'
+          description: 'Minimum number of days before certificate expiration.'
+        -
+          macro: '{$BIGIP.CPU.UTIL.WARN.MAX}'
+          value: '85'
+          description: 'The warning threshold of the CPU utilization in %.'
+        -
+          macro: '{$BIGIP.CPU.UTIL.WARN.MIN}'
+          value: '65'
+          description: 'The recovery threshold of the CPU utilization in %.'
+        -
+          macro: '{$BIGIP.FS.FREE.WARN.MAX}'
+          value: '20'
+          description: 'The recovery threshold of the file system utilization in %.'
+        -
+          macro: '{$BIGIP.FS.FREE.WARN.MIN}'
+          value: '10'
+          description: 'The warning threshold of the file system utilization in %.'
+        -
+          macro: '{$BIGIP.LLD.FILTER.PART.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable mount point names.'
+        -
+          macro: '{$BIGIP.LLD.FILTER.PART.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered by mount point names.'
+        -
+          macro: '{$BIGIP.MEMORY.UTIL.WARN.MAX}'
+          value: '85'
+          description: 'The warning threshold of the memory utilization in %.'
+        -
+          macro: '{$BIGIP.MEMORY.UTIL.WARN.MIN}'
+          value: '65'
+          description: 'The recovery threshold of the memory utilization in %.'
+        -
+          macro: '{$BIGIP.SWAP.UTIL.WARN.MAX}'
+          value: '85'
+          description: 'The warning threshold of the swap utilization in %.'
+        -
+          macro: '{$BIGIP.SWAP.UTIL.WARN.MIN}'
+          value: '65'
+          description: 'The recovery threshold of the swap utilization in %.'
+        -
+          macro: '{$BIGIP.TEMP.HIGH}'
+          value: '50'
+          description: 'The critical threshold of the temperature in °C'
+        -
+          macro: '{$BIGIP.TEMP.WARN}'
+          value: '45'
+          description: 'The warning threshold of the temperature in °C'
+        -
+          macro: '{$SNMP.TIMEOUT}'
+          value: 5m
+          description: 'The time interval for SNMP agent availability trigger expression.'
+      valuemaps:
+        -
+          uuid: 849febb31f524e9296afc5ec6ffb2fe3
+          name: 'Chassis status'
+          mappings:
+            -
+              value: '0'
+              newvalue: bad
+            -
+              value: '1'
+              newvalue: good
+            -
+              value: '2'
+              newvalue: notpresent
+        -
+          uuid: ed7e1317987b433e9aa7168db3824c94
+          name: 'Module provision level'
+          mappings:
+            -
+              value: '1'
+              newvalue: none
+            -
+              value: '2'
+              newvalue: minimum
+            -
+              value: '3'
+              newvalue: nominal
+            -
+              value: '4'
+              newvalue: dedicated
+            -
+              value: '5'
+              newvalue: custom
+        -
+          uuid: 6e590fa7db7441d5a4b145204ee254bb
+          name: 'Pause state'
+          mappings:
+            -
+              value: '0'
+              newvalue: none
+            -
+              value: '1'
+              newvalue: txrx
+            -
+              value: '2'
+              newvalue: tx
+            -
+              value: '3'
+              newvalue: rx
+        -
+          uuid: b615a47192fc48f4b2cedb205c33f7d0
+          name: 'SNMP available'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'not available'
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: unknown
+        -
+          uuid: 74bcf04a70da49f89f04a20a9830fe13
+          name: 'SNMP ltmPoolStatusEnabledState'
+          mappings:
+            -
+              value: '0'
+              newvalue: none
+            -
+              value: '1'
+              newvalue: enabled
+            -
+              value: '2'
+              newvalue: disabled
+            -
+              value: '3'
+              newvalue: disabledbyparent
+        -
+          uuid: 3a8776175b1f4cd7aa62f0182c7e3ed7
+          name: 'SNMP ltmVsStatusAvailState'
+          mappings:
+            -
+              value: '0'
+              newvalue: none
+            -
+              value: '1'
+              newvalue: green
+            -
+              value: '2'
+              newvalue: yellow
+            -
+              value: '3'
+              newvalue: red
+            -
+              value: '4'
+              newvalue: blue
+            -
+              value: '5'
+              newvalue: gray
+        -
+          uuid: 6f96920248994bca92eb8d4394346027
+          name: 'SNMP sysCmFailoverStatusId'
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: offline
+            -
+              value: '2'
+              newvalue: forcedOffline
+            -
+              value: '3'
+              newvalue: standby
+            -
+              value: '4'
+              newvalue: active
+        -
+          uuid: 1a42ed91b734453ab29a4c1f1feaca89
+          name: 'SNMP sysCmSyncStatusId'
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: syncing
+            -
+              value: '2'
+              newvalue: needManualSync
+            -
+              value: '3'
+              newvalue: inSync
+            -
+              value: '4'
+              newvalue: syncFailed
+            -
+              value: '5'
+              newvalue: syncDisconnected
+            -
+              value: '6'
+              newvalue: standalone
+            -
+              value: '7'
+              newvalue: awaitingInitialSync
+            -
+              value: '8'
+              newvalue: incompatibleVersion
+            -
+              value: '9'
+              newvalue: partialSync
+  graphs:
+    -
+      uuid: 9530ea135466433cb25f73ed78960960
+      name: 'F5 BIG-IP: TCP/UDP statistics'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'F5 Big-IP SNMP'
+            key: bigip.tcp.open
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'F5 Big-IP SNMP'
+            key: bigip.udp.open
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'F5 Big-IP SNMP'
+            key: bigip.tcp.close_wait
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'F5 Big-IP SNMP'
+            key: bigip.tcp.fin1_wait
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'F5 Big-IP SNMP'
+            key: bigip.tcp.fin2_wait
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'F5 Big-IP SNMP'
+            key: bigip.tcp.time_wait

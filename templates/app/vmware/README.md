@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template to monitor VMware vCenter and ESX hypervisor.
 The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
 For additional information please check https://www.zabbix.com/documentation/6.0/manual/vm_monitoring
@@ -27,12 +27,17 @@ For additional information please check https://www.zabbix.com/documentation/6.0
 
 No specific Zabbix configuration is required.
 
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
+|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
+|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
 
 ## Template links
 
-|Name|
-|----|
-|VMware macros |
+There are no template links in this template.
 
 ## Discovery rules
 
@@ -65,13 +70,13 @@ No specific Zabbix configuration is required.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/).
 
 # VMware Guest
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -81,20 +86,25 @@ Refer to the vendor documentation.
 
 No specific Zabbix configuration is required.
 
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
+|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
+|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
 
 ## Template links
 
-|Name|
-|----|
-|VMware macros |
+There are no template links in this template.
 
 ## Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Network device discovery |<p>Discovery of all network devices.</p> |SIMPLE |vmware.vm.net.if.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |Disk device discovery |<p>Discovery of all disk devices.</p> |SIMPLE |vmware.vm.vfs.dev.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |Mounted filesystem discovery |<p>Discovery of all guest file systems.</p> |SIMPLE |vmware.vm.vfs.fs.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|Network device discovery |<p>Discovery of all network devices.</p> |SIMPLE |vmware.vm.net.if.discovery[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 
 ## Items collected
 
@@ -125,7 +135,7 @@ No specific Zabbix configuration is required.
 |VMware |VMware: CPU usage in percents |<p>CPU usage as a percentage during the interval.</p> |SIMPLE |vmware.vm.cpu.usage.perf[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: CPU latency in percents |<p>Percentage of time the virtual machine is unable to run because it is contending for access to the physical CPU(s).</p> |SIMPLE |vmware.vm.cpu.latency[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: CPU readiness latency in percents |<p>Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU.</p> |SIMPLE |vmware.vm.cpu.readiness[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
-|VMware |VMware: CPU swap-in latence in percents |<p>Percentage of CPU time spent waiting for swap-in.</p> |SIMPLE |vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
+|VMware |VMware: CPU swap-in latency in percents |<p>Percentage of CPU time spent waiting for swap-in.</p> |SIMPLE |vmware.vm.cpu.swapwait[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: Uptime of guest OS |<p>Total time elapsed since the last operating system boot-up (in seconds).</p> |SIMPLE |vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}] |
 |VMware |VMware: Number of bytes received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (bytes per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},bps] |
 |VMware |VMware: Number of packets received on interface {#IFDESC} |<p>VMware virtual machine network interface input statistics (packets per second).</p> |SIMPLE |vmware.vm.net.if.in[{$VMWARE.URL},{$VMWARE.VM.UUID},{#IFNAME},pps] |
@@ -149,7 +159,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: VM has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: VM has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
 
 ## Feedback
 
@@ -159,7 +169,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 
 ## Setup
 
@@ -169,18 +179,24 @@ Refer to the vendor documentation.
 
 No specific Zabbix configuration is required.
 
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
+|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
+|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
 
 ## Template links
 
-|Name|
-|----|
-|VMware macros |
+There are no template links in this template.
 
 ## Discovery rules
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Datastore discovery |<p>-</p> |SIMPLE |vmware.hv.datastore.discovery[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
+|Healthcheck discovery |<p>VMware Rollup Health State sensor discovery</p> |DEPENDENT |vmware.hv.healthcheck.discovery<p>**Preprocessing**:</p><p>- JSONPATH: `$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")]`</p><p>- JAVASCRIPT: `return JSON.stringify(value != "[]" ? [{'{#SINGLETON}': ''}] : []);`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 
 ## Items collected
 
@@ -207,7 +223,6 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Used memory |<p>Physical memory usage on the host.</p> |SIMPLE |vmware.hv.memory.used[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
 |VMware |VMware: Number of bytes received |<p>VMware hypervisor network input statistics (bytes per second).</p> |SIMPLE |vmware.hv.network.in[{$VMWARE.URL},{$VMWARE.HV.UUID},bps] |
 |VMware |VMware: Number of bytes transmitted |<p>VMware hypervisor network output statistics (bytes per second).</p> |SIMPLE |vmware.hv.network.out[{$VMWARE.URL},{$VMWARE.HV.UUID},bps] |
-|VMware |VMware: Health state rollup |<p>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p> |SIMPLE |vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
 |VMware |VMware: Overall status |<p>The overall alarm status of the host: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p> |SIMPLE |vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
 |VMware |VMware: Uptime |<p>System uptime.</p> |SIMPLE |vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
 |VMware |VMware: Version |<p>Dot-separated version string.</p> |SIMPLE |vmware.hv.version[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
@@ -217,61 +232,20 @@ No specific Zabbix configuration is required.
 |VMware |VMware: Total size of datastore {#DATASTORE} |<p>VMware datastore space in bytes.</p> |SIMPLE |vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}] |
 |VMware |VMware: Average write latency of the datastore {#DATASTORE} |<p>Average amount of time for a write operation to the datastore (milliseconds).</p> |SIMPLE |vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency] |
 |VMware |VMware: Multipath count for datastore {#DATASTORE} |<p>Number of available datastore paths.</p> |SIMPLE |vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}] |
+|VMware |VMware: Health state rollup |<p>The host health state rollup sensor value: gray - unknown, green - ok, red - it has a problem, yellow - it might have a problem.</p> |DEPENDENT |vmware.hv.sensor.health.state[{#SINGLETON}]<p>**Preprocessing**:</p><p>- JSONPATH: `$..HostNumericSensorInfo[?(@.name=="VMware Rollup Health State")].healthState.label.first()`</p> |
+|Zabbix raw items |VMware: Get sensors |<p>Master item for sensors data.</p> |SIMPLE |vmware.hv.sensors.get[{$VMWARE.URL},{$VMWARE.HV.UUID}] |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|VMware: Hypervisor is down |<p>The service is unavailable or does not accept ICMP ping.</p> |`{TEMPLATE_NAME:icmpping[].last()}=0` |AVERAGE |<p>Manual close: YES</p> |
-|VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3` |HIGH |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
-|VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.sensor.health.state[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Yellow</p> |
-|VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=3` |HIGH | |
-|VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`{TEMPLATE_NAME:vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
-|VMware: Hypervisor has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`{TEMPLATE_NAME:vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}].last()}<10m` |WARNING |<p>Manual close: YES</p> |
-|VMware: The multipath count has been changed |<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p> |`{TEMPLATE_NAME:vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}].diff()}=1 and {TEMPLATE_NAME:vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}].last()}<{#MULTIPATH.COUNT}` |AVERAGE |<p>Manual close: YES</p> |
-
-## Feedback
-
-Please report any issues with the template at https://support.zabbix.com
-
-# VMware macros
-
-## Overview
-
-For Zabbix version: 5.4 and higher  
-
-## Setup
-
-Refer to the vendor documentation.
-
-## Zabbix configuration
-
-No specific Zabbix configuration is required.
-
-### Macros used
-
-|Name|Description|Default|
-|----|-----------|-------|
-|{$VMWARE.PASSWORD} |<p>VMware service {$USERNAME} user password</p> |`` |
-|{$VMWARE.URL} |<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p> |`` |
-|{$VMWARE.USERNAME} |<p>VMware service user name</p> |`` |
-
-## Template links
-
-There are no template links in this template.
-
-## Discovery rules
-
-
-## Items collected
-
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-
-## Triggers
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
+|VMware: Hypervisor is down |<p>The service is unavailable or does not accept ICMP ping.</p> |`last(/VMware Hypervisor/icmpping[])=0` |AVERAGE |<p>Manual close: YES</p> |
+|VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=3` |HIGH | |
+|VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`last(/VMware Hypervisor/vmware.hv.status[{$VMWARE.URL},{$VMWARE.HV.UUID}])=2` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
+|VMware: Hypervisor has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m` |WARNING |<p>Manual close: YES</p> |
+|VMware: The multipath count has been changed |<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p> |`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}` |AVERAGE |<p>Manual close: YES</p> |
+|VMware: The {$VMWARE.HV.UUID} health is Red |<p>One or more components in the appliance might be in an unusable status and the appliance might become unresponsive soon. Security patches might be available.</p> |`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Red"` |HIGH |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p> |
+|VMware: The {$VMWARE.HV.UUID} health is Yellow |<p>One or more components in the appliance might become overloaded soon.</p> |`last(/VMware Hypervisor/vmware.hv.sensor.health.state[{#SINGLETON}])="Yellow"` |AVERAGE |<p>**Depends on**:</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Red</p><p>- VMware: The {$VMWARE.HV.UUID} health is Yellow</p> |
 
 ## Feedback
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,8 +45,6 @@ typedef struct
 zbx_ifrow_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ifrow_init                                                   *
  *                                                                            *
  * Purpose: initialize the zbx_ifrow_t variable                               *
  *                                                                            *
@@ -93,8 +91,6 @@ static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ifrow_clean                                                  *
- *                                                                            *
  * Purpose: clean the zbx_ifrow_t variable                                    *
  *                                                                            *
  * Parameters:                                                                *
@@ -110,8 +106,6 @@ static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ifrow_call_get_if_entry                                      *
  *                                                                            *
  * Purpose: call either GetIfEntry() or GetIfEntry2() based on the Windows    *
  *          release to fill the passed MIB interface structure.               *
@@ -264,8 +258,6 @@ static ULONG64	zbx_ifrow_get_out_discards(const zbx_ifrow_t *pIfRow)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ifrow_get_utf8_description                                   *
- *                                                                            *
  * Purpose: returns interface description encoded in UTF-8 format             *
  *                                                                            *
  * Parameters:                                                                *
@@ -306,8 +298,6 @@ static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ifrow_get_guid_str                                           *
  *                                                                            *
  * Purpose: returns interface GUID in string format                           *
  *                                                                            *

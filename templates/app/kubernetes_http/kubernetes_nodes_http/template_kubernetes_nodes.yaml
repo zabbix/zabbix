@@ -1,0 +1,1987 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-15T08:11:32Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: f397be2340734d24bc666102fbe184a5
+      template: 'Kubernetes nodes by HTTP'
+      name: 'Kubernetes nodes by HTTP'
+      description: |
+        Get Kubernetes nodes metrics by HTTP.
+        Metrics are collected by requests to Kubernetes API.
+        
+        Don't forget to read the README.md for the correct setup of the template.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 70dab03a327a4dc0ab9fe8031052584d
+          name: 'Kubernetes: Get nodes'
+          type: SCRIPT
+          key: kube.nodes
+          delay: 0;s00
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Kube = {
+                  params: {},
+                  pods_limit: 1000,
+            
+                  setParams: function (params) {
+                      ['api_endpoint', 'token', 'endpoint_name'].forEach(function (field) {
+                          if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                              || params[field] === '') {
+                              throw 'Required param is not set: "' + field + '".';
+                          }
+                      });
+            
+                      Kube.params = params;
+                      if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
+                          Kube.params.api_endpoint += '/';
+                      }
+                  },
+            
+                  request: function (query) {
+                      var response,
+                          request = new HttpRequest(),
+                          url = Kube.params.api_endpoint + query;
+            
+                      request.addHeader('Content-Type: application/json');
+                      request.addHeader('Authorization: Bearer ' + Kube.params.token);
+            
+                      Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                      response = request.get(url);
+            
+                      Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                      if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                          throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                      }
+            
+                      if (response !== null) {
+                          try {
+                              response = JSON.parse(response);
+                          }
+                          catch (error) {
+                              throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                          }
+                      }
+            
+                      return {
+                          status: request.getStatus(),
+                          response: response
+                      };
+                  },
+            
+                  getNodes: function () {
+                      var result = Kube.request('v1/nodes');
+            
+                      if (typeof result.response !== 'object'
+                          || typeof result.response.items === 'undefined'
+                          || result.status != 200) {
+                          throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
+                      };
+            
+                      return result.response;
+                  },
+            
+                  getPods: function () {
+                      var result = [],
+                          continue_token;
+            
+                      while (continue_token !== '') {
+                          var data = Kube.request('v1/pods?limit=' + Kube.pods_limit
+                              + ((typeof continue_token !== 'undefined') ? '&continue=' + continue_token : ''));
+            
+                          if (typeof data.response !== 'object'
+                              || typeof data.response.items === 'undefined'
+                              || data.status != 200) {
+                              throw 'Cannot get pods from Kubernetes API. Check debug log for more information.';
+                          };
+            
+                          result.push.apply(result, data.response.items);
+                          continue_token = data.response.metadata.continue || '';
+                      }
+            
+                      return result;
+                  },
+            
+                  getEndpointIPs: function () {
+                      var result = Kube.request('v1/endpoints'),
+                          epIPs = {};
+            
+                      if (typeof result.response !== 'object'
+                          || typeof result.response.items === 'undefined'
+                          || result.status != 200) {
+                          throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
+                      };
+            
+                      result.response.items.forEach(function (ep) {
+                          if (ep.metadata.name === Kube.params.endpoint_name && Array.isArray(ep.subsets)) {
+                              ep.subsets.forEach(function (subset) {
+                                  if (Array.isArray(subset.addresses)) {
+                                      subset.addresses.forEach(function (addr) {
+                                          epIPs[addr.ip] = '';
+                                      });
+                                  }
+                              });
+                          }
+                      });
+            
+                      return epIPs;
+                  }
+              },
+            
+                  Fmt = {
+                      factors: {
+                          Ki: 1024, K: 1000,
+                          Mi: 1024 ** 2, M: 1000 ** 2,
+                          Gi: 1024 ** 3, G: 1000 ** 3,
+                          Ti: 1024 ** 4, T: 1000 ** 4,
+                      },
+            
+                      cpuFormat: function (cpu) {
+                          if (typeof cpu === 'undefined') {
+                              return 0;
+                          }
+            
+                          if (cpu.indexOf('m') > -1) {
+                              return parseInt(cpu) / 1000;
+                          }
+            
+                          return parseInt(cpu);
+                      },
+            
+                      memoryFormat: function (mem) {
+                          if (typeof mem === 'undefined') {
+                              return 0;
+                          }
+            
+                          var pair,
+                              factor;
+            
+                          if (pair = mem.match(/(\d+)(\w*)/)) {
+                              if (factor = Fmt.factors[pair[2]]) {
+                                  return parseInt(pair[1]) * factor;
+                              }
+            
+                              return mem;
+                          }
+            
+                          return parseInt(mem);
+                      }
+            
+                  }
+            
+              try {
+                  Kube.setParams(JSON.parse(value));
+            
+                  var nodes = Kube.getNodes(),
+                      pods = Kube.getPods(),
+                      epIPs = Kube.getEndpointIPs();
+            
+                  for (idx in nodes.items) {
+                      var internalIP,
+                          nodePodsCount = 0,
+                          nodePods = [],
+                          roles = [];
+            
+                      Object.keys(nodes.items[idx].metadata.labels).forEach(function (label) {
+                          var splitLabel = label.match(/^node-role.kubernetes.io\/([\w\.-]+)/);
+            
+                          if (splitLabel) {
+                              roles.push(splitLabel[1]);
+                          }
+                      });
+            
+                      var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
+                          return addr.type === 'InternalIP';
+                      });
+            
+                      var internalIP = internalIPs.length && internalIPs[0].address;
+            
+                      pods.forEach(function (pod) {
+                          var containers = {
+                              limits: { cpu: 0, memory: 0 },
+                              requests: { cpu: 0, memory: 0 },
+                              restartCount: 0
+                          }
+            
+                          if (pod.status.hostIP === internalIP) {
+                              pod.spec.containers.forEach(function (container) {
+                                  var limits = container.resources.limits,
+                                      requests = container.resources.requests;
+            
+                                  nodePodsCount++;
+            
+                                  if (typeof limits !== 'undefined') {
+                                      containers.limits.cpu += Fmt.cpuFormat(limits.cpu);
+                                      containers.limits.memory += Fmt.memoryFormat(limits.memory);
+                                  }
+            
+                                  if (typeof requests !== 'undefined') {
+                                      containers.requests.cpu += Fmt.cpuFormat(requests.cpu);
+                                      containers.requests.memory += Fmt.memoryFormat(requests.memory);
+                                  }
+                              });
+            
+                              pod.status.containerStatuses.forEach(function (container) {
+                                  containers.restartCount += container.restartCount;
+                              });
+            
+                              nodePods.push({
+                                  name: pod.metadata.name,
+                                  namespace: pod.metadata.namespace,
+                                  labels: pod.metadata.labels,
+                                  annotations: pod.metadata.annotations,
+                                  phase: pod.status.phase,
+                                  conditions: pod.status.conditions,
+                                  startTime: pod.status.startTime,
+                                  containers: containers
+                              })
+                          }
+                      })
+                      delete nodes.items[idx].metadata.managedFields;
+                      delete nodes.items[idx].status.images;
+            
+                      nodes.items[idx].status.capacity.cpu = Fmt.cpuFormat(nodes.items[idx].status.capacity.cpu);
+                      nodes.items[idx].status.capacity.memory = Fmt.memoryFormat(nodes.items[idx].status.capacity.memory);
+                      nodes.items[idx].status.allocatable.cpu = Fmt.cpuFormat(nodes.items[idx].status.allocatable.cpu);
+                      nodes.items[idx].status.allocatable.memory = Fmt.memoryFormat(nodes.items[idx].status.allocatable.memory);
+            
+                      nodes.items[idx].status.podsCount = nodePodsCount;
+                      nodes.items[idx].status.roles = roles.join(', ');
+                      nodes.items[idx].pods = nodePods;
+                  }
+            
+                  nodes.endpointIPs = epIPs;
+            
+                  return JSON.stringify(nodes);
+              }
+              catch (error) {
+                  error += (String(error).endsWith('.')) ? '' : '.';
+                  Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
+                  return JSON.stringify({ error: error });
+              }
+          description: 'Collecting and processing cluster nodes data via Kubernetes API.'
+          timeout: 10s
+          parameters:
+            -
+              name: api_endpoint
+              value: '{$KUBE.API.ENDPOINT.URL}'
+            -
+              name: token
+              value: '{$KUBE.API.TOKEN}'
+            -
+              name: endpoint_name
+              value: '{$KUBE.NODES.ENDPOINT.NAME}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: f78df5e88780418b894017086f8d9641
+          name: 'Get nodes check'
+          type: DEPENDENT
+          key: kube.nodes.check
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Data collection check.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: kube.nodes
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 827016cf41254f38aa58ff99e22f9e6f
+              expression: 'length(last(/Kubernetes nodes by HTTP/kube.nodes.check))>0'
+              name: 'Kubernetes: Failed to get nodes'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: e0b213a441a740e98b8405fd303e0683
+          name: 'Node LLD'
+          type: DEPENDENT
+          key: kube.nodes.lld
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Generation of data for node discovery rules.'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function parseFilters(filter) {
+                      var pairs = {};
+                  
+                      filter.split(/\s*,\s*/).forEach(function (kv) {
+                          if (/([\w\.-]+\/[\w\.-]+):\s*.+/.test(kv)) {
+                              var pair = kv.split(/\s*:\s*/);
+                              pairs[pair[0]] = pair[1];
+                          }
+                      });
+                  
+                      return pairs;
+                  }
+                  
+                  function filter(name, data, filters) {
+                      var filtered = true;
+                  
+                      if (typeof data === 'object') {
+                          Object.keys(filters).some(function (filter) {
+                              var exclude = filter.match(/^!(.+)/);
+                              if (filter in data || (exclude && exclude[1] in data)) {
+                                  if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
+                                      || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
+                                      Zabbix.log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
+                  
+                                      filtered = false;
+                                      return true;
+                                  }
+                              };
+                          });
+                      }
+                  
+                      return filtered;
+                  }
+                  
+                  try {
+                      var input = JSON.parse(value),
+                          output = [];
+                  
+                      if (typeof input !== 'object' || typeof input.items === 'undefined') {
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
+                          throw 'Incorrect JSON. Check debug log for more information.';
+                      }
+                  
+                      var filterLabels = parseFilters('{$KUBE.NODE.FILTER.LABELS}'),
+                          filterAnnotations = parseFilters('{$KUBE.NODE.FILTER.ANNOTATIONS}');
+                  
+                      input.items.forEach(function (node) {
+                          if (filter(node.metadata.name, node.metadata.labels, filterLabels)
+                              && filter(node.metadata.name, node.metadata.annotations, filterAnnotations)) {
+                              Zabbix.log(4, '[ Kubernetes discovery ] Filtered node "' + node.metadata.name + '"');
+                  
+                              var internalIPs = node.status.addresses.filter(function (addr) {
+                                  return addr.type === 'InternalIP';
+                              });
+                  
+                              var internalIP = internalIPs.length && internalIPs[0].address;
+                  
+                              if (internalIP in input.endpointIPs) {
+                                  output.push({
+                                      '{#NAME}': node.metadata.name,
+                                      '{#IP}': internalIP,
+                                      '{#ROLES}': node.status.roles,
+                                      '{#ARCH}': node.metadata.labels['kubernetes.io/arch'] || '',
+                                      '{#OS}': node.metadata.labels['kubernetes.io/os'] || ''
+                                  });
+                              }
+                              else {
+                                  Zabbix.log(4, '[ Kubernetes discovery ] Node "' + node.metadata.name + '" is not included in the list of endpoint IPs');
+                              }
+                          }
+                      });
+                  
+                      return JSON.stringify(output);
+                  }
+                  catch (error) {
+                      error += (String(error).endsWith('.')) ? '' : '.';
+                      Zabbix.log(3, '[ Kubernetes discovery ] ERROR: ' + error);
+                      throw 'Discovery error: ' + error;
+                  }
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: kube.nodes
+          tags:
+            -
+              tag: component
+              value: raw
+      discovery_rules:
+        -
+          uuid: f408d71f02f645f6a7e24047a57860b6
+          name: 'Node discovery'
+          type: DEPENDENT
+          key: kube.node.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#ROLES}'
+                value: '{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#ROLES}'
+                value: '{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+          item_prototypes:
+            -
+              uuid: 6f986c54ff744522abd793347dba5148
+              name: 'Node [{#NAME}] Addresses: External IP'
+              type: DEPENDENT
+              key: 'kube.node.addresses.external_ip[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Typically the IP address of the node that is externally routable (available from outside the cluster).'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.addresses[?(@.type == "ExternalIP")].address.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: addresses
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: a6bb3067ed44446e9b4831f5be57661b
+              name: 'Node [{#NAME}] Addresses: Internal IP'
+              type: DEPENDENT
+              key: 'kube.node.addresses.internal_ip[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Typically the IP address of the node that is routable only within the cluster.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.addresses[?(@.type == "InternalIP")].address.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: addresses
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: 57eb59ad6e63466f993cd7064788c75d
+              name: 'Node [{#NAME}] Allocatable: CPU'
+              type: DEPENDENT
+              key: 'kube.node.allocatable.cpu[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: |
+                Allocatable CPU.
+                
+                'Allocatable' on a Kubernetes node is defined as the amount of compute resources that are available for pods. The scheduler does not over-subscribe 'Allocatable'. 'CPU', 'memory' and 'ephemeral-storage' are supported as of now.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.allocatable.cpu.first()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: allocatable
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: 843ecf5ca78148caa49f3b4cca26e4d4
+              name: 'Node [{#NAME}] Allocatable: Memory'
+              type: DEPENDENT
+              key: 'kube.node.allocatable.memory[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: |
+                Allocatable Memory.
+                
+                'Allocatable' on a Kubernetes node is defined as the amount of compute resources that are available for pods. The scheduler does not over-subscribe 'Allocatable'. 'CPU', 'memory' and 'ephemeral-storage' are supported as of now.
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.allocatable.memory.first()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: allocatable
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: be853c34395643af828e349105e2feba
+              name: 'Node [{#NAME}] Allocatable: Pods'
+              type: DEPENDENT
+              key: 'kube.node.allocatable.pods[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.allocatable.pods.first()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: allocatable
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: 96c25644261446afb70ce874ff1c7b7d
+              name: 'Node [{#NAME}] Capacity: CPU'
+              type: DEPENDENT
+              key: 'kube.node.capacity.cpu[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: |
+                CPU resource capacity.
+                
+                https://kubernetes.io/docs/concepts/architecture/nodes/#capacity
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.capacity.cpu.first()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: capacity
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: e890e682c3454d20b7cd3becc950279f
+              name: 'Node [{#NAME}] Capacity: Memory'
+              type: DEPENDENT
+              key: 'kube.node.capacity.memory[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: |
+                Memory resource capacity.
+                
+                https://kubernetes.io/docs/concepts/architecture/nodes/#capacity
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.capacity.memory.first()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: capacity
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: f45997b967964ed29c29b64b94544a48
+              name: 'Node [{#NAME}] Capacity: Pods'
+              type: DEPENDENT
+              key: 'kube.node.capacity.pods[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.capacity.pods.first()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: capacity
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: ad5f8baa9ff44ca0ba17fc83e197420e
+              name: 'Node [{#NAME}] Conditions: Disk pressure'
+              type: DEPENDENT
+              key: 'kube.node.conditions.diskpressure[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'True if pressure exists on the disk size - that is, if the disk capacity is low; otherwise False.'
+              valuemap:
+                name: 'Node conditions'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "DiskPressure")].status.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: conditions
+                -
+                  tag: node
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 4e283f3f104a4239a0b1c24f0313ab95
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.diskpressure[{#NAME}])=1'
+                  name: 'Node [{#NAME}] Conditions: Pressure exists on the disk size'
+                  event_name: 'Node [{#NAME}] Conditions: Pressure exists on the disk size (state: {ITEM.VALUE})'
+                  priority: WARNING
+                  description: 'True - pressure exists on the disk size - that is, if the disk capacity is low; otherwise False.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 44b60c111e2a4d0bae0de443394d0add
+              name: 'Node [{#NAME}] Conditions: Memory pressure'
+              type: DEPENDENT
+              key: 'kube.node.conditions.memorypressure[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'True if pressure exists on the node memory - that is, if the node memory is low; otherwise False.'
+              valuemap:
+                name: 'Node conditions'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "MemoryPressure")].status.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: conditions
+                -
+                  tag: node
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: f580b6534bf54281912515874ca46cdf
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.memorypressure[{#NAME}])=1'
+                  name: 'Node [{#NAME}] Conditions: Pressure exists on the node memory'
+                  event_name: 'Node [{#NAME}] Conditions: Pressure exists on the node memory (state: {ITEM.VALUE})'
+                  priority: WARNING
+                  description: 'True - pressure exists on the node memory - that is, if the node memory is low; otherwise False'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 8c77db54e90d474a8ff35a98c67772d5
+              name: 'Node [{#NAME}] Conditions: Network unavailable'
+              type: DEPENDENT
+              key: 'kube.node.conditions.networkunavailable[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'True if the network for the node is not correctly configured, otherwise False.'
+              valuemap:
+                name: 'Node conditions'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "NetworkUnavailable")].status.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: conditions
+                -
+                  tag: node
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 0da0db08077a42668efcc886c155bf4e
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.networkunavailable[{#NAME}])=1'
+                  name: 'Node [{#NAME}] Conditions: Network is not correctly configured'
+                  event_name: 'Node [{#NAME}] Conditions: Network is not correctly configured (state: {ITEM.VALUE})'
+                  priority: WARNING
+                  description: 'True - the network for the node is not correctly configured, otherwise False'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 31f02b4517e24571962fefd61e09e2a5
+              name: 'Node [{#NAME}] Conditions: PID pressure'
+              type: DEPENDENT
+              key: 'kube.node.conditions.pidpressure[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'True if pressure exists on the processes - that is, if there are too many processes on the node; otherwise False.'
+              valuemap:
+                name: 'Node conditions'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "PIDPressure")].status.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: conditions
+                -
+                  tag: node
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 5f6a7fce910e4cf79e9fc778519ad00f
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.pidpressure[{#NAME}])=1'
+                  name: 'Node [{#NAME}] Conditions: Pressure exists on the processes'
+                  event_name: 'Node [{#NAME}] Conditions: Pressure exists on the processes (state: {ITEM.VALUE})'
+                  priority: WARNING
+                  description: 'True - pressure exists on the processes - that is, if there are too many processes on the node; otherwise False'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: 9341a018a45848feae0f61660ca5f849
+              name: 'Node [{#NAME}] Conditions: Ready'
+              type: DEPENDENT
+              key: 'kube.node.conditions.ready[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'True if the node is healthy and ready to accept pods, False if the node is not healthy and is not accepting pods, and Unknown if the node controller has not heard from the node in the last node-monitor-grace-period (default is 40 seconds).'
+              valuemap:
+                name: 'Node conditions'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.conditions[?(@.type == "Ready")].status.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: conditions
+                -
+                  tag: node
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 02f873ab69fb4df49578cf5e1cbad1b8
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.conditions.ready[{#NAME}])<>1'
+                  name: 'Node [{#NAME}] Conditions: Is not in Ready state'
+                  event_name: 'Node [{#NAME}] Conditions: Is not in Ready state (state: {ITEM.VALUE})'
+                  priority: WARNING
+                  description: |
+                    False - if the node is not healthy and is not accepting pods.
+                    Unknown - if the node controller has not heard from the node in the last node-monitor-grace-period (default is 40 seconds).
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 8f9152074e2041d7b5cd2c6215e06832
+              name: 'Node [{#NAME}] Info: Architecture'
+              type: DEPENDENT
+              key: 'kube.node.info.architecture[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Node architecture.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.architecture.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: info
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: 405fe8cae9be4ea8888f378dadda8946
+              name: 'Node [{#NAME}] Info: Container runtime'
+              type: DEPENDENT
+              key: 'kube.node.info.containerruntime[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                Container runtime.
+                
+                https://kubernetes.io/docs/setup/production-environment/container-runtimes/
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.containerRuntimeVersion.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: info
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: a14e705e142f4c34bfc9175686b18754
+              name: 'Node [{#NAME}] Info: Kernel version'
+              type: DEPENDENT
+              key: 'kube.node.info.kernelversion[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Node kernel version.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.kernelVersion.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: info
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: f1a1ea522dfd49d09a69b9b014845f7a
+              name: 'Node [{#NAME}] Info: Kubelet version'
+              type: DEPENDENT
+              key: 'kube.node.info.kubeletversion[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Version of Kubelet.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.kubeletVersion.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: info
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: d39865e0754b4280926b89f19dddb740
+              name: 'Node [{#NAME}] Info: KubeProxy version'
+              type: DEPENDENT
+              key: 'kube.node.info.kubeproxyversion[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Version of KubeProxy.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.kubeProxyVersion.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: info
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: fe06e13c3aec4efc8f7c9539b6600097
+              name: 'Node [{#NAME}] Info: Operating system'
+              type: DEPENDENT
+              key: 'kube.node.info.operatingsystem[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Node operating system.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.operatingSystem.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: info
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: 1b25ffe6190c408996b87622b7b87329
+              name: 'Node [{#NAME}] Info: OS image'
+              type: DEPENDENT
+              key: 'kube.node.info.osversion[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Node OS image.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.nodeInfo.kernelVersion.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: info
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: bcd18bdb8cd1466fa81bbe2e75ba996c
+              name: 'Node [{#NAME}] Info: Roles'
+              type: DEPENDENT
+              key: 'kube.node.info.roles[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Node roles.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.roles.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: info
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: 1fb0ebd40fcb4e6c8a22bb646191adb2
+              name: 'Node [{#NAME}] Limits: CPU'
+              type: DEPENDENT
+              key: 'kube.node.limits.cpu[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: |
+                Node CPU limits.
+                
+                https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.limits.cpu.sum()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: limits
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: e3ad703e83724cc7a5b918d9efae6e62
+              name: 'Node [{#NAME}] Limits: Memory'
+              type: DEPENDENT
+              key: 'kube.node.limits.memory[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: |
+                Node Memory limits.
+                
+                https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.limits.memory.sum()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: limits
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: 8ea2954c99cc4e22a82c5a333146d936
+              name: 'Node [{#NAME}] Requests: CPU'
+              type: DEPENDENT
+              key: 'kube.node.requests.cpu[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: |
+                Node CPU requests.
+                
+                https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.requests.cpu.sum()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: 32f2f1d3ad084c6c9bbb96ad2fe9d98d
+              name: 'Node [{#NAME}] Requests: Memory'
+              type: DEPENDENT
+              key: 'kube.node.requests.memory[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: |
+                Node Memory requests.
+                
+                https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].pods[*].containers.requests.memory.sum()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: requests
+                -
+                  tag: node
+                  value: '{#NAME}'
+            -
+              uuid: 0e30ed9718a54eb1ac643ac643471ca2
+              name: 'Node [{#NAME}] Uptime'
+              type: DEPENDENT
+              key: 'kube.node.uptime[{#NAME}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Node uptime.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].metadata.creationTimestamp.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.floor((Date.now() - new Date(value)) / 1000);'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: uptime
+                -
+                  tag: node
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: b322a8c9a4404da49c434e78822d6ac5
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10'
+                  name: 'Node [{#NAME}]: Has been restarted'
+                  event_name: 'Node [{#NAME}]: Has been restarted (uptime < 10m)'
+                  priority: INFO
+                  description: 'Uptime is less than 10 minutes'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 0203ec4fb37a4eb180edcba398bf470d
+              name: 'Node [{#NAME}] Used: Pods'
+              type: DEPENDENT
+              key: 'kube.node.used.pods[{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Current number of pods on the node.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NAME}")].status.podsCount.first()'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: used
+                -
+                  tag: node
+                  value: '{#NAME}'
+          trigger_prototypes:
+            -
+              uuid: f64efc13be2c4c53a48de40504cf064d
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.9'
+              name: 'Node [{#NAME}] Limits: Total CPU limits are too high'
+              event_name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 90% of allocatable)'
+              opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Node [{#NAME}] Limits: Total CPU limits are too high'
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 1'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 4c035b6c85574141832691e7ad264f40
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 1'
+              name: 'Node [{#NAME}] Limits: Total CPU limits are too high'
+              event_name: 'Node [{#NAME}] Limits: Total CPU limits are too high (more than 100% of allocatable)'
+              opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 5d0d803cfbbe42edb7d32d731ae5f741
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.9'
+              name: 'Node [{#NAME}] Limits: Total memory limits are too high'
+              event_name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 90% of allocatable)'
+              opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Node [{#NAME}] Limits: Total memory limits are too high'
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 1'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 4fa15174194c476899a96fcf233a5aea
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.limits.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 1'
+              name: 'Node [{#NAME}] Limits: Total memory limits are too high'
+              event_name: 'Node [{#NAME}] Limits: Total memory limits are too high (more than 100% of allocatable)'
+              opdata: 'Limits: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 256cf876a4674dd09123bb388c1a9d32
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.5'
+              name: 'Node [{#NAME}] Requests: Total CPU requests are too high'
+              event_name: 'Node [{#NAME}] Requests: Total CPU requests are too high (more than 50% of allocatable)'
+              opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Node [{#NAME}] Requests: Total CPU requests are too high'
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 7fa6901f620c4b388d550c669089dde2
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.cpu[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.cpu[{#NAME}]) > 0.8'
+              name: 'Node [{#NAME}] Requests: Total CPU requests are too high'
+              event_name: 'Node [{#NAME}] Requests: Total CPU requests are too high (more than 80% of allocatable)'
+              opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: d73aa5aa2a9b424789181033630bb432
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.5'
+              name: 'Node [{#NAME}] Requests: Total memory requests are too high'
+              event_name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 50% of allocatable)'
+              opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Node [{#NAME}] Requests: Total memory requests are too high'
+                  expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: ad9a65c4786e48b9a4b77c1214fa2e1f
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.requests.memory[{#NAME}]) / last(/Kubernetes nodes by HTTP/kube.node.allocatable.memory[{#NAME}]) > 0.8'
+              name: 'Node [{#NAME}] Requests: Total memory requests are too high'
+              event_name: 'Node [{#NAME}] Requests: Total memory requests are too high (more than 80% of allocatable)'
+              opdata: 'Requests: {ITEM.LASTVALUE1}, Allocatable: {ITEM.LASTVALUE2}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 0126dfbfa9d949499e0f7689b714c855
+              expression: 'last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9'
+              name: 'Node [{#NAME}] Used: Kubelet too many pods'
+              event_name: 'Node [{#NAME}] Used: Kubelet too many pods (more than 95% of capacity)'
+              opdata: 'Used: {ITEM.LASTVALUE1}, Capacity: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'Kubelet is running at capacity.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+          graph_prototypes:
+            -
+              uuid: 646efb7b19f5408dba2f3fe2d6a92213
+              name: 'Node [{#NAME}] Allocatable: Pod limits'
+              graph_items:
+                -
+                  drawtype: BOLD_LINE
+                  color: 4CAF50
+                  item:
+                    host: 'Kubernetes nodes by HTTP'
+                    key: 'kube.node.allocatable.pods[{#NAME}]'
+                -
+                  sortorder: '1'
+                  drawtype: BOLD_LINE
+                  color: AB47BC
+                  item:
+                    host: 'Kubernetes nodes by HTTP'
+                    key: 'kube.node.capacity.pods[{#NAME}]'
+                -
+                  sortorder: '2'
+                  drawtype: GRADIENT_LINE
+                  color: 1E88E5
+                  calc_fnc: MAX
+                  item:
+                    host: 'Kubernetes nodes by HTTP'
+                    key: 'kube.node.used.pods[{#NAME}]'
+          master_item:
+            key: kube.nodes.lld
+        -
+          uuid: 0cf35d7efd2045c2b22d3dd660ebe210
+          name: 'Cluster node discovery'
+          type: DEPENDENT
+          key: kube.node_host.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              -
+                macro: '{#ROLES}'
+                value: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#ROLES}'
+                value: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+          host_prototypes:
+            -
+              uuid: bfcbf26edd704bdfaa65e244a987839e
+              host: '{#NAME}'
+              name: '{#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: 'Kubernetes/Nodes/Role: {#ROLES}'
+              templates:
+                -
+                  name: 'Linux by Zabbix agent'
+              macros:
+                -
+                  macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+                  value: ^/(dev|sys|run|proc|etc/.+|.+/shm|hostfs/root/var/lib/docker/.+)$
+                  description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+                -
+                  macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+                  value: ^(autofs|binfmt_misc|cgroup|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|mqueue|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|sysfs|tracefs)$
+                  description: 'This macro is used in filesystems discovery. Can be overridden on the host or linked template level'
+              tags:
+                -
+                  tag: addr
+                  value: '{#IP}'
+                -
+                  tag: arch
+                  value: '{#ARCH}'
+                -
+                  tag: os
+                  value: '{#OS}'
+                -
+                  tag: roles
+                  value: '{#ROLES}'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#IP}'
+          master_item:
+            key: kube.nodes.lld
+        -
+          uuid: b9dd5b50208e415da509f61ec73451c1
+          name: 'Pod discovery'
+          type: DEPENDENT
+          key: kube.pod.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NODE}'
+                value: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
+                formulaid: C
+              -
+                macro: '{#NODE}'
+                value: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: ed4ea3dbbce74404a5039aa9918b8e2b
+              name: 'Node [{#NODE}] Pod [{#POD}] Conditions: Containers ready'
+              type: DEPENDENT
+              key: 'kube.pod.conditions.containers_ready[{#POD}]'
+              delay: '0'
+              history: 7d
+              description: |
+                All containers in the Pod are ready.
+                
+                https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions
+              valuemap:
+                name: 'Pod conditions'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "ContainersReady")].status.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: conditions
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: node
+                  value: '{#NODE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
+              uuid: 647ca68c325742d083e37c05e2826205
+              name: 'Node [{#NODE}] Pod [{#POD}] Conditions: Initialized'
+              type: DEPENDENT
+              key: 'kube.pod.conditions.initialized[{#POD}]'
+              delay: '0'
+              history: 7d
+              description: |
+                All init containers have started successfully.
+                
+                https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions
+              valuemap:
+                name: 'Pod conditions'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "Initialized")].status.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: conditions
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: node
+                  value: '{#NODE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
+              uuid: b73a5c5d3b614815be157eb53c6afb1f
+              name: 'Node [{#NODE}] Pod [{#POD}] Conditions: Ready'
+              type: DEPENDENT
+              key: 'kube.pod.conditions.ready[{#POD}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The Pod is able to serve requests and should be added to the load balancing pools of all matching Services.
+                
+                https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions
+              valuemap:
+                name: 'Pod conditions'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "Ready")].status.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: conditions
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: node
+                  value: '{#NODE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
+              uuid: 5956cd1780604f0793efd7bbce2559b6
+              name: 'Node [{#NODE}] Pod [{#POD}] Conditions: Scheduled'
+              type: DEPENDENT
+              key: 'kube.pod.conditions.scheduled[{#POD}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The Pod has been scheduled to a node.
+                
+                https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions
+              valuemap:
+                name: 'Pod conditions'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].conditions[?(@.type == "PodScheduled")].status.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''True'', ''False'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: conditions
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: node
+                  value: '{#NODE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+            -
+              uuid: 5fd018faebb84462bf8111861795b04e
+              name: 'Node [{#NODE}] Pod [{#POD}] Containers: Restarts'
+              type: DEPENDENT
+              key: 'kube.pod.containers.restartcount[{#POD}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of times the container has been restarted, currently based on the number of dead containers that have not yet been removed. Note that this is calculated from dead containers. But those containers are subject to garbage collection.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].containers.restartCount.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: container
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: node
+                  value: '{#NODE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+              trigger_prototypes:
+                -
+                  uuid: 8f1808cd67614cda959ec70e92a59235
+                  expression: '(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],3m))>2'
+                  name: 'Node [{#NODE}] Pod [{#POD}]: Pod is crash looping'
+                  priority: WARNING
+                  description: 'Pos restarts more than 2 times in the last 3 minutes.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 6862be81e52b4abcb319a8847b022634
+              name: 'Node [{#NODE}] Pod [{#POD}] Status: Phase'
+              type: DEPENDENT
+              key: 'kube.pod.status.phase[{#POD}]'
+              delay: '0'
+              history: 7d
+              description: |
+                The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle.
+                
+                https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-phase
+              valuemap:
+                name: 'Pod phase'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].phase.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return [''Pending'', ''Running'', ''Succeeded'', ''Failed'', ''Unknown''].indexOf(value) + 1 || ''Problem with status processing in JS'';'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: node
+                  value: '{#NODE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+              trigger_prototypes:
+                -
+                  uuid: e565d243bef84007b09addb22ea3d759
+                  expression: 'count(/Kubernetes nodes by HTTP/kube.pod.status.phase[{#POD}],10m, "regexp","^(1|4|5)$")>=9'
+                  name: 'Node [{#NODE}] Pod [{#POD}] Status: Kubernetes Pod not healthy'
+                  priority: HIGH
+                  description: 'Pod has been in a non-ready state for longer than 10 minutes.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: abb0b84204164301bb9fc6ab14284631
+              name: 'Node [{#NODE}] Pod [{#POD}] Uptime'
+              type: DEPENDENT
+              key: 'kube.pod.uptime[{#POD}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Pod uptime.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].startTime.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.floor((Date.now() - new Date(value)) / 1000);'
+              master_item:
+                key: kube.nodes
+              tags:
+                -
+                  tag: component
+                  value: uptime
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: node
+                  value: '{#NODE}'
+                -
+                  tag: pod
+                  value: '{#POD}'
+          master_item:
+            key: kube.nodes
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  function parseFilters(filter) {
+                      var pairs = {};
+                  
+                      filter.split(/\s*,\s*/).forEach(function (kv) {
+                          if (/([\w\.-]+\/[\w\.-]+):\s*.+/.test(kv)) {
+                              var pair = kv.split(/\s*:\s*/);
+                              pairs[pair[0]] = pair[1];
+                          }
+                      });
+                  
+                      return pairs;
+                  }
+                  
+                  function filter(name, data, filters) {
+                      var filtered = true;
+                  
+                      if (typeof data === 'object') {
+                          Object.keys(filters).some(function (filter) {
+                              var exclude = filter.match(/^!(.+)/);
+                              if (filter in data || (exclude && exclude[1] in data)) {
+                                  if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
+                                      || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
+                                      Zabbix.log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
+                  
+                                      filtered = false;
+                                      return true;
+                                  }
+                              };
+                          });
+                      }
+                  
+                      return filtered;
+                  }
+                  
+                  try {
+                      var input = JSON.parse(value),
+                          output = [];
+                  
+                      if (typeof input !== 'object' || typeof input.items === 'undefined') {
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
+                          throw 'Incorrect JSON. Check debug log for more information.';
+                      }
+                  
+                      var filterNodeLabels = parseFilters('{$KUBE.NODE.FILTER.LABELS}'),
+                          filterNodeAnnotations = parseFilters('{$KUBE.NODE.FILTER.ANNOTATIONS}'),
+                          filterPodLabels = parseFilters('{$KUBE.POD.FILTER.LABELS}'),
+                          filterPodAnnotations = parseFilters('{$KUBE.POD.FILTER.ANNOTATIONS}');
+                  
+                      input.items.forEach(function (node) {
+                          if (filter(node.metadata.name, node.metadata.labels, filterNodeLabels)
+                              && filter(node.metadata.name, node.metadata.annotations, filterNodeAnnotations)) {
+                              node.pods.forEach(function (pod) {
+                                  if (filter(pod.name, pod.labels, filterPodLabels)
+                                      && filter(pod.name, pod.annotations, filterPodAnnotations)) {
+                                      Zabbix.log(4, '[ Kubernetes discovery ] Filtered pod "' + pod.name + '"');
+                  
+                                      output.push({
+                                          '{#POD}': pod.name,
+                                          '{#NAMESPACE}': pod.namespace,
+                                          '{#NODE}': node.metadata.name
+                                      });
+                                  }
+                              });
+                          }
+                      });
+                  
+                      return JSON.stringify(output);
+                  }
+                  catch (error) {
+                      error += (String(error).endsWith('.')) ? '' : '.';
+                      Zabbix.log(3, '[ Kubernetes discovery ] ERROR: ' + error);
+                      throw 'Discovery error: ' + error;
+                  }
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: 'kubernetes nodes'
+      macros:
+        -
+          macro: '{$KUBE.API.ENDPOINT.URL}'
+          value: 'https://localhost:6443/api'
+          description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>/api'
+        -
+          macro: '{$KUBE.API.TOKEN}'
+          description: 'Service account bearer token'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable nodes'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered nodes'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable nodes by role'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered node by role'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable cluster nodes'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered cluster nodes'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable nodes hosts by role'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered cluster nodes by role'
+        -
+          macro: '{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable pods by namespace'
+        -
+          macro: '{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered pods by namespace'
+        -
+          macro: '{$KUBE.NODE.FILTER.ANNOTATIONS}'
+          description: 'Annotations to filter nodes (regex in values are supported)'
+        -
+          macro: '{$KUBE.NODE.FILTER.LABELS}'
+          description: 'Labels to filter nodes (regex in values are supported)'
+        -
+          macro: '{$KUBE.NODES.ENDPOINT.NAME}'
+          value: zabbix-zabbix-helm-chrt-agent
+          description: 'Kubernetes nodes endpoint name. See kubectl -n monitoring get ep'
+        -
+          macro: '{$KUBE.POD.FILTER.ANNOTATIONS}'
+          description: 'Annotations to filter pods (regex in values are supported)'
+        -
+          macro: '{$KUBE.POD.FILTER.LABELS}'
+          description: 'Labels to filter Pods (regex in values are supported)'
+      valuemaps:
+        -
+          uuid: 785b20f8979341c4b470870ec8f50414
+          name: 'Node conditions'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'True'
+            -
+              value: '2'
+              newvalue: 'False'
+            -
+              value: '3'
+              newvalue: Unknown
+        -
+          uuid: f93e30e125de4909b52e7c38bc3f2c97
+          name: 'Pod conditions'
+          mappings:
+            -
+              value: '1'
+              newvalue: 'True'
+            -
+              value: '2'
+              newvalue: 'False'
+            -
+              value: '3'
+              newvalue: Unknown
+        -
+          uuid: 21ff77dde5964dcfb4bb2ae202a5f33c
+          name: 'Pod phase'
+          mappings:
+            -
+              value: '1'
+              newvalue: Pending
+            -
+              value: '2'
+              newvalue: Running
+            -
+              value: '3'
+              newvalue: Succeeded
+            -
+              value: '4'
+              newvalue: Failed
+            -
+              value: '5'
+              newvalue: Unknown

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,13 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
-#include "log.h"
-
-#include "zbxjson.h"
-
 #include "checks_java.h"
+
+#include "log.h"
+#include "zbxjson.h"
 
 static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *response,
 		char *error, int max_error_len)

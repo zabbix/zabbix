@@ -1,0 +1,117 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:48Z'
+  groups:
+    -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    -
+      uuid: c55052212c774e3fbab00343050b3db5
+      template: 'Brocade_Foundry Performance SNMP'
+      name: 'Brocade_Foundry Performance SNMP'
+      description: |
+        Template Module Brocade_Foundry Performance
+        
+        MIBs used:
+        FOUNDRY-SN-AGENT-MIB
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: b2bda926f1864eb893c53ef0c6cad2a2
+          name: 'CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.52.0
+          key: 'system.cpu.util[snAgGblCpuUtil1MinAvg.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: FOUNDRY-SN-AGENT-MIB
+            The statistics collection of 1 minute CPU utilization.
+          tags:
+            -
+              tag: component
+              value: cpu
+          triggers:
+            -
+              uuid: 7b068eb5d43846d987148f38f66b1f1a
+              expression: 'min(/Brocade_Foundry Performance SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: e357f3d53b9a48a087e140b94b3aff1d
+          name: 'Memory utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.53.0
+          key: 'vm.memory.util[snAgGblDynMemUtil.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: FOUNDRY-SN-AGENT-MIB
+            The system dynamic memory utilization, in unit of percentage.
+            Deprecated: Refer to snAgSystemDRAMUtil.
+            For NI platforms, refer to snAgentBrdMemoryUtil100thPercent.
+          tags:
+            -
+              tag: component
+              value: memory
+          triggers:
+            -
+              uuid: 929046c4439741a9aa3ab00933322a86
+              expression: 'min(/Brocade_Foundry Performance SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
+      macros:
+        -
+          macro: '{$CPU.UTIL.CRIT}'
+          value: '90'
+        -
+          macro: '{$MEMORY.UTIL.MAX}'
+          value: '90'
+  graphs:
+    -
+      uuid: ed536efa5baa4d5ca8ee1af4fc813e72
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Brocade_Foundry Performance SNMP'
+            key: 'system.cpu.util[snAgGblCpuUtil1MinAvg.0]'
+    -
+      uuid: 8e5d8b8e81d2473c99df3d7ad5c147c3
+      name: 'Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Brocade_Foundry Performance SNMP'
+            key: 'vm.memory.util[snAgGblDynMemUtil.0]'

@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2021 Zabbix SIA
+ ** Copyright (C) 2001-2022 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package com.zabbix.gateway;
 
 import org.junit.*;
 import static org.junit.Assert.*;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -145,7 +144,6 @@ public class JMXTest {
 					useRMISSLforURLHintCache.put(JMX_APP_URL, false);
 				}
 			}
-
 
 			MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
 

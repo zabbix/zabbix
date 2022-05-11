@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,23 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
-#include "log.h"
-#include "zbxserver.h"
-#include "zbxregexp.h"
-#include "valuecache.h"
-#include "zbxtrends.h"
-#include "../zbxalgo/vectorimpl.h"
-
 #include "anomalystl.h"
+
+#include "common.h"
+#include "log.h"
+#include "zbxeval.h"
+#include "../zbxalgo/vectorimpl.h"
 
 ZBX_PTR_VECTOR_DECL(VV, zbx_vector_history_record_t *)
 ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
 
 /*******************************************************************************
- *                                                                             *
- * Function: zbx_get_percentage_of_deviations_in_remainder                     *
  *                                                                             *
  * Purpose: finds how many values in stl remainder are outliers                *
  *                                                                             *
@@ -56,7 +50,7 @@ ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
  *                                                                             *
  *******************************************************************************/
 int	zbx_get_percentage_of_deviations_in_stl_remainder(const zbx_vector_history_record_t *remainder,
-		zbx_uint64_t deviations_count, const char* devalg, int detect_period_start, int detect_period_end,
+		double deviations_count, const char* devalg, int detect_period_start, int detect_period_end,
 		double *result, char **error)
 {
 	int			i, total_values_count = 0, deviations_detected_count = 0, ret = FAIL;
@@ -99,7 +93,7 @@ int	zbx_get_percentage_of_deviations_in_stl_remainder(const zbx_vector_history_r
 	if (SUCCEED != (ret = stat_func(&remainder_values_dbl, &remainder_deviation, error)))
 		goto out;
 
-	deviation_limit = remainder_deviation * (double)deviations_count;
+	deviation_limit = remainder_deviation * deviations_count;
 
 	for (i = 0; i < remainder->values_num; i++)
 	{
@@ -724,11 +718,15 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 	if (S_JUMP_DEF == nsjump)
 		nsjump = (int)(tmp = ceil((double)s_window / 10));
 
+	ZBX_UNUSED(tmp);
+
 	if (T_WINDOW_DEF == t_window)
 		t_window = nextodd(ceil(1.5 * (double)freq / (1 - (1.5 / s_window))));
 
 	if (T_JUMP_DEF == ntjump)
 		ntjump = (int)(tmp = ceil(t_window/10));
+
+	ZBX_UNUSED(tmp);
 
 	if (L_WINDOW_DEF == l_window)
 		l_window = nextodd(freq);
@@ -738,6 +736,8 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 
 	if (L_JUMP_DEF == nljump)
 		nljump = (int)(tmp = ceil((double)l_window / 10));
+
+	ZBX_UNUSED(tmp);
 
 	if (INNER_DEF == inner)
 		inner = (1 == is_robust) ? 1 : 2;

@@ -1,0 +1,363 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:27:45Z'
+  groups:
+    -
+      uuid: e960332b3f6c46a1956486d4f3f99fce
+      name: 'Templates/Server hardware'
+  templates:
+    -
+      uuid: f01bd64eef4049fabe087cccae590226
+      template: 'Intel SR1530 IPMI'
+      name: 'Intel SR1530 IPMI'
+      description: |
+        Template for monitoring Intel SR1530 server system
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Server hardware'
+      items:
+        -
+          uuid: f1d7b90d87c6411e9d887d223b4f9022
+          name: 'BB +1.8V SM'
+          type: IPMI
+          key: bb_1.8v_sm
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +1.8V SM'
+          tags:
+            -
+              tag: component
+              value: system
+            -
+              tag: component
+              value: voltage
+          triggers:
+            -
+              uuid: 55cc8ccf46954499a9c274ab301dd857
+              expression: 'last(/Intel SR1530 IPMI/bb_1.8v_sm)<1.597 or last(/Intel SR1530 IPMI/bb_1.8v_sm)>2.019'
+              name: 'BB +1.8V SM Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: 'last(/Intel SR1530 IPMI/power)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 55e3dc7d5bd34da0862d724ab5d18bb7
+              expression: 'last(/Intel SR1530 IPMI/bb_1.8v_sm)<1.646 or last(/Intel SR1530 IPMI/bb_1.8v_sm)>1.960'
+              name: 'BB +1.8V SM Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +1.8V SM Critical [{ITEM.VALUE}]'
+                  expression: 'last(/Intel SR1530 IPMI/bb_1.8v_sm)<1.597 or last(/Intel SR1530 IPMI/bb_1.8v_sm)>2.019'
+                -
+                  name: Power
+                  expression: 'last(/Intel SR1530 IPMI/power)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 21820c76180446ff9965f8937e6d1ba0
+          name: 'BB +3.3V'
+          type: IPMI
+          key: bb_3.3v
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +3.3V'
+          tags:
+            -
+              tag: component
+              value: system
+            -
+              tag: component
+              value: voltage
+          triggers:
+            -
+              uuid: 35a0dedd6fb244759a4feca2c1aff961
+              expression: 'last(/Intel SR1530 IPMI/bb_3.3v)<2.876 or last(/Intel SR1530 IPMI/bb_3.3v)>3.729'
+              name: 'BB +3.3V Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: 'last(/Intel SR1530 IPMI/power)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: bd2472feb90f40429fbbcd0bddbdd455
+              expression: 'last(/Intel SR1530 IPMI/bb_3.3v)<2.970 or last(/Intel SR1530 IPMI/bb_3.3v)>3.618'
+              name: 'BB +3.3V Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +3.3V Critical [{ITEM.VALUE}]'
+                  expression: 'last(/Intel SR1530 IPMI/bb_3.3v)<2.876 or last(/Intel SR1530 IPMI/bb_3.3v)>3.729'
+                -
+                  name: Power
+                  expression: 'last(/Intel SR1530 IPMI/power)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 7bd5269be38c417aba374c9e8af28f8c
+          name: 'BB +3.3V STBY'
+          type: IPMI
+          key: bb_3.3v_stby
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +3.3V STBY'
+          tags:
+            -
+              tag: component
+              value: system
+            -
+              tag: component
+              value: voltage
+          triggers:
+            -
+              uuid: c0f82f508d38405d978c746f5c95a178
+              expression: 'last(/Intel SR1530 IPMI/bb_3.3v_stby)<2.876 or last(/Intel SR1530 IPMI/bb_3.3v_stby)>3.729'
+              name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 8f957e674af84229aa2e1ee78bf941a0
+              expression: 'last(/Intel SR1530 IPMI/bb_3.3v_stby)<2.970 or last(/Intel SR1530 IPMI/bb_3.3v_stby)>3.618'
+              name: 'BB +3.3V STBY Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +3.3V STBY Critical [{ITEM.VALUE}]'
+                  expression: 'last(/Intel SR1530 IPMI/bb_3.3v_stby)<2.876 or last(/Intel SR1530 IPMI/bb_3.3v_stby)>3.729'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 7931e499e1894942a4763432a6a446fd
+          name: 'BB +5.0V'
+          type: IPMI
+          key: bb_5.0v
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'BB +5.0V'
+          tags:
+            -
+              tag: component
+              value: system
+            -
+              tag: component
+              value: voltage
+          triggers:
+            -
+              uuid: dec3da3d68b04f3c9ea16fabe17b8faa
+              expression: 'last(/Intel SR1530 IPMI/bb_5.0v)<4.362 or last(/Intel SR1530 IPMI/bb_5.0v)>5.663'
+              name: 'BB +5.0V Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              dependencies:
+                -
+                  name: Power
+                  expression: 'last(/Intel SR1530 IPMI/power)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: e2683b71d36b4ab4ad8a98c964b19118
+              expression: 'last(/Intel SR1530 IPMI/bb_5.0v)<4.483 or last(/Intel SR1530 IPMI/bb_5.0v)>5.495'
+              name: 'BB +5.0V Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB +5.0V Critical [{ITEM.VALUE}]'
+                  expression: 'last(/Intel SR1530 IPMI/bb_5.0v)<4.362 or last(/Intel SR1530 IPMI/bb_5.0v)>5.663'
+                -
+                  name: Power
+                  expression: 'last(/Intel SR1530 IPMI/power)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 2e6d7059cbb349889c639e9fba09bd8c
+          name: 'BB Ambient Temp'
+          type: IPMI
+          key: bb_ambient_temp
+          history: 1w
+          value_type: FLOAT
+          units: C
+          ipmi_sensor: 'BB Ambient Temp'
+          tags:
+            -
+              tag: component
+              value: system
+            -
+              tag: component
+              value: temperature
+          triggers:
+            -
+              uuid: 0adcefe86a99468d9d7f0db2021ec8c9
+              expression: 'last(/Intel SR1530 IPMI/bb_ambient_temp)<5 or last(/Intel SR1530 IPMI/bb_ambient_temp)>66'
+              name: 'BB Ambient Temp Critical [{ITEM.VALUE}]'
+              priority: DISASTER
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+            -
+              uuid: 6630637c02224bacbe3456a388233775
+              expression: 'last(/Intel SR1530 IPMI/bb_ambient_temp)<10 or last(/Intel SR1530 IPMI/bb_ambient_temp)>61'
+              name: 'BB Ambient Temp Non-Critical [{ITEM.VALUE}]'
+              priority: HIGH
+              dependencies:
+                -
+                  name: 'BB Ambient Temp Critical [{ITEM.VALUE}]'
+                  expression: 'last(/Intel SR1530 IPMI/bb_ambient_temp)<5 or last(/Intel SR1530 IPMI/bb_ambient_temp)>66'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: 1821294a921d401f822678ce1d246163
+          name: Power
+          type: IPMI
+          key: power
+          history: 1w
+          ipmi_sensor: power
+          tags:
+            -
+              tag: component
+              value: system
+            -
+              tag: component
+              value: voltage
+          triggers:
+            -
+              uuid: 85722b8734df45d589afd69262a498a4
+              expression: 'last(/Intel SR1530 IPMI/power)=0'
+              name: Power
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: efc577d6deba4f46b1fe79e6a1a26fdd
+          name: 'Processor Vcc'
+          type: IPMI
+          key: processor_vcc
+          history: 1w
+          value_type: FLOAT
+          units: V
+          ipmi_sensor: 'Processor Vcc'
+          tags:
+            -
+              tag: component
+              value: system
+            -
+              tag: component
+              value: voltage
+        -
+          uuid: 89e5edc9cd6d4984a7a76320f7800ae9
+          name: 'System Fan 3'
+          type: IPMI
+          key: system_fan_3
+          history: 1w
+          value_type: FLOAT
+          units: RPM
+          ipmi_sensor: 'System Fan 3'
+          tags:
+            -
+              tag: component
+              value: fan
+            -
+              tag: component
+              value: system
+      tags:
+        -
+          tag: class
+          value: hardware
+        -
+          tag: target
+          value: intel
+        -
+          tag: target
+          value: intel-sr1530
+  graphs:
+    -
+      uuid: e1fff55999a6420f987659ca0dc8c102
+      name: 'Fan speed and ambient temperature'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_ambient_temp
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: system_fan_3
+    -
+      uuid: bec82c29b93c4841a89d0978a899c70b
+      name: Voltage
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: power
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_1.8v_sm
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_3.3v
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_3.3v_stby
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: bb_5.0v
+        -
+          sortorder: '5'
+          color: 6C59DC
+          item:
+            host: 'Intel SR1530 IPMI'
+            key: processor_vcc

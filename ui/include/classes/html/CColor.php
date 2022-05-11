@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,21 +21,25 @@
 
 class CColor extends CDiv {
 
-	const MAX_LENGTH = 6;
-
 	private $name;
 	private $value;
-	private $is_enabled = true;
-	private $is_required = false;
+	private $enabled = true;
 	private $append_color_picker_js = true;
 	private $input_id;
 
 	/**
+	 * Either "Use default" is enabled.
+	 *
+	 * @var bool
+	 */
+	private $use_default = false;
+
+	/**
 	 * Creates a color picker form element.
 	 *
-	 * @param string $name        Color picker field name.
-	 * @param string $value       Color value in HEX RGB format.
-	 * @param string $input_id    (optional) Color input field id.
+	 * @param string $name      Color picker field name.
+	 * @param string $value     Color value in HEX RGB format.
+	 * @param string $input_id  (optional) Color input field id.
 	 */
 	public function __construct($name, $value, $input_id = null) {
 		parent::__construct();
@@ -48,25 +52,23 @@ class CColor extends CDiv {
 	/**
 	 * Enable or disable the element.
 	 *
-	 * @param bool $is_enabled
+	 * @param bool $enabled
 	 *
 	 * @return CColor
 	 */
-	public function setEnabled($is_enabled = true) {
-		$this->is_enabled = $is_enabled;
+	public function setEnabled(bool $enabled = true): self {
+		$this->enabled = $enabled;
 
 		return $this;
 	}
 
 	/**
-	 * Set or reset element 'aria-required' attribute.
-	 *
-	 * @param bool $is_required
-	 *
+	 * Enable default color button.
+
 	 * @return CColor
 	 */
-	public function setAriaRequired($is_required = true) {
-		$this->is_required = $is_required;
+	public function enableUseDefault(): self {
+		$this->use_default = true;
 
 		return $this;
 	}
@@ -78,11 +80,21 @@ class CColor extends CDiv {
 	 *
 	 * @return CColor
 	 */
-	public function appendColorPickerJs($append = true)
-	{
+	public function appendColorPickerJs(bool $append = true): self {
 		$this->append_color_picker_js = $append;
 
 		return $this;
+	}
+
+	/**
+	 * Make colorpicker initialization javascript.
+	 *
+	 * @return string
+	 */
+	protected function getInitJavascript(): string {
+		return 'jQuery("#'.$this->name.'").colorpicker('.json_encode([
+			'use_default' => $this->use_default
+		]).');';
 	}
 
 	/**
@@ -92,25 +104,18 @@ class CColor extends CDiv {
 	 *
 	 * @return string
 	 */
-	public function toString($destroy = true) {
-		$this->cleanItems();
-
-		$input = (new CTextBox($this->name, $this->value))
-			->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
-			->setAttribute('maxlength', self::MAX_LENGTH)
-			->setEnabled($this->is_enabled)
-			->setAriaRequired($this->is_required);
+	public function toString($destroy = true): string {
+		$input = (new CInput('hidden', $this->name, $this->value))->setEnabled($this->enabled);
 
 		if ($this->input_id !== null) {
 			$input->setId($this->input_id);
 		}
 
-		$this->addItem($input);
+		$this
+			->addClass(ZBX_STYLE_COLOR_PICKER)
+			->cleanItems()
+			->addItem($input);
 
-		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
-
-		$init_script = $this->append_color_picker_js ? get_js('jQuery("#'.$this->name.'").colorpicker()') : '';
-
-		return parent::toString($destroy).$init_script;
+		return parent::toString($destroy).($this->append_color_picker_js ? get_js($this->getInitJavascript()) : '');
 	}
 }

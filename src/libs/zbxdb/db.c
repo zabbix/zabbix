@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "log.h"
 
 #include "zbxdb.h"
 
@@ -26,6 +27,7 @@
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 #elif defined(HAVE_ORACLE)
+#	include "dbschema.h"
 #	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
 #	include <libpq-fe.h>
@@ -33,8 +35,6 @@
 #	include <sqlite3.h>
 #endif
 
-#include "dbschema.h"
-#include "log.h"
 #if defined(HAVE_SQLITE3)
 #	include "mutexs.h"
 #endif
@@ -78,6 +78,7 @@ static int	db_auto_increment;
 static MYSQL			*conn = NULL;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
+static char			*ZBX_CHARSET = NULL;
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -167,8 +168,6 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_last_strerr                                               *
- *                                                                            *
  * Purpose: get last error set by database                                    *
  *                                                                            *
  * Return value: last database error message                                  *
@@ -180,8 +179,6 @@ const char	*zbx_db_last_strerr(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_last_errcode                                              *
  *                                                                            *
  * Purpose: get last error code returned by database                          *
  *                                                                            *
@@ -237,8 +234,6 @@ static const char	*zbx_oci_error(sword status, sb4 *err)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: OCI_handle_sql_error                                             *
  *                                                                            *
  * Purpose: handles Oracle prepare/bind/execute/select operation error        *
  *                                                                            *
@@ -363,8 +358,6 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_init_autoincrement_options                                *
- *                                                                            *
  * Purpose: specify the autoincrement options during db connect               *
  *                                                                            *
  ******************************************************************************/
@@ -374,8 +367,6 @@ void	zbx_db_init_autoincrement_options(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_connect                                                   *
  *                                                                            *
  * Purpose: connect to the database                                           *
  *                                                                            *
@@ -389,6 +380,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
+	const char	*charset;
 #if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
 	bool		mysql_reconnect = 1;
 #else
@@ -579,6 +571,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
+
+	charset = NULL == ZBX_CHARSET ? "utf8" : ZBX_CHARSET;
+	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
+	if (ZBX_DB_OK == ret && 0 != mysql_set_character_set(conn, charset))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", charset);
 
 	if (ZBX_DB_OK == ret && 0 != mysql_autocommit(conn, 1))
 	{
@@ -1016,8 +1013,6 @@ void	zbx_db_close(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_begin                                                     *
- *                                                                            *
  * Purpose: start transaction                                                 *
  *                                                                            *
  * Comments: do nothing if DB does not support transactions                   *
@@ -1049,8 +1044,6 @@ int	zbx_db_begin(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_commit                                                    *
  *                                                                            *
  * Purpose: commit transaction                                                *
  *                                                                            *
@@ -1097,8 +1090,6 @@ int	zbx_db_commit(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_rollback                                                  *
  *                                                                            *
  * Purpose: rollback transaction                                              *
  *                                                                            *
@@ -1215,8 +1206,6 @@ int	zbx_db_statement_prepare(const char *sql)
 
 /******************************************************************************
  *                                                                            *
- * Function: db_bind_dynamic_cb                                               *
- *                                                                            *
  * Purpose: callback function used by dynamic parameter binding               *
  *                                                                            *
  ******************************************************************************/
@@ -1269,8 +1258,6 @@ static sb4 db_bind_dynamic_cb(dvoid *ctxp, OCIBind *bindp, ub4 iter, ub4 index, 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_bind_parameter_dyn                                        *
  *                                                                            *
  * Purpose: performs dynamic parameter binding, converting value if necessary *
  *                                                                            *
@@ -1424,8 +1411,6 @@ out:
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_vexecute                                                  *
  *                                                                            *
  * Purpose: Execute SQL statement. For non-select statements only.            *
  *                                                                            *
@@ -1606,8 +1591,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_vselect                                                   *
  *                                                                            *
  * Purpose: execute a select statement                                        *
  *                                                                            *
@@ -1912,8 +1895,6 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
 
 #ifdef HAVE_POSTGRESQL
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_bytea_unescape                                            *
  *                                                                            *
  * Purpose: converts the null terminated string into binary buffer            *
  *                                                                            *
@@ -2247,8 +2228,6 @@ static int	zbx_db_is_escape_sequence(char c)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_escape_string                                             *
- *                                                                            *
  * Return value: escaped string                                               *
  *                                                                            *
  * Comments: sync changes with 'zbx_db_get_escape_string_len'                 *
@@ -2287,8 +2266,6 @@ static void	zbx_db_escape_string(const char *src, char *dst, size_t len, zbx_esc
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_get_escape_string_len                                     *
  *                                                                            *
  * Purpose: to calculate escaped string length limited by bytes or characters *
  *          whichever is reached first.                                       *
@@ -2335,8 +2312,6 @@ static size_t	zbx_db_get_escape_string_len(const char *s, size_t max_bytes, size
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_dyn_escape_string                                         *
- *                                                                            *
  * Purpose: to escape string limited by bytes or characters, whichever limit  *
  *          is reached first.                                                 *
  *                                                                            *
@@ -2364,8 +2339,6 @@ char	*zbx_db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_cha
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_get_escape_like_pattern_len                               *
- *                                                                            *
  * Return value: return length of escaped LIKE pattern with terminating '\0'  *
  *                                                                            *
  * Comments: sync changes with 'zbx_db_escape_like_pattern'                   *
@@ -2390,8 +2363,6 @@ static int	zbx_db_get_escape_like_pattern_len(const char *src)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_escape_like_pattern                                       *
  *                                                                            *
  * Return value: escaped string to be used as pattern in LIKE                 *
  *                                                                            *
@@ -2448,8 +2419,6 @@ static void	zbx_db_escape_like_pattern(const char *src, char *dst, int len)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_dyn_escape_like_pattern                                   *
- *                                                                            *
  * Return value: escaped string to be used as pattern in LIKE                 *
  *                                                                            *
  ******************************************************************************/
@@ -2469,8 +2438,6 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_strlen_n                                                  *
- *                                                                            *
  * Purpose: return the string length to fit into a database field of the      *
  *          specified size                                                    *
  *                                                                            *
@@ -2483,8 +2450,6 @@ int	zbx_db_strlen_n(const char *text_loc, size_t maxlen)
 }
 
 /*********************************************************************************
- *                                                                               *
- * Function: zbx_db_version_check                                                *
  *                                                                               *
  * Purpose: determine if a vendor database(MySQL, MariaDB, PostgreSQL,           *
  *          Oracle, ElasticDB) version satisfies Zabbix requirements             *
@@ -2533,8 +2498,6 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_version_json_create                                       *
- *                                                                            *
  * Purpose: prepare json for front-end with the DB current, minimum and       *
  *          maximum versions and a flag that indicates if the version         *
  *          satisfies the requirements                                        *
@@ -2566,8 +2529,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_dbms_version_get                                             *
  *                                                                            *
  * Purpose: For PostgreSQL, MySQL and MariaDB:                                *
  *          returns DBMS version as integer: MMmmuu                           *
@@ -2607,8 +2568,6 @@ zbx_uint32_t	zbx_dbms_version_get(void)
 #ifdef HAVE_MYSQL
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dbms_mariadb_used                                            *
- *                                                                            *
  * Purpose: returns flag if the mariadb was detected                          *
  *                                                                            *
  * Return value: ON  - mariadb detected                                       *
@@ -2621,8 +2580,6 @@ int	zbx_dbms_mariadb_used(void)
 #endif
 
 /***************************************************************************************************************
- *                                                                                                             *
- * Function: zbx_dbms_version_info_extract                                                                     *
  *                                                                                                             *
  * Purpose: retrieves the DB version info, including numeric version value                                     *
  *                                                                                                             *
@@ -2840,8 +2797,6 @@ out:
 #if defined(HAVE_POSTGRESQL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tsdb_get_version                                             *
- *                                                                            *
  * Purpose: returns TimescaleDB (TSDB) version as integer: MMmmuu             *
  *          M = major version part                                            *
  *          m = minor version part                                            *
@@ -2907,8 +2862,6 @@ out:
 #if defined(HAVE_MYSQL)
 void zbx_db_set_character_set(const char *char_set)
 {
-	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
-	if (0 != mysql_set_character_set(conn, char_set))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"%s\"", char_set);
+	ZBX_CHARSET = zbx_strdup(ZBX_CHARSET, char_set);
 }
 #endif

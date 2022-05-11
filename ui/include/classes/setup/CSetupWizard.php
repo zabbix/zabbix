@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,6 +80,18 @@ class CSetupWizard extends CForm {
 	}
 
 	private function doAction(): void {
+		/*
+		 * Having non-super-admin authenticated at this step means:
+		 *   - Either the config file has been manually created by the user.
+		 *   - Or dealing with a spoofed session cookie.
+		 *
+		 * Since it is not possible to distinguish between the two, skip data validation and prevent stage switching.
+		 * Any of either cases is only possible with self::STAGE_INSTALL stage.
+		 */
+		if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+			return;
+		}
+
 		if (hasRequest('back') && array_key_exists($this->getStep(), getRequest('back'))) {
 			$this->doBack();
 		}
@@ -359,7 +371,7 @@ class CSetupWizard extends CForm {
 			->setFocusableElementId('label-default-lang')
 			->setAttribute('autofocus', 'autofocus');
 
-		$all_locales_available = 1;
+		$all_locales_available = true;
 
 		foreach (getLocales() as $localeid => $locale) {
 			if (!$locale['display']) {
@@ -376,7 +388,9 @@ class CSetupWizard extends CForm {
 
 			$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
-			$all_locales_available &= (int) $locale_available;
+			if (!$locale_available) {
+				$all_locales_available = false;
+			}
 		}
 
 		// Restoring original locale.
@@ -387,7 +401,7 @@ class CSetupWizard extends CForm {
 			$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
 			$lang_select->setReadonly();
 		}
-		elseif ($all_locales_available == 0) {
+		elseif (!$all_locales_available) {
 			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 		}
 
@@ -594,8 +608,8 @@ class CSetupWizard extends CForm {
 	}
 
 	private function stageSettings(): array {
-		$timezones[ZBX_DEFAULT_TIMEZONE] = CDateTimeZoneHelper::getSystemDateTimeZone();
-		$timezones += (new CDateTimeZoneHelper())->getAllDateTimeZones();
+		$timezones[ZBX_DEFAULT_TIMEZONE] = CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System'));
+		$timezones += CTimezoneHelper::getList();
 
 		$table = (new CFormList())
 			->addRow(
@@ -745,6 +759,20 @@ class CSetupWizard extends CForm {
 	}
 
 	private function stageInstall(): array {
+		/*
+		 * Having non-super-admin authenticated at this step means:
+		 *   - Either the config file has been manually created by the user.
+		 *   - Or dealing with a spoofed session cookie.
+		 *
+		 * Since it is not possible to distinguish between the two, it's also impossible to validate the config file
+		 * and display any discrepancies with the configuration stored within the session.
+		 */
+		if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
+			CSessionHelper::clear();
+
+			return $this->stageInstalled();
+		}
+
 		$vault_config = [
 			'VAULT_URL' => '',
 			'VAULT_DB_PATH' => '',
@@ -857,21 +885,29 @@ class CSetupWizard extends CForm {
 					new CTag('li', true, _s('Save it as "%1$s"', $config_file_name))
 				])
 			];
-		}
-		else {
-			$this->disable_cancel_button = true;
-			$this->disable_back_button = true;
 
-			// Clear session after success install.
-			CSessionHelper::clear();
-
-			$message_box = null;
-			$message = [
-				(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))
-					->addClass(ZBX_STYLE_GREEN),
-				new CTag('p', true, _s('Configuration file "%1$s" created.', $config_file_name))
+			return [
+				new CTag('h1', true, _('Install')),
+				(new CDiv([$message_box, $message]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
 			];
 		}
+
+		// Clear session after success install.
+		CSessionHelper::clear();
+
+		return $this->stageInstalled();
+	}
+
+	private function stageInstalled() {
+		$this->disable_cancel_button = true;
+		$this->disable_back_button = true;
+
+		$message_box = null;
+		$message = [
+			(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))
+				->addClass(ZBX_STYLE_GREEN),
+			new CTag('p', true, _s('Configuration file "%1$s" created.', ltrim(CConfigFile::CONFIG_FILE_PATH, '/')))
+		];
 
 		return [
 			new CTag('h1', true, _('Install')),
@@ -973,13 +1009,13 @@ class CSetupWizard extends CForm {
 
 		$result = true;
 
-		if (!zbx_empty($DB['SCHEMA']) && $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL && $DB['SCHEMA'] !== '') {
 			$db_schema = DBselect(
-				"SELECT schema_name".
-				" FROM information_schema.schemata".
-				" WHERE schema_name='".pg_escape_string($DB['SCHEMA'])."'"
+				'SELECT NULL'.
+					' FROM information_schema.schemata'.
+					' WHERE schema_name='.zbx_dbstr($DB['SCHEMA'])
 			);
-			$result = DBfetch($db_schema);
+			$result = (bool) DBfetch($db_schema);
 		}
 
 		$db = DB::getDbBackend();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -189,7 +189,6 @@ class C10ImportConverter extends CConverter {
 
 		foreach ($content['templates'] as &$template) {
 			$template['template'] = $template['name'];
-			$template = $this->convertTemplateItem($template);
 			$template = $this->convertHostApplications($template);
 			$template = $this->convertHostItems($template);
 			$template = $this->convertHostTriggers($template, $template['template']);
@@ -257,14 +256,33 @@ class C10ImportConverter extends CConverter {
 				}
 			}
 
-			// if a least one IPMI item exists on a host, create an IPMI interface
+			// If a least one IPMI item exists on a host, create an IPMI interface.
 			if ($hasIpmiItem) {
+				if (array_key_exists('ipmi_ip', $host) && $host['ipmi_ip'] !== '') {
+					$ip_parser = new CIPParser(['v6' => ZBX_HAVE_IPV6]);
+
+					if ($ip_parser->parse($host['ipmi_ip']) == CParser::PARSE_SUCCESS) {
+						$ip = $host['ipmi_ip'];
+						$dns = '';
+						$useip = (string) INTERFACE_USE_IP;
+					}
+					else {
+						$ip = '';
+						$dns = $host['ipmi_ip'];
+						$useip = (string) INTERFACE_USE_DNS;
+					}
+				}
+				else {
+					$ip = $host['ip'];
+					$dns = '';
+					$useip = (string) INTERFACE_USE_IP;
+				}
+
 				$ipmiInterface = [
 					'type' => (string) INTERFACE_TYPE_IPMI,
-					'useip' => (string) INTERFACE_USE_IP,
-					'ip' => (array_key_exists('ipmi_ip', $host) && $host['ipmi_ip'] !== '')
-						? $host['ipmi_ip'] : $host['ip'],
-					'dns' => '',
+					'useip' => $useip,
+					'ip' => $ip,
+					'dns' => $dns,
 					'port' => (array_key_exists('ipmi_port', $host) && $host['ipmi_port'] !== '')
 						? $host['ipmi_port'] : '623',
 					'default' => (string) INTERFACE_PRIMARY,
@@ -274,9 +292,10 @@ class C10ImportConverter extends CConverter {
 				$i++;
 			}
 
-			// if SNMP item exist, create an SNMP interface for each SNMP item port.
+			// If SNMP item exist, create an SNMP interface for each SNMP item port.
 			if ($snmpItems) {
 				$snmpInterfaces = [];
+
 				foreach ($snmpItems as $item) {
 					if (!isset($item['snmp_port']) || isset($snmpInterfaces[$item['snmp_port']])) {
 						continue;
@@ -309,26 +328,31 @@ class C10ImportConverter extends CConverter {
 					continue;
 				}
 
-				$interfaceType = itemTypeInterface($item['type']);
+				// 1.8 till 4.4 uses the old item types.
+				if ($item['type'] == ITEM_TYPE_SNMPV1 || $item['type'] == ITEM_TYPE_SNMPV2C
+						|| $item['type'] == ITEM_TYPE_SNMPV3) {
+					$interfaceType = INTERFACE_TYPE_SNMP;
+				}
+				else {
+					$interfaceType = itemTypeInterface($item['type']);
+				}
+
 				switch ($interfaceType) {
 					case INTERFACE_TYPE_AGENT:
 					case INTERFACE_TYPE_ANY:
 						$item['interface_ref'] = $agentInterface['interface_ref'];
-
 						break;
+
 					case INTERFACE_TYPE_IPMI:
 						$item['interface_ref'] = $ipmiInterface['interface_ref'];
-
 						break;
+
 					case INTERFACE_TYPE_SNMP:
 						if (isset($item['snmp_port'])) {
 							$item['interface_ref'] = $snmpInterfaces[$item['snmp_port']]['interface_ref'];
 						}
-
 						break;
 				}
-
-				unset($item['snmp_port']);
 			}
 			unset($item);
 		}
@@ -655,7 +679,7 @@ class C10ImportConverter extends CConverter {
 		}
 
 		foreach ($host['items'] as &$item) {
-			$item = CArrayHelper::renameKeys($item, ['trapper_hosts' => 'allowed_hosts']);
+			$item = CArrayHelper::renameKeys($item, ['trapper_hosts' => 'allowed_hosts', 'snmp_port' => 'port']);
 			$item['name'] = $item['description'];
 
 			// convert simple check keys
@@ -927,11 +951,13 @@ class C10ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertProxy(array $host) {
-		if (!array_key_exists('proxy_hostid', $host)) {
-			$host['proxy_hostid'] = '';
+		$host['proxy'] = [];
+
+		// If ID is zero, no proxy was assigned to host. Thus it is not name.
+		if ($host['proxy_hostid'] != 0) {
+			$host['proxy']['name'] = $host['proxy_hostid'];
 		}
 
-		$host['proxy']['name'] = $host['proxy_hostid'];
 		unset($host['proxy_hostid']);
 
 		return $host;
@@ -947,28 +973,14 @@ class C10ImportConverter extends CConverter {
 	protected function convertItemValueMap(array $item) {
 		$item['valuemap'] = [];
 		if (array_key_exists('valuemapid', $item)) {
-			$item['valuemap']['name'] = $item['valuemapid'];
+			// If ID is zero, no value maps were assigned to item. Thus it is not name.
+			if ($item['valuemapid'] != 0) {
+				$item['valuemap']['name'] = $item['valuemapid'];
+			}
+
 			unset($item['valuemapid']);
 		}
 
 		return $item;
-	}
-
-	/**
-	 * Add new tag port to template items.
-	 *
-	 * @param array $template  Import data.
-	 *
-	 * @return array
-	 */
-	protected function convertTemplateItem(array $template) {
-		if (array_key_exists('items', $template)) {
-			foreach ($template['items'] as &$item) {
-				$item['port'] = '';
-				unset($item['snmp_port']);
-			}
-		}
-
-		return $template;
 	}
 }

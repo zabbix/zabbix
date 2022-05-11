@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 	protected function checkInput(): bool {
 		$fields = [
-			'ids' => 'required|array',
+			'hostids' => 'required|array',
 			'update' => 'in 1',
 			'visible' => 'array',
 			'tags' => 'array',
@@ -87,7 +87,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	protected function checkPermissions(): bool {
 		$hosts = API::Host()->get([
 			'output' => [],
-			'hostids' => $this->getInput('ids'),
+			'hostids' => $this->getInput('hostids'),
 			'editable' => true
 		]);
 
@@ -97,7 +97,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	protected function doAction(): void {
 		if ($this->hasInput('update')) {
 			$output = [];
-			$hostids = $this->getInput('ids');
+			$hostids = $this->getInput('hostids');
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
 				function (array $macro): bool {
@@ -262,26 +262,30 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 						switch ($this->getInput('mass_action_tpls')) {
 							case ZBX_ACTION_ADD:
-								$host['templates'] = array_unique(
-									array_merge($host_templateids, $this->getInput('templates', []))
+								$host['templates'] = zbx_toObject(
+									array_unique(array_merge($host_templateids, $this->getInput('templates', []))),
+									'templateid'
 								);
 								break;
 
 							case ZBX_ACTION_REPLACE:
-								$host['templates'] = $this->getInput('templates', []);
+								$host['templates'] = zbx_toObject($this->getInput('templates', []), 'templateid');
+
 								if ($this->hasInput('mass_clear_tpls')) {
-									$host['templates_clear'] = array_unique(
-										array_diff($host_templateids, $this->getInput('templates', []))
+									$host['templates_clear'] = zbx_toObject(
+										array_diff($host_templateids, $this->getInput('templates', [])), 'templateid'
 									);
 								}
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								$host['templates'] = array_unique(
-									array_diff($host_templateids, $this->getInput('templates', []))
+								$host['templates'] = zbx_toObject(
+									array_diff($host_templateids, $this->getInput('templates', [])), 'templateid'
 								);
+
 								if ($this->hasInput('mass_clear_tpls')) {
-									$host['templates_clear'] = array_unique($this->getInput('templates', []));
+									$host['templates_clear'] =
+										zbx_toObject($this->getInput('templates', []), 'templateid');
 								}
 								break;
 						}
@@ -472,7 +476,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'ids' => $this->getInput('ids'),
+				'hostids' => $this->getInput('hostids'),
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.list')
@@ -490,7 +494,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 			$data['discovered_host'] = !(bool) API::Host()->get([
 				'output' => [],
-				'hostids' => $data['ids'],
+				'hostids' => $data['hostids'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 				'limit' => 1
 			]);

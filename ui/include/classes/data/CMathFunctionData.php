@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ final class CMathFunctionData {
 		'cbrt' =>				[['count' => 1]],
 		'ceil' =>				[['count' => 1]],
 		'char' =>				[['count' => 1]],
-		'concat' =>				[['count' => 2]],
+		'concat' =>				[['min' => 2]],
 		'cos' =>				[['count' => 1]],
 		'cosh' =>				[['count' => 1]],
 		'cot' =>				[['count' => 1]],

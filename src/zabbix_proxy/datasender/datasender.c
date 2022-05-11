@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,19 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "datasender.h"
+
 #include "comms.h"
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
-#include "zbxjson.h"
 #include "proxy.h"
 #include "zbxself.h"
-#include "dbcache.h"
 #include "zbxtasks.h"
-#include "dbcache.h"
-
-#include "datasender.h"
 #include "zbxcrypto.h"
 #include "zbxcompress.h"
 
@@ -55,8 +51,6 @@ extern unsigned int	configured_tls_connect_mode;
 					ZBX_DATASENDER_TASKS_RECV)
 
 /******************************************************************************
- *                                                                            *
- * Function: get_hist_upload_state                                            *
  *                                                                            *
  * Purpose: Get current history upload state (disabled/enabled)               *
  *                                                                            *
@@ -84,8 +78,6 @@ static void	get_hist_upload_state(const char *buffer, int *state)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proxy_data_sender                                                *
  *                                                                            *
  * Purpose: collects host availability, history, discovery, autoregistration  *
  *          data and sends 'proxy data' request                               *
@@ -188,12 +180,17 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		reserved = j.buffer_size;
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
 		/* retry till have a connection */
 		if (FAIL == connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 				configured_tls_connect_mode, CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING))
 		{
+			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 			goto clean;
 		}
+
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		upload_state = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
 		get_hist_upload_state(sock.buffer, hist_upload_state);
@@ -264,8 +261,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_datasender_loop                                             *
  *                                                                            *
  * Purpose: periodically sends history and events to the server               *
  *                                                                            *

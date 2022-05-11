@@ -1,0 +1,1369 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:17Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 230fa9f7c1774821bbe6cdcbbba5cbc6
+      template: 'Morningstar TriStar PWM SNMP'
+      name: 'Morningstar TriStar PWM SNMP'
+      description: |
+        MIBs used:
+        TRISTAR
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: b76ef47ada0c43cfb50c6a80c8ca55e5
+          name: 'Battery: Battery Voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.8.30.0
+          key: 'battery.voltage.discovery[batteryVoltage.0]'
+          delay: 15m
+          history: '0'
+          value_type: FLOAT
+          units: V
+          description: |
+            MIB: TRISTAR
+            Description:Battery voltage
+            Scaling Factor:0.002950042724609375
+            Units:V
+            Range:[0.0, 80.0]
+            Modbus address:0x0008
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.002950042725'
+          tags:
+            -
+              tag: component
+              value: battery
+            -
+              tag: component
+              value: discovery
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 0c57da022cf8497e88f788cee1b3a0a6
+          name: 'Status: Control Mode'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.8.45.0
+          key: 'control.mode[controlMode.0]'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: TRISTAR
+            Description:Control Mode
+            Modbus address:0x001A
+            
+            0: charge
+            1: loadControl
+            2: diversion
+            3: lighting
+          valuemap:
+            name: 'TriStar PWM control mode'
+          tags:
+            -
+              tag: component
+              value: status
+        -
+          uuid: 25a576060f6948e59a855462b04c7276
+          name: 'Counter: Amp-hours'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.8.39.0
+          key: 'counter.charge_amp_hours[ahResettable.0]'
+          history: 7d
+          value_type: FLOAT
+          units: Ah
+          description: |
+            MIB: TRISTAR
+            Description:Ah (Resettable)
+            Scaling Factor:0.1
+            Units:Ah
+            Range:[0.0, 50000.0]
+            Modbus addresses:H=0x0011 L=0x0012
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.1'
+          tags:
+            -
+              tag: component
+              value: counter
+        -
+          uuid: d2351af0b6244044949eba67a7f7b39c
+          name: 'Counter: KW-hours'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.8.49.0
+          key: 'counter.charge_kw_hours[kilowattHours.0]'
+          history: 7d
+          value_type: FLOAT
+          units: '!kWh'
+          description: |
+            MIB: TRISTAR
+            Description:Kilowatt Hours
+            Scaling Factor:1.0
+            Units:kWh
+            Range:[0.0, 5000.0]
+            Modbus address:0x001E
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.001'
+            -
+              type: REGEX
+              parameters:
+                - '^(\d+)(\.\d{1,2})?'
+                - \1\2
+          tags:
+            -
+              tag: component
+              value: counter
+        -
+          uuid: 03c3397ac32b47499002b13e0735ec9b
+          name: 'Status: Alarms'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.8.42.0
+          key: 'status.alarms[alarms.0]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: TRISTAR
+            Description:Alarms
+            Modbus addresses:H=0x001D L=0x0017
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var FIELDS = [
+                    'rtsOpen',
+                    'rtsShorted',
+                    'rtsDisconnected',
+                    'heatsinkTempSensorOpen',
+                    'heatsinkTempSensorShorted',
+                    'tristarHot',
+                    'currentLimit',
+                    'currentOffset',
+                    'batterySense',
+                    'batterySenseDisconnected',
+                    'uncalibrated',
+                    'rtsMiswire',
+                    'highVoltageDisconnect',
+                    'diversionLoadNearMax',
+                    'systemMiswire',
+                    'mosfetSOpen',
+                    'p12VoltageReferenceOff',
+                    'loadDisconnectState',
+                  ];
+                  
+                  var flags = parseInt(value.replace(/\x20/g, ''), 16),
+                    result = [];
+                  
+                  for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
+                      if (flags & f) {
+                          result.push(FIELDS[i]);
+                      }
+                  }
+                  
+                  return result.length ? result.join('\n') : 'No alarms';
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 121d47c6bbdd45bca261df2e01ea41c6
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySense")=2'
+              name: 'Status: Device has "batterySense" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: fd2d9290144143d39bb5a3cf0a2d261f
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2'
+              name: 'Status: Device has "batterySenseDisconnected" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 83d5b8d52acd4e21ac6d3a9cf05dcd04
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2'
+              name: 'Status: Device has "currentLimit" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: d9529a4372d848038e6ee561d62e9f22
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2'
+              name: 'Status: Device has "currentOffset" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 5f3983acc1cc417e860c1305b11c15ea
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","diversionLoadNearMax")=2'
+              name: 'Status: Device has "diversionLoadNearMax" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 878e04df7e7b416bb0d2213b5dbb80e6
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
+              name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: c642ed9496ce4322809c7142d32929a5
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2'
+              name: 'Status: Device has "heatsinkTempSensorShorted" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 532421fe17bf4732a01a6990e34e649a
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","highVoltageDisconnect")=2'
+              name: 'Status: Device has "highVoltageDisconnect" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: ae90e8034baf4b21906d56d18bfa4da8
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","loadDisconnectState")=2'
+              name: 'Status: Device has "loadDisconnectState" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 8d8b721c6dee40499b29bee44b21589a
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2'
+              name: 'Status: Device has "mosfetSOpen" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 8cda8e5773de4583b9baa6a6e542e32c
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","p12VoltageReferenceOff")=2'
+              name: 'Status: Device has "p12VoltageReferenceOff" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 1b6192b8ca364c229b35ba6de89ad56b
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2'
+              name: 'Status: Device has "rtsDisconnected" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 176de77a142d45a3ac39ea42989e209c
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2'
+              name: 'Status: Device has "rtsMiswire" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: f63029eabc8e498ea7e6336d312ac169
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2'
+              name: 'Status: Device has "rtsShorted" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 480b69c1febf45a2971788c2f967c45d
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2'
+              name: 'Status: Device has "systemMiswire" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 4a287e4086c4458aaa3dc48bbb8ee219
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","tristarHot")=2'
+              name: 'Status: Device has "tristarHot" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: de665482d2574730a3a839948dd730ea
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2'
+              name: 'Status: Device has "uncalibrated" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 9d0f4444f98c4ec082d35559e8fe9ac5
+          name: 'Status: Faults'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.8.43.0
+          key: 'status.faults[faults.0]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: TRISTAR
+            Description:Battery voltage
+            Scaling Factor:0.002950042724609375
+            Units:V
+            Range:[0.0, 80.0]
+            Modbus address:0x0008
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var FIELDS = [
+                    'externalShort',
+                    'overcurrent',
+                    'mosfetSShorted',
+                    'softwareFault',
+                    'highVoltageDisconnect',
+                    'tristarHot',
+                    'dipSwitchChange',
+                    'customSettingsEdit',
+                    'reset',
+                    'systemMiswire',
+                    'rtsShorted',
+                    'rtsDisconnected',
+                  ];
+                  
+                  var flags = parseInt(value.replace(/\x20/g, ''), 16),
+                    result = [];
+                  
+                  for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
+                      if (flags & f) {
+                          result.push(FIELDS[i]);
+                      }
+                  }
+                  
+                  return result.length ? result.join('\n') : 'No faults';
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 514b041aebdd4ddb8ab2d1222c0ef295
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2'
+              name: 'Status: Device has "customSettingsEdit" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 1a40ce8b87f04ab1b4f30387e9ce2d9d
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","dipSwitchChange")=2'
+              name: 'Status: Device has "dipSwitchChange" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 49b120c3933c43b1b7f5c77f7b359997
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","externalShort")=2'
+              name: 'Status: Device has "externalShort" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: f063b9f717c44ab988db7ac95bfca68f
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","highVoltageDisconnect")=2'
+              name: 'Status: Device has "highVoltageDisconnect" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 468716d748f1470cb764ce1af922164d
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","mosfetSShorted")=2'
+              name: 'Status: Device has "mosfetSShorted" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: b6f65dfca421490eafff48991cdf1e3b
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","overcurrent")=2'
+              name: 'Status: Device has "overcurrent" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 73561a5765694633b1dc0ef1b1f60fd4
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","reset")=2'
+              name: 'Status: Device has "reset" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: d14c7d928f57448390c2b4c588a28c65
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","rtsDisconnected")=2'
+              name: 'Status: Device has "rtsDisconnected" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: d94067598c234968b4929404067eff86
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","rtsShorted")=2'
+              name: 'Status: Device has "rtsShorted" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 886b18bee7cd4f8eb454973e2d2ae59f
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","softwareFault")=2'
+              name: 'Status: Device has "softwareFault" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 2e520cdafaaa4eefad5ebea71819c3a6
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","systemMiswire")=2'
+              name: 'Status: Device has "systemMiswire" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 041be44e639d4d1eadb15230a678e278
+              expression: 'count(/Morningstar TriStar PWM SNMP/status.faults[faults.0],#3,"like","tristarHot")=2'
+              name: 'Status: Device has "tristarHot" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 642eec19ba5d450186590e9f5bba36db
+          name: 'Status: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: status.uptime
+          history: 7d
+          units: uptime
+          description: 'Device uptime in seconds'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: f0549419f015448497cd7d15a2bf96fa
+              expression: 'last(/Morningstar TriStar PWM SNMP/status.uptime)<10m'
+              name: 'Status: Device has been restarted'
+              event_name: 'Status: Device has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 64aa2a79fe854def8e179a4d27790417
+              expression: 'nodata(/Morningstar TriStar PWM SNMP/status.uptime,5m)=1'
+              name: 'Status: Failed to fetch data'
+              event_name: 'Status: Failed to fetch data (or no data for 5m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 5 minutes'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: bc729e23973b4d9d97d694d884431e0b
+          name: 'Temperature: Battery'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.8.37.0
+          key: 'temp.battery[batteryTemperature.0]'
+          history: 7d
+          value_type: FLOAT
+          units: C
+          description: |
+            MIB: TRISTAR
+            Description:Battery Temperature
+            Scaling Factor:1.0
+            Units:deg C
+            Range:[-40, 120]
+            Modbus address:0x000F
+          tags:
+            -
+              tag: component
+              value: temperature
+          triggers:
+            -
+              uuid: e759b90e2bf44bbb8e5efe5b9e458e40
+              expression: 'min(/Morningstar TriStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+              name: 'Temperature: Critically high battery temperature'
+              event_name: 'Temperature: Critically high battery temperature (over {$BATTERY.TEMP.MAX.CRIT}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: e57f335f657d45768509f139d31dcdae
+              expression: 'max(/Morningstar TriStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+              name: 'Temperature: Critically low battery temperature'
+              event_name: 'Temperature: Critically low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 7d1444dba9334e91ad425a6f2ff9fef9
+              expression: 'min(/Morningstar TriStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}'
+              name: 'Temperature: High battery temperature'
+              event_name: 'Temperature: High battery temperature (over {$BATTERY.TEMP.MAX.WARN}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Temperature: Critically high battery temperature'
+                  expression: 'min(/Morningstar TriStar PWM SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 14fe4a22b28c4d08a24da51a54e36e81
+              expression: 'max(/Morningstar TriStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}'
+              name: 'Temperature: Low battery temperature'
+              event_name: 'Temperature: Low battery temperature (below {$BATTERY.TEMP.MIN.WARN}C for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Temperature: Critically low battery temperature'
+                  expression: 'max(/Morningstar TriStar PWM SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: a9a009058e99419dbb6cbef5b7797388
+          name: 'Temperature: Heatsink'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.8.36.0
+          key: 'temp.heatsink[heatsinkTemperature.0]'
+          history: 7d
+          value_type: FLOAT
+          units: C
+          description: |
+            MIB: TRISTAR
+            Description:Heatsink Temperature
+            Scaling Factor:1.0
+            Units:deg C
+            Range:[-40, 120]
+            Modbus address:0x000E
+          tags:
+            -
+              tag: component
+              value: temperature
+      discovery_rules:
+        -
+          uuid: 0e06c296579f4b6aa40d69ebb62742b4
+          name: 'Battery voltage discovery'
+          type: DEPENDENT
+          key: battery.voltage.discovery
+          delay: '0'
+          description: 'Discovery for battery voltage triggers'
+          item_prototypes:
+            -
+              uuid: e1960caed8c44606bb684e28cdfac3c7
+              name: 'Battery: Voltage{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.8.30.0
+              key: 'battery.voltage[batteryVoltage.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: TRISTAR
+                Description:Battery voltage
+                Scaling Factor:0.002950042724609375
+                Units:V
+                Range:[0.0, 80.0]
+                Modbus address:0x0008
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.002950042725'
+                -
+                  type: REGEX
+                  parameters:
+                    - '^(\d+)(\.\d{1,2})?'
+                    - \1\2
+              tags:
+                -
+                  tag: component
+                  value: battery
+              trigger_prototypes:
+                -
+                  uuid: 156ec13d673b4a8aa02a87b1794cb722
+                  expression: 'min(/Morningstar TriStar PWM SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                  name: 'Battery: Critically high battery voltage'
+                  event_name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: 5e4400321f4f45b39397c68a4ba54d8e
+                  expression: 'max(/Morningstar TriStar PWM SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                  name: 'Battery: Critically low battery voltage'
+                  event_name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: fa6502a4a0214f7f933e982182d21d6b
+                  expression: 'min(/Morningstar TriStar PWM SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
+                  name: 'Battery: High battery voltage'
+                  event_name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Battery: Critically high battery voltage'
+                      expression: 'min(/Morningstar TriStar PWM SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: a5275748f4c742ea8ab9efd266901e95
+                  expression: 'max(/Morningstar TriStar PWM SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
+                  name: 'Battery: Low battery voltage'
+                  event_name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Battery: Critically low battery voltage'
+                      expression: 'max(/Morningstar TriStar PWM SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+          graph_prototypes:
+            -
+              uuid: bbdea967f4f34a299dd8d9bee43f2841
+              name: 'Battery: Voltage{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Morningstar TriStar PWM SNMP'
+                    key: 'battery.voltage[batteryVoltage.0{#SINGLETON}]'
+          master_item:
+            key: 'battery.voltage.discovery[batteryVoltage.0]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var v_range = [
+                        [[0, 18], [12, 15, 11.5, 15.5]],
+                        [[18, 36], [24, 30, 23, 31]],
+                        [[36, 99], [48, 60, 46, 62]],
+                    ],
+                    result = [];
+                  
+                  for (var idx in v_range) {
+                      if (v_range[idx][0][0] < value && value <= v_range[idx][0][1]) {
+                          result = [{
+                              '{#VOLTAGE.MIN.WARN}': parseInt({$VOLTAGE.MIN.WARN}) || v_range[idx][1][0],
+                              '{#VOLTAGE.MAX.WARN}': parseInt({$VOLTAGE.MAX.WARN}) || v_range[idx][1][1],
+                              '{#VOLTAGE.MIN.CRIT}': parseInt({$VOLTAGE.MIN.CRIT}) || v_range[idx][1][2],
+                              '{#VOLTAGE.MAX.CRIT}': parseInt({$VOLTAGE.MAX.CRIT}) || v_range[idx][1][3],
+                              '{#SINGLETON}': ''
+                          }];
+                          break;
+                      }
+                  }
+                  
+                  return JSON.stringify(result);
+        -
+          uuid: 58a500192e61490f97f33d5b5f6e972f
+          name: 'Charge mode discovery'
+          type: DEPENDENT
+          key: controlmode.charge.discovery
+          delay: '0'
+          lifetime: 1h
+          description: 'Discovery for device in charge mode'
+          item_prototypes:
+            -
+              uuid: f5d120bee1964f10853819d576ddb930
+              name: 'Array: Voltage{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.8.32.0
+              key: 'array.voltage[arrayloadVoltage.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: TRISTAR
+                Description:Array/Load Voltage
+                Scaling Factor:0.00424652099609375
+                Units:V
+                Range:[0, 80]
+                Modbus address:0x000A
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.004246520996'
+                -
+                  type: REGEX
+                  parameters:
+                    - '^(\d+)(\.\d{1,2})?'
+                    - \1\2
+              tags:
+                -
+                  tag: component
+                  value: array
+            -
+              uuid: b5d74de2e96440a5a00a4a4dffffbb26
+              name: 'Battery: Charge Current{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.8.33.0
+              key: 'charge.current[chargeCurrent.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              units: A
+              description: |
+                MIB: TRISTAR
+                Description:Charge Current
+                Scaling Factor:0.002034515380859375
+                Units:A
+                Range:[0, 60]
+                Modbus address:0x000B
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.002034515381'
+                -
+                  type: REGEX
+                  parameters:
+                    - '^(\d+)(\.\d{1,2})?'
+                    - \1\2
+              tags:
+                -
+                  tag: component
+                  value: battery
+          graph_prototypes:
+            -
+              uuid: 9886a05be4a74a82a208e3a5950f022d
+              name: 'Array: Voltage{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Morningstar TriStar PWM SNMP'
+                    key: 'array.voltage[arrayloadVoltage.0{#SINGLETON}]'
+            -
+              uuid: cd64c57669314d2e9526fbc580034c81
+              name: 'Battery: Charge Current{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Morningstar TriStar PWM SNMP'
+                    key: 'charge.current[chargeCurrent.0{#SINGLETON}]'
+          master_item:
+            key: 'control.mode[controlMode.0]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(parseInt(value) === 0 ? [{''{#SINGLETON}'': ''''}] : []);'
+        -
+          uuid: 02fbfa1dd59a4b9c87bb81da81312f54
+          name: 'Charge + Diversion mode discovery'
+          type: DEPENDENT
+          key: controlmode.charge_diversion.discovery
+          delay: '0'
+          lifetime: 1h
+          description: 'Discovery for device in charge and diversion modes'
+          item_prototypes:
+            -
+              uuid: e08b526bbb484753a11c99011d31d945
+              name: 'Battery: Charge State{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.8.46.0
+              key: 'charge.state[controlState.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              description: |
+                MIB: TRISTAR
+                Description:Control State
+                Modbus address:0x001B
+              valuemap:
+                name: 'TriStar PWM charge state'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: battery
+              trigger_prototypes:
+                -
+                  uuid: da21473ce79c42269cc24d3e470b7d07
+                  expression: 'last(/Morningstar TriStar PWM SNMP/charge.state[controlState.0{#SINGLETON}])={$CHARGE.STATE.CRIT}'
+                  name: 'Battery: Device charge in critical state'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 79a592050bc64c018cfa5c7b779fba02
+                  expression: 'last(/Morningstar TriStar PWM SNMP/charge.state[controlState.0{#SINGLETON}])={$CHARGE.STATE.WARN}'
+                  name: 'Battery: Device charge in warning state'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Battery: Device charge in critical state'
+                      expression: 'last(/Morningstar TriStar PWM SNMP/charge.state[controlState.0{#SINGLETON}])={$CHARGE.STATE.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: edd7d01d2523481293f3ac9e8f3c0a00
+              name: 'Battery: Target Voltage{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.8.38.0
+              key: 'target.voltage[targetVoltage.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: TRISTAR
+                Description:Target Regulation Voltage
+                Scaling Factor:0.002950042724609375
+                Units:V
+                Range:[0.0, 80.0]
+                Modbus address:0x0010
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.002950042725'
+                -
+                  type: REGEX
+                  parameters:
+                    - '^(\d+)(\.\d{1,2})?'
+                    - \1\2
+              tags:
+                -
+                  tag: component
+                  value: battery
+          master_item:
+            key: 'control.mode[controlMode.0]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var mode = parseInt(value);
+                  return JSON.stringify((mode === 0 || mode === 2) ? [{'{#SINGLETON}': ''}] : []);
+        -
+          uuid: 8c345c0134fe4d90af83292e557d7309
+          name: 'Diversion mode discovery'
+          type: DEPENDENT
+          key: controlmode.diversion.discovery
+          delay: '0'
+          lifetime: 1h
+          description: 'Discovery for device in diversion mode'
+          item_prototypes:
+            -
+              uuid: 33e6b5a75c1e454cb7b7bc0b1426d1b9
+              name: 'Load: PWM Duty Cycle{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.8.48.0
+              key: 'diversion.pwm_duty_cycle[pwmDutyCycle.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              description: |
+                MIB: TRISTAR
+                Description:PWM Duty Cycle
+                Scaling Factor:0.392156862745098
+                Units:%
+                Range:[0.0, 100.0]
+                Modbus address:0x001C
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.3921568627'
+                -
+                  type: REGEX
+                  parameters:
+                    - '^(\d+)(\.\d{1,2})?'
+                    - \1\2
+              tags:
+                -
+                  tag: component
+                  value: load
+          master_item:
+            key: 'control.mode[controlMode.0]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(parseInt(value) === 2 ? [{''{#SINGLETON}'': ''''}] : []);'
+        -
+          uuid: 54bfd7f730e64af89f937e9b1b6e4d79
+          name: 'Load mode discovery'
+          type: DEPENDENT
+          key: controlmode.load.discovery
+          delay: '0'
+          lifetime: 1h
+          description: 'Discovery for device in load mode'
+          item_prototypes:
+            -
+              uuid: 6d42918b9c244f88a23ab1daf2a929ce
+              name: 'Load: State{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.8.47.0
+              key: 'load.state[loadState.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              description: |
+                MIB: TRISTAR
+                Description:Load State
+                Modbus address:0x001B
+                
+                0: Start
+                1: Normal
+                2: LvdWarning
+                3: Lvd
+                4: Fault
+                5: Disconnect
+                6: LvdWarning1
+                7: OverrideLvd
+                8: Equalize
+              valuemap:
+                name: 'TriStar PWM load state'
+              preprocessing:
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                -
+                  tag: component
+                  value: load
+              trigger_prototypes:
+                -
+                  uuid: 9035e0a92d384a3c844b8a4d4ebd1eb9
+                  expression: 'last(/Morningstar TriStar PWM SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar TriStar PWM SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.CRIT:"fault"}'
+                  name: 'Load: Device load in critical state'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: a2d13f97c4bd46bfab8e74a2f2a7df2e
+                  expression: 'last(/Morningstar TriStar PWM SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar TriStar PWM SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.WARN:"override"}'
+                  name: 'Load: Device load in warning state'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Load: Device load in critical state'
+                      expression: 'last(/Morningstar TriStar PWM SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar TriStar PWM SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.CRIT:"fault"}'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+          master_item:
+            key: 'control.mode[controlMode.0]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.stringify(parseInt(value) === 1 ? [{''{#SINGLETON}'': ''''}] : []);'
+        -
+          uuid: 2e2e01f5c1db4224a97162382c77832c
+          name: 'Load + Diversion mode discovery'
+          type: DEPENDENT
+          key: controlmode.load_diversion.discovery
+          delay: '0'
+          lifetime: 1h
+          description: 'Discovery for device in load and diversion modes'
+          item_prototypes:
+            -
+              uuid: b6db019203cc41ca94dcbe54382fdaad
+              name: 'Load: Current{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.8.34.0
+              key: 'load.current[loadCurrent.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              units: A
+              description: |
+                MIB: TRISTAR
+                Description:Load Current
+                Scaling Factor:0.00966400146484375
+                Units:A
+                Range:[0, 60]
+                Modbus address:0x000C
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.009664001465'
+                -
+                  type: REGEX
+                  parameters:
+                    - '^(\d+)(\.\d{1,2})?'
+                    - \1\2
+              tags:
+                -
+                  tag: component
+                  value: load
+            -
+              uuid: f87ddb7d31d748c8917030ede731f37a
+              name: 'Load: Voltage{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.8.32.0
+              key: 'load.voltage[arrayloadVoltage.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: TRISTAR
+                Description:Array/Load Voltage
+                Scaling Factor:0.00424652099609375
+                Units:V
+                Range:[0, 80]
+                Modbus address:0x000A
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.004246520996'
+                -
+                  type: REGEX
+                  parameters:
+                    - '^(\d+)(\.\d{1,2})?'
+                    - \1\2
+              tags:
+                -
+                  tag: component
+                  value: load
+          graph_prototypes:
+            -
+              uuid: 91ee10b435144218ab3dfac8f6bf7bdd
+              name: 'Load: Current{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Morningstar TriStar PWM SNMP'
+                    key: 'load.current[loadCurrent.0{#SINGLETON}]'
+            -
+              uuid: b4b595193e0c40a2b390f7ce6eefba4a
+              name: 'Load: Voltage{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Morningstar TriStar PWM SNMP'
+                    key: 'load.voltage[arrayloadVoltage.0{#SINGLETON}]'
+          master_item:
+            key: 'control.mode[controlMode.0]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var mode = parseInt(value);
+                  return JSON.stringify((mode === 1 || mode === 2) ? [{'{#SINGLETON}': ''}] : []);
+      tags:
+        -
+          tag: class
+          value: power
+        -
+          tag: target
+          value: morningstar
+      macros:
+        -
+          macro: '{$BATTERY.TEMP.MAX.CRIT}'
+          value: '60'
+          description: 'Battery high temperature critical value'
+        -
+          macro: '{$BATTERY.TEMP.MAX.WARN}'
+          value: '45'
+          description: 'Battery high temperature warning value'
+        -
+          macro: '{$BATTERY.TEMP.MIN.CRIT}'
+          value: '-20'
+          description: 'Battery low temperature critical value'
+        -
+          macro: '{$BATTERY.TEMP.MIN.WARN}'
+          value: '0'
+          description: 'Battery low temperature warning value'
+        -
+          macro: '{$CHARGE.STATE.CRIT}'
+          value: '4'
+          description: fault
+        -
+          macro: '{$CHARGE.STATE.WARN}'
+          value: '2'
+          description: disconnect
+        -
+          macro: '{$LOAD.STATE.CRIT:"fault"}'
+          value: '4'
+          description: fault
+        -
+          macro: '{$LOAD.STATE.CRIT:"lvd"}'
+          value: '3'
+          description: lvd
+        -
+          macro: '{$LOAD.STATE.WARN:"disconnect"}'
+          value: '5'
+          description: disconnect
+        -
+          macro: '{$LOAD.STATE.WARN:"lvdWarning"}'
+          value: '2'
+          description: lvdWarning
+        -
+          macro: '{$LOAD.STATE.WARN:"override"}'
+          value: '7'
+          description: override
+        -
+          macro: '{$VOLTAGE.MAX.CRIT}'
+        -
+          macro: '{$VOLTAGE.MAX.WARN}'
+        -
+          macro: '{$VOLTAGE.MIN.CRIT}'
+        -
+          macro: '{$VOLTAGE.MIN.WARN}'
+      valuemaps:
+        -
+          uuid: 4985c4742d5844e7bc0aee5aeeacc436
+          name: 'TriStar PWM charge state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Start
+            -
+              value: '1'
+              newvalue: NightCheck
+            -
+              value: '2'
+              newvalue: Disconnect
+            -
+              value: '3'
+              newvalue: Night
+            -
+              value: '4'
+              newvalue: Fault
+            -
+              value: '5'
+              newvalue: Bulk
+            -
+              value: '6'
+              newvalue: Absorption
+            -
+              value: '7'
+              newvalue: Float
+            -
+              value: '8'
+              newvalue: Equalize
+        -
+          uuid: 252c3fb63cc34bb1a36ae6e9cbe5880c
+          name: 'TriStar PWM control mode'
+          mappings:
+            -
+              value: '0'
+              newvalue: Charge
+            -
+              value: '1'
+              newvalue: LoadControl
+            -
+              value: '2'
+              newvalue: Diversion
+            -
+              value: '3'
+              newvalue: Lighting
+        -
+          uuid: 735e1a0d990a4c449e59eeb402f3b40e
+          name: 'TriStar PWM load state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Start
+            -
+              value: '1'
+              newvalue: Normal
+            -
+              value: '2'
+              newvalue: LvdWarning
+            -
+              value: '3'
+              newvalue: Lvd
+            -
+              value: '4'
+              newvalue: Fault
+            -
+              value: '5'
+              newvalue: Disconnect
+            -
+              value: '6'
+              newvalue: LvdWarning1
+            -
+              value: '7'
+              newvalue: OverrideLvd
+            -
+              value: '8'
+              newvalue: Equalize
+  graphs:
+    -
+      uuid: ce3aa40eac5f4ee199ed214752304e19
+      name: 'Temperature: Battery/Heatsink'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar TriStar PWM SNMP'
+            key: 'temp.battery[batteryTemperature.0]'
+        -
+          sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 2774A4
+          item:
+            host: 'Morningstar TriStar PWM SNMP'
+            key: 'temp.heatsink[heatsinkTemperature.0]'

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,7 +108,9 @@ if ($data['action']['filter']['conditions']) {
 	}
 }
 
-$formula = (new CTextBox('formula', $data['action']['filter']['formula']))
+$formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
+		DB::getFieldLength('actions', 'formula')
+	))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
@@ -131,10 +133,12 @@ $action_tab->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.condition.actions",'.json_encode([
-			'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
-			'source' => $data['eventsource']
-		]).', null, this);')
+		->onClick(
+			'return PopUp("popup.condition.actions", '.json_encode([
+				'type' => ZBX_POPUP_CONDITION_TYPE_ACTION,
+				'source' => $data['eventsource']
+			]).', {dialogue_class: "modal-popup-medium"});'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
 
@@ -156,13 +160,6 @@ if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL
 		(new CTextBox('esc_period', $data['action']['esc_period']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
-	);
-}
-
-if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-	$operation_tab->addRow(_('Pause operations for suppressed problems'),
-		(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
-			->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
 	);
 }
 
@@ -471,6 +468,18 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
+}
+
+if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	$operation_tab
+		->addRow(_('Pause operations for suppressed problems'),
+			(new CCheckBox('pause_suppressed', ACTION_PAUSE_SUPPRESSED_TRUE))
+				->setChecked($data['action']['pause_suppressed'] == ACTION_PAUSE_SUPPRESSED_TRUE)
+		)
+		->addRow(_('Notify about canceled escalations'),
+			(new CCheckBox('notify_if_canceled', ACTION_NOTIFY_IF_CANCELED_TRUE))
+				->setChecked($data['action']['notify_if_canceled'] == ACTION_NOTIFY_IF_CANCELED_TRUE)
+		);
 }
 
 // Append tabs to form.

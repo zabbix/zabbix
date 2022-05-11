@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxtrends.h"
+#include "zbxtypes.h"
 
 #ifndef ZABBIX_TRENDS_H
 #define ZABBIX_TRENDS_H
@@ -33,16 +34,6 @@ typedef enum
 	ZBX_TREND_FUNCTION_SUM
 }
 zbx_trend_function_t;
-
-typedef enum
-{
-	ZBX_TREND_STATE_UNKNOWN,
-	ZBX_TREND_STATE_NORMAL,
-	ZBX_TREND_STATE_NODATA,
-	ZBX_TREND_STATE_OVERFLOW,
-	ZBX_TREND_STATE_COUNT
-}
-zbx_trend_state_t;
 
 int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_function_t function, double *value,
 		zbx_trend_state_t *state);

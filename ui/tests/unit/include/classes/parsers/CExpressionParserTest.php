@@ -1,7 +1,7 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -303,7 +303,7 @@ class CExpressionParserTest extends TestCase {
 			['last(/host/key,1)and(-1)', null, CParser::PARSE_SUCCESS_CONT],
 			['last(/host/key,1)or(-1)', null, CParser::PARSE_SUCCESS_CONT],
 
-			// "not(" is treated as math functionu name.
+			// "not(" is treated as math function name.
 			['last(/host/key,1)*not(-1)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1)/not(-1)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1)+not(-1)', null, CParser::PARSE_SUCCESS],
@@ -481,7 +481,7 @@ class CExpressionParserTest extends TestCase {
 			['last(/host/key,1)and(- 1)', null, CParser::PARSE_SUCCESS_CONT],
 			['last(/host/key,1)or(- 1)', null, CParser::PARSE_SUCCESS_CONT],
 
-			// "not(" is treated as math functionu name.
+			// "not(" is treated as math function name.
 			['last(/host/key,1)*not(- 1)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1)/not(- 1)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1)+not(- 1)', null, CParser::PARSE_SUCCESS],
@@ -1165,7 +1165,7 @@ class CExpressionParserTest extends TestCase {
 			['last(/host/key,1) and(not 1)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1) or(not 1)', null, CParser::PARSE_SUCCESS],
 
-			// "not(" is treated as math functionu name.
+			// "not(" is treated as math function name.
 			['last(/host/key,1) *not(not 1)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1) /not(not 1)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1) +not(not 1)', null, CParser::PARSE_SUCCESS],
@@ -1189,7 +1189,7 @@ class CExpressionParserTest extends TestCase {
 			['last(/host/key,1)and(not 1)', null, CParser::PARSE_SUCCESS_CONT],
 			['last(/host/key,1)or(not 1)', null, CParser::PARSE_SUCCESS_CONT],
 
-			// "not(" is treated as math functionu name.
+			// "not(" is treated as math function name.
 			['last(/host/key,1)*not(not 1)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1)/not(not 1)', null, CParser::PARSE_SUCCESS],
 			['last(/host/key,1)+not(not 1)', null, CParser::PARSE_SUCCESS],

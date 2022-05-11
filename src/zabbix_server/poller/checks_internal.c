@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,14 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "checks_internal.h"
-#include "checks_java.h"
-#include "dbcache.h"
-#include "zbxself.h"
-#include "proxy.h"
-#include "zbxtrends.h"
 
+#include "checks_java.h"
+#include "zbxself.h"
+#include "preproc.h"
+#include "zbxtrends.h"
 #include "../vmware/vmware.h"
 #include "../../libs/zbxserver/zabbix_stats.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
@@ -57,8 +55,6 @@ static int	compare_interfaces(const void *p1, const void *p2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_host_interfaces_discovery                                    *
  *                                                                            *
  * Purpose: get data of all network interfaces for a host from configuration  *
  *          cache and pack into JSON for LLD                                  *
@@ -172,16 +168,12 @@ static int	zbx_host_interfaces_discovery(zbx_uint64_t hostid, struct zbx_json *j
 
 /******************************************************************************
  *                                                                            *
- * Function: get_value_internal                                               *
- *                                                                            *
  * Purpose: retrieve data from Zabbix server (internally supported items)     *
  *                                                                            *
  * Parameters: item - item we are interested in                               *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
 int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)

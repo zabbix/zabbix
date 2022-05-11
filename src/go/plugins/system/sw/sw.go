@@ -1,8 +1,9 @@
+//go:build !windows
 // +build !windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,9 +30,9 @@ import (
 	"strings"
 	"time"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/zbxcmd"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -
@@ -42,7 +43,8 @@ type Plugin struct {
 
 // Options -
 type Options struct {
-	Timeout int
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int
 }
 
 type manager struct {

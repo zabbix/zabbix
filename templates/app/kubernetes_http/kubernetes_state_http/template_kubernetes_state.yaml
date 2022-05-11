@@ -1,0 +1,4011 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:27:54Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 07695028a2ba4b66a5414797bec791df
+      template: 'Kubernetes cluster state by HTTP'
+      name: 'Kubernetes cluster state by HTTP'
+      description: |
+        Get Kubernetes state metrics by HTTP.
+        Metrics are collected by requests to Kubernetes API.
+        
+        Don't forget to read the README.md for the correct setup of the template.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 41c79d9286734cc3b0e3aa5ef729e5fe
+          name: 'Kubernetes: Get component statuses'
+          type: HTTP_AGENT
+          key: kube.componentstatuses
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          timeout: 10s
+          url: '{$KUBE.API.URL}{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}'
+          status_codes: '200, 403'
+          headers:
+            -
+              name: Authorization
+              value: 'Bearer {$KUBE.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: e40b126a0cf64ce6bfed3b3de1d4dfa8
+          name: 'Kubernetes: Control plane LLD'
+          type: SCRIPT
+          key: kube.control_plane.lld
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Kube = {
+                params: {},
+            
+                setParams: function (params) {
+                    ['api_endpoint', 'token'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                            || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                    });
+            
+                    Kube.params = params;
+                    if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
+                        Kube.params.api_endpoint += '/';
+                    }
+                },
+            
+                request: function (query) {
+                    var response,
+                        request = new HttpRequest(),
+                        url = Kube.params.api_endpoint + query;
+            
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    response = request.get(url);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                        }
+                    }
+            
+                    return {
+                        status: request.getStatus(),
+                        response: response
+                    };
+                },
+            
+                getNodes: function () {
+                    var result = Kube.request('v1/nodes');
+            
+                    if (typeof result.response !== 'object'
+                        || typeof result.response.items === 'undefined'
+                        || result.status != 200) {
+                        throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
+                    };
+            
+                    return result.response;
+                },
+            };
+            
+            try {
+                Kube.setParams(JSON.parse(value));
+            
+                var nodes = Kube.getNodes(),
+                    controlPlaneNodes = [];
+            
+                for (idx in nodes.items) {
+                    for (label in nodes.items[idx].metadata.labels) {
+                        if (label === 'node-role.kubernetes.io/control-plane') {                          
+                            var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
+                                return addr.type === 'InternalIP';
+                            });
+            
+                            var internalIP = internalIPs.length && internalIPs[0].address;
+            
+                            controlPlaneNodes.push({
+                                '{#NAME}': nodes.items[idx].metadata.name,
+                                '{#IP}': internalIP,
+                                '{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + internalIP + ':' + Kube.params.api_server_port + '/metrics',
+                                '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + internalIP + ':' + Kube.params.controller_port + '/metrics',
+                                '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + internalIP + ':' + Kube.params.scheduler_port + '/metrics',
+                                '{#COMPONENT.API}' : 'API',
+                                '{#COMPONENT.CONTROLLER}' : 'Controller manager',
+                                '{#COMPONENT.SCHEDULER}' : 'Scheduler'
+                            });
+            
+                            break;
+                        }
+                    }
+                }
+            
+                return JSON.stringify(controlPlaneNodes);
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
+                return JSON.stringify({ error: error });
+            }
+          description: 'Generation of data for Control plane discovery rules.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          timeout: 10s
+          parameters:
+            -
+              name: token
+              value: '{$KUBE.API.TOKEN}'
+            -
+              name: api_server_scheme
+              value: '{$KUBE.API_SERVER.SCHEME}'
+            -
+              name: api_server_port
+              value: '{$KUBE.API_SERVER.PORT}'
+            -
+              name: controller_scheme
+              value: '{$KUBE.CONTROLLER_MANAGER.SCHEME}'
+            -
+              name: controller_port
+              value: '{$KUBE.CONTROLLER_MANAGER.PORT}'
+            -
+              name: scheduler_scheme
+              value: '{$KUBE.SCHEDULER.SCHEME}'
+            -
+              name: scheduler_port
+              value: '{$KUBE.SCHEDULER.PORT}'
+            -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 6f22e81d69d04eeca88a7992463556a7
+          name: 'Kubernetes: CronJob count'
+          type: DEPENDENT
+          key: kube.cronjob.count
+          delay: '0'
+          history: 7d
+          description: 'Number of cronjobs.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - kube_cronjob_created
+                - function
+                - count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kube.state.metrics
+          tags:
+            -
+              tag: component
+              value: cronjob
+        -
+          uuid: 483fc2c315264ae5963d34a45f80156e
+          name: 'Kubernetes: Deployment count'
+          type: DEPENDENT
+          key: kube.deployment.count
+          delay: '0'
+          history: 7d
+          description: 'The number of deployments.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - kube_deployment_created
+                - function
+                - count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kube.state.metrics
+          tags:
+            -
+              tag: component
+              value: deployment
+        -
+          uuid: 93126582e30e45b8a70f6e45402e2f54
+          name: 'Kubernetes: Endpoint count'
+          type: DEPENDENT
+          key: kube.endpoint.count
+          delay: '0'
+          history: 7d
+          description: 'Number of endpoints.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - kube_endpoint_created
+                - function
+                - count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kube.state.metrics
+          tags:
+            -
+              tag: component
+              value: endpoint
+        -
+          uuid: c08df3a8ae044ae9a331db33bcca7db3
+          name: 'Kubernetes: Job count'
+          type: DEPENDENT
+          key: kube.job.count
+          delay: '0'
+          history: 7d
+          description: 'Number of jobs(generated by cronjob + job).'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - kube_job_created
+                - function
+                - count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kube.state.metrics
+          tags:
+            -
+              tag: component
+              value: job
+        -
+          uuid: d731fb05f0284921ab3548ba631f019c
+          name: 'Kubernetes: Get livez'
+          type: HTTP_AGENT
+          key: kube.livez
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var output = [],
+                      conponent;
+                  
+                  value.split(/\n/).forEach(function (entry) {
+                      if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {
+                          output.push({
+                              name: component[1],
+                              value: component[2]
+                          });
+                      }
+                  });
+                  
+                  return JSON.stringify(output);
+          timeout: 10s
+          url: '{$KUBE.API.URL}{$KUBE.API.LIVEZ.ENDPOINT}?verbose'
+          status_codes: '200, 403'
+          headers:
+            -
+              name: Authorization
+              value: 'Bearer {$KUBE.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: d266edd6dda34e15888b572569a1f301
+          name: 'Kubernetes: Namespace count'
+          type: DEPENDENT
+          key: kube.namespace.count
+          delay: '0'
+          history: 7d
+          description: 'The number of namespaces.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - kube_namespace_created
+                - function
+                - count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kube.state.metrics
+          tags:
+            -
+              tag: component
+              value: namespace
+        -
+          uuid: 968e1dcaf76645aebd4979b9ad4eca9e
+          name: 'Kubernetes: Node count'
+          type: DEPENDENT
+          key: kube.node.count
+          delay: '0'
+          history: 7d
+          description: 'The number of nodes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - kube_node_created
+                - function
+                - count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kube.state.metrics
+          tags:
+            -
+              tag: component
+              value: node
+        -
+          uuid: aae78585c668466da5d0ab8d8b899828
+          name: 'Kubernetes: Node LLD'
+          type: SCRIPT
+          key: kube.node.lld
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Kube = {
+                params: {},
+            
+                setParams: function (params) {
+                    ['api_endpoint', 'token'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                            || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                    });
+            
+                    Kube.params = params;
+                    if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
+                        Kube.params.api_endpoint += '/';
+                    }
+                },
+            
+                request: function (query) {
+                    var response,
+                        request = new HttpRequest(),
+                        url = Kube.params.api_endpoint + query;
+            
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    response = request.get(url);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                        }
+                    }
+            
+                    return {
+                        status: request.getStatus(),
+                        response: response
+                    };
+                },
+            
+                getNodes: function () {
+                    var result = Kube.request('v1/nodes');
+            
+                    if (typeof result.response !== 'object'
+                        || typeof result.response.items === 'undefined'
+                        || result.status != 200) {
+                        throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
+                    };
+            
+                    return result.response;
+                },
+            };
+            
+            try {
+                Kube.setParams(JSON.parse(value));
+            
+                var nodes = Kube.getNodes(),
+                    kubeNodes = [];
+            
+                for (idx in nodes.items) {
+                    var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
+                        return addr.type === 'InternalIP';
+                    });
+            
+                    var internalIP = internalIPs.length && internalIPs[0].address;
+            
+                    kubeNodes.push({
+                        '{#NAME}': nodes.items[idx].metadata.name,
+                        '{#IP}': internalIP,
+                        '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + internalIP + ':' + Kube.params.kubelet_port,
+                        '{#COMPONENT}': 'Kubelet'
+                    });
+                }
+            
+                return JSON.stringify(kubeNodes);
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
+                return JSON.stringify({ error: error });
+            }
+          description: 'Generation of data for Kubelet discovery rules.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          timeout: 10s
+          parameters:
+            -
+              name: token
+              value: '{$KUBE.API.TOKEN}'
+            -
+              name: kubelet_scheme
+              value: '{$KUBE.KUBELET.SCHEME}'
+            -
+              name: kubelet_port
+              value: '{$KUBE.KUBELET.PORT}'
+            -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 3a5eaef4e8134dfb9f2935f98a8b88f7
+          name: 'Kubernetes: Get readyz'
+          type: HTTP_AGENT
+          key: kube.readyz
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var output = [],
+                      component;
+                  
+                  value.split(/\n/).forEach(function (entry) {
+                      if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {
+                          output.push({
+                              name: component[1],
+                              value: component[2]
+                          });
+                      }
+                  });
+                  
+                  return JSON.stringify(output);
+          timeout: 10s
+          url: '{$KUBE.API.URL}{$KUBE.API.READYZ.ENDPOINT}?verbose'
+          status_codes: '200, 403'
+          headers:
+            -
+              name: Authorization
+              value: 'Bearer {$KUBE.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 262b0114fed14fec91d50589e97307a7
+          name: 'Kubernetes: Service count'
+          type: DEPENDENT
+          key: kube.service.count
+          delay: '0'
+          history: 7d
+          description: 'The number of services.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - kube_service_created
+                - function
+                - count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kube.state.metrics
+          tags:
+            -
+              tag: component
+              value: service
+        -
+          uuid: 66e69f9970ce478f8f0ff13f26b248e3
+          name: 'Kubernetes: Get state metrics'
+          type: SCRIPT
+          key: kube.state.metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Kube = {
+                params: {},
+                metrics_endpoint: undefined,
+            
+                setParams: function (params) {
+                    ['api_endpoint', 'token', 'state_endpoint_name'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                            || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                    });
+            
+                      Kube.params = params;
+                      if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
+                          Kube.params.api_endpoint += '/';
+                      }
+                },
+            
+                apiRequest: function (query) {
+                    var response,
+                        request = new HttpRequest(),
+                        url = Kube.params.api_endpoint + query;
+            
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    response = request.get(url);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                        }
+                    }
+            
+                    return {
+                        status: request.getStatus(),
+                        response: response
+                    };
+                },
+            
+                getMetricsEndpoint: function () {
+                    var result = Kube.apiRequest('v1/endpoints'),
+                        endpoint = undefined;
+            
+                    if (typeof result.response !== 'object'
+                        || typeof result.response.items === 'undefined'
+                        || result.status != 200) {
+                        throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
+                    };
+            
+                    result.response.items.forEach(function (ep) {
+                        if (ep.metadata.name === Kube.params.state_endpoint_name && Array.isArray(ep.subsets)) {
+                            if (typeof ep.subsets[0].addresses !== 'undefined') {
+                                var subset = ep.subsets[0];
+            
+                                endpoint = {
+                                    address: subset.addresses[0].ip,
+                                    port: port = subset.ports.filter(function (port) {
+                                        return port.name === 'http';
+                                    })[0].port || 8080
+                                }
+                            }
+                        }
+                    });
+            
+                    Kube.metrics_endpoint = endpoint;
+                    return endpoint;
+                },
+            
+                getStateMetrics: function () {
+                    if (typeof Kube.metrics_endpoint === 'undefined') {
+                        throw 'Cannot get kube-state-metrics endpoints from Kubernetes API. Check debug log for more information.';
+                    }
+            
+                    var response,
+                        request = new HttpRequest(),
+                        url = 'http://' + Kube.metrics_endpoint.address + ':' + Kube.metrics_endpoint.port + '/metrics';
+            
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    response = request.get(url);
+            
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (response === null) {
+                        throw 'failed to get Kubernetes state metrics. Check debug log for more information.';
+                    }
+            
+                    return response;
+            
+                }
+            };
+            
+            try {
+                Kube.setParams(JSON.parse(value));
+            
+                var metricsEndpoint = Kube.getMetricsEndpoint(),
+                    stateMetrics = Kube.getStateMetrics();
+            
+                return stateMetrics;
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
+                return JSON.stringify({ error: error });
+            }
+          description: 'Collecting Kubernetes metrics from kube-state-metrics.'
+          timeout: 10s
+          parameters:
+            -
+              name: state_endpoint_name
+              value: '{$KUBE.STATE.ENDPOINT.NAME}'
+            -
+              name: token
+              value: '{$KUBE.API.TOKEN}'
+            -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 3940412bea334e139a72b223197582eb
+          name: 'Kubernetes: Statefulset count'
+          type: DEPENDENT
+          key: kube.statefulset.count
+          delay: '0'
+          history: 7d
+          description: 'The number of statefulsets.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - kube_statefulset_created
+                - function
+                - count
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: kube.state.metrics
+          tags:
+            -
+              tag: component
+              value: statefulset
+      discovery_rules:
+        -
+          uuid: dbfd8959361f4cdd973ed552eb18eb86
+          name: 'API servers discovery'
+          type: DEPENDENT
+          key: kube.api_servers.discovery
+          delay: '0'
+          host_prototypes:
+            -
+              uuid: a67ac5100e6d499088e4c81856f947fc
+              host: 'API {#NAME}'
+              name: 'API {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: 'Kubernetes/Components: {#COMPONENT.API}'
+              templates:
+                -
+                  name: 'Kubernetes API server by HTTP'
+              macros:
+                -
+                  macro: '{$KUBE.API.SERVER.URL}'
+                  value: '{#KUBE.API.SERVER.URL}'
+              tags:
+                -
+                  tag: addr
+                  value: '{#IP}'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#IP}'
+          master_item:
+            key: kube.control_plane.lld
+        -
+          uuid: 920b56d5e9234da6b60717763e206736
+          name: 'Component statuses discovery'
+          type: DEPENDENT
+          key: kube.componentstatuses.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: 766e311f05f646d18eaaaa9ea9afa691
+              name: 'Kubernetes: Component [{#NAME}]: Healthy'
+              type: DEPENDENT
+              key: 'kube.componentstatuses.healthy[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Cluster component healthy.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.items.[?(@.metadata.name == "{#NAME}")].conditions[?(@.type == "Healthy")].status.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.componentstatuses
+              tags:
+                -
+                  tag: component
+                  value: component
+                -
+                  tag: component
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: healthy
+              trigger_prototypes:
+                -
+                  uuid: 58828a692aa2418ba98c6d66a23f1506
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,,"True")<2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0'
+                  name: 'Kubernetes: Component [{#NAME}] is unhealthy'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+          master_item:
+            key: kube.componentstatuses
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.items.forEach(function (component) {
+                      output.push({
+                          '{#NAME}': component.metadata.name
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 08463c66bce845e7acff0d91785e0982
+          name: 'Controller manager nodes discovery'
+          type: DEPENDENT
+          key: kube.controller_manager.discovery
+          delay: '0'
+          host_prototypes:
+            -
+              uuid: 9d529f3924fc4831a62fb1eec79b64d7
+              host: 'Controller manager {#NAME}'
+              name: 'Controller manager {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: 'Kubernetes/Components: {#COMPONENT.CONTROLLER}'
+              templates:
+                -
+                  name: 'Kubernetes Controller manager by HTTP'
+              macros:
+                -
+                  macro: '{$KUBE.CONTROLLER.SERVER.URL}'
+                  value: '{#KUBE.CONTROLLER.SERVER.URL}'
+              tags:
+                -
+                  tag: addr
+                  value: '{#IP}'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#IP}'
+          master_item:
+            key: kube.control_plane.lld
+        -
+          uuid: 9bb7532f14dd42c6a532636126e507f9
+          name: 'CronJob discovery'
+          type: DEPENDENT
+          key: kube.cronjob.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: fd1afcc4646146588fd3c22cf2f7e040
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Completion failed'
+              type: DEPENDENT
+              key: 'kube.cronjob.completion.failed[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of job has failed its execution.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_job_failed{namespace="{#NAMESPACE}", job_name=~"{#NAME}-*", condition="true"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cronjob
+                -
+                  tag: cronjob
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 5ba1dfd55c784f8597575b38399d5e36
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Completion succeeded'
+              type: DEPENDENT
+              key: 'kube.cronjob.completion.succeeded[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of job has completed its execution.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_job_complete{namespace="{#NAMESPACE}", job_name=~"{#NAME}-*", condition="true"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cronjob
+                -
+                  tag: cronjob
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 7ae683d5a1ed4f84a09b38863bd263a7
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Last schedule'
+              type: DEPENDENT
+              key: 'kube.cronjob.last_schedule_time[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'LastScheduleTime keeps information of when was the last time the job was successfully scheduled.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_cronjob_status_last_schedule_time{namespace="{#NAMESPACE}", cronjob="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return new Date(value * 1000).toString().slice(0,19);'
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cronjob
+                -
+                  tag: cronjob
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 8ad7e96b34604a4991698288a7af8027
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Next schedule'
+              type: DEPENDENT
+              key: 'kube.cronjob.next_schedule_time[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Next time the cronjob should be scheduled. The time after lastScheduleTime, or after the cron job''s creation time if it''s never been scheduled. Use this to determine if the job is delayed.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_cronjob_next_schedule_time{namespace="{#NAMESPACE}", cronjob="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return new Date(value * 1000).toString().slice(0,19);'
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cronjob
+                -
+                  tag: cronjob
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 329e8166d1ec42cca7508580efaad366
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Suspend'
+              type: DEPENDENT
+              key: 'kube.cronjob.spec_suspend[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Suspend flag tells the controller to suspend subsequent executions.'
+              valuemap:
+                name: 'CronJob suspend flag'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_cronjob_spec_suspend{namespace="{#NAMESPACE}", cronjob="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cronjob
+                -
+                  tag: cronjob
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: ce13a921915a4232971f2e29102cac64
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Active'
+              type: DEPENDENT
+              key: 'kube.cronjob.status_active[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Active holds pointers to currently running jobs.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_cronjob_status_active{namespace="{#NAMESPACE}", cronjob="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cronjob
+                -
+                  tag: cronjob
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 26993138717242079583b1c17d0e8dc8
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Failed'
+              type: DEPENDENT
+              key: 'kube.cronjob.status_failed[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of pods which reached Phase Failed and the reason for failure.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_job_status_failed{namespace="{#NAMESPACE}", job_name=~"{#NAME}-*"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cronjob
+                -
+                  tag: cronjob
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 9e5adc642c3a40ab80654542903cd314
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] CronJob [{#NAME}]: Succeeded'
+              type: DEPENDENT
+              key: 'kube.cronjob.status_succeeded[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of pods which reached Phase Succeeded.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_job_status_succeeded{namespace="{#NAMESPACE}", job_name=~"{#NAME}-*"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cronjob
+                -
+                  tag: cronjob
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_cronjob_created
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.cronjob,
+                          '{#NAMESPACE}': metric.labels.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 907dd8e2792e4e1591a99e4cdf65b0f0
+          name: 'Daemonset discovery'
+          type: DEPENDENT
+          key: kube.daemonset.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 61a295b5e2ec4e1f91984a74d0695c1b
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Desired'
+              type: DEPENDENT
+              key: 'kube.daemonset.desired[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of nodes that should be running the daemon pod.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_daemonset_status_desired_number_scheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: daemonset
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 5393cb9b29e442198967cdd2a040d673
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Misscheduled'
+              type: DEPENDENT
+              key: 'kube.daemonset.misscheduled[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of nodes running a daemon pod but are not supposed to.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_daemonset_status_number_misscheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: daemonset
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 193ccc0290514c4594193a8bcfd60312
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Ready'
+              type: DEPENDENT
+              key: 'kube.daemonset.ready[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of nodes that should be running the daemon pod and have one or more running and ready.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_daemonset_status_number_ready{namespace="{#NAMESPACE}", daemonset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: daemonset
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 5727ade78d394d8da1ae46b5d35b5f54
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Scheduled'
+              type: DEPENDENT
+              key: 'kube.daemonset.scheduled[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of nodes running at least one daemon pod and are supposed to.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_daemonset_status_current_number_scheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: daemonset
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: d7c1ebe9e42942719dae731a2c440208
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Daemonset [{#NAME}]: Updated number scheduled'
+              type: DEPENDENT
+              key: 'kube.daemonset.updated[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The total number of nodes that are running updated daemon pod.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_daemonset_status_updated_number_scheduled{namespace="{#NAMESPACE}", daemonset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: daemonset
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_daemonset_status_number_ready
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.daemonset,
+                          '{#NAMESPACE}': metric.labels.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 461770e4762f498e86f3f1c931fe27a9
+          name: 'Deployment discovery'
+          type: DEPENDENT
+          key: kube.deployment.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 943c67dc814e4b06a57fbc4ef609686a
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas'
+              type: DEPENDENT
+              key: 'kube.deployment.replicas[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of replicas per deployment.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_deployment_status_replicas{namespace="{#NAMESPACE}", deployment="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: deployment
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 23d730bdea7f444eb5f2ee8bf5987379
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas available'
+              type: DEPENDENT
+              key: 'kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of available replicas per deployment.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_deployment_status_replicas_available{namespace="{#NAMESPACE}", deployment="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: deployment
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: status
+                  value: available
+            -
+              uuid: b79fe110f4d64a94bb78d7f1e9b175e7
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas desired'
+              type: DEPENDENT
+              key: 'kube.deployment.replicas_desired[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of desired pods for a deployment.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_deployment_spec_replicas{namespace="{#NAMESPACE}", deployment="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: deployment
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 891537523f98425c8bb1566f984b535a
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas unavailable'
+              type: DEPENDENT
+              key: 'kube.deployment.replicas_unavailable[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of unavailable replicas per deployment.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_deployment_status_replicas_unavailable{namespace="{#NAMESPACE}", deployment="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: deployment
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: status
+                  value: unavailable
+            -
+              uuid: 241480bc5e90426abbf5d2792cd846cd
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas updated'
+              type: DEPENDENT
+              key: 'kube.deployment.replicas_updated[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of updated replicas per deployment.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_deployment_status_replicas_updated{namespace="{#NAMESPACE}", deployment="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: deployment
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: status
+                  value: updated
+            -
+              uuid: 2651b21facca4bd88929079f4372da37
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Rollingupdate max unavailable'
+              type: DEPENDENT
+              key: 'kube.deployment.rollingupdate.max_unavailable[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Maximum number of unavailable replicas during a rolling update of a deployment.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_deployment_spec_strategy_rollingupdate_max_unavailable{namespace="{#NAMESPACE}", deployment="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: deployment
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: edc5635267b146d2b0a986e5820227ac
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Paused'
+              type: DEPENDENT
+              key: 'kube.deployment.spec_paused[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Whether the deployment is paused and will not be processed by the deployment controller.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_deployment_spec_paused{namespace="{#NAMESPACE}", deployment="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: deployment
+                -
+                  tag: daemonset
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+          trigger_prototypes:
+            -
+              uuid: aa9f828467d84252aecc00dd342b5661
+              expression: '(last(/Kubernetes cluster state by HTTP/kube.deployment.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}]))<>0'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Deployment replicas mismatch'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_deployment_spec_paused
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.deployment,
+                          '{#NAMESPACE}': metric.labels.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 671a0dd7f6e54c6893094fa4360d3dd4
+          name: 'Endpoint discovery'
+          type: DEPENDENT
+          key: kube.endpoint.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: d587eb7186dd425ead2c9554825ba20a
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Endpoint [{#NAME}]: Address available'
+              type: DEPENDENT
+              key: 'kube.endpoint.address_available[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of addresses available in endpoint.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_endpoint_address_available{namespace="{#NAMESPACE}", endpoint="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: endpoint
+                -
+                  tag: endpoint
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: status
+                  value: available
+            -
+              uuid: 91fc21c37e144890858137f7f5c38135
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Endpoint [{#NAME}]: Address not ready'
+              type: DEPENDENT
+              key: 'kube.endpoint.address_not_ready[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of addresses not ready in endpoint.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_endpoint_address_not_ready{namespace="{#NAMESPACE}", endpoint="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: endpoint
+                -
+                  tag: endpoint
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: status
+                  value: not-ready
+            -
+              uuid: f6c2a426e0154c34b2bcb98eeeb88a0d
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Endpoint [{#NAME}]: Age'
+              type: DEPENDENT
+              key: 'kube.endpoint.age[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Endpoint age (number of secods since creation).'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_endpoint_created{namespace="{#NAMESPACE}", endpoint="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return (Math.floor(Date.now()/1000)-Number(value))'
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: endpoint
+                -
+                  tag: endpoint
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_endpoint_created
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.endpoint,
+                          '{#NAMESPACE}': metric.labels.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: bc6897c5abe246fdb1ba72c1e71cdb81
+          name: 'Job discovery'
+          type: DEPENDENT
+          key: kube.job.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: b1fad48e204e4bf9a03c79baa0f58963
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion failed'
+              type: DEPENDENT
+              key: 'kube.job.completion.failed[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of job has failed its execution.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_job_failed{namespace="{#NAMESPACE}", job_name="{#NAME}", condition="true"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: job
+                -
+                  tag: job
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: 51d3653b2c7543dba04339ded6ff65dd
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Completion succeeded'
+              type: DEPENDENT
+              key: 'kube.job.completion.succeeded[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Number of job has completed its execution.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_job_complete{namespace="{#NAMESPACE}", job_name="{#NAME}", condition="true"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: job
+                -
+                  tag: job
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: f175e0bd1f6b41a2b62e69df40b3fc07
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Failed'
+              type: DEPENDENT
+              key: 'kube.job.status_failed[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of pods which reached Phase Failed and the reason for failure.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_job_status_failed{namespace="{#NAMESPACE}", job_name="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: job
+                -
+                  tag: job
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+            -
+              uuid: b909868367d5481d982d33d5248167ab
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Job [{#NAME}]: Succeeded'
+              type: DEPENDENT
+              key: 'kube.job.status_succeeded[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of pods which reached Phase Succeeded.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_job_status_succeeded{namespace="{#NAMESPACE}", job_name="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: job
+                -
+                  tag: job
+                  value: '{#NAME}'
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'kube_job_owner{owner_is_controller="<none>"}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.job_name,
+                          '{#NAMESPACE}': metric.labels.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 11ca82627209443a96693e443d6391c1
+          name: 'Kubelet discovery'
+          type: DEPENDENT
+          key: kube.kubelet.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          host_prototypes:
+            -
+              uuid: c1c4807f378a47dfa59e9bbc8e43f5e2
+              host: 'Kubelet {#NAME}'
+              name: 'Kubelet {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: 'Kubernetes/Components: {#COMPONENT}'
+              templates:
+                -
+                  name: 'Kubernetes Kubelet by HTTP'
+              macros:
+                -
+                  macro: '{$KUBE.KUBELET.URL}'
+                  value: '{#KUBE.KUBELET.URL}'
+              tags:
+                -
+                  tag: addr
+                  value: '{#IP}'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#IP}'
+          master_item:
+            key: kube.node.lld
+        -
+          uuid: 438e963e02a749b5a2cc487b9fd5db05
+          name: 'Livez discovery'
+          type: DEPENDENT
+          key: kube.livez.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: 93548d985c1542a891bfc74f2d42d59a
+              name: 'Kubernetes: Livez [{#NAME}]: Healthcheck'
+              type: DEPENDENT
+              key: 'kube.livez.helthcheck[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Result of livez helthcheck for component.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name == "{#NAME}")].value.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.livez
+              tags:
+                -
+                  tag: component
+                  value: livez
+                -
+                  tag: component
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 9fcb23d29ac3481a8613515cc2cccfcf
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.helthcheck[{#NAME}]))>0'
+                  name: 'Kubernetes: Livez [{#NAME}] is unhealthy'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+          master_item:
+            key: kube.livez
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (component) {
+                      output.push({
+                          '{#NAME}': component.name
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 9d161120d2be48d1abb6e56107057874
+          name: 'Node discovery'
+          type: DEPENDENT
+          key: kube.node.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: 4f994219cbe94dfe8d96af1ad5018212
+              name: 'Kubernetes: Node [{#NAME}]: CPU allocatable'
+              type: DEPENDENT
+              key: 'kube.node.cpu_allocatable[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: cpu
+              description: 'The CPU resources of a node that are available for scheduling.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_node_status_allocatable{node="{#NAME}", resource="cpu"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: node
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: allocatable
+            -
+              uuid: 5d3ad3e1b2a547aea65b557ff2765ef7
+              name: 'Kubernetes: Node [{#NAME}]: CPU capacity'
+              type: DEPENDENT
+              key: 'kube.node.cpu_capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: cpu
+              description: 'The capacity for CPU resources of a node.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_node_status_capacity{node="{#NAME}", resource="cpu"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: node
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: capacity
+            -
+              uuid: 49440553854441f39ecbcf7052d83e51
+              name: 'Kubernetes: Node [{#NAME}]: Ephemeral storage allocatable'
+              type: DEPENDENT
+              key: 'kube.node.ephemeral_storage_allocatable[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The allocatable ephemeral-storage of a node that is available for scheduling.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_node_status_allocatable{node="{#NAME}", resource="ephemeral_storage"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: ephemeral-storage
+                -
+                  tag: node
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: capacity
+            -
+              uuid: 2831a4b1bc1549198203f3e894f07a1f
+              name: 'Kubernetes: Node [{#NAME}]: Ephemeral storage capacity'
+              type: DEPENDENT
+              key: 'kube.node.ephemeral_storage_capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The ephemeral-storage capacity of a node.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_node_status_capacity{node="{#NAME}", resource="ephemeral_storage"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: ephemeral-storage
+                -
+                  tag: node
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: capacity
+            -
+              uuid: 0247f7ba014443a0b13a4fdd3e191062
+              name: 'Kubernetes: Node [{#NAME}]: Memory allocatable'
+              type: DEPENDENT
+              key: 'kube.node.memory_allocatable[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The Memory resources of a node that are available for scheduling.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_node_status_allocatable{node="{#NAME}", resource="memory"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: node
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: allocatable
+            -
+              uuid: 3336028952b14e2ab3dae55659156ea3
+              name: 'Kubernetes: Node [{#NAME}]: Memory capacity'
+              type: DEPENDENT
+              key: 'kube.node.memory_capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The capacity for Memory resources of a node.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_node_status_capacity{node="{#NAME}", resource="memory"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: node
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: capacity
+            -
+              uuid: 049eb92c52a24c9887d7120f2a7e106c
+              name: 'Kubernetes: Node [{#NAME}]: Pods allocatable'
+              type: DEPENDENT
+              key: 'kube.node.pods_allocatable[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The Pods resources of a node that are available for scheduling.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_node_status_allocatable{node="{#NAME}", resource="pods"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pods
+                -
+                  tag: node
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: allocatable
+            -
+              uuid: 163edc95ec7d41f29099b94409916d82
+              name: 'Kubernetes: Node [{#NAME}]: Pods capacity'
+              type: DEPENDENT
+              key: 'kube.node.pods_capacity[{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The capacity for Pods resources of a node.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_node_status_capacity{node="{#NAME}", resource="pods"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pods
+                -
+                  tag: node
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: capacity
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_node_info
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.node
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: a7bf79185bab4eb8891e5a154424a96d
+          name: 'PodDisruptionBudget discovery'
+          type: DEPENDENT
+          key: kube.pdb.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 3eef1fb3311e429fa3043c9e4d88335f
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PodDisruptionBudget [{#NAME}]: Disruptions allowed'
+              type: DEPENDENT
+              key: 'kube.pdb.disruptions_allowed[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of pod disruptions that are allowed.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_poddisruptionbudget_status_pod_disruptions_allowed{namespace="{#NAMESPACE}", poddisruptionbudget="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pdb
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pdb
+                  value: '{#NAME}'
+            -
+              uuid: a303e07be68c40bdb7d996696af53c98
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PodDisruptionBudget [{#NAME}]: Pods desired'
+              type: DEPENDENT
+              key: 'kube.pdb.pods_desired[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Minimum desired number of healthy pods.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_poddisruptionbudget_status_desired_healthy{namespace="{#NAMESPACE}", poddisruptionbudget="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pdb
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pdb
+                  value: '{#NAME}'
+            -
+              uuid: f2a82d6de52446f594a6554137508604
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PodDisruptionBudget [{#NAME}]: Pods healthy'
+              type: DEPENDENT
+              key: 'kube.pdb.pods_healthy[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Current number of healthy pods.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_poddisruptionbudget_status_current_healthy{namespace="{#NAMESPACE}", poddisruptionbudget="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pdb
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pdb
+                  value: '{#NAME}'
+            -
+              uuid: 2c15033188ab4062a432f30c3320677f
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PodDisruptionBudget [{#NAME}]: Pods total'
+              type: DEPENDENT
+              key: 'kube.pdb.pods_total[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Total number of pods counted by this disruption budget.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_poddisruptionbudget_status_expected_pods{namespace="{#NAMESPACE}", poddisruptionbudget="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pdb
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pdb
+                  value: '{#NAME}'
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_poddisruptionbudget_created
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.poddisruptionbudget,
+                          '{#NAMESPACE}': metric.labels.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: d88889ab64804c4389d3755ea49b80d6
+          name: 'Pod discovery'
+          type: DEPENDENT
+          key: kube.pod.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 3a145b38d57f4164a7a9ef0dd15c530a
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers CPU limits'
+              type: DEPENDENT
+              key: 'kube.pod.containers.limits.cpu[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The limit on CPU cores to be used by a container.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_container_resource_limits{pod="{#NAME}", resource="cpu"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: resource
+                  value: cpu
+            -
+              uuid: e1dd38e6fb484610891aef057a58daf0
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers memory limits'
+              type: DEPENDENT
+              key: 'kube.pod.containers.limits.memory[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The limit on memory to be used by a container.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_container_resource_limits{pod="{#NAME}", resource="memory"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: resource
+                  value: memory
+            -
+              uuid: 8465ea15f3974476924cb66df5a63e0c
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers CPU requests'
+              type: DEPENDENT
+              key: 'kube.pod.containers.requests.cpu[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of requested cpu cores by a container.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_container_resource_requests{pod="{#NAME}", resource="cpu"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: resource
+                  value: cpu
+            -
+              uuid: 27379c192d0841a5adb2c2e4ae937263
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers memory requests'
+              type: DEPENDENT
+              key: 'kube.pod.containers.requests.memory[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The number of requested memory bytes by a container.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_container_resource_requests{pod="{#NAME}", resource="memory"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: resource
+                  value: memory
+            -
+              uuid: 1719bf9d1a1c443dbddcefb91483a77c
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers ready'
+              type: DEPENDENT
+              key: 'kube.pod.containers_ready[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Describes whether the containers readiness check succeeded.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_container_status_ready{pod="{#NAME}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: ready
+            -
+              uuid: fbc8f3a91ec9429ca4c6d70c07480dcc
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers restarts'
+              type: DEPENDENT
+              key: 'kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of container restarts.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_container_status_restarts_total{pod="{#NAME}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: restarts
+              trigger_prototypes:
+                -
+                  uuid: 4656457043d04f4a9b829222ad071d22
+                  expression: '(last(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}])-min(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}],#3))>2'
+                  name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is crash looping'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: b96149f7a44d4a49903421fbc38c0101
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers running'
+              type: DEPENDENT
+              key: 'kube.pod.containers_running[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'Describes whether the container is currently in running state.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_container_status_running{pod="{#NAME}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: running
+            -
+              uuid: 50785c1c96894866973ebf8491e3c320
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers terminated'
+              type: DEPENDENT
+              key: 'kube.pod.containers_terminated[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Describes whether the container is currently in terminated state.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_container_status_terminated{pod="{#NAME}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: terminated
+            -
+              uuid: 01d80d5f171f4af2b3b1da70679e87ba
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Containers waiting'
+              type: DEPENDENT
+              key: 'kube.pod.containers_waiting[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Describes whether the container is currently in waiting state.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_container_status_waiting{pod="{#NAME}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: waiting
+            -
+              uuid: dedbaa4308624b6b982a7e6b62f92d3f
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Failed'
+              type: DEPENDENT
+              key: 'kube.pod.phase.failed[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Pod is in failed state.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Failed"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: failed
+                -
+                  tag: pod
+                  value: '{#NAME}'
+            -
+              uuid: fa3759bb7873453b9842f3e459403163
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Pending'
+              type: DEPENDENT
+              key: 'kube.pod.phase.pending[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Pod is in pending state.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Pending"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: pending
+                -
+                  tag: pod
+                  value: '{#NAME}'
+            -
+              uuid: 59168479f1e246bf8da46606f3ce2a5e
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Running'
+              type: DEPENDENT
+              key: 'kube.pod.phase.running[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Pod is in unknown state.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Running"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: running
+                -
+                  tag: pod
+                  value: '{#NAME}'
+            -
+              uuid: 8a9451a6466f4c64b31377d850841578
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Succeeded'
+              type: DEPENDENT
+              key: 'kube.pod.phase.succeeded[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Pod is in succeeded state.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Succeeded"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: succeeded
+                -
+                  tag: pod
+                  value: '{#NAME}'
+            -
+              uuid: 9303dab482754a7b991b3ba4afef96e7
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}] Phase: Unknown'
+              type: DEPENDENT
+              key: 'kube.pod.phase.unknown[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Pod is in unknown state.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_status_phase{pod="{#NAME}", phase="Unknown"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: unknown
+                -
+                  tag: pod
+                  value: '{#NAME}'
+            -
+              uuid: d946bc58d5a44aa9936b09c825a51f59
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Ready'
+              type: DEPENDENT
+              key: 'kube.pod.ready[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Describes whether the pod is ready to serve requests.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_status_ready{pod="{#NAME}", condition="true"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: ready
+            -
+              uuid: 0f858209a4b344de80b1382710c6f153
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Scheduled'
+              type: DEPENDENT
+              key: 'kube.pod.scheduled[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Describes the status of the scheduling process for the pod.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_status_scheduled{pod="{#NAME}", condition="true"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: scheduled
+            -
+              uuid: 93ba93d04ec34b5193252f19a33f5d59
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Unschedulable'
+              type: DEPENDENT
+              key: 'kube.pod.unschedulable[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Describes the unschedulable status for the pod.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_pod_status_unschedulable{pod="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pod
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: pod
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: unschedulable
+          trigger_prototypes:
+            -
+              uuid: 5bf79dee7b974064b5848a7dcf6428c2
+              expression: 'min(/Kubernetes cluster state by HTTP/kube.pod.phase.failed[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.pending[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.unknown[{#NAMESPACE}/{#NAME}],10m)>0'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is not healthy'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_pod_start_time
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.pod,
+                          '{#NAMESPACE}': metric.labels.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 4143b2f294ac45a5ab570a94a626fca6
+          name: 'PVC discovery'
+          type: DEPENDENT
+          key: kube.pvc.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 9187144531f145398bfbe7281290533d
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Requested storage'
+              type: DEPENDENT
+              key: 'kube.pvc.requested.storage[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: B
+              description: 'The capacity of storage requested by the persistent volume claim.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="{#NAMESPACE}", name="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: requested
+                -
+                  tag: phase
+                  value: '{#NAME}'
+            -
+              uuid: 6bbe0a1846834467b6147ecfe0c53035
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Active, sum'
+              type: DEPENDENT
+              key: 'kube.pvc.status_phase.active.sum[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Persistent volume claim is currently in Active phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}", phase="Active"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: active
+                -
+                  tag: phase
+                  value: '{#NAME}'
+            -
+              uuid: 49b5eb7d714c4b019178c96e44af1216
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Available'
+              type: DEPENDENT
+              key: 'kube.pvc.status_phase.active[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Persistent volume claim is currently in Active phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Available"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: active
+                -
+                  tag: pvc
+                  value: '{#NAME}'
+            -
+              uuid: c6560c039b894af6a264a0f509491c1f
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Bound, sum'
+              type: DEPENDENT
+              key: 'kube.pvc.status_phase.bound.sum[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Persistent volume claim is currently in Bound phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}", phase="Bound"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: bound
+                -
+                  tag: phase
+                  value: '{#NAME}'
+            -
+              uuid: 8a979a9baf4e42aeb708be9af81c14c4
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Bound'
+              type: DEPENDENT
+              key: 'kube.pvc.status_phase.bound[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Persistent volume claim is currently in Bound phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Bound"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: bound
+                -
+                  tag: pvc
+                  value: '{#NAME}'
+            -
+              uuid: 6810603a92d941afa29dc2e9314d92ae
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Lost, sum'
+              type: DEPENDENT
+              key: 'kube.pvc.status_phase.lost.sum[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Persistent volume claim is currently in Lost phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}",persistentvolumeclaim="{#NAME}", phase="Lost"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: lost
+                -
+                  tag: phase
+                  value: '{#NAME}'
+            -
+              uuid: 0e08b33ba95f4f8d811ace1fcbe44fc7
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Lost'
+              type: DEPENDENT
+              key: 'kube.pvc.status_phase.lost[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Persistent volume claim is currently in Lost phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Lost"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: lost
+                -
+                  tag: pvc
+                  value: '{#NAME}'
+            -
+              uuid: 1227e04d6b374154bbf07f1cf64eebeb
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Status phase: Pending, sum'
+              type: DEPENDENT
+              key: 'kube.pvc.status_phase.pending.sum[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Persistent volume claim is currently in Pending phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", persistentvolumeclaim="{#NAME}", phase="Pending"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: pending
+                -
+                  tag: pvc
+                  value: '{#NAME}'
+            -
+              uuid: 6ab12b7a2ad345a090c3dc36d604d800
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] PVC [{#NAME}] Status phase: Pending'
+              type: DEPENDENT
+              key: 'kube.pvc.status_phase.pending[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Persistent volume claim is currently in Pending phase.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_persistentvolumeclaim_status_phase{namespace="{#NAMESPACE}", name="{#NAME}", phase="Pending"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: pvc
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: phase
+                  value: pending
+                -
+                  tag: pvc
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 75a1b90ae3f14a52a0f5d7d073332042
+                  expression: 'min(/Kubernetes cluster state by HTTP/kube.pvc.status_phase.pending[{#NAMESPACE}/{#NAME}],2m)>0'
+                  name: 'Kubernetes: NS [{#NAMESPACE}] PVC [{#NAME}]: PVC is pending'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_persistentvolumeclaim_info
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.persistentvolumeclaim,
+                          '{#NAMESPACE}': metric.labels.namespace
+                  
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: ee274767c42345e3a501f43e81a3364a
+          name: 'Readyz discovery'
+          type: DEPENDENT
+          key: kube.readyz.discovery
+          delay: '0'
+          item_prototypes:
+            -
+              uuid: c0693fb2709e4b01a35ca433edb84db7
+              name: 'Kubernetes: Readyz [{#NAME}]: Healthcheck'
+              type: DEPENDENT
+              key: 'kube.readyz.helthcheck[{#NAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Result of readyz helthcheck for component.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@.name == "{#NAME}")].value.first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.readyz
+              tags:
+                -
+                  tag: component
+                  value: readyz
+                -
+                  tag: component
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 1a88c2cf94d3444c9e5320776b323ce6
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.helthcheck[{#NAME}]))>0'
+                  name: 'Kubernetes: Readyz [{#NAME}] is unhealthy'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+          master_item:
+            key: kube.readyz
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (component) {
+                      output.push({
+                          '{#NAME}': component.name
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: 6244f250f6cd411080221843ad1c59f2
+          name: 'Replicaset discovery'
+          type: DEPENDENT
+          key: kube.replicaset.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 928536dae27c4e3497627b9f5642a7a8
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Fully labeled replicas'
+              type: DEPENDENT
+              key: 'kube.replicaset.fully_labeled_replicas[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of fully labeled replicas per ReplicaSet.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_replicaset_status_fully_labeled_replicas{namespace="{#NAMESPACE}", replicaset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: replicaset
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: replicaset
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: fully-labeled
+            -
+              uuid: 4e911e4b71c342dba2227ed7ef360190
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Ready'
+              type: DEPENDENT
+              key: 'kube.replicaset.ready[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of ready replicas per ReplicaSet.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_replicaset_status_ready_replicas{namespace="{#NAMESPACE}", replicaset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: replicaset
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: replicaset
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: ready
+            -
+              uuid: 545c8486dcc9409c93c6efee0f4b2ad6
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Replicas'
+              type: DEPENDENT
+              key: 'kube.replicaset.replicas[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of replicas per ReplicaSet.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_replicaset_status_replicas{namespace="{#NAMESPACE}", replicaset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: replicaset
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: replicaset
+                  value: '{#NAME}'
+            -
+              uuid: 30aea656c8a5470ea4566333077628b3
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Desired replicas'
+              type: DEPENDENT
+              key: 'kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of desired pods for a ReplicaSet.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_replicaset_spec_replicas{namespace="{#NAMESPACE}", replicaset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: replicaset
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: replicaset
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: desired
+          trigger_prototypes:
+            -
+              uuid: 8046757dbd3b459c9cd9f7bd369dd416
+              expression: '(last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}]))<>0'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicasSet mismatch'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_replicaset_status_replicas
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.replicaset,
+                          '{#NAMESPACE}': metric.labels.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: f732cbb0e71e4ab896c973e355d7a6a4
+          name: 'Scheduler servers nodes discovery'
+          type: DEPENDENT
+          key: kube.scheduler.discovery
+          delay: '0'
+          host_prototypes:
+            -
+              uuid: 46da4b85c58f4c59825e61778a64a58e
+              host: 'Scheduler {#NAME}'
+              name: 'Scheduler {#NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: 'Kubernetes/Components: {#COMPONENT.SCHEDULER}'
+              templates:
+                -
+                  name: 'Kubernetes Scheduler by HTTP'
+              macros:
+                -
+                  macro: '{$KUBE.SCHEDULER.SERVER.URL}'
+                  value: '{#KUBE.SCHEDULER.SERVER.URL}'
+              tags:
+                -
+                  tag: addr
+                  value: '{#IP}'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#IP}'
+          master_item:
+            key: kube.control_plane.lld
+        -
+          uuid: 37812660877243e9bdbc0ffc7815578c
+          name: 'Statefulset discovery'
+          type: DEPENDENT
+          key: kube.statefulset.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NAMESPACE}'
+                value: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: '0'
+          item_prototypes:
+            -
+              uuid: 9cc34425228f44868f3cd46450d557ca
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Replicas'
+              type: DEPENDENT
+              key: 'kube.statefulset.replicas[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of replicas per StatefulSet.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_statefulset_status_replicas{namespace="{#NAMESPACE}", statefulset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: statefulset
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: statefulset
+                  value: '{#NAME}'
+            -
+              uuid: 33e5a534b35f40c6ad7fef53212ef970
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Current replicas'
+              type: DEPENDENT
+              key: 'kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of current replicas per StatefulSet.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_statefulset_status_replicas_current{namespace="{#NAMESPACE}", statefulset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: statefulset
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: statefulset
+                  value: '{#NAME}'
+            -
+              uuid: 3fee3afc8b924b13ae24ab4b5e793acf
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Desired replicas'
+              type: DEPENDENT
+              key: 'kube.statefulset.replicas_desired[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Number of desired pods for a StatefulSet.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_statefulset_replicas{namespace="{#NAMESPACE}", statefulset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: statefulset
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: statefulset
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: ready
+            -
+              uuid: b35c1cebd902484998f383585ce29b76
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Ready replicas'
+              type: DEPENDENT
+              key: 'kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of ready replicas per StatefulSet.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_statefulset_status_replicas_ready{namespace="{#NAMESPACE}", statefulset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: statefulset
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: statefulset
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: ready
+            -
+              uuid: b00b1cfed30e4b90b9754d543e72d7aa
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Updated replicas'
+              type: DEPENDENT
+              key: 'kube.statefulset.replicas_updated[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of updated replicas per StatefulSet.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'kube_statefulset_status_replicas_updated{namespace="{#NAMESPACE}", statefulset="{#NAME}"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: kube.state.metrics
+              tags:
+                -
+                  tag: component
+                  value: statefulset
+                -
+                  tag: namespace
+                  value: '{#NAMESPACE}'
+                -
+                  tag: statefulset
+                  value: '{#NAME}'
+                -
+                  tag: status
+                  value: updated
+          trigger_prototypes:
+            -
+              uuid: 469d6933f5494ca48a212cdc364058e0
+              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]))<>0'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: Statefulset replicas mismatch'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: c29a27fe5a0345c8af9e0d4e99b22dcb
+              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: availability
+          master_item:
+            key: kube.state.metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - kube_statefulset_status_replicas
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var input = JSON.parse(value),
+                      output = [];
+                  
+                  input.forEach(function (metric) {
+                      output.push({
+                          '{#NAME}': metric.labels.statefulset,
+                          '{#NAMESPACE}': metric.labels.namespace
+                      });
+                  });
+                  
+                  return JSON.stringify(output);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: 'kubernetes state'
+      macros:
+        -
+          macro: '{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}'
+          value: /api/v1/componentstatuses
+          description: 'Kubernetes API componentstatuses endpoint /api/v1/componentstatuses'
+        -
+          macro: '{$KUBE.API.LIVEZ.ENDPOINT}'
+          value: /livez
+          description: 'Kubernetes API livez endpoint /livez'
+        -
+          macro: '{$KUBE.API.READYZ.ENDPOINT}'
+          value: /readyz
+          description: 'Kubernetes API readyz endpoint /readyz'
+        -
+          macro: '{$KUBE.API.TOKEN}'
+          description: 'Service account bearer token'
+        -
+          macro: '{$KUBE.API.URL}'
+          value: 'https://localhost:6443'
+          description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>'
+        -
+          macro: '{$KUBE.API_SERVER.PORT}'
+          value: '6443'
+          description: 'Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.'
+        -
+          macro: '{$KUBE.API_SERVER.SCHEME}'
+          value: https
+          description: 'Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.'
+        -
+          macro: '{$KUBE.CONTROLLER_MANAGER.PORT}'
+          value: '10252'
+          description: 'Kubernetes Controller manager metrics endpoint port. Used in ControlPlane LLD.'
+        -
+          macro: '{$KUBE.CONTROLLER_MANAGER.SCHEME}'
+          value: http
+          description: 'Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.'
+        -
+          macro: '{$KUBE.KUBELET.PORT}'
+          value: '10250'
+          description: 'Kubernetes Kubelet manager metrics endpoint port. Used in Kubelet LLD.'
+        -
+          macro: '{$KUBE.KUBELET.SCHEME}'
+          value: https
+          description: 'Kubernetes Kubelet manager metrics endpoint scheme. Used in Kubelet LLD.'
+        -
+          macro: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable pods by namespace'
+        -
+          macro: '{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered pods by namespace'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable nodes by nodename'
+        -
+          macro: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered nodes by nodename'
+        -
+          macro: '{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable worker nodes by nodename'
+        -
+          macro: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered worker nodes by nodename'
+        -
+          macro: '{$KUBE.SCHEDULER.PORT}'
+          value: '10251'
+          description: 'Kubernetes Scheduler manager metrics endpoint port. Used in ControlPlane LLD.'
+        -
+          macro: '{$KUBE.SCHEDULER.SCHEME}'
+          value: http
+          description: 'Kubernetes Scheduler manager metrics endpoint scheme. Used in ControlPlane LLD.'
+        -
+          macro: '{$KUBE.STATE.ENDPOINT.NAME}'
+          value: zabbix-kube-state-metrics
+          description: 'Kubernetes state endpoint name'
+      valuemaps:
+        -
+          uuid: a435f7e23050406ca40cf6f5f872b5a7
+          name: 'CronJob suspend flag'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'False'
+            -
+              value: '1'
+              newvalue: 'True'
