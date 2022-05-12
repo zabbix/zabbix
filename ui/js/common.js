@@ -259,7 +259,7 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 		objForm.submit();
 	}
 
-	return false;
+	return true;
 }
 
 function getDimensions(obj) {

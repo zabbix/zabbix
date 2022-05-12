@@ -116,8 +116,6 @@ CSuggest.prototype = {
 		};
 
 		new RPC.Call(rpcRequest);
-
-		return true;
 	},
 
 	serverRespond: function(needle, respond) {
