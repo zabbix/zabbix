@@ -116,7 +116,39 @@ void zbx_md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
 #include "common.h"
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
-char	*zbx_create_token(zbx_uint64_t seed);
-size_t	zbx_get_token_len(void);
-char	*zbx_gen_uuid4(const char *seed);
+
+/* sha */
+#include "zbxsysinc.h"
+
+#define ZBX_SHA256_DIGEST_SIZE	32
+
+/* Structure to save state of computation between the single steps. */
+typedef struct
+{
+	uint32_t	H[8];
+	uint32_t	total[2];
+	uint32_t	buflen;
+	char		buffer[128];	/* NB: always correctly aligned for uint32_t. */
+}
+sha256_ctx;
+
+void	zbx_sha256_init(sha256_ctx *ctx);
+void	zbx_sha256_process_bytes(const void *buffer, size_t len, sha256_ctx *ctx);
+void	*zbx_sha256_finish(sha256_ctx *ctx, void *resbuf);
+void	zbx_sha256_hash(const char *in, char *out);
+void	zbx_sha256_hash_len(const char *in, size_t len, char *out);
+
+void	zbx_sha512_hash(const char *in, char *out);
+/* end of sha */
+
+typedef enum
+{
+	ZBX_HASH_MD5,
+	ZBX_HASH_SHA256
+}
+zbx_crypto_hash_t;
+
+int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
+		char **out);
+
 #endif /* ZABBIX_HASH_H */

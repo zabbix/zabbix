@@ -3,5 +3,8 @@
 noinst_LIBRARIES = libzbxhash.a
 
 libzbxhash_a_SOURCES = \
+	sha256crypt.c \
+	sha512crypt.c \
 	zbxhash.c \
-	md5.c
+	md5.c \
+	hmac.c
