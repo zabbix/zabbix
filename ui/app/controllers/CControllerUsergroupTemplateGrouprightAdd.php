@@ -54,18 +54,21 @@ class CControllerUsergroupTemplateGrouprightAdd extends CController {
 
 	protected function doAction() {
 		$new_templategroup_right = $this->getInput('new_templategroup_right') + [
-				'groupids' => [],
-				'permission' => PERM_NONE,
-				'include_subgroups' => '0'
-			];
+			'groupids' => [],
+			'permission' => PERM_NONE,
+			'include_subgroups' => '0'
+		];
 
-		list($templategroup_groupids, $templategroup_subgroupids) = $new_templategroup_right['include_subgroups']
+		[$templategroup_groupids, $templategroup_subgroupids] = $new_templategroup_right['include_subgroups']
 			? [[], $new_templategroup_right['groupids']]
 			: [$new_templategroup_right['groupids'], []];
 
 		$this->setResponse(new CControllerResponseData([
 			'templategroup_rights' => collapseGroupRights(applyTemplateGroupRights(
-				$this->getInput('templategroup_rights'), $templategroup_groupids, $templategroup_subgroupids, $new_templategroup_right['permission']
+				$this->getInput('templategroup_rights'),
+				$templategroup_groupids,
+				$templategroup_subgroupids,
+				$new_templategroup_right['permission']
 			)),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -73,4 +76,3 @@ class CControllerUsergroupTemplateGrouprightAdd extends CController {
 		]));
 	}
 }
-

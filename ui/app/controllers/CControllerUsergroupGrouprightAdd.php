@@ -23,8 +23,8 @@ class CControllerUsergroupGrouprightAdd extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'group_rights'            => 'required|array',
-			'new_group_right'         => 'required|array'
+			'group_rights'    => 'required|array',
+			'new_group_right' => 'required|array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -63,7 +63,7 @@ class CControllerUsergroupGrouprightAdd extends CController {
 			'include_subgroups' => '0'
 		];
 
-		list($groupids, $subgroupids) = $new_group_right['include_subgroups']
+		[$groupids, $subgroupids] = $new_group_right['include_subgroups']
 			? [[], $new_group_right['groupids']]
 			: [$new_group_right['groupids'], []];
 

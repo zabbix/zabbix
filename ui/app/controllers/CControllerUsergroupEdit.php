@@ -116,9 +116,9 @@ class CControllerUsergroupEdit extends CController {
 			'include_subgroups' => '0'
 		];
 		$data['new_templategroup_right'] = $this->getInput('new_templategroup_right', []) + [
-				'groupids' => [],
-				'permission' => PERM_NONE,
-				'include_subgroups' => '0'
+			'groupids' => [],
+			'permission' => PERM_NONE,
+			'include_subgroups' => '0'
 		];
 
 		$data['tag_filters'] = $this->getTagFilters();
@@ -153,6 +153,8 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	/**
+	 * Returns the sorted list of permissions to the host groups.
+	 *
 	 * @return array
 	 */
 	private function getGroupRights() {
@@ -166,6 +168,8 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	/**
+	 * Returns the sorted list of permissions to the template groups.
+	 *
 	 * @return array
 	 */
 	private function getTemplategroupRights() {
@@ -179,6 +183,8 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	/**
+	 * Returns the sorted list of the unique tag filters and group names.
+	 *
 	 * @return array
 	 */
 	private function getTagFilters() {
