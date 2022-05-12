@@ -26,7 +26,7 @@
 $group_rights_table = (new CTable())
 	->setId('group-right-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Host Group'), _('Permissions')]);
+	->setHeader([_('Host group'), _('Permissions')]);
 
 foreach ($data['group_rights'] as $groupid => $group_right) {
 	$form_vars = [];

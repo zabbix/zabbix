@@ -20,7 +20,7 @@
 
 
 /**
- * @var CView $this
+ * @var CPartial $this
  * @var array $data
  */
 
@@ -49,15 +49,11 @@ if ($data['groupid'] != 0 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 	]);
 }
 
-$tabs = (new CTabView(['id' => 'hostgroup-tabs']))
-	->addTab('hostgroup-tab', _('Host group'), $form_grid);
+$tabs = (new CTabView(['id' => 'hostgroup-tabs']))->addTab('hostgroup-tab', _('Host group'), $form_grid);
 
 if (array_key_exists('buttons', $data)) {
 	$primary_btn = array_shift($data['buttons']);
-	$tabs->setFooter(makeFormFooter(
-		$primary_btn,
-		$data['buttons']
-	));
+	$tabs->setFooter(makeFormFooter($primary_btn, $data['buttons']));
 }
 
 $form

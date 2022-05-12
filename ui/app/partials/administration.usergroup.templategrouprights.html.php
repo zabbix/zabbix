@@ -37,7 +37,9 @@ foreach ($data['templategroup_rights'] as $groupid => $group_right) {
 
 	if ($groupid == 0) {
 		$form_vars[] = (new CVar('templategroup_rights['.$groupid.'][grouped]', $group_right['grouped']))->removeId();
-		$form_vars[] = (new CVar('templategroup_rights['.$groupid.'][permission]', $group_right['permission']))->removeId();
+		$form_vars[] = (
+			new CVar('templategroup_rights['.$groupid.'][permission]', $group_right['permission'])
+		)->removeId();
 
 		$form_data_json[$groupid]['grouped'] = $group_right['grouped'];
 		$form_data_json[$groupid]['permission'] = $group_right['permission'];
@@ -55,7 +57,9 @@ foreach ($data['templategroup_rights'] as $groupid => $group_right) {
 	}
 	else {
 		if (array_key_exists('grouped', $group_right) && $group_right['grouped']) {
-			$form_vars[] = (new CVar('templategroup_rights['.$groupid.'][grouped]', $group_right['grouped']))->removeId();
+			$form_vars[] = (
+				new CVar('templategroup_rights['.$groupid.'][grouped]', $group_right['grouped'])
+			)->removeId();
 			$form_data_json[$groupid]['grouped'] = $group_right['grouped'];
 
 			$group_name = [$group_right['name'], SPACE, italic('('._('including subgroups').')')];
