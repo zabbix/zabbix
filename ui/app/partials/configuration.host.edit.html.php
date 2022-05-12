@@ -375,7 +375,6 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 		$input_field = (new CTextArea('host_inventory['.$field_name.']', $data['host']['inventory'][$field_name]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
-
 	else {
 		$input_field = (new CTextBox('host_inventory['.$field_name.']', $data['host']['inventory'][$field_name]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
