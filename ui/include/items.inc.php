@@ -1136,9 +1136,9 @@ function getDataOverviewCellData(array $db_items, array $data, int $show_suppres
  */
 function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, int $evaltype): array {
 	if ($hostids === null) {
-		$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1;
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_hosts = API::Host()->get([
-			'output' => [],
+			'output' => ['name'],
 			'groupids' => $groupids,
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
@@ -1146,6 +1146,10 @@ function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, i
 			'limit' => $limit,
 			'preservekeys' => true
 		]);
+
+		CArrayHelper::sort($db_hosts, ['name']);
+		$db_hosts = array_slice($db_hosts, 0, CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1, true);
+
 		$hostids = array_keys($db_hosts);
 	}
 
