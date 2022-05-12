@@ -44,6 +44,7 @@
 					this.edit();
 				}
 				else if (e.target.classList.contains('js-edit-hostgroup')) {
+					e.preventDefault();
 					this.edit({groupid: e.target.dataset.groupid});
 				}
 				else if (e.target.classList.contains('js-massenable-hostgroup')) {

@@ -35,9 +35,11 @@
 				const group_link = e.target.closest('a');
 				if (group_link !== null) {
 					if (group_link.classList.contains('js-edit-templategroup')) {
+						e.preventDefault();
 						this.editTemplateGroup({groupid: e.target.closest('a').dataset.groupid});
 					}
 					else if (group_link.classList.contains('js-edit-hostgroup')) {
+						e.preventDefault();
 						this.editHostGroup({groupid: e.target.closest('a').dataset.groupid});
 					}
 				}

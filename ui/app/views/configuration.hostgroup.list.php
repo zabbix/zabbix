@@ -131,7 +131,11 @@ foreach ($this->data['groups'] as $group) {
 		$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
-	$name[] = (new CLink($group['name']))
+	$name[] = (new CLink(CHtml::encode($group['name']),
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'hostgroup.edit')
+			->setArgument('groupid', $group['groupid'])
+	))
 		->addClass('js-edit-hostgroup')
 		->setAttribute('data-groupid', $group['groupid']);
 

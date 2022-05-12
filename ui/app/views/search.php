@@ -203,6 +203,15 @@ $table = (new CTableInfo())
 
 foreach ($data['host_groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
+	$name_link = $group['editable'] && $data['allowed_ui_conf_host_groups']
+		? (new CLink($caption, (new CUrl('zabbix.php'))
+				->setArgument('action', 'hostgroup.edit')
+				->setArgument('groupid', $group['groupid'])
+		))
+			->addClass('js-edit-hostgroup')
+			->setAttribute('data-groupid', $group['groupid'])
+		: new CSpan($caption);
+
 	$hosts_link = null;
 
 	if ($data['admin']) {
@@ -229,11 +238,7 @@ foreach ($data['host_groups'] as $groupid => $group) {
 	$latest_data_link = (new CCol($latest_data_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 	$table->addRow([
-		$group['editable'] && $data['allowed_ui_conf_host_groups']
-			? (new CLink($caption))
-				->addClass('js-edit-hostgroup')
-				->setAttribute('data-groupid', $groupid)
-			: new CSpan($caption),
+		$name_link,
 		$latest_data_link,
 		$data['allowed_ui_problems']
 			? new CLink(_('Problems'),
@@ -375,6 +380,15 @@ $table = (new CTableInfo())
 
 foreach ($data['template_groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
+	$name_link = $group['editable'] && $data['allowed_ui_conf_template_groups']
+		? (new CLink($caption, (new CUrl('zabbix.php'))
+				->setArgument('action', 'templategroup.edit')
+				->setArgument('groupid', $group['groupid'])
+		))
+			->addClass('js-edit-templategroup')
+			->setAttribute('data-groupid', $group['groupid'])
+		: new CSpan($caption);
+
 	$templates_link = null;
 
 	if ($data['admin']) {
@@ -388,11 +402,7 @@ foreach ($data['template_groups'] as $groupid => $group) {
 	}
 
 	$table->addRow([
-		$group['editable'] && $data['allowed_ui_conf_template_groups']
-			? (new CLink($caption))
-				->addClass('js-edit-templategroup')
-				->setAttribute('data-groupid', $groupid)
-			: new CSpan($caption),
+		$name_link,
 		$templates_link
 	]);
 }

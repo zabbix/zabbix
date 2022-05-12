@@ -36,6 +36,7 @@
 					this.edit();
 				}
 				else if (e.target.classList.contains('js-edit-templategroup')) {
+					e.preventDefault();
 					this.edit({groupid: e.target.dataset.groupid});
 				}
 				else if (e.target.classList.contains('js-massdelete-templategroup')) {

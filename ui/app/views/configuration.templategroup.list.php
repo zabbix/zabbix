@@ -111,7 +111,11 @@ foreach ($this->data['groups'] as $group) {
 
 	$name = [];
 
-	$name[] = (new CLink($group['name']))
+	$name[] = (new CLink(CHtml::encode($group['name']),
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'templategroup.edit')
+			->setArgument('groupid', $group['groupid'])
+	))
 		->addClass('js-edit-templategroup')
 		->setAttribute('data-groupid', $group['groupid']);
 
