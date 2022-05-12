@@ -875,8 +875,6 @@ class CWidgetNavTree extends CWidget {
 										overlay.unsetLoading();
 									},
 									success: (resp) => {
-										let new_item;
-
 										form.querySelectorAll('.msg-bad').forEach((msg) => {
 											msg.remove();
 										})
@@ -906,14 +904,12 @@ class CWidgetNavTree extends CWidget {
 
 												id = this._getNextId();
 
-												new_item = {
-														id: id,
-														name: resp['name'],
-														sysmapid: resp['sysmapid'],
-														parent: parent
-													};
-
-												root.append(this._makeTreeItem(new_item));
+												root.append(this._makeTreeItem({
+													id: id,
+													name: resp['name'],
+													sysmapid: resp['sysmapid'],
+													parent: parent
+												}));
 
 												root.closest('.tree-item').classList.remove('closed');
 												root.closest('.tree-item').classList.add('opened', 'is-parent');
@@ -930,14 +926,12 @@ class CWidgetNavTree extends CWidget {
 															const submap_item = resp.submaps[submapid];
 															const submap_itemid = this._getNextId();
 
-															new_item = {
+															root.append(this._makeTreeItem({
 																id: submap_itemid,
 																name: submap_item['name'],
 																sysmapid: submap_item['sysmapid'],
 																parent: itemid
-															};
-
-															root.append(this._makeTreeItem(new_item));
+															}));
 															add_child_level(submapid, submap_itemid, depth + 1);
 														}
 													});

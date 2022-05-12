@@ -146,21 +146,19 @@ CViewSwitcher.prototype = {
 			return null;
 		}
 
-		switch (obj.tagName) {
-			case 'SELECT':
+		switch (obj.tagName.toLowerCase) {
+			case 'select':
 				return (obj.selectedIndex > -1) ? obj.options[obj.selectedIndex].value : null;
 
-			case 'INPUT':
-				if (obj.getAttribute('type').toUpperCase() === 'CHECKBOX') {
+			case 'input':
+				if (obj.getAttribute('type').toLowerCase() === 'checkbox') {
 					return obj.checked ? obj.value : null;
 				}
-				// break; is not missing here.
+				return obj.value;
 
 			default:
 				return obj.value;
 		}
-
-		return null;
 	},
 
 	setObjValue : function (obj, value) {
@@ -179,16 +177,17 @@ CViewSwitcher.prototype = {
 				break;
 
 			case 'input':
-				let input_type = obj.getAttribute('type');
+				const input_type = obj.getAttribute('type');
 				if (!is_null(input_type) && input_type.toLowerCase() === 'checkbox') {
 					obj.checked = true;
 				}
-				// break; is not missing here.
+				obj.value = value;
+				break;
 
 			case 'textarea':
 			default:
 				obj.value = value;
-				// break; is not missing here.
+				break;
 		}
 	},
 

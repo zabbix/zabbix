@@ -92,7 +92,8 @@ RPC.Call.prototype = {
 			});
 		}
 		request.data = JSON.stringify(body);
-		request.data = new jQuery.ajax(RPC.rpcurl(), request);
+
+		new jQuery.ajax(RPC.rpcurl(), request);
 	},
 
 	processRespond: function(_, _, resp){
