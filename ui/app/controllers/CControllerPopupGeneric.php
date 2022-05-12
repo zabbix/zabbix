@@ -709,11 +709,11 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($this->source_table === 'hosts' && !$this->hasInput('templated_hosts')) {
-			$group_options['real_hosts'] = 1;
+			$group_options['with_hosts'] = 1;
 		}
 		elseif ($this->source_table === 'templates') {
 			$host_options['templated_hosts'] = 1;
-			$templategroup_options['templated_hosts'] = 1;
+			$templategroup_options['with_templates'] = 1;
 		}
 
 		if ($this->hasInput('monitored_hosts')) {
@@ -721,12 +721,12 @@ class CControllerPopupGeneric extends CController {
 			$host_options['monitored_hosts'] = 1;
 		}
 		elseif ($this->hasInput('real_hosts')) {
-			$group_options['real_hosts'] = 1;
+			$group_options['with_hosts'] = 1;
 			$host_options['real_hosts'] = 1;
 		}
 		elseif ($this->hasInput('templated_hosts')) {
 			$host_options['templated_hosts'] = 1;
-			$templategroup_options['templated_hosts'] = 1;
+			$templategroup_options['with_templates'] = 1;
 		}
 		elseif ($this->source_table !== 'templates' && $this->source_table !== 'host_templates') {
 			$group_options['with_hosts_and_templates'] = 1;
@@ -739,7 +739,7 @@ class CControllerPopupGeneric extends CController {
 
 		if ($this->hasInput('templategroupid')) {
 			$host_options['templategroupid'] = $this->getInput('templategroupid');
-			$templategroup_options['templategroupid'] = $this->getInput('templategroupid');
+			$templategroup_options['groupid'] = $this->getInput('templategroupid');
 		}
 
 		if ($this->hasInput('enrich_parent_groups') || $this->group_preselect_required

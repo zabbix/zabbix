@@ -79,7 +79,7 @@ else {
 	}
 
 	// Add filter tab.
-	$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
+	$hg_ms_params = ($data['context'] === 'host') ? ['with_hosts' => true] : ['with_templates' => true];
 
 	$widget->addItem(
 		(new CFilter())
@@ -103,8 +103,7 @@ else {
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groupids_',
-									'real_hosts' => 1,
-									'editable' => 1,
+									'editable' => true,
 									'enrich_parent_groups' => true
 								] + $hg_ms_params
 							]

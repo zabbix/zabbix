@@ -53,8 +53,8 @@ $filter = (new CFilter())
 							'srcfld1' => 'groupid',
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
-							'templated_hosts' => 1,
-							'editable' => 1,
+							'with_templates' => true,
+							'editable' => true,
 							'enrich_parent_groups' => true
 						]
 					]

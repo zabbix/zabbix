@@ -130,7 +130,7 @@ switch ($data['method']) {
 
 	/**
 	 * Create multi select data.
-	 * Supported objects: "hosts", "hostGroup", "templates", "templateGroups", "triggers"
+	 * Supported objects: "hosts", "hostGroup", "templates", "templateGroup", "triggers"
 	 *
 	 * @param string $data['object_name']
 	 * @param string $data['search']
@@ -145,7 +145,7 @@ switch ($data['method']) {
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'with_hosts' => array_key_exists('real_hosts', $data),
+					'with_hosts' => array_key_exists('with_hosts', $data),
 					'with_items' => array_key_exists('with_items', $data),
 					'with_httptests' => array_key_exists('with_httptests', $data),
 					'with_monitored_triggers' => array_key_exists('with_monitored_triggers', $data),
@@ -328,7 +328,7 @@ switch ($data['method']) {
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'with_templates' => array_key_exists('templated_hosts', $data),
+					'with_templates' => array_key_exists('with_templates', $data),
 					'with_items' => array_key_exists('with_items', $data),
 					'with_httptests' => array_key_exists('with_httptests', $data),
 					'with_triggers' => array_key_exists('with_triggers', $data),

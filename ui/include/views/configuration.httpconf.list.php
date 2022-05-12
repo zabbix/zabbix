@@ -24,7 +24,7 @@
  */
 require_once dirname(__FILE__).'/js/configuration.httpconf.list.js.php';
 
-$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
+$hg_ms_params = ($data['context'] === 'host') ? ['with_hosts' => true] : ['with_templates' => true];
 
 $filter_column_left = (new CFormList())
 	->addRow(
@@ -41,8 +41,7 @@ $filter_column_left = (new CFormList())
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_groupids_',
-					'with_hosts_and_templates' => 1,
-					'editable' => 1,
+					'editable' => true,
 					'enrich_parent_groups' => true
 				] + $hg_ms_params
 			]

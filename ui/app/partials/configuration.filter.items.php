@@ -50,6 +50,8 @@ zbx_add_post_js("var filterTypeSwitcher".
 	" = new CViewSwitcher('filter_type', 'change', ".json_encode($filter_type_visibility).");"
 );
 
+$hg_ms_params = ($data['context'] === 'host') ? ['with_hosts' => true] : ['with_templates' => true];
+
 // First column.
 $filter_column_1
 	->addRow(
@@ -68,7 +70,7 @@ $filter_column_1
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
 					'enrich_parent_groups' => true
-				]
+				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	)

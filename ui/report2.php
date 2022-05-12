@@ -459,7 +459,6 @@ else {
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
 							'with_triggers' => true,
-							'real_hosts' => 1,
 							'enrich_parent_groups' => true
 						]
 					]
