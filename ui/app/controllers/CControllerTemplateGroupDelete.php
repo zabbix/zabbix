@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -52,19 +52,12 @@ class CControllerTemplateGroupDelete extends CController {
 
 	protected function doAction(): void {
 		$groupids = $this->getInput('groupids');
-
 		$result = API::TemplateGroup()->delete($groupids);
-
 		$deleted = count($groupids);
-
 		$output = [];
 
 		if ($result) {
-			$output['success']['title'] = _n(
-				'Template group deleted',
-				'Template groups deleted',
-				$deleted
-			);
+			$output['success']['title'] = _n('Template group deleted', 'Template groups deleted', $deleted);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -72,7 +65,7 @@ class CControllerTemplateGroupDelete extends CController {
 		}
 		else {
 			$groups = API::TemplateGroup()->get([
-				'output' => ['groupid'],
+				'output' => [],
 				'groupids' => $groupids,
 				'editable' => true,
 				'preservekeys' => true
@@ -84,7 +77,7 @@ class CControllerTemplateGroupDelete extends CController {
 				'keepids' => array_keys($groups)
 			];
 		}
+
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }
-

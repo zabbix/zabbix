@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -52,11 +52,8 @@ class CControllerHostGroupDelete extends CController {
 
 	protected function doAction(): void {
 		$groupids = $this->getInput('groupids');
-
 		$result = API::HostGroup()->delete($groupids);
-
 		$deleted = count($groupids);
-
 		$output = [];
 
 		if ($result) {
@@ -68,7 +65,7 @@ class CControllerHostGroupDelete extends CController {
 		}
 		else {
 			$groups = API::HostGroup()->get([
-				'output' => ['groupid'],
+				'output' => [],
 				'groupids' => $groupids,
 				'editable' => true,
 				'preservekeys' => true
@@ -80,8 +77,7 @@ class CControllerHostGroupDelete extends CController {
 				'keepids' => array_keys($groups)
 			];
 		}
+
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }
-
-

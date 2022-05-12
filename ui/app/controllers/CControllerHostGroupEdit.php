@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -82,6 +82,7 @@ class CControllerHostGroupEdit extends CController{
 			$group = $groups[0];
 			$data['name'] = $group['name'];
 		}
+
 		// For clone action.
 		if ($this->hasInput('name')) {
 			$data['name'] = $this->getInput('name');
@@ -94,4 +95,3 @@ class CControllerHostGroupEdit extends CController{
 		$this->setResponse($response);
 	}
 }
-

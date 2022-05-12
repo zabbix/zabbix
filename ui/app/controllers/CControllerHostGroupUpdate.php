@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -96,6 +96,7 @@ class CControllerHostGroupUpdate extends CController {
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
+
 		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 	}
 }

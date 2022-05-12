@@ -88,7 +88,7 @@ class CControllerHostGroupList extends CController {
 			'sortfield' => $sort_field,
 			'limit' => $limit
 		]);
-		order_result($groups, $sort_field, $sort_order);
+		CArrayHelper::sort($groups, [['field' => $sort_field, 'order' => $sort_order]]);
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('hostgroup.list', $page_num);
@@ -100,24 +100,24 @@ class CControllerHostGroupList extends CController {
 
 		$data['groupCounts'] = API::HostGroup()->get([
 			'output' => ['groupid'],
-			'groupids' => $groupids,
 			'selectHosts' => API_OUTPUT_COUNT,
+			'groupids' => $groupids,
 			'preservekeys' => true
 		]);
 
 		$limit = CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE) + 1;
 		$data['groups'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name', 'flags'],
-			'groupids' => $groupids,
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectGroupDiscovery' => ['ts_delete'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'groupids' => $groupids,
 			'limitSelects' => $limit
 		]);
-		order_result($data['groups'], $sort_field, $sort_order);
+		CArrayHelper::sort($data['groups'], [['field' => $sort_field, 'order' => $sort_order]]);
 
 		foreach ($data['groups'] as &$group) {
-			order_result($group['hosts'], 'name');
+			CArrayHelper::sort($group['hosts'], ['name']);
 		}
 		unset($group);
 

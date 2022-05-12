@@ -54,7 +54,7 @@ class CControllerHostGroupEnable extends CController {
 
 		DBstart();
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'status', 'host'],
+			'output' => ['hostid'],
 			'groupids' => $groupids,
 			'editable' => true
 		]);
