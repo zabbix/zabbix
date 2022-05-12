@@ -233,7 +233,7 @@ function removeVarsBySelector(form_name, selector) {
 function create_var(form_name, var_name, var_value, doSubmit) {
 	var objForm = is_string(form_name) ? document.forms[form_name] : form_name;
 	if (!objForm) {
-		return false;
+		return;
 	}
 
 	var objVar = (typeof(objForm[var_name]) != 'undefined') ? objForm[var_name] : null;
@@ -241,7 +241,7 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 		objVar = document.createElement('input');
 		objVar.setAttribute('type', 'hidden');
 		if (!objVar) {
-			return false;
+			return;
 		}
 		objVar.setAttribute('name', var_name);
 		objVar.setAttribute('id', var_name.replace(']', '').replace('[', '_'));
@@ -258,8 +258,6 @@ function create_var(form_name, var_name, var_value, doSubmit) {
 	if (doSubmit) {
 		objForm.submit();
 	}
-
-	return true;
 }
 
 function getDimensions(obj) {

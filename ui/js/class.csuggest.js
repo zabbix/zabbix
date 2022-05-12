@@ -101,7 +101,7 @@ CSuggest.prototype = {
 	// search
 	searchServer: function(needle) {
 		if (needle !== this.userNeedle.toLowerCase()) {
-			return true;
+			return;
 		}
 
 		var rpcRequest = {
