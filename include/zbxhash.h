@@ -80,7 +80,7 @@
 ** efficiently on either one than if ARCH_IS_BIG_ENDIAN is defined.
 */
 
-#define MD5_DIGEST_SIZE 16
+#define ZBX_MD5_DIGEST_SIZE 16
 
 typedef unsigned char md5_byte_t; /* 8-bit byte */
 typedef unsigned int md5_word_t; /* 32-bit word */

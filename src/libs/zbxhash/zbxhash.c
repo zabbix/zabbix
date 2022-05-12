@@ -36,7 +36,7 @@ void	zbx_md5buf2str(const md5_byte_t *md5, char *str)
 	char		*p = str;
 	int		i;
 
-	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
 	{
 		*p++ = hex[md5[i] >> 4];
 		*p++ = hex[md5[i] & 15];

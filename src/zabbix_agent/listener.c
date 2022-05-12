@@ -34,8 +34,8 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 #	include "zbxnix.h"
 #endif
 
-#include "zbxcrypto.h"
-#include "../libs/zbxcrypto/tls_tcp_active.h"
+//#include "zbxcrypto.h"
+#include "zbxtls.h"
 
 #ifndef _WINDOWS
 static volatile sig_atomic_t	need_update_userparam;

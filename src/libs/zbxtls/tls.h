@@ -49,29 +49,6 @@
 #endif
 
 #if defined(_WINDOWS)
-/* Typical thread is long-running, if necessary, it initializes TLS for itself. Zabbix sender is an exception. If */
-/* data is sent from a file or in real time then sender's 'main' thread starts the 'send_value' thread for each   */
-/* 250 values to be sent. To avoid TLS initialization on every start of 'send_value' thread we initialize TLS in  */
-/* 'main' thread and use this structure for passing minimum TLS variables into 'send_value' thread. */
-
-struct zbx_thread_sendval_tls_args
-{
-#if defined(HAVE_GNUTLS)
-	gnutls_certificate_credentials_t	my_cert_creds;
-	gnutls_psk_client_credentials_t		my_psk_client_creds;
-	gnutls_priority_t			ciphersuites_cert;
-	gnutls_priority_t			ciphersuites_psk;
-#elif defined(HAVE_OPENSSL)
-	SSL_CTX			*ctx_cert;
-#ifdef HAVE_OPENSSL_WITH_PSK
-	SSL_CTX			*ctx_psk;
-	const char		*psk_identity_for_cb;
-	size_t			psk_identity_len_for_cb;
-	char			*psk_for_cb;
-	size_t			psk_len_for_cb;
-#endif
-#endif
-};
 
 #endif	/* #if defined(_WINDOWS) */
 

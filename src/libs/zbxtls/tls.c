@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxtls.h"
+
 #include "zbxsysinc.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -26,8 +28,6 @@
 #include "zbxthreads.h"
 #include "log.h"
 #include "zbxcrypto.h"
-#include "tls_tcp.h"
-#include "tls_tcp_active.h"
 
 #if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER)
 /* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) or LibreSSL */

@@ -22,7 +22,7 @@
 
 #include "db.h"
 #include "log.h"
-#include "zbxhash.h"
+#include "zbxcrypto.h"
 
 extern unsigned char	program_type;
 
