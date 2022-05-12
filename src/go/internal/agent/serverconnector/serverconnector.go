@@ -29,13 +29,13 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxcomms"
@@ -79,6 +79,12 @@ type activeChecksResponse struct {
 type agentDataResponse struct {
 	Response string `json:"response"`
 	Info     string `json:"info"`
+}
+
+type heartbeatMessage struct {
+	Request            string `json:"request"`
+	Host               string `json:"host"`
+	HeartbeatFrequency int    `json:"heartbeat_freq"`
 }
 
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
@@ -302,9 +308,49 @@ func (c *Connector) refreshActiveChecks() {
 	c.firstActiveChecksRefreshed = true
 }
 
+func (c *Connector) sendHeartbeatMsg() {
+	var err error
+
+	h := heartbeatMessage{
+		Request: "active check heartbeat",
+		HeartbeatFrequency: c.options.HeartbeatFrequency,
+		Host:    c.hostname,
+	}
+
+	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.addresses)
+	defer log.Debugf("[%d] End of sendHeartBeatMsg() from %s", c.clientID, c.addresses)
+
+	request, err := json.Marshal(&h)
+	if err != nil {
+		log.Errf("[%d] cannot create heartbeat message to to [%s]: %s", c.clientID, c.addresses[0], err)
+		return
+	}
+
+	_, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
+		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
+
+	if errs != nil {
+		if !reflect.DeepEqual(errs, c.lastErrors) {
+			for i := 0; i < len(errs); i++ {
+				log.Warningf("[%d] %s", c.clientID, errs[i])
+			}
+			log.Warningf("[%d] sending of heartbeat message for [%s] started to fail", c.clientID,
+				c.hostname)
+			c.lastErrors = errs
+		}
+		return
+	}
+
+	if c.lastErrors != nil {
+		log.Warningf("[%d] sending of heartbeat message to [%s] is working again", c.clientID, c.addresses[0])
+		c.lastErrors = nil
+	}
+}
+
 func (c *Connector) run() {
 	var lastRefresh time.Time
 	var lastFlush time.Time
+	var lastHeartbeat time.Time
 
 	defer log.PanicHook()
 	log.Debugf("[%d] starting server connector for %s", c.clientID, c.addresses)
@@ -322,6 +368,10 @@ run:
 			if now.Sub(lastRefresh) > time.Second*time.Duration(c.options.RefreshActiveChecks) {
 				c.refreshActiveChecks()
 				lastRefresh = time.Now()
+			}
+			if now.Sub(lastHeartbeat) > time.Second*time.Duration(c.options.HeartbeatFrequency) {
+				c.sendHeartbeatMsg()
+				lastHeartbeat = time.Now()
 			}
 		case u := <-c.input:
 			if u == nil {

@@ -648,7 +648,7 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
 
 	if (NULL != data)
 	{
-		zbx_availability_flush(data, data_offset);
+		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, data_offset, NULL);
 		zbx_free(data);
 	}
 }
@@ -681,7 +681,7 @@ static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_u
 
 	if (NULL != data)
 	{
-		zbx_availability_flush(data, data_offset);
+		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, data_offset, NULL);
 		zbx_free(data);
 	}
 }

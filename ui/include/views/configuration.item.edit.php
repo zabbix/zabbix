@@ -1069,11 +1069,12 @@ if ($data['itemid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Execute now')))
+		$buttons[] = (new CSimpleButton(_('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
-			);
+			)
+			->onClick('view.checkNow(this);');
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');

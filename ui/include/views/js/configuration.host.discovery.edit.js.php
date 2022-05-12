@@ -200,6 +200,49 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			}
 		},
 
+		checkNow(button) {
+			button.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'item.masscheck_now');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({itemids: [document.getElementById('itemid').value], discovery_rule: 1})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					clearMessages();
+
+					/*
+					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
+					 * messages and that would mean to reload the page and show them. Also postMessageError would be
+					 * displayed right after header is loaded. Meaning message is not inside the page form like that is
+					 * in postMessageOk case. Instead show message directly that comes from controller.
+					 */
+					if ('error' in response) {
+						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
+					}
+					else if('success' in response) {
+						addMessage(makeMessageBox('good', [], response.success.title, true, false));
+					}
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					button.classList.remove('is-loading');
+
+					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
+					button.blur();
+				});
+		},
+
 		editHost(e, hostid) {
 			e.preventDefault();
 			const host_data = {hostid};

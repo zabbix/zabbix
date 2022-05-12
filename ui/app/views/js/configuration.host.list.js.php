@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -108,7 +108,7 @@
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-				body: urlEncodeData({hostids: chkbxRange.getSelectedIds()})
+				body: urlEncodeData({hostids: Object.keys(chkbxRange.getSelectedIds())})
 			})
 				.then((response) => response.json())
 				.then((response) => {

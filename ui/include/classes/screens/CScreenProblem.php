@@ -1004,7 +1004,7 @@ class CScreenProblem extends CScreenBase {
 				if ($this->data['filter']['compact_view'] && $this->data['filter']['show_suppressed']
 						&& count($info_icons) > 1) {
 					$cell_info = (new CButton(null))
-						->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+						->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
 						->addStyle('margin-left: -3px;')
 						->setHint(makeInformationList($info_icons));
 				}
@@ -1094,7 +1094,8 @@ class CScreenProblem extends CScreenBase {
 					? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 						->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 						->addClass(ZBX_STYLE_LINK_ALT)
-						->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+						->setAttribute('data-eventid', $problem['eventid'])
+						->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
 					: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
 						$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
 					);

@@ -22,8 +22,8 @@ package mongodb
 import (
 	"encoding/json"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"gopkg.in/mgo.v2/bson"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // connPoolStatsHandler

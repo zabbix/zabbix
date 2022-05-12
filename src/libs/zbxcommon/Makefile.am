@@ -3,7 +3,6 @@
 noinst_LIBRARIES = libzbxcommon.a
 
 libzbxcommon_a_SOURCES = \
-	alias.c \
 	comms.c \
 	file.c \
 	iprange.c \
@@ -12,7 +11,6 @@ libzbxcommon_a_SOURCES = \
 	str.c \
 	variant.c \
 	variant_misc.c \
-	zbxgetopt.c \
 	time.c \
 	cuid.c
 

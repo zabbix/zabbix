@@ -176,7 +176,8 @@ $overviewFormList->addRow(_('Monitoring'),
 // configuration
 if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 	$hostLink = (new CLink(_('Host')))
-		->onClick('view.editHost({hostid:\''.$data['host']['hostid'].'\'})');
+		->setAttribute('data-hostid', $data['host']['hostid'])
+		->onClick('view.editHost({hostid: this.dataset.hostid});');
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('items.php'))
 			->setArgument('filter_set', '1')

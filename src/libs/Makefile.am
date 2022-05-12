@@ -13,6 +13,7 @@ DIST_SUBDIRS = \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
+	zbxgetopt \
 	zbxlog \
 	zbxnix \
 	zbxconf \
@@ -43,6 +44,7 @@ DIST_SUBDIRS = \
 	zbxservice \
 	zbxaudit \
 	zbxeval \
+	zbxserialize \
 	zbxxml \
 	zbxha \
 	zbxrtc
@@ -75,6 +77,7 @@ SERVER_SUBDIRS = \
 	zbxservice \
 	zbxaudit \
 	zbxeval \
+	zbxserialize \
 	zbxha \
 	zbxrtc
 else
@@ -104,6 +107,7 @@ PROXY_SUBDIRS = \
 	zbxavailability \
 	zbxaudit \
 	zbxeval \
+	zbxserialize \
 	zbxrtc
 endif
 endif
@@ -112,6 +116,7 @@ SUBDIRS = \
 	zbxhash \
 	zbxcrypto \
 	zbxcommon \
+	zbxgetopt \
 	zbxlog \
 	zbxalgo \
 	zbxnix \

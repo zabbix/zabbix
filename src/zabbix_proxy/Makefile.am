@@ -1,10 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	diag \
 	heart \
 	housekeeper \
 	proxyconfig \
 	datasender \
+	stats \
 	taskmanager
 
 sbin_PROGRAMS = zabbix_proxy
@@ -21,6 +23,7 @@ libzbxproxy_a_CFLAGS = \
 zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
+	diag/libzbxdiag_proxy.a \
 	heart/libzbxheart.a \
 	$(top_builddir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
@@ -49,11 +52,13 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_builddir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
+	$(top_builddir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
-	$(top_builddir)/src/libs/zbxserver/libzbxserver_proxy.a \
+	stats/libzbxserver_proxy.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
+	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_builddir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
@@ -66,6 +71,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_builddir)/src/libs/zbxgetopt/libzbxgetopt.a \
 	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
@@ -82,7 +88,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_proxy.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \
-	$(top_builddir)/src/libs/zbxdiag/libzbxdiag_proxy.a \
+	$(top_builddir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \

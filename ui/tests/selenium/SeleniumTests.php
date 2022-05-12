@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
 require_once dirname(__FILE__).'/testGeneric.php';
+require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
@@ -126,9 +127,9 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItem.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItemPrototype.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
-require_once dirname(__FILE__).'/services/testFormMonitoringServices.php';
-require_once dirname(__FILE__).'/services/testPageMonitoringServices.php';
-require_once dirname(__FILE__).'/services/testPageMonitoringServicesMassUpdate.php';
+require_once dirname(__FILE__).'/services/testFormServicesServices.php';
+require_once dirname(__FILE__).'/services/testPageServicesServices.php';
+require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
@@ -214,6 +215,7 @@ class SeleniumTests {
 
 		$suite->addTestSuite('testDocumentationLinks');
 		$suite->addTestSuite('testGeneric');
+		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testGraphAxis');
 		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
@@ -251,8 +253,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
-		$suite->addTestSuite('testPageMonitoringServices');
-		$suite->addTestSuite('testPageMonitoringServicesMassUpdate');
+		$suite->addTestSuite('testPageServicesServices');
+		$suite->addTestSuite('testPageServicesServicesMassUpdate');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
@@ -322,7 +324,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMacrosTemplate');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
-		$suite->addTestSuite('testFormMonitoringServices');
+		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testFormNetworkDiscovery');
 		$suite->addTestSuite('testFormPreprocessingCloneHost');
 		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
