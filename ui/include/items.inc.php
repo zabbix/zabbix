@@ -1087,16 +1087,21 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids, ?string 
 	}
 
 	if ($hostids === null) {
+		$config = select_config();
 		$db_hosts = API::Host()->get([
-			'output' => [],
+			'output' => ['name'],
 			'groupids' => $groupids,
 			'applicationids' => $applicationids,
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
 			'sortfield' => ['name'],
-			'limit' => ZBX_MAX_TABLE_COLUMNS + 1,
+			'limit' => $config['search_limit'],
 			'preservekeys' => true
 		]);
+
+		CArrayHelper::sort($db_hosts, ['name']);
+		$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS + 1, true);
+
 		$hostids = array_keys($db_hosts);
 	}
 
