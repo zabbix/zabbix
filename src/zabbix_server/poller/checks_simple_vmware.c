@@ -2082,12 +2082,19 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	datastore = ds_get(&service->data->datastores, ds_name);
-
-	if (NULL == datastore)
+	/* allow passing ds uuid or name for backwards compatibility */
+	if (NULL == (datastore = ds_get(&service->data->datastores, ds_name)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
-		goto unlock;
+		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)ds_name};
+
+		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+				vmware_ds_name_compare)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+			goto unlock;
+		}
+
+		datastore = service->data->datastores.values[i];
 	}
 
 	if (NULL == datastore->uuid)
@@ -2713,30 +2720,15 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 	if (NULL != ds_name && '\0' != *ds_name)
 	{
-		zbx_vmware_datastore_t	*datastore;
-		zbx_vmware_dsname_t	dsnames_cmp;
+		zbx_vmware_dsname_t	dsname_cmp;
 		zbx_vmware_hvdisk_t	hvdisk_cmp;
 
-		datastore = ds_get(&service->data->datastores, ds_name);
+		dsname_cmp.name = (char *)ds_name;
 
-		if (NULL == datastore)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
-			goto unlock;
-		}
-
-		dsnames_cmp.name = datastore->name;
-
-		if (FAIL == (i = zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsnames_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
-					datastore->name));
-			goto unlock;
-		}
-
-		if (NULL == datastore->uuid)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+					ds_name));
 			goto unlock;
 		}
 
