@@ -83,7 +83,7 @@ typedef struct
 	unsigned char		status;
 	unsigned char		discover;
 	unsigned char		severity;
-	unsigned char		inventory_mode;
+	signed char		inventory_mode;
 }
 lld_override_operation_t;
 
@@ -717,8 +717,8 @@ static void	lld_override_operations_load(zbx_vector_ptr_t *overrides, const zbx_
 			zbx_vector_uint64_append(&override_operation->templateids, templateid);
 		}
 
-		override_operation->inventory_mode = FAIL == DBis_null(row[14]) ?
-				(unsigned char)atoi(row[14]) : HOST_INVENTORY_COUNT;
+		override_operation->inventory_mode = FAIL == DBis_null(row[14]) ? (signed char)atoi(row[14]) :
+				HOST_INVENTORY_COUNT;
 	}
 	DBfree_result(result);
 
@@ -1029,7 +1029,7 @@ void	lld_override_trigger(const zbx_vector_ptr_t *overrides, const char *name, u
 }
 
 void	lld_override_host(const zbx_vector_ptr_t *overrides, const char *name, zbx_vector_uint64_t *lnk_templateids,
-		char *inventory_mode, unsigned char *status, unsigned char *discover)
+		signed char *inventory_mode, unsigned char *status, unsigned char *discover)
 {
 	int	i, j, k;
 

@@ -106,8 +106,8 @@ zbx_vmware_perf_entity_t;
 
 typedef struct
 {
-	char				*name;
 	char				*uuid;
+	char				*name;
 	char				*id;
 	zbx_uint64_t			capacity;
 	zbx_uint64_t			free_space;
@@ -116,8 +116,19 @@ typedef struct
 }
 zbx_vmware_datastore_t;
 
+int	vmware_ds_uuid_compare(const void *d1, const void *d2);
 int	vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
+
+typedef struct
+{
+	char	*name;
+	char	*uuid;
+}
+zbx_vmware_ds_name_uuid_t;
+
+int	vmware_hvds_name_compare(const void *d1, const void *d2);
+ZBX_PTR_VECTOR_DECL(ds_name_uuid, zbx_vmware_ds_name_uuid_t)
 
 typedef struct
 {
@@ -162,15 +173,15 @@ zbx_vmware_vm_t;
 /* the vmware hypervisor data */
 typedef struct
 {
-	char			*uuid;
-	char			*id;
-	char			*clusterid;
-	char			*datacenter_name;
-	char			*parent_name;
-	char			*parent_type;
-	char			**props;
-	zbx_vector_str_t	ds_names;
-	zbx_vector_ptr_t	vms;
+	char				*uuid;
+	char				*id;
+	char				*clusterid;
+	char				*datacenter_name;
+	char				*parent_name;
+	char				*parent_type;
+	char				**props;
+	zbx_vector_ds_name_uuid_t	ds_names;
+	zbx_vector_ptr_t		vms;
 }
 zbx_vmware_hv_t;
 
