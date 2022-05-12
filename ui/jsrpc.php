@@ -141,7 +141,7 @@ switch ($data['method']) {
 	case 'multiselect.get':
 		switch ($data['object_name']) {
 			case 'hostGroup':
-				$options = [
+				$db_groups = API::HostGroup()->get([
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
@@ -153,24 +153,19 @@ switch ($data['method']) {
 					'editable' => array_key_exists('editable', $data),
 					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
 					'preservekeys' => true
-				];
-				$hostGroups = API::HostGroup()->get($options);
+				]);
 
-				if ($hostGroups) {
-					if (array_key_exists('enrich_parent_groups', $data)) {
-						$hostGroups = enrichParentGroups($hostGroups);
-					}
-
-					CArrayHelper::sort($hostGroups, [
-						['field' => 'name', 'order' => ZBX_SORT_UP]
-					]);
-
-					if (isset($data['limit'])) {
-						$hostGroups = array_slice($hostGroups, 0, $data['limit']);
-					}
-
-					$result = CArrayHelper::renameObjectsKeys($hostGroups, ['groupid' => 'id']);
+				if (array_key_exists('enrich_parent_groups', $data)) {
+					$db_groups = enrichParentGroups($db_groups);
 				}
+
+				CArrayHelper::sort($db_groups, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
+
+				if (array_key_exists('limit', $data)) {
+					$db_groups = array_slice($db_groups, 0, $data['limit']);
+				}
+
+				$result = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
 				break;
 
 			case 'host_templates':
@@ -324,7 +319,7 @@ switch ($data['method']) {
 				break;
 
 			case 'templateGroup':
-				$options = [
+				$db_groups = API::TemplateGroup()->get([
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
@@ -335,24 +330,19 @@ switch ($data['method']) {
 					'editable' => array_key_exists('editable', $data),
 					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
 					'preservekeys' => true
-				];
-				$templateGroups = API::TemplateGroup()->get($options);
+				]);
 
-				if ($templateGroups) {
-					if (array_key_exists('enrich_parent_groups', $data)) {
-						$templateGroups = enrichParentTemplateGroups($templateGroups);
-					}
-
-					CArrayHelper::sort($templateGroups, [
-						['field' => 'name', 'order' => ZBX_SORT_UP]
-					]);
-
-					if (isset($data['limit'])) {
-						$templateGroups = array_slice($templateGroups, 0, $data['limit']);
-					}
-
-					$result = CArrayHelper::renameObjectsKeys($templateGroups, ['groupid' => 'id']);
+				if (array_key_exists('enrich_parent_groups', $data)) {
+					$db_groups = enrichParentTemplateGroups($db_groups);
 				}
+
+				CArrayHelper::sort($db_groups, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
+
+				if (array_key_exists('limit', $data)) {
+					$db_groups = array_slice($db_groups, 0, $data['limit']);
+				}
+
+				$result = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
 				break;
 
 			case 'proxies':
