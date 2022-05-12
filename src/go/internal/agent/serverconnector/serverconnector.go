@@ -327,7 +327,7 @@ func (c *Connector) sendHeartbeatMsg() {
 	}
 
 	_, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
-		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
+		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig, true)
 
 	if errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {

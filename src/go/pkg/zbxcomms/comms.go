@@ -337,6 +337,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 	var err error
 	var errs []error
 	var c *Connection
+	var no_response = false
 
 	if len(args) > 0 {
 		var ok bool
@@ -345,6 +346,15 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 			log.Tracef("%s", errs[len(errs)-1])
 
 			return nil, errs
+		}
+
+		if len(args) > 1 {
+			if no_response, ok = args[1].(bool); !ok {
+				errs = append(errs, fmt.Errorf("invalid response handling flag of type %T", args[1]))
+				log.Tracef("%s", errs[len(errs)-1])
+
+				return nil, errs
+			}
 		}
 	}
 
@@ -389,7 +399,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 	}
 	log.Tracef("received [%s] from [%s]", string(b), (*addresses)[0])
 
-	if len(b) == 0 {
+	if len(b) == 0 && !no_response {
 		errs = append(errs, fmt.Errorf("connection closed"))
 		log.Tracef("%s", errs[len(errs)-1])
 
