@@ -145,13 +145,12 @@ switch ($data['method']) {
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'with_hosts' => array_key_exists('with_hosts', $data) && $data['with_hosts'],
-					'with_items' => array_key_exists('with_items', $data) && $data['with_items'],
-					'with_httptests' => array_key_exists('with_httptests', $data) && $data['with_httptests'],
-					'with_monitored_triggers' => array_key_exists('with_monitored_triggers', $data)
-						&& $data['with_monitored_triggers'],
-					'with_triggers' => array_key_exists('with_triggers', $data) && $data['with_triggers'],
-					'editable' => array_key_exists('editable', $data) && $data['editable'],
+					'with_hosts' => array_key_exists('with_hosts', $data),
+					'with_items' => array_key_exists('with_items', $data),
+					'with_httptests' => array_key_exists('with_httptests', $data),
+					'with_monitored_triggers' => array_key_exists('with_monitored_triggers', $data),
+					'with_triggers' => array_key_exists('with_triggers', $data),
+					'editable' => array_key_exists('editable', $data),
 					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
 					'preservekeys' => true
 				]);
@@ -324,11 +323,11 @@ switch ($data['method']) {
 					'output' => ['groupid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
-					'with_templates' => array_key_exists('with_templates', $data) && $data['with_templates'],
-					'with_items' => array_key_exists('with_items', $data) && $data['with_items'],
-					'with_httptests' => array_key_exists('with_httptests', $data) && $data['with_httptests'],
-					'with_triggers' => array_key_exists('with_triggers', $data) && $data['with_triggers'],
-					'editable' => array_key_exists('editable', $data) && $data['editable'],
+					'with_templates' => array_key_exists('with_templates', $data),
+					'with_items' => array_key_exists('with_items', $data),
+					'with_httptests' => array_key_exists('with_httptests', $data),
+					'with_triggers' => array_key_exists('with_triggers', $data),
+					'editable' => array_key_exists('editable', $data),
 					'limit' => array_key_exists('limit', $data) ? $data['limit'] : null,
 					'preservekeys' => true
 				]);
