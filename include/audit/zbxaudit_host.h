@@ -104,7 +104,7 @@ PREPARE_AUDIT_HOST_UPDATE_H(custom_interfaces, int)
 
 void	zbx_audit_host_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
 void	zbx_audit_host_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
-		const char *macro, const char *value, const char *description, int type);
+		const char *macro, const char *value, const char *description, int type, int macro_discovery);
 
 #define PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO_H(resource, type1)					\
 void	zbx_audit_host_update_json_update_hostmacro_##resource(zbx_uint64_t hostid,		\

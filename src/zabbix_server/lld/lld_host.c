@@ -35,6 +35,7 @@ typedef struct
 	char		*description_orig;
 	unsigned char	type;
 	unsigned char	type_orig;
+	unsigned char	macro_discovery;
 #define ZBX_FLAG_LLD_HMACRO_UPDATE_VALUE		__UINT64_C(0x00000001)
 #define ZBX_FLAG_LLD_HMACRO_UPDATE_DESCRIPTION		__UINT64_C(0x00000002)
 #define ZBX_FLAG_LLD_HMACRO_UPDATE_TYPE			__UINT64_C(0x00000004)
@@ -1913,7 +1914,7 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
-			"select hm.macro,hm.value,hm.description,hm.type"
+			"select hm.macro,hm.value,hm.description,hm.type,hm.macro_discovery"
 			" from hostmacro hm,items i"
 			" where hm.hostid=i.hostid"
 				" and i.itemid=" ZBX_FS_UI64,
@@ -1932,6 +1933,7 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
 		hostmacro->type_orig = 0;
 		hostmacro->flags = 0;
 		ZBX_STR2UCHAR(hostmacro->type, row[3]);
+		ZBX_STR2UCHAR(hostmacro->macro_discovery, row[4]);
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
@@ -1979,7 +1981,7 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = DBselect(
-			"select hm.macro,hm.value,hm.description,hm.type"
+			"select hm.macro,hm.value,hm.description,hm.type,hm.macro_discovery"
 			" from hostmacro hm"
 			" where hm.hostid=" ZBX_FS_UI64,
 			parent_hostid);
@@ -1996,6 +1998,7 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 		hostmacro->description_orig = NULL;
 		ZBX_STR2UCHAR(hostmacro->type, row[3]);
 		hostmacro->type_orig = hostmacro->type;
+		ZBX_STR2UCHAR(hostmacro->macro_discovery, row[4]);
 		hostmacro->flags = 0;
 
 		zbx_vector_ptr_append(hostmacros, hostmacro);
@@ -2020,6 +2023,7 @@ static void	lld_hostmacros_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *mas
 		hostmacro->description_orig = NULL;
 		hostmacro->type = masterhostmacro->type;
 		hostmacro->type_orig = hostmacro->type;
+		hostmacro->macro_discovery = masterhostmacro->macro_discovery;
 		hostmacro->flags = 0;
 		zbx_vector_ptr_append(hostmacros, hostmacro);
 	}
@@ -2040,6 +2044,7 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 		/* check if host macro has already been added */
 		if (0 == hostmacro->hostmacroid && 0 == strcmp(hostmacro->macro, macro))
 		{
+			/* do not update/remove manual macros */
 			if (ZBX_MACRO_DISCOVERY_MANUAL == macro_discovery)
 			{
 				lld_hostmacro_free(hostmacro);
@@ -2078,6 +2083,7 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 	hostmacro->flags = ZBX_FLAG_LLD_HMACRO_REMOVE;
 	hostmacro->type = 0;
 	hostmacro->type_orig = 0;
+	hostmacro->macro_discovery = 0;
 
 	zbx_vector_ptr_append(hostmacros, hostmacro);
 }
@@ -2129,6 +2135,7 @@ static void	lld_hostmacros_make(const zbx_vector_ptr_t *hostmacros, zbx_vector_p
 			hostmacro->description = zbx_strdup(NULL,
 					((zbx_lld_hostmacro_t *)hostmacros->values[j])->description);
 			hostmacro->description_orig = NULL;
+			hostmacro->macro_discovery = ((zbx_lld_hostmacro_t *)hostmacros->values[j])->macro_discovery;
 			hostmacro->flags = 0x00;
 			zbx_substitute_lld_macros(&hostmacro->value, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
 			zbx_substitute_lld_macros(&hostmacro->description, host->jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
@@ -2894,7 +2901,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
 		zbx_db_insert_prepare(&db_insert_hmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value",
-				"description", "type", NULL);
+				"description", "type", "macro_discovery", NULL);
 	}
 
 	if (0 != new_interfaces)
@@ -3281,11 +3288,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			{
 				zbx_db_insert_add_values(&db_insert_hmacro, hostmacroid, host->hostid,
 						hostmacro->macro, hostmacro->value, hostmacro->description,
-						(int)hostmacro->type);
+						(int)hostmacro->type, (int)hostmacro->macro_discovery);
 				zbx_audit_host_update_json_add_hostmacro(host->hostid,
 						hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
 						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
-						hostmacro->description, (int)hostmacro->type);
+						hostmacro->description, (int)hostmacro->type,
+						(int)hostmacro->macro_discovery);
 				hostmacroid++;
 			}
 			else if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE))
