@@ -7891,14 +7891,16 @@ int	zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char 
 		const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
 		zbx_vector_custquery_param_t *query_params)
 {
-	zbx_vmware_cust_query_t	*pcq, cq;
-	int			i, ret = FAIL;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() soap_type:%s id:%s query_type:%u key:%s", __func__, soap_type, id,
 			query_type, key);
 
-	if (NULL == (pcq = zbx_vmware_service_get_cust_query(service, soap_type, id, key, query_type, mode)))
+	if (NULL == zbx_vmware_service_get_cust_query(service, soap_type, id, key, query_type, mode))
 	{
+		int			i;
+		zbx_vmware_cust_query_t	cq;
+
 		cq.soap_type = vmware_shared_strdup(soap_type);
 		cq.id = vmware_shared_strdup(id);
 		cq.key = vmware_shared_strdup(key);
@@ -7907,6 +7909,7 @@ int	zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char 
 		cq.value = NULL;
 		cq.error = NULL;
 		cq.state = ZBX_VMWARE_CQ_NEW;
+		cq.last_pooled = 0;
 
 		if (VMWARE_DVSWITCH_FETCH_DV_PORTS == query_type)
 		{
@@ -7928,8 +7931,7 @@ int	zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char 
 			zbx_vector_custquery_param_append(cq.query_params, cqp);
 		}
 
-		pcq = (zbx_vmware_cust_query_t *)zbx_hashset_insert(&service->cust_queries, &cq,
-				sizeof(zbx_vmware_cust_query_t));
+		zbx_hashset_insert(&service->cust_queries, &cq, sizeof(zbx_vmware_cust_query_t));
 		ret = SUCCEED;
 	}
 

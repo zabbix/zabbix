@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 <?= (new CScriptTemplate('valuemap-rename-row-tmpl'))->addItem(
@@ -113,3 +114,4 @@
 		</td>
 	</tr>
 </script>
+

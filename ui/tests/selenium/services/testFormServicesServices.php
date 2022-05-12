@@ -960,13 +960,14 @@ class testFormServicesServices extends CWebTest {
 			$rules_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 			$rules_form->fill($rule_fields);
 			$rules_form->submit();
-			$rules_form->waitUntilNotPresent();
 
 			if ($expected === TEST_BAD) {
 				$this->assertMessage(TEST_BAD, null, $data['error']);
 
 				return;
 			}
+
+			$rules_form->waitUntilNotPresent();
 		}
 
 		if (array_key_exists('children', $data)) {
