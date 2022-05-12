@@ -505,7 +505,7 @@ void	zbx_dbsync_env_set_sync(int object, const zbx_dbsync_t *sync)
 	dbsync_env.journals[ZBX_DBSYNC_JOURNAL(object)].sync = sync;
 }
 
-static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal, zbx_vector_dbsync_changelog_t *queue)
+static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 {
 	zbx_vector_uint64_t	objectids;
 	int			i;
@@ -527,7 +527,8 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal, zbx_vector_d
 		if (FAIL != zbx_vector_uint64_bsearch(&objectids, journal->changelog.values[i].objectid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
-			zbx_vector_dbsync_changelog_append(queue, journal->changelog.values[i].changelog);
+			zbx_hashset_insert(&dbsync_env.changelog, &journal->changelog.values[i].changelog,
+					sizeof(zbx_dbsync_changelog_t));
 		}
 	}
 
@@ -536,18 +537,10 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal, zbx_vector_d
 
 void	zbx_dbsync_env_flush_changelog(void)
 {
-	int				i;
-	zbx_vector_dbsync_changelog_t	queue;
-
-	zbx_vector_dbsync_changelog_create(&queue);
+	size_t	i;
 
 	for (i = 0; i < (int)ARRSIZE(dbsync_env.journals); i++)
-		dbsync_env_flush_journal(&dbsync_env.journals[i], &queue);
-
-	for (i = 0; i < queue.values_num; i++)
-		zbx_hashset_insert(&dbsync_env.changelog, &queue.values[i], sizeof(zbx_dbsync_changelog_t));
-
-	zbx_vector_dbsync_changelog_destroy(&queue);
+		dbsync_env_flush_journal(&dbsync_env.journals[i]);
 }
 
 void	zbx_dbsync_env_clear(void)
