@@ -270,8 +270,8 @@ $tag_filter_form_list->addRow(null,
 
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_list)
-	->addTab('template_permissions_tab', _('Template permissions'), $template_permissions_form_grid, TAB_INDICATOR_PERMISSIONS)
-	->addTab('permissions_tab', _('Host permissions'), $host_permissions_form_grid, TAB_INDICATOR_PERMISSIONS)
+	->addTab('template_permissions_tab', _('Template permissions'), $template_permissions_form_grid, TAB_INDICATOR_TEMPLATE_PERMISSIONS)
+	->addTab('permissions_tab', _('Host permissions'), $host_permissions_form_grid, TAB_INDICATOR_HOST_PERMISSIONS)
 	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_list, TAB_INDICATOR_TAG_FILTER);
 if (!$data['form_refresh']) {
 	$tabs->setSelected(0);
