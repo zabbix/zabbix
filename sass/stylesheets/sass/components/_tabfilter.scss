@@ -138,10 +138,6 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			&:hover {
 				background: $tab-label-focus-bg-color;
 			}
-
-			.icon-edit {
-				background: url($sprite-path) no-repeat -42px -621px;
-			}
 		}
 
 		&.selected {
@@ -180,7 +176,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 		@extend %btn-widget-defaults;
 		width: 24px;
 		height: 22px;
-		background: url($sprite-path) no-repeat -354px -621px;
+		background: url($sprite-path) no-repeat -42px -621px;
 
 		cursor: pointer;
 		margin: 0;
@@ -201,10 +197,9 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	margin-left: .4em;
 	padding: 0.1em 0.4em;
 	font-size: $font-h3-size;
-	background-color: $white;
+	background-color: $ui-bg-selected-color;
 	border-radius: 2px;
-	border: 1px solid;
-	color: $tab-label-counter-color;
+	color: $white;
 	content: attr(data-counter);
 }
 
@@ -227,7 +222,8 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 }
 
 .icon-filter::before {
-	display: block;
+	vertical-align: middle;
+	display: inline-block;
 	width: 24px;
 	height: 24px;
 	content: '';

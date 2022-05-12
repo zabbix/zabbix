@@ -146,24 +146,16 @@ svg a {
   background-color: #4f4f4f;
   color: #ffffff; }
 
-[data-indicator="count"][data-indicator-value]:not([data-indicator-value="0"])::after {
-  content: attr(data-indicator-value);
-  margin-left: .4em;
-  color: #768d99;
-  font-size: 0.917em; }
-
-[data-indicator="mark"][data-indicator-value]:not([data-indicator-value="0"])::after {
+[data-indicator="mark"][data-indicator-value]:not([data-indicator-value="0"]) {
   content: '';
   display: inline-block;
   margin-left: .4em;
   margin-right: 7px;
   width: 7px;
   height: 7px;
+  border: none;
   border-radius: 50%;
   background: #009900; }
-[data-indicator="mark"][data-indicator-value]:not([data-indicator-value="0"])::before {
-  display: inline-block;
-  vertical-align: middle; }
 
 .ui-resizable-border-n {
   border-top: 1px solid #768d99;
@@ -2515,8 +2507,6 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
         color: #f2f2f2; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover {
         background: #414141; }
-      .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .icon-edit {
-        background: url("../img/icon-sprite.svg?20211222") no-repeat -42px -621px; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
       background-color: #2b2b2b; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
@@ -2538,7 +2528,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .filter-container.tabfilter-container .icon-edit {
     width: 24px;
     height: 22px;
-    background: url("../img/icon-sprite.svg?20211222") no-repeat -354px -621px;
+    background: url("../img/icon-sprite.svg?20211222") no-repeat -42px -621px;
     cursor: pointer;
     margin: 0;
     vertical-align: middle;
@@ -2551,10 +2541,9 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   margin-left: .4em;
   padding: 0.1em 0.4em;
   font-size: 0.917em;
-  background-color: #ffffff;
+  background-color: #4f4f4f;
   border-radius: 2px;
-  border: 1px solid;
-  color: #e1e3ed;
+  color: #ffffff;
   content: attr(data-counter); }
 
 [data-counter=""]::after {
@@ -2570,7 +2559,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   padding-right: 35px; }
 
 .icon-filter::before {
-  display: block;
+  vertical-align: middle;
+  display: inline-block;
   width: 24px;
   height: 24px;
   content: '';

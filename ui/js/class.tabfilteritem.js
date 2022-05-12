@@ -422,6 +422,21 @@ class CTabFilterItem extends CBaseComponent {
 		this.setBrowserLocation(new URLSearchParams(this._apply_url));
 	}
 
+	setFilterIndicator(tab_target) {
+		if (!tab_target.querySelector("a[data-indicator='mark']")) {
+			let green_dot = document.createElement('a');
+			green_dot.setAttribute('data-indicator-value', '1');
+			green_dot.setAttribute('data-indicator', 'mark');
+			tab_target.appendChild(green_dot);
+		}
+	}
+
+	removeFilterIndicator(tab_target) {
+		if (tab_target.querySelector("a[data-indicator='mark']")) {
+			tab_target.querySelector("a[data-indicator='mark']").remove();
+		}
+	}
+
 	/**
 	 * Checks difference between original form values and to be posted values.
 	 * Updates this._unsaved according to check results
@@ -458,8 +473,12 @@ class CTabFilterItem extends CBaseComponent {
 
 		if (this._index === 0) {
 			if (has_filter) {
-				this._target.parentNode.setAttribute('data-indicator-value', '1');
-				this._target.parentNode.setAttribute('data-indicator', 'mark');
+
+				this.setFilterIndicator(this._target)
+
+
+				// this._target.parentNode.setAttribute('data-indicator-value', '1');
+				// this._target.parentNode.setAttribute('data-indicator', 'mark');
 			}
 			else {
 				this.resetUnsavedState();
@@ -467,8 +486,9 @@ class CTabFilterItem extends CBaseComponent {
 		}
 		else {
 			if (src_query.toString() !== search_params.toString()) {
-				this._target.parentNode.setAttribute('data-indicator-value', '1');
-				this._target.parentNode.setAttribute('data-indicator', 'mark');
+				this.setFilterIndicator(this._target)
+				// this._target.parentNode.setAttribute('data-indicator-value', '1');
+				// this._target.parentNode.setAttribute('data-indicator', 'mark');
 			}
 			else {
 				this.resetUnsavedState();
@@ -495,8 +515,10 @@ class CTabFilterItem extends CBaseComponent {
 		src_query.sort();
 
 		this._src_url = src_query.toString();
-		this._target.parentNode.removeAttribute('data-indicator-value');
-		this._target.parentNode.removeAttribute('data-indicator');
+
+		this.removeFilterIndicator(this._target);
+		// this._target.parentNode.removeAttribute('data-indicator-value');
+		// this._target.parentNode.removeAttribute('data-indicator');
 	}
 
 	/**
