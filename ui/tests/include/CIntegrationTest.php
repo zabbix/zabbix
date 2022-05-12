@@ -324,6 +324,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param string $component              component name
 	 * @param string $waitLogLineOverride    already log line to use to consider component as running
+	 * @param bool $skip_pid    skip PID check
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
@@ -522,6 +523,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param string $component    component name
 	 * @param string $waitLogLineOverride    already log line to use to consider component as running
+	 * @param bool $skip_pid    skip PID check
 	 *
 	 * @throws Exception    on missing configuration or failed start
 	 */
