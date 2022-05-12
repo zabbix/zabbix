@@ -178,8 +178,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 					[
 						'type' => '1',
 						'params' => "2",
-						'error_handler' => 0,
-						'error_handler_params' => ''
+						'error_handler' => 0
 					]
 				]
 			],

@@ -166,8 +166,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 					[
 						'type' => '1',
 						'params' => "2",
-						'error_handler' => 0,
-						'error_handler_params' => ''
+						'error_handler' => 0
 					]
 				]
 			],
@@ -294,15 +293,11 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 				'preprocessing' => [
 					[
 						'type' => '4',
-						'params' => '123',
-						'error_handler' => 0,
-						'error_handler_params' => ''
+						'params' => '123'
 					],
 					[
 						'type' => '25',
-						'params' => "error\nmistake",
-						'error_handler' => 0,
-						'error_handler_params' => ''
+						'params' => "error\nmistake"
 					]
 				]
 			],
