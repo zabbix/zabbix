@@ -25,20 +25,18 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
 
-$hg_ms_params = ($data['context'] === 'host') ? ['with_hosts' => true] : ['with_templates' => true];
+$hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_templates' => true];
 
 $filter_column1 = (new CFormList())
 	->addRow(
-		(new CLabel( ($data['context'] === 'host') ? _('Host groups') : _('Template groups'),
-			'filter_groupids'
-		)),
+		new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'), 'filter_groupids'),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
-			'object_name' => ($data['context'] === 'host') ? 'hostGroup' : 'templateGroup',
+			'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
 			'data' => $data['filter_groupids_ms'],
 			'popup' => [
 				'parameters' => [
-					'srctbl' =>  ($data['context'] === 'host') ? 'host_groups' : 'template_group',
+					'srctbl' =>  $data['context'] === 'host' ? 'host_groups' : 'template_group',
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'groupids',
 					'dstfld1' => 'filter_groupids_',
@@ -48,17 +46,18 @@ $filter_column1 = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow((new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids')),
+	->addRow(
+		new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hostids'),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
-			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter_hostids_ms'],
 			'popup' => [
-				'filter_preselect_fields' => ($data['context'] === 'host')
+				'filter_preselect_fields' => $data['context'] === 'host'
 					? ['hostgroups' => 'filter_groupids_']
 					: ['templategroups' => 'filter_groupids_'],
 				'parameters' => [
-					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'hostids',
 					'dstfld1' => 'filter_hostids_',

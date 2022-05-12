@@ -423,63 +423,32 @@ elseif (hasRequest('filter_rst')) {
 /*
  * Display
  */
-if (hasRequest('parent_discoveryid')) {
-	// Argument parent_discoveryid is considered as alternative filter.
-	$filter = [
-		'groups' => null,
-		'hosts' => null
-	];
-}
-else {
-	$filter = [
-		'groups' => CProfile::getArray($prefix.'graphs.filter_groupids', null),
-		'hosts' => CProfile::getArray($prefix.'graphs.filter_hostids', null)
-	];
-}
+$filter_groupids = hasRequest('parent_discoveryid') ? [] : CProfile::getArray($prefix.'graphs.filter_groupids', []);
+$filter_hostids = hasRequest('parent_discoveryid') ? [] : CProfile::getArray($prefix.'graphs.filter_hostids', []);
 
-// Get host or template groups.
-if (getRequest('context') === 'host') {
-	$filter['groups'] = $filter['groups']
-		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter['groups'],
-			'editable' => true,
-			'preservekeys' => true
-		]), ['groupid' => 'id'])
-		: [];
-}
-else {
-	$filter['groups'] = $filter['groups']
-		? CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $filter['groups'],
-			'editable' => true,
-			'preservekeys' => true
-		]), ['groupid' => 'id'])
-		: [];
-}
+$filter = [
+	'groups' => [],
+	'hosts' => []
+];
 
-$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
-if ($filter_groupids) {
-	$filter_groupids = getSubGroups($filter_groupids, $ms_groups, [], getRequest('context'));
-}
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
 
 // Get hosts.
 if (getRequest('context') === 'host') {
-	$filter['hosts'] = $filter['hosts']
+	$filter['hosts'] = $filter_hostids
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
-			'hostids' => $filter['hosts'],
+			'hostids' => $filter_hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['hostid' => 'id'])
 		: [];
 }
 else {
-	$filter['hosts'] = $filter['hosts']
+	$filter['hosts'] = $filter_hostids
 		? CArrayHelper::renameObjectsKeys(API::Template()->get([
 			'output' => ['templateid', 'name'],
-			'templateids' => $filter['hosts'],
+			'templateids' => $filter_hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['templateid' => 'id'])
@@ -719,7 +688,7 @@ else {
 	$options = [
 		'output' => ['graphid', 'name', 'graphtype'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
-		'groupids' => $filter_groupids,
+		'groupids' => $filter_groupids ? $filter_groupids : null,
 		'discoveryids' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
 		'templated' => ($data['context'] === 'template'),
 		'editable' => true,
