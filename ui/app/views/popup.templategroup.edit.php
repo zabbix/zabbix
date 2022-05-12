@@ -41,6 +41,7 @@ if ($data['groupid'] !== null) {
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
+			'enabled' => CWebUser::getType() == USER_TYPE_SUPER_ADMIN,
 			'isSubmit' => false,
 			'action' => 'templategroup_edit_popup.clone();'
 		],

@@ -41,7 +41,8 @@ $data += [
 			(new CSubmit('update', _('Update')))
 				->addClass('js-update-templategroup'),
 			(new CSimpleButton(_('Clone')))
-				->addClass('js-clone-templategroup'),
+				->addClass('js-clone-templategroup')
+				->setEnabled(CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
 			(new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected template group?'))
 				->addClass('js-delete-templategroup'),

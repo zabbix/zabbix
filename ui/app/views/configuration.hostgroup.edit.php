@@ -41,7 +41,8 @@ $data += [
 			(new CSubmit('update', _('Update')))
 				->addClass('js-update-hostgroup'),
 			(new CSimpleButton(_('Clone')))
-				->addClass('js-clone-hostgroup'),
+				->addClass('js-clone-hostgroup')
+				->setEnabled(CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
 			(new CSimpleButton(_('Delete')))
 				->setAttribute('confirm', _('Delete selected host group?'))
 				->addClass('js-delete-hostgroup'),
