@@ -30,7 +30,7 @@ import (
 	"sync"
 	"time"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 const (

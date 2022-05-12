@@ -975,7 +975,7 @@ class testFormAction extends CLegacyWebTest {
 			$this->assertTrue($this->query('xpath://label[text()="Operation"]/../../div[text()="Send message"]')->one()->isValid());
 		}
 		elseif (isset($data['check_operationtype'])) {
-			$options = $this->query('id:operation-type-select')->asZDropdown()->one();
+			$options = $this->query('id:operation-type-select')->asDropdown()->one();
 			switch ($eventsource) {
 				case EVENT_SOURCE_TRIGGERS:
 				case EVENT_SOURCE_SERVICE:
@@ -1155,7 +1155,7 @@ class testFormAction extends CLegacyWebTest {
 			? ['Send message', 'Notify all involved']
 			: ['Send message', 'Notify all involved', 'Reboot', 'Selenium script'];
 		$this->assertEquals($message_types, $operation_details->query('id:operation-type-select')
-				->asZDropdown()->one()->getOptions()->asText());
+				->asDropdown()->one()->getOptions()->asText());
 		$this->assertEquals('Send message', $operation_details->getField('Operation')->getValue());
 		// Make sure that Custom message is unchecked and that message related fields are not visible.
 		$this->assertFalse($operation_details->getField('Custom message')->getValue());
@@ -1224,15 +1224,15 @@ class testFormAction extends CLegacyWebTest {
 					'esc_period' => '123',
 					'conditions' => [
 						[
-							'Type' => 'Trigger name',
+							'Type' => CFormElement::RELOADABLE_FILL('Trigger name'),
 							'Value' => 'trigger'
 						],
 						[
-							'Type' => 'Trigger severity',
+							'Type' => CFormElement::RELOADABLE_FILL('Trigger severity'),
 							'Severity' => 'Warning'
 						],
 						[
-							'Type' => 'Tag name',
+							'Type' => CFormElement::RELOADABLE_FILL('Tag name'),
 							'Operator' => 'does not contain',
 							'Tag' => 'Does not contain Tag'
 						]
@@ -1271,11 +1271,11 @@ class testFormAction extends CLegacyWebTest {
 					'name' => 'TestFormAction Discovery 001',
 					'conditions' => [
 						[
-							'Type' => 'Service type',
+							'Type' => CFormElement::RELOADABLE_FILL('Service type'),
 							'Service type' => 'FTP'
 						],
 						[
-							'Type' => 'Received value',
+							'Type' => CFormElement::RELOADABLE_FILL('Received value'),
 							'Operator' => 'does not contain',
 							'Value' => 'Received value'
 						]
@@ -1312,11 +1312,11 @@ class testFormAction extends CLegacyWebTest {
 					'name' => 'TestFormAction Autoregistration 001',
 					'conditions' => [
 						[
-							'Type' => 'Host name',
+							'Type' => CFormElement::RELOADABLE_FILL('Host name'),
 							'Value' => 'Zabbix'
 						],
 						[
-							'Type' => 'Host metadata',
+							'Type' => CFormElement::RELOADABLE_FILL('Host metadata'),
 							'Operator'=> 'does not contain',
 							'Value' => 'Zabbix'
 						]
@@ -1354,11 +1354,11 @@ class testFormAction extends CLegacyWebTest {
 					'esc_period' => '123',
 					'conditions' => [
 						[
-							'Type' => 'Event type',
+							'Type' => CFormElement::RELOADABLE_FILL('Event type'),
 							'Event type' => 'Trigger in "unknown" state'
 						],
 						[
-							'Type' => 'Tag name',
+							'Type' => CFormElement::RELOADABLE_FILL('Tag name'),
 							'Operator' => 'does not contain',
 							'Tag' => 'Does not contain Tag'
 						]
@@ -1397,21 +1397,21 @@ class testFormAction extends CLegacyWebTest {
 					'esc_period' => '666',
 					'conditions' => [
 						[
-							'Type' => 'Service',
+							'Type' => CFormElement::RELOADABLE_FILL('Service'),
 							'Operator' => 'does not equal',
 							'Services' => 'Reference service'
 						],
 						[
-							'Type' => 'Service name',
+							'Type' => CFormElement::RELOADABLE_FILL('Service name'),
 							'Value' => 'Part of service name'
 						],
 						[
-							'Type' => 'Service tag name',
+							'Type' => CFormElement::RELOADABLE_FILL('Service tag name'),
 							'Operator' => 'contains',
 							'Tag' => 'Service tag name'
 						],
 						[
-							'Type' => 'Service tag value',
+							'Type' => CFormElement::RELOADABLE_FILL('Service tag value'),
 							'Tag' => 'Service tag',
 							'Operator' => 'does not contain',
 							'Value' => 'Service tag value'
