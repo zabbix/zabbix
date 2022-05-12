@@ -204,7 +204,8 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Triggers'), $trigger_multiselect);
+
+					->addRow(new CLabel(_('Triggers'), 'trigger_new_condition_ms'), $trigger_multiselect);
 				break;
 
 			// Trigger severity form elements.
