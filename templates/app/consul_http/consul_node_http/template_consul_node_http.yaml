@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-27T08:27:08Z'
+  date: '2022-05-12T14:08:05Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,6 +15,7 @@ zabbix_export:
         
         Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.API.TOKEN}.
         Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.
+        More information about metrics you can find in official documentation: https://www.consul.io/docs/agent/telemetry
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -1731,6 +1732,28 @@ zabbix_export:
                 -
                   tag: service
                   value: '{#SERVICE_NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 661551e1e9e94b25b7bd6ea876640b6d
+                  expression: 'last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 2'
+                  name: 'Consul: Aggregated status is ''critical'''
+                  event_name: 'Consul: Node''s health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
+                  priority: AVERAGE
+                  description: 'Aggregated state of service on the local agent is ''critical''.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: 724f6a5e16f64a779a71ad9a9378fb60
+                  expression: 'last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 1'
+                  name: 'Consul: Aggregated status is ''warning'''
+                  priority: WARNING
+                  description: 'Aggregated state of service on the local agent is ''warning''.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 20a0ec9e059548a192c9c37bd7aeaaed
               name: 'Consul: ["{#SERVICE_NAME}"]: Check ["{#SERVICE_CHECK_NAME}"]: Output'

@@ -4,11 +4,11 @@
 ## Overview
 
 For Zabbix version: 6.0 and higher  
-The template to monitor HashiCorp Consul by Zabbix that works without any external scripts.
-Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
-Do not forget to enable Prometheus format for export metrics. 
-See documentation: https://www.consul.io/docs/agent/options#telemetry-prometheus_retention_time
-
+The template to monitor HashiCorp Consul by Zabbix that works without any external scripts.  
+Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
+Do not forget to enable Prometheus format for export metrics.
+See [documentation](https://www.consul.io/docs/agent/options#telemetry-prometheus_retention_time).  
+More information about metrics you can find in [official documentation](https://www.consul.io/docs/agent/telemetry).  
 
 Template `HashiCorp Consul Node by HTTP` — collects metrics by HTTP agent from /v1/agent/metrics endpoint.
 
@@ -26,7 +26,7 @@ Internal service metrics are collected from /v1/agent/metrics endpoint.
 Do not forget to enable Prometheus format for export metrics. See [documentation](https://www.consul.io/docs/agent/options#telemetry-prometheus_retention_time).
 Template need to use Authorization via API token.
 
-Don't forget change macros {$CONSUL.NODE.API.URL}, {$CONSUL.API.TOKEN}.  
+Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.API.TOKEN}.  
 Also, see the Macros section for a list of macros used to set trigger values.  
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
 
@@ -147,6 +147,8 @@ There are no template links in this template.
 |Consul: Node's health score is warning |<p>This metric ranges from 0 to 8, where 0 indicates "totally healthy".</p><p>This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.</p><p>For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf</p> |`max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Consul: Node's health score is critical</p> |
 |Consul: Node's health score is critical |<p>This metric ranges from 0 to 8, where 0 indicates "totally healthy".</p><p>This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.</p><p>For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf</p> |`max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}` |AVERAGE | |
 |Consul: Failed to get local services |<p>Failed to get local services. Check debug log for more information.</p> |`length(last(/HashiCorp Consul Node by HTTP/consul.get_local_services.check))>0` |WARNING | |
+|Consul: Aggregated status is 'warning' |<p>Aggregated state of service on the local agent is 'warning'.</p> |`last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 1` |WARNING | |
+|Consul: Aggregated status is 'critical' |<p>Aggregated state of service on the local agent is 'critical'.</p> |`last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 2` |AVERAGE | |
 
 ## Feedback
 

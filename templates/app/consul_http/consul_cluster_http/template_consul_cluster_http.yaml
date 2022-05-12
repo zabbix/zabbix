@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-28T08:28:48Z'
+  date: '2022-05-12T14:07:06Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -15,6 +15,7 @@ zabbix_export:
         
         Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.API.TOKEN}.
         Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.
+        More information about metrics you can find in official documentation: https://www.consul.io/docs/agent/telemetry
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -183,7 +184,7 @@ zabbix_export:
           key: consul.nodes_critical
           delay: '0'
           history: 7d
-          description: 'Number of agents on current dc with serf health status "critical".'
+          description: 'Number of agents on current dc with serf health status ''critical''.'
           preprocessing:
             -
               type: JSONPATH
@@ -205,7 +206,7 @@ zabbix_export:
               expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_critical)>0'
               name: 'Consul: One or more nodes in cluster in ''critical'' state'
               priority: AVERAGE
-              description: 'One or more agents on current dc with serf health status "critical".'
+              description: 'One or more agents on current dc with serf health status ''critical''.'
               tags:
                 -
                   tag: scope
@@ -217,7 +218,7 @@ zabbix_export:
           key: consul.nodes_passing
           delay: '0'
           history: 7d
-          description: 'Number of agents on current dc with serf health status "passing".'
+          description: 'Number of agents on current dc with serf health status ''passing''.'
           preprocessing:
             -
               type: JSONPATH
@@ -263,7 +264,7 @@ zabbix_export:
           key: consul.nodes_warning
           delay: '0'
           history: 7d
-          description: 'Number of agents on current dc with serf health status "warning".'
+          description: 'Number of agents on current dc with serf health status ''warning''.'
           preprocessing:
             -
               type: JSONPATH
@@ -285,7 +286,7 @@ zabbix_export:
               expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_warning)>0'
               name: 'Consul: One or more nodes in cluster in ''warning'' state'
               priority: WARNING
-              description: 'One or more agents on current dc with serf health status "warning".'
+              description: 'One or more agents on current dc with serf health status ''warning''.'
               tags:
                 -
                   tag: scope
@@ -494,6 +495,18 @@ zabbix_export:
                 -
                   tag: service
                   value: '{#SERVICE_NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 60919b58bd484597aa7ec03f308eb614
+                  expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.service.nodes_critical["{#SERVICE_NAME}"])>{$CONSUL.CLUSTER.SERVICE_NODES.CRITICAL.MAX.AVG:"{#SERVICE_NAME}"}'
+                  name: 'Consul: Service ["{#SERVICE_NAME}"]: Too many nodes with service status ''critical'''
+                  event_name: 'Consul: Service ["{#SERVICE_NAME}"]: Too many nodes with service status ''critical'' (over {$CONSUL.CLUSTER.SERVICE_NODES.CRITICAL.MAX.AVG:"{#SERVICE_NAME}"})'
+                  priority: AVERAGE
+                  description: 'One or more nodes with service status ''critical''.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
             -
               uuid: 3807bd01fda5425694eb8e4169eb4078
               name: 'Consul: Service ["{#SERVICE_NAME}"]: Nodes passing'
@@ -506,31 +519,6 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$[?(@.Node == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''passing'')].length()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 3h
-              master_item:
-                key: 'consul.get_service_stats["{#SERVICE_NAME}"]'
-              tags:
-                -
-                  tag: component
-                  value: service
-                -
-                  tag: service
-                  value: '{#SERVICE_NAME}'
-            -
-              uuid: a1db87ce7d7a414aaadfef5f9a0dc662
-              name: 'Consul: Service ["{#SERVICE_NAME}"]: Nodes up'
-              type: DEPENDENT
-              key: 'consul.service.nodes_up["{#SERVICE_NAME}"]'
-              delay: '0'
-              history: 7d
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''passing'')].length()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -623,6 +611,10 @@ zabbix_export:
           macro: '{$CONSUL.LLD.FILTER.SERVICE_NAME.NOT_MATCHES}'
           value: 'CHANGE IF NEEDED'
           description: 'Filter to exclude discovered services.'
+        -
+          macro: '{$CONSUL.SERVICE_NODES.CRITICAL.MAX.AVG}'
+          value: '0'
+          description: 'Maximum number of service nodes in status ''critical'' for trigger expression. Can be used with context.'
         -
           macro: '{$CONSUL.TOKEN}'
           value: '<PUT YOUR AUTH TOKEN>'
