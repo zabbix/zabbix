@@ -42,9 +42,9 @@ L.Map.include({
 	},
 
 	elmntCounter: (function() {
-		let stc_var = 0;
+		let counter = 0;
 		return function() {
-			return ++stc_var;
+			return ++counter;
 		}
 	})()
 });
