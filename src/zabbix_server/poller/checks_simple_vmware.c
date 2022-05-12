@@ -2359,19 +2359,19 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	for (i = 0; i < service->data->datastores.values_num; i++)
+
+	if (NULL == (datastore = ds_get(&service->data->datastores, ds_name)))
 	{
-		if (0 != strcmp(ds_name, service->data->datastores.values[i]->name))
-			continue;
+		zbx_vmware_datastore_t	ds_cmp =  {.name = (char *)ds_name};
+
+		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+				vmware_ds_name_compare)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
+			goto unlock;
+		}
 
 		datastore = service->data->datastores.values[i];
-		break;
-	}
-
-	if (NULL == datastore)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
-		goto unlock;
 	}
 
 	for (i=0; i < datastore->hv_uuids_access.values_num; i++)
