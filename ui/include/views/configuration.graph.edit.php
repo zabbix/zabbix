@@ -236,7 +236,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
 	}
 
-	$yaxismin_label = new CLabel(_('Y axis MIN value'),'ymin_type_label');
+	$yaxismin_label = new CLabel(_('Y axis MIN value'), 'ymin_type_label');
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$yaxismin_label->setAsteriskMark();
 	}
@@ -312,8 +312,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$yaxismax_label = new CLabel(_('Y axis MAX value'), 'ymax_type_label');
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-		$yaxismax_label
-			->setAsteriskMark();
+		$yaxismax_label->setAsteriskMark();
 	}
 
 	$graphFormList->addRow($yaxismax_label, $yaxisMaxData);
