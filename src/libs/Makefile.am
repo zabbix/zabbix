@@ -137,7 +137,6 @@ SUBDIRS = \
 	zbxipcservice \
 	zbxcompress \
 	zbxxml \
-	zbxtls \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)
