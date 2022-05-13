@@ -334,89 +334,65 @@ static int	DBpatch_6010023(void)
 	return ret;
 }
 
+#define HTTPSTEP_ITEM_TYPE_RSPCODE	0
+#define HTTPSTEP_ITEM_TYPE_TIME		1
+#define HTTPSTEP_ITEM_TYPE_IN		2
+#define HTTPSTEP_ITEM_TYPE_LASTSTEP	3
+#define HTTPSTEP_ITEM_TYPE_LASTERROR	4
+
 static int	DBpatch_6010024(void)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
 	int		ret = SUCCEED;
 	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
+	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
+	char		*out = NULL;
 
 	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
 		return SUCCEED;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	result = DBselect("select itemid,name,key_ from items where type=9");
+	result = DBselect(
+			"select hi.itemid,hi.type,ht.name"
+			" from httptestitem hi,httptest ht"
+			" where hi.httptestid=ht.httptestid");
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
 		zbx_uint64_t	itemid;
-		char		*expression = row[1], *out = NULL;
-		int		pos = 0, last_pos = 0;
-		zbx_token_t	token;
-		size_t		out_alloc = 0, out_offset = 0;
-		AGENT_REQUEST	request;
+		char		*esc;
+		size_t		out_offset = 0;
+		unsigned char	type;
 
 		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(type, row[1]);
 
-		init_request(&request);
-
-		if (SUCCEED != parse_item_key(row[2], &request))
+		switch (type)
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
+			case HTTPSTEP_ITEM_TYPE_IN:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Download speed for scenario \"%s\".", row[2]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Failed step of scenario \"%s\".", row[2]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_LASTERROR:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Last error message of scenario \"%s\".", row[2]);
+				break;
 		}
+		esc = DBdyn_escape_field("items", "name", out);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
+				ZBX_FS_UI64 ";\n", esc, itemid);
+		zbx_free(esc);
 
-		for (; SUCCEED == zbx_token_find(expression, pos, &token, ZBX_TOKEN_SEARCH_REFERENCES); pos++)
-		{
-			char	*param;
-
-			switch (token.type)
-			{
-				case ZBX_TOKEN_REFERENCE:
-					if (0 < token.data.reference.index && 9 >= token.data.reference.index &&
-							NULL != (param = get_rparam(&request,
-							token.data.reference.index - 1)))
-					{
-						zbx_strncpy_alloc(&out, &out_alloc, &out_offset,
-								expression + last_pos, token.loc.l - last_pos);
-						zbx_strcpy_alloc(&out, &out_alloc, &out_offset, param);
-
-						last_pos = token.loc.r + 1;
-					}
-					ZBX_FALLTHROUGH;
-				default:
-					pos = token.loc.r;
-					break;
-			}
-		}
-
-		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, expression + last_pos);
-
-		free_request(&request);
-
-		if (ITEM_NAME_LEN < zbx_strlen_utf8(out))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot convert web monitoring item \"" ZBX_FS_UI64 "\" name:"
-					" too long parameter", itemid);
-		}
-		else
-		{
-			char	*esc;
-
-			esc = DBdyn_escape_field("items", "name", out);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
-					ZBX_FS_UI64 ";\n", esc, itemid);
-			zbx_free(esc);
-
-			ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-
-		zbx_free(out);
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
-
 	DBfree_result(result);
+
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
@@ -426,6 +402,75 @@ static int	DBpatch_6010024(void)
 	}
 
 	zbx_free(sql);
+	zbx_free(out);
+
+	return ret;
+}
+
+static int	DBpatch_6010025(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
+	char		*out = NULL;
+
+	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select hi.itemid,hi.type,hs.name,ht.name"
+			" from httpstepitem hi,httpstep hs,httptest ht"
+			" where hi.httpstepid=hs.httpstepid"
+				" and hs.httptestid=ht.httptestid");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+		char		*esc;
+		size_t		out_offset = 0;
+		unsigned char	type;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(type, row[1]);
+
+		switch (type)
+		{
+			case HTTPSTEP_ITEM_TYPE_IN:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Download speed for step \"%s\" of scenario \"%s\".", row[2], row[3]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_TIME:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Response time for step \"%s\" of scenario \"%s\".", row[2], row[3]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_RSPCODE:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Response code for step \"%s\" of scenario \"%s\".", row[2], row[3]);
+				break;
+		}
+		esc = DBdyn_escape_field("items", "name", out);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
+				ZBX_FS_UI64 ";\n", esc, itemid);
+		zbx_free(esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+	zbx_free(out);
 
 	return ret;
 }
@@ -461,5 +506,6 @@ DBPATCH_ADD(6010021, 0,	1)
 DBPATCH_ADD(6010022, 0,	1)
 DBPATCH_ADD(6010023, 0,	1)
 DBPATCH_ADD(6010024, 0,	1)
+DBPATCH_ADD(6010025, 0,	1)
 
 DBPATCH_END()
