@@ -36,7 +36,37 @@ class C60ImportConverter extends CConverter {
 
 		if (array_key_exists('groups', $data['zabbix_export'])) {
 			if (array_key_exists('templates', $data['zabbix_export'])) {
-				$data['zabbix_export']['template_groups'] = $data['zabbix_export']['groups'];
+				$template_groups = [];
+				$host_groups = [];
+
+				foreach ($data['zabbix_export']['templates'] as $template) {
+					foreach ($template['groups'] as $group) {
+						$template_groups[] = $group['name'];
+					}
+
+					if (array_key_exists('discovery_rules', $template)) {
+						foreach ($template['discovery_rules'] as $discovery_rule) {
+							if (array_key_exists('host_prototypes', $discovery_rule)) {
+								foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
+									if (array_key_exists('group_links', $host_prototype)) {
+										foreach ($host_prototype['group_links'] as $group_link) {
+											$host_groups[] = $group_link['group']['name'];
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				foreach ($data['zabbix_export']['groups'] as $group) {
+					if (in_array($group['name'], $host_groups)) {
+						$data['zabbix_export']['host_groups'][] = $group;
+					}
+					if (in_array($group['name'], $template_groups)) {
+						$data['zabbix_export']['template_groups'][] = $group;
+					}
+				}
 			}
 			else {
 				$data['zabbix_export']['host_groups'] = $data['zabbix_export']['groups'];
