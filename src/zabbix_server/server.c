@@ -33,6 +33,7 @@
 #include "zbxmutexs.h"
 #include "zbxmodules.h"
 #include "zbxnix.h"
+#include "zbxtls.h"
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"
@@ -1118,7 +1119,10 @@ int	main(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':

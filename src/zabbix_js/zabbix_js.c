@@ -185,7 +185,10 @@ int	main(int argc, char **argv)
 				ret = SUCCEED;
 				goto clean;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				zbx_tls_version();
+#endif
 				ret = SUCCEED;
 				goto clean;
 			default:

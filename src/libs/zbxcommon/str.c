@@ -48,16 +48,12 @@ static const char	help_message_footer[] =
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-/* void	version(void) */
-/* { */
-/* 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION); */
-/* 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__); */
-/* 	puts(copyright_message); */
-/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
-/* 	printf("\n"); */
-/* 	zbx_tls_version(); */
-/* #endif */
-/* } */
+void	zbx_version(void)
+{
+	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
+	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
+	puts(copyright_message);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -68,7 +64,7 @@ static const char	help_message_footer[] =
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	usage(void)
+void	zbx_usage(void)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */

@@ -961,7 +961,7 @@ extern const char	*help_message[];
 
 void	help(void);
 void	usage(void);
-//void	version(void);
+void	zbx_version(void);
 
 const char	*get_program_name(const char *path);
 

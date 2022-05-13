@@ -27,6 +27,7 @@
 #include "zbxthreads.h"
 #include "zbxjson.h"
 #include "zbxregexp.h"
+#include "zbxtls.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

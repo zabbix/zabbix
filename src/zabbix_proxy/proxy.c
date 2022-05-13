@@ -49,6 +49,7 @@
 #include "../zabbix_server/vmware/vmware.h"
 #include "setproctitle.h"
 #include "zbxcrypto.h"
+#include "zbxtls.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
 #include "zbxavailability.h"
@@ -1035,7 +1036,10 @@ int	main(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':

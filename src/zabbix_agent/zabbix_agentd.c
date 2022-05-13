@@ -22,6 +22,7 @@
 #include "zbxgetopt.h"
 #include "zbxcomms.h"
 #include "modbtype.h"
+#include "zbxtls.h"
 
 static char	*CONFIG_PID_FILE = NULL;
 
@@ -1466,7 +1467,10 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_VERSION:
-			version();
+			zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			zbx_tls_version();
+#endif
 #ifdef _AIX
 			printf("\n");
 			tl_version();

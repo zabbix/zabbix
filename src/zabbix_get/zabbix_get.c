@@ -21,6 +21,7 @@
 #include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
+#include "zbxtls.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"
@@ -376,7 +377,10 @@ int	main(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
