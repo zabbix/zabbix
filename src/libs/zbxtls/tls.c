@@ -22,7 +22,6 @@
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "zbxtls.h"
 
-#include "tls.h"
 #include "zbxcomms.h"
 #include "zbxthreads.h"
 #include "log.h"

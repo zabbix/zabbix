@@ -181,7 +181,7 @@ int	main(int argc, char **argv)
 				timeout = atoi(zbx_optarg);
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				ret = SUCCEED;
 				goto clean;
 			case 'V':
@@ -192,7 +192,7 @@ int	main(int argc, char **argv)
 				ret = SUCCEED;
 				goto clean;
 			default:
-				usage();
+				zbx_usage();
 				goto clean;
 		}
 	}
@@ -211,7 +211,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{
-		usage();
+		zbx_usage();
 		goto close;
 	}
 

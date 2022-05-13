@@ -118,11 +118,11 @@ void	zbx_usage(void)
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	help(void)
+void	zbx_help(void)
 {
 	const char	**p = help_message;
 
-	usage();
+	zbx_usage();
 	printf("\n");
 
 	while (NULL != *p)
