@@ -1,8 +1,15 @@
 Changes for 6.2.0rc1
 
 New features:
+.......PS. [ZBXNEXT-7494] removed deprecated CurlHttpRequest (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
+....I..... [ZBX-20861] fixed incorrect naming of web scenario items after upgrade (vso)
+........S. [ZBX-20823] fixed inability to update hosts that were created by LLD on aarch64 (vso)
+..F....... [ZBX-20945] fixed broken trigger link in trigger mass update => dependencies (esekace)
+...G...... [ZBX-20886] fixed handle leak on Zabbix agent 2 in vfs.fs.get (vso)
+...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent2 (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta2
