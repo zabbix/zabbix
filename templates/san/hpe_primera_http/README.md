@@ -42,12 +42,8 @@ No specific Zabbix configuration is required.
 |{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.NOT_MATCHES} |<p>Filter to exclude discovered tasks by name.</p> |`.*` |
 |{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.MATCHES} |<p>Filter of discoverable tasks by type.</p> |`.*` |
 |{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.NOT_MATCHES} |<p>Filter to exclude discovered tasks by type.</p> |`CHANGE_IF_NEEDED` |
-|{$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT} |<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p> |`5G` |
-|{$HPE.PRIMERA.VOLUME.FREE.MIN.WARN} |<p>This macro is used for trigger expression. It can be overridden on the host or linked on the template level.</p> |`10G` |
 |{$HPE.PRIMERA.VOLUME.NAME.MATCHES} |<p>This macro is used in filters of volume discovery rule.</p> |`.*` |
 |{$HPE.PRIMERA.VOLUME.NAME.NOT_MATCHES} |<p>This macro is used in filters of volume discovery rule.</p> |`^(admin|.srdata|.mgmtdata)$` |
-|{$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT} |<p>Threshold of used volume space for high severity trigger in %.</p> |`90` |
-|{$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN} |<p>Threshold of used volume space for warning trigger in %.</p> |`80` |
 
 ## Template links
 
@@ -59,7 +55,7 @@ There are no template links in this template.
 |----|-----------|----|----|
 |Common provisioning groups discovery |<p>List of CPGs resources.</p> |DEPENDENT |hpe.primera.cpg.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$HPE.PRIMERA.CPG.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$HPE.PRIMERA.CPG.NAME.NOT_MATCHES}`</p> |
 |Disks discovery |<p>List of physical disk resources.</p> |DEPENDENT |hpe.primera.disks.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
-|Hosts discovery |<p>List of host properties.</p> |DEPENDENT |hpe.primera.hosts.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Hosts discovery |<p>List of host properties.</p> |DEPENDENT |hpe.primera.hosts.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#NAME} EXISTS</p> |
 |Ports discovery |<p>List of ports.</p> |DEPENDENT |hpe.primera.ports.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#TYPE} NOT_MATCHES_REGEX `3`</p> |
 |Tasks discovery |<p>List of tasks started within last 24 hours.</p> |DEPENDENT |hpe.primera.tasks.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.NOT_MATCHES}`</p><p>- {#TYPE} MATCHES_REGEX `{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.MATCHES}`</p><p>- {#TYPE} NOT_MATCHES_REGEX `{$HPE.PRIMERA.LLD.FILTER.TASK.TYPE.NOT_MATCHES}`</p> |
 |Volumes discovery |<p>List of storage volume resources.</p> |DEPENDENT |hpe.primera.volumes.discovery<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p><p>**Filter**:</p>AND <p>- {#NAME} MATCHES_REGEX `{$HPE.PRIMERA.VOLUME.NAME.MATCHES}`</p><p>- {#NAME} NOT_MATCHES_REGEX `{$HPE.PRIMERA.VOLUME.NAME.NOT_MATCHES}`</p> |
@@ -172,7 +168,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|HPE Primera: WSAPI is not responding |<p>ID from system information is 0 or unable to retrieve system information.</p> |`last(/HPE Primera by HTTP/hpe.primera.system.health)=0` |HIGH |<p>**Depends on**:</p><p>- HPE Primera: Service is unavailable</p> |
+|HPE Primera: Failed to fetch data from WSAPI |<p>ID from system information is 0 or unable to retrieve system information.</p> |`max(/HPE Primera by HTTP/hpe.primera.system.health,#3)=0` |AVERAGE |<p>**Depends on**:</p><p>- HPE Primera: Service is unavailable</p> |
 |HPE Primera: Service is unavailable |<p>-</p> |`last(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"])=0` |HIGH |<p>Manual close: YES</p> |
 |CPG [{#NAME}]: Degraded |<p>CPG [{#NAME}] is in degraded state.</p> |`last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#ID}"])=2` |AVERAGE | |
 |CPG [{#NAME}]: Failed |<p>CPG [{#NAME}] is in failed state.</p> |`last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#ID}"])=3` |HIGH | |
@@ -190,8 +186,6 @@ There are no template links in this template.
 |Task [{#NAME}]: Failed |<p>Task [{#NAME}] is failed.</p> |`last(/HPE Primera by HTTP/hpe.primera.task["{#ID}",status])=4` |AVERAGE | |
 |Volume [{#NAME}]: Degraded |<p>Volume [{#NAME}] is in degraded state.</p> |`last(/HPE Primera by HTTP/hpe.primera.volume.state["{#ID}"])=2` |AVERAGE | |
 |Volume [{#NAME}]: Failed |<p>Volume [{#NAME}] is in failed state.</p> |`last(/HPE Primera by HTTP/hpe.primera.volume.state["{#ID}"])=3` |HIGH | |
-|Volume [{#NAME}]: Space is critically low |<p>Two conditions should match: First, space utilization should be above {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"}%.</p><p>Second condition: The pool free space is less than {$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT:"{#NAME}"}.</p> |`min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)/last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) > {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"} and (last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) - min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)) < {$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT:"{#NAME}"}` |HIGH | |
-|Volume [{#NAME}]: Space is low |<p>Two conditions should match: First, space utilization should be above {$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN:"{#NAME}"}%.</p><p>Second condition: The pool free space is less than {$HPE.PRIMERA.VOLUME.FREE.MIN.WARN:"{#NAME}"}.</p> |`min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)/last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) > {$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN:"{#NAME}"} and (last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) - min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)) < {$HPE.PRIMERA.VOLUME.FREE.MIN.WARN:"{#NAME}"}` |WARNING |<p>**Depends on**:</p><p>- Volume [{#NAME}]: Space is critically low</p> |
 
 ## Feedback
 

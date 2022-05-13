@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-06T14:27:31Z'
+  date: '2022-05-13T10:31:57Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -317,7 +317,7 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: disks
+              value: disk
             -
               tag: component
               value: storage
@@ -721,9 +721,9 @@ zabbix_export:
           triggers:
             -
               uuid: 570d440e7ec9445585003208eca06e63
-              expression: 'last(/HPE Primera by HTTP/hpe.primera.system.health)=0'
-              name: 'HPE Primera: WSAPI is not responding'
-              priority: HIGH
+              expression: 'max(/HPE Primera by HTTP/hpe.primera.system.health,#3)=0'
+              name: 'HPE Primera: Failed to fetch data from WSAPI'
+              priority: AVERAGE
               description: 'ID from system information is 0 or unable to retrieve system information.'
               dependencies:
                 -
@@ -2837,6 +2837,13 @@ zabbix_export:
           key: hpe.primera.hosts.discovery
           delay: '0'
           description: 'List of host properties.'
+          filter:
+            evaltype: AND
+            conditions:
+              - 
+                macro: '{#NAME}'
+                operator: EXISTS
+                formulaid: A
           item_prototypes:
             -
               uuid: 142a03a36dbf477ebbcb99994efe4246
@@ -3078,9 +3085,6 @@ zabbix_export:
                   tag: component
                   value: port
                 -
-                  tag: label
-                  value: '{#LABEL}'
-                -
                   tag: port
                   value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
               trigger_prototypes:
@@ -3133,9 +3137,6 @@ zabbix_export:
                   tag: component
                   value: port
                 -
-                  tag: label
-                  value: '{#LABEL}'
-                -
                   tag: port
                   value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
             -
@@ -3184,9 +3185,6 @@ zabbix_export:
                 -
                   tag: component
                   value: port
-                -
-                  tag: label
-                  value: '{#LABEL}'
                 -
                   tag: port
                   value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
@@ -3255,9 +3253,6 @@ zabbix_export:
                   tag: component
                   value: port
                 -
-                  tag: label
-                  value: '{#LABEL}'
-                -
                   tag: port
                   value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
           master_item:
@@ -3266,9 +3261,6 @@ zabbix_export:
             -
               lld_macro: '{#CARD.PORT}'
               path: $.portPos.cardPort
-            -
-              lld_macro: '{#LABEL}'
-              path: $.label
             -
               lld_macro: '{#NODE}'
               path: $.portPos.node
@@ -4521,45 +4513,6 @@ zabbix_export:
                 -
                   tag: volume
                   value: '{#NAME}'
-          trigger_prototypes:
-            -
-              uuid: 59226030b2ce4c5e8a3cf31990e6b036
-              expression: 'min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)/last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) > {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"} and (last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) - min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)) < {$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT:"{#NAME}"}'
-              name: 'Volume [{#NAME}]: Space is critically low'
-              event_name: 'Volume [{#NAME}]: Space is critically low (more than {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"}% used)'
-              opdata: 'Current usage: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
-              priority: HIGH
-              description: |
-                Two conditions should match: First, space utilization should be above {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"}%.
-                Second condition: The pool free space is less than {$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT:"{#NAME}"}.
-              tags:
-                -
-                  tag: scope
-                  value: capacity
-                -
-                  tag: scope
-                  value: performance
-            -
-              uuid: dd1f0c9a629e4fd0b507a0bb95cc40b4
-              expression: 'min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)/last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) > {$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN:"{#NAME}"} and (last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) - min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)) < {$HPE.PRIMERA.VOLUME.FREE.MIN.WARN:"{#NAME}"}'
-              name: 'Volume [{#NAME}]: Space is low'
-              event_name: 'Volume [{#NAME}]: Space is low (more than {$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN:"{#NAME}"}% used)'
-              opdata: 'Current usage: {ITEM.LASTVALUE1} of {ITEM.LASTVALUE2}'
-              priority: WARNING
-              description: |
-                Two conditions should match: First, space utilization should be above {$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN:"{#NAME}"}%.
-                Second condition: The pool free space is less than {$HPE.PRIMERA.VOLUME.FREE.MIN.WARN:"{#NAME}"}.
-              dependencies:
-                -
-                  name: 'Volume [{#NAME}]: Space is critically low'
-                  expression: 'min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)/last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) > {$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT:"{#NAME}"} and (last(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",size]) - min(/HPE Primera by HTTP/hpe.primera.volume.space.total["{#ID}",used],5m)) < {$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT:"{#NAME}"}'
-              tags:
-                -
-                  tag: scope
-                  value: capacity
-                -
-                  tag: scope
-                  value: performance
           graph_prototypes:
             -
               uuid: 8c7139d2b7d94773ad6ef813c7fa59c9
@@ -4748,14 +4701,6 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered tasks by type.'
         -
-          macro: '{$HPE.PRIMERA.VOLUME.FREE.MIN.CRIT}'
-          value: 5G
-          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
-        -
-          macro: '{$HPE.PRIMERA.VOLUME.FREE.MIN.WARN}'
-          value: 10G
-          description: 'This macro is used for trigger expression. It can be overridden on the host or linked on the template level.'
-        -
           macro: '{$HPE.PRIMERA.VOLUME.NAME.MATCHES}'
           value: '.*'
           description: 'This macro is used in filters of volume discovery rule.'
@@ -4763,14 +4708,6 @@ zabbix_export:
           macro: '{$HPE.PRIMERA.VOLUME.NAME.NOT_MATCHES}'
           value: ^(admin|.srdata|.mgmtdata)$
           description: 'This macro is used in filters of volume discovery rule.'
-        -
-          macro: '{$HPE.PRIMERA.VOLUME.PUSED.MAX.CRIT}'
-          value: '90'
-          description: 'Threshold of used volume space for high severity trigger in %.'
-        -
-          macro: '{$HPE.PRIMERA.VOLUME.PUSED.MAX.WARN}'
-          value: '80'
-          description: 'Threshold of used volume space for warning trigger in %.'
       valuemaps:
         -
           uuid: 79ba0611293541f29f8b43b34e64465d
