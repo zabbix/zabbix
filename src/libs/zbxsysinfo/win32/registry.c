@@ -328,6 +328,7 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 	DWORD			BufferSize = MAX_VALUE_NAME, type;
 	LSTATUS			errCode;
 	HKEY			hive_handle;
+	int			ret = SUCCEED;
 
 	if (FAIL == split_fullkey(&key, &hive_handle))
 	{
@@ -342,7 +343,8 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 			&BufferSize)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, strerror_from_system(errCode)));
-		return FAIL;
+		ret = FAIL;
+		goto out;
 	}
 
 	if (REG_BINARY == type)
@@ -385,19 +387,18 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 		char	*buffer;
 
 		buffer = zbx_unicode_to_utf8(wbuffer);
-		SET_STR_RESULT(result, zbx_strdup(NULL, buffer));
-		zbx_free(buffer);
+		SET_STR_RESULT(result, buffer);
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported type"));
-		return FAIL;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported registry data type"));
+		ret = FAIL;
 	}
-
+out:
 	zbx_free(wkey);
 	zbx_free(wvalue);
 
-	return SUCCEED;
+	return ret;
 }
 
 int	REGISTRY_DATA(AGENT_REQUEST *request, AGENT_RESULT *result)
