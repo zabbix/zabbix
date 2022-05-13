@@ -431,7 +431,7 @@ int	REGISTRY_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char	*pkey, *pmode, *regexp;
 	int	mode;
 
-	if (2 < request->nparam)
+	if (3 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
