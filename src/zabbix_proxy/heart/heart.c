@@ -24,7 +24,8 @@
 #include "zbxjson.h"
 #include "zbxself.h"
 
-#include "zbxcrypto.h"
+//#include "zbxcrypto.h"
+#include "zbxtls.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
 

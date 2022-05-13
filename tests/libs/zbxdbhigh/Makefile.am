@@ -39,6 +39,7 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
+	$(top_srcdir)/src/libs/zbxtls/libzbxtls.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \

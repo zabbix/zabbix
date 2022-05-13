@@ -28,6 +28,7 @@
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
+#include "zbxtls.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 

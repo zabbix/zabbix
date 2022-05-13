@@ -1046,7 +1046,7 @@ int	main(int argc, char **argv)
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}
