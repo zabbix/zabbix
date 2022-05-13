@@ -388,6 +388,10 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 		return nil, errs
 	}
 
+	if no_response {
+		return nil, nil
+	}
+
 	log.Tracef("receiving data from [%s]", (*addresses)[0])
 
 	b, err := c.Read()
@@ -399,7 +403,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 	}
 	log.Tracef("received [%s] from [%s]", string(b), (*addresses)[0])
 
-	if len(b) == 0 && !no_response {
+	if len(b) == 0 {
 		errs = append(errs, fmt.Errorf("connection closed"))
 		log.Tracef("%s", errs[len(errs)-1])
 
