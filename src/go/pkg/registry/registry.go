@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"regexp"
 	"encoding/json"
 	"encoding/base64"
 	"golang.org/x/sys/windows/registry"
@@ -70,7 +71,7 @@ func getHive(key string) (hive registry.Key, e error) {
 	return 0, errors.New("Failed to parse key.")
 }
 
-func discoverValues(hive registry.Key, fullkey string, values []RegistryValue, current_key string) (result []RegistryValue, e error) {
+func discoverValues(hive registry.Key, fullkey string, values []RegistryValue, current_key string, re string) (result []RegistryValue, e error) {
 	k, err := registry.OpenKey(hive, fullkey, registry.QUERY_VALUE|registry.ENUMERATE_SUB_KEYS)
 	if err != nil {
 		return nil, err
@@ -89,18 +90,27 @@ func discoverValues(hive registry.Key, fullkey string, values []RegistryValue, c
 	}
 
 	for _, v := range v {
-		fmt.Print()
 		data, valtype, err := convertValue(k, v)
 		sdata := fmt.Sprintf("%v", data)
+
 		if err != nil {
 			continue
 		}
-		values = append(values, RegistryValue{fullkey, current_key, v, sdata, valtype})
+
+		if re != "" {
+			match, _ := regexp.MatchString(re, v)
+
+			if match {
+				values = append(values, RegistryValue{fullkey, current_key, v, sdata, valtype})
+			}
+		} else {
+			values = append(values, RegistryValue{fullkey, current_key, v, sdata, valtype})
+		}
 	}
 
 	for _, i := range s {
 		new_fullkey := fullkey + "\\" + i
-		values, _ = discoverValues(hive, new_fullkey, values, i)
+		values, _ = discoverValues(hive, new_fullkey, values, i, re)
 	}
 
 	return values, nil
@@ -137,6 +147,7 @@ func convertValue(k registry.Key, value string) (result interface{}, stype strin
 			return "", "REG_NONE", nil
 		case registry.EXPAND_SZ:
 			stype = "REG_EXPAND_SZ"
+			fallthrough
 		case registry.SZ:
 			if stype == "" {
 				stype = "REG_SZ"
@@ -155,6 +166,7 @@ func convertValue(k registry.Key, value string) (result interface{}, stype strin
 			return base64.StdEncoding.EncodeToString(val), "REG_BINARY", nil
 		case registry.DWORD:
 			stype = "REG_QWORD"
+			fallthrough
 		case registry.QWORD:
 			if stype == "" {
 				stype = "REG_DWORD"
@@ -216,6 +228,7 @@ func GetValue(params []string) (result interface{}, err error) {
 
 func Discover(params []string) (result string, err error) {
 	var j []byte
+	var re string
 
 	if len(params) == 0 || len(params) > 3 {
 		return "", errors.New("Invalid number of parameters.")
@@ -235,6 +248,9 @@ func Discover(params []string) (result string, err error) {
 			mode = RegistryDiscoveryModeKeys
 		} else if params[1] == "values" {
 			mode = RegistryDiscoveryModeValues
+			if len(params) == 3 {
+				re = params[2]
+			}
 		}
 	} else {
 		mode = RegistryDiscoveryModeValues
@@ -246,7 +262,7 @@ func Discover(params []string) (result string, err error) {
 		j, _ = json.Marshal(results)
 	} else if mode == RegistryDiscoveryModeValues {
 		results := make([]RegistryValue, 0)
-		results, _ = discoverValues(hive, key, results, "")
+		results, _ = discoverValues(hive, key, results, "", re)
 		j, _ = json.Marshal(results)
 	} else {
 		return "", errors.New("Invalid mode parameter.")
