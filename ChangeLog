@@ -4,6 +4,10 @@ New features:
 ..F....... [ZBX-20946] enabled German, Greek, Romanian, Spanish and Vietnamese languages in frontend (miks)
 
 Bug fixes:
+.......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
+...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent2 (vso)
+...G...... [ZBX-20886] fixed handle leak on Zabbix agent 2 in vfs.fs.get (vso)
+........S. [ZBX-20823] fixed inability to update hosts that were created by LLD on aarch64 (vso)
 ..F....... [ZBX-20380] fixed maintenance highlighting having priority over problem severity highlighting for map elements of map, host group and trigger types (agriscenko)
 
 --------------------------------------------------------------------------------
