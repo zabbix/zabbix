@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-11T05:26:40Z'
+  date: '2022-05-13T11:03:57Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -15,13 +15,10 @@ zabbix_export:
         It works without any external scripts and uses the script items.
         
         Setup:
-        1. Create user zabbix on the storage with browse role and enable it for all domains.
-        2. The WSAPI server does not start automatically. To enable it:
-        - log in to the CLI as Super, Service, or any role granted the wsapi_set right;
-        - start the WSAPI server by command: 'startwsapi';
-        - to check WSAPI state use command: 'showwsapi'.
-        3. Link template to the host.
-        4. Configure {$HPE.MSA.API.PASSWORD} and {$HPE.PRIMERA.API.PASSWORD}.
+        1. Create user zabbix on the storage with monitor role.
+        2. Link template to the host.
+        3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which one API is accessible if not specified.
+        4. Change {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -135,6 +132,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of controllers.'
           preprocessing:
             -
               type: JSONPATH
@@ -263,11 +261,22 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of controllers statistics.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
                 - '$.[''controller-statistics'']'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  JSON.parse(value).forEach(function (key) {
+                      key["durable-id"] = key["durable-id"].toLowerCase();
+                      result.push(key);
+                  });
+                  return JSON.stringify(result);
           timeout: '{$HPE.MSA.DATA.TIMEOUT}'
           parameters:
             -
@@ -391,6 +400,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of disks.'
           preprocessing:
             -
               type: JSONPATH
@@ -519,6 +529,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of disk groups.'
           preprocessing:
             -
               type: JSONPATH
@@ -647,6 +658,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of disk groups statistics.'
           preprocessing:
             -
               type: JSONPATH
@@ -775,6 +787,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of enclosures.'
           preprocessing:
             -
               type: JSONPATH
@@ -903,6 +916,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of fans.'
           preprocessing:
             -
               type: JSONPATH
@@ -916,6 +930,96 @@ zabbix_export:
             -
               name: method
               value: fans
+            -
+              name: username
+              value: '{$HPE.MSA.API.USERNAME}'
+            -
+              name: password
+              value: '{$HPE.MSA.API.PASSWORD}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: c6e8ad1dbc7f442eb003c738c07819cf
+          name: 'HPE MSA: Get I/O modules'
+          type: SCRIPT
+          key: hpe.msa.raw.io_modules
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var params = JSON.parse(value),
+                fields = ['username', 'password', 'method', 'base_url'],
+                result = {};
+            
+            fields.forEach(function (field) {
+                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
+                    throw 'Required param is not set: "' + field + '".';
+                }
+            });
+            
+            if (!params.base_url.endsWith('/')) {
+                params.base_url += '/';
+            }
+            
+            var response, request = new HttpRequest();
+            request.addHeader('datatype: json');
+            
+            auth_string = sha256(params.username + '_' + params.password)
+            
+            response = request.get(params.base_url + 'api/login/' + auth_string);
+            
+            if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            }
+            
+            if (response !== null) {
+                try {
+                    auth_data = JSON.parse(response);
+                }
+                catch (error) {
+                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
+                }
+            }
+            
+            sessionKey = auth_data['status'][0]['response'];
+            
+            request = new HttpRequest();
+            request.addHeader('sessionKey: ' + sessionKey);
+            request.addHeader('datatype: json');
+            
+            response = request.get(params.base_url + 'api/show/' + params.method);
+            
+            
+            if (request.getStatus() < 200 || request.getStatus() >= 300) {
+               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            }
+            
+            if (response !== null) {
+                try {
+                   result = JSON.stringify(response);
+                }
+                catch (error) {
+                   throw 'Failed to parse response received from device API. Check debug log for more information.';
+                }
+            }
+            
+            return response;
+          description: 'The list of I/O modules.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''io-modules'']'
+          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: base_url
+              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
+            -
+              name: method
+              value: io-modules
             -
               name: username
               value: '{$HPE.MSA.API.USERNAME}'
@@ -1031,6 +1135,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of pools.'
           preprocessing:
             -
               type: JSONPATH
@@ -1159,6 +1264,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of ports.'
           preprocessing:
             -
               type: JSONPATH
@@ -1287,6 +1393,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of power supplies.'
           preprocessing:
             -
               type: JSONPATH
@@ -1415,6 +1522,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'General system information.'
           timeout: '{$HPE.MSA.DATA.TIMEOUT}'
           parameters:
             -
@@ -1538,6 +1646,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of volumes.'
           preprocessing:
             -
               type: JSONPATH
@@ -1666,6 +1775,7 @@ zabbix_export:
             }
             
             return JSON.stringify(result);
+          description: 'The list of volumes statistics.'
           preprocessing:
             -
               type: JSONPATH
@@ -1747,11 +1857,11 @@ zabbix_export:
               expression: 'nodata(/HPE MSA 2040 Storage by HTTP/hpe.msa.system.health,5m)=1'
               name: 'Failed to fetch API data'
               event_name: 'Failed to fetch API data (or no data for 5m)'
-              priority: WARNING
+              priority: AVERAGE
               description: 'Zabbix has not received data for items for the last 5 minutes.'
               dependencies:
                 -
-                  name: 'Service is down'
+                  name: 'Service is down or unavailable'
                   expression: 'max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}"],5m)=0'
               tags:
                 -
@@ -1940,8 +2050,9 @@ zabbix_export:
             -
               uuid: b8d07373a0fb4051a0534891b255994a
               expression: 'max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}"],5m)=0'
-              name: 'Service is down'
-              priority: WARNING
+              name: 'Service is down or unavailable'
+              priority: HIGH
+              description: 'HTTP/HTTPS service is down or unable to establish TCP connection.'
               tags:
                 -
                   tag: scope
@@ -1956,10 +2067,413 @@ zabbix_export:
           description: 'Discover controllers.'
           item_prototypes:
             -
-              uuid: 5a987843b14c4d25a1fde4429015f773
-              name: 'Controller [{#DURABLE.ID}]: Firmware version'
+              uuid: 53b0ea51add74c629814c881ac824d1b
+              name: 'Controller [{#CONTROLLER.ID}]: Cache: Read hits, rate'
               type: DEPENDENT
-              key: 'hpe.msa.controllers["{#DURABLE.ID}",firmware]'
+              key: 'hpe.msa.controllers.cache.read.hits["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              description: 'For the controller that owns the volume, the number of times the block to be read is found in cache per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''read-cache-hits''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 23ed270bc823484cb514600bf23b2aa5
+              name: 'Controller [{#CONTROLLER.ID}]: Cache: Read misses, rate'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.cache.read.misses["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              description: 'For the controller that owns the volume, the number of times the block to be read is not found in cache per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''read-cache-misses''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 71a92c76ae7740cd9e58ea337f4a75e3
+              name: 'Controller [{#CONTROLLER.ID}]: Cache: Write hits, rate'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.cache.write.hits["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              description: 'For the controller that owns the volume, the number of times the block written to is found in cache per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-hits''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: bafcf98cee9c4a8da0aea7b39a5242d4
+              name: 'Controller [{#CONTROLLER.ID}]: Cache: Write misses, rate'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.cache.write.misses["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              description: 'For the controller that owns the volume, the number of times the block written to is not found in cache per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-misses''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: fa9400f2dcba40f4b57dfcef6f7856a0
+              name: 'Controller [{#CONTROLLER.ID}]: Cache: Write utilization'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.cache.write["{#CONTROLLER.ID}",util]'
+              delay: '0'
+              history: 7d
+              units: '%'
+              description: 'Percentage of write cache in use, from 0 to 100.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-used''].first()'
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 38a6ca0447d548c593d08acf377250cb
+              name: 'Controller [{#CONTROLLER.ID}]: Cache memory size'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.cache["{#CONTROLLER.ID}",total]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Controller cache memory size.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''cache-memory-size''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '1048576'
+              master_item:
+                key: hpe.msa.raw.controllers
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: cfff8c77d99440d18794e1c6dbf738ad
+              name: 'Controller [{#CONTROLLER.ID}]: CPU utilization'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.cpu["{#CONTROLLER.ID}",util]'
+              delay: '0'
+              history: 7d
+              units: '%'
+              description: 'Percentage of time the CPU is busy, from 0 to 100.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''cpu-load''].first()'
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+              trigger_prototypes:
+                -
+                  uuid: b94f1cfd6e6a48f8a18c644532b7a9c8
+                  expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers.cpu["{#CONTROLLER.ID}",util],5m)>{$HPE.MSA.CONTROLLER.CPU.UTIL.CRIT}'
+                  name: 'Controller [{#CONTROLLER.ID}]: High CPU utilization'
+                  event_name: 'Controller [{#CONTROLLER.ID}]: High CPU utilization (over {$HPE.MSA.CONTROLLER.CPU.UTIL.CRIT}% for 5m)'
+                  priority: WARNING
+                  description: 'Controller CPU utilization is too high. The system might be slow to respond.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: c87dc81f4a3447f3962a69a8b0d79769
+              name: 'Controller [{#CONTROLLER.ID}]: Data transfer rate: Reads'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.data_transfer.reads["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'The data read rate, in bytes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''data-read-numeric''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 7c34d1c4fd784fb695d9fc7c5a686329
+              name: 'Controller [{#CONTROLLER.ID}]: Data transfer rate: Total'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.data_transfer.total["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              units: Bps
+              description: 'The data transfer rate, in bytes per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''bytes-per-second-numeric''].first()'
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 93b508f92de04dfbbfe7099bf37796ce
+              name: 'Controller [{#CONTROLLER.ID}]: Data transfer rate: Writes'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.data_transfer.writes["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'The data write rate, in bytes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''data-written-numeric''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 3d7f1a97cd8249efbabc2402006c1cc2
+              name: 'Controller [{#CONTROLLER.ID}]: IOPS, read rate'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.iops.read["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!r/s'
+              description: 'Number of read operations per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-reads''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 8bf0601293a64628be08d16391d1e11b
+              name: 'Controller [{#CONTROLLER.ID}]: IOPS, total rate'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.iops.total["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              units: '!iops'
+              description: 'Input/output operations per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''iops''].first()'
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 6444038b72294992ab17c126ccbe7251
+              name: 'Controller [{#CONTROLLER.ID}]: IOPS, write rate'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers.iops.write["{#CONTROLLER.ID}",rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!w/s'
+              description: 'Number of write operations per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-writes''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.controllers.statistics
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 5940d26205924a13ba351f5d56192fcb
+              name: 'Controller [{#CONTROLLER.ID}]: Disks'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",disks]'
+              delay: '0'
+              history: 7d
+              description: 'Number of disks in the storage system.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''disks''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.msa.raw.controllers
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 94c2c9bfd2414875a53fbe94f6230666
+              name: 'Controller [{#CONTROLLER.ID}]: Disk groups'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",disk_groups]'
+              delay: '0'
+              history: 7d
+              description: 'Number of disk groups in the storage system.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''virtual-disks''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.msa.raw.controllers
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 5a987843b14c4d25a1fde4429015f773
+              name: 'Controller [{#CONTROLLER.ID}]: Firmware version'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",firmware]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -1982,12 +2496,12 @@ zabbix_export:
                   value: controller
                 -
                   tag: controller
-                  value: '{#DURABLE.ID}'
+                  value: '{#CONTROLLER.ID}'
             -
               uuid: 6d2a84b6b1804082ab4ef3451a52b552
-              name: 'Controller [{#DURABLE.ID}]: Health'
+              name: 'Controller [{#CONTROLLER.ID}]: Health'
               type: DEPENDENT
-              key: 'hpe.msa.controllers["{#DURABLE.ID}",health]'
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",health]'
               delay: '0'
               history: 7d
               description: 'Controller health status.'
@@ -2015,55 +2529,83 @@ zabbix_export:
                   value: health
                 -
                   tag: controller
-                  value: '{#DURABLE.ID}'
+                  value: '{#CONTROLLER.ID}'
               trigger_prototypes:
                 -
                   uuid: 381a5fe2adfd4f4ea15763cdf0a1bd0d
-                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#DURABLE.ID}",health])=1'
-                  name: 'Controller [{#DURABLE.ID}]: Controller health is in degraded state'
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",health])=1'
+                  name: 'Controller [{#CONTROLLER.ID}]: Controller health is in degraded state'
                   priority: WARNING
                   description: 'Controller health is in degraded state.'
                   dependencies:
                     -
-                      name: 'Controller [{#DURABLE.ID}]: Controller is down'
-                      expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#DURABLE.ID}",status])=1'
+                      name: 'Controller [{#CONTROLLER.ID}]: Controller is down'
+                      expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",status])=1'
                   tags:
                     -
                       tag: scope
                       value: performance
                 -
                   uuid: 2082d12ff9c54a5ea709dba05c14ae00
-                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#DURABLE.ID}",health])=2'
-                  name: 'Controller [{#DURABLE.ID}]: Controller health is in fault state'
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",health])=2'
+                  name: 'Controller [{#CONTROLLER.ID}]: Controller health is in fault state'
                   priority: AVERAGE
                   description: 'Controller health is in fault state.'
                   dependencies:
                     -
-                      name: 'Controller [{#DURABLE.ID}]: Controller is down'
-                      expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#DURABLE.ID}",status])=1'
+                      name: 'Controller [{#CONTROLLER.ID}]: Controller is down'
+                      expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",status])=1'
                   tags:
                     -
                       tag: scope
                       value: availability
                 -
                   uuid: 0b2ed99c47a64210b198cc0a3a6b84b5
-                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#DURABLE.ID}",health])=3'
-                  name: 'Controller [{#DURABLE.ID}]: Controller health is in unknown state'
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",health])=3'
+                  name: 'Controller [{#CONTROLLER.ID}]: Controller health is in unknown state'
                   priority: INFO
                   description: 'Controller health is in unknown state.'
                   dependencies:
                     -
-                      name: 'Controller [{#DURABLE.ID}]: Controller is down'
-                      expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#DURABLE.ID}",status])=1'
+                      name: 'Controller [{#CONTROLLER.ID}]: Controller is down'
+                      expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",status])=1'
                   tags:
                     -
                       tag: scope
                       value: notice
             -
-              uuid: 33e754d5acb84b7c86b2e23b122e6eed
-              name: 'Controller [{#DURABLE.ID}]: Part number'
+              uuid: 5f00490ddd22458b93add06ed24a9f96
+              name: 'Controller [{#CONTROLLER.ID}]: IP address'
               type: DEPENDENT
-              key: 'hpe.msa.controllers["{#DURABLE.ID}",part_number]'
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",ip_address]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Controller network port IP address.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''ip-address''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.msa.raw.controllers
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: 33e754d5acb84b7c86b2e23b122e6eed
+              name: 'Controller [{#CONTROLLER.ID}]: Part number'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",part_number]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2086,12 +2628,38 @@ zabbix_export:
                   value: controller
                 -
                   tag: controller
-                  value: '{#DURABLE.ID}'
+                  value: '{#CONTROLLER.ID}'
+            -
+              uuid: e4930566c3844f9487e343c203f3eb96
+              name: 'Controller [{#CONTROLLER.ID}]: Pools'
+              type: DEPENDENT
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",pools]'
+              delay: '0'
+              history: 7d
+              description: 'Number of pools in the storage system.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-storage-pools''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.msa.raw.controllers
+              tags:
+                -
+                  tag: component
+                  value: controller
+                -
+                  tag: controller
+                  value: '{#CONTROLLER.ID}'
             -
               uuid: c073adb77eb84cf79e1e1693d9378d47
-              name: 'Controller [{#DURABLE.ID}]: Serial number'
+              name: 'Controller [{#CONTROLLER.ID}]: Serial number'
               type: DEPENDENT
-              key: 'hpe.msa.controllers["{#DURABLE.ID}",serial_number]'
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",serial_number]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2114,12 +2682,12 @@ zabbix_export:
                   value: controller
                 -
                   tag: controller
-                  value: '{#DURABLE.ID}'
+                  value: '{#CONTROLLER.ID}'
             -
               uuid: a2be1b4b814d45b18bb4e313818511d6
-              name: 'Controller [{#DURABLE.ID}]: Status'
+              name: 'Controller [{#CONTROLLER.ID}]: Status'
               type: DEPENDENT
-              key: 'hpe.msa.controllers["{#DURABLE.ID}",status]'
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",status]'
               delay: '0'
               history: 7d
               description: 'Storage controller status.'
@@ -2145,86 +2713,23 @@ zabbix_export:
                   value: health
                 -
                   tag: controller
-                  value: '{#DURABLE.ID}'
+                  value: '{#CONTROLLER.ID}'
               trigger_prototypes:
                 -
                   uuid: 1524e80a37cb4b64a7360488e132a433
-                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#DURABLE.ID}",status])=1'
-                  name: 'Controller [{#DURABLE.ID}]: Controller is down'
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",status])=1'
+                  name: 'Controller [{#CONTROLLER.ID}]: Controller is down'
                   priority: HIGH
+                  description: 'The controller is down.'
                   tags:
                     -
                       tag: scope
                       value: availability
-          master_item:
-            key: hpe.msa.raw.controllers
-          lld_macro_paths:
-            -
-              lld_macro: '{#DURABLE.ID}'
-              path: '$.[''durable-id'']'
-          preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
-        -
-          uuid: ec4fba7c51fa4d94a480d829b1a9b06a
-          name: 'Controller statistics discovery'
-          type: DEPENDENT
-          key: hpe.msa.controllers.statistics.discovery
-          delay: '0'
-          description: 'Discover controller statistics.'
-          item_prototypes:
-            -
-              uuid: cfff8c77d99440d18794e1c6dbf738ad
-              name: 'Controller [{#DURABLE.ID}]: CPU utilization'
-              type: DEPENDENT
-              key: 'hpe.msa.controllers.cpu["{#DURABLE.ID}",util]'
-              delay: '0'
-              history: 7d
-              units: '%'
-              description: 'Percentage of time the CPU is busy, from 0 to 100.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''cpu-load''].first()'
-              master_item:
-                key: hpe.msa.raw.controllers.statistics
-              tags:
-                -
-                  tag: component
-                  value: controller
-                -
-                  tag: controller
-                  value: '{#DURABLE.ID}'
-            -
-              uuid: 8bf0601293a64628be08d16391d1e11b
-              name: 'Controller [{#DURABLE.ID}]: IOPS, rate'
-              type: DEPENDENT
-              key: 'hpe.msa.controllers.iops["{#DURABLE.ID}",rate]'
-              delay: '0'
-              history: 7d
-              description: 'Input/output operations per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''iops''].first()'
-              master_item:
-                key: hpe.msa.raw.controllers.statistics
-              tags:
-                -
-                  tag: component
-                  value: controller
-                -
-                  tag: controller
-                  value: '{#DURABLE.ID}'
             -
               uuid: df2bede9ea85483581a35a45a15d4de4
-              name: 'Controller [{#DURABLE.ID}]: Uptime'
+              name: 'Controller [{#CONTROLLER.ID}]: Uptime'
               type: DEPENDENT
-              key: 'hpe.msa.controllers["{#DURABLE.ID}",uptime]'
+              key: 'hpe.msa.controllers["{#CONTROLLER.ID}",uptime]'
               delay: '0'
               history: 7d
               units: uptime
@@ -2242,31 +2747,101 @@ zabbix_export:
                   value: controller
                 -
                   tag: controller
-                  value: '{#DURABLE.ID}'
+                  value: '{#CONTROLLER.ID}'
               trigger_prototypes:
                 -
                   uuid: 136bb1ccd4114a529a99ddbf803fd974
-                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#DURABLE.ID}",uptime])<10m'
-                  name: 'Controller [{#DURABLE.ID}]: Controller has been restarted'
-                  event_name: 'Controller [{#DURABLE.ID}]: Controller [{#DURABLE.ID}] has been restarted (uptime < 10m)'
-                  priority: INFO
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",uptime])<10m'
+                  name: 'Controller [{#CONTROLLER.ID}]: Controller has been restarted'
+                  event_name: 'Controller [{#CONTROLLER.ID}]: Controller has been restarted (uptime < 10m)'
+                  priority: WARNING
+                  description: 'The controller uptime is less than 10 minutes.'
                   tags:
                     -
                       tag: scope
-                      value: notice
+                      value: availability
           graph_prototypes:
             -
-              uuid: fca4007d4dd1491dbceba1644b50e1b5
-              name: 'Controller [{#DURABLE.ID}]: Controller CPU utilization'
+              uuid: 93aeac1a193e43d3a93a3892bd26b0ff
+              name: 'Controller [{#CONTROLLER.ID}]: Cache: Write utilization'
               graph_items:
                 -
                   color: 1A7C11
                   item:
                     host: 'HPE MSA 2040 Storage by HTTP'
-                    key: 'hpe.msa.controllers.cpu["{#DURABLE.ID}",util]'
+                    key: 'hpe.msa.controllers.cache.write["{#CONTROLLER.ID}",util]'
+            -
+              uuid: a7432b24cd834aa0be9dec3935641dfb
+              name: 'Controller [{#CONTROLLER.ID}]: Cache usage'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.controllers.cache.read.hits["{#CONTROLLER.ID}",rate]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.controllers.cache.read.misses["{#CONTROLLER.ID}",rate]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.controllers.cache.write.hits["{#CONTROLLER.ID}",rate]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.controllers.cache.write.misses["{#CONTROLLER.ID}",rate]'
+            -
+              uuid: fca4007d4dd1491dbceba1644b50e1b5
+              name: 'Controller [{#CONTROLLER.ID}]: Controller CPU utilization'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.controllers.cpu["{#CONTROLLER.ID}",util]'
+            -
+              uuid: 0b2598db582546308d092c9e7889e698
+              name: 'Controller [{#CONTROLLER.ID}]: Data transfer rate'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.controllers.data_transfer.reads["{#CONTROLLER.ID}",rate]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.controllers.data_transfer.writes["{#CONTROLLER.ID}",rate]'
+            -
+              uuid: 0793bb861e874a2c8e7e60a4c40bc34e
+              name: 'Controller [{#CONTROLLER.ID}]: Disk operations rate'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.controllers.iops.read["{#CONTROLLER.ID}",rate]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.controllers.iops.write["{#CONTROLLER.ID}",rate]'
           master_item:
-            key: hpe.msa.raw.controllers.statistics
+            key: hpe.msa.raw.controllers
           lld_macro_paths:
+            -
+              lld_macro: '{#CONTROLLER.ID}'
+              path: '$.[''controller-id'']'
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
@@ -2285,7 +2860,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 60418ff95d2b4ac698fe041647656005
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Space total'
+              name: 'Disk [{#DURABLE.ID}]: Space total'
               type: DEPENDENT
               key: 'hpe.msa.disks.space["{#DURABLE.ID}",total]'
               delay: '0'
@@ -2313,10 +2888,10 @@ zabbix_export:
                   value: disk
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: 579f29536b0740b9887cbb0863bd3e45
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: SSD life left'
+              name: 'Disk [{#DURABLE.ID}]: SSD life left'
               type: DEPENDENT
               key: 'hpe.msa.disks.ssd["{#DURABLE.ID}",life_left]'
               delay: '0'
@@ -2341,10 +2916,10 @@ zabbix_export:
                   value: disk
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: a430bd06d24447649687dc9b9c3dee2c
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Disk group'
+              name: 'Disk [{#DURABLE.ID}]: Disk group'
               type: DEPENDENT
               key: 'hpe.msa.disks["{#DURABLE.ID}",group]'
               delay: '0'
@@ -2370,10 +2945,10 @@ zabbix_export:
                   value: disk
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: 17f4069e731b45c7a9d9bfc5786a07fc
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Health'
+              name: 'Disk [{#DURABLE.ID}]: Health'
               type: DEPENDENT
               key: 'hpe.msa.disks["{#DURABLE.ID}",health]'
               delay: '0'
@@ -2403,12 +2978,12 @@ zabbix_export:
                   value: health
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
               trigger_prototypes:
                 -
                   uuid: 58d2da30bfe74d05ad05e0b286fe0fae
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",health])=1'
-                  name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Disk health is in degraded state'
+                  name: 'Disk [{#DURABLE.ID}]: Disk health is in degraded state'
                   priority: WARNING
                   description: 'Disk health is in degraded state.'
                   tags:
@@ -2418,7 +2993,7 @@ zabbix_export:
                 -
                   uuid: 1f0e81d23e1e423ba885425f33773f5b
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",health])=2'
-                  name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Disk health is in fault state'
+                  name: 'Disk [{#DURABLE.ID}]: Disk health is in fault state'
                   priority: AVERAGE
                   description: 'Disk health is in fault state.'
                   tags:
@@ -2428,7 +3003,7 @@ zabbix_export:
                 -
                   uuid: dc75dd0456a145b3ab0646c9403caeb6
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",health])=3'
-                  name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Disk health is in unknown state'
+                  name: 'Disk [{#DURABLE.ID}]: Disk health is in unknown state'
                   priority: INFO
                   description: 'Disk health is in unknown state.'
                   tags:
@@ -2437,7 +3012,7 @@ zabbix_export:
                       value: notice
             -
               uuid: 689e29b31fd0490fb26920c04d094136
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Model'
+              name: 'Disk [{#DURABLE.ID}]: Model'
               type: DEPENDENT
               key: 'hpe.msa.disks["{#DURABLE.ID}",model]'
               delay: '0'
@@ -2462,10 +3037,10 @@ zabbix_export:
                   value: disk
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: 20d37295acce41acac8ba77962130774
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Storage pool'
+              name: 'Disk [{#DURABLE.ID}]: Storage pool'
               type: DEPENDENT
               key: 'hpe.msa.disks["{#DURABLE.ID}",pool]'
               delay: '0'
@@ -2491,10 +3066,10 @@ zabbix_export:
                   value: disk
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: 7c4da69f28824444960e6783fe090526
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Serial number'
+              name: 'Disk [{#DURABLE.ID}]: Serial number'
               type: DEPENDENT
               key: 'hpe.msa.disks["{#DURABLE.ID}",serial_number]'
               delay: '0'
@@ -2519,10 +3094,10 @@ zabbix_export:
                   value: disk
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: 770749eafc79429185e7127d95b1ff74
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Temperature'
+              name: 'Disk [{#DURABLE.ID}]: Temperature'
               type: DEPENDENT
               key: 'hpe.msa.disks["{#DURABLE.ID}",temperature]'
               delay: '0'
@@ -2547,10 +3122,10 @@ zabbix_export:
                   value: disk
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: 5ba57b2f4d014b2a81c546e8f74a133e
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Temperature status'
+              name: 'Disk [{#DURABLE.ID}]: Temperature status'
               type: DEPENDENT
               key: 'hpe.msa.disks["{#DURABLE.ID}",temperature_status]'
               delay: '0'
@@ -2586,12 +3161,12 @@ zabbix_export:
                   value: health
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
               trigger_prototypes:
                 -
                   uuid: b194f7b133274552823b66e44c88bd02
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",temperature_status])=2'
-                  name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Disk temperature is critically high'
+                  name: 'Disk [{#DURABLE.ID}]: Disk temperature is critically high'
                   priority: AVERAGE
                   description: 'Disk temperature is critically high.'
                   tags:
@@ -2601,7 +3176,7 @@ zabbix_export:
                 -
                   uuid: aaabacd5f5194378b6c8388e2ef90abe
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",temperature_status])=3'
-                  name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Disk temperature is high'
+                  name: 'Disk [{#DURABLE.ID}]: Disk temperature is high'
                   priority: WARNING
                   description: 'Disk temperature is high.'
                   tags:
@@ -2611,7 +3186,7 @@ zabbix_export:
                 -
                   uuid: 60d0fc661aa140798f937a63fdd6e5f9
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",temperature_status])=4'
-                  name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Disk temperature is unknown'
+                  name: 'Disk [{#DURABLE.ID}]: Disk temperature is unknown'
                   priority: INFO
                   description: 'Disk temperature is unknown.'
                   tags:
@@ -2620,7 +3195,7 @@ zabbix_export:
                       value: notice
             -
               uuid: d781943c08d24556a083a16cca34ad58
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Type'
+              name: 'Disk [{#DURABLE.ID}]: Type'
               type: DEPENDENT
               key: 'hpe.msa.disks["{#DURABLE.ID}",type]'
               delay: '0'
@@ -2649,10 +3224,10 @@ zabbix_export:
                   value: disk
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: 86ce9f4d139e46908750d158b004b517
-              name: 'Disk [{#ENCLOSURE.ID}.{#SLOT}]: Vendor'
+              name: 'Disk [{#DURABLE.ID}]: Vendor'
               type: DEPENDENT
               key: 'hpe.msa.disks["{#DURABLE.ID}",vendor]'
               delay: '0'
@@ -2677,19 +3252,13 @@ zabbix_export:
                   value: disk
                 -
                   tag: disk
-                  value: '{#ENCLOSURE.ID}.{#SLOT}'
+                  value: '{#DURABLE.ID}'
           master_item:
             key: hpe.msa.raw.disks
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
-            -
-              lld_macro: '{#ENCLOSURE.ID}'
-              path: '$.[''enclosure-id'']'
-            -
-              lld_macro: '{#SLOT}'
-              path: '$.[''slot'']'
             -
               lld_macro: '{#TYPE}'
               path: '$.[''description-numeric'']'
@@ -2723,6 +3292,248 @@ zabbix_export:
           delay: '0'
           description: 'Discover disk groups.'
           item_prototypes:
+            -
+              uuid: 5b0b3db4bdff429996111d566b6d0386
+              name: 'Disk group [{#NAME}]: Average response time: Read'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.avg_rsp_time["{#NAME}",read]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Average response time for all read operations, calculated over the interval since these statistics were last requested or reset.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''avg-read-rsp-time''].first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.000001'
+              master_item:
+                key: hpe.msa.raw.disks.groups.statistics
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: 4a4fb1ae86df4607882de9c9d40f51f4
+              name: 'Disk group [{#NAME}]: Average response time: Total'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.avg_rsp_time["{#NAME}",total]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Average response time for read and write operations, calculated over the interval since these statistics were last requested or reset.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''avg-rsp-time''].first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.000001'
+              master_item:
+                key: hpe.msa.raw.disks.groups.statistics
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: a93c1e1b1eee496d861464128aaefa57
+              name: 'Disk group [{#NAME}]: Average response time: Write'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.avg_rsp_time["{#NAME}",write]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: s
+              description: 'Average response time for all write operations, calculated over the interval since these statistics were last requested or reset.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''avg-write-rsp-time''].first()'
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '0.000001'
+              master_item:
+                key: hpe.msa.raw.disks.groups.statistics
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: 46ba55c8ec2e4811b254441f22ead159
+              name: 'Disk group [{#NAME}]: Data transfer rate: Reads'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.data_transfer.reads["{#NAME}",rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'The data read rate, in bytes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''data-read-numeric''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.disks.groups.statistics
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: b1e2347ea10b4e84bb227668f5560b14
+              name: 'Disk group [{#NAME}]: Data transfer rate: Total'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.data_transfer.total["{#NAME}",rate]'
+              delay: '0'
+              history: 7d
+              units: Bps
+              description: 'The data transfer rate, in bytes per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
+              master_item:
+                key: hpe.msa.raw.disks.groups.statistics
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: a3df11b895fa425799c34516050000bd
+              name: 'Disk group [{#NAME}]: Data transfer rate: Writes'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.data_transfer.writes["{#NAME}",rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'The data write rate, in bytes per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''data-written-numeric''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.disks.groups.statistics
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: 18cd4383127548b68313184a2b94750f
+              name: 'Disk group [{#NAME}]: IOPS, read rate'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.iops.read["{#NAME}",rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!r/s'
+              description: 'Number of read operations per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''number-of-reads''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.disks.groups.statistics
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: 044e291ab66d48dcb8b66ee18f638702
+              name: 'Disk group [{#NAME}]: IOPS, total rate'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.iops.total["{#NAME}",rate]'
+              delay: '0'
+              history: 7d
+              units: '!iops'
+              description: 'Input/output operations per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''iops''].first()'
+              master_item:
+                key: hpe.msa.raw.disks.groups.statistics
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: 66ec5badb1d2491d9e07b5ce45486d72
+              name: 'Disk group [{#NAME}]: IOPS, write rate'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.iops.write["{#NAME}",rate]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '!w/s'
+              description: 'Number of write operations per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''number-of-writes''].first()'
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: hpe.msa.raw.disks.groups.statistics
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
             -
               uuid: 5356a1f819a54c59bb3765d99a965537
               name: 'Disk group [{#NAME}]: RAID type'
@@ -2773,6 +3584,33 @@ zabbix_export:
                   type: MULTIPLIER
                   parameters:
                     - '512'
+              master_item:
+                key: hpe.msa.raw.disks.groups
+              tags:
+                -
+                  tag: component
+                  value: disk-group
+                -
+                  tag: disk-group
+                  value: '{#NAME}'
+            -
+              uuid: bfe1a64952754488898798f5f07e24b1
+              name: 'Disk group [{#NAME}]: Pool space used'
+              type: DEPENDENT
+              key: 'hpe.msa.disks.groups.space["{#NAME}",pool_util]'
+              delay: '0'
+              history: 7d
+              units: '%'
+              description: 'The percentage of pool capacity that the disk group occupies.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''name''] == "{#NAME}")].[''pool-percentage''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: hpe.msa.raw.disks.groups
               tags:
@@ -2838,26 +3676,26 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: d6494d79dae94aeda2b78169f8960224
-                  expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.PRIMERA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}'
+                  expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}'
                   name: 'Disk group [{#NAME}]: Disk group space is critically low'
-                  event_name: 'Disk group [{#NAME}]: Disk group space is critically low (used > {$HPE.PRIMERA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}%)'
+                  event_name: 'Disk group [{#NAME}]: Disk group space is critically low (used > {$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}%)'
                   priority: AVERAGE
-                  description: 'Disk group is running low on free space (less than {$HPE.PRIMERA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}% available).'
+                  description: 'Disk group is running low on free space (less than {$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}% available).'
                   tags:
                     -
                       tag: scope
                       value: performance
                 -
                   uuid: ea04be93082640709ec6e58ae640575c
-                  expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.PRIMERA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}'
+                  expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}'
                   name: 'Disk group [{#NAME}]: Disk group space is low'
-                  event_name: 'Disk group [{#NAME}]: Disk group space is low (used > {$HPE.PRIMERA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}%)'
+                  event_name: 'Disk group [{#NAME}]: Disk group space is low (used > {$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}%)'
                   priority: WARNING
-                  description: 'Disk group is running low on free space (less than {$HPE.PRIMERA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}% available).'
+                  description: 'Disk group is running low on free space (less than {$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}% available).'
                   dependencies:
                     -
                       name: 'Disk group [{#NAME}]: Disk group space is critically low'
-                      expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.PRIMERA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}'
+                      expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}'
                   tags:
                     -
                       tag: scope
@@ -3102,280 +3940,6 @@ zabbix_export:
                       value: performance
           graph_prototypes:
             -
-              uuid: 234be7ebf50e42f6a098662f1fffba03
-              name: 'Disk group [{#NAME}]: Space utilization'
-              graph_items:
-                -
-                  color: 1A7C11
-                  item:
-                    host: 'HPE MSA 2040 Storage by HTTP'
-                    key: 'hpe.msa.disks.groups.space["{#NAME}",free]'
-                -
-                  sortorder: '1'
-                  color: 2774A4
-                  item:
-                    host: 'HPE MSA 2040 Storage by HTTP'
-                    key: 'hpe.msa.disks.groups.space["{#NAME}",total]'
-          master_item:
-            key: hpe.msa.raw.disks.groups
-          lld_macro_paths:
-            -
-              lld_macro: '{#NAME}'
-              path: '$.[''name'']'
-          preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
-        -
-          uuid: ec2f8888805e42318e5eb0d3fe738091
-          name: 'Disk group statistics discovery'
-          type: DEPENDENT
-          key: hpe.msa.disks.groups.statistics.discovery
-          delay: '0'
-          description: 'Discover disk group statistics.'
-          item_prototypes:
-            -
-              uuid: 5b0b3db4bdff429996111d566b6d0386
-              name: 'Disk group [{#NAME}]: Average response time: Read'
-              type: DEPENDENT
-              key: 'hpe.msa.disks.groups.avg_rsp_time["{#NAME}",read]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: s
-              description: 'Average response time for all read operations, calculated over the interval since these statistics were last requested or reset.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''avg-read-rsp-time''].first()'
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '0.000001'
-              master_item:
-                key: hpe.msa.raw.disks.groups.statistics
-              tags:
-                -
-                  tag: component
-                  value: disk-group
-                -
-                  tag: disk-group
-                  value: '{#NAME}'
-            -
-              uuid: 4a4fb1ae86df4607882de9c9d40f51f4
-              name: 'Disk group [{#NAME}]: Average response time: Total'
-              type: DEPENDENT
-              key: 'hpe.msa.disks.groups.avg_rsp_time["{#NAME}",total]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: s
-              description: 'Average response time for read and write operations, calculated over the interval since these statistics were last requested or reset.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''avg-rsp-time''].first()'
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '0.000001'
-              master_item:
-                key: hpe.msa.raw.disks.groups.statistics
-              tags:
-                -
-                  tag: component
-                  value: disk-group
-                -
-                  tag: disk-group
-                  value: '{#NAME}'
-            -
-              uuid: a93c1e1b1eee496d861464128aaefa57
-              name: 'Disk group [{#NAME}]: Average response time: Write'
-              type: DEPENDENT
-              key: 'hpe.msa.disks.groups.avg_rsp_time["{#NAME}",write]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: s
-              description: 'Average response time for all write operations, calculated over the interval since these statistics were last requested or reset.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''avg-write-rsp-time''].first()'
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '0.000001'
-              master_item:
-                key: hpe.msa.raw.disks.groups.statistics
-              tags:
-                -
-                  tag: component
-                  value: disk-group
-                -
-                  tag: disk-group
-                  value: '{#NAME}'
-            -
-              uuid: 46ba55c8ec2e4811b254441f22ead159
-              name: 'Disk group [{#NAME}]: Data transfer rate: Reads'
-              type: DEPENDENT
-              key: 'hpe.msa.disks.groups.data_transfer.reads["{#NAME}",rate]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: Bps
-              description: 'The data read rate, in bytes per second.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''data-read-numeric''].first()'
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-              master_item:
-                key: hpe.msa.raw.disks.groups.statistics
-              tags:
-                -
-                  tag: component
-                  value: disk-group
-                -
-                  tag: disk-group
-                  value: '{#NAME}'
-            -
-              uuid: b1e2347ea10b4e84bb227668f5560b14
-              name: 'Disk group [{#NAME}]: Data transfer rate: Total'
-              type: DEPENDENT
-              key: 'hpe.msa.disks.groups.data_transfer.total["{#NAME}",rate]'
-              delay: '0'
-              history: 7d
-              units: Bps
-              description: 'The data transfer rate, in bytes per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
-              master_item:
-                key: hpe.msa.raw.disks.groups.statistics
-              tags:
-                -
-                  tag: component
-                  value: disk-group
-                -
-                  tag: disk-group
-                  value: '{#NAME}'
-            -
-              uuid: a3df11b895fa425799c34516050000bd
-              name: 'Disk group [{#NAME}]: Data transfer rate: Writes'
-              type: DEPENDENT
-              key: 'hpe.msa.disks.groups.data_transfer.writes["{#NAME}",rate]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: Bps
-              description: 'The data write rate, in bytes per second.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''data-written-numeric''].first()'
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-              master_item:
-                key: hpe.msa.raw.disks.groups.statistics
-              tags:
-                -
-                  tag: component
-                  value: disk-group
-                -
-                  tag: disk-group
-                  value: '{#NAME}'
-            -
-              uuid: 044e291ab66d48dcb8b66ee18f638702
-              name: 'Disk group [{#NAME}]: IOPS, rate'
-              type: DEPENDENT
-              key: 'hpe.msa.disks.groups.iops["{#NAME}",rate]'
-              delay: '0'
-              history: 7d
-              description: 'Input/output operations per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''iops''].first()'
-              master_item:
-                key: hpe.msa.raw.disks.groups.statistics
-              tags:
-                -
-                  tag: component
-                  value: disk-group
-                -
-                  tag: disk-group
-                  value: '{#NAME}'
-            -
-              uuid: 18cd4383127548b68313184a2b94750f
-              name: 'Disk group [{#NAME}]: Reads, rate'
-              type: DEPENDENT
-              key: 'hpe.msa.disks.groups.reads["{#NAME}",rate]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              description: 'Number of read operations per second.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''number-of-reads''].first()'
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-              master_item:
-                key: hpe.msa.raw.disks.groups.statistics
-              tags:
-                -
-                  tag: component
-                  value: disk-group
-                -
-                  tag: disk-group
-                  value: '{#NAME}'
-            -
-              uuid: 66ec5badb1d2491d9e07b5ce45486d72
-              name: 'Disk group [{#NAME}]: Writes, rate'
-              type: DEPENDENT
-              key: 'hpe.msa.disks.groups.writes["{#NAME}",rate]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              description: 'Number of write operations per second.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''number-of-writes''].first()'
-                -
-                  type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-              master_item:
-                key: hpe.msa.raw.disks.groups.statistics
-              tags:
-                -
-                  tag: component
-                  value: disk-group
-                -
-                  tag: disk-group
-                  value: '{#NAME}'
-          graph_prototypes:
-            -
               uuid: 1d5b8a7246a845678a938da75b7e32cc
               name: 'Disk group [{#NAME}]: Average response time'
               graph_items:
@@ -3413,15 +3977,30 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE MSA 2040 Storage by HTTP'
-                    key: 'hpe.msa.disks.groups.reads["{#NAME}",rate]'
+                    key: 'hpe.msa.disks.groups.iops.read["{#NAME}",rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE MSA 2040 Storage by HTTP'
-                    key: 'hpe.msa.disks.groups.writes["{#NAME}",rate]'
+                    key: 'hpe.msa.disks.groups.iops.write["{#NAME}",rate]'
+            -
+              uuid: 234be7ebf50e42f6a098662f1fffba03
+              name: 'Disk group [{#NAME}]: Space utilization'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.disks.groups.space["{#NAME}",free]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.disks.groups.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.raw.disks.groups.statistics
+            key: hpe.msa.raw.disks.groups
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -3561,7 +4140,7 @@ zabbix_export:
                   value: '{#DURABLE.ID}'
             -
               uuid: f9279641e2cb4c95a07d43ef1f1caba5
-              name: 'Enclosure [{#DURABLE.ID}]: Part number.'
+              name: 'Enclosure [{#DURABLE.ID}]: Part number'
               type: DEPENDENT
               key: 'hpe.msa.enclosures["{#DURABLE.ID}",part_number]'
               delay: '0'
@@ -3660,7 +4239,7 @@ zabbix_export:
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=6'
                   name: 'Enclosure [{#DURABLE.ID}]: Enclosure has unknown status'
                   priority: INFO
-                  description: 'Enclosure has unknown status'
+                  description: 'Enclosure has unknown status.'
                   tags:
                     -
                       tag: scope
@@ -3716,7 +4295,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: b4732ef73f0e4fcc9458797b28e2b829
-              name: '{#NAME} [{#LOCATION}]: Health'
+              name: 'Fan [{#DURABLE.ID}]: Health'
               type: DEPENDENT
               key: 'hpe.msa.fans["{#DURABLE.ID}",health]'
               delay: '0'
@@ -3751,7 +4330,7 @@ zabbix_export:
                 -
                   uuid: 377a9c494a5443c0ba694ab78683da17
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",health])=1'
-                  name: '{#NAME} [{#LOCATION}]: Fan health is in degraded state'
+                  name: 'Fan [{#DURABLE.ID}]: Fan health is in degraded state'
                   priority: WARNING
                   description: 'Fan health is in degraded state.'
                   tags:
@@ -3761,7 +4340,7 @@ zabbix_export:
                 -
                   uuid: 4446cef7b06140e3a29018944201ebd7
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",health])=2'
-                  name: '{#NAME} [{#LOCATION}]: Fan health is in fault state'
+                  name: 'Fan [{#DURABLE.ID}]: Fan health is in fault state'
                   priority: AVERAGE
                   description: 'Fan health is in fault state.'
                   tags:
@@ -3771,7 +4350,7 @@ zabbix_export:
                 -
                   uuid: 3273a1f3595046e69ef6c74ac6f56eeb
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",health])=3'
-                  name: '{#NAME} [{#LOCATION}]: Fan health is in unknown state'
+                  name: 'Fan [{#DURABLE.ID}]: Fan health is in unknown state'
                   priority: INFO
                   description: 'Fan health is in unknown state.'
                   tags:
@@ -3780,7 +4359,7 @@ zabbix_export:
                       value: notice
             -
               uuid: eb7057d0b65e40138899753b06abfb68
-              name: '{#NAME} [{#LOCATION}]: Speed'
+              name: 'Fan [{#DURABLE.ID}]: Speed'
               type: DEPENDENT
               key: 'hpe.msa.fans["{#DURABLE.ID}",speed]'
               delay: '0'
@@ -3803,7 +4382,7 @@ zabbix_export:
                   value: '{#DURABLE.ID}'
             -
               uuid: 45f948cb8f484367a7a5735beb796a1b
-              name: '{#NAME} [{#LOCATION}]: Status'
+              name: 'Fan [{#DURABLE.ID}]: Status'
               type: DEPENDENT
               key: 'hpe.msa.fans["{#DURABLE.ID}",status]'
               delay: '0'
@@ -3836,7 +4415,7 @@ zabbix_export:
                 -
                   uuid: f8afe70029aa4cdfb1f68452eea27986
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",status])=1'
-                  name: '{#NAME} [{#LOCATION}]: Fan has error status'
+                  name: 'Fan [{#DURABLE.ID}]: Fan has error status'
                   priority: AVERAGE
                   description: 'Fan has error status.'
                   tags:
@@ -3846,7 +4425,7 @@ zabbix_export:
                 -
                   uuid: 8ad445006c51474fbee30a70971a97a5
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",status])=3'
-                  name: '{#NAME} [{#LOCATION}]: Fan is missing'
+                  name: 'Fan [{#DURABLE.ID}]: Fan is missing'
                   priority: INFO
                   description: 'Fan is missing.'
                   tags:
@@ -3856,7 +4435,7 @@ zabbix_export:
                 -
                   uuid: fabe4e0bde194675a089db45125428b6
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",status])=2'
-                  name: '{#NAME} [{#LOCATION}]: Fan is off'
+                  name: 'Fan [{#DURABLE.ID}]: Fan is off'
                   priority: WARNING
                   description: 'Fan is off.'
                   tags:
@@ -3866,7 +4445,7 @@ zabbix_export:
           graph_prototypes:
             -
               uuid: 44c2c9cdec6247cf8f4d0e2bd7e0e372
-              name: '{#NAME} [{#LOCATION}]: Speed'
+              name: 'Fan [{#DURABLE.ID}]: Speed'
               graph_items:
                 -
                   color: 1A7C11
@@ -3880,11 +4459,201 @@ zabbix_export:
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
             -
-              lld_macro: '{#LOCATION}'
-              path: '$.[''location'']'
-            -
               lld_macro: '{#NAME}'
               path: '$.[''name'']'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+        -
+          uuid: 472d12b2436845f1baadde23d614d005
+          name: 'I/O modules discovery'
+          type: DEPENDENT
+          key: hpe.msa.io_modules.discovery
+          delay: '0'
+          description: 'Discover I/O modules.'
+          item_prototypes:
+            -
+              uuid: ed9ca320d18e4c1fb5f084a9632b5a00
+              name: 'I/O module [{#DURABLE.ID}]: Health'
+              type: DEPENDENT
+              key: 'hpe.msa.io_modules["{#DURABLE.ID}",health]'
+              delay: '0'
+              history: 7d
+              description: 'I/O module health status.'
+              valuemap:
+                name: Health
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '4'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hpe.msa.raw.io_modules
+              tags:
+                -
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: io-module
+                -
+                  tag: io-module
+                  value: '{#DURABLE.ID}'
+              trigger_prototypes:
+                -
+                  uuid: c5b4a405c4af4ef6a9c8d49c70d1ce39
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",health])=1'
+                  name: 'I/O module [{#DURABLE.ID}]: I/O module health is in degraded state'
+                  priority: WARNING
+                  description: 'I/O module health is in degraded state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+                -
+                  uuid: 9f85f8da9f7648abaa92572f6cb401aa
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",health])=2'
+                  name: 'I/O module [{#DURABLE.ID}]: I/O module health is in fault state'
+                  priority: AVERAGE
+                  description: 'I/O module health is in fault state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: ebb4a6c3a45e42c2a61a55f5f82aff5a
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",health])=3'
+                  name: 'I/O module [{#DURABLE.ID}]: I/O module health is in unknown state'
+                  priority: INFO
+                  description: 'I/O module health is in unknown state.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: db5b0e5c525d4ed2a4e6658680e4f352
+              name: 'I/O module [{#DURABLE.ID}]: Part number'
+              type: DEPENDENT
+              key: 'hpe.msa.io_modules["{#DURABLE.ID}",part_number]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Part number of the I/O module.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.msa.raw.io_modules
+              tags:
+                -
+                  tag: component
+                  value: io-module
+                -
+                  tag: io-module
+                  value: '{#DURABLE.ID}'
+            -
+              uuid: 85a7c6949e42427c98701777ea846489
+              name: 'I/O module [{#DURABLE.ID}]: Serial number'
+              type: DEPENDENT
+              key: 'hpe.msa.io_modules["{#DURABLE.ID}",serial_number]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'I/O module serial number.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.msa.raw.io_modules
+              tags:
+                -
+                  tag: component
+                  value: io-module
+                -
+                  tag: io-module
+                  value: '{#DURABLE.ID}'
+            -
+              uuid: 1dc6e1b00561421bbdcf590316b111bc
+              name: 'I/O module [{#DURABLE.ID}]: Status'
+              type: DEPENDENT
+              key: 'hpe.msa.io_modules["{#DURABLE.ID}",status]'
+              delay: '0'
+              history: 7d
+              description: 'I/O module status.'
+              valuemap:
+                name: 'I/O module status'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '3'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hpe.msa.raw.io_modules
+              tags:
+                -
+                  tag: component
+                  value: health
+                -
+                  tag: component
+                  value: io-module
+                -
+                  tag: io-module
+                  value: '{#DURABLE.ID}'
+              trigger_prototypes:
+                -
+                  uuid: 7c2faab01158442284b85acdf22bdc43
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",status])=3'
+                  name: 'I/O module [{#DURABLE.ID}]: I/O module has unknown status'
+                  priority: INFO
+                  description: 'I/O module has unknown status.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+                -
+                  uuid: 5dde3710cdb1422db37d05962a97a264
+                  expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",status])=1'
+                  name: 'I/O module [{#DURABLE.ID}]: I/O module is down'
+                  priority: AVERAGE
+                  description: 'I/O module is down.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+          master_item:
+            key: hpe.msa.raw.io_modules
+          lld_macro_paths:
+            -
+              lld_macro: '{#DURABLE.ID}'
+              path: '$.[''durable-id'']'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3984,26 +4753,26 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 042ac4fedb00485c8c6f48016182b9dd
-                  expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.PRIMERA.POOL.PUSED.MAX.CRIT:"{#NAME}"}'
+                  expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.MSA.POOL.PUSED.MAX.CRIT:"{#NAME}"}'
                   name: 'Pool [{#NAME}]: Pool space is critically low'
-                  event_name: 'Pool [{#NAME}]: Pool space is critically low (used > {$HPE.PRIMERA.POOL.PUSED.MAX.CRIT:"{#NAME}"}%)'
+                  event_name: 'Pool [{#NAME}]: Pool space is critically low (used > {$HPE.MSA.POOL.PUSED.MAX.CRIT:"{#NAME}"}%)'
                   priority: AVERAGE
-                  description: 'Pool is running low on free space (less than {$HPE.PRIMERA.POOL.PUSED.MAX.CRIT:"{#NAME}"}% available).'
+                  description: 'Pool is running low on free space (less than {$HPE.MSA.POOL.PUSED.MAX.CRIT:"{#NAME}"}% available).'
                   tags:
                     -
                       tag: scope
                       value: performance
                 -
                   uuid: f4c7a9ed832d4668be64acf9da3c9814
-                  expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.PRIMERA.POOL.PUSED.MAX.WARN:"{#NAME}"}'
+                  expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.MSA.POOL.PUSED.MAX.WARN:"{#NAME}"}'
                   name: 'Pool [{#NAME}]: Pool space is low'
-                  event_name: 'Pool [{#NAME}]: Pool space is low (used > {$HPE.PRIMERA.POOL.PUSED.MAX.WARN:"{#NAME}"}%)'
+                  event_name: 'Pool [{#NAME}]: Pool space is low (used > {$HPE.MSA.POOL.PUSED.MAX.WARN:"{#NAME}"}%)'
                   priority: WARNING
-                  description: 'Pool is running low on free space (less than {$HPE.PRIMERA.POOL.PUSED.MAX.WARN:"{#NAME}"}% available).'
+                  description: 'Pool is running low on free space (less than {$HPE.MSA.POOL.PUSED.MAX.WARN:"{#NAME}"}% available).'
                   dependencies:
                     -
                       name: 'Pool [{#NAME}]: Pool space is critically low'
-                      expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.PRIMERA.POOL.PUSED.MAX.CRIT:"{#NAME}"}'
+                      expression: 'min(/HPE MSA 2040 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.MSA.POOL.PUSED.MAX.CRIT:"{#NAME}"}'
                   tags:
                     -
                       tag: scope
@@ -4235,6 +5004,34 @@ zabbix_export:
                     -
                       tag: scope
                       value: performance
+            -
+              uuid: b1240a5950a3466b9d0725729bef3a03
+              name: 'Port [{#NAME}]: Type'
+              type: DEPENDENT
+              key: 'hpe.msa.ports["{#NAME}",type]'
+              delay: '0'
+              history: 7d
+              description: 'Port type.'
+              valuemap:
+                name: 'Port type'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''port''] == "{#NAME}")].[''port-type-numeric''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.msa.raw.ports
+              tags:
+                -
+                  tag: component
+                  value: port
+                -
+                  tag: port
+                  value: '{#NAME}'
           master_item:
             key: hpe.msa.raw.ports
           lld_macro_paths:
@@ -4256,7 +5053,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 4e4f593738fb451cbfd1589a3054387e
-              name: 'Power supply [{#LOCATION}]: Health'
+              name: 'Power supply [{#DURABLE.ID}]: Health'
               type: DEPENDENT
               key: 'hpe.msa.power_supplies["{#DURABLE.ID}",health]'
               delay: '0'
@@ -4286,12 +5083,12 @@ zabbix_export:
                   value: power-supply
                 -
                   tag: power-supply
-                  value: '{#LOCATION}'
+                  value: '{#DURABLE.ID}'
               trigger_prototypes:
                 -
                   uuid: 2394f69a635a4072bd96494b8df8ae3e
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",health])=1'
-                  name: 'Power supply [{#LOCATION}]: Power supply health is in degraded state'
+                  name: 'Power supply [{#DURABLE.ID}]: Power supply health is in degraded state'
                   priority: WARNING
                   description: 'Power supply health is in degraded state.'
                   tags:
@@ -4301,7 +5098,7 @@ zabbix_export:
                 -
                   uuid: f390553cfe4646e0ab9a4fd9cab20886
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",health])=2'
-                  name: 'Power supply [{#LOCATION}]: Power supply health is in fault state'
+                  name: 'Power supply [{#DURABLE.ID}]: Power supply health is in fault state'
                   priority: AVERAGE
                   description: 'Power supply health is in fault state.'
                   tags:
@@ -4311,7 +5108,7 @@ zabbix_export:
                 -
                   uuid: 9499fbdcc6a946138fb6cd69d8be9a00
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",health])=3'
-                  name: 'Power supply [{#LOCATION}]: Power supply health is in unknown state'
+                  name: 'Power supply [{#DURABLE.ID}]: Power supply health is in unknown state'
                   priority: INFO
                   description: 'Power supply health is in unknown state.'
                   tags:
@@ -4320,7 +5117,7 @@ zabbix_export:
                       value: notice
             -
               uuid: 1b72c54bff3a4b129e959db43e895839
-              name: 'Power supply [{#LOCATION}]: Part number.'
+              name: 'Power supply [{#DURABLE.ID}]: Part number'
               type: DEPENDENT
               key: 'hpe.msa.power_supplies["{#DURABLE.ID}",part_number]'
               delay: '0'
@@ -4345,10 +5142,10 @@ zabbix_export:
                   value: power-supply
                 -
                   tag: power-supply
-                  value: '{#LOCATION}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: bdbf30f2e70d427bb9237b941fed5941
-              name: 'Power supply [{#LOCATION}]: Serial number.'
+              name: 'Power supply [{#DURABLE.ID}]: Serial number'
               type: DEPENDENT
               key: 'hpe.msa.power_supplies["{#DURABLE.ID}",serial_number]'
               delay: '0'
@@ -4373,10 +5170,10 @@ zabbix_export:
                   value: power-supply
                 -
                   tag: power-supply
-                  value: '{#LOCATION}'
+                  value: '{#DURABLE.ID}'
             -
               uuid: 110fa50ee1d64ecdb064d3bd7b34dc90
-              name: 'Power supply [{#LOCATION}]: Status'
+              name: 'Power supply [{#DURABLE.ID}]: Status'
               type: DEPENDENT
               key: 'hpe.msa.power_supplies["{#DURABLE.ID}",status]'
               delay: '0'
@@ -4406,12 +5203,12 @@ zabbix_export:
                   value: power-supply
                 -
                   tag: power-supply
-                  value: '{#LOCATION}'
+                  value: '{#DURABLE.ID}'
               trigger_prototypes:
                 -
                   uuid: 28896e70b14f463aae8c8af4786e52ff
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",status])=2'
-                  name: 'Power supply [{#LOCATION}]: Power supply has error status'
+                  name: 'Power supply [{#DURABLE.ID}]: Power supply has error status'
                   priority: AVERAGE
                   description: 'Power supply has error status.'
                   tags:
@@ -4421,7 +5218,7 @@ zabbix_export:
                 -
                   uuid: ac6b0d55fbac4f338261f6a90b68e5b0
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",status])=4'
-                  name: 'Power supply [{#LOCATION}]: Power supply has unknown status'
+                  name: 'Power supply [{#DURABLE.ID}]: Power supply has unknown status'
                   priority: INFO
                   description: 'Power supply has unknown status.'
                   tags:
@@ -4431,7 +5228,7 @@ zabbix_export:
                 -
                   uuid: c9cddccdeed34aa4a533f0ad07aab5ae
                   expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",status])=1'
-                  name: 'Power supply [{#LOCATION}]: Power supply has warning status'
+                  name: 'Power supply [{#DURABLE.ID}]: Power supply has warning status'
                   priority: WARNING
                   description: 'Power supply has warning status.'
                   tags:
@@ -4444,9 +5241,6 @@ zabbix_export:
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
-            -
-              lld_macro: '{#LOCATION}'
-              path: '$.[''location'']'
           preprocessing:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -4459,102 +5253,6 @@ zabbix_export:
           key: hpe.msa.volumes.discovery
           delay: '0'
           description: 'Discover volumes.'
-          item_prototypes:
-            -
-              uuid: b47d7b03e19f4e25803b1d639a0ecf43
-              name: 'Volume [{#NAME}]: Space allocated'
-              type: DEPENDENT
-              key: 'hpe.msa.volumes.space["{#NAME}",allocated]'
-              delay: '0'
-              history: 7d
-              description: 'The amount of space currently allocated to the volume.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''allocated-size-numeric''].first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '512'
-              master_item:
-                key: hpe.msa.raw.volumes
-              tags:
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
-              uuid: b6aaba39f7c74dcf95947626852855c8
-              name: 'Volume [{#NAME}]: Space total'
-              type: DEPENDENT
-              key: 'hpe.msa.volumes.space["{#NAME}",total]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'The capacity of the volume.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''size-numeric''].first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-                -
-                  type: MULTIPLIER
-                  parameters:
-                    - '512'
-              master_item:
-                key: hpe.msa.raw.volumes
-              tags:
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-          graph_prototypes:
-            -
-              uuid: f8c4f07925404bc0b1e3ada45358580a
-              name: 'Volume [{#NAME}]: Space utilization'
-              graph_items:
-                -
-                  color: 1A7C11
-                  item:
-                    host: 'HPE MSA 2040 Storage by HTTP'
-                    key: 'hpe.msa.volumes.space["{#NAME}",allocated]'
-                -
-                  sortorder: '1'
-                  color: 2774A4
-                  item:
-                    host: 'HPE MSA 2040 Storage by HTTP'
-                    key: 'hpe.msa.volumes.space["{#NAME}",total]'
-          master_item:
-            key: hpe.msa.raw.volumes
-          lld_macro_paths:
-            -
-              lld_macro: '{#NAME}'
-              path: '$.[''name'']'
-          preprocessing:
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
-        -
-          uuid: 6e89241aea1e439d99243cdd887a6f2d
-          name: 'Volume statistics discovery'
-          type: DEPENDENT
-          key: hpe.msa.volumes.statistics.discovery
-          delay: '0'
-          description: 'Discover volume statistics.'
           item_prototypes:
             -
               uuid: f9818ae47544417bb270af4f8f014c0a
@@ -4740,35 +5438,14 @@ zabbix_export:
                   tag: volume
                   value: '{#NAME}'
             -
-              uuid: 9d14e4239f5941a7bfb07b6645b9e698
-              name: 'Volume [{#NAME}]: IOPS, rate'
-              type: DEPENDENT
-              key: 'hpe.msa.volumes.iops["{#NAME}",rate]'
-              delay: '0'
-              history: 7d
-              description: 'Input/output operations per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''iops''].first()'
-              master_item:
-                key: hpe.msa.raw.volumes.statistics
-              tags:
-                -
-                  tag: component
-                  value: volume
-                -
-                  tag: volume
-                  value: '{#NAME}'
-            -
               uuid: 0e2831ed17ec4fe0a56b800086b47901
-              name: 'Volume [{#NAME}]: Reads, rate'
+              name: 'Volume [{#NAME}]: IOPS, read rate'
               type: DEPENDENT
-              key: 'hpe.msa.volumes.reads["{#NAME}",rate]'
+              key: 'hpe.msa.volumes.iops.read["{#NAME}",rate]'
               delay: '0'
               history: 7d
               value_type: FLOAT
+              units: '!r/s'
               description: 'Number of read operations per second.'
               preprocessing:
                 -
@@ -4789,13 +5466,37 @@ zabbix_export:
                   tag: volume
                   value: '{#NAME}'
             -
-              uuid: e1a6b6cc609c4cf789978f01b18af31f
-              name: 'Volume [{#NAME}]: Writes, rate'
+              uuid: 9d14e4239f5941a7bfb07b6645b9e698
+              name: 'Volume [{#NAME}]: IOPS, total rate'
               type: DEPENDENT
-              key: 'hpe.msa.volumes.writes["{#NAME}",rate]'
+              key: 'hpe.msa.volumes.iops.total["{#NAME}",rate]'
+              delay: '0'
+              history: 7d
+              units: '!iops'
+              description: 'Input/output operations per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''iops''].first()'
+              master_item:
+                key: hpe.msa.raw.volumes.statistics
+              tags:
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: e1a6b6cc609c4cf789978f01b18af31f
+              name: 'Volume [{#NAME}]: IOPS, write rate'
+              type: DEPENDENT
+              key: 'hpe.msa.volumes.iops.write["{#NAME}",rate]'
               delay: '0'
               history: 7d
               value_type: FLOAT
+              units: '!w/s'
               description: 'Number of write operations per second.'
               preprocessing:
                 -
@@ -4808,6 +5509,68 @@ zabbix_export:
                     - ''
               master_item:
                 key: hpe.msa.raw.volumes.statistics
+              tags:
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: b47d7b03e19f4e25803b1d639a0ecf43
+              name: 'Volume [{#NAME}]: Space allocated'
+              type: DEPENDENT
+              key: 'hpe.msa.volumes.space["{#NAME}",allocated]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The amount of space currently allocated to the volume.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''allocated-size-numeric''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '512'
+              master_item:
+                key: hpe.msa.raw.volumes
+              tags:
+                -
+                  tag: component
+                  value: volume
+                -
+                  tag: volume
+                  value: '{#NAME}'
+            -
+              uuid: b6aaba39f7c74dcf95947626852855c8
+              name: 'Volume [{#NAME}]: Space total'
+              type: DEPENDENT
+              key: 'hpe.msa.volumes.space["{#NAME}",total]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'The capacity of the volume.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''size-numeric''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '512'
+              master_item:
+                key: hpe.msa.raw.volumes
               tags:
                 -
                   tag: component
@@ -4866,15 +5629,30 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE MSA 2040 Storage by HTTP'
-                    key: 'hpe.msa.volumes.reads["{#NAME}",rate]'
+                    key: 'hpe.msa.volumes.iops.read["{#NAME}",rate]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE MSA 2040 Storage by HTTP'
-                    key: 'hpe.msa.volumes.writes["{#NAME}",rate]'
+                    key: 'hpe.msa.volumes.iops.write["{#NAME}",rate]'
+            -
+              uuid: f8c4f07925404bc0b1e3ada45358580a
+              name: 'Volume [{#NAME}]: Space utilization'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.volumes.space["{#NAME}",allocated]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.volumes.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.raw.volumes.statistics
+            key: hpe.msa.raw.volumes
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -4898,37 +5676,41 @@ zabbix_export:
         -
           macro: '{$HPE.MSA.API.PASSWORD}'
           type: SECRET_TEXT
-          description: 'Specify password for WSAPI.'
+          description: 'Specify password for API.'
         -
           macro: '{$HPE.MSA.API.PORT}'
           value: '443'
-          description: 'Connection port for WSAPI.'
+          description: 'Connection port for API.'
         -
           macro: '{$HPE.MSA.API.SCHEME}'
           value: https
-          description: 'Connection scheme timeout for WSAPI.'
+          description: 'Connection scheme timeout for API.'
         -
           macro: '{$HPE.MSA.API.USERNAME}'
           value: zabbix
-          description: 'Specify user name for WSAPI.'
+          description: 'Specify user name for API.'
+        -
+          macro: '{$HPE.MSA.CONTROLLER.CPU.UTIL.CRIT}'
+          value: '90'
+          description: 'The critical threshold of the CPU utilization in %.'
         -
           macro: '{$HPE.MSA.DATA.TIMEOUT}'
           value: 5s
-          description: 'Response timeout for WSAPI.'
+          description: 'Response timeout for API.'
         -
-          macro: '{$HPE.PRIMERA.DISKS.GROUP.PUSED.MAX.CRIT}'
+          macro: '{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT}'
           value: '90'
           description: 'The critical threshold of the disk group space utilization in percent.'
         -
-          macro: '{$HPE.PRIMERA.DISKS.GROUP.PUSED.MAX.WARN}'
+          macro: '{$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN}'
           value: '80'
           description: 'The warning threshold of the disk group space utilization in percent.'
         -
-          macro: '{$HPE.PRIMERA.POOL.PUSED.MAX.CRIT}'
+          macro: '{$HPE.MSA.POOL.PUSED.MAX.CRIT}'
           value: '90'
           description: 'The critical threshold of the pool space utilization in percent.'
         -
-          macro: '{$HPE.PRIMERA.POOL.PUSED.MAX.WARN}'
+          macro: '{$HPE.MSA.POOL.PUSED.MAX.WARN}'
           value: '80'
           description: 'The warning threshold of the pool space utilization in percent.'
       valuemaps:
@@ -5080,6 +5862,38 @@ zabbix_export:
             -
               value: '4'
               newvalue: N/A
+        -
+          uuid: 8792604f2c914a5c8e810dffbfa0ebfd
+          name: 'I/O module status'
+          mappings:
+            -
+              value: '0'
+              newvalue: Operational
+            -
+              value: '1'
+              newvalue: Down
+            -
+              value: '2'
+              newvalue: 'Not installed'
+            -
+              value: '3'
+              newvalue: Unknown
+        -
+          uuid: 66a23d01db744677a1878143ccf102c7
+          name: 'Port type'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unknown
+            -
+              value: '6'
+              newvalue: FC
+            -
+              value: '8'
+              newvalue: SAS
+            -
+              value: '9'
+              newvalue: iSCSI
         -
           uuid: 996bbe1c4e2841d6ac35efd9b5236fef
           name: 'RAID type'
