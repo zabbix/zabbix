@@ -45,16 +45,18 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'items'					=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 			'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
+			'stacked'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_STACKED_OFF, SVG_GRAPH_STACKED_ON])],
 			'width'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
 			'pointsize'				=> ['type' => API_INT32, 'in' => implode(',', range(1, 10))],
 			'transparency'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(0, 10))],
 			'fill'					=> ['type' => API_INT32, 'in' => implode(',', range(0, 10))],
-			'missingdatafunc'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO])],
+			'missingdatafunc'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_LAST_KNOWN])],
 			'axisy'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
 			'timeshift'				=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
 			'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 			'aggregate_interval'	=> ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
-			'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])]
+			'aggregate_grouping'	=> ['type' => API_INT32, 'in' => implode(',', [GRAPH_AGGREGATE_BY_ITEM, GRAPH_AGGREGATE_BY_DATASET])],
+			'approximation'			=> ['type' => API_INT32, 'in' => implode(',', [APPROXIMATION_MIN, APPROXIMATION_AVG, APPROXIMATION_MAX, APPROXIMATION_ALL])]
 		]]);
 
 		$this->setDefault([]);
@@ -110,6 +112,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'items' => [],
 			'color' => self::DEFAULT_COLOR,
 			'type' => SVG_GRAPH_TYPE_LINE,
+			'stacked' => SVG_GRAPH_STACKED_OFF,
 			'width' => SVG_GRAPH_DEFAULT_WIDTH,
 			'pointsize' => SVG_GRAPH_DEFAULT_POINTSIZE,
 			'transparency' => SVG_GRAPH_DEFAULT_TRANSPARENCY,
@@ -119,7 +122,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'missingdatafunc' => SVG_GRAPH_MISSING_DATA_NONE,
 			'aggregate_function' => AGGREGATE_NONE,
 			'aggregate_interval' => GRAPH_AGGREGATE_DEFAULT_INTERVAL,
-			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM
+			'aggregate_grouping'=> GRAPH_AGGREGATE_BY_ITEM,
+			'approximation' => APPROXIMATION_AVG
 		];
 	}
 
@@ -136,6 +140,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$dataset_fields = [
 			'color' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'stacked' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'width' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'pointsize' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'transparency' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -145,7 +150,8 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			'missingdatafunc' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
-			'aggregate_grouping' => ZBX_WIDGET_FIELD_TYPE_INT32
+			'aggregate_grouping' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'approximation' => ZBX_WIDGET_FIELD_TYPE_INT32
 		];
 		$dataset_defaults = self::getDefaults();
 

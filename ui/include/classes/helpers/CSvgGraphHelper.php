@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -42,7 +42,7 @@ class CSvgGraphHelper {
 	 *
 	 * @return array
 	 */
-	public static function get(array $options, $width, $height) {
+	public static function get(array $options, int $width, int $height): array {
 		$metrics = [];
 		$errors = [];
 
@@ -50,7 +50,7 @@ class CSvgGraphHelper {
 		self::getMetrics($metrics, $options['data_sets']);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['overrides']);
-		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level timeshifts.
+		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
@@ -62,7 +62,6 @@ class CSvgGraphHelper {
 		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
 		$legend_height = ($options['legend'] == SVG_GRAPH_LEGEND_ON) ? $options['legend_lines'] * 18 : 0;
 
-		// Draw SVG graph.
 		$graph = (new CSvgGraph([
 			'time_period' => $options['time_period'],
 			'x_axis' => $options['x_axis'],
@@ -76,14 +75,13 @@ class CSvgGraphHelper {
 		if ($options['problems']['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
 			$options['problems']['itemids'] =
 				($options['problems']['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
-					? array_unique(zbx_objectValues($metrics, 'itemid'))
+					? array_unique(array_column($metrics, 'itemid'))
 					: null;
 
-			$problems = self::getProblems($options['problems'], $options['time_period']);
-			$graph->addProblems($problems);
+			$graph->addProblems(self::getProblems($options['problems'], $options['time_period']));
 		}
 
-		if ($legend_height > 0) {
+		if ($options['legend'] == SVG_GRAPH_LEGEND_ON) {
 			$labels = [];
 
 			foreach ($metrics as $metric) {
@@ -93,9 +91,7 @@ class CSvgGraphHelper {
 				];
 			}
 
-			$legend = (new CSvgGraphLegend($labels))
-				->setAttribute('style', 'height: '.$legend_height.'px')
-				->toString();
+			$legend = new CSvgGraphLegend($labels, $legend_height);
 		}
 		else {
 			$legend = '';
@@ -104,7 +100,7 @@ class CSvgGraphHelper {
 		// Draw graph.
 		$graph->draw();
 
-		// SBox available only for graphs without overriten relative time.
+		// SBox available only for graphs without overridden relative time.
 		if ($options['dashboard_time']) {
 			$graph->addSBox();
 		}
@@ -122,396 +118,17 @@ class CSvgGraphHelper {
 					'w' => $graph->getCanvasWidth(),
 					'h' => $graph->getCanvasHeight()
 				],
-				'spp' => (int) ($options['time_period']['time_to'] - $options['time_period']['time_from']) / $graph->getCanvasWidth()
+				'spp' => ($options['time_period']['time_to'] - $options['time_period']['time_from'])
+					/ $graph->getCanvasWidth()
 			],
 			'errors' => $errors
 		];
 	}
 
 	/**
-	 * Select aggregated data to show in graph for each metric.
-	 */
-	protected static function getMetricsAggregatedData(array &$metrics = []) {
-		$dataset_metrics = [];
-
-		foreach ($metrics as $metric_num => &$metric) {
-			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
-				continue;
-			}
-
-			$dataset_num = $metric['data_set'];
-
-			if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
-				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
-			}
-			else {
-				$name = 'Dataset #'.($dataset_num + 1);
-			}
-
-			$item = [
-				'itemid' => $metric['itemid'],
-				'value_type' => $metric['value_type'],
-				'source' => ($metric['source'] == SVG_GRAPH_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
-			];
-
-			if (!array_key_exists($dataset_num, $dataset_metrics)) {
-				$metric = array_merge($metric, [
-					'name' => graph_item_aggr_fnc2str($metric['options']['aggregate_function']).'('.$name.')',
-					'items' => [],
-					'points' => []
-				]);
-				$metric['options']['aggregate_interval'] =
-					(int) timeUnitToSeconds($metric['options']['aggregate_interval'], true);
-
-				if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET) {
-					$dataset_metrics[$dataset_num] = $metric_num;
-				}
-
-				$metric['items'][] = $item;
-			}
-			else {
-				$metrics[$dataset_metrics[$dataset_num]]['items'][] = $item;
-				unset($metrics[$metric_num]);
-			}
-		}
-		unset($metric);
-
-		foreach ($metrics as &$metric) {
-			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
-				continue;
-			}
-
-			$result = Manager::History()->getAggregationByInterval(
-				$metric['items'], $metric['time_period']['time_from'], $metric['time_period']['time_to'],
-				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
-			);
-
-			$metric_points = [];
-
-			if ($result) {
-				foreach ($result as $itemid => $points) {
-					foreach ($points['data'] as $point) {
-						$metric_points[$point['tick']]['itemid'][] = $point['itemid'];
-						$metric_points[$point['tick']]['clock'][] = $point['clock'];
-
-						if (array_key_exists('count', $point)) {
-							$metric_points[$point['tick']]['count'][] = $point['count'];
-						}
-						if (array_key_exists('value', $point)) {
-							$metric_points[$point['tick']]['value'][] = $point['value'];
-						}
-					}
-				}
-				ksort($metric_points, SORT_NUMERIC);
-
-				switch ($metric['options']['aggregate_function']) {
-					case AGGREGATE_MIN:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = ['clock' => $tick, 'value' => min($point['value'])];
-						}
-						break;
-					case AGGREGATE_MAX:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = ['clock' => $tick, 'value' => max($point['value'])];
-						}
-						break;
-					case AGGREGATE_AVG:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = [
-								'clock' => $tick,
-								'value' => CMathHelper::safeAvg($point['value'])
-							];
-						}
-						break;
-					case AGGREGATE_COUNT:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['count'])];
-						}
-						break;
-					case AGGREGATE_SUM:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['value'])];
-						}
-						break;
-					case AGGREGATE_FIRST:
-						foreach ($metric_points as $tick => $point) {
-							if ($point['clock']) {
-								$metric['points'][] = [
-									'clock' => $tick,
-									'value' => $point['value'][array_search(min($point['clock']), $point['clock'])]
-								];
-							}
-						}
-						break;
-					case AGGREGATE_LAST:
-						foreach ($metric_points as $tick => $point) {
-							if ($point['clock']) {
-								$metric['points'][] = [
-									'clock' => $tick,
-									'value' => $point['value'][array_search(max($point['clock']), $point['clock'])]
-								];
-							}
-						}
-						break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Select data to show in graph for each metric.
-	 */
-	protected static function getMetricsData(array &$metrics, $width) {
-		// To reduce number of requests, group metrics by time range.
-		$tr_groups = [];
-		foreach ($metrics as $metric_num => &$metric) {
-			if ($metric['options']['aggregate_function'] != AGGREGATE_NONE) {
-				continue;
-			}
-
-			$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
-			$metric['points'] = [];
-
-			$key = $metric['time_period']['time_from'].$metric['time_period']['time_to'];
-			if (!array_key_exists($key, $tr_groups)) {
-				$tr_groups[$key] = [
-					'time' => [
-						'from' => $metric['time_period']['time_from'],
-						'to' => $metric['time_period']['time_to']
-					]
-				];
-			}
-
-			$tr_groups[$key]['items'][$metric_num] = [
-				'itemid' => $metric['itemid'],
-				'value_type' => $metric['value_type'],
-				'source' => ($metric['source'] == SVG_GRAPH_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
-			];
-		}
-		unset($metric);
-
-		// Request data.
-		foreach ($tr_groups as $tr_group) {
-			$results = Manager::History()->getGraphAggregationByWidth($tr_group['items'], $tr_group['time']['from'],
-				$tr_group['time']['to'], $width
-			);
-
-			if ($results) {
-				foreach ($tr_group['items'] as $metric_num => $item) {
-					$metric = &$metrics[$metric_num];
-
-					// Collect and sort data points.
-					if (array_key_exists($item['itemid'], $results)) {
-						$points = [];
-						foreach ($results[$item['itemid']]['data'] as $point) {
-							$points[] = ['clock' => $point['clock'], 'value' => $point['avg']];
-						}
-						usort($points, [__CLASS__, 'sortByClock']);
-						$metric['points'] = $points;
-
-						unset($metric['source'], $metric['history'], $metric['trends']);
-					}
-				}
-				unset($metric);
-			}
-		}
-	}
-
-	/**
-	 * Calculate what data source must be used for each metric.
-	 */
-	protected static function getGraphDataSource(array &$metrics, array &$errors, $data_source, $width) {
-		/**
-		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
-		 * $metric.
-		 */
-		if ($data_source == SVG_GRAPH_DATA_SOURCE_AUTO) {
-			/**
-			 * First, if global configuration setting "Override item history period" is enabled, override globally
-			 * specified "Data storage period" value to each metric's custom history storage duration, converting it
-			 * to seconds. If "Override item history period" is disabled, item level field 'history' will be used
-			 * later but now we are just storing the field name 'history' in array $to_resolve.
-			 *
-			 * Do the same with trends.
-			 */
-			$to_resolve = [];
-
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-				foreach ($metrics as &$metric) {
-					$metric['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-				}
-				unset($metric);
-			}
-			else {
-				$to_resolve[] = 'history';
-			}
-
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-				foreach ($metrics as &$metric) {
-					$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-				}
-				unset($metric);
-			}
-			else {
-				$to_resolve[] = 'trends';
-			}
-
-			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given $metric.
-			if ($to_resolve) {
-				$metrics = CMacrosResolverHelper::resolveTimeUnitMacros($metrics, $to_resolve);
-				$simple_interval_parser = new CSimpleIntervalParser();
-
-				foreach ($metrics as $num => &$metric) {
-					// Convert its values to seconds.
-					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-						if ($simple_interval_parser->parse($metric['history']) != CParser::PARSE_SUCCESS) {
-							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
-								_('invalid history storage period')
-							);
-							unset($metrics[$num]);
-						}
-						else {
-							$metric['history'] = timeUnitToSeconds($metric['history']);
-						}
-					}
-
-					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-						if ($simple_interval_parser->parse($metric['trends']) != CParser::PARSE_SUCCESS) {
-							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
-								_('invalid trend storage period')
-							);
-							unset($metrics[$num]);
-						}
-						else {
-							$metric['trends'] = timeUnitToSeconds($metric['trends']);
-						}
-					}
-				}
-				unset($metric);
-			}
-
-			foreach ($metrics as &$metric) {
-				/**
-				 * History as a data source is used in 2 cases:
-				 * 1) if trends are disabled (set to 0) either for particular $metric item or globally;
-				 * 2) if period for requested data is newer than the period of keeping history for particular $metric
-				 *	  item.
-				 *
-				 * Use trends otherwise.
-				 */
-				$history = $metric['history'];
-				$trends = $metric['trends'];
-				$time_from = $metric['time_period']['time_from'];
-				$period = $metric['time_period']['time_to'] - $time_from;
-
-				$metric['source'] = ($trends == 0 || (time() - $history < $time_from
-						&& $period / $width <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
-					? SVG_GRAPH_DATA_SOURCE_HISTORY
-					: SVG_GRAPH_DATA_SOURCE_TRENDS;
-			}
-			unset($metric);
-		}
-		else {
-			foreach ($metrics as &$metric) {
-				$metric['source'] = $data_source;
-			}
-			unset($metric);
-		}
-	}
-
-	/**
-	 * Find problems at given time period that matches specified problem options.
-	 */
-	protected static function getProblems(array $problem_options, array $time_period) {
-		$options = [
-			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
-			'select_acknowledges' => ['action'],
-			'problem_time_from' => $time_period['time_from'],
-			'problem_time_till' => $time_period['time_to'],
-			'preservekeys' => true
-		];
-
-		// Find triggers involved.
-		if ($problem_options['problemhosts'] !== '') {
-			$options['hostids'] = array_keys(API::Host()->get([
-				'output' => [],
-				'searchWildcardsEnabled' => true,
-				'searchByAny' => true,
-				'search' => [
-					'name' => self::processPattern($problem_options['problemhosts'])
-				],
-				'preservekeys' => true
-			]));
-
-			// Return if no hosts found.
-			if (!$options['hostids']) {
-				return [];
-			}
-		}
-
-		$options['objectids'] = array_keys(API::Trigger()->get([
-			'output' => [],
-			'hostids' => array_key_exists('hostids', $options) ? $options['hostids'] : null,
-			'itemids' => $problem_options['itemids'],
-			'monitored' => true,
-			'preservekeys' => true
-		]));
-
-		unset($options['hostids']);
-
-		// Return if no triggers found.
-		if (!$options['objectids']) {
-			return [];
-		}
-
-		// Add severity filter.
-		$filter_severities = implode(',', $problem_options['severities']);
-		$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-		if ($filter_severities !== '' && $filter_severities !== $all_severities) {
-			$options['severities'] = $problem_options['severities'];
-		}
-
-		// Add problem name filter.
-		if ($problem_options['problem_name'] !== '') {
-			$options['searchWildcardsEnabled'] = true;
-			$options['search']['name'] = $problem_options['problem_name'];
-		}
-
-		// Add tags filter.
-		if ($problem_options['tags']) {
-			$options['evaltype'] = $problem_options['evaltype'];
-			$options['tags'] = $problem_options['tags'];
-		}
-
-		$events = API::Event()->get($options);
-
-		// Find end time for each problem.
-		if ($events) {
-			$r_events = API::Event()->get([
-				'output' => ['clock'],
-				'eventids' => zbx_objectValues($events, 'r_eventid'),
-				'preservekeys' => true
-			]);
-		}
-
-		// Add recovery times for each problem event.
-		foreach ($events as &$event) {
-			$event['r_clock'] = array_key_exists($event['r_eventid'], $r_events)
-				? $r_events[$event['r_eventid']]['clock']
-				: 0;
-		}
-		unset($event);
-
-		CArrayHelper::sort($events, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
-
-		return $events;
-	}
-
-	/**
 	 * Select metrics from given data set options. Apply data set options to each selected metric.
 	 */
-	protected static function getMetrics(array &$metrics, array $data_sets) {
+	private static function getMetrics(array &$metrics, array $data_sets): void {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
@@ -579,9 +196,9 @@ class CSvgGraphHelper {
 	}
 
 	/**
-	 * Apply overrides for each pattern matchig metric.
+	 * Apply overrides for each pattern matching metric.
 	 */
-	protected static function applyOverrides(array &$metrics = [], array $overrides = []) {
+	private static function applyOverrides(array &$metrics = [], array $overrides = []): void {
 		foreach ($overrides as $override) {
 			if ($override['hosts'] === '' || $override['items'] === '') {
 				continue;
@@ -614,7 +231,7 @@ class CSvgGraphHelper {
 				 */
 				if ($hosts_patterns !== null) {
 					for ($hosts_pattern = reset($hosts_patterns); !$host_matches && $hosts_pattern !== false;
-							$hosts_pattern = next($hosts_patterns)) {
+						$hosts_pattern = next($hosts_patterns)) {
 						$pattern = '/^'.str_replace('\*', '.*', preg_quote($hosts_pattern, '/')).'$/i';
 						$host_matches = (bool) preg_match($pattern, $metric['hosts'][0]['name']);
 					}
@@ -622,7 +239,7 @@ class CSvgGraphHelper {
 
 				if ($items_patterns !== null && $host_matches) {
 					for ($items_pattern = reset($items_patterns); !$item_matches && $items_pattern !== false;
-							$items_pattern = next($items_patterns)) {
+						$items_pattern = next($items_patterns)) {
 						$pattern = '/^'.str_replace('\*', '.*', preg_quote($items_pattern, '/')).'$/i';
 						$item_matches = (bool) preg_match($pattern, $metric['name']);
 					}
@@ -630,7 +247,7 @@ class CSvgGraphHelper {
 
 				/**
 				 * We need to know total amount of matched metrics to calculate variations of colors. That's why we
-				 * first collect matching metrics and than override existing metric options.
+				 * first collect matching metrics and then override existing metric options.
 				 */
 				if ($host_matches && $item_matches) {
 					$metrics_matched[] = $metric_num;
@@ -686,7 +303,7 @@ class CSvgGraphHelper {
 	/**
 	 * Apply time period for each metric.
 	 */
-	protected static function getTimePeriods(array &$metrics, array $options) {
+	private static function getTimePeriods(array &$metrics, array $options): void {
 		foreach ($metrics as &$metric) {
 			$metric['time_period'] = $options;
 
@@ -699,6 +316,393 @@ class CSvgGraphHelper {
 	}
 
 	/**
+	 * Calculate what data source must be used for each metric.
+	 */
+	private static function getGraphDataSource(array &$metrics, array &$errors, int $data_source, int $width): void {
+		/**
+		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
+		 * $metric.
+		 */
+		if ($data_source == SVG_GRAPH_DATA_SOURCE_AUTO) {
+			/**
+			 * First, if global configuration setting "Override item history period" is enabled, override globally
+			 * specified "Data storage period" value to each metric custom history storage duration, converting it
+			 * to seconds. If "Override item history period" is disabled, item level field 'history' will be used
+			 * later, but now we are just storing the field name 'history' in array $to_resolve.
+			 *
+			 * Do the same with trends.
+			 */
+			$to_resolve = [];
+
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+				foreach ($metrics as &$metric) {
+					$metric['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+				}
+				unset($metric);
+			}
+			else {
+				$to_resolve[] = 'history';
+			}
+
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
+				foreach ($metrics as &$metric) {
+					$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+				}
+				unset($metric);
+			}
+			else {
+				$to_resolve[] = 'trends';
+			}
+
+			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given $metric.
+			if ($to_resolve) {
+				$metrics = CMacrosResolverHelper::resolveTimeUnitMacros($metrics, $to_resolve);
+				$simple_interval_parser = new CSimpleIntervalParser();
+
+				foreach ($metrics as $num => &$metric) {
+					// Convert its values to seconds.
+					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+						if ($simple_interval_parser->parse($metric['history']) != CParser::PARSE_SUCCESS) {
+							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
+								_('invalid history storage period')
+							);
+							unset($metrics[$num]);
+						}
+						else {
+							$metric['history'] = timeUnitToSeconds($metric['history']);
+						}
+					}
+
+					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
+						if ($simple_interval_parser->parse($metric['trends']) != CParser::PARSE_SUCCESS) {
+							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
+								_('invalid trend storage period')
+							);
+							unset($metrics[$num]);
+						}
+						else {
+							$metric['trends'] = timeUnitToSeconds($metric['trends']);
+						}
+					}
+				}
+				unset($metric);
+			}
+
+			foreach ($metrics as &$metric) {
+				/**
+				 * History as a data source is used in 2 cases:
+				 * 1) if trends are disabled (set to 0) either for particular $metric item or globally;
+				 * 2) if period for requested data is newer than the period of keeping history for particular $metric
+				 *    item.
+				 *
+				 * Use trends otherwise.
+				 */
+				$history = $metric['history'];
+				$trends = $metric['trends'];
+				$time_from = $metric['time_period']['time_from'];
+				$period = $metric['time_period']['time_to'] - $time_from;
+
+				$metric['source'] = ($trends == 0 || (time() - $history < $time_from
+						&& $period / $width <= ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
+					? SVG_GRAPH_DATA_SOURCE_HISTORY
+					: SVG_GRAPH_DATA_SOURCE_TRENDS;
+			}
+		}
+		else {
+			foreach ($metrics as &$metric) {
+				$metric['source'] = $data_source;
+			}
+		}
+
+		unset($metric);
+	}
+
+	/**
+	 * Select data to show in graph for each metric.
+	 */
+	private static function getMetricsData(array &$metrics, int $width): void {
+		// To reduce number of requests, group metrics by time range.
+		$tr_groups = [];
+		foreach ($metrics as $metric_num => &$metric) {
+			if ($metric['options']['aggregate_function'] != AGGREGATE_NONE) {
+				continue;
+			}
+
+			$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+			$metric['points'] = [];
+
+			$key = $metric['time_period']['time_from'].$metric['time_period']['time_to'];
+			if (!array_key_exists($key, $tr_groups)) {
+				$tr_groups[$key] = [
+					'time' => [
+						'from' => $metric['time_period']['time_from'],
+						'to' => $metric['time_period']['time_to']
+					]
+				];
+			}
+
+			$tr_groups[$key]['items'][$metric_num] = [
+				'itemid' => $metric['itemid'],
+				'value_type' => $metric['value_type'],
+				'source' => ($metric['source'] == SVG_GRAPH_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
+			];
+		}
+		unset($metric);
+
+		// Request data.
+		foreach ($tr_groups as $tr_group) {
+			$results = Manager::History()->getGraphAggregationByWidth($tr_group['items'], $tr_group['time']['from'],
+				$tr_group['time']['to'], $width
+			);
+
+			if ($results) {
+				foreach ($tr_group['items'] as $metric_num => $item) {
+					$metric = &$metrics[$metric_num];
+
+					// Collect and sort data points.
+					if (array_key_exists($item['itemid'], $results)) {
+						$points = [];
+						foreach ($results[$item['itemid']]['data'] as $point) {
+							$points[] = ['clock' => $point['clock'], 'value' => $point['avg']];
+						}
+						usort($points, [__CLASS__, 'sortByClock']);
+						$metric['points'] = $points;
+
+						unset($metric['source'], $metric['history'], $metric['trends']);
+					}
+				}
+				unset($metric);
+			}
+		}
+	}
+
+	/**
+	 * Select aggregated data to show in graph for each metric.
+	 */
+	private static function getMetricsAggregatedData(array &$metrics = []): void {
+		$dataset_metrics = [];
+
+		foreach ($metrics as $metric_num => &$metric) {
+			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
+				continue;
+			}
+
+			$dataset_num = $metric['data_set'];
+
+			if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
+				$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+			}
+			else {
+				$name = 'Dataset #'.($dataset_num + 1);
+			}
+
+			$item = [
+				'itemid' => $metric['itemid'],
+				'value_type' => $metric['value_type'],
+				'source' => ($metric['source'] == SVG_GRAPH_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
+			];
+
+			if (!array_key_exists($dataset_num, $dataset_metrics)) {
+				$metric = array_merge($metric, [
+					'name' => graph_item_aggr_fnc2str($metric['options']['aggregate_function']).'('.$name.')',
+					'items' => [],
+					'points' => []
+				]);
+
+				$metric['options']['aggregate_interval'] =
+					(int) timeUnitToSeconds($metric['options']['aggregate_interval'], true);
+
+				if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET) {
+					$dataset_metrics[$dataset_num] = $metric_num;
+				}
+
+				$metric['items'][] = $item;
+			}
+			else {
+				$metrics[$dataset_metrics[$dataset_num]]['items'][] = $item;
+				unset($metrics[$metric_num]);
+			}
+		}
+		unset($metric);
+
+		foreach ($metrics as &$metric) {
+			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
+				continue;
+			}
+
+			$result = Manager::History()->getAggregationByInterval(
+				$metric['items'], $metric['time_period']['time_from'], $metric['time_period']['time_to'],
+				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
+			);
+
+			$metric_points = [];
+
+			if ($result) {
+				foreach ($result as $points) {
+					foreach ($points['data'] as $point) {
+						$metric_points[$point['tick']]['itemid'][] = $point['itemid'];
+						$metric_points[$point['tick']]['clock'][] = $point['clock'];
+
+						if (array_key_exists('count', $point)) {
+							$metric_points[$point['tick']]['count'][] = $point['count'];
+						}
+						if (array_key_exists('value', $point)) {
+							$metric_points[$point['tick']]['value'][] = $point['value'];
+						}
+					}
+				}
+				ksort($metric_points, SORT_NUMERIC);
+
+				switch ($metric['options']['aggregate_function']) {
+					case AGGREGATE_MIN:
+						foreach ($metric_points as $tick => $point) {
+							$metric['points'][] = ['clock' => $tick, 'value' => min($point['value'])];
+						}
+						break;
+
+					case AGGREGATE_MAX:
+						foreach ($metric_points as $tick => $point) {
+							$metric['points'][] = ['clock' => $tick, 'value' => max($point['value'])];
+						}
+						break;
+
+					case AGGREGATE_AVG:
+						foreach ($metric_points as $tick => $point) {
+							$metric['points'][] = [
+								'clock' => $tick,
+								'value' => CMathHelper::safeAvg($point['value'])
+							];
+						}
+						break;
+
+					case AGGREGATE_COUNT:
+						foreach ($metric_points as $tick => $point) {
+							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['count'])];
+						}
+						break;
+
+					case AGGREGATE_SUM:
+						foreach ($metric_points as $tick => $point) {
+							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['value'])];
+						}
+						break;
+
+					case AGGREGATE_FIRST:
+						foreach ($metric_points as $tick => $point) {
+							if ($point['clock']) {
+								$metric['points'][] = [
+									'clock' => $tick,
+									'value' => $point['value'][array_search(min($point['clock']), $point['clock'])]
+								];
+							}
+						}
+						break;
+
+					case AGGREGATE_LAST:
+						foreach ($metric_points as $tick => $point) {
+							if ($point['clock']) {
+								$metric['points'][] = [
+									'clock' => $tick,
+									'value' => $point['value'][array_search(max($point['clock']), $point['clock'])]
+								];
+							}
+						}
+						break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Find problems at given time period that matches specified problem options.
+	 */
+	private static function getProblems(array $problem_options, array $time_period): array {
+		$options = [
+			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
+			'select_acknowledges' => ['action'],
+			'problem_time_from' => $time_period['time_from'],
+			'problem_time_till' => $time_period['time_to'],
+			'preservekeys' => true
+		];
+
+		// Find triggers involved.
+		if ($problem_options['problemhosts'] !== '') {
+			$options['hostids'] = array_keys(API::Host()->get([
+				'output' => [],
+				'searchWildcardsEnabled' => true,
+				'searchByAny' => true,
+				'search' => [
+					'name' => self::processPattern($problem_options['problemhosts'])
+				],
+				'preservekeys' => true
+			]));
+
+			// Return if no hosts found.
+			if (!$options['hostids']) {
+				return [];
+			}
+		}
+
+		$options['objectids'] = array_keys(API::Trigger()->get([
+			'output' => [],
+			'hostids' => $options['hostids'] ?? null,
+			'itemids' => $problem_options['itemids'],
+			'monitored' => true,
+			'preservekeys' => true
+		]));
+
+		unset($options['hostids']);
+
+		// Return if no triggers found.
+		if (!$options['objectids']) {
+			return [];
+		}
+
+		// Add severity filter.
+		$filter_severities = implode(',', $problem_options['severities']);
+		$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
+
+		if ($filter_severities !== '' && $filter_severities !== $all_severities) {
+			$options['severities'] = $problem_options['severities'];
+		}
+
+		// Add problem name filter.
+		if ($problem_options['problem_name'] !== '') {
+			$options['searchWildcardsEnabled'] = true;
+			$options['search']['name'] = $problem_options['problem_name'];
+		}
+
+		// Add tags filter.
+		if ($problem_options['tags']) {
+			$options['evaltype'] = $problem_options['evaltype'];
+			$options['tags'] = $problem_options['tags'];
+		}
+
+		$events = API::Event()->get($options);
+
+		// Find end time for each problem.
+		if ($events) {
+			$r_events = API::Event()->get([
+				'output' => ['clock'],
+				'eventids' => array_column($events, 'r_eventid'),
+				'preservekeys' => true
+			]);
+
+			// Add recovery times for each problem event.
+			foreach ($events as &$event) {
+				$event['r_clock'] = array_key_exists($event['r_eventid'], $r_events)
+					? $r_events[$event['r_eventid']]['clock']
+					: 0;
+			}
+			unset($event);
+		}
+
+		CArrayHelper::sort($events, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+
+		return $events;
+	}
+
+	/**
 	 * Prepare an array to be used for hosts/items filtering.
 	 *
 	 * @param array  $patterns  Array of strings containing hosts/items patterns.
@@ -706,15 +710,15 @@ class CSvgGraphHelper {
 	 * @return array|mixed  Returns array of patterns.
 	 *                      Returns NULL if array contains '*' (so any possible host/item search matches).
 	 */
-	protected static function processPattern(array $patterns) {
-		return in_array('*', $patterns) ? null : $patterns;
+	private static function processPattern(array $patterns): ?array {
+		return in_array('*', $patterns, true) ? null : $patterns;
 	}
 
-	/*
+	/**
 	 * Sort data points by clock field.
 	 * Do not use this function directly. It serves as value_compare_func function for usort.
 	 */
-	protected static function sortByClock($a, $b) {
+	private static function sortByClock(array $a, array $b): int {
 		if ($a['clock'] == $b['clock']) {
 			return 0;
 		}

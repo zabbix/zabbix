@@ -2445,6 +2445,13 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .subfilter-enabled sup {
     color: #8f8f8f; }
 
+.svg-graph {
+  display: block; }
+
+.svg-point-highlight {
+  fill: #f2f2f2;
+  fill-opacity: .5; }
+
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
@@ -2748,6 +2755,52 @@ div.dashboard-grid-widget-slareport .date-vertical {
   border: 1px solid #303030; }
 .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph table {
   width: initial; }
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .dataset-head {
+  display: grid;
+  grid-template-columns: 24px 24px 1fr 1fr 24px;
+  grid-gap: 10px; }
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .dataset-body {
+  display: grid;
+  grid-template-columns: 24px 1fr 1fr 24px;
+  grid-gap: 10px;
+  align-items: start;
+  position: relative;
+  margin-top: 10px; }
+  .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .dataset-body .form-grid {
+    padding-top: 0; }
+    .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .dataset-body .form-grid:first-child {
+      grid-column-start: 2; }
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .drag-icon {
+  position: absolute;
+  left: -14px; }
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .dataset-actions {
+  text-align: right; }
+  .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .dataset-actions .btn-remove {
+    top: 0;
+    right: 0;
+    vertical-align: baseline; }
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .items-list {
+  grid-column: 2 / span 3; }
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .list-vertical-accordion {
+  position: relative;
+  margin-left: 15px;
+  padding-left: 0; }
+.overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .list-accordion-item {
+  position: relative;
+  margin-bottom: 10px; }
+  .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
+    content: ' ';
+    position: absolute;
+    top: 24px;
+    bottom: 0;
+    left: 11px;
+    width: 2px;
+    background: #303030; }
+  .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .multiselect {
+    height: 24px;
+    overflow: hidden; }
+  .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-body {
+    display: none; }
 
 .link-action {
   border-bottom: 1px dotted;
@@ -3960,10 +4013,10 @@ button {
 .btn-widget-action {
   background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -618px; }
 
-.btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle {
+.btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle {
   background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -654px; }
 
-.btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle {
+.btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle {
   background: url("../img/icon-sprite.svg?20211222") no-repeat -6px -689px; }
 
 .btn-widget-edit {
@@ -4243,7 +4296,7 @@ button {
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
 
-.btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
+.btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {
   width: 24px;
   height: 24px;
   margin: 2px 2px 0 0; }
@@ -4252,13 +4305,13 @@ button {
   width: 24px;
   height: 24px; }
 
-.filter-container.tabfilter-container .icon-edit, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle, .btn-dashboard-conf {
+.filter-container.tabfilter-container .icon-edit, .btn-dashboard-page-properties, .btn-iterator-page-previous, .btn-iterator-page-next, .btn-widget-action, .btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .interface-btn-toggle, .btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle, .interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .interface-btn-toggle, .btn-widget-edit, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off, .btn-info-clock, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle, .btn-dashboard-conf {
   border: 0;
   min-height: 0;
   padding: 0;
   opacity: .5;
   transition: opacity .2s ease-out; }
-  .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-dashboard-page-properties, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, [disabled].btn-widget-expand, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle, [disabled].btn-dashboard-conf, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-dashboard-page-properties:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, [disabled].btn-widget-expand:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:hover, [disabled].btn-dashboard-conf:hover, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-dashboard-page-properties:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, [disabled].btn-widget-expand:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:focus, [disabled].btn-dashboard-conf:focus, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-dashboard-page-properties:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, [disabled].btn-widget-expand:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:active, [disabled].btn-dashboard-conf:active {
+  .filter-container.tabfilter-container [disabled].icon-edit, [disabled].btn-dashboard-page-properties, [disabled].btn-iterator-page-previous, [disabled].btn-iterator-page-next, [disabled].btn-widget-action, [disabled].btn-widget-collapse, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle, [disabled].btn-widget-expand, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle, [disabled].btn-widget-edit, [disabled].btn-alarm-on, [disabled].btn-alarm-off, [disabled].btn-sound-on, [disabled].btn-sound-off, [disabled].btn-info-clock, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle, [disabled].btn-dashboard-conf, .filter-container.tabfilter-container [disabled].icon-edit:hover, [disabled].btn-dashboard-page-properties:hover, [disabled].btn-iterator-page-previous:hover, [disabled].btn-iterator-page-next:hover, [disabled].btn-widget-action:hover, [disabled].btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:hover, [disabled].btn-widget-edit:hover, [disabled].btn-alarm-on:hover, [disabled].btn-alarm-off:hover, [disabled].btn-sound-on:hover, [disabled].btn-sound-off:hover, [disabled].btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:hover, [disabled].btn-dashboard-conf:hover, .filter-container.tabfilter-container [disabled].icon-edit:focus, [disabled].btn-dashboard-page-properties:focus, [disabled].btn-iterator-page-previous:focus, [disabled].btn-iterator-page-next:focus, [disabled].btn-widget-action:focus, [disabled].btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:focus, [disabled].btn-widget-edit:focus, [disabled].btn-alarm-on:focus, [disabled].btn-alarm-off:focus, [disabled].btn-sound-on:focus, [disabled].btn-sound-off:focus, [disabled].btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:focus, [disabled].btn-dashboard-conf:focus, .filter-container.tabfilter-container [disabled].icon-edit:active, [disabled].btn-dashboard-page-properties:active, [disabled].btn-iterator-page-previous:active, [disabled].btn-iterator-page-next:active, [disabled].btn-widget-action:active, [disabled].btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed [disabled].list-accordion-item-toggle:active, [disabled].btn-widget-edit:active, [disabled].btn-alarm-on:active, [disabled].btn-alarm-off:active, [disabled].btn-sound-on:active, [disabled].btn-sound-off:active, [disabled].btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] [disabled].interface-btn-toggle:active, [disabled].btn-dashboard-conf:active {
     background-color: transparent;
     opacity: .25; }
 
@@ -4287,7 +4340,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .inaccessible .subfilter-enabled {
   color: #b2b2b2; }
 
-.filter-container.tabfilter-container .icon-edit:hover, .btn-dashboard-page-properties:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .btn-widget-expand:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:hover, .btn-dashboard-conf:hover, .filter-container.tabfilter-container .icon-edit:focus, .btn-dashboard-page-properties:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .btn-widget-expand:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:focus, .btn-dashboard-conf:focus, .filter-container.tabfilter-container .icon-edit:active, .btn-dashboard-page-properties:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .btn-widget-expand:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:active, .btn-dashboard-conf:active {
+.filter-container.tabfilter-container .icon-edit:hover, .btn-dashboard-page-properties:hover, .btn-iterator-page-previous:hover, .btn-iterator-page-next:hover, .btn-widget-action:hover, .btn-widget-collapse:hover, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:hover, .btn-widget-expand:hover, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:hover, .btn-widget-edit:hover, .btn-alarm-on:hover, .btn-alarm-off:hover, .btn-sound-on:hover, .btn-sound-off:hover, .btn-info-clock:hover, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:hover, .btn-dashboard-conf:hover, .filter-container.tabfilter-container .icon-edit:focus, .btn-dashboard-page-properties:focus, .btn-iterator-page-previous:focus, .btn-iterator-page-next:focus, .btn-widget-action:focus, .btn-widget-collapse:focus, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:focus, .btn-widget-expand:focus, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:focus, .btn-widget-edit:focus, .btn-alarm-on:focus, .btn-alarm-off:focus, .btn-sound-on:focus, .btn-sound-off:focus, .btn-info-clock:focus, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:focus, .btn-dashboard-conf:focus, .filter-container.tabfilter-container .icon-edit:active, .btn-dashboard-page-properties:active, .btn-iterator-page-previous:active, .btn-iterator-page-next:active, .btn-widget-action:active, .btn-widget-collapse:active, .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle:active, .btn-widget-expand:active, .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle:active, .btn-widget-edit:active, .btn-alarm-on:active, .btn-alarm-off:active, .btn-sound-on:active, .btn-sound-off:active, .btn-info-clock:active, .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle:active, .btn-dashboard-conf:active {
   background-color: transparent;
   opacity: 1; }
 
@@ -4709,7 +4762,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
         padding-left: 0; }
   .overlay-dialogue.modal-popup {
     top: 0;
-    max-width: 1024px; }
+    max-width: 1120px; }
     .overlay-dialogue.modal-popup.modal-popup-small {
       max-width: 450px;
       width: 100%; }
@@ -5077,10 +5130,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   stroke: #e45959;
   stroke-width: 2px; }
 
-.svg-point-highlight {
-  fill: #f2f2f2 !important;
-  fill-opacity: .5 !important; }
-
 .svg-graph-preview {
   margin-top: 10px;
   min-width: 960px;
@@ -5094,9 +5143,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     right: 0;
     top: 0;
     z-index: 3; }
-
-.svg-graph {
-  display: block; }
 
 .svg-single-item-graph-legend,
 .svg-single-two-items-graph-legend,
@@ -5900,25 +5946,25 @@ svg {
   border-radius: 0; }
 
 .list-vertical-accordion {
-  display: table;
   padding-left: 15px;
   width: calc(100% - 15px); }
-  .list-vertical-accordion .list-accordion-item {
-    display: table-row; }
-    .list-vertical-accordion .list-accordion-item .btn-remove {
-      position: relative;
-      right: -10px;
-      top: 3px; }
+  .list-vertical-accordion .list-accordion-item .btn-remove {
+    position: relative;
+    right: -10px;
+    top: 3px; }
   .list-vertical-accordion .list-accordion-item-head,
   .list-vertical-accordion .list-accordion-item-body {
     padding-bottom: 2px; }
-  .list-vertical-accordion .list-accordion-item-closed .multiselect {
-    height: 24px;
-    overflow: hidden; }
-  .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-head {
-    margin-bottom: 5px; }
+  .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-body {
+    display: block; }
+  .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle {
+    margin: 0; }
   .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
     display: none; }
+  .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle {
+    margin: 0; }
+  .list-vertical-accordion .list-accordion-item-toggle {
+    text-indent: -9999px; }
 
 .display-none, .table-forms > li.display-none {
   display: none; }
@@ -6674,7 +6720,8 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
       border-radius: 2px; }
 
 .btn-toggle-chevron {
-  position: relative; }
+  position: relative;
+  text-indent: -9999px; }
   .btn-toggle-chevron[aria-expanded="true"] {
     color: #f2f2f2;
     background-color: #5e737e;
@@ -6783,8 +6830,6 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
       .interface-container .interface-row .interface-cell .table-forms-td-right {
         padding-bottom: 0; }
 
-.interface-row.list-accordion-item[data-type="2"].list-accordion-item-closed .list-accordion-item-body {
-  display: none; }
 .interface-row.list-accordion-item[data-type="2"].list-accordion-item-opened .list-accordion-item-body {
   display: block; }
 .interface-row.list-accordion-item[data-type="2"] .interface-btn-toggle {

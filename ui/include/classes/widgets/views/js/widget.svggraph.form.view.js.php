@@ -60,10 +60,36 @@ window.widget_svggraph_form = new class {
 		//	}
 		//});
 
+		document.querySelector('.js-add-item').addEventListener('click', () => this._selectItems());
+
 		document
 			.getElementById('dataset-menu')
 			.addEventListener('click', this._addDataset);
 	}
+
+
+
+	_selectItems() {
+		const overlay = PopUp("popup.generic", {
+			srctbl: 'items',
+			srcfld1: 'itemid',
+			srcfld2: 'name',
+			dstfrm: 'graphForm',
+			numeric: 1,
+			writeonly: 1,
+			multiselect: 1,
+			with_webitems: 1,
+			real_hosts: 1
+		});
+
+		overlay.$dialogue[0].addEventListener('overlay.submit', (e) => {
+			console.log(e.detail);
+		});
+	}
+
+
+
+
 
 	_timePeriodTabInit() { // TODO: Time period tab - update controls enable status on 'Set custom time period' checkbox change
 		jQuery("#time_from, #time_to, #time_from_calendar, #time_to_calendar")

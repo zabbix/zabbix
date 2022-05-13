@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,16 +21,20 @@
 
 class CSvgGraphLine extends CSvgPath {
 
+	public const ZBX_STYLE_CLASS = 'svg-graph-line';
+
 	protected $path;
 
 	protected $itemid;
 	protected $item_name;
 	protected $units;
 	protected $host;
-	protected $options;
+
 	protected $add_label;
 
-	public function __construct($path, $metric) {
+	protected $options;
+
+	public function __construct(array $path, array $metric) {
 		parent::__construct();
 
 		$this->add_label = true;
@@ -50,27 +54,24 @@ class CSvgGraphLine extends CSvgPath {
 		];
 	}
 
-	public function makeStyles() {
+	public function makeStyles(): array {
 		$this
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE)
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order']);
-
-		$line_style = ($this->options['type'] == SVG_GRAPH_TYPE_LINE) ? ['stroke-linejoin' => 'round'] : [];
+			->addClass(self::ZBX_STYLE_CLASS)
+			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order']);
 
 		return [
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE => [
+			'.'.self::ZBX_STYLE_CLASS => [
 				'fill' => 'none'
 			],
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order'] => [
+			'.'.self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order'] => [
 				'opacity' => $this->options['transparency'] * 0.1,
 				'stroke' => $this->options['color'],
 				'stroke-width' => $this->options['width']
-			] + $line_style
+			] + ($this->options['type'] == SVG_GRAPH_TYPE_LINE ? ['stroke-linejoin' => 'round'] : [])
 		];
 	}
 
-	protected function draw() {
-		// drawMetricArea can be called with single data point.
+	protected function draw(): void {
 		if (count($this->path) > 1) {
 			$last_point = [0, 0];
 
@@ -89,9 +90,7 @@ class CSvgGraphLine extends CSvgPath {
 		}
 	}
 
-	public function toString($destroy = true) {
-		$this->draw();
-
+	public function toString($destroy = true): string {
 		if ($this->add_label && $this->path) {
 			$line_values = '';
 
@@ -101,6 +100,8 @@ class CSvgGraphLine extends CSvgPath {
 
 			$this->setAttribute('label', $line_values);
 		}
+
+		$this->draw();
 
 		return parent::toString($destroy);
 	}

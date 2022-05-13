@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,11 +24,12 @@
  */
 class CSvgGraphLineGroup extends CSvgGroup {
 
-	protected $paths;
-	protected $metric;
-	protected $options;
+	private $paths;
+	private $metric;
 
-	public function __construct($paths, $metric) {
+	private $options;
+
+	public function __construct(array $paths, array $metric) {
 		parent::__construct();
 
 		$this->paths = $paths;
@@ -46,23 +47,21 @@ class CSvgGraphLineGroup extends CSvgGroup {
 		$this->options['pointsize'] = max($this->options['width'], 3);
 	}
 
-	public function makeStyles() {
+	public function makeStyles(): array {
 		$this
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE)
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->metric['itemid'].'-'.$this->options['order']);
-
-		$line_style = ($this->options['type'] == SVG_GRAPH_TYPE_LINE) ? ['stroke-linejoin' => 'round'] : [];
+			->addClass(CSvgGraphLine::ZBX_STYLE_CLASS)
+			->addClass(CSvgGraphLine::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order']);
 
 		return [
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE => [
+			'.'.CSvgGraphLine::ZBX_STYLE_CLASS => [
 				'fill' => 'none'
 			],
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->metric['itemid'].'-'.$this->options['order'] => [
+			'.'.CSvgGraphLine::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order'] => [
 				'stroke-opacity' => $this->options['transparency'] * 0.1,
 				'stroke' => $this->options['color'],
 				'stroke-width' => $this->options['width']
-			] + $line_style,
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->metric['itemid'].'-'.$this->options['order'].' circle' => [
+			] + ($this->options['type'] == SVG_GRAPH_TYPE_LINE ? ['stroke-linejoin' => 'round'] : []),
+			'.'.CSvgGraphLine::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order'].' circle' => [
 				'fill-opacity' => $this->options['transparency'] * 0.1,
 				'fill' => $this->options['color'],
 				'stroke-width' => 0
@@ -70,7 +69,12 @@ class CSvgGraphLineGroup extends CSvgGroup {
 		];
 	}
 
-	protected function draw() {
+	protected function draw(): void {
+		$this->addItem(
+			(new CSvgCircle(-10, -10, $this->options['width'] + 4))
+				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
+		);
+
 		foreach ($this->paths as $path) {
 			// Draw single data point paths as circles instead of lines.
 			$this->addItem((count($path) > 1)
@@ -81,12 +85,11 @@ class CSvgGraphLineGroup extends CSvgGroup {
 		}
 	}
 
-	public function toString($destroy = true) {
-		$this->setAttribute('data-set', $this->options['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
+	public function toString($destroy = true): string {
+		$this
+			->setAttribute('data-set', $this->options['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
 			->setAttribute('data-metric', CHtml::encode($this->metric['name']))
 			->setAttribute('data-color', $this->options['color'])
-			->addItem((new CSvgCircle(-10, -10, $this->options['width'] + 4))
-				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE))
 			->draw();
 
 		return parent::toString($destroy);

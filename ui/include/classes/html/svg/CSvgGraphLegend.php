@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,31 +21,55 @@
 
 class CSvgGraphLegend extends CDiv {
 
+	private const ZBX_STYLE_CLASS = 'svg-graph-legend';
+
+	private const ZBX_STYLE_GRAPH_LEGEND_SINGLE_ITEM = 'svg-single-item-graph-legend';
+	private const ZBX_STYLE_GRAPH_LEGEND_TWO_ITEMS = 'svg-single-two-items-graph-legend';
+
+	private $labels;
+
+	private $height;
+
 	/**
 	 * @param array  $labels
 	 * @param string $labels[]['name']
 	 * @param string $labels[]['color']
 	 */
-	public function __construct(array $labels = []) {
+	public function __construct(array $labels, int $height) {
 		parent::__construct();
 
-		foreach ($labels as $label) {
-			// border-color is for legend element ::before pseudo element.
-			parent::addItem((new CDiv($label['name']))->setAttribute('style', 'border-color: '.$label['color']));
-		}
+		$this->labels = $labels;
+		$this->height = $height;
+	}
 
-		switch (count($labels)) {
+	private function draw(): void {
+		switch (count($this->labels)) {
 			case 1:
-				$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND_SINGLE_ITEM);
+				$this->addClass(self::ZBX_STYLE_GRAPH_LEGEND_SINGLE_ITEM);
 				break;
 
 			case 2:
-				$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND_TWO_ITEMS);
+				$this->addClass(self::ZBX_STYLE_GRAPH_LEGEND_TWO_ITEMS);
 				break;
 
 			default:
-				$this->addClass(CSvgTag::ZBX_STYLE_GRAPH_LEGEND);
+				$this->addClass(self::ZBX_STYLE_CLASS);
 				break;
 		}
+
+		foreach ($this->labels as $label) {
+			// border-color is for legend element ::before pseudo element.
+			$this->addItem(
+				(new CDiv($label['name']))->setAttribute('style', 'border-color: '.$label['color'])
+			);
+		}
+	}
+
+	public function toString($destroy = true) {
+		$this
+			->setAttribute('style', 'height: '.$this->height.'px')
+			->draw();
+
+		return parent::toString($destroy);
 	}
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -22,15 +22,34 @@
 class CSvg extends CSvgTag {
 
 	public function __construct() {
-		parent::__construct('svg', true);
+		parent::__construct('svg');
+	}
 
+	/**
+	 * Set SVG element width and height.
+	 *
+	 * @param int $width
+	 * @param int $height
+	 *
+	 * @return CSvg
+	 */
+	public function setSize(int $width, int $height): self {
+		$this->setAttribute('width', $width.'px');
+		$this->setAttribute('height', $height.'px');
+
+		return parent::setSize($width, $height);
+	}
+
+	public function toString($destroy = true): string {
 		$this
 			->setAttribute('id', str_replace('.', '', uniqid('svg_', true)))
 			->setAttribute('version', '1.1')
 			->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+		return parent::toString($destroy);
 	}
 
-	protected function startToString() {
+	protected function startToString(): string {
 		if (!$this->styles) {
 			return parent::startToString();
 		}
@@ -51,18 +70,5 @@ class CSvg extends CSvgTag {
 		$styles = (new CTag('style', true, $styles))->toString();
 
 		return parent::startToString().$styles;
-	}
-
-	/**
-	 * Set SVG element width and height.
-	 *
-	 * @param int $width
-	 * @param int $height
-	 */
-	public function setSize($width, $height) {
-		$this->setAttribute('width', $width.'px');
-		$this->setAttribute('height', $height.'px');
-
-		return parent::setSize($width, $height);
 	}
 }

@@ -131,12 +131,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_data_source->getName()] = $field_data_source;
 
 		// Simple triggers.
-		$field_simple_triggers = (new CWidgetFieldRadioButtonList('simple_triggers', _('Simple triggers'), [  //TODO: 6940 translation string
-			SVG_GRAPH_SIMPLE_TRIGGERS_ON => _('On'),
-			SVG_GRAPH_SIMPLE_TRIGGERS_OFF => _('Off')
-		]))
-			->setDefault(SVG_GRAPH_SIMPLE_TRIGGERS_OFF)
-			->setModern(true);
+		$field_simple_triggers = new CWidgetFieldCheckBox('simple_triggers', _('Simple triggers'));
 
 		if (array_key_exists('simple_triggers', $this->data)) {
 			$field_simple_triggers->setValue($this->data['simple_triggers']);
@@ -145,12 +140,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_simple_triggers->getName()] = $field_simple_triggers;
 
 		// Working time.
-		$field_working_time = (new CWidgetFieldRadioButtonList('working_time', _('Working time'), [  //TODO: 6940 translation string
-			SVG_GRAPH_WORKING_TIME_ON => _('On'),
-			SVG_GRAPH_WORKING_TIME_OFF => _('Off')
-		]))
-			->setDefault(SVG_GRAPH_WORKING_TIME_OFF)
-			->setModern(true);
+		$field_working_time = new CWidgetFieldCheckBox('working_time', _('Working time'));
 
 		if (array_key_exists('working_time', $this->data)) {
 			$field_working_time->setValue($this->data['working_time']);
@@ -159,12 +149,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_working_time->getName()] = $field_working_time;
 
 		// Percentile line left.
-		$field_percentile_left = (new CWidgetFieldRadioButtonList('percentile_left', _('Percentile line (left)'), [  //TODO: 6940 translation string
-			SVG_GRAPH_PERCENTILE_LEFT_ON => _('On'),
-			SVG_GRAPH_PERCENTILE_LEFT_OFF => _('Off')
-		]))
-			->setDefault(SVG_GRAPH_PERCENTILE_LEFT_OFF)
-			->setModern(true);
+		$field_percentile_left = new CWidgetFieldCheckBox('percentile_left', _('Percentile line (left)'));
 
 		if (array_key_exists('percentile_left', $this->data)) {
 			$field_percentile_left->setValue($this->data['percentile_left']);
@@ -187,12 +172,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_percentile_left_value->getName()] = $field_percentile_left_value;
 
 		// Percentile line right.
-		$field_percentile_right = (new CWidgetFieldRadioButtonList('percentile_right', _('Percentile line (right)'), [  //TODO: 6940 translation string
-			SVG_GRAPH_PERCENTILE_RIGHT_ON => _('On'),
-			SVG_GRAPH_PERCENTILE_RIGHT_OFF => _('Off')
-		]))
-			->setDefault(SVG_GRAPH_PERCENTILE_RIGHT_OFF)
-			->setModern(true);
+		$field_percentile_right = new CWidgetFieldCheckBox('percentile_right', _('Percentile line (right)'));
 
 		if (array_key_exists('percentile_right', $this->data)) {
 			$field_percentile_right->setValue($this->data['percentile_right']);

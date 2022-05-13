@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,9 +21,11 @@
 
 class CSvgGraphArea extends CSvgGraphLine {
 
-	protected $y_zero;
+	public const ZBX_STYLE_CLASS = 'svg-graph-area';
 
-	public function __construct($path, $metric, $y_zero = 0) {
+	private $y_zero;
+
+	public function __construct(array $path, array $metric, int $y_zero = 0) {
 		parent::__construct($path, $metric);
 
 		$this->y_zero = $y_zero;
@@ -33,13 +35,13 @@ class CSvgGraphArea extends CSvgGraphLine {
 		];
 	}
 
-	public function makeStyles() {
+	public function makeStyles(): array {
 		$this
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA)
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order']);
+			->addClass(self::ZBX_STYLE_CLASS)
+			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order']);
 
 		return [
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order'] => [
+			'.'.self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order'] => [
 				'fill-opacity' => $this->options['fill'] * 0.1,
 				'fill' => $this->options['color'],
 				'stroke-opacity' => 0.1,
@@ -49,8 +51,8 @@ class CSvgGraphArea extends CSvgGraphLine {
 		];
 	}
 
-	protected function draw() {
-		$path = parent::draw();
+	protected function draw(): void {
+		parent::draw();
 
 		if ($this->path) {
 			$first_point = reset($this->path);
@@ -60,7 +62,5 @@ class CSvgGraphArea extends CSvgGraphLine {
 				->lineTo($first_point[0], $this->y_zero)
 				->closePath();
 		}
-
-		return $path;
 	}
 }

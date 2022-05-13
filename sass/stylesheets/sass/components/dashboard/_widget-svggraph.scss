@@ -9,6 +9,82 @@
 		table {
 			width: initial;
 		}
+
+		.dataset-head {
+			display: grid;
+			grid-template-columns: 24px 24px 1fr 1fr 24px;
+			grid-gap: 10px;
+		}
+
+		.dataset-body {
+			display: grid;
+			grid-template-columns: 24px 1fr 1fr 24px;
+			grid-gap: 10px;
+			align-items: start;
+			position: relative;
+			margin-top: 10px;
+
+			.form-grid {
+				padding-top: 0;
+
+				&:first-child {
+					grid-column-start: 2;
+				}
+			}
+		}
+
+		.drag-icon {
+			position: absolute;
+			left: -14px;
+		}
+
+		.dataset-actions {
+			text-align: right;
+
+			.btn-remove {
+				top: 0;
+				right: 0;
+				vertical-align: baseline;
+			}
+		}
+
+		.items-list {
+			grid-column: 2 / span 3;
+		}
+
+		.list-vertical-accordion {
+			position: relative;
+			margin-left: 15px;
+			padding-left: 0;
+		}
+
+		.list-accordion-item {
+			position: relative;
+			margin-bottom: 10px;
+
+			&.list-accordion-item-opened {
+				&::before {
+					content: ' ';
+					position: absolute;
+					top: 24px;
+					bottom: 0;
+					left: 11px;
+					width: 2px;
+					background: $ui-border-color;
+				}
+			}
+
+			&.list-accordion-item-closed {
+				.multiselect {
+					height: 24px;
+					overflow: hidden;
+				}
+
+				.dataset-body {
+					display: none;
+				}
+			}
+		}
 	}
 }
 

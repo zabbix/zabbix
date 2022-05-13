@@ -43,6 +43,7 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/range-control";
 @import "components/service/info";
 @import "components/subfilter";
+@import "components/svg-graph";
 @import "components/tabfilter";
 @import "components/toc";
 @import "components/z-bar-gauge";
@@ -3127,7 +3128,7 @@ $form-icon-btn: (
 
 	&.modal-popup {
 		top: 0; //top: 50px; TODO: 6940
-		max-width: 1024px;
+		max-width: 1120px;
 
 		&.modal-popup-small {
 			max-width: 450px;
@@ -3703,10 +3704,6 @@ $form-icon-btn: (
 	stroke: $red;
 	stroke-width: 2px;
 }
-.svg-point-highlight {
-	fill: $font-color !important;
-	fill-opacity: .5 !important;
-}
 
 .svg-graph-preview {
 	margin-top: 10px;
@@ -3723,10 +3720,6 @@ $form-icon-btn: (
 		top: 0;
 		z-index: 3; // More than z-index of form controls, less than z-index of .msg-*.
 	}
-}
-
-.svg-graph {
-	display: block;
 }
 
 .svg-single-item-graph-legend,
@@ -4824,13 +4817,10 @@ svg {
 }
 
 .list-vertical-accordion {
-	display: table;
 	padding-left: 15px;
 	width: calc(100% - 15px);
 
 	.list-accordion-item {
-		display: table-row;
-
 		.btn-remove {
 			position: relative;
 			right: -10px;
@@ -4843,19 +4833,30 @@ svg {
 		padding-bottom: 2px;
 	}
 
+	.list-accordion-item-opened {
+		.list-accordion-item-body {
+			display: block;
+		}
+
+		.list-accordion-item-toggle {
+			@extend .btn-widget-collapse;
+			margin: 0;
+		}
+	}
+
 	.list-accordion-item-closed {
-		.multiselect {
-			height: 24px;
-			overflow: hidden;
-		}
-
-		.list-accordion-item-head {
-			margin-bottom: 5px;
-		}
-
 		.list-accordion-item-body {
 			display: none;
 		}
+
+		.list-accordion-item-toggle {
+			@extend .btn-widget-expand;
+			margin: 0;
+		}
+	}
+
+	.list-accordion-item-toggle {
+		text-indent: -9999px;
 	}
 }
 
@@ -5954,6 +5955,7 @@ button {
 
 .btn-toggle-chevron {
 	position: relative;
+	text-indent: -9999px;
 
 	&[aria-expanded="true"] {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
@@ -6152,10 +6154,6 @@ button {
 	&.list-accordion-item-closed {
 		.interface-btn-toggle {
 			@extend .btn-widget-expand;
-		}
-
-		.list-accordion-item-body {
-			display: none;
 		}
 	}
 

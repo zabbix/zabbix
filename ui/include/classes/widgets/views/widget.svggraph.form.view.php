@@ -104,11 +104,11 @@ function getDisplayOptionsTab(array $fields): CDiv {
 				])
 				->addItem([
 					CWidgetHelper::getLabel($fields['simple_triggers']),
-					new CFormField(CWidgetHelper::getRadioButtonList($fields['simple_triggers']))
+					new CFormField(CWidgetHelper::getCheckBox($fields['simple_triggers']))
 				])
 				->addItem([
 					CWidgetHelper::getLabel($fields['working_time']),
-					new CFormField(CWidgetHelper::getRadioButtonList($fields['working_time']))
+					new CFormField(CWidgetHelper::getCheckBox($fields['working_time']))
 				])
 		)
 		->addItem(
@@ -116,14 +116,14 @@ function getDisplayOptionsTab(array $fields): CDiv {
 				->addItem([
 					CWidgetHelper::getLabel($fields['percentile_left']),
 					new CFormField([
-						CWidgetHelper::getRadioButtonList($fields['percentile_left'])->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						CWidgetHelper::getCheckBox($fields['percentile_left']),
 						CWidgetHelper::getTextBox($fields['percentile_left_value'])
 					])
 				])
 				->addItem([
 					CWidgetHelper::getLabel($fields['percentile_right']),
 					new CFormField([
-						CWidgetHelper::getRadioButtonList($fields['percentile_right'])->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						CWidgetHelper::getCheckBox($fields['percentile_right']),
 						CWidgetHelper::getTextBox($fields['percentile_right_value'])
 					])
 				])
@@ -140,16 +140,16 @@ function getTimePeriodTab(array $fields): CFormGrid {
 			CWidgetHelper::getLabel($fields['time_from']),
 			new CFormField(
 				CWidgetHelper::getDatePicker($fields['time_from'])
-					->setDateFormat(DATE_TIME_FORMAT_SECONDS)
-					->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
+					->setDateFormat(ZBX_FULL_DATE_TIME)
+					->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 			)
 		])
 		->addItem([
 			CWidgetHelper::getLabel($fields['time_to']),
 			new CFormField(
 				CWidgetHelper::getDatePicker($fields['time_to'])
-					->setDateFormat(DATE_TIME_FORMAT_SECONDS)
-					->setPlaceholder(DATE_TIME_FORMAT_SECONDS_PLACEHOLDER)
+					->setDateFormat(ZBX_FULL_DATE_TIME)
+					->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 			)
 		]);
 }

@@ -1072,6 +1072,11 @@ define('AGGREGATE_SUM',		5);
 define('AGGREGATE_FIRST',	6);
 define('AGGREGATE_LAST',	7);
 
+define('APPROXIMATION_MIN',	1);
+define('APPROXIMATION_AVG',	2);
+define('APPROXIMATION_MAX',	4);
+define('APPROXIMATION_ALL',	7);
+
 define('GRAPH_AGGREGATE_BY_ITEM',		0);
 define('GRAPH_AGGREGATE_BY_DATASET',	1);
 
@@ -1102,9 +1107,13 @@ define('SVG_GRAPH_TYPE_POINTS',		1);
 define('SVG_GRAPH_TYPE_STAIRCASE',	2);
 define('SVG_GRAPH_TYPE_BAR',		3);
 
-define('SVG_GRAPH_MISSING_DATA_NONE',			 0);
-define('SVG_GRAPH_MISSING_DATA_CONNECTED',		 1);
-define('SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO',	 2);
+define('SVG_GRAPH_STACKED_OFF',	0);
+define('SVG_GRAPH_STACKED_ON',	1);
+
+define('SVG_GRAPH_MISSING_DATA_NONE',			0);
+define('SVG_GRAPH_MISSING_DATA_CONNECTED',		1);
+define('SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO',	2);
+define('SVG_GRAPH_MISSING_DATA_LAST_KNOWN',		3);
 
 define('SVG_GRAPH_DATA_SOURCE_AUTO',	0);
 define('SVG_GRAPH_DATA_SOURCE_HISTORY',	1);
@@ -1926,6 +1935,7 @@ define('ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED', 'list-accordion-item-opened');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED', 'list-accordion-item-closed');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD', 'list-accordion-item-head');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_BODY', 'list-accordion-item-body');
+define('ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE', 'list-accordion-item-toggle');
 define('ZBX_STYLE_LOCAL_CLOCK', 'local-clock');
 define('ZBX_STYLE_LOG_NA_BG', 'log-na-bg');
 define('ZBX_STYLE_LOG_INFO_BG', 'log-info-bg');

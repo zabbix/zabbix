@@ -934,6 +934,7 @@ class CWidgetHelper {
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_NONE => _('None'),
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_CONNECTED => _x('Connected', 'missing data function'),
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO => _x('Treat as 0', 'missing data function'),
+			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_LAST_KNOWN => _x('Last known', 'missing data function'),
 			'axisy' => _('Y-axis'),
 			'axisy'.GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 			'axisy'.GRAPH_YAXIS_SIDE_RIGHT => _('Right'),
@@ -1009,6 +1010,7 @@ class CWidgetHelper {
 						['name' => _('Missing data').'/'._('None'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_NONE]],
 						['name' => _('Missing data').'/'._x('Connected', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_CONNECTED]],
 						['name' => _('Missing data').'/'._x('Treat as 0', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO]],
+						['name' => _('Missing data').'/'._x('Last known', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_LAST_KNOWN]],
 
 						['name' => _('Y-axis').'/'._('Left'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_LEFT]],
 						['name' => _('Y-axis').'/'._('Right'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_RIGHT]],
@@ -1140,80 +1142,101 @@ class CWidgetHelper {
 	 * @return CListItem
 	 */
 	private static function getGraphDataSetLayout($field_name, array $value, $form_name, $row_num, $is_opened) {
-		return (new CListItem([
-			// Accordion head - data set selection fields and tools.
-			(new CDiv([
-				(new CDiv())
-					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('position: absolute; margin-left: -25px;'),
-				(new CDiv([
-					(new CDiv([
-						(new CButton())
-							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
-							->addStyle('background-color: #'.$value['color'].';')
-							->setAttribute('title', $is_opened ? _('Collapse') : _('Expand'))
-							->removeId(),
-						(new CPatternSelect([
-							'name' => $field_name.'['.$row_num.'][hosts][]',
-							'object_name' => 'hosts',
-							'data' => $value['hosts'],
-							'placeholder' => _('host pattern'),
-							'popup' => [
-								'parameters' => [
-									'srctbl' => 'hosts',
-									'srcfld1' => 'host',
-									'dstfrm' => $form_name,
-									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
-								]
-							],
-							'add_post_js' => false
-						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					]))->addClass(ZBX_STYLE_COLUMN_50),
-					(new CDiv(
-						(new CPatternSelect([
-							'name' => $field_name.'['.$row_num.'][items][]',
-							'object_name' => 'items',
-							'data' => $value['items'],
-							'placeholder' => _('item pattern'),
-							'popup' => [
-								'parameters' => [
-									'srctbl' => 'items',
-									'srcfld1' => 'name',
-									'real_hosts' => 1,
-									'numeric' => 1,
-									'webitems' => 1,
-									'dstfrm' => $form_name,
-									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
-								]
-							],
-							'add_post_js' => false
-						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					))->addClass(ZBX_STYLE_COLUMN_50)
-				]))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
-					->addClass(ZBX_STYLE_COLUMN_95),
-				(new CDiv([
-					(new CButton())
-						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_BTN_REMOVE)
-						->removeId()
-				]))->addClass(ZBX_STYLE_COLUMN_5)
-			]))
-				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
-				->addClass(ZBX_STYLE_COLUMNS),
+		$dataset = 0;
 
-			// Accordion body - data set configuration options.
-			(new CDiv(
-				(new CDiv([
-					// Left column fields.
-					(new CDiv(
-						(new CFormList())
-							->addRow(_('Base color'),
-								(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
-									->appendColorPickerJs(false)
-							)
-							->addRow(_('Draw'),
+		$dataset_head = [
+			new CDiv((new CSimpleButton('&nbsp;'))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE))
+		];
+
+		if ($dataset == 1) {
+			$dataset_head = array_merge($dataset_head, [
+				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))->appendColorPickerJs(false),
+				(new CPatternSelect([
+					'name' => $field_name.'['.$row_num.'][hosts][]',
+					'object_name' => 'hosts',
+					'data' => $value['hosts'],
+					'placeholder' => _('host pattern'),
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'hosts',
+							'srcfld1' => 'host',
+							'dstfrm' => $form_name,
+							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
+						]
+					],
+					'add_post_js' => false
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				(new CPatternSelect([
+					'name' => $field_name.'['.$row_num.'][items][]',
+					'object_name' => 'items',
+					'data' => $value['items'],
+					'placeholder' => _('item pattern'),
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'items',
+							'srcfld1' => 'name',
+							'real_hosts' => 1,
+							'numeric' => 1,
+							'webitems' => 1,
+							'dstfrm' => $form_name,
+							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
+						]
+					],
+					'add_post_js' => false
+				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			]);
+		}
+		else {
+			$items_list = (new CTable())
+				->setId('itemsTable')
+				->setColumns([
+					(new CTableColumn())->addClass('table-col-handle'),
+					(new CTableColumn())->addClass('table-col-no'),
+					(new CTableColumn(_('Color')))->addClass('table-col-colour'),
+					(new CTableColumn(_('Name')))->addClass('table-col-name'),
+					(new CTableColumn(_('Action')))->addClass('table-col-action')
+				])
+				->addItem(
+					(new CTag('tfoot', true))
+						->addItem(
+							(new CCol(
+								(new CList())
+									->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
+									->addItem(
+										(new CSimpleButton(_('Add')))
+											->addClass(ZBX_STYLE_BTN_LINK)
+											->addClass('js-add-item')
+									)
+							))->setColSpan(5)
+						)
+				);
+
+			$dataset_head = array_merge($dataset_head, [
+				(new CDiv($items_list))->addClass('items-list table-forms-separator')
+			]);
+		}
+
+		$dataset_head[] = (new CDiv(
+			(new CButton())
+				->setAttribute('title', _('Delete'))
+				->addClass(ZBX_STYLE_BTN_REMOVE)
+				->removeId()
+		))->addClass('dataset-actions');
+
+		return (new CListItem([
+			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+			(new CDiv())
+				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
+				->addClass('dataset-head')
+				->addItem($dataset_head),
+			(new CDiv())
+				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
+				->addClass('dataset-body')
+				->addItem([
+					(new CFormGrid())
+						->addItem([
+							new CLabel(_('Draw')),
+							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][type]', (int) $value['type']))
 									->addValue(_('Line'), SVG_GRAPH_TYPE_LINE)
 									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
@@ -1222,7 +1245,18 @@ class CWidgetHelper {
 									->onChange('changeDataSetDrawType(this)')
 									->setModern(true)
 							)
-							->addRow(_('Width'),
+						])
+						->addItem([
+							new CLabel(_('Stacked'), $field_name.'['.$row_num.'][stacked]'),
+							new CFormField([
+								(new CVar($field_name.'['.$row_num.'][stacked]', '0'))->removeId(),
+								(new CCheckBox($field_name.'['.$row_num.'][stacked]'))
+									->setChecked((bool) $value['stacked'])
+							])
+						])
+						->addItem([
+							new CLabel(_('Width')),
+							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -1230,7 +1264,10 @@ class CWidgetHelper {
 									->setMin(0)
 									->setMax(10)
 							)
-							->addRow(_('Point size'),
+						])
+						->addItem([
+							new CLabel(_('Point size')),
+							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -1238,16 +1275,22 @@ class CWidgetHelper {
 									->setMin(1)
 									->setMax(10)
 							)
-							->addRow(_('Transparency'),
+						])
+						->addItem([
+							new CLabel(_('Transparency')),
+							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
-										(int) $value['transparency'])
-									)
+									(int) $value['transparency'])
+								)
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
 							)
-							->addRow(_('Fill'),
+						])
+						->addItem([
+							new CLabel(_('Fill')),
+							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -1255,17 +1298,14 @@ class CWidgetHelper {
 									->setMin(0)
 									->setMax(10)
 							)
-						)
-					)
-						->addClass(ZBX_STYLE_COLUMN_50),
-
-					// Right column fields.
-					(new CDiv(
-						(new CFormList())
-							->addRow(_('Missing data'),
+						]),
+					(new CFormGrid())
+						->addItem([
+							new CLabel(_('Missing data')),
+							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][missingdatafunc]',
-										(int) $value['missingdatafunc'])
-									)
+									(int) $value['missingdatafunc'])
+								)
 									->addValue(_('None'), SVG_GRAPH_MISSING_DATA_NONE)
 									->addValue(_x('Connected', 'missing data function'),
 										SVG_GRAPH_MISSING_DATA_CONNECTED
@@ -1273,24 +1313,35 @@ class CWidgetHelper {
 									->addValue(_x('Treat as 0', 'missing data function'),
 										SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO
 									)
+									->addValue(_x('Last known', 'missing data function'),
+										SVG_GRAPH_MISSING_DATA_LAST_KNOWN
+									)
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setModern(true)
 							)
-							->addRow(_('Y-axis'),
+						])
+						->addItem([
+							new CLabel(_('Y-axis')),
+							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][axisy]', (int) $value['axisy']))
 									->addValue(_('Left'), GRAPH_YAXIS_SIDE_LEFT)
 									->addValue(_('Right'), GRAPH_YAXIS_SIDE_RIGHT)
 									->setModern(true)
 							)
-							->addRow(_('Time shift'),
+						])
+						->addItem([
+							new CLabel(_('Time shift'), $field_name.'['.$row_num.'][timeshift]'),
+							new CFormField(
 								(new CTextBox($field_name.'['.$row_num.'][timeshift]', $value['timeshift']))
 									->setAttribute('placeholder', _('none'))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(
-								new CLabel(_('Aggregation function'),
-									'label-'.$field_name.'_'.$row_num.'_aggregate_function'
-								),
+						])
+						->addItem([
+							new CLabel(_('Aggregation function'),
+								'label-'.$field_name.'_'.$row_num.'_aggregate_function'
+							),
+							new CFormField(
 								(new CSelect($field_name.'['.$row_num.'][aggregate_function]'))
 									->setId($field_name.'_'.$row_num.'_aggregate_function')
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
@@ -1307,18 +1358,22 @@ class CWidgetHelper {
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(_('Aggregation interval'),
-								(new CTextBox(
-									$field_name.'['.$row_num.'][aggregate_interval]',
+						])
+						->addItem([
+							new CLabel(_('Aggregation interval'), $field_name.'['.$row_num.'][aggregate_interval]'),
+							new CFormField(
+								(new CTextBox($field_name.'['.$row_num.'][aggregate_interval]',
 									$value['aggregate_interval']
 								))
 									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
 									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(_('Aggregate'),
-								(new CRadioButtonList(
-									$field_name.'['.$row_num.'][aggregate_grouping]',
+						])
+						->addItem([
+							new CLabel(_('Aggregate')),
+							new CFormField(
+								(new CRadioButtonList($field_name.'['.$row_num.'][aggregate_grouping]',
 									(int) $value['aggregate_grouping'])
 								)
 									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
@@ -1326,15 +1381,26 @@ class CWidgetHelper {
 									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
 									->setModern(true)
 							)
-					))
-						->addClass(ZBX_STYLE_COLUMN_50)
-				]))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
-					->addClass(ZBX_STYLE_COLUMN_95)
-			))
-				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
-				->addClass(ZBX_STYLE_COLUMNS)
+						])
+						->addItem([
+							new CLabel(_('Approximation'),
+								'label-'.$field_name.'_'.$row_num.'_approximation'
+							),
+							new CFormField(
+								(new CSelect($field_name.'['.$row_num.'][approximation]'))
+									->setId($field_name.'_'.$row_num.'_approximation')
+									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_approximation')
+									->setValue((int) $value['approximation'])
+									->addOptions(CSelect::createOptionsFromArray([
+										APPROXIMATION_ALL =>_('all'),
+										APPROXIMATION_MIN =>_('min'),
+										APPROXIMATION_AVG =>_('avg'),
+										APPROXIMATION_MAX =>_('max')
+									]))
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+						])
+				])
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
 			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED);
@@ -1424,6 +1490,7 @@ class CWidgetHelper {
 						jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);
 						jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
 						jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
+						jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
 						break;
 					case "'.SVG_GRAPH_TYPE_BAR.'":
 						jQuery("#ds_" + row_num + "_width").rangeControl("disable");
@@ -1433,6 +1500,7 @@ class CWidgetHelper {
 						jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);
 						jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
 						jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
+						jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
 						break;
 					default:
 						jQuery("#ds_" + row_num + "_width").rangeControl("enable");
@@ -1442,6 +1510,7 @@ class CWidgetHelper {
 						jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);
 						jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);
 						jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);
+						jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", false);
 						break;
 				}
 			};
