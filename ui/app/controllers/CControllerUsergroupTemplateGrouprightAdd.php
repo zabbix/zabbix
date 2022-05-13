@@ -23,7 +23,7 @@ class CControllerUsergroupTemplateGrouprightAdd extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'templategroup_rights' => 'required|array',
+			'templategroup_rights'    => 'required|array',
 			'new_templategroup_right' => 'required|array'
 		];
 
@@ -65,9 +65,7 @@ class CControllerUsergroupTemplateGrouprightAdd extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'templategroup_rights' => collapseGroupRights(applyTemplateGroupRights(
-				$this->getInput('templategroup_rights'),
-				$templategroup_groupids,
-				$templategroup_subgroupids,
+				$this->getInput('templategroup_rights'), $templategroup_groupids, $templategroup_subgroupids,
 				$new_templategroup_right['permission']
 			)),
 			'user' => [

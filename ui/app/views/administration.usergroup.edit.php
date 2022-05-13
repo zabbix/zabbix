@@ -115,8 +115,8 @@ $template_permissions_form_grid = new CFormGrid();
 $template_permissions_form_grid->addItem([
 	new CLabel(_('Permissions')),
 	new CFormField((new CDiv(new CPartial('administration.usergroup.templategrouprights.html', [
-	'templategroup_rights' => $data['templategroup_rights']
-])))
+		'templategroup_rights' => $data['templategroup_rights']
+	])))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
 ]);

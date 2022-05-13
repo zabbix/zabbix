@@ -23,22 +23,22 @@ class CControllerUsergroupCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>					'required|not_empty|db usrgrp.name',
-			'userids' =>				'array_db users.userid',
-			'gui_access' =>				'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
-			'users_status' =>			'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
-			'debug_mode' =>				'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
-			'userdirectoryid' =>		'db usrgrp.userdirectoryid',
+			'name' =>						'required|not_empty|db usrgrp.name',
+			'userids' =>					'array_db users.userid',
+			'gui_access' =>					'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
+			'users_status' =>				'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'debug_mode' =>					'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
+			'userdirectoryid' =>			'db usrgrp.userdirectoryid',
 
-			'group_rights' =>			'array',
-			'templategroup_rights' => 	'array',
-			'tag_filters' =>			'array',
+			'group_rights' =>				'array',
+			'templategroup_rights' => 		'array',
+			'tag_filters' =>				'array',
 
-			'new_group_right' =>		'array',
-			'new_templategroup_right' =>'array',
-			'new_tag_filter' =>			'array',
+			'new_group_right' =>			'array',
+			'new_templategroup_right' =>	'array',
+			'new_tag_filter' =>				'array',
 
-			'form_refresh' =>			'int32'
+			'form_refresh' =>				'int32'
 		];
 
 		$ret = $this->validateInput($fields);

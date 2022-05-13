@@ -40,13 +40,9 @@ class CControllerUsergroupGrouprightAdd extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$this->setResponse((new CControllerResponseData([
+				'main_block' => json_encode(['messages' => getMessages()->toString()])
+			]))->disableView());
 		}
 
 		return $ret;
