@@ -35,7 +35,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 	// List of items to check.
 	private static $items = [
-		/*[
+		[
 			'key' => 'agent.ping',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT
@@ -219,29 +219,25 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'system.cpu.util[,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.5,
-			'compareType' => self::COMPARE_AVERAGE
+			'threshold' => 0.5
 		],
 		[
 			'key' => 'system.cpu.load[,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.5,
-			'compareType' => self::COMPARE_AVERAGE
+			'threshold' => 0.5
 		],
 		[
 			'key' => 'vfs.dev.read[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 10,
-			'compareType' => self::COMPARE_AVERAGE
+			'threshold' => 10
 		],
 		[
 			'key' => 'vfs.dev.write[,operations]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100,
-			'compareType' => self::COMPARE_AVERAGE
+			'threshold' => 100
 		],
 		[
 			'key' => 'proc.cpu.util[,,,,avg1]',
@@ -268,8 +264,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'proc.mem[zabbix_server,zabbix,avg]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 100.0,
-			'compareType' => self::COMPARE_AVERAGE
+			'threshold' => 100.0
 		],
 		[
 			'key' => 'web.page.perf[http://localhost]',
@@ -282,15 +277,13 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'net.tcp.service.perf[ssh]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.05,
-			'compareType' => self::COMPARE_AVERAGE
+			'threshold' => 0.05
 		],
 		[
 			'key' => 'net.udp.service.perf[ntp]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.05,
-			'compareType' => self::COMPARE_AVERAGE
+			'threshold' => 0.05
 		],
 		[
 			'key' => 'system.swap.size[,total]',
@@ -305,14 +298,14 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
 			'threshold' => 0.1,
 			'compareType' => self::COMPARE_AVERAGE
-		],*/
+		],
 		[
 			'key' => 'vfs.fs.size[/tmp,free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 262144,
+			'threshold' => 10000000,
 			'compareType' => self::COMPARE_AVERAGE
-		]/*,
+		],
 		[
 			'key' => 'vm.memory.size[free]',
 			'type' => ITEM_TYPE_ZABBIX,
@@ -325,9 +318,8 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'zabbix.stats[127.0.0.1,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'threshold' => 50,
-			'compareType' => self::COMPARE_AVERAGE
-		]*/
+			'threshold' => 50
+		]
 	];
 
 	/**
@@ -562,26 +554,17 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			case ITEM_VALUE_TYPE_UINT64:
 				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
 					$value = [];
-					print_r("\n");
 					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
 						$value[$component] = 0;
 						$records = count($values[$component]);
 
-						print_r($values[$component]);
-						print_r("\n");
-
-
 						if ($records > 0) {
 							$value[$component] = array_sum($values[$component]) / $records;
-							print_r($value[$component]);
-							print_r("\n");
 						}
 					}
 
 					$a = $value[self::COMPONENT_AGENT];
 					$b = $value[self::COMPONENT_AGENT2];
-					print_r("\n");
-					print("AKDBG  records ".$records." ".$a." ".$b." ".abs(abs($a) - abs($b))."\n");
 				}
 				else {
 					$a = end($values[self::COMPONENT_AGENT]);
