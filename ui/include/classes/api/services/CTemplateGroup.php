@@ -555,7 +555,7 @@ class CTemplateGroup extends CApiService {
 
 		$db_uuid = DB::select('hstgrp', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($groups_to_create, 'uuid')],
+			'filter' => ['uuid' => array_column($groups_to_create, 'uuid'), 'type' => HOST_GROUP_TYPE_TEMPLATE_GROUP],
 			'limit' => 1
 		]);
 
