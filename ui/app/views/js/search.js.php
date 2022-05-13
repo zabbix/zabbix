@@ -33,6 +33,7 @@
 
 			document.addEventListener('click', (e) => {
 				const group_link = e.target.closest('a');
+
 				if (group_link !== null) {
 					if (group_link.classList.contains('js-edit-templategroup')) {
 						e.preventDefault();

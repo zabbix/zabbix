@@ -160,6 +160,7 @@
 					if (typeof permission !== 'undefined') {
 						obj[Object.keys(obj)[0]].permission = permission;
 					}
+
 					return obj;
 				})
 			);
@@ -329,8 +330,9 @@
 		}
 
 		/**
-		 * Collects template data, sends to controller for processing. On success, permissions table is updated and form objects
-		 * are removed from DOM. On failure error message is displayed. During request, loader is displayed.
+		 * Collects template data, sends to controller for processing. On success, permissions table is updated and
+		 * form objects are removed from DOM. On failure error message is displayed. During request, loader is
+		 * displayed.
 		 *
 		 * @param {string} action
 		 */

@@ -46,10 +46,10 @@
 		initActionButtons() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-hostgroup')) {
-					this.submit(e);
+					this.submit();
 				}
 				else if (e.target.classList.contains('js-update-hostgroup')) {
-					this.submit(e);
+					this.submit();
 				}
 				else if (e.target.classList.contains('js-clone-hostgroup')) {
 					this.clone();
@@ -60,9 +60,7 @@
 			});
 		},
 
-		submit(e) {
-			e.preventDefault()
-
+		submit() {
 			const fields = getFormFields(this.form);
 
 			if (this.groupid !== null) {
@@ -82,7 +80,7 @@
 			const create_url = new Curl('zabbix.php', false);
 			create_url.setArgument('action', 'hostgroup.create');
 
-			const curl = this.groupid !== null ? update_url : create_url;
+			const curl = this.groupid === null ? create_url : update_url;
 
 			this._post(curl.getUrl(), fields, (response) => {
 				postMessageOk(response.success.title);
@@ -195,7 +193,6 @@
 				const submit_button = view.form.querySelector('.tfoot-buttons button[type="submit"]');
 
 				view.setLoading(submit_button);
-				view.submit(event);
 			}
 		}
 }
