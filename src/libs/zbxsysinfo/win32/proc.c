@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 
 #include <tlhelp32.h>
+#include "sddl.h"
 
 #include "zbxsymbols.h"
 #include "log.h"
@@ -599,7 +600,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 					proc_data->name = zbx_strdup(NULL, baseName);
 					proc_data->tid = te32.th32ThreadID;
 					proc_data->sid = zbx_strdup(NULL, sid);
-					proc_data->user = zbx_strdup(NULL, userName);
+					proc_data->user = zbx_strdup(NULL, uname);
 
 					zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 				}
@@ -620,7 +621,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data->name = zbx_strdup(NULL, baseName);
 			proc_data->threads = pe32.cntThreads;
 			proc_data->sid = zbx_strdup(NULL, sid);
-			proc_data->user = zbx_strdup(NULL, userName);
+			proc_data->user = zbx_strdup(NULL, uname);
 
 			if (FALSE != GetProcessHandleCount(hProcess, &handleCount))
 				proc_data->handles = (zbx_uint64_t)handleCount;
