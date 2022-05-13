@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/uri"
 )
 
 func TestConnManager_closeUnused(t *testing.T) {

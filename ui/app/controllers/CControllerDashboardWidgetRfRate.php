@@ -57,6 +57,6 @@ class CControllerDashboardWidgetRfRate extends CController {
 			$this->getInput('widgetid')
 		);
 
-		$this->setResponse(new CControllerResponseData(['main_block' => '']));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
 	}
 }

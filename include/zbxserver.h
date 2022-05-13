@@ -56,31 +56,30 @@
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
 
-#define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
+typedef void (*zbx_get_zabbix_stats_ext_func_t)(struct zbx_json *json);
 
-int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
-		const zbx_timespec_t *ts, char **error);
-
-int	zbx_is_trigger_function(const char *name, size_t len);
-
-int	substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
+int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
 		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);
 
-int	substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
-		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
-		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
-		const DB_SERVICE *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);
+int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const DB_EVENT *event,
+		const DB_EVENT *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host,
+		const DC_ITEM *dc_item, const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack,
+		const zbx_service_alarm_t *service_alarm, const DB_SERVICE *service, const char *tz, char **data,
+		int macro_type, char *error, int maxerrlen);
 
-void	evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
+void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
 		const DC_ITEM *history_items, const int *history_errcodes);
-void	prepare_triggers(DC_TRIGGER **triggers, int triggers_num);
+void	zbx_prepare_triggers(DC_TRIGGER **triggers, int triggers_num);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
 void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
+
+void	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext_func_t cb);
+void	zbx_get_zabbix_stats(struct zbx_json *json);
 
 #define ZBX_EXPRESSION_NORMAL		0
 #define ZBX_EXPRESSION_AGGREGATE	1
@@ -122,21 +121,22 @@ int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
 #define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
 
-int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
-		int flags, char *error, size_t max_error_len);
-int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, int macro_type, char *error, size_t maxerrlen);
-int	substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
+int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
+		const zbx_vector_ptr_t *lld_macro_paths, int flags, char *error, size_t max_error_len);
+int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
 		char *error, size_t maxerrlen);
-int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
+int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
+		char *error, size_t maxerrlen);
+int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len);
-int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+int	zbx_substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
-int	substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
+int	zbx_substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
-int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
+int	zbx_substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,

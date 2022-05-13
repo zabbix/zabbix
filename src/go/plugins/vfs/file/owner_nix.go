@@ -30,7 +30,7 @@ import (
 	"strconv"
 	"syscall"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 // Export -

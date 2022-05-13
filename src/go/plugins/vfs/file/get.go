@@ -25,7 +25,7 @@ import (
 	"os"
 	"time"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type jsTimeLoc time.Time

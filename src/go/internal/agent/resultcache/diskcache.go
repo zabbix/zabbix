@@ -28,11 +28,11 @@ import (
 	"sync/atomic"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/version"
 
 	_ "github.com/mattn/go-sqlite3"

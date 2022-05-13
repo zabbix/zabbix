@@ -81,9 +81,26 @@ if ($itemids) {
 		'webitems' => true
 	]);
 
-	foreach ($itemids as $itemid) {
-		if (!array_key_exists($itemid, $items)) {
+	if (getRequest('action') == HISTORY_BATCH_GRAPH) {
+		// Remove items that are not numeric.
+		$items = array_filter($items, function ($item) {
+			return ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64);
+		});
+
+		// Keep only item IDs that are applicable to graphs.
+		$itemids = array_keys($items);
+
+		// If there are none left and all of the selected did not exist or were not numeric, display error.
+		if (!$itemids) {
 			access_deny();
+		}
+	}
+	else {
+		// If other mode is selected, retain original functionality where all given items are checked if they exist.
+		foreach ($itemids as $itemid) {
+			if (!array_key_exists($itemid, $items)) {
+				access_deny();
+			}
 		}
 	}
 

@@ -2030,8 +2030,8 @@ typedef struct
 	unsigned char		discover;
 	unsigned char		custom_interfaces_orig;
 	unsigned char		custom_interfaces;
-	char			inventory_mode_orig;
-	char			inventory_mode;
+	signed char		inventory_mode_orig;
+	signed char		inventory_mode;
 	zbx_uint64_t		templateid_host;
 }
 zbx_host_prototype_t;
@@ -2206,7 +2206,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		if (SUCCEED == DBis_null(row[7]))
 			host_prototype->inventory_mode = HOST_INVENTORY_DISABLED;
 		else
-			host_prototype->inventory_mode = (char)atoi(row[7]);
+			host_prototype->inventory_mode = (signed char)atoi(row[7]);
 
 		host_prototype->inventory_mode_orig = HOST_INVENTORY_DISABLED;
 
@@ -2251,7 +2251,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 				if (host_prototype->itemid == itemid && 0 == strcmp(host_prototype->host, row[2]))
 				{
-					char	inventory_mode_null_processed;
+					signed char	inventory_mode_null_processed;
 
 					ZBX_STR2UINT64(host_prototype->hostid, row[1]);
 
@@ -2282,7 +2282,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 					if (SUCCEED == DBis_null(row[8]))
 						inventory_mode_null_processed = HOST_INVENTORY_DISABLED;
 					else
-						inventory_mode_null_processed = (char)atoi(row[8]);
+						inventory_mode_null_processed = (signed char)atoi(row[8]);
 
 					if (host_prototype->inventory_mode != inventory_mode_null_processed)
 					{
@@ -3832,7 +3832,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 				}
 
 				zbx_audit_host_prototype_update_json_update_inventory_mode(host_prototype->hostid,
-						host_prototype->inventory_mode_orig, host_prototype->inventory_mode);
+						(int)host_prototype->inventory_mode_orig,
+						(int)host_prototype->inventory_mode);
 			}
 		}
 
@@ -5914,7 +5915,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 
 			zbx_free(tmp);
 			tmp = strdup(row[4]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 				continue;

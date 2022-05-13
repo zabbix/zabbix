@@ -23,8 +23,8 @@ import (
 	"context"
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // uptimeHandler finds difference btw current time and

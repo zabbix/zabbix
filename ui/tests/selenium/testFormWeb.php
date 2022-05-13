@@ -258,7 +258,7 @@ class testFormWeb extends CLegacyWebTest {
 			'Chromium 80 (Linux)', 'Opera 67 (Windows)', 'Opera 67 (Linux)', 'Opera 67 (macOS)', 'Safari 13 (macOS)',
 			'Safari 13 (iPhone)', 'Safari 13 (iPad)', 'Safari 13 (iPod Touch)', 'Zabbix', 'Lynx 2.8.8rel.2', 'Links 2.8',
 			'Googlebot 2.1', 'other ...'];
-		$agent_element = $this->query('id:agent')->asZDropdown()->one();
+		$agent_element = $this->query('id:agent')->asDropdown()->one();
 		$this->assertEquals($agent_element->getOptions()->asText(), $agents);
 
 		$agent_groups = ['Internet Explorer', 'Mozilla Firefox', 'Opera', 'Safari', 'Google Chrome', 'Others'];
