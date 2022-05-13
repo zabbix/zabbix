@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-05-03 15:27+0000\n"
+"PO-Revision-Date: 2022-05-11 13:30+0000\n"
 "Last-Translator: Atsushi <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -317,11 +317,11 @@ msgstr "障害発生数上位100項目"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12時間表示"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24時間表示"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -665,7 +665,7 @@ msgstr "有効"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "アクティブチェック"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -1158,7 +1158,7 @@ msgstr "ゲストの物理メモリページをバックアップするために
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
-msgstr ""
+msgstr "アナログ"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
@@ -3598,7 +3598,7 @@ msgstr "時刻"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:72
 msgid "Clock type"
-msgstr ""
+msgstr "時計のタイプ"
 
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:139
@@ -5465,7 +5465,7 @@ msgstr "Digest"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:74
 msgid "Digital"
-msgstr ""
+msgstr "デジタル"
 
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
@@ -5730,7 +5730,7 @@ msgstr "VMwareハイパーバイザーのデータストアのディスカバリ
 
 #: include/classes/data/CItemData.php:1379
 msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのネットワークインターフェースのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザー。JSONで返す"
 
 #: include/classes/data/CItemData.php:1306
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
@@ -7123,7 +7123,7 @@ msgstr "フォームデータ"
 #: include/classes/widgets/forms/CWidgetFormClock.php:182
 #: include/classes/widgets/forms/CWidgetFormClock.php:242
 msgid "Format"
-msgstr ""
+msgstr "表示形式"
 
 #: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
 #: include/views/configuration.item.prototype.edit.php:707
@@ -10935,7 +10935,7 @@ msgstr "ローカル"
 
 #: include/classes/widgets/fields/CWidgetFieldTimeZone.php:58
 msgid "Local default"
-msgstr ""
+msgstr "ローカルのデフォルト"
 
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
@@ -15878,7 +15878,7 @@ msgstr "セカンダリPOCスクリーン名"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:173
 msgid "Seconds"
-msgstr ""
+msgstr "秒表示"
 
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
@@ -16313,7 +16313,7 @@ msgstr "マップ\"%2$s\"の共有オプション\"%1$s\"の値がありませ�
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:243
 msgid "Short"
-msgstr ""
+msgstr "短縮"
 
 #: app/partials/monitoring.latest.filter.php:154
 #: app/partials/monitoring.problem.filter.php:222
@@ -19095,11 +19095,11 @@ msgstr "ユーザー"
 
 #: include/classes/data/CItemData.php:1255
 msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware分散仮想スイッチ、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/data/CItemData.php:1259
 msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
-msgstr ""
+msgstr "VMware FetchDVPortラッパー、<url> - VMwareサービスURL、<filter> - VMwareのDistributedVirtualSwitchPortCriteriaデータオブジェクト、<mode> - state(デフォルト)/full。JSONで返す"
 
 #: include/classes/data/CItemData.php:1702
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
@@ -19115,7 +19115,7 @@ msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> 
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareデータセンターとそのID、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
@@ -19160,7 +19160,7 @@ msgstr "VMwareハイパーバイザーのクラスター名、<url> - VMwareサ�
 
 #: include/classes/data/CItemData.php:1275
 msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMwareハイパーバイザーの接続状態、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
@@ -19196,7 +19196,7 @@ msgstr "VMwareハイパーバイザーネットワーク入力統計、<url> - V
 
 #: include/classes/data/CItemData.php:1387
 msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
-msgstr ""
+msgstr "VMwareハイパーバイザーのネットワークインターフェーススピード、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<ifname> - インターフェース名"
 
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
@@ -19220,11 +19220,11 @@ msgstr "VMwareハイパーバイザーのプロセッサー利用量(Hz)、<url>
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのセンサー値、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
 
 #: include/classes/data/CItemData.php:1355
 msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMwareハイパーバイザーのシリアル番号、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19272,7 +19272,7 @@ msgstr "VMware仮想マシンの圧縮されたメモリサイズ、<url> - VMwa
 
 #: include/classes/data/CItemData.php:1431
 msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
-msgstr ""
+msgstr "VMware仮想マシンのカスタム属性値、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<name> - カスタム属性名"
 
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
@@ -19288,7 +19288,7 @@ msgstr "VMware仮想マシンのディスクデバイスの書き込み統計、
 
 #: include/classes/data/CItemData.php:1439
 msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware仮想マシンのディスクの統合要求、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/data/CItemData.php:1566
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -19344,11 +19344,11 @@ msgstr "VMware仮想マシンの共有メモリサイズ、<url> - VMwareサー�
 
 #: include/classes/data/CItemData.php:1555
 msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのスナップショットの状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。JSONで返す"
 
 #: include/classes/data/CItemData.php:1559
 msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware仮想マシンの状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -19356,7 +19356,7 @@ msgstr "VMware仮想マシンのスワップされたメモリサイズ、<url> 
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
-msgstr ""
+msgstr "VMware仮想マシンのツールの状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<mode> - versionまたはstatus"
 
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
