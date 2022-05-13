@@ -136,7 +136,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
 				'name' => '12_SSH_Agent',
-				'key_' => 'ssh.run[{#KEY}]',
+				'key_' => 'ssh.run[{#KEY},]',
 				'type' => 13,
 				'value_type' => 1,
 				'interfaceid' => self::AGENT_INTERFACE_ID,

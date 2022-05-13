@@ -351,6 +351,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	$req_data = $item_draft + $_REQUEST;
 
+	if (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
+		$req_data['trends'] = ITEM_NO_STORAGE_VALUE;
+	}
+
+	if (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
+		$req_data['history'] = ITEM_NO_STORAGE_VALUE;
+	}
+
 	if (array_key_exists('preprocessing', $req_data)) {
 		$req_data['preprocessing'] = normalizeItemPreprocessingSteps(getRequest('preprocessing', []));
 	}

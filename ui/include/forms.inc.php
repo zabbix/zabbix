@@ -613,11 +613,11 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
  * @return array
  */
 function prepareItemHttpAgentFormData(array $item) {
-	if ($item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+	if (array_key_exists('request_method', $item) && $item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
 		$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 	}
 
-	if ($item['query_fields']) {
+	if (array_key_exists('query_fields', $item) && $item['query_fields']) {
 		$query_fields = [];
 
 		foreach ($item['query_fields']['name'] as $index => $key) {
@@ -633,7 +633,7 @@ function prepareItemHttpAgentFormData(array $item) {
 		$item['query_fields'] = $query_fields;
 	}
 
-	if ($item['headers']) {
+	if (array_key_exists('headers', $item) && $item['headers']) {
 		$tmp_headers = [];
 
 		foreach ($item['headers']['name'] as $index => $key) {
@@ -695,8 +695,8 @@ function prepareItemHttpAgentFormData(array $item) {
 function prepareScriptItemFormData(array $item): array {
 	$values = [];
 
-	if (is_array($item['parameters']) && array_key_exists('name', $item['parameters'])
-			&& array_key_exists('value', $item['parameters'])) {
+	if (array_key_exists('parameters', $item) && is_array($item['parameters'])
+			&& array_key_exists('name', $item['parameters']) && array_key_exists('value', $item['parameters'])) {
 		foreach ($item['parameters']['name'] as $index => $key) {
 			if (array_key_exists($index, $item['parameters']['value'])
 					&& ($key !== '' || $item['parameters']['value'][$index] !== '')) {

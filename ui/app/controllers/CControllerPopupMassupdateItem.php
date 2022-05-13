@@ -23,8 +23,6 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupMassupdateItem extends CController {
 
-	private $opt_interfaceid_expected = false;
-
 	protected function checkInput() {
 		$fields = [
 			'allow_traps' => 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_ON, HTTPCHECK_ALLOW_TRAPS_OFF]),
@@ -67,42 +65,12 @@ class CControllerPopupMassupdateItem extends CController {
 			'visible' => 'array'
 		];
 
-		$this->opt_interfaceid_expected = (getRequest('interfaceid') == INTERFACE_TYPE_OPT);
-
-		if ($this->opt_interfaceid_expected) {
+		if (getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
 			unset($fields['interfaceid']);
 			unset($_REQUEST['interfaceid']);
 		}
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret && $this->opt_interfaceid_expected) {
-			if ($this->hasInput('type')) {
-				$item_types = [$this->getInput('type')];
-			}
-			else {
-				$options = [
-					'output' => ['type'],
-					'itemids' => $this->getInput('ids')
-				];
-				$item_types = (bool) $this->getInput('prototype')
-					? API::ItemPrototype()->get($options)
-					: API::Item()->get($options);
-
-				$item_types = array_column($item_types, 'type', 'type');
-			}
-
-			foreach ($item_types as $item_type) {
-				if (itemTypeInterface($item_type) != INTERFACE_TYPE_OPT) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Host interface'),
-						interfaceType2str(INTERFACE_TYPE_OPT)
-					));
-					$ret = false;
-
-					break;
-				}
-			}
-		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -139,21 +107,42 @@ class CControllerPopupMassupdateItem extends CController {
 	 */
 	protected function getItemsOrPrototypes(): array {
 		$options = [
-			'output' => ['itemid', 'type'],
+			'output' => array_merge(['itemid', 'type', 'hostid', 'name', 'key_', 'templateid', 'flags'], [
+				'allow_traps',
+				'authtype',
+				'delay',
+				'description',
+				'discover',
+				'history',
+				'history_mode',
+				'interfaceid',
+				'jmx_endpoint',
+				'logtimefmt',
+				'master_itemid',
+				'parent_discoveryid',
+				'password',
+				'post_type',
+				'posts',
+				'privatekey',
+				'publickey',
+				'status',
+				'trapper_hosts',
+				'trends',
+				'trends_mode',
+				'timeout',
+				'units',
+				'url',
+				'username',
+				'value_type',
+				'valuemapid'
+			]),
 			'selectTags' => ['tag', 'value'],
+			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('ids'),
 			'preservekeys' => true
 		];
 
-		if ($this->getInput('prototype')) {
-			$result = API::ItemPrototype()->get($options);
-		}
-		else {
-			$options['output'][] = 'flags';
-			$result = API::Item()->get($options);
-		}
-
-		return $result;
+		return $this->getInput('prototype') ? API::ItemPrototype()->get($options) : API::Item()->get($options);
 	}
 
 	/**
@@ -174,38 +163,12 @@ class CControllerPopupMassupdateItem extends CController {
 	protected function update(): CControllerResponse {
 		$result = true;
 		$ids = $this->getInput('ids');
-		$prototype = (bool) $this->getInput('prototype');
-		$input = [
-			'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
-			'authtype' => '',
-			'delay' => DB::getDefault('items', 'delay'),
-			'description' => '',
-			'discover' => ZBX_PROTOTYPE_DISCOVER,
-			'headers' => [],
-			'history' => ITEM_NO_STORAGE_VALUE,
-			'jmx_endpoint' => '',
-			'logtimefmt' => '',
-			'master_itemid' => 0,
-			'password' => '',
-			'post_type' => ZBX_POSTTYPE_RAW,
-			'posts' => '',
-			'preprocessing' => [],
-			'privatekey' => '',
-			'publickey' => '',
-			'status' => ITEM_STATUS_ACTIVE,
-			'tags' => [],
-			'timeout' => '',
-			'trapper_hosts' => '',
-			'trends' => ITEM_NO_STORAGE_VALUE,
-			'type' => 0,
-			'units' => '',
-			'url' => '',
-			'username' => '',
-			'value_type' => ITEM_VALUE_TYPE_UINT64,
-			'valuemapid' => 0,
-			'interfaceid' => $this->opt_interfaceid_expected ? 0 : ''
-		];
+		$is_prototype = (bool) $this->getInput('prototype');
+		$item_defaults = DB::getDefaults('items') + array_fill_keys(['valuemapid', 'interfaceid', 'master_itemid'], 0);
+
+		$input = $item_defaults + ['tags' => [], 'preprocessing' => []];
 		$this->getInputs($input, array_keys($input));
+		$input = array_intersect_key($input, $this->getInput('visible', []));
 
 		if ($this->getInput('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
 			$input['trends'] = ITEM_NO_STORAGE_VALUE;
@@ -215,99 +178,113 @@ class CControllerPopupMassupdateItem extends CController {
 			$input['history'] = ITEM_NO_STORAGE_VALUE;
 		}
 
-		$input = array_intersect_key($input, $this->getInput('visible', []));
+		if (array_key_exists('preprocessing', $input)) {
+			$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
+		}
 
 		if (array_key_exists('tags', $input)) {
-			$input['tags'] = array_filter($input['tags'], function ($tag) {
+			$input['tags'] = array_filter($input['tags'], static function ($tag) {
 				return ($tag['tag'] !== '' || $tag['value'] !== '');
 			});
 		}
 
+		if (array_key_exists('headers', $input)) {
+			$input['headers']['value'] += array_fill_keys(array_keys($input['headers']['name']), '');
+			$headers = [];
+
+			foreach ($input['headers']['name'] as $i => $header_name) {
+				if ($header_name !== '' || $input['headers']['value'][$i] !== '') {
+					$headers[$header_name] = $input['headers']['value'][$i];
+				}
+			}
+
+			$input['headers'] = $headers;
+		}
+
+		$item_general_rules = CItem::getValidationRules();
+		$db_items = $this->getItemsOrPrototypes();
+		$items_to_update = [];
+
 		try {
 			DBstart();
-			$delay_flex = $this->getInput('delay_flex', []);
-
-			if (array_key_exists('delay', $input) && $delay_flex) {
-				$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
-				$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
-				$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
-
-				foreach ($delay_flex as $interval) {
-					if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
-						if ($interval['delay'] === '' && $interval['period'] === '') {
-							continue;
-						}
-
-						if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
-							info(_s('Invalid interval "%1$s".', $interval['delay']));
-							throw new Exception();
-						}
-						elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
-							info(_s('Invalid interval "%1$s".', $interval['period']));
-							throw new Exception();
-						}
-
-						$input['delay'] .= ';'.$interval['delay'].'/'.$interval['period'];
-					}
-					else {
-						if ($interval['schedule'] === '') {
-							continue;
-						}
-
-						if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
-							info(_s('Invalid interval "%1$s".', $interval['schedule']));
-							throw new Exception();
-						}
-
-						$input['delay'] .= ';'.$interval['schedule'];
-					}
-				}
-			}
-
-			if (array_key_exists('headers', $input) && $input['headers']) {
-				$input['headers']['value'] += array_fill_keys(array_keys($input['headers']['name']), '');
-
-				$headers = [];
-				foreach ($input['headers']['name'] as $i => $header_name) {
-					if ($header_name !== '' || $input['headers']['value'][$i] !== '') {
-						$headers[$header_name] = $input['headers']['value'][$i];
-					}
-				}
-				$input['headers'] = $headers;
-			}
-
-			if (array_key_exists('preprocessing', $input) && $input['preprocessing']) {
-				$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
-			}
-
-			$items_to_update = [];
-			$items = $this->getItemsOrPrototypes();
 
 			foreach ($ids as $id) {
-				$update_item = [];
+				$db_item = $db_items[$id];
+				$item_type = array_key_exists('type', $input) ? $input['type'] : $db_item['type'];
+				$item_host = $db_item['hosts'][0];
+				$db_item['host_status'] = $item_host['status'];
+				unset($db_item['hosts']);
+
+				if ($is_prototype) {
+					unset($db_item['inventory_link']);
+				}
+
+				$item_draft = $input + [
+					'type' => $item_type,
+					'host_status' => $item_host['status']
+				];
+
+				$req_data = $item_draft + $db_item;
+
+				if (array_key_exists('delay', $input)) {
+					$delay_error = null;
+					$req_data['delay'] = processItemDelay($item_type, $req_data['key_'], $delay_error);
+
+					if ($delay_error !== null) {
+						error($delay_error);
+						throw new Exception();
+					}
+				}
+
+				if ($item_type == ITEM_TYPE_SCRIPT) {
+					$req_data = prepareScriptItemFormData($req_data);
+				}
+				elseif ($item_type == ITEM_TYPE_HTTPAGENT) {
+					// Headers not in 'sortorder' format, pass as is.
+					$headers = array_key_exists('headers', $input) ? $input['headers'] : [];
+					unset($req_data['headers']);
+					$req_data = prepareItemHttpAgentFormData($req_data);
+					$req_data['headers'] = $headers;
+				}
+
+				$api_input_rules = $item_general_rules;
+				$item_type_object = CItemTypeFactory::getObject($item_type);
+
+				if ($db_item['templateid'] != 0) {
+					$api_input_rules['fields'] += $item_type_object::getUpdateValidationRulesInherited($db_item);
+				}
+				elseif ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					$api_input_rules['fields'] += $item_type_object::getUpdateValidationRulesDiscovered();
+				}
+				else {
+					$api_input_rules['fields'] += $item_type_object::getUpdateValidationRules($db_item);
+				}
 
 				if (array_key_exists('tags', $input)) {
 					switch ($this->getInput('mass_update_tags', ZBX_ACTION_ADD)) {
 						case ZBX_ACTION_ADD:
 							$unique_tags = [];
-							foreach (array_merge($items[$id]['tags'], $input['tags']) as $tag) {
+							$req_data['tags'] = [];
+
+							foreach (array_merge($db_item['tags'], $input['tags']) as $tag) {
 								$unique_tags[$tag['tag']][$tag['value']] = $tag;
 							}
 
 							foreach ($unique_tags as $tags_by_name) {
 								foreach ($tags_by_name as $tag) {
-									$update_item['tags'][] = $tag;
+									$req_data['tags'][] = $tag;
 								}
 							}
 							break;
 
 						case ZBX_ACTION_REPLACE:
-							$update_item['tags'] = $input['tags'];
+							$req_data['tags'] = $input['tags'];
 							break;
 
 						case ZBX_ACTION_REMOVE:
 							$diff_tags = [];
-							foreach ($items[$id]['tags'] as $a) {
+
+							foreach ($db_item['tags'] as $a) {
 								foreach ($input['tags'] as $b) {
 									if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
 										continue 2;
@@ -316,31 +293,25 @@ class CControllerPopupMassupdateItem extends CController {
 
 								$diff_tags[] = $a;
 							}
-							$update_item['tags'] = $diff_tags;
+
+							$req_data['tags'] = $diff_tags;
 							break;
 					}
 				}
 
-				if ($prototype || $items[$id]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-					$update_item += $input;
+				CArrayHelper::sort($req_data['tags'], ['tag', 'value']);
+				$item_draft['tags'] = $req_data['tags'];
 
-					$type = array_key_exists('type', $input) ? $input['type'] : $items[$id]['type'];
+				$draft_fields = array_fill_keys(['tags', 'preprocessing'], true)
+					+ CItemHelper::extractConditionFields($api_input_rules['fields']);
+				$item_draft += CItemHelper::combineFromFieldIndex($draft_fields, $req_data, $item_defaults);
+				$input_index = CItemHelper::extractExpectedFieldIndex($api_input_rules, $item_draft, $db_item);
 
-					if ($type != ITEM_TYPE_JMX) {
-						unset($update_item['jmx_endpoint']);
-					}
+				// Add remainder of "visible" input to clean item, as we want to receive complaints
+				// about fields passed erroneously, e.g. master_itemid on non-dependent items.
+				$item = CItemHelper::combineFromFieldIndex($input_index, $req_data, $input) + $input;
 
-					if ($type != ITEM_TYPE_HTTPAGENT && $type != ITEM_TYPE_SCRIPT) {
-						unset($update_item['timeout']);
-					}
-				}
-				else if (array_key_exists('status', $input)) {
-					$items_to_update[] = ['itemid' => $id, 'status' => $input['status']];
-				}
-
-				if ($update_item) {
-					$items_to_update[] = ['itemid' => $id] + $update_item;
-				}
+				$items_to_update[] = $item;
 			}
 
 			if ($items_to_update && !$this->updateItemOrPrototype($items_to_update)) {
@@ -349,12 +320,12 @@ class CControllerPopupMassupdateItem extends CController {
 		}
 		catch (Exception $e) {
 			$result = false;
-			CMessageHelper::setErrorTitle($prototype ? _('Cannot update item prototypes') : _('Cannot update items'));
+			CMessageHelper::setErrorTitle($is_prototype ? _('Cannot update item prototypes') : _('Cannot update items'));
 		}
 
 		if (DBend($result)) {
 			$messages = CMessageHelper::getMessages();
-			$output = ['title' => $prototype ? _('Item prototypes updated') : _('Items updated')];
+			$output = ['title' => $is_prototype ? _('Item prototypes updated') : _('Items updated')];
 
 			if (count($messages)) {
 				$output['messages'] = array_column($messages, 'message');

@@ -1505,7 +1505,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => [
 						['type' => 'Custom multiplier', 'parameter_1' => 'abc']
 					],
-					'details' => 'Incorrect value for field "params": a numeric value is expected.'
+					'details' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
 				]
 			],
 			[

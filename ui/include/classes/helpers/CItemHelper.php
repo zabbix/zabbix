@@ -93,7 +93,7 @@ class CItemHelper {
 	 *
 	 * @param bool $as_objects     Whether (true) a collection of entries or (false) a single entry is expected.
 	 * @param array $fields        List of field/type conditions.
-	 * @param array $data          Fields and values on currrent input level.
+	 * @param array $data          Fields and values on current input level.
 	 * @param array|null $db_item  To pass in case of if-closure.
 	 *
 	 * @return array

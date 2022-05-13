@@ -1633,7 +1633,8 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if (!in_array($interface_type, [false, INTERFACE_TYPE_ANY, INTERFACE_TYPE_OPT])
-					&& $db_interfaces[$item['interfaceid']]['type'] != $interface_type) {
+					&& (!$db_interfaces || !array_key_exists($item['interfaceid'], $db_interfaces)
+							|| $db_interfaces[$item['interfaceid']]['type'] != $interface_type)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i + 1).'/interfaceid',
 					_s('the host interface ID of type "%1$s" is expected', interfaceType2str($interface_type))
