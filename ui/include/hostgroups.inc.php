@@ -42,9 +42,9 @@ function isReadableHostGroups(array $groupids) {
  */
 function isReadableTemplateGroups(array $groupids) {
 	return count($groupids) == API::TemplateGroup()->get([
-			'countOutput' => true,
-			'groupids' => $groupids
-		]);
+		'countOutput' => true,
+		'groupids' => $groupids
+	]);
 }
 
 /**
@@ -67,8 +67,8 @@ function isWritableHostGroups(array $groupids) {
  *
  * @param array  $groupids
  * @param array  $ms_groups  [OUT] the list of groups for multiselect.
- * @param array  $options    additional API options to select host groups or template groups.
- * @param string $context    context of hosts or templates.
+ * @param array  $options    Additional API options to select host groups or template groups.
+ * @param string $context    Context of hosts or templates.
  *
  * @return array
  */
@@ -110,7 +110,7 @@ function getSubGroups(array $groupids, array &$ms_groups = null, array $options 
  *
  * @param array $template_groupids
  * @param array $ms_template_groups  [OUT] the list of groups for multiselect.
- * @param array $options    additional API options to select template groups.
+ * @param array $options             Additional API options to select template groups.
  *
  * @return array
  */

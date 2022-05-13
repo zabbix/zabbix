@@ -913,6 +913,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
 			$hosts_ids = getRequest('copy_targetids');
 		}
+
 		// template groups
 		elseif (getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE_GROUP) {
 			$hosts_ids = [];
