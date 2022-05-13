@@ -169,7 +169,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
 				'name' => '14_DB_Monitor',
-				'key_' => 'db.odbc.select[{#KEY}]',
+				'key_' => 'db.odbc.select[{#KEY},]',
 				'type' => 11,
 				'value_type' => 0,
 				'delay' => '90s',

@@ -157,7 +157,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 			[
 				'hostid' => self::HOSTID,
 				'name' => '14_DB_Monitor',
-				'key_' => 'db.odbc.select',
+				'key_' => 'db.odbc.select[]',
 				'type' => 11,
 				'value_type' => 0,
 				'delay' => '90s',
