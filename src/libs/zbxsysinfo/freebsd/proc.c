@@ -46,6 +46,8 @@
 #	define ZBX_PROC_NIVCSW		kp_eproc.e_pstats.p_ru.ru_nivcsw
 #	define ZBX_PROC_UTIME		kp_eproc.e_pstats.p_ru.ru_utime.tv_sec
 #	define ZBX_PROC_STIME		kp_eproc.e_pstats.p_ru.ru_stime.tv_sec
+#	define ZBX_PROC_UID		kp_proc.p_ruid
+#	define ZBX_PROC_GID		kp_proc.p_rgid
 #else
 #	define ZBX_COMMLEN		COMMLEN
 #	define ZBX_PROC_PID		ki_pid
@@ -69,6 +71,8 @@
 #	define ZBX_PROC_NIVCSW		ki_rusage.ru_nivcsw
 #	define ZBX_PROC_UTIME		ki_rusage.ru_utime.tv_sec
 #	define ZBX_PROC_STIME		ki_rusage.ru_stime.tv_sec
+#	define ZBX_PROC_UID		ki_ruid
+#	define ZBX_PROC_GID		ki_rgid
 #endif
 
 #if (__FreeBSD_version) < 500000
@@ -95,6 +99,11 @@ typedef struct
 	char		*cmdline;
 	char		*state;
 	zbx_uint64_t	processes;
+
+	char		*user;
+	char		*group;
+	zbx_uint64_t	uid;
+	zbx_uint64_t	gid;
 
 	zbx_uint64_t	cputime_user;
 	zbx_uint64_t	cputime_system;
@@ -129,6 +138,8 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data->tname);
 	zbx_free(proc_data->cmdline);
 	zbx_free(proc_data->state);
+	zbx_free(proc_data->user);
+	zbx_free(proc_data->group);
 
 	zbx_free(proc_data);
 }
@@ -739,6 +750,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	for (i = 0; i < count; i++)
 	{
 		proc_data_t	*proc_data;
+		struct passwd	*pw;
+		struct group	*gr;
 
 		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, proc[i].ZBX_PROC_COMM))
 			continue;
@@ -748,6 +761,9 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (NULL != proccomm && '\0' != *proccomm && NULL == zbx_regexp_match(args, proccomm, NULL))
 			continue;
+
+		pw = getpwuid(proc[i].ZBX_PROC_UID);
+		gr = getgrgid(proc[i].ZBX_PROC_GID);
 
 		if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
 		{
@@ -785,6 +801,12 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
 				proc_data->name = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_COMM);
 				proc_data->state = get_state(&proc_thread[k]);
+				proc_data->uid = proc[i].ZBX_PROC_UID;
+				proc_data->gid = proc[i].ZBX_PROC_GID;
+				proc_data->user = NULL != pw ? zbx_strdup(NULL, pw->pw_name) :
+						zbx_dsprintf(NULL, ZBX_FS_UI64, proc_data->uid);
+				proc_data->group = NULL != gr ? zbx_strdup(NULL, gr->gr_name) :
+						zbx_dsprintf(NULL, ZBX_FS_UI64, proc_data->gid);
 				proc_data->cputime_user = proc_thread[k].ZBX_PROC_UTIME;
 				proc_data->cputime_system = proc_thread[k].ZBX_PROC_STIME;
 				proc_data->io_write_op = proc_thread[k].ZBX_PROC_INBLOCK;
@@ -838,17 +860,27 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->jid = proc[i].ZBX_PROC_JID;
 				proc_data->cmdline = zbx_strdup(NULL, args);
 				proc_data->state = get_state(&proc[i]);
+				proc_data->uid = proc[i].ZBX_PROC_UID;
+				proc_data->gid = proc[i].ZBX_PROC_GID;
+				proc_data->user = NULL != pw ? zbx_strdup(NULL, pw->pw_name) :
+						zbx_dsprintf(NULL, ZBX_FS_UI64, proc_data->uid);
+				proc_data->group = NULL != gr ? zbx_strdup(NULL, gr->gr_name) :
+						zbx_dsprintf(NULL, ZBX_FS_UI64, proc_data->gid);
 			}
 			else
 			{
 				proc_data->cmdline = NULL;
 				proc_data->state = NULL;
+				proc_data->user = NULL;
+				proc_data->group = NULL;
 			}
 
 			proc_data->tname = NULL;
 
 			zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 		}
+
+
 	}
 
 	zbx_free(proc);
@@ -910,6 +942,10 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "jid", pdata->jid);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&j, "uid", pdata->uid);
+			zbx_json_adduint64(&j, "gid", pdata->gid);
 			zbx_json_adduint64(&j, "vsize", pdata->vsize);
 			zbx_json_addfloat(&j, "pmem", pdata->pmem);
 			zbx_json_adduint64(&j, "rss", pdata->rss);
@@ -933,6 +969,10 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&j, "uid", pdata->uid);
+			zbx_json_adduint64(&j, "gid", pdata->gid);
 			zbx_json_addint64(&j, "tid", pdata->tid);
 			zbx_json_addstring(&j, "tname", ZBX_NULL2EMPTY_STR(pdata->tname), ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&j, "cputime_user", pdata->cputime_user);
