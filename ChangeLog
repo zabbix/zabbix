@@ -4461,6 +4461,7 @@ New features:
 ..F....... [ZBX-20946] enabled Bulgarian, Chinese (zh_TW), German, Greek, Indonesian, Romanian, Spanish and Vietnamese languages in frontend (miks)
 
 Bug fixes:
+.......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.40
