@@ -9,6 +9,7 @@ DIST_SUBDIRS = \
 	zbxalgo \
 	zbxmedia \
 	zbxcrypto \
+	zbxtls \
 	zbxhash \
 	zbxcommon \
 	zbxcomms \
@@ -47,8 +48,7 @@ DIST_SUBDIRS = \
 	zbxserialize \
 	zbxxml \
 	zbxha \
-	zbxrtc \
-	zbxtls
+	zbxrtc
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -118,6 +118,7 @@ endif
 SUBDIRS = \
 	zbxhash \
 	zbxcrypto \
+	zbxtls \
 	zbxcommon \
 	zbxgetopt \
 	zbxlog \
