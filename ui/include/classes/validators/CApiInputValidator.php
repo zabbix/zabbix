@@ -299,17 +299,10 @@ class CApiInputValidator {
 			case API_OBJECT:
 				foreach ($rule['fields'] as $field_name => $field_rule) {
 					if ($data !== null && array_key_exists($field_name, $data)) {
-						if ($field_rule['type'] === API_MULTIPLE) {
-							foreach ($field_rule['rules'] as $multiple_rule) {
-								if (array_key_exists('else', $multiple_rule)
-										|| (is_array($multiple_rule['if'])
-											&& self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in']))
-										|| ($multiple_rule['if'] instanceof Closure
-											&& call_user_func($multiple_rule['if'], $data))) {
-									$field_rule = $multiple_rule;
-									break;
-								}
-							}
+						$field_rule = self::resolveRuleConditions($field_rule, $data);
+
+						if ($field_rule === null) {
+							return false;
 						}
 
 						$subpath = ($path === '/' ? $path : $path.'/').$field_name;
@@ -335,6 +328,41 @@ class CApiInputValidator {
 		$error = 'Incorrect validation rules.';
 
 		return false;
+	}
+
+	/**
+	 * Resolve rule conditions like API_MULTIPLE.
+	 *
+	 * @param array $field_rule
+	 * @param array $data
+	 *
+	 * @return array|null
+	 */
+	private static function resolveRuleConditions(array $field_rule, array $data): ?array {
+		while ($field_rule['type'] == API_MULTIPLE) {
+			$matched_rule = null;
+
+			foreach ($field_rule['rules'] as $rule) {
+				if (array_key_exists('else', $rule)
+						|| (is_array($rule['if']) && self::isInRange($data[$rule['if']['field']], $rule['if']['in']))
+						|| ($rule['if'] instanceof Closure && call_user_func($rule['if'], $data))) {
+					$field_rule += ['flags' => 0x00];
+					$rule += ['flags' => 0x00];
+					$rule['flags'] |= $field_rule['flags'] & API_REQUIRED;
+					$matched_rule = $rule + array_intersect_key($field_rule, array_flip(['default', 'default_source']));
+
+					break;
+				}
+			}
+
+			if ($matched_rule === null) {
+				return null;
+			}
+
+			$field_rule = $matched_rule;
+		}
+
+		return $field_rule;
 	}
 
 	/**
@@ -1198,33 +1226,14 @@ class CApiInputValidator {
 
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
-			if ($field_rule['type'] === API_MULTIPLE) {
-				foreach ($field_rule['rules'] as $multiple_rule) {
-					if (array_key_exists('else', $multiple_rule)
-							|| (is_array($multiple_rule['if'])
-								&& self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in']))
-							|| ($multiple_rule['if'] instanceof Closure
-								&& call_user_func($multiple_rule['if'], $data))) {
-						if ($multiple_rule['type'] == API_UNEXPECTED
-								&& !self::validateUnexpected($field_name, $multiple_rule, $data, $path, $error)) {
-							return false;
-						}
+			$field_rule = self::resolveRuleConditions($field_rule, $data);
 
-						$field_rule += ['flags' => 0x00];
-						$multiple_rule += ['flags' => 0x00];
-						$multiple_rule['flags'] = ($field_rule['flags'] & API_REQUIRED) | $multiple_rule['flags'];
-						$field_rule = $multiple_rule +
-							array_intersect_key($field_rule, array_flip(['default', 'default_source']));
-						break;
-					}
-				}
-
-				if ($field_rule['type'] === API_MULTIPLE) {
-					$error = 'Incorrect validation rules.';
-					return false;
-				}
+			if ($field_rule === null) {
+				$error = 'Incorrect validation rules.';
+				return false;
 			}
-			elseif ($field_rule['type'] === API_UNEXPECTED
+
+			if ($field_rule['type'] === API_UNEXPECTED
 					&& !self::validateUnexpected($field_name, $field_rule, $data, $path, $error)) {
 				return false;
 			}
@@ -2090,17 +2099,10 @@ class CApiInputValidator {
 		foreach ($data as $index => $object) {
 			foreach ($rule['fields'] as $field_name => $field_rule) {
 				if (array_key_exists($field_name, $object)) {
-					if ($field_rule['type'] === API_MULTIPLE) {
-						foreach ($field_rule['rules'] as $multiple_rule) {
-							if (array_key_exists('else', $multiple_rule)
-									|| (is_array($multiple_rule['if'])
-										&& self::isInRange($object[$multiple_rule['if']['field']], $multiple_rule['if']['in']))
-									|| ($multiple_rule['if'] instanceof Closure
-										&& call_user_func($multiple_rule['if'], $object))) {
-								$field_rule = $multiple_rule;
-								break;
-							}
-						}
+					$field_rule = self::resolveRuleConditions($field_rule, $object);
+
+					if ($field_rule === null) {
+						return false;
 					}
 
 					$subpath = ($path === '/' ? $path : $path.'/').($index + 1).'/'.$field_name;
