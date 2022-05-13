@@ -25,7 +25,6 @@
 #include "zbxregexp.h"
 #include <locale.h>
 #include <winreg.h>
-#include <tchar.h>
 
 #define MAX_KEY_LENGTH			255
 #define MAX_DATA_LENGTH			65534
@@ -105,7 +104,7 @@ static void	registry_get_multistring_value(const wchar_t *wbuffer, struct zbx_js
 {
 	char	*buffer;
 
-	while (*wbuffer)
+	while (L'\0' != *wbuffer)
 	{
 		buffer = zbx_unicode_to_utf8(wbuffer);
 		zbx_json_addstring(j, NULL, buffer, ZBX_JSON_TYPE_STRING);
@@ -162,9 +161,9 @@ static void	registry_discovery_convert_value_data(struct zbx_json *j, DWORD type
 static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, struct zbx_json *j, int mode, wchar_t *root,
 		const char *regexp)
 {
-	TCHAR				achClass[MAX_PATH] = TEXT(""), achValue[MAX_VALUE_NAME];
-	DWORD				cchClassName = MAX_PATH, cSubKeys=0, cValues, cbName, i, retCode,
-						cchValue = MAX_VALUE_NAME;
+	wchar_t			achClass[MAX_PATH] = TEXT(""), achValue[MAX_VALUE_NAME];
+	DWORD			cchClassName = MAX_PATH, cSubKeys=0, cValues, cbName, i, retCode,
+				cchValue = MAX_VALUE_NAME;
 	zbx_vector_ptr_t	wsubkeys;
 
 	retCode = RegQueryInfoKey(hKey, achClass, &cchClassName, NULL, &cSubKeys, NULL, NULL, &cValues, NULL, NULL, NULL, NULL);
@@ -182,6 +181,9 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 		zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, uroot, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, subkey, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(j);
+
+		zbx_free(uroot);
+		zbx_free(subkey);
 	}
 
 	for (i = 0; i < cSubKeys; i++)
@@ -228,7 +230,7 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 			char	*buf;
 
 			cchValue = MAX_VALUE_NAME;
-			achValue[0] = '\0';
+			achValue[0] = L'\0';
 
 			retCode = RegEnumValueW(hKey, i, achValue, &cchValue, NULL, &valueType, (BYTE*)dataBuffer, &lpDataLength);
 
@@ -243,32 +245,36 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 						zbx_free(buf);
 						continue;
 					}
-
-					goto add_fullkey;
 				}
+				else
+				{
+					zbx_json_addobject(j, NULL);
 
-				zbx_json_addobject(j, NULL);
+					buf = zbx_unicode_to_utf8(root);
+					zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, buf,
+							ZBX_JSON_TYPE_STRING);
 
-				buf = zbx_unicode_to_utf8(root);
-add_fullkey:
-				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, buf, ZBX_JSON_TYPE_STRING);
-				zbx_free(buf);
+					zbx_free(buf);
 
-				buf = zbx_unicode_to_utf8(current_subkey);
-				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, buf, ZBX_JSON_TYPE_STRING);
-				zbx_free(buf);
+					buf = zbx_unicode_to_utf8(current_subkey);
+					zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, buf,
+							ZBX_JSON_TYPE_STRING);
 
-				buf = zbx_unicode_to_utf8(achValue);
-				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_NAME, buf, ZBX_JSON_TYPE_STRING);
-				zbx_free(buf);
+					zbx_free(buf);
 
-				buf = zbx_unicode_to_utf8(dataBuffer);
-				registry_discovery_convert_value_data(j, valueType, dataBuffer);
-				zbx_free(buf);
+					buf = zbx_unicode_to_utf8(achValue);
+					zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_NAME, buf, ZBX_JSON_TYPE_STRING);
+					zbx_free(buf);
 
-				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_TYPE, registry_type_to_string(valueType), ZBX_JSON_TYPE_STRING);
+					buf = zbx_unicode_to_utf8(dataBuffer);
+					registry_discovery_convert_value_data(j, valueType, dataBuffer);
+					zbx_free(buf);
 
-				zbx_json_close(j);
+					zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_TYPE,
+							registry_type_to_string(valueType), ZBX_JSON_TYPE_STRING);
+
+					zbx_json_close(j);
+				}
 			}
 		}
 	}
@@ -281,7 +287,7 @@ static int	split_fullkey(char **fullkey, HKEY *hive_handle)
 	if (NULL == (end = strchr(*fullkey, '\\')))
 		return FAIL;
 
-	(*fullkey)[end - (*fullkey)] = '\0';
+	*end = '\0';
 
 	if (0 == (*hive_handle = get_hkey_from_fullkey(*fullkey)))
 		return FAIL;
@@ -303,7 +309,7 @@ static void	registry_discover(char *key, int mode, AGENT_RESULT *result, const c
 		return FAIL;
 	}
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	wkey = zbx_utf8_to_unicode(key);
 
@@ -384,10 +390,7 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 	}
 	else if (REG_SZ == type || REG_EXPAND_SZ == type)
 	{
-		char	*buffer;
-
-		buffer = zbx_unicode_to_utf8(wbuffer);
-		SET_STR_RESULT(result, buffer);
+		SET_STR_RESULT(result, zbx_unicode_to_utf8(wbuffer));
 	}
 	else
 	{
