@@ -20,11 +20,11 @@
 
 
 /**
+ * @var CView $this
  * @var array $data
  */
 
-$popup_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'templategroup.edit');
+$popup_url = (new CUrl('zabbix.php'))->setArgument('action', 'templategroup.edit');
 
 if ($data['groupid'] !== null) {
 	$popup_url->setArgument('groupid', $data['groupid']);

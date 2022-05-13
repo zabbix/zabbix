@@ -33,13 +33,11 @@ $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 $data += [
 	'buttons' => ($data['groupid'] == 0)
 		? [
-			(new CSubmit('add', _('Add')))
-				->addClass('js-create-hostgroup'),
+			(new CSubmit('add', _('Add')))->addClass('js-create-hostgroup'),
 			$cancel_button
 		]
 		: [
-			(new CSubmit('update', _('Update')))
-				->addClass('js-update-hostgroup'),
+			(new CSubmit('update', _('Update')))->addClass('js-update-hostgroup'),
 			(new CSimpleButton(_('Clone')))
 				->addClass('js-clone-hostgroup')
 				->setEnabled(CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
@@ -57,8 +55,8 @@ $data += [
 	->show();
 
 (new CScriptTag('view.init('.json_encode([
-			'groupid' => $data['groupid'],
-			'name' => $data['name'],
-	]).');'))
+	'groupid' => $data['groupid'],
+	'name' => $data['name'],
+]). ');'))
 	->setOnDocumentReady()
 	->show();

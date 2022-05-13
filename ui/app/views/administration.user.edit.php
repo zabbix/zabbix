@@ -424,11 +424,11 @@ if ($data['action'] === 'user.edit') {
 
 		$permissions_table = (new CTable())
 			->setAttribute('style', 'width: 100%;')
-			->setHeader([_('Host group'), _('Type'),_('Permissions')]);
+			->setHeader([_('Group'), _('Type'), _('Permissions')]);
 
 		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
-			$permissions_table->addRow([italic(_('All groups')), _('Hosts'),permissionText(PERM_READ_WRITE)]);
-			$permissions_table->addRow([italic(_('All groups')), _('Templates'),permissionText(PERM_READ_WRITE)]);
+			$permissions_table->addRow([italic(_('All groups')), _('Hosts'), permissionText(PERM_READ_WRITE)]);
+			$permissions_table->addRow([italic(_('All groups')), _('Templates'), permissionText(PERM_READ_WRITE)]);
 		}
 		else {
 			foreach ($data['groups_rights'] as $groupid => $group_rights) {
@@ -440,8 +440,10 @@ if ($data['action'] === 'user.edit') {
 				else {
 					$group_name = $group_rights['name'];
 				}
-				$permissions_table->addRow([$group_name, _('Hosts'),permissionText($group_rights['permission'])]);
+
+				$permissions_table->addRow([$group_name, _('Hosts'), permissionText($group_rights['permission'])]);
 			}
+
 			foreach ($data['templategroups_rights'] as $groupid => $group_rights) {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
@@ -451,6 +453,7 @@ if ($data['action'] === 'user.edit') {
 				else {
 					$group_name = $group_rights['name'];
 				}
+
 				$permissions_table->addRow([$group_name, _('Templates'), permissionText($group_rights['permission'])]);
 			}
 		}

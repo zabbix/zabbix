@@ -21,8 +21,8 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
-
 
 $this->includeJsFile('configuration.hostgroup.list.js.php');
 
@@ -71,7 +71,7 @@ $table = (new CTableInfo())
 				->onClick("checkAll('".$form->getName()."', 'all_groups', 'groups');")
 			))->addClass(ZBX_STYLE_CELL_WIDTH))
 		->addItem(
-			make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $view_url)
+			make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)
 		)
 		->addItem((new CColHeader(_('Hosts')))->setColSpan(2))
 		->addItem((new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH))
@@ -79,7 +79,7 @@ $table = (new CTableInfo())
 
 $current_time = time();
 
-foreach ($this->data['groups'] as $group) {
+foreach ($data['groups'] as $group) {
 	$hosts_output = [];
 	$n = 0;
 
@@ -113,7 +113,7 @@ foreach ($this->data['groups'] as $group) {
 		$hosts_output[] = $host_output;
 	}
 
-	$host_count = $this->data['groupCounts'][$group['groupid']]['hosts'];
+	$host_count = $data['groupCounts'][$group['groupid']]['hosts'];
 
 	$name = [];
 	if ($group['discoveryRule']) {
@@ -166,7 +166,7 @@ foreach ($this->data['groups'] as $group) {
 
 $form->addItem([
 	$table,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'groups', [
 		'hostgroup.massenable' => [
 			'content' => (new CSimpleButton(_('Enable hosts')))
@@ -193,21 +193,19 @@ $widget
 	->addItem($form)
 	->show();
 
-(new CScriptTag('
-		view.init('.json_encode([
-		'enable_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'hostgroup.enable')
-			->setArgumentSID()
-			->getUrl(),
-		'disable_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'hostgroup.disable')
-			->setArgumentSID()
-			->getUrl(),
-		'delete_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'hostgroup.delete')
-			->setArgumentSID()
-			->getUrl()
-	]).');
-'))
+(new CScriptTag('view.init('.json_encode([
+	'enable_url' => (new CUrl('zabbix.php'))
+		->setArgument('action', 'hostgroup.enable')
+		->setArgumentSID()
+		->getUrl(),
+	'disable_url' => (new CUrl('zabbix.php'))
+		->setArgument('action', 'hostgroup.disable')
+		->setArgumentSID()
+		->getUrl(),
+	'delete_url' => (new CUrl('zabbix.php'))
+		->setArgument('action', 'hostgroup.delete')
+		->setArgumentSID()
+		->getUrl()
+]).');'))
 	->setOnDocumentReady()
 	->show();

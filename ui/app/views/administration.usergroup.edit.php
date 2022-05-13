@@ -111,8 +111,7 @@ $form_list->addRow(_('Debug mode'),
 		->setChecked($data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 );
 
-$template_permissions_form_grid = new CFormGrid();
-$template_permissions_form_grid->addItem([
+$template_permissions_form_grid = (new CFormGrid())->addItem([
 	new CLabel(_('Permissions')),
 	new CFormField((new CDiv(new CPartial('administration.usergroup.templategrouprights.html', [
 		'templategroup_rights' => $data['templategroup_rights']
@@ -127,7 +126,10 @@ $new_templategroup_right_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'new_templategroup_right[groupids][]',
 			'object_name' => 'templateGroup',
-			'data' => array_intersect_key($data['template_groups_ms'], array_flip($data['new_templategroup_right']['groupids'])),
+			'data' => array_intersect_key(
+				$data['template_groups_ms'],
+				array_flip($data['new_templategroup_right']['groupids'])
+			),
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'template_group',
@@ -138,7 +140,10 @@ $new_templategroup_right_table = (new CTable())
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(
-			(new CRadioButtonList('new_templategroup_right[permission]', (int) $data['new_templategroup_right']['permission']))
+			(new CRadioButtonList(
+				'new_templategroup_right[permission]',
+				(int) $data['new_templategroup_right']['permission']
+			))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Deny'), PERM_DENY)
@@ -158,14 +163,12 @@ $new_templategroup_right_table = (new CTable())
 
 $template_permissions_form_grid
 	->addItem([
-		new CLabel(''),
 		new CFormField((new CDiv($new_templategroup_right_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
 	]);
 
-$host_permissions_form_grid = new CFormGrid();
-$host_permissions_form_grid->addItem([
+$host_permissions_form_grid = (new CFormGrid())->addItem([
 	new CLabel(_('Permissions')),
 	new CFormField((new CDiv(new CPartial('administration.usergroup.grouprights.html', [
 		'group_rights' => $data['group_rights']
@@ -211,7 +214,6 @@ $new_group_right_table = (new CTable())
 
 $host_permissions_form_grid
 	->addItem([
-		new CLabel(''),
 		new CFormField((new CDiv($new_group_right_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))

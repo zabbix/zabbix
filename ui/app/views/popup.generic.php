@@ -58,7 +58,8 @@ if (array_key_exists('templategroups', $data['filter'])) {
 	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
 	$templategroup_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
-	$controls[] = (new CFormList())->addRow(new CLabel(_('Template group'), 'popup_template_group_ms'), $templategroup_ms);
+	$controls[] = (new CFormList())
+		->addRow(new CLabel(_('Template group'), 'popup_template_group_ms'), $templategroup_ms);
 
 	$script_inline .= $templategroup_ms->getPostJS(). 'popup_generic.initTemplategroupsFilter();';
 }

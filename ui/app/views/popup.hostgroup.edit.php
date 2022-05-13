@@ -20,11 +20,11 @@
 
 
 /**
+ * @var CView $this
  * @var array $data
  */
 
-$popup_url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'hostgroup.edit');
+$popup_url = (new CUrl('zabbix.php'))->setArgument('action', 'hostgroup.edit');
 
 if ($data['groupid'] !== null) {
 	$popup_url->setArgument('groupid', $data['groupid']);
@@ -88,4 +88,3 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 echo json_encode($output);
-

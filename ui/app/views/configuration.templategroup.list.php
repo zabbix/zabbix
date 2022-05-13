@@ -35,8 +35,7 @@ $widget = (new CWidget())
 			: (new CSubmit('form', _('Create template group').' '._('(Only super admins can create groups)')))
 				->setEnabled(false)
 		)
-	))->setAttribute('aria-label', _('Content controls'))
-	);
+		))->setAttribute('aria-label', _('Content controls')));
 
 $filter = (new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'templategroup.list'))
@@ -70,7 +69,7 @@ $table = (new CTableInfo())
 				->onClick("checkAll('".$form->getName()."', 'all_groups', 'groupids');")
 			))->addClass(ZBX_STYLE_CELL_WIDTH))
 		->addItem(
-			make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder'], $view_url)
+			make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)
 		)
 		->addItem((new CColHeader(_('Templates')))->setColSpan(2))
 		->addItem((new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH))
@@ -78,7 +77,7 @@ $table = (new CTableInfo())
 
 $current_time = time();
 
-foreach ($this->data['groups'] as $group) {
+foreach ($data['groups'] as $group) {
 	$templates_output = [];
 	$n = 0;
 
@@ -107,11 +106,9 @@ foreach ($this->data['groups'] as $group) {
 		}
 	}
 
-	$template_count = $this->data['groupCounts'][$group['groupid']]['templates'];
+	$template_count = $data['groupCounts'][$group['groupid']]['templates'];
 
-	$name = [];
-
-	$name[] = (new CLink(CHtml::encode($group['name']),
+	$name = (new CLink(CHtml::encode($group['name']),
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'templategroup.edit')
 			->setArgument('groupid', $group['groupid'])
@@ -140,7 +137,7 @@ foreach ($this->data['groups'] as $group) {
 
 $form->addItem([
 	$table,
-	$this->data['paging'],
+	$data['paging'],
 	new CActionButtonList('action', 'groupids', [
 		'templategroup.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
@@ -153,15 +150,14 @@ $form->addItem([
 
 $widget
 	->addItem($filter)
-	->addItem($form);
-$widget->show();
+	->addItem($form)
+	->show();
 
 (new CScriptTag('view.init('.json_encode([
-		'delete_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'templategroup.delete')
-			->setArgumentSID()
-			->getUrl()
-	]).');
-'))
+	'delete_url' => (new CUrl('zabbix.php'))
+		->setArgument('action', 'templategroup.delete')
+		->setArgumentSID()
+		->getUrl()
+]).');'))
 	->setOnDocumentReady()
 	->show();
