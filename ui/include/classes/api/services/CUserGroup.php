@@ -316,18 +316,18 @@ class CUserGroup extends CApiService {
 		$names = [];
 		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access']);
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'usrgrpid' =>			['type' => API_ID],
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
-			'debug_mode' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED])],
-			'gui_access' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
-			'users_status' =>		['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
-			'userdirectoryid' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP])], 'type' => API_ID],
-										['else' => true, 'type' => API_UNEXPECTED]
+			'usrgrpid' =>				['type' => API_ID],
+			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
+			'debug_mode' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED])],
+			'gui_access' =>				['type' => API_INT32, 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED])],
+			'users_status' =>			['type' => API_INT32, 'in' => implode(',', [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED])],
+			'userdirectoryid' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'gui_access', 'in' => implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP])], 'type' => API_ID],
+											['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'rights' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
-				'id' =>					['type' => API_ID, 'flags' => API_REQUIRED],
-				'permission' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
+			'rights' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'replacement' => 'hostgroup_rights', 'uniq' => [['id']], 'fields' => [
+				'id' =>						['type' => API_ID, 'flags' => API_REQUIRED],
+				'permission' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
 			]],
 			'hostgroup_rights' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['id']], 'fields' => [
 				'id' =>						['type' => API_ID, 'flags' => API_REQUIRED],
@@ -337,14 +337,14 @@ class CUserGroup extends CApiService {
 				'id' =>						['type' => API_ID, 'flags' => API_REQUIRED],
 				'permission' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PERM_DENY, PERM_READ, PERM_READ_WRITE])]
 			]],
-			'tag_filters' =>		['type' => API_OBJECTS, 'uniq' => [['groupid', 'tag', 'value']], 'fields' => [
-				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-				'tag' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
+			'tag_filters' =>			['type' => API_OBJECTS, 'uniq' => [['groupid', 'tag', 'value']], 'fields' => [
+				'groupid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+				'tag' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
+				'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
 			]],
-			'userids' =>			['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
-			'users' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
-				'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+			'userids' =>				['type' => API_IDS, 'flags' => API_NORMALIZE | API_DEPRECATED, 'uniq' => true],
+			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
+				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]]
 		]];
 
