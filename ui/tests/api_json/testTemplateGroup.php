@@ -958,7 +958,7 @@ class testTemplateGroup extends CAPITest {
 			['name' => 'Propagate group 2'],
 			['name' => 'Propagate group 2/Group 1'],
 			['name' => 'Propagate group 3'],
-			['name' => 'Propagate group 3/Group 1'],
+			['name' => 'Propagate group 3/Group 1']
 		]);
 		$this->assertArrayHasKey('groupids', $response);
 		self::$data['groupids'] = array_combine(self::$data['groupids'], $response['groupids']);

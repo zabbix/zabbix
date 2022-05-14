@@ -620,12 +620,39 @@ foreach ($data['db_dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
-$dependenciesFormList->addRow(_('Dependencies'),
-	(new CDiv([
-		$dependenciesTable,
-		new CHorList([
-			(new CButton('bnt1', _('Add')))
-				->setAttribute('add_dep_template_trigger', $data['hostid'])
+$buttons = $data['context'] === 'host'
+	? new CHorList([
+			(new CButton('add_dep_trigger', _('Add')))
+				->setAttribute('data-hostid', $data['hostid'])
+				->onClick('
+					PopUp("popup.generic", {
+						srctbl: "triggers",
+						srcfld1: "triggerid",
+						reference: "deptrigger",
+						hostid: this.dataset.hostid,
+						multiselect: 1,
+						with_triggers: 1,
+						real_hosts: 1,
+						normal_only: 1
+					}, {dialogue_class: "modal-popup-generic"});
+				')
+				->addClass(ZBX_STYLE_BTN_LINK),
+			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
+				->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+				->onClick('
+					PopUp("popup.generic", {
+						srctbl: "trigger_prototypes",
+						srcfld1: "triggerid",
+						reference: "deptrigger",
+						parent_discoveryid: this.dataset.parent_discoveryid,
+						multiselect: 1
+					}, {dialogue_class: "modal-popup-generic"});
+				')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		])
+	: new CHorList([
+			(new CButton('add_dep_trigger', _('Add')))
+				->setAttribute('data-templateid', $data['hostid'])
 				->onClick('
 					PopUp("popup.generic", {
 						srctbl: "template_triggers",
@@ -644,12 +671,12 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						srctbl: "trigger_prototypes",
 						srcfld1: "triggerid",
 						reference: "deptrigger",
-						multiselect: 1,
-						parent_discoveryid: this.dataset.parent_discoveryid
-					} , {dialogue_class: "modal-popup-generic"});
+						parent_discoveryid: this.dataset.parent_discoveryid,
+						multiselect: 1
+					}, {dialogue_class: "modal-popup-generic"});
 				')
 				->addClass(ZBX_STYLE_BTN_LINK),
-			(new CButton('add_dep_trigger', _('Add host trigger')))
+			(new CButton('add_dep_host_trigger', _('Add host trigger')))
 				->onClick('
 					PopUp("popup.generic", {
 						srctbl: "triggers",
@@ -657,13 +684,15 @@ $dependenciesFormList->addRow(_('Dependencies'),
 						reference: "deptrigger",
 						multiselect: 1,
 						with_triggers: 1,
-						normal_only: 1,
-						hostid: this.dataset.hostid
+						real_hosts: 1,
+						normal_only: 1
 					}, {dialogue_class: "modal-popup-generic"});
 				')
 				->addClass(ZBX_STYLE_BTN_LINK)
-		])
-	]))
+		]);
+
+$dependenciesFormList->addRow(_('Dependencies'),
+	(new CDiv([$dependenciesTable, $buttons]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );

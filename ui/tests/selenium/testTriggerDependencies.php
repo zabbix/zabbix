@@ -78,7 +78,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($trigger);
 		$this->zbxTestClickWait('tab_dependenciesTab');
 
-		$this->zbxTestClick('bnt1');
+		$this->zbxTestClick('add_dep_trigger');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
 		$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
 		$host->fill([
@@ -86,7 +86,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 			'context' => 'Templates'
 		]);
 		$this->zbxTestClickLinkTextWait($dependencies);
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('add_dep_trigger'));
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent($expected);
 	}

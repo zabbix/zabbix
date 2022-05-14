@@ -58,7 +58,7 @@ class CControllerPopupGeneric extends CController {
 	const POPUPS_HAVING_HOST_FILTER = ['triggers', 'items', 'graphs', 'graph_prototypes', 'item_prototypes'];
 
 	/**
-	 * Popups having host filter selector.
+	 * Popups having template filter selector.
 	 *
 	 * @array
 	 */
@@ -517,6 +517,7 @@ class CControllerPopupGeneric extends CController {
 			'enrich_parent_groups' =>				'in 1',
 			'filter_groupid_rst' =>					'in 1',
 			'filter_hostid_rst' =>					'in 1',
+			'filter_templateid_rst' =>				'in 1',
 			'user_type' =>							'in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
 			'hostids' => 							'array'
 		];
@@ -644,9 +645,9 @@ class CControllerPopupGeneric extends CController {
 
 		if ($template_options) {
 			$templates = API::Template()->get([
-					'output' => [],
-					'preservekeys' => true
-				] + $template_options);
+				'output' => [],
+				'preservekeys' => true
+			] + $template_options);
 
 			if (!$templates) {
 				return false;
@@ -682,7 +683,6 @@ class CControllerPopupGeneric extends CController {
 		$host_options = [];
 		$templategroup_options = [];
 		$template_options = [];
-
 
 		if ($this->hasInput('writeonly')) {
 			$group_options['editable'] = 1;
@@ -865,7 +865,6 @@ class CControllerPopupGeneric extends CController {
 
 		// Template dropdown.
 		if (in_array($this->source_table, self::POPUPS_HAVING_TEMPLATE_FILTER)) {
-
 			$src_name = 'templates';
 
 			$templates = $this->templateids
@@ -887,10 +886,10 @@ class CControllerPopupGeneric extends CController {
 				'disabled' => $this->hasInput('only_hostid'),
 				'popup' => [
 					'parameters' => [
-							'srctbl' => $src_name,
-							'srcfld1' => 'hostid',
-							'dstfld1' => 'popup_template'
-						] + $template_options
+						'srctbl' => $src_name,
+						'srcfld1' => 'hostid',
+						'dstfld1' => 'popup_template'
+					] + $template_options
 				],
 				'add_post_js' => false
 			];
@@ -998,8 +997,7 @@ class CControllerPopupGeneric extends CController {
 			$this->source_table,
 			self::POPUPS_HAVING_TEMPLATE_GROUP_FILTER
 		);
-		$this->template_preselect_required = in_array($this->source_table,
-			self::POPUPS_HAVING_TEMPLATE_FILTER);
+		$this->template_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_TEMPLATE_FILTER);
 		$this->page_options = $this->getPageOptions();
 
 		// Make control filters. Must be called before extending groupids.

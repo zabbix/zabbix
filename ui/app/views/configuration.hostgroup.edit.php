@@ -56,7 +56,7 @@ $data += [
 
 (new CScriptTag('view.init('.json_encode([
 	'groupid' => $data['groupid'],
-	'name' => $data['name'],
+	'name' => $data['name']
 ]). ');'))
 	->setOnDocumentReady()
 	->show();
