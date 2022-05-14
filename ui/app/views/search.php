@@ -194,10 +194,10 @@ $table = (new CTableInfo())
 			->setColSpan($data['host_groups'] ? 3 : 1)
 			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 		)
-		->addItem($data['admin']
-			? (new CColHeader(_('Configuration')))
-				->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
-			: null
+		->addItem(
+			$data['admin']
+				? (new CColHeader(_('Configuration')))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
+				: null
 		)
 	);
 
@@ -205,8 +205,8 @@ foreach ($data['host_groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
 	$name_link = $group['editable'] && $data['allowed_ui_conf_host_groups']
 		? (new CLink($caption, (new CUrl('zabbix.php'))
-				->setArgument('action', 'hostgroup.edit')
-				->setArgument('groupid', $group['groupid'])
+			->setArgument('action', 'hostgroup.edit')
+			->setArgument('groupid', $group['groupid'])
 		))
 			->addClass('js-edit-hostgroup')
 			->setAttribute('data-groupid', $group['groupid'])
@@ -371,10 +371,10 @@ if ($data['admin']) {
 $table = (new CTableInfo())
 	->setHeader((new CRowHeader())
 		->addItem(new CColHeader(_('Template group')))
-		->addItem($data['admin']
-			? (new CColHeader(_('Configuration')))
-				->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
-			: null
+		->addItem(
+			$data['admin']
+				? (new CColHeader(_('Configuration')))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
+				: null
 		)
 	);
 
@@ -382,8 +382,8 @@ foreach ($data['template_groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
 	$name_link = $group['editable'] && $data['allowed_ui_conf_template_groups']
 		? (new CLink($caption, (new CUrl('zabbix.php'))
-				->setArgument('action', 'templategroup.edit')
-				->setArgument('groupid', $group['groupid'])
+			->setArgument('action', 'templategroup.edit')
+			->setArgument('groupid', $group['groupid'])
 		))
 			->addClass('js-edit-templategroup')
 			->setAttribute('data-groupid', $group['groupid'])
@@ -401,10 +401,7 @@ foreach ($data['template_groups'] as $groupid => $group) {
 		$templates_link = (new CCol($templates_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 	}
 
-	$table->addRow([
-		$name_link,
-		$templates_link
-	]);
+	$table->addRow([$name_link, $templates_link]);
 }
 
 $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATEGROUP, $table))
