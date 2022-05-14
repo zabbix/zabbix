@@ -577,7 +577,7 @@ class testHostGroup extends CAPITest {
 				'expected_error' => 'Invalid parameter "/": the parameter "groups" is missing.'
 			],
 			[
-				'hosstgroup' => [
+				'hostgroup' => [
 					'groups' => [],
 					'permissions' => true
 				],

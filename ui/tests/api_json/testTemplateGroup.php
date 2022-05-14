@@ -579,10 +579,12 @@ class testTemplateGroup extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $key => $id) {
-				foreach($templategroup['templates'] as $templateid) {
+				foreach($templategroup['templates'] as $template) {
 					$dbResult = DBSelect(
-						'select * from hosts_groups where groupid=' . zbx_dbstr($id)
-						.'and hostid=' .zbx_dbstr($templateid['templateid'])
+						'SELECT groupid'.
+						' FROM hosts_groups'.
+						' WHERE groupid='.$id.
+							'AND hostid='.$template['templateid']
 					);
 					$dbRow = DBFetch($dbResult);
 					$this->assertEquals($dbRow['groupid'], $templategroup['groups'][$key]['groupid']);
@@ -710,16 +712,18 @@ class testTemplateGroup extends CAPITest {
 			foreach ($result['result']['groupids'] as $id) {
 				if (array_key_exists('templateid', $templategroup['templates'])) {
 					$dbResult = DBSelect(
-						'select * from hosts_groups where groupid=' . zbx_dbstr($id)
-						.'and hostid=' .zbx_dbstr($templategroup['templates']['templateid'])
+						'SELECT groupid'.
+						' FROM hosts_groups'.
+						' WHERE groupid='.$id.
+							'AND hostid='.$templategroup['templates']['templateid']
 					);
 					$dbRow = DBFetch($dbResult);
 					$this->assertEquals($dbRow['groupid'], $templategroup['groups']['groupid']);
 				}
 				else {
-					$dbResult = DBSelect('select * from hosts_groups where groupid=' . zbx_dbstr($id));
+					$dbResult = DBSelect('SELECT NULL FROM hosts_groups WHERE groupid='.$id);
 					$dbRow = DBFetch($dbResult);
-					$this->assertEquals($dbRow['groupid'], false);
+					$this->assertSame($dbRow, false);
 				}
 			}
 		}
@@ -809,12 +813,9 @@ class testTemplateGroup extends CAPITest {
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $key => $id) {
 				foreach($templategroup['templateids'] as $templateid) {
-					$dbResult = DBSelect(
-						'select * from hosts_groups where groupid=' . zbx_dbstr($id)
-						.'and hostid=' .zbx_dbstr($templateid)
-					);
+					$dbResult = DBSelect('SELECT NULL FROM hosts_groups WHERE groupid='.$id.' AND hostid='.$templateid);
 					$dbRow = DBFetch($dbResult);
-					$this->assertEquals($dbRow['groupid'], false);
+					$this->assertSame($dbRow, false);
 				}
 			}
 		}
