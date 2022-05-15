@@ -141,14 +141,4 @@ void	zbx_sha256_hash_len(const char *in, size_t len, char *out);
 void	zbx_sha512_hash(const char *in, char *out);
 /* end of sha */
 
-typedef enum
-{
-	ZBX_HASH_MD5,
-	ZBX_HASH_SHA256
-}
-zbx_crypto_hash_t;
-
-int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
-		char **out);
-
 #endif /* ZABBIX_HASH_H */

@@ -29,4 +29,13 @@ char	*zbx_create_token(zbx_uint64_t seed);
 size_t	zbx_get_token_len(void);
 char	*zbx_gen_uuid4(const char *seed);
 
+typedef enum
+{
+	ZBX_HASH_MD5,
+	ZBX_HASH_SHA256
+}
+zbx_crypto_hash_t;
+
+int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
+		char **out);
 #endif /* ZABBIX_CRYPTO_H */

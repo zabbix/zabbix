@@ -6,4 +6,5 @@ libzbxcrypto_a_SOURCES = \
 	crypto.c \
 	base64.c \
 	aes.c \
-	aes.h
+	aes.h \
+	hmac.c
