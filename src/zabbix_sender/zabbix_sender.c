@@ -27,9 +27,7 @@
 #include "zbxcrypto.h"
 #include "zbxtls.h"
 
-#if defined(_WINDOWS)
-#	include "../libs/zbxcrypto/tls.h"
-#else
+#if !defined(_WINDOWS)
 #	include "zbxnix.h"
 #endif
 

@@ -52,7 +52,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxgetopt\getopt.o \
 	..\..\..\src\libs\zbxhash\md5.o \
-	..\..\..\src\libs\zbxcrypto\sha256crypt.o \
+	..\..\..\src\libs\zbxhash\sha256crypt.o \
 	..\..\..\src\libs\zbxcrypto\crypto.o \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
