@@ -201,7 +201,7 @@ function getHostGroupsRights(array $usrgrpids = []) {
 /**
  * Returns the list of permissions to the template groups for selected user groups.
  *
- * @param array $usrgrpids   An array of user group IDs.
+ * @param array $usrgrpids  An array of user group IDs.
  *
  * @return array
  */
@@ -371,13 +371,13 @@ function collapseTagFilters(array $tag_filters) {
 /**
  * Applies new permissions to the host groups.
  *
- * @param array  $groups_rights                          Array with host roup rights information.
- * @param string $groups_rights[<groupid>]['name']       Name of the host group.
- * @param int    $groups_rights[<groupid>]['permission'] Permission level.
- * @param int    $groups_rights[<groupid>]['grouped']    (optional) If group is grouped with subgroups.
- * @param array  $groupids                               Host group ID.
- * @param array  $groupids_subgroupids                   Host group's subgroup IDs.
- * @param int    $new_permission                         New permission level.
+ * @param array  $groups_rights                           Array with host roup rights information.
+ * @param string $groups_rights[<groupid>]['name']        Name of the host group.
+ * @param int    $groups_rights[<groupid>]['permission']  Permission level.
+ * @param int    $groups_rights[<groupid>]['grouped']     (optional) If group is grouped with subgroups.
+ * @param array  $groupids                                Host group ID.
+ * @param array  $groupids_subgroupids                    Host group's subgroup IDs.
+ * @param int    $new_permission                          New permission level.
  *
  * @return array
  */
@@ -455,13 +455,13 @@ function applyHostGroupRights(array $groups_rights, array $groupids = [], array 
 /**
  * Applies new permissions to the template groups.
  *
- * @param array  $groups_rights                          Array with template group rights information.
- * @param string $groups_rights[<groupid>]['name']       Name of the template group.
- * @param int    $groups_rights[<groupid>]['permission'] Permission level.
- * @param int    $groups_rights[<groupid>]['grouped']    (optional) If group is grouped with subgroups.
- * @param array  $groupids                               Group ID.
- * @param array  $groupids_subgroupids                   Group's subgroup IDs
- * @param int    $new_permission                         New permission level.
+ * @param array  $groups_rights                           Array with template group rights information.
+ * @param string $groups_rights[<groupid>]['name']        Name of the template group.
+ * @param int    $groups_rights[<groupid>]['permission']  Permission level.
+ * @param int    $groups_rights[<groupid>]['grouped']     (optional) If group is grouped with subgroups.
+ * @param array  $groupids                                Group ID.
+ * @param array  $groupids_subgroupids                    Group's subgroup IDs
+ * @param int    $new_permission                          New permission level.
  *
  * @return array
  */

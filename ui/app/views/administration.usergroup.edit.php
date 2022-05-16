@@ -126,8 +126,7 @@ $new_templategroup_right_table = (new CTable())
 		(new CMultiSelect([
 			'name' => 'new_templategroup_right[groupids][]',
 			'object_name' => 'templateGroup',
-			'data' => array_intersect_key(
-				$data['template_groups_ms'],
+			'data' => array_intersect_key($data['template_groups_ms'],
 				array_flip($data['new_templategroup_right']['groupids'])
 			),
 			'popup' => [
@@ -140,8 +139,7 @@ $new_templategroup_right_table = (new CTable())
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(
-			(new CRadioButtonList(
-				'new_templategroup_right[permission]',
+			(new CRadioButtonList('new_templategroup_right[permission]',
 				(int) $data['new_templategroup_right']['permission']
 			))
 				->addValue(_('Read-write'), PERM_READ_WRITE)

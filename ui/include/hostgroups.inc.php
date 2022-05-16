@@ -66,7 +66,7 @@ function isWritableHostGroups(array $groupids) {
  * Get sub-groups of selected host groups or template groups.
  *
  * @param array  $groupids
- * @param array  $ms_groups  [OUT] the list of groups for multiselect.
+ * @param array  $ms_groups  [OUT] The list of groups for multiselect.
  * @param array  $options    Additional API options to select host groups or template groups.
  * @param string $context    Context of hosts or templates.
  *
@@ -109,7 +109,7 @@ function getSubGroups(array $groupids, array &$ms_groups = null, array $options 
  * Get sub-groups of selected template groups.
  *
  * @param array $template_groupids
- * @param array $ms_template_groups  [OUT] the list of groups for multiselect.
+ * @param array $ms_template_groups  [OUT] The list of groups for multiselect.
  * @param array $options             Additional API options to select template groups.
  *
  * @return array

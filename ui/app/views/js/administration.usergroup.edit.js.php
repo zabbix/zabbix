@@ -352,8 +352,8 @@
 		}
 
 		/**
-		 * Collects host data, sends to controller for processing. On success, permissions table is updated and form objects
-		 * are removed from DOM. On failure error message is displayed. During request, loader is displayed.
+		 * Collects host data, sends to controller for processing. On success, permissions table is updated and form
+		 * objects are removed from DOM. On failure error message is displayed. During request, loader is displayed.
 		 *
 		 * @param {string} action
 		 */
