@@ -217,8 +217,8 @@ zbx_vmware_pnic_t;
 int	vmware_pnic_compare(const void *v1, const void *v2);
 ZBX_PTR_VECTOR_DECL(vmware_pnic, zbx_vmware_pnic_t *)
 
-#define ZBX_VMWARE_ALARM_ACK_FALSE      0
-#define ZBX_VMWARE_ALARM_ACK_TRUE       1
+#define ZBX_VMWARE_ALARM_BOOL_FALSE      0
+#define ZBX_VMWARE_ALARM_BOOL_TRUE       1
 
 /* hypervisor alarm data */
 typedef struct

@@ -4730,29 +4730,27 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
 }
 
-#define ALARM_ENABLED	0
-#define ALARM_DISABLED	1
 static int	vmware_service_get_hv_alarm_details(zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vmware_alarm_t *alarm, char **error)
 {
-#	define ZBX_POST_VMWARE_GET_ALARMS                                                       \
-		ZBX_POST_VSPHERE_HEADER                                                         \
-		"<ns0:RetrievePropertiesEx>"                                                    \
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"                  \
-			"<ns0:specSet>"                                                         \
-				"<ns0:propSet>"                                                 \
-					"<ns0:type>Alarm</ns0:type>"                            \
-					"<ns0:pathSet>info.name</ns0:pathSet>"                  \
-					"<ns0:pathSet>info.systemName</ns0:pathSet>"            \
-					"<ns0:pathSet>info.description</ns0:pathSet>"           \
-					"<ns0:pathSet>info.enabled</ns0:pathSet>"               \
-				"</ns0:propSet>"                                                \
-				"<ns0:objectSet>"                                               \
-					"<ns0:obj type=\"Alarm\">%s</ns0:obj>"                  \
-				"</ns0:objectSet>"                                              \
-			"</ns0:specSet>"                                                        \
-			"<ns0:options/>"                                                        \
-		"</ns0:RetrievePropertiesEx>"                                                   \
+#	define ZBX_POST_VMWARE_GET_ALARMS						\
+		ZBX_POST_VSPHERE_HEADER							\
+		"<ns0:RetrievePropertiesEx>"						\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"		\
+			"<ns0:specSet>"							\
+				"<ns0:propSet>"						\
+					"<ns0:type>Alarm</ns0:type>"			\
+					"<ns0:pathSet>info.name</ns0:pathSet>"		\
+					"<ns0:pathSet>info.systemName</ns0:pathSet>"	\
+					"<ns0:pathSet>info.description</ns0:pathSet>"	\
+					"<ns0:pathSet>info.enabled</ns0:pathSet>"	\
+				"</ns0:propSet>"					\
+				"<ns0:objectSet>"					\
+					"<ns0:obj type=\"Alarm\">%s</ns0:obj>"		\
+				"</ns0:objectSet>"					\
+			"</ns0:specSet>"						\
+			"<ns0:options/>"						\
+		"</ns0:RetrievePropertiesEx>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
 	xmlDoc		*alarm_details = NULL;
@@ -4760,7 +4758,7 @@ static int	vmware_service_get_hv_alarm_details(zbx_vmware_service_t *service, CU
 	int		ret = FAIL;
 	char		tmp[MAX_STRING_LEN], *value;
 
-	zabbix_log(LOG_LEVEL_CRIT, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_GET_ALARMS,
 			vmware_service_objects[service->type].property_collector, alarm->key);
@@ -4779,7 +4777,7 @@ static int	vmware_service_get_hv_alarm_details(zbx_vmware_service_t *service, CU
 
 	if (NULL != (value = zbx_xml_doc_read_value(alarm_details, ZBX_XPATH_PROP_NAME("info.enabled"))))
 	{
-		alarm->enabled = 0 == strcmp(value, "true") ? ALARM_ENABLED : ALARM_DISABLED;
+		alarm->enabled = 0 == strcmp(value, "true") ? ZBX_VMWARE_ALARM_BOOL_TRUE : ZBX_VMWARE_ALARM_BOOL_FALSE;
 		zbx_free(value);
 	}
 	else
@@ -4795,8 +4793,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 	return ret;
 }
-#undef ALARM_ENABLED
-#undef ALARM_DISABLED
 
 static void	vmware_service_get_hv_alarms_data(zbx_vmware_service_t *service, CURL *easyhandle, xmlDoc *details,
 		zbx_vector_vmware_alarm_t *alarms, char **error)
@@ -4877,7 +4873,7 @@ static void	vmware_service_get_hv_alarms_data(zbx_vmware_service_t *service, CUR
 		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("acknowledged"))))
 		{
 			alarm->acknowledged = 0 == strcmp(value, "true")
-				? ZBX_VMWARE_ALARM_ACK_TRUE : ZBX_VMWARE_ALARM_ACK_FALSE;
+				? ZBX_VMWARE_ALARM_BOOL_TRUE : ZBX_VMWARE_ALARM_BOOL_FALSE;
 			zbx_free(value);
 		}
 
