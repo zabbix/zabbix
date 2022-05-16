@@ -37,6 +37,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcrypto}.c{..\..\..\src\libs\zbxcrypto}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxtls}.c{..\..\..\src\libs\zbxtls}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxgetopt}.c{..\..\..\src\libs\zbxgetopt}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
