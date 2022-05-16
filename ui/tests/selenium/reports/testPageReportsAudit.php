@@ -152,6 +152,12 @@ class testPageReportsAudit extends CLegacyWebTest {
 
 	public function testPageReportsAudit_CheckLayout() {
 		$form = $this->getFormAndActionList();
+
+		if (!($form->getField('Users')->isVisible())) {
+			$this->query('id:ui-id-2')->waitUntilClickable()->one()->click();
+		}
+
+
 		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'],$form->getLabels()->asText());
 		$this->assertTrue(!array_diff($this->actions, self::$action_list->getLabels()->asText()));
 
