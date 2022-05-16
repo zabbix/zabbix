@@ -5463,7 +5463,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
-	int		i, flags, changelog_num, ret = FAIL;
+	int		i, flags, changelog_num, dberr = ZBX_DB_FAIL;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec, expr_sec,
 			csec2, hsec2, hisec2, ifsec2, idsec2, isec2, tisec2, pisec2, tsec2, dsec2, fsec2, expr_sec2,
 			action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
@@ -6192,14 +6192,10 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
 
-	ret = SUCCEED;
+	dberr = ZBX_DB_OK;
 out:
 	if (0 == sync_in_progress)
-	{
-		/* non recoverable database error is encountered */
-		THIS_SHOULD_NEVER_HAPPEN;
 		START_SYNC;
-	}
 
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
@@ -6207,25 +6203,28 @@ out:
 	FINISH_SYNC;
 
 #ifdef HAVE_ORACLE
-	if (SUCCEED == ret)
-	{
-		if (ZBX_DB_OK != DBcommit())
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Configuration cache has not been fully initialized because of"
-					" database errors. Full database scan will be attempted on next sync.");
-			ret = FAIL;
-		}
-	}
+	if (ZBX_DB_OK == dberr)
+		dberr = DBcommit();
 	else
 		DBrollback();
 #endif
-
-	if (SUCCEED == ret)
+	switch (dberr)
 	{
-		if (ZBX_DBSYNC_INIT != changelog_sync_mode)
-			zbx_dbsync_env_flush_changelog();
-		else
-			sync_status = ZBX_DBSYNC_STATUS_INITIALIZED;
+		case ZBX_DB_OK:
+			if (ZBX_DBSYNC_INIT != changelog_sync_mode)
+				zbx_dbsync_env_flush_changelog();
+			else
+				sync_status = ZBX_DBSYNC_STATUS_INITIALIZED;
+			break;
+		case ZBX_DB_FAIL:
+			/* non recoverable database error is encountered */
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
+		case ZBX_DB_DOWN:
+			zabbix_log(LOG_LEVEL_WARNING, "Configuration cache has not been fully initialized because of"
+					" database connection problems. Full database scan will be attempted on next"
+					" sync.");
+			break;
 	}
 
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_MACROS)))
