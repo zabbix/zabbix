@@ -251,30 +251,31 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 					zbx_json_addobject(j, NULL);
 
 					buf = zbx_unicode_to_utf8(root);
-					zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, buf,
-							ZBX_JSON_TYPE_STRING);
-
-					zbx_free(buf);
-
-					buf = zbx_unicode_to_utf8(current_subkey);
-					zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, buf,
-							ZBX_JSON_TYPE_STRING);
-
-					zbx_free(buf);
-
-					buf = zbx_unicode_to_utf8(achValue);
-					zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_NAME, buf, ZBX_JSON_TYPE_STRING);
-					zbx_free(buf);
-
-					buf = zbx_unicode_to_utf8(dataBuffer);
-					registry_discovery_convert_value_data(j, valueType, dataBuffer);
-					zbx_free(buf);
-
-					zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_TYPE,
-							registry_type_to_string(valueType), ZBX_JSON_TYPE_STRING);
-
-					zbx_json_close(j);
 				}
+
+				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, buf,
+						ZBX_JSON_TYPE_STRING);
+
+				zbx_free(buf);
+
+				buf = zbx_unicode_to_utf8(current_subkey);
+				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, buf,
+						ZBX_JSON_TYPE_STRING);
+
+				zbx_free(buf);
+
+				buf = zbx_unicode_to_utf8(achValue);
+				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_NAME, buf, ZBX_JSON_TYPE_STRING);
+				zbx_free(buf);
+
+				buf = zbx_unicode_to_utf8(dataBuffer);
+				registry_discovery_convert_value_data(j, valueType, dataBuffer);
+				zbx_free(buf);
+
+				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_TYPE,
+						registry_type_to_string(valueType), ZBX_JSON_TYPE_STRING);
+
+				zbx_json_close(j);
 			}
 		}
 	}
@@ -299,8 +300,8 @@ static int	split_fullkey(char **fullkey, HKEY *hive_handle)
 
 static void	registry_discover(char *key, int mode, AGENT_RESULT *result, const char *regexp)
 {
-	wchar_t			*wkey;
-	HKEY			hkey, hive_handle;
+	wchar_t		*wkey;
+	HKEY		hkey, hive_handle;
 	struct zbx_json	j;
 
 	if (FAIL == split_fullkey(&key, &hive_handle))
