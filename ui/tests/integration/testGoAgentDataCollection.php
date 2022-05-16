@@ -517,7 +517,6 @@ class testGoAgentDataCollection extends CIntegrationTest {
 	 * @dataProvider getItems
 	 */
 	public function testGoAgentDataCollection_checkData($item) {
-		
 		$data = $this->getItemData();
 		if (!array_key_exists($item['key'], $data)) {
 			$this->fail('No metrics for item "'.$item['key'].'"');
@@ -557,7 +556,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
 					$value = [];
 					$diff_values = [];
-					
+
 					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
 						for ($i = 0; $i < self::OFFSET_MAX; $i++) {
 							$value[$component][$i] = 0;
@@ -575,7 +574,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 							}
 						}
 					}
-					
+
 					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
 						$diff_values[$i] = abs(abs($value[self::COMPONENT_AGENT][$i]) - abs($value[self::COMPONENT_AGENT2][$i]));
 					}
