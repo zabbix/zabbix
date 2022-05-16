@@ -247,7 +247,7 @@ class testPageReportsAudit extends CLegacyWebTest {
 					break;
 
 				case 'Proxy':
-					$this->assertEquals(['All', 'Add', 'Configuration refresh', 'Delete', 'Update'], $enabled);
+					$this->assertEquals(['Add', 'Configuration refresh', 'Delete', 'Update'], $enabled);
 					break;
 
 				case 'User':
