@@ -643,7 +643,6 @@ if (!$readonly) {
 		? (new CButton('add_dep_trigger', _('Add')))
 			->setAttribute('data-hostid', $data['hostid'])
 			->onClick('
-				console.log(this.dataset);
 				PopUp("popup.generic", {
 					srctbl: "triggers",
 					srcfld1: "triggerid",
