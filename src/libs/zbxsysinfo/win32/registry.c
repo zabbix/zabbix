@@ -18,13 +18,18 @@
 **/
 
 #include "sysinfo.h"
-#include "log.h"
 #include "base64.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include <locale.h>
 #include <winreg.h>
+
+#define ZBX_SYSINFO_REGISTRY_TAG_FULLKEY	"fullkey"
+#define ZBX_SYSINFO_REGISTRY_TAG_LASTKEY	"lastsubkey"
+#define ZBX_SYSINFO_REGISTRY_TAG_NAME		"name"
+#define ZBX_SYSINFO_REGISTRY_TAG_DATA		"data"
+#define ZBX_SYSINFO_REGISTRY_TAG_TYPE		"type"
 
 #define MAX_KEY_LENGTH			255
 #define MAX_DATA_LENGTH			65534
@@ -37,41 +42,23 @@
 static HKEY	get_hkey_from_fullkey(char *fullkey)
 {
 	if (0 == strcmp("HKEY_CLASSES_ROOT", fullkey) || 0 == strcmp("HKCR", fullkey))
-	{
 		return HKEY_CLASSES_ROOT;
-	}
 	else if (0 == strcmp("HKEY_CURRENT_CONFIG", fullkey) || 0 == strcmp("HKCC", fullkey))
-	{
 		return HKEY_CURRENT_CONFIG;
-	}
 	else if (0 == strcmp("HKEY_CURRENT_USER", fullkey) || 0 == strcmp("HKCU", fullkey))
-	{
 		return HKEY_CURRENT_USER;
-	}
 	else if (0 == strcmp("HKEY_CURRENT_USER_LOCAL_SETTINGS", fullkey) || 0 == strcmp("HKCULS", fullkey))
-	{
 		return HKEY_CURRENT_USER_LOCAL_SETTINGS;
-	}
 	else if (0 == strcmp("HKEY_LOCAL_MACHINE", fullkey) || 0 == strcmp("HKLM", fullkey))
-	{
 		return HKEY_LOCAL_MACHINE;
-	}
 	else if (0 == strcmp("HKEY_PERFORMANCE_DATA", fullkey) || 0 == strcmp("HKPD", fullkey))
-	{
 		return HKEY_PERFORMANCE_DATA;
-	}
 	else if (0 == strcmp("HKEY_PERFORMANCE_NLSTEXT", fullkey) || 0 == strcmp("HKPN", fullkey))
-	{
 		return HKEY_PERFORMANCE_NLSTEXT;
-	}
 	else if (0 == strcmp("HKEY_PERFORMANCE_TEXT", fullkey) || 0 == strcmp("HKPT", fullkey))
-	{
 		return HKEY_PERFORMANCE_TEXT;
-	}
 	else if (0 == strcmp("HKEY_USERS", fullkey) || 0 == strcmp("HKU", fullkey))
-	{
 		return HKEY_USERS;
-	}
 
 	return 0;
 }
@@ -155,8 +142,8 @@ static void	registry_discovery_convert_value_data(struct zbx_json *j, DWORD type
 ZBX_PTR_VECTOR_DECL(wchar_ptr, wchar_t *)
 ZBX_PTR_VECTOR_IMPL(wchar_ptr, wchar_t *)
 
-static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, struct zbx_json *j, int mode, wchar_t *root,
-		const char *regexp)
+static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, struct zbx_json *j, int mode,
+		wchar_t *root, const char *regexp)
 {
 	wchar_t			achClass[MAX_PATH] = TEXT(""), achValue[MAX_VALUE_NAME];
 	DWORD			cchClassName = MAX_PATH, cSubKeys=0, cValues, cbName, i, retCode,
@@ -164,7 +151,8 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 	char			*uroot, *usubkey;
 	zbx_vector_wchar_ptr_t	wsubkeys;
 
-	retCode = RegQueryInfoKey(hKey, achClass, &cchClassName, NULL, &cSubKeys, NULL, NULL, &cValues, NULL, NULL, NULL, NULL);
+	retCode = RegQueryInfoKey(hKey, achClass, &cchClassName, NULL, &cSubKeys, NULL, NULL, &cValues, NULL, NULL,
+			NULL, NULL);
 
 	zbx_vector_wchar_ptr_create(&wsubkeys);
 
@@ -228,7 +216,8 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 			cchValue = MAX_VALUE_NAME;
 			achValue[0] = L'\0';
 
-			retCode = RegEnumValueW(hKey, i, achValue, &cchValue, NULL, &valueType, (BYTE*)dataBuffer, &lpDataLength);
+			retCode = RegEnumValueW(hKey, i, achValue, &cchValue, NULL, &valueType, (BYTE*)dataBuffer,
+					&lpDataLength);
 
 			if (ERROR_SUCCESS == retCode)
 			{
@@ -293,7 +282,7 @@ static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const ch
 
 	if (FAIL == split_fullkey(&key, &hive_handle))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Incorrect key provided"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to parse registry key."));
 		return FAIL;
 	}
 
@@ -330,7 +319,7 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 
 	if (FAIL == split_fullkey(&key, &hive_handle))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Incorrect key provided"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to parse registry key."));
 		return FAIL;
 	}
 
@@ -377,7 +366,7 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 			SET_STR_RESULT(result, zbx_unicode_to_utf8(wbuffer));
 			break;
 		default:
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported registry data type"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported registry data type."));
 			ret = FAIL;
 			break;
 	}
@@ -445,7 +434,7 @@ int	REGISTRY_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Incorrect parameter 'mode' was provided."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid 'mode' parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 

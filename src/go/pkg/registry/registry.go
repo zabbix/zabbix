@@ -45,8 +45,10 @@ type RegistryValue struct {
 	Type       string      `json:"type"`
 }
 
-const RegistryDiscoveryModeKeys = 0
-const RegistryDiscoveryModeValues = 1
+const (
+	RegistryDiscoveryModeKeys   = 0
+	RegistryDiscoveryModeValues = 1
+)
 
 func getHive(key string) (hive registry.Key, e error) {
 	switch {

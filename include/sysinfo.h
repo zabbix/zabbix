@@ -404,12 +404,4 @@ zbx_uint32_t get_thread_global_mutex_flag(void);
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
 #endif
 
-#if defined(_WINDOWS) || defined(__MINGW32__)
-#define ZBX_SYSINFO_REGISTRY_TAG_FULLKEY	"fullkey"
-#define ZBX_SYSINFO_REGISTRY_TAG_LASTKEY	"lastsubkey"
-#define ZBX_SYSINFO_REGISTRY_TAG_NAME		"name"
-#define ZBX_SYSINFO_REGISTRY_TAG_DATA		"data"
-#define ZBX_SYSINFO_REGISTRY_TAG_TYPE		"type"
-#endif
-
 #endif
