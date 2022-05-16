@@ -192,7 +192,7 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 		if (0 == wcscmp(wsubkey, L""))
 			continue;
 
-		swprintf(wnew_root, MAX_FULLKEY_LENGTH, L"%ls\\%ls", root, wsubkey);
+		_snwprintf_s(wnew_root, MAX_FULLKEY_LENGTH, MAX_FULLKEY_LENGTH, L"%ls\\%ls", root, wsubkey);
 
 		if (ERROR_SUCCESS == RegOpenKeyExW(HKEY_LOCAL_MACHINE, wnew_root, 0, KEY_READ, &hSubkey))
 		{
@@ -279,6 +279,8 @@ static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const ch
 	wchar_t		*wkey;
 	HKEY		hkey, hive_handle;
 	struct zbx_json	j;
+	DWORD		retCode;
+	int		ret = SUCCEED;
 
 	if (FAIL == split_fullkey(&key, &hive_handle))
 	{
@@ -290,15 +292,22 @@ static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const ch
 
 	wkey = zbx_utf8_to_unicode(key);
 
-	if (ERROR_SUCCESS == RegOpenKeyEx(hive_handle, wkey, 0, KEY_READ, &hkey))
+	if (ERROR_SUCCESS == (retCode = RegOpenKeyEx(hive_handle, wkey, 0, KEY_READ, &hkey)))
 	{
 		discovery_get_regkey_values(hkey, TEXT(""), &j, mode, wkey, regexp);
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, strerror_from_system(retCode)));
+		ret = FAIL;
+		goto out;
 	}
 
 	RegCloseKey(hkey);
 
 	zbx_json_close(&j);
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+out:
 	zbx_json_free(&j);
 	zbx_free(wkey);
 
