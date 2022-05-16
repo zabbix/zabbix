@@ -145,11 +145,17 @@ foreach ($data['groups'] as $group) {
 	}
 
 	if ($host_count > 0) {
-		$count = (new CLink($host_count, (new CUrl('zabbix.php'))
-			->setArgument('action', 'host.list')
-			->setArgument('filter_set', '1')
-			->setArgument('filter_groups', [$group['groupid']]))
-		)->addClass(ZBX_STYLE_ICON_COUNT);
+		if ($data['allowed_ui_conf_hosts']) {
+			$count = new CLink($host_count, (new CUrl('zabbix.php'))
+				->setArgument('action', 'host.list')
+				->setArgument('filter_set', '1')
+				->setArgument('filter_groups', [$group['groupid']]));
+		}
+		else {
+			$count = new CSpan($host_count);
+		}
+
+		$count->addClass(ZBX_STYLE_ICON_COUNT);
 	}
 	else {
 		$count = (new CSpan(''));
@@ -158,7 +164,7 @@ foreach ($data['groups'] as $group) {
 	$table->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		$data['allowed_ui_conf_hosts'] ? $count : '',
+		$count,
 		$hosts_output ? $hosts_output : '',
 		makeInformationList($info_icons)
 	]);

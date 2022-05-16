@@ -116,9 +116,15 @@ foreach ($data['groups'] as $group) {
 		->setAttribute('data-groupid', $group['groupid']);
 
 	if ($template_count > 0) {
-		$count = new CLink($template_count, (new CUrl('templates.php'))
-			->setArgument('filter_set', '1')
-			->setArgument('filter_groups', [$group['groupid']]));
+		if ($data['allowed_ui_conf_templates']) {
+			$count = new CLink($template_count, (new CUrl('templates.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_groups', [$group['groupid']]));
+		}
+		else {
+			$count = new CSpan($template_count);
+		}
+
 		$count->addClass(ZBX_STYLE_ICON_COUNT);
 	}
 	else {
@@ -128,7 +134,7 @@ foreach ($data['groups'] as $group) {
 	$table->addRow([
 		new CCheckBox('groupids['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		$data['allowed_ui_conf_templates'] ? $count : '',
+		$count,
 		$templates_output ? $templates_output : ''
 	]);
 }
