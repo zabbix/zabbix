@@ -23,7 +23,7 @@ my $file = dirname($0)."/../src/schema.tmpl";	# name the file
 
 my ($state, %output, $eol, $fk_bol, $fk_eol, $ltab, $pkey, $table_name, $pkey_name);
 my ($szcol1, $szcol2, $szcol3, $szcol4, $sequences, $sql_suffix, $triggers);
-my ($fkeys, $fkeys_prefix, $fkeys_suffix, $uniq);
+my ($fkeys, $fkeys_prefix, $fkeys_suffix, $uniq, $delete_cascade);
 
 my %c = (
 	"type"		=>	"code",
@@ -208,6 +208,8 @@ sub process_table
 	my $flags;
 
 	newstate("table");
+	
+	$delete_cascade = 0;
 
 	($table_name, $pkey_name, $flags) = split(/\|/, $line, 3);
 
@@ -343,6 +345,7 @@ sub process_field
 
 			if (not $fk_flags or $fk_flags eq "")
 			{
+				$delete_cascade = 1;
 				$fk_flags = "ZBX_FK_CASCADE_DELETE";
 			}
 			elsif ($fk_flags eq "RESTRICT")
@@ -426,6 +429,7 @@ sub process_field
 
 			if (not $fk_flags or $fk_flags eq "")
 			{
+				$delete_cascade = 1;
 				$fk_flags = " ON DELETE CASCADE";
 			}
 			elsif ($fk_flags eq "RESTRICT")
@@ -837,6 +841,12 @@ sub close_function
 
 sub process_changelog
 {
+	if ($delete_cascade)
+	{
+		close 
+		die "foreign keys without RESTRICT flag are not compatible with table CHANGELOG token";
+	}
+	
 	if ($output{"database"} eq "c")
 	{
 		return
