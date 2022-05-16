@@ -3336,8 +3336,7 @@ ZABBIX.apps.map = (function($) {
 					element,
 					elementTypeText,
 					i,
-					ln,
-					name;
+					ln;
 
 				$('#massList tbody').empty();
 
