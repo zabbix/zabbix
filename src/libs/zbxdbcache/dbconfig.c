@@ -6183,6 +6183,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() timer queue: %d (%d allocated)", __func__,
 				config->trigger_queue.elems_num, config->trigger_queue.elems_alloc);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : %d", __func__, zbx_dbsync_env_changelog_num());
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __func__,
 				100 * ((double)config_mem->free_size / config_mem->orig_size));
 

@@ -556,6 +556,11 @@ void	zbx_dbsync_env_clear(void)
 
 }
 
+int	zbx_dbsync_env_changelog_num(void)
+{
+	return dbsync_env.changelog.num_data;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get rows changed since last sync                                  *
