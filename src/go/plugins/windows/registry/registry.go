@@ -41,12 +41,12 @@ type Plugin struct {
 
 var impl Plugin
 
-type RegistryKey struct {
+type registryKey struct {
 	Fullkey    string `json:"fullkey"`
 	Lastsubkey string `json:"lastsubkey"`
 }
 
-type RegistryValue struct {
+type registryValue struct {
 	Fullkey    string      `json:"fullkey"`
 	Lastsubkey string      `json:"lastsubkey"`
 	Name       string      `json:"name"`
@@ -85,7 +85,7 @@ func getHive(key string) (hive registry.Key, e error) {
 	return 0, errors.New("Failed to parse key.")
 }
 
-func discoverValues(hive registry.Key, fullkey string, discovered_values []RegistryValue, current_key string, re string) (result []RegistryValue, e error) {
+func discoverValues(hive registry.Key, fullkey string, discovered_values []registryValue, current_key string, re string) (result []registryValue, e error) {
 	k, err := registry.OpenKey(hive, fullkey, registry.READ)
 	if err != nil {
 		return nil, err
@@ -94,12 +94,12 @@ func discoverValues(hive registry.Key, fullkey string, discovered_values []Regis
 
 	subkeys, err := k.ReadSubKeyNames(0)
 	if err != nil {
-		return []RegistryValue{}, err
+		return []registryValue{}, err
 	}
 
 	values, err := k.ReadValueNames(0)
 	if err != nil {
-		return []RegistryValue{}, err
+		return []registryValue{}, err
 	}
 
 	for _, v := range values {
@@ -114,11 +114,11 @@ func discoverValues(hive registry.Key, fullkey string, discovered_values []Regis
 
 			if match {
 				discovered_values = append(discovered_values,
-					RegistryValue{fullkey, current_key, v, data, valtype})
+					registryValue{fullkey, current_key, v, data, valtype})
 			}
 		} else {
 			discovered_values = append(discovered_values,
-				RegistryValue{fullkey, current_key, v, data, valtype})
+				registryValue{fullkey, current_key, v, data, valtype})
 		}
 	}
 
@@ -130,7 +130,7 @@ func discoverValues(hive registry.Key, fullkey string, discovered_values []Regis
 	return discovered_values, nil
 }
 
-func discoverKeys(hive registry.Key, fullkey string, subkeys []RegistryKey) (result []RegistryKey, e error) {
+func discoverKeys(hive registry.Key, fullkey string, subkeys []registryKey) (result []registryKey, e error) {
 	k, err := registry.OpenKey(hive, fullkey, registry.ENUMERATE_SUB_KEYS)
 	if err != nil {
 		return nil, err
@@ -144,11 +144,11 @@ func discoverKeys(hive registry.Key, fullkey string, subkeys []RegistryKey) (res
 		return nil, err
 	}
 
-	subkeys = append(subkeys, RegistryKey{fullkey, ""})
+	subkeys = append(subkeys, registryKey{fullkey, ""})
 
 	for _, i := range s {
 		current_key := fullkey + "\\" + i
-		subkeys = append(subkeys, RegistryKey{current_key, i})
+		subkeys = append(subkeys, registryKey{current_key, i})
 		discoverKeys(hive, current_key, subkeys)
 	}
 
@@ -245,11 +245,11 @@ func discover(params []string) (result string, err error) {
 	}
 
 	if mode == RegistryDiscoveryModeKeys {
-		results := make([]RegistryKey, 0)
+		results := make([]registryKey, 0)
 		results, err = discoverKeys(hive, key, results)
 		j, _ = json.Marshal(results)
 	} else if mode == RegistryDiscoveryModeValues {
-		results := make([]RegistryValue, 0)
+		results := make([]registryValue, 0)
 		results, err = discoverValues(hive, key, results, "", re)
 		j, _ = json.Marshal(results)
 	} else {
