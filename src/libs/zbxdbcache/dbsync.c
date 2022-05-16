@@ -429,7 +429,6 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 		zbx_dbsync_journal_init(&dbsync_env.journals[i]);
 
-	dbsync_prune_changelog();
 	changelog_num = dbsync_env.changelog.num_data;
 
 	if (ZBX_DBSYNC_INIT == mode)
@@ -546,6 +545,8 @@ void	zbx_dbsync_env_flush_changelog(void)
 void	zbx_dbsync_env_clear(void)
 {
 	size_t	i;
+
+	dbsync_prune_changelog();
 
 	zbx_hashset_destroy(&dbsync_env.strpool);
 
