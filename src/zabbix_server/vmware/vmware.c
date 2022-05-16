@@ -4756,9 +4756,6 @@ static int	vmware_service_get_hv_alarm_details(zbx_vmware_service_t *service, CU
 		ZBX_POST_VSPHERE_FOOTER
 
 	xmlDoc		*alarm_details = NULL;
-	xmlXPathContext	*xpathCtx;
-	xmlXPathObject	*xpathObj;
-	xmlNodeSetPtr	nodeset;
 
 	int		ret = FAIL;
 	char		tmp[MAX_STRING_LEN], *value;
