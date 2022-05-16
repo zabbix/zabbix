@@ -510,6 +510,7 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 	int			i;
 
 	zbx_vector_uint64_create(&objectids);
+	zbx_vector_uint64_reserve(&objectids, journal->sync->rows.values_num);
 
 	for (i = 0; i < journal->sync->rows.values_num; i++)
 	{
