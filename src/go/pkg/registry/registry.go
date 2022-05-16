@@ -224,11 +224,19 @@ func GetValue(params []string) (result interface{}, err error) {
 	}
 
 	handle, err := registry.OpenKey(hive, key, registry.QUERY_VALUE)
+	defer handle.Close()
 	if err != nil {
 		return err, nil
 	}
 
 	result, _, err = convertValue(handle, value)
+
+	if x, ok := result.([]string); ok {
+		var j []byte
+		j, err = json.Marshal(x)
+		result = string(j)
+	}
+
 	return
 }
 
