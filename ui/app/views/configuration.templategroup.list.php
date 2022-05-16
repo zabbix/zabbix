@@ -72,7 +72,6 @@ $table = (new CTableInfo())
 			make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)
 		)
 		->addItem((new CColHeader(_('Templates')))->setColSpan(2))
-		->addItem((new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH))
 	);
 
 $current_time = time();
@@ -130,8 +129,7 @@ foreach ($data['groups'] as $group) {
 		new CCheckBox('groupids['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$data['allowed_ui_conf_templates'] ? $count : '',
-		empty($templates_output) ? '' : $templates_output,
-		''
+		$templates_output ? $templates_output : ''
 	]);
 }
 

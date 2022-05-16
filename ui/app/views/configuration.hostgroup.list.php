@@ -159,7 +159,7 @@ foreach ($data['groups'] as $group) {
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$data['allowed_ui_conf_hosts'] ? $count : '',
-		empty($hosts_output) ? '' : $hosts_output,
+		$hosts_output ? $hosts_output : '',
 		makeInformationList($info_icons)
 	]);
 }
