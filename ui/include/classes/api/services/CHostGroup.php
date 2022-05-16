@@ -49,6 +49,7 @@ class CHostGroup extends CApiService {
 	public function get(array $options) {
 		$result = [];
 
+		$output_fields = ['groupid', 'name', 'flags', 'uuid'];
 		$host_fields = ['hostid', 'host', 'name', 'description', 'proxy_hostid', 'status', 'ipmi_authtype',
 			'ipmi_privilege', 'ipmi_password', 'ipmi_username', 'inventory_mode', 'tls_connect', 'tls_accept',
 			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'maintenanceid', 'maintenance_type',
@@ -98,7 +99,7 @@ class CHostGroup extends CApiService {
 			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>				['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'flags', 'uuid']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
 			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
 			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
@@ -119,16 +120,14 @@ class CHostGroup extends CApiService {
 		}
 
 		$sqlParts = [
-			'select'	=> ['hstgrp' => 'g.groupid'],
-			'from'		=> ['hstgrp' => 'hstgrp g'],
-			'where'		=> ['g.type='.HOST_GROUP_TYPE_HOST_GROUP],
-			'order'		=> []
+			'select' => ['hstgrp' => 'g.groupid'],
+			'from' => ['hstgrp' => 'hstgrp g'],
+			'where' => ['g.type='.HOST_GROUP_TYPE_HOST_GROUP],
+			'order' => []
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $this->getTableSchema()['fields'];
-			unset($options['output']['type']);
-			$options['output'] = array_keys($options['output']);
+			$options['output'] = $output_fields;
 		}
 
 		// editable + PERMISSION CHECK
@@ -365,11 +364,10 @@ class CHostGroup extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-		}
 
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			if (!$options['preservekeys']) {
+				$result = array_values($result);
+			}
 		}
 
 		return $result;
@@ -573,8 +571,8 @@ class CHostGroup extends CApiService {
 	 */
 	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
-			'groupid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>					['type' => API_HG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
+			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>		['type' => API_HG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
