@@ -35,7 +35,9 @@ $fields = [
 	'parent_discoveryid' =>	[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'copy_type' =>			[T_ZBX_INT, O_OPT, P_SYS,
-								IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+								IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
+									COPY_TYPE_TO_TEMPLATE,
+								]),
 								'isset({copy})'
 							],
 	'copy_mode' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null],
@@ -340,29 +342,11 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 			'templated_hosts' => true
 		];
 
-		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
 			$options['hostids'] = getRequest('copy_targetids');
 		}
-		// host groups
 		else {
-			$groupids = getRequest('copy_targetids');
-			zbx_value2array($groupids);
-
-			$dbGroups = API::HostGroup()->get([
-				'output' => ['groupid'],
-				'groupids' => $groupids,
-				'editable' => true
-			]);
-			$dbGroups = zbx_toHash($dbGroups, 'groupid');
-
-			foreach ($groupids as $groupid) {
-				if (!isset($dbGroups[$groupid])) {
-					access_deny();
-				}
-			}
-
-			$options['groupids'] = $groupids;
+			$options['groupids'] = getRequest('copy_targetids');
 		}
 
 		$dbHosts = API::Host()->get($options);

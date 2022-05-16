@@ -35,8 +35,8 @@ $fields = [
 	'hostid' =>									[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'(isset({form}) && ({form} == "update"))'],
 	'copy_type' =>								[T_ZBX_INT, O_OPT, P_SYS,
-													IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
-														COPY_TYPE_TO_TEMPLATE
+													IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP,
+														COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE,
 													]),
 													'isset({copy})'
 												],
@@ -498,32 +498,30 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 }
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('copy')
 		&& hasRequest('g_triggerid')) {
-
 	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-
-		// Hosts or templates.
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetids');
+			$hostids = getRequest('copy_targetids');
 		}
-		// Host groups.
+		elseif (getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE_GROUP) {
+			$hostids = array_keys(API::Template()->get([
+				'output' => [],
+				'groupids' => getRequest('copy_targetids'),
+				'editable' => true,
+				'preservekeys' => true
+			]));
+		}
 		else {
-			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetids');
-			$db_hosts = DBselect(
-				'SELECT DISTINCT h.hostid'.
-				' FROM hosts h,hosts_groups hg'.
-				' WHERE h.hostid=hg.hostid'.
-					' AND '.dbConditionInt('hg.groupid', $group_ids)
-			);
-
-			while ($db_host = DBfetch($db_hosts)) {
-				$hosts_ids[] = $db_host['hostid'];
-			}
+			$hostids = array_keys(API::Host()->get([
+				'output' => [],
+				'groupids' => getRequest('copy_targetids'),
+				'editable' => true,
+				'preservekeys' => true
+			]));
 		}
 
 		DBstart();
 
-		$result = copyTriggersToHosts(getRequest('g_triggerid'), $hosts_ids, getRequest('hostid'));
+		$result = copyTriggersToHosts(getRequest('g_triggerid'), $hostids, getRequest('hostid'));
 		$result = DBend($result);
 
 		$triggers_count = count(getRequest('g_triggerid'));
