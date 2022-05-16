@@ -9,7 +9,6 @@ DIST_SUBDIRS = \
 	zbxalgo \
 	zbxmedia \
 	zbxcrypto \
-	zbxtls \
 	zbxhash \
 	zbxcommon \
 	zbxcomms \
@@ -80,8 +79,7 @@ SERVER_SUBDIRS = \
 	zbxeval \
 	zbxserialize \
 	zbxha \
-	zbxrtc \
-	zbxtls
+	zbxrtc
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -110,15 +108,13 @@ PROXY_SUBDIRS = \
 	zbxaudit \
 	zbxeval \
 	zbxserialize \
-	zbxrtc \
-	zbxtls
+	zbxrtc
 endif
 endif
 
 SUBDIRS = \
 	zbxhash \
 	zbxcrypto \
-	zbxtls \
 	zbxcommon \
 	zbxgetopt \
 	zbxlog \

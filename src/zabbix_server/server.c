@@ -33,7 +33,7 @@
 #include "zbxmutexs.h"
 #include "zbxmodules.h"
 #include "zbxnix.h"
-#include "zbxtls.h"
+#include "zbxcomms.h"
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"

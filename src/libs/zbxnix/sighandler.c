@@ -23,7 +23,7 @@
 #include "common.h"
 #include "log.h"
 #include "fatal.h"
-#include "zbxtls.h"
+#include "zbxcomms.h"
 
 #define ZBX_EXIT_NONE		0
 #define ZBX_EXIT_SUCCESS	1

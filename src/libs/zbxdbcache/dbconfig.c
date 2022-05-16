@@ -25,7 +25,6 @@
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
-#include "zbxtls.h"
 #include "../zbxkvs/kvs.h"
 #include "../zbxvault/vault.h"
 #include "base64.h"

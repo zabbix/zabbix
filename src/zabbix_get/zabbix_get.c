@@ -21,7 +21,6 @@
 #include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
-#include "zbxtls.h"
 
 #ifndef _WINDOWS
 #	include "zbxnix.h"

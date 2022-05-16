@@ -25,7 +25,6 @@
 #include "zbxjson.h"
 #include "zbxmutexs.h"
 #include "zbxcrypto.h"
-#include "zbxtls.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"

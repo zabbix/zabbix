@@ -38,11 +38,11 @@
 #include "checks_calculated.h"
 #include "checks_http.h"
 #include "zbxcrypto.h"
-#include "zbxtls.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
 #include "log.h"
 #include "zbxavailability.h"
+#include "zbxcomms.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

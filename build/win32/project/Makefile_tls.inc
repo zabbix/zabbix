@@ -71,6 +71,6 @@ LIBS =		$(LIBS) "$(TLSLIB)"
 !	ENDIF
 
 INCS =	$(INCS) /I "$(TLSINCDIR)"
-OBJS =	$(OBJS) ..\..\..\src\libs\zbxtls\tls.o ..\..\..\src\libs\zbxtls\tls_version.o
+OBJS =	$(OBJS) ..\..\..\src\libs\zbxcomms\tls.o ..\..\..\src\libs\zbxcomms\tls_version.o
 
 !ENDIF

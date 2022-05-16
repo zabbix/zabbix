@@ -29,8 +29,6 @@
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "zbxcrypto.h"
-//#include "../zbxcrypto/tls_tcp_active.h"
-#include "zbxtls.h"
 #include "../zbxkvs/kvs.h"
 #include "zbxlld.h"
 #include "events.h"

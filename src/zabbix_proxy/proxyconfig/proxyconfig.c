@@ -24,8 +24,6 @@
 #include "proxy.h"
 #include "zbxself.h"
 
-//#include "zbxcrypto.h"
-#include "zbxtls.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"

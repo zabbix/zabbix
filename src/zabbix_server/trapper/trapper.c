@@ -27,8 +27,6 @@
 #include "proxyconfig.h"
 #include "proxydata.h"
 #include "zbxnix.h"
-//#include "zbxcrypto.h"
-#include "zbxtls.h"
 #include "zbxcommshigh.h"
 #include "zbxserver.h"
 #include "../poller/checks_snmp.h"

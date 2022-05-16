@@ -19,11 +19,11 @@
 
 #include "zbxcomms.h"
 #include "comms.h"
+#include "tls.h"
 
 #include "common.h"
 #include "base64.h"
 #include "log.h"
-#include "zbxtls.h"
 #include "zbxcompress.h"
 #include "zbxxml.h"
 

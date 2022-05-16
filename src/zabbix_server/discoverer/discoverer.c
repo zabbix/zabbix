@@ -29,8 +29,7 @@
 #include "zbxnix.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
-//#include "zbxcrypto.h"
-#include "zbxtls.h"
+#include "zbxcomms.h"
 #include "../events.h"
 
 extern int				CONFIG_DISCOVERER_FORKS;

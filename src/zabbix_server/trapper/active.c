@@ -24,7 +24,7 @@
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 
-#include "zbxtls.h"
+#include "zbxcomms.h"
 
 extern unsigned char	program_type;
 

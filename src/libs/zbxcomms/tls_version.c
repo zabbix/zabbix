@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxcomms.h"
 #include "common.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-#include "zbxtls.h"
 
 #include "zbxcrypto.h"
 
