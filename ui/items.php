@@ -923,7 +923,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 				'SELECT DISTINCT h.hostid'.
 				' FROM hosts h,hosts_groups hg'.
 				' WHERE h.hostid=hg.hostid'.
-				' AND '.dbConditionInt('hg.groupid', $templategroup_ids)
+					' AND '.dbConditionInt('hg.groupid', $templategroup_ids)
 			);
 
 			while ($db_template = DBfetch($db_templates)) {
