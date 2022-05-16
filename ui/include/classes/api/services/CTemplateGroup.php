@@ -49,6 +49,7 @@ class CTemplateGroup extends CApiService {
 	public function get(array $options) {
 		$result = [];
 
+		$output_fields = ['groupid', 'name', 'uuid'];
 		$template_fields = ['templateid', 'host', 'name', 'description', 'uuid'];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -78,7 +79,7 @@ class CTemplateGroup extends CApiService {
 			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>				['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', ['groupid', 'name', 'uuid']), 'default' => API_OUTPUT_EXTEND],
+			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'selectTemplates' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $template_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
@@ -97,16 +98,14 @@ class CTemplateGroup extends CApiService {
 		}
 
 		$sqlParts = [
-			'select'	=> ['hstgrp' => 'g.groupid'],
-			'from'		=> ['hstgrp' => 'hstgrp g'],
-			'where'		=> ['g.type='.HOST_GROUP_TYPE_TEMPLATE_GROUP],
-			'order'		=> []
+			'select' => ['hstgrp' => 'g.groupid'],
+			'from' => ['hstgrp' => 'hstgrp g'],
+			'where' => ['g.type='.HOST_GROUP_TYPE_TEMPLATE_GROUP],
+			'order' => []
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $this->getTableSchema()['fields'];
-			unset($options['output']['flags'], $options['output']['type']);
-			$options['output'] = array_keys($options['output']);
+			$options['output'] = $output_fields;
 		}
 
 		// editable + PERMISSION CHECK
@@ -298,11 +297,10 @@ class CTemplateGroup extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-		}
 
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			if (!$options['preservekeys']) {
+				$result = array_values($result);
+			}
 		}
 
 		return $result;
@@ -425,8 +423,8 @@ class CTemplateGroup extends CApiService {
 	 */
 	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid'], ['name']], 'fields' => [
-			'groupid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-			'name' =>					['type' => API_TG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
+			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'name' =>		['type' => API_TG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $groups, '/', $error)) {
