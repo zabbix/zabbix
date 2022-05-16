@@ -254,8 +254,8 @@ if (isset($_REQUEST['form'])) {
 		$data['drule']['status'] = getRequest('status', DRULE_STATUS_ACTIVE);
 		$data['drule']['dchecks'] = getRequest('dchecks', []);
 		$data['drule']['nextcheck'] = getRequest('nextcheck', 0);
-		$data['drule']['uniqueness_criteria'] = CHtml::encode(getRequest('uniqueness_criteria', -1));
-		$data['drule']['host_source'] = CHtml::encode(getRequest('host_source', ZBX_DISCOVERY_DNS));
+		$data['drule']['uniqueness_criteria'] = getRequest('uniqueness_criteria', -1);
+		$data['drule']['host_source'] = getRequest('host_source', ZBX_DISCOVERY_DNS);
 		$data['drule']['name_source'] = getRequest('name_source', ZBX_DISCOVERY_UNSPEC);
 	}
 
