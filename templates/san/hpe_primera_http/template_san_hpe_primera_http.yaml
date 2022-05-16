@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-13T10:31:57Z'
+  date: '2022-05-16T10:23:21Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -526,6 +526,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.allocatedCapacityMiB
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -557,6 +558,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.failedCapacityMiB
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -588,6 +590,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.freeCapacityMiB
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -619,6 +622,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.totalCapacityMiB
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -650,6 +654,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.chunkletSizeMiB
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -873,6 +878,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.model
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -899,6 +905,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.name
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -922,6 +929,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.onlineNodes.length()
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -945,6 +953,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.totalNodes
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -971,6 +980,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.serialNumber
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -996,6 +1006,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.systemVersion
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1359,6 +1370,9 @@ zabbix_export:
                 -
                   tag: component
                   value: cpg
+                -
+                  tag: component
+                  value: storage
                 -
                   tag: cpg
                   value: '{#NAME}'
