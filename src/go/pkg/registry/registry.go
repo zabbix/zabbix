@@ -189,14 +189,14 @@ func convertValue(k registry.Key, value string) (result interface{}, stype strin
 		return val, "REG_MULTI_SZ", nil
 	}
 
-	return "", "", err
+	return "", "", errors.New("Unsupported registry data type.")
 }
 
 func splitFullkey(fullkey string) (hive registry.Key, key string, e error) {
 	idx := strings.Index(fullkey, "\\")
 
 	if idx == -1 {
-		return 0, "", errors.New("Failed to parse key.")
+		return 0, "", errors.New("Failed to parse registry key.")
 	}
 
 	hive, e = getHive(fullkey[:idx])
@@ -206,8 +206,12 @@ func splitFullkey(fullkey string) (hive registry.Key, key string, e error) {
 }
 
 func GetValue(params []string) (result interface{}, err error) {
-	if len(params) < 1 || len(params) > 2 {
-		return nil, errors.New("Invalid number of parameters.")
+	if len(params) > 2 {
+		return nil, errors.New("Too many parameters.")
+	}
+
+	if len(params) < 1 {
+		return nil, errors.New("Registry key is not supplied.")
 	}
 
 	fullkey := params[0]
@@ -244,8 +248,12 @@ func Discover(params []string) (result string, err error) {
 	var j []byte
 	var re string
 
-	if len(params) == 0 || len(params) > 3 {
-		return "", errors.New("Invalid number of parameters.")
+	if len(params) > 3 {
+		return "", errors.New("Too many parameters.")
+	}
+
+	if len(params) < 1 {
+		return "", errors.New("Registry key is not supplied.")
 	}
 
 	fullkey := params[0]
@@ -279,7 +287,7 @@ func Discover(params []string) (result string, err error) {
 		results, _ = discoverValues(hive, key, results, "", re)
 		j, _ = json.Marshal(results)
 	} else {
-		return "", errors.New("Invalid mode parameter.")
+		return "", errors.New("Invalid 'mode' parameter.")
 	}
 
 	return string(j), nil
