@@ -118,8 +118,8 @@ class testFormFilter extends CWebTest {
 
 			$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertEquals('italic', $this->query('xpath://li[@data-target="tabfilter_1"]/a[@class="tabfilter-item-link"]')
-					->one()->getCSSValue('font-style')
+			$this->assertTrue($this->query('xpath://li[@data-target="tabfilter_1"][@data-indicator-value="1"]')
+					->one()->isVisible()
 			);
 
 			$filter_container->selectTab('update_tab');

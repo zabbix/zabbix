@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
+ * @backup profiles
+ *
  * @dataSource TagFilter
  */
 class testPageMonitoringHosts extends CWebTest {
@@ -351,7 +353,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @dataProvider getCheckFilterData
 	 */
 	public function testPageMonitoringHosts_CheckFilter($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
 		$result_form = $this->query('xpath://form[@name="host_view"]')->one();
@@ -359,6 +361,8 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->waitUntilReady();
 		$result_form->waitUntilReloaded();
 		$this->assertTableDataColumn($data['expected']);
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 	}
 
 	public static function getTagsFilterData() {
@@ -786,10 +790,12 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
+		$this->query('button:Reset')->one()->waitUntilClickable()->click();
+		$this->page->waitUntilReady();
 	}
 
 	public function testPageMonitoringHosts_ResetButtonCheck() {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$this->page->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -819,7 +825,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 	// Checking that Show suppressed problems filter works.
 	public function testPageMonitoringHosts_ShowSuppresed() {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$this->page->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -880,7 +886,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * Check enabled links and that correct host is displayed.
 	 */
 	public function testPageMonitoringHosts_EnabledLinks($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		switch ($data['name']) {
 			case 'Dynamic widgets H1':
@@ -1002,7 +1008,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * Click on host name from the table and check displayed popup context.
 	 */
 	public function testPageMonitoringHosts_HostContextMenu($data) {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
 		$row->query('link', $data['name'])->one()->click();
 		$this->page->waitUntilReady();
@@ -1075,7 +1081,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	public function testPageMonitoringHosts_TableSorting() {
 		// Sort by name and status.
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 		foreach (['Name', 'Status'] as $listing) {
 			$query = $this->query('xpath://a[@href and text()="'.$listing.'"]');
 			$query->one()->click();
