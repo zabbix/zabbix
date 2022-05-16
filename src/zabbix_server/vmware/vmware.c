@@ -106,6 +106,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_pnic, zbx_vmware_pnic_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_custom_attr, zbx_vmware_custom_attr_t *)
 ZBX_PTR_VECTOR_IMPL(custquery_param, zbx_vmware_custquery_param_t)
 ZBX_PTR_VECTOR_IMPL(vmware_dvswitch, zbx_vmware_dvswitch_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_alarm, zbx_vmware_alarm_t *)
 
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
@@ -258,6 +259,9 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_XPATH_HV_VMS()										\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
 	"/*[local-name()='val']/*[@type='VirtualMachine']"
+
+#define ZBX_XPATH_HV_ALARMS()										\
+	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='AlarmState']"	\
 
 #define ZBX_XPATH_DATASTORE_SUMMARY(property)								\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
@@ -2175,7 +2179,7 @@ static void	vmware_dsname_free(zbx_vmware_dsname_t *dsname)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees resources allocated to store Datastore name data            *
+ * Purpose: frees resources allocated to physical NIC data                    *
  *                                                                            *
  * Parameters: nic - [IN] the pnic of hv                                      *
  *                                                                            *
@@ -2186,6 +2190,25 @@ static void	vmware_pnic_free(zbx_vmware_pnic_t *nic)
 	zbx_free(nic->driver);
 	zbx_free(nic->mac);
 	zbx_free(nic);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees resources allocated to store alarm data                     *
+ *                                                                            *
+ * Parameters: alarm - [IN] the alarm object                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_alarm_free(zbx_vmware_alarm_t *alarm)
+{
+	zbx_free(alarm->key);
+	zbx_free(alarm->name);
+	zbx_free(alarm->system_name);
+	zbx_free(alarm->description);
+	zbx_free(alarm->entity_name);
+	zbx_free(alarm->overall_status);
+	zbx_free(alarm->time);
+	zbx_free(alarm);
 }
 
 /******************************************************************************
@@ -2205,6 +2228,9 @@ static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 
 	zbx_vector_vmware_pnic_clear_ext(&hv->pnics, vmware_pnic_free);
 	zbx_vector_vmware_pnic_destroy(&hv->pnics);
+
+	zbx_vector_vmware_alarm_clear_ext(&hv->alarms, vmware_alarm_free);
+	zbx_vector_vmware_alarm_destroy(&hv->alarms);
 
 	zbx_free(hv->uuid);
 	zbx_free(hv->id);
@@ -3964,42 +3990,43 @@ out:
 static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL *easyhandle, const char *hvid,
 		const zbx_vmware_propmap_t *propmap, int props_num, xmlDoc **xdoc, char **error)
 {
-#	define ZBX_POST_HV_DETAILS 									\
-		ZBX_POST_VSPHERE_HEADER									\
-		"<ns0:RetrievePropertiesEx>"								\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
-			"<ns0:specSet>"									\
-				"<ns0:propSet>"								\
-					"<ns0:type>HostSystem</ns0:type>"				\
-					"<ns0:pathSet>vm</ns0:pathSet>"					\
-					"<ns0:pathSet>parent</ns0:pathSet>"				\
-					"<ns0:pathSet>datastore</ns0:pathSet>"				\
-					"<ns0:pathSet>config.virtualNicManagerInfo.netConfig</ns0:pathSet>"\
-					"<ns0:pathSet>config.network.pnic</ns0:pathSet>"		\
+#	define ZBX_POST_HV_DETAILS 										\
+		ZBX_POST_VSPHERE_HEADER										\
+		"<ns0:RetrievePropertiesEx>"									\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"					\
+			"<ns0:specSet>"										\
+				"<ns0:propSet>"									\
+					"<ns0:type>HostSystem</ns0:type>"					\
+					"<ns0:pathSet>vm</ns0:pathSet>"						\
+					"<ns0:pathSet>parent</ns0:pathSet>"					\
+					"<ns0:pathSet>datastore</ns0:pathSet>"					\
+					"<ns0:pathSet>config.virtualNicManagerInfo.netConfig</ns0:pathSet>"	\
+					"<ns0:pathSet>config.network.pnic</ns0:pathSet>"			\
 					"<ns0:pathSet>config.network.ipRouteConfig.defaultGateway</ns0:pathSet>"\
-					"<ns0:pathSet>summary.managementServerIp</ns0:pathSet>"		\
-					"<ns0:pathSet>config.storageDevice.scsiTopology</ns0:pathSet>"	\
-					"%s"								\
-				"</ns0:propSet>"							\
-				"<ns0:propSet>"								\
-					"<ns0:type>Datastore</ns0:type>"				\
-					"<ns0:pathSet>host[\"%s\"].mountInfo.mounted</ns0:pathSet>"	\
-					"<ns0:pathSet>host[\"%s\"].mountInfo.accessible</ns0:pathSet>"	\
-					"<ns0:pathSet>host[\"%s\"].mountInfo.accessMode</ns0:pathSet>"	\
-				"</ns0:propSet>"							\
-				"<ns0:objectSet>"							\
-					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"			\
-					"<ns0:skip>false</ns0:skip>"					\
-					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"		\
-						"<ns0:name>DSObject</ns0:name>"				\
-						"<ns0:type>HostSystem</ns0:type>"			\
-						"<ns0:path>datastore</ns0:path>"			\
-						"<ns0:skip>false</ns0:skip>"				\
-					"</ns0:selectSet>"						\
-				"</ns0:objectSet>"							\
-			"</ns0:specSet>"								\
-			"<ns0:options/>"								\
-		"</ns0:RetrievePropertiesEx>"								\
+					"<ns0:pathSet>summary.managementServerIp</ns0:pathSet>"			\
+					"<ns0:pathSet>config.storageDevice.scsiTopology</ns0:pathSet>"		\
+					"<ns0:pathSet>triggeredAlarmState</ns0:pathSet>"			\
+					"%s"									\
+				"</ns0:propSet>"								\
+				"<ns0:propSet>"									\
+					"<ns0:type>Datastore</ns0:type>"					\
+					"<ns0:pathSet>host[\"%s\"].mountInfo.mounted</ns0:pathSet>"		\
+					"<ns0:pathSet>host[\"%s\"].mountInfo.accessible</ns0:pathSet>"		\
+					"<ns0:pathSet>host[\"%s\"].mountInfo.accessMode</ns0:pathSet>"		\
+				"</ns0:propSet>"								\
+				"<ns0:objectSet>"								\
+					"<ns0:obj type=\"HostSystem\">%s</ns0:obj>"				\
+					"<ns0:skip>false</ns0:skip>"						\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"			\
+						"<ns0:name>DSObject</ns0:name>"					\
+						"<ns0:type>HostSystem</ns0:type>"				\
+						"<ns0:path>datastore</ns0:path>"				\
+						"<ns0:skip>false</ns0:skip>"					\
+					"</ns0:selectSet>"							\
+				"</ns0:objectSet>"								\
+			"</ns0:specSet>"									\
+			"<ns0:options/>"									\
+		"</ns0:RetrievePropertiesEx>"									\
 		ZBX_POST_VSPHERE_FOOTER
 
 	char	tmp[MAX_STRING_LEN + ZBX_VMWARE_HVPROPS_NUM * 100], props[MAX_STRING_LEN], *hvid_esc;
@@ -4703,6 +4730,168 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
 }
 
+#define ALARM_ENABLED	0
+#define ALARM_DISABLED	1
+static int	vmware_service_get_hv_alarm_details(zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vmware_alarm_t *alarm, char **error)
+{
+#	define ZBX_POST_VMWARE_GET_ALARMS                                                       \
+		ZBX_POST_VSPHERE_HEADER                                                         \
+		"<ns0:RetrievePropertiesEx>"                                                    \
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"                  \
+			"<ns0:specSet>"                                                         \
+				"<ns0:propSet>"                                                 \
+					"<ns0:type>Alarm</ns0:type>"                            \
+					"<ns0:pathSet>info.name</ns0:pathSet>"                  \
+					"<ns0:pathSet>info.systemName</ns0:pathSet>"            \
+					"<ns0:pathSet>info.description</ns0:pathSet>"           \
+					"<ns0:pathSet>info.enabled</ns0:pathSet>"               \
+				"</ns0:propSet>"                                                \
+				"<ns0:objectSet>"                                               \
+					"<ns0:obj type=\"Alarm\">%s</ns0:obj>"                  \
+				"</ns0:objectSet>"                                              \
+			"</ns0:specSet>"                                                        \
+			"<ns0:options/>"                                                        \
+		"</ns0:RetrievePropertiesEx>"                                                   \
+		ZBX_POST_VSPHERE_FOOTER
+
+	xmlDoc		*alarm_details = NULL;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+
+	int		ret = FAIL;
+	char		tmp[MAX_STRING_LEN], *value;
+
+	zabbix_log(LOG_LEVEL_CRIT, "In %s()", __func__);
+
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_GET_ALARMS,
+			vmware_service_objects[service->type].property_collector, alarm->key);
+
+	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &alarm_details, error))
+		goto out;
+
+	if (NULL == (alarm->name = zbx_xml_doc_read_value(alarm_details, ZBX_XPATH_PROP_NAME("info.name"))))
+		goto out;
+
+	if (NULL == (alarm->system_name = zbx_xml_doc_read_value(alarm_details, ZBX_XPATH_PROP_NAME("info.systemName"))))
+		goto out;
+
+	if (NULL == (alarm->description = zbx_xml_doc_read_value(alarm_details, ZBX_XPATH_PROP_NAME("info.description"))))
+		goto out;
+
+	if (NULL != (value = zbx_xml_doc_read_value(alarm_details, ZBX_XPATH_PROP_NAME("info.enabled"))))
+	{
+		alarm->enabled = 0 == strcmp(value, "true") ? ALARM_ENABLED : ALARM_DISABLED;
+		zbx_free(value);
+	}
+	else
+	{
+		goto out;
+	}
+
+	ret = SUCCEED;
+
+out:
+	zbx_xml_free_doc(alarm_details);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	return ret;
+}
+#undef ALARM_ENABLED
+#undef ALARM_DISABLED
+
+static void	vmware_service_get_hv_alarms_data(zbx_vmware_service_t *service, CURL *easyhandle, xmlDoc *details,
+		zbx_vector_vmware_alarm_t *alarms, char **error)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlNode		*entity_node;
+	xmlChar		*entity_type_value;
+	int 		i = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	xpathCtx = xmlXPathNewContext(details);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_HV_ALARMS(), xpathCtx)))
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	zbx_vector_vmware_alarm_reserve(alarms, nodeset->nodeNr);
+
+	for (; i < nodeset->nodeNr; i++)
+	{
+		zbx_vmware_alarm_t	*alarm;
+		char			*value;
+
+		if (NULL == (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("alarm"))))
+			continue;
+
+		alarm = (zbx_vmware_alarm_t*)zbx_malloc(NULL, sizeof(zbx_vmware_alarm_t));
+		memset(alarm, 0, sizeof(zbx_vmware_alarm_t));
+
+		alarm->key = value;
+		alarm->entity_type = ZBX_VMWARE_ENTITY_UNKNOWN;
+
+		entity_node = nodeset->nodeTab[i]->children;
+		while (NULL != entity_node)
+		{
+			if (0 != strcmp((const char*)entity_node->name, "entity"))
+			{
+				entity_node = entity_node->next;
+				continue;
+			}
+
+			if (NULL != (entity_type_value = xmlGetProp(entity_node, (const xmlChar*)"type")))
+			{
+				if (0 == strcmp((const char*)entity_type_value, "HostSystem"))
+					alarm->entity_type = ZBX_VMWARE_ENTITY_HV;
+				else if (0 == strcmp((const char*)entity_type_value, "VirtualMachine"))
+					alarm->entity_type = ZBX_VMWARE_ENTITY_VM;
+				else if (0 == strcmp((const char*)entity_type_value, "Datastore"))
+					alarm->entity_type = ZBX_VMWARE_ENTITY_DATASTORE;
+				else if (0 == strcmp((const char*)entity_type_value, "Datacenter"))
+					alarm->entity_type = ZBX_VMWARE_ENTITY_DATACENTER;
+				else if (0 == strcmp((const char*)entity_type_value, "ComputeResource"))
+					alarm->entity_type = ZBX_VMWARE_ENTITY_CLUSTER;
+
+				xmlFree(entity_type_value);
+			}
+			break;
+		}
+
+		if (ZBX_VMWARE_ENTITY_UNKNOWN == alarm->entity_type ||
+				SUCCEED != vmware_service_get_hv_alarm_details(service, easyhandle, alarm, error))
+		{
+			vmware_alarm_free(alarm);
+			continue;
+		}
+
+		alarm->time = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("time"));
+		alarm->overall_status = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("overallStatus"));
+		alarm->entity_name = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("entity"));
+
+		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("acknowledged"))))
+		{
+			alarm->acknowledged = 0 == strcmp(value, "true")
+				? ZBX_VMWARE_ALARM_ACK_TRUE : ZBX_VMWARE_ALARM_ACK_FALSE;
+			zbx_free(value);
+		}
+
+		zbx_vector_vmware_alarm_append(alarms, alarm);
+	}
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sorting function to sort Resource pool names vector by name       *
@@ -4751,6 +4940,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	zbx_vector_vmware_pnic_create(&hv->pnics);
 
+	zbx_vector_vmware_alarm_create(&hv->alarms);
+
 	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, hv_propmap,
 			ZBX_VMWARE_HVPROPS_NUM, &details, error))
 	{
@@ -4767,6 +4958,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	hv->id = zbx_strdup(NULL, id);
 
 	vmware_service_get_hv_pnics_data(details, &hv->pnics);
+
+	vmware_service_get_hv_alarms_data(service, easyhandle, details, &hv->alarms, error);
 
 	if (NULL != (value = zbx_xml_doc_read_value(details, "//*[@type='" ZBX_VMWARE_SOAP_CLUSTER "']")))
 		hv->clusterid = value;
