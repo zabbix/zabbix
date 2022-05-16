@@ -796,7 +796,7 @@ class CWidgetNavTree extends CWidget {
 
 		const empty_template = {};
 
-		for (const [severity, value] in Object.entries(this._severity_levels)) {
+		for (const [severity, _] in Object.entries(this._severity_levels)) {
 			empty_template[severity] = 0;
 		}
 
