@@ -1,4 +1,6 @@
+//go:build windows
 // +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,26 +23,27 @@
 package registry
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"regexp"
-	"encoding/json"
-	"encoding/base64"
+	"strings"
+
 	"golang.org/x/sys/windows/registry"
 )
 
 type RegistryKey struct {
-	Fullkey    string      `json:"fullkey"`
+	Fullkey    string `json:"fullkey"`
 	Lastsubkey string `json:"lastsubkey"`
 }
 
 type RegistryValue struct {
 	Fullkey    string      `json:"fullkey"`
-	Lastsubkey string `json:"lastsubkey"`
+	Lastsubkey string      `json:"lastsubkey"`
 	Name       string      `json:"name"`
-	Data       string      `json:"data"`
-	Type       interface{}      `json:"type"`
+	Data       interface{} `json:"data"`
+	Type       string      `json:"type"`
 }
 
 const RegistryDiscoveryModeKeys = 0
@@ -73,14 +76,13 @@ func getHive(key string) (hive registry.Key, e error) {
 }
 
 func discoverValues(hive registry.Key, fullkey string, values []RegistryValue, current_key string, re string) (result []RegistryValue, e error) {
-	k, err := registry.OpenKey(hive, fullkey, registry.QUERY_VALUE|registry.ENUMERATE_SUB_KEYS)
+	k, err := registry.OpenKey(hive, fullkey, registry.READ)
 	if err != nil {
 		return nil, err
 	}
 	defer k.Close()
 
 	s, err := k.ReadSubKeyNames(0)
-
 	if err != nil {
 		return nil, err
 	}
@@ -92,11 +94,12 @@ func discoverValues(hive registry.Key, fullkey string, values []RegistryValue, c
 
 	for _, v := range v {
 		data, valtype, err := convertValue(k, v)
-		sdata := fmt.Sprintf("%v", data)
 
 		if err != nil {
 			continue
 		}
+
+		sdata := fmt.Sprintf("%v", data)
 
 		if re != "" {
 			match, _ := regexp.MatchString(re, v)
@@ -107,6 +110,9 @@ func discoverValues(hive registry.Key, fullkey string, values []RegistryValue, c
 		} else {
 			values = append(values, RegistryValue{fullkey, current_key, v, sdata, valtype})
 		}
+
+		k.Close()
+		registry.OpenKey(hive, fullkey, registry.READ)
 	}
 
 	for _, i := range s {
@@ -140,49 +146,52 @@ func discoverKeys(hive registry.Key, fullkey string, subkeys []RegistryKey) (res
 }
 
 func convertValue(k registry.Key, value string) (result interface{}, stype string, err error) {
-	_, valueType, _ := k.GetValue(value, nil)
+	_, valueType, err := k.GetValue(value, nil)
+	if err != nil {
+		return nil, "", err
+	}
 	defer k.Close()
 
 	switch valueType {
-		case registry.NONE:
-			return "", "REG_NONE", nil
-		case registry.EXPAND_SZ:
-			stype = "REG_EXPAND_SZ"
-			fallthrough
-		case registry.SZ:
-			if stype == "" {
-				stype = "REG_SZ"
-			}
-			val, _, err := k.GetStringValue(value)
-			if err != nil {
-				return nil, "", errors.New("Failed to retrieve value.")
-			}
-			return val, stype, nil
-		case registry.BINARY:
-			stype = "REG_BINARY"
-			val, _, err := k.GetBinaryValue(value)
-			if err != nil {
-				return nil, "", errors.New("Failed to retrieve value.")
-			}
-			return base64.StdEncoding.EncodeToString(val), "REG_BINARY", nil
-		case registry.DWORD:
-			stype = "REG_QWORD"
-			fallthrough
-		case registry.QWORD:
-			if stype == "" {
-				stype = "REG_DWORD"
-			}
-			val, _, err := k.GetIntegerValue(value)
-			if err != nil {
-				return nil, "", errors.New("Failed to retrieve value.")
-			}
-			return val, stype, nil
-		case registry.MULTI_SZ:
-			val, _, err := k.GetStringsValue(value)
-			if err != nil {
-				return nil, "", errors.New("Failed to retrieve value.")
-			}
-			return val, "REG_MULTI_SZ", nil
+	case registry.NONE:
+		return "", "REG_NONE", nil
+	case registry.EXPAND_SZ:
+		stype = "REG_EXPAND_SZ"
+		fallthrough
+	case registry.SZ:
+		if stype == "" {
+			stype = "REG_SZ"
+		}
+		val, _, err := k.GetStringValue(value)
+		if err != nil {
+			return nil, "", err
+		}
+		return val, stype, nil
+	case registry.BINARY:
+		stype = "REG_BINARY"
+		val, _, err := k.GetBinaryValue(value)
+		if err != nil {
+			return nil, "", err
+		}
+		return base64.StdEncoding.EncodeToString(val), "REG_BINARY", nil
+	case registry.DWORD:
+		stype = "REG_QWORD"
+		fallthrough
+	case registry.QWORD:
+		if stype == "" {
+			stype = "REG_DWORD"
+		}
+		val, _, err := k.GetIntegerValue(value)
+		if err != nil {
+			return nil, "", err
+		}
+		return val, stype, nil
+	case registry.MULTI_SZ:
+		val, _, err := k.GetStringsValue(value)
+		if err != nil {
+			return nil, "", err
+		}
+		return val, "REG_MULTI_SZ", nil
 	}
 
 	return "", "", errors.New("Value not found.")
@@ -224,7 +233,7 @@ func GetValue(params []string) (result interface{}, err error) {
 	}
 
 	result, _, err = convertValue(handle, value)
-	return 
+	return
 }
 
 func Discover(params []string) (result string, err error) {

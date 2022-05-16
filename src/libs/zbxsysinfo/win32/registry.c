@@ -78,7 +78,8 @@ static HKEY	get_hkey_from_fullkey(char *fullkey)
 
 static const char	*registry_type_to_string(DWORD type)
 {
-	switch (type) {
+	switch (type)
+	{
 		case REG_BINARY:
 			return "REG_BINARY";
 		case REG_DWORD:
@@ -115,48 +116,44 @@ static void	registry_get_multistring_value(const wchar_t *wbuffer, struct zbx_js
 
 static void	registry_discovery_convert_value_data(struct zbx_json *j, DWORD type, wchar_t *wbuffer)
 {
-	if (REG_BINARY == type)
+	char		*buffer, *bin_value;
+	zbx_uint64_t	num_value;
+
+	switch (type)
 	{
-		char	*buffer, *bvalue = NULL;
-
-		buffer = zbx_unicode_to_utf8(wbuffer);
-		str_base64_encode_dyn(buffer, &bvalue, (int)strlen(buffer));
-		zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_DATA, bvalue, ZBX_JSON_TYPE_STRING);
-
-		zbx_free(buffer);
-		zbx_free(bvalue);
-	}
-	else if (REG_DWORD == type || REG_QWORD == type)
-	{
-		char			*buffer;
-		zbx_uint64_t	num_val;
-
-		buffer = zbx_unicode_to_utf8(wbuffer);
-		ZBX_STR2UINT64(num_val, buffer);
-		zbx_json_adduint64(j, ZBX_SYSINFO_REGISTRY_TAG_DATA, num_val);
-		zbx_free(buffer);
-	}
-	else if (REG_MULTI_SZ == type)
-	{
-		zbx_json_addarray(j, ZBX_SYSINFO_REGISTRY_TAG_DATA);
-
-		registry_get_multistring_value(wbuffer, j);
-
-		zbx_json_close(j);
-	}
-	else if (REG_NONE == type)
-	{
-		zbx_json_adduint64(j, ZBX_SYSINFO_REGISTRY_TAG_DATA, 0);
-	}
-	else if (REG_SZ == type || REG_EXPAND_SZ == type)
-	{
-		char	*buffer;
-
-		buffer = zbx_unicode_to_utf8(wbuffer);
-		zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_DATA, buffer, ZBX_JSON_TYPE_STRING);
-		zbx_free(buffer);
+		case REG_BINARY:
+			buffer = zbx_unicode_to_utf8(wbuffer);
+			str_base64_encode_dyn(buffer, &bin_value, (int)strlen(buffer));
+			zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_DATA, bin_value, ZBX_JSON_TYPE_STRING);
+			zbx_free(buffer);
+			zbx_free(bin_value);
+			break;
+		case REG_DWORD:
+		case REG_QWORD:
+			buffer = zbx_unicode_to_utf8(wbuffer);
+			ZBX_STR2UINT64(num_value, buffer);
+			zbx_json_adduint64(j, ZBX_SYSINFO_REGISTRY_TAG_DATA, num_value);
+			zbx_free(buffer);
+			break;
+		case REG_MULTI_SZ:
+			zbx_json_addarray(j, ZBX_SYSINFO_REGISTRY_TAG_DATA);
+			registry_get_multistring_value(wbuffer, j);
+			zbx_json_close(j);
+			break;
+		case REG_NONE:
+			zbx_json_adduint64(j, ZBX_SYSINFO_REGISTRY_TAG_DATA, 0);
+			break;
+		case REG_SZ:
+		case REG_EXPAND_SZ:
+			buffer = zbx_unicode_to_utf8(wbuffer);
+			zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_DATA, buffer, ZBX_JSON_TYPE_STRING);
+			zbx_free(buffer);
+			break;
 	}
 }
+
+ZBX_PTR_VECTOR_DECL(wchar_ptr, wchar_t *)
+ZBX_PTR_VECTOR_IMPL(wchar_ptr, wchar_t *)
 
 static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, struct zbx_json *j, int mode, wchar_t *root,
 		const char *regexp)
@@ -164,26 +161,27 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 	wchar_t			achClass[MAX_PATH] = TEXT(""), achValue[MAX_VALUE_NAME];
 	DWORD			cchClassName = MAX_PATH, cSubKeys=0, cValues, cbName, i, retCode,
 				cchValue = MAX_VALUE_NAME;
-	zbx_vector_ptr_t	wsubkeys;
+	char			*uroot, *usubkey;
+	//zbx_vector_ptr_t	wsubkeys;
+	zbx_vector_wchar_ptr_t	wsubkeys;
 
 	retCode = RegQueryInfoKey(hKey, achClass, &cchClassName, NULL, &cSubKeys, NULL, NULL, &cValues, NULL, NULL, NULL, NULL);
 
-	zbx_vector_ptr_create(&wsubkeys);
+	//zbx_vector_ptr_create(&wsubkeys);
+	zbx_vector_wchar_ptr_create(&wsubkeys);
+
+	uroot = zbx_unicode_to_utf8(root);
+	usubkey = zbx_unicode_to_utf8(current_subkey);
 
 	if (REGISTRY_DISCOVERY_MODE_KEYS == mode)
 	{
-		char	*uroot, *subkey;
-
-		uroot = zbx_unicode_to_utf8(root);
-		subkey = zbx_unicode_to_utf8(current_subkey);
-
 		zbx_json_addobject(j, NULL);
 		zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, uroot, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, subkey, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, usubkey, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(j);
 
 		zbx_free(uroot);
-		zbx_free(subkey);
+		zbx_free(usubkey);
 	}
 
 	for (i = 0; i < cSubKeys; i++)
@@ -193,7 +191,8 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 		if (ERROR_SUCCESS == retCode)
 		{
-			zbx_vector_ptr_append(&wsubkeys, wcsdup(achClass));
+			//zbx_vector_ptr_append
+			zbx_vector_wchar_ptr_append(&wsubkeys, wcsdup(achClass));
 		}
 	}
 
@@ -203,7 +202,7 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 		wchar_t	wnew_root[MAX_FULLKEY_LENGTH];
 		wchar_t	*wsubkey;
 
-		wsubkey = (wchar_t *)wsubkeys.values[i];
+		wsubkey = wsubkeys.values[i];
 
 		if (0 == wcscmp(wsubkey, L""))
 			continue;
@@ -218,8 +217,8 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 		RegCloseKey(hSubkey);
 	}
 
-	zbx_vector_ptr_clear_ext(&wsubkeys, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&wsubkeys);
+	zbx_vector_wchar_ptr_clear_ext(&wsubkeys, zbx_ptr_free);
+	zbx_vector_wchar_ptr_destroy(&wsubkeys);
 
 	if (REGISTRY_DISCOVERY_MODE_VALUES == mode && cValues)
 	{
@@ -227,7 +226,7 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 		{
 			DWORD	valueType, lpDataLength = MAX_BUFFER_LEN;
 			wchar_t	dataBuffer[MAX_BUFFER_LEN];
-			char	*buf;
+			char	*uvaluename;
 
 			cchValue = MAX_VALUE_NAME;
 			achValue[0] = L'\0';
@@ -236,41 +235,29 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 			if (ERROR_SUCCESS == retCode)
 			{
+				uvaluename = zbx_unicode_to_utf8(achValue);
+
 				if (NULL != regexp && '\0' != *regexp)
 				{
-					buf = zbx_unicode_to_utf8(achValue);
-
-					if (NULL == zbx_regexp_match(buf, regexp, NULL))
+					if (NULL == zbx_regexp_match(uvaluename, regexp, NULL))
 					{
-						zbx_free(buf);
+						zbx_free(uvaluename);
 						continue;
 					}
 				}
-				else
-				{
-					zbx_json_addobject(j, NULL);
 
-					buf = zbx_unicode_to_utf8(root);
-				}
+				zbx_json_addobject(j, NULL);
 
-				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, buf,
+				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, uroot,
 						ZBX_JSON_TYPE_STRING);
 
-				zbx_free(buf);
-
-				buf = zbx_unicode_to_utf8(current_subkey);
-				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, buf,
+				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, usubkey,
 						ZBX_JSON_TYPE_STRING);
 
-				zbx_free(buf);
+				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_NAME, uvaluename, ZBX_JSON_TYPE_STRING);
+				zbx_free(uvaluename);
 
-				buf = zbx_unicode_to_utf8(achValue);
-				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_NAME, buf, ZBX_JSON_TYPE_STRING);
-				zbx_free(buf);
-
-				buf = zbx_unicode_to_utf8(dataBuffer);
 				registry_discovery_convert_value_data(j, valueType, dataBuffer);
-				zbx_free(buf);
 
 				zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_TYPE,
 						registry_type_to_string(valueType), ZBX_JSON_TYPE_STRING);
@@ -279,6 +266,9 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 			}
 		}
 	}
+
+	zbx_free(uroot);
+	zbx_free(usubkey);
 }
 
 static int	split_fullkey(char **fullkey, HKEY *hive_handle)
@@ -298,7 +288,7 @@ static int	split_fullkey(char **fullkey, HKEY *hive_handle)
 	return SUCCEED;
 }
 
-static void	registry_discover(char *key, int mode, AGENT_RESULT *result, const char *regexp)
+static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const char *regexp)
 {
 	wchar_t		*wkey;
 	HKEY		hkey, hive_handle;
@@ -325,17 +315,21 @@ static void	registry_discover(char *key, int mode, AGENT_RESULT *result, const c
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 	zbx_json_free(&j);
 	zbx_free(wkey);
+
+	return SUCCEED;
 }
 
 
 static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result)
 {
-	wchar_t			wbuffer[MAX_VALUE_NAME], *wkey, *wvalue;
-	zbx_uint64_t	num_val;
-	DWORD			BufferSize = MAX_VALUE_NAME, type;
-	LSTATUS			errCode;
-	HKEY			hive_handle;
-	int			ret = SUCCEED;
+	wchar_t		wbuffer[MAX_VALUE_NAME], *wkey, *wvalue;
+	char		*buffer, *bin_value;
+	struct zbx_json	j;
+	zbx_uint64_t	num_value;
+	DWORD		BufferSize = MAX_VALUE_NAME, type;
+	LSTATUS		errCode;
+	HKEY		hive_handle;
+	int		ret = SUCCEED;
 
 	if (FAIL == split_fullkey(&key, &hive_handle))
 	{
@@ -354,49 +348,41 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 		goto out;
 	}
 
-	if (REG_BINARY == type)
-	{
-		char	*buffer, *bvalue = NULL;
+	switch (type) {
+		case REG_BINARY:
+			buffer = zbx_unicode_to_utf8(wbuffer);
+			str_base64_encode_dyn(buffer, &bin_value, (int)strlen(buffer));
+			SET_STR_RESULT(result, bin_value);
+			zbx_free(buffer);
+			break;
+		case REG_DWORD:
+		case REG_QWORD:
+			buffer = zbx_unicode_to_utf8(wbuffer);
+			ZBX_STR2UINT64(num_value, buffer);
+			SET_UI64_RESULT(result, num_value);
+			zbx_free(buffer);
+			break;
+		case REG_MULTI_SZ:
+			zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+			zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-		buffer = zbx_unicode_to_utf8(wbuffer);
-		str_base64_encode_dyn(buffer, &bvalue, (int)strlen(buffer));
-		SET_STR_RESULT(result, bvalue);
-		zbx_free(buffer);
-	}
-	else if (REG_DWORD == type || REG_QWORD == type)
-	{
-		char	*buffer;
+			registry_get_multistring_value(wbuffer, &j);
 
-		buffer = zbx_unicode_to_utf8(wbuffer);
-		ZBX_STR2UINT64(num_val, buffer);
-		SET_UI64_RESULT(result, num_val);
-		zbx_free(buffer);
-	}
-	else if (REG_MULTI_SZ == type)
-	{
-		struct zbx_json	j;
-
-		zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-		zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
-
-		registry_get_multistring_value(wbuffer, &j);
-
-		zbx_json_close(&j);
-		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
-		zbx_json_free(&j);
-	}
-	else if (REG_NONE == type)
-	{
-		SET_UI64_RESULT(result, 0);
-	}
-	else if (REG_SZ == type || REG_EXPAND_SZ == type)
-	{
-		SET_STR_RESULT(result, zbx_unicode_to_utf8(wbuffer));
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported registry data type"));
-		ret = FAIL;
+			zbx_json_close(&j);
+			SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+			zbx_json_free(&j);
+			break;
+		case REG_NONE:
+			SET_UI64_RESULT(result, 0);
+			break;
+		case REG_SZ:
+		case REG_EXPAND_SZ:
+			SET_STR_RESULT(result, zbx_unicode_to_utf8(wbuffer));
+			break;
+		default:
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported registry data type"));
+			ret = FAIL;
+			break;
 	}
 out:
 	zbx_free(wkey);
@@ -468,7 +454,8 @@ int	REGISTRY_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	regexp = get_rparam(request, 2);
 
-	registry_discover(pkey, mode, result, regexp);
+	if (FAIL == registry_discover(pkey, mode, result, regexp))
+		return SYSINFO_RET_FAIL;
 
 	return SYSINFO_RET_OK;
 }
