@@ -35,7 +35,7 @@ $widget = (new CWidget())
 				->addItem(
 					CWebUser::getType() == USER_TYPE_SUPER_ADMIN
 						? (new CSimpleButton(_('Create host group')))->addClass('js-create-hostgroup')
-						: (new CSubmit('form', _('Create host group').' '._('(Only super admins can create groups)')))
+						: (new CSimpleButton(_('Create host group').' '._('(Only super admins can create groups)')))
 							->setEnabled(false)
 				)
 		))->setAttribute('aria-label', _('Content controls'))
@@ -65,17 +65,15 @@ $view_url = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $table = (new CTableInfo())
-	->setHeader((new CRowHeader())
-		->addItem((new CColHeader(
+	->setHeader([
+		(new CColHeader(
 			(new CCheckBox('all_groups'))
 				->onClick("checkAll('".$form->getName()."', 'all_groups', 'groups');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH))
-		->addItem(
-			make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)
-		)
-		->addItem((new CColHeader(_('Hosts')))->setColSpan(2))
-		->addItem((new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH))
-	);
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
+		(new CColHeader(_('Hosts')))->setColSpan(2),
+		(new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH)
+	]);
 
 $current_time = time();
 
@@ -144,6 +142,7 @@ foreach ($data['groups'] as $group) {
 		$info_icons[] = getHostGroupLifetimeIndicator($current_time, $group['groupDiscovery']['ts_delete']);
 	}
 
+	$count = '';
 	if ($host_count > 0) {
 		if ($data['allowed_ui_conf_hosts']) {
 			$count = new CLink($host_count, (new CUrl('zabbix.php'))
@@ -156,9 +155,6 @@ foreach ($data['groups'] as $group) {
 		}
 
 		$count->addClass(ZBX_STYLE_ICON_COUNT);
-	}
-	else {
-		$count = (new CSpan(''));
 	}
 
 	$table->addRow([

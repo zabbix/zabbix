@@ -32,7 +32,7 @@ $widget = (new CWidget())
 		->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
 			? (new CSimpleButton(_('Create template group')))
 				->addClass('js-create-templategroup')
-			: (new CSubmit('form', _('Create template group').' '._('(Only super admins can create groups)')))
+			: (new CSimpleButton(_('Create template group').' '._('(Only super admins can create groups)')))
 				->setEnabled(false)
 		)
 		))->setAttribute('aria-label', _('Content controls')));
@@ -63,16 +63,14 @@ $view_url = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $table = (new CTableInfo())
-	->setHeader((new CRowHeader())
-		->addItem((new CColHeader(
+	->setHeader([
+		(new CColHeader(
 			(new CCheckBox('all_groups'))
 				->onClick("checkAll('".$form->getName()."', 'all_groups', 'groupids');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH))
-		->addItem(
-			make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url)
-		)
-		->addItem((new CColHeader(_('Templates')))->setColSpan(2))
-	);
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
+		(new CColHeader(_('Templates')))->setColSpan(2)
+	]);
 
 $current_time = time();
 
@@ -115,6 +113,7 @@ foreach ($data['groups'] as $group) {
 		->addClass('js-edit-templategroup')
 		->setAttribute('data-groupid', $group['groupid']);
 
+	$count = '';
 	if ($template_count > 0) {
 		if ($data['allowed_ui_conf_templates']) {
 			$count = new CLink($template_count, (new CUrl('templates.php'))
@@ -126,9 +125,6 @@ foreach ($data['groups'] as $group) {
 		}
 
 		$count->addClass(ZBX_STYLE_ICON_COUNT);
-	}
-	else {
-		$count = (new CSpan(''));
 	}
 
 	$table->addRow([
