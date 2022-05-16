@@ -27,9 +27,9 @@ class CControllerHostGroupEdit extends CController{
 
 	protected function checkInput(): bool {
 		$fields = [
-			'groupid' =>			'db hstgrp.groupid',
-			'name' =>				'string',
-			'subgroups' =>			'in 0,1'
+			'groupid'   => 'db hstgrp.groupid',
+			'name'      => 'string',
+			'subgroups' => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -81,6 +81,7 @@ class CControllerHostGroupEdit extends CController{
 			]);
 			$group = $groups[0];
 			$data['name'] = $group['name'];
+			$data['flags'] = $group['flags'];
 		}
 
 		// For clone action.
