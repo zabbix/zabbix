@@ -297,6 +297,7 @@ class CTemplateGroup extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['groupid'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$result = array_values($result);
