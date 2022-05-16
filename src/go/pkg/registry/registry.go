@@ -26,7 +26,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -99,16 +98,14 @@ func discoverValues(hive registry.Key, fullkey string, values []RegistryValue, c
 			continue
 		}
 
-		sdata := fmt.Sprintf("%v", data)
-
 		if re != "" {
 			match, _ := regexp.MatchString(re, v)
 
 			if match {
-				values = append(values, RegistryValue{fullkey, current_key, v, sdata, valtype})
+				values = append(values, RegistryValue{fullkey, current_key, v, data, valtype})
 			}
 		} else {
-			values = append(values, RegistryValue{fullkey, current_key, v, sdata, valtype})
+			values = append(values, RegistryValue{fullkey, current_key, v, data, valtype})
 		}
 
 		k.Close()
