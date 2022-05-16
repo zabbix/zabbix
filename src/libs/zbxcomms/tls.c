@@ -128,17 +128,6 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 }
 #endif
 
-struct zbx_tls_context
-{
-#if defined(HAVE_GNUTLS)
-	gnutls_session_t		ctx;
-	gnutls_psk_client_credentials_t	psk_client_creds;
-	gnutls_psk_server_credentials_t	psk_server_creds;
-#elif defined(HAVE_OPENSSL)
-	SSL				*ctx;
-#endif
-};
-
 extern unsigned int			configured_tls_connect_mode;
 extern unsigned int			configured_tls_accept_modes;
 

@@ -57,7 +57,26 @@ zbx_buf_type_t;
 #define ZBX_STAT_BUF_LEN	2048
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-typedef struct zbx_tls_context	zbx_tls_context_t;
+
+#if defined(HAVE_GNUTLS)
+#	include <gnutls/gnutls.h>
+#	include <gnutls/x509.h>
+#elif defined(HAVE_OPENSSL)
+#	include <openssl/ssl.h>
+#	include <openssl/err.h>
+#	include <openssl/rand.h>
+#endif
+
+typedef struct
+{
+#if defined(HAVE_GNUTLS)
+	gnutls_session_t		ctx;
+	gnutls_psk_client_credentials_t	psk_client_creds;
+	gnutls_psk_server_credentials_t	psk_server_creds;
+#elif defined(HAVE_OPENSSL)
+	SSL				*ctx;
+#endif
+} zbx_tls_context_t;
 #endif
 
 typedef struct
@@ -194,18 +213,8 @@ int	zbx_telnet_test_login(ZBX_SOCKET socket_fd);
 int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
 int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
 
-
 /* TLS BLOCK */
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-
-#if defined(HAVE_GNUTLS)
-#	include <gnutls/gnutls.h>
-#	include <gnutls/x509.h>
-#elif defined(HAVE_OPENSSL)
-#	include <openssl/ssl.h>
-#	include <openssl/err.h>
-#	include <openssl/rand.h>
-#endif
 
 #if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER)
 #	if !defined(LIBRESSL_VERSION_NUMBER)
