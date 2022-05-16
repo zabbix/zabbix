@@ -385,7 +385,7 @@ class CWidgetNavTree extends CWidget {
 		});
 
 		return tree;
-	};
+	}
 
 	_makeTree() {
 		const tree = this._buildTree();
@@ -427,7 +427,7 @@ class CWidgetNavTree extends CWidget {
 		ul.classList.add('tree-list');
 
 		return ul;
-	};
+	}
 
 	_makeTreeItem(item, depth = 1, editable = true) {
 		const li_item = document.createElement('li');
@@ -662,7 +662,7 @@ class CWidgetNavTree extends CWidget {
 		}
 
 		return li_item;
-	};
+	}
 
 	_removeTree() {
 		const root = this._target.querySelector('.root');
@@ -715,7 +715,7 @@ class CWidgetNavTree extends CWidget {
 				$arrow.removeClass('arrow-down a1').addClass('arrow-right');
 			}
 		});
-	};
+	}
 
 	_markTreeItemSelected(itemid) {
 		const selected_item = document.getElementById(`${this._unique_id}_tree-item-${itemid}`);
@@ -744,7 +744,7 @@ class CWidgetNavTree extends CWidget {
 		this.fire(WIDGET_NAVTREE_EVENT_MARK, {itemid: this._navtree_item_selected});
 
 		return true;
-	};
+	}
 
 	_openBranch(itemid) {
 		if (!jQuery(`.tree-item[data-id=${itemid}]`).is(':visible')) {
@@ -765,7 +765,7 @@ class CWidgetNavTree extends CWidget {
 					.closest('.tree-list').not('.root');
 			}
 		}
-	};
+	}
 
 	_getNextId() {
 		this._last_id++;
@@ -787,7 +787,7 @@ class CWidgetNavTree extends CWidget {
 				}
 			})
 			.disableSelection();
-	};
+	}
 
 	_parseProblems() {
 		if (this._severity_levels === null) {
@@ -822,7 +822,7 @@ class CWidgetNavTree extends CWidget {
 					.appendChild(indicator)
 			}
 		}
-	};
+	}
 
 	_itemEditDialog(id, parent, depth, trigger_elmnt) {
 		const url = new Curl('zabbix.php');
@@ -970,7 +970,7 @@ class CWidgetNavTree extends CWidget {
 				}, trigger_elmnt);
 			}
 		});
-	};
+	}
 
 	_updateWidgetFields() {
 		const prefix = `${this.getUniqueId()}_`;
@@ -1014,5 +1014,5 @@ class CWidgetNavTree extends CWidget {
 				}
 			}
 		});
-	};
+	}
 }
