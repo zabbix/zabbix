@@ -10,4 +10,6 @@ libzbxcomms_a_SOURCES = \
 	tls.c \
 	tls_version.c
 
-libzbxcomms_a_CFLAGS = $(LIBXML2_CFLAGS) $(TLS_CFLAGS)
+libzbxcomms_a_CFLAGS = \
+		$(LIBXML2_CFLAGS) \
+		$(TLS_CFLAGS)
