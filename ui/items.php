@@ -37,7 +37,8 @@ $fields = [
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
 	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,
-										IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP]),
+										IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE,
+											COPY_TYPE_TO_TEMPLATE_GROUP]),
 										'isset({copy})'
 									],
 	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],

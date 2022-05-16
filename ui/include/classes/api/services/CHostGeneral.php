@@ -1779,7 +1779,7 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Add the existing template groups, templates, tags, macros.
+	 * Add the existing host or template groups, templates, tags, macros.
 	 *
 	 * @param array $hosts
 	 * @param array $db_hosts

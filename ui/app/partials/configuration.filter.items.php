@@ -79,7 +79,7 @@ $filter_column_1
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter_data']['hosts'],
 			'popup' => [
-				'filter_preselect_fields' => ($data['context'] === 'host')
+				'filter_preselect_fields' => $data['context'] === 'host'
 					? ['hostgroups' => 'filter_groupids_']
 					: ['templategroups' => 'filter_groupids_'],
 				'parameters' => [

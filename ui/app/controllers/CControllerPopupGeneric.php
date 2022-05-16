@@ -41,7 +41,7 @@ class CControllerPopupGeneric extends CController {
 	 *
 	 * @array
 	 */
-	const POPUPS_HAVING_GROUP_FILTER = ['hosts', 'host_templates'];
+	const POPUPS_HAVING_HOST_GROUP_FILTER = ['hosts', 'host_templates'];
 
 	/**
 	 * Popups having template group filter selector.
@@ -599,7 +599,10 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($templategroup_options) {
-			$template_groups = API::TemplateGroup()->get(['output' => [], 'preservekeys' => true] + $templategroup_options);
+			$template_groups = API::TemplateGroup()->get([
+				'output' => [],
+				'preservekeys' => true
+			] + $templategroup_options);
 
 			if (!$template_groups) {
 				return false;
@@ -743,7 +746,7 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($this->hasInput('enrich_parent_groups') || $this->group_preselect_required
-			|| $this->template_group_preselect_required) {
+				|| $this->template_group_preselect_required) {
 			$group_options['enrich_parent_groups'] = 1;
 			$templategroup_options['enrich_parent_groups'] = 1;
 		}
@@ -803,10 +806,10 @@ class CControllerPopupGeneric extends CController {
 				'selectedLimit' => 1,
 				'popup' => [
 					'parameters' => [
-							'srctbl' => 'template_group',
-							'srcfld1' => 'groupid',
-							'dstfld1' => 'popup_template_group'
-						] + $templategroup_options
+						'srctbl' => 'template_group',
+						'srcfld1' => 'groupid',
+						'dstfld1' => 'popup_template_group'
+					] + $templategroup_options
 				],
 				'add_post_js' => false
 			];
@@ -991,7 +994,7 @@ class CControllerPopupGeneric extends CController {
 
 		// Set popup options.
 		$this->host_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_HOST_FILTER);
-		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_GROUP_FILTER)
+		$this->group_preselect_required = in_array($this->source_table, self::POPUPS_HAVING_HOST_GROUP_FILTER)
 			|| ($this->source_table === 'valuemaps' && !$this->hasInput('hostids'));
 		$this->template_group_preselect_required = in_array(
 			$this->source_table,
@@ -1182,8 +1185,7 @@ class CControllerPopupGeneric extends CController {
 			case 'templates':
 				$options += [
 					'output' => ['templateid', 'name'],
-					'groupids' => $this->template_groupids ? $this->template_groupids : null,
-					'templated_hosts' => $this->hasInput('with_hosts_and_templates') ? true : null
+					'groupids' => $this->template_groupids ? $this->template_groupids : null
 				];
 				$records = (!$this->template_group_preselect_required || $this->template_groupids)
 					? API::Template()->get($options)
@@ -1295,10 +1297,6 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->hasInput('with_items')) {
 					$options['with_items'] = true;
-				}
-
-				if ($this->hasInput('with_monitored_triggers')) {
-					$options['with_monitored_triggers'] = true;
 				}
 
 				$records = API::TemplateGroup()->get($options);

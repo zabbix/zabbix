@@ -27,18 +27,18 @@
 <script type="text/javascript">
 
 	jQuery(function($) {
-		var $form                                = $('form[name="user_group_form"]'),
-			$new_group_right_table               = $form.find('table#new-group-right-table'),
-			$new_templategroup_right_table       = $form.find('table#new-templategroup-right-table'),
-			$group_right_table_container         = $form.find('table#group-right-table').parent(),
+		let $form = $('form[name="user_group_form"]'),
+			$new_group_right_table = $form.find('table#new-group-right-table'),
+			$new_templategroup_right_table = $form.find('table#new-templategroup-right-table'),
+			$group_right_table_container = $form.find('table#group-right-table').parent(),
 			$templategroup_right_table_container = $form.find('table#templategroup-right-table').parent(),
-			$new_tag_filter_table                = $form.find('table#new-tag-filter-table'),
-			$tag_filter_table_container          = $form.find('table#tag-filter-table').parent(),
-			$ms_tag_filter_groups                = $new_tag_filter_table.find('.multiselect'),
-			$ms_group_right_groups               = $new_group_right_table.find('.multiselect'),
-			$ms_templategroup_right_groups       = $new_templategroup_right_table.find('.multiselect'),
-			$userdirectory                       = $form.find('[name="userdirectoryid"]'),
-			$gui_access                          = $form.find('[name="gui_access"]'),
+			$new_tag_filter_table = $form.find('table#new-tag-filter-table'),
+			$tag_filter_table_container = $form.find('table#tag-filter-table').parent(),
+			$ms_tag_filter_groups = $new_tag_filter_table.find('.multiselect'),
+			$ms_group_right_groups = $new_group_right_table.find('.multiselect'),
+			$ms_templategroup_right_groups = $new_templategroup_right_table.find('.multiselect'),
+			$userdirectory = $form.find('[name="userdirectoryid"]'),
+			$gui_access = $form.find('[name="gui_access"]'),
 			timeoutid_new_group_right,
 			timeoutid_new_templategroup_right,
 			timeoutid_new_tag_filter,
@@ -68,7 +68,7 @@
 		}
 
 		/**
-		 * Collects data.
+		 * Collects tag filter form data.
 		 *
 		 * @return {object}
 		 */
@@ -96,7 +96,7 @@
 		}
 
 		/**
-		 * Collects data.
+		 * Collects host group right form data.
 		 *
 		 * @return {object}
 		 */
@@ -132,7 +132,7 @@
 		}
 
 		/**
-		 * Collects data.
+		 * Collects template group right form data.
 		 *
 		 * @return {object}
 		 */
@@ -154,7 +154,7 @@
 
 			data.templategroup_rights = $.extend.apply({},
 				$templategroup_right_table_container.find('[name="templategroup_right"]').map(function(i, node) {
-					var obj = JSON.parse(node.value),
+					let obj = JSON.parse(node.value),
 						permission = jQuery(node).parent().find('input[type="radio"]').filter(':checked').val();
 
 					if (typeof permission !== 'undefined') {

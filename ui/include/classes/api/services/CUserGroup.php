@@ -466,11 +466,13 @@ class CUserGroup extends CApiService {
 					$groupids[$right['id']] = true;
 				}
 			}
+
 			if (array_key_exists('templategroup_rights', $usrgrp)) {
 				foreach ($usrgrp['templategroup_rights'] as $right) {
 					$groupids[$right['id']] = true;
 				}
 			}
+
 			if (array_key_exists('tag_filters', $usrgrp)) {
 				foreach ($usrgrp['tag_filters'] as $tag_filter) {
 					$groupids[$tag_filter['groupid']] = true;
@@ -1106,6 +1108,8 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
+	 * Adds related host or template groups rights requested by "select*" options to the resulting object set.
+	 *
 	 * @param array  $options
 	 * @param array  $result
 	 * @param string $option

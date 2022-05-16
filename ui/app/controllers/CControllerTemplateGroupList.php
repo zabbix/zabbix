@@ -49,11 +49,11 @@ class CControllerTemplateGroupList extends CController {
 	}
 
 	protected function doAction(): void {
-		$sort_field = $this->getInput('sort', CProfile::get('web.templategroups.php.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.templategroups.php.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.templategroups.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.templategroups.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.templategroups.php.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.templategroups.php.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.templategroups.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.templategroups.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.templategroups.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);

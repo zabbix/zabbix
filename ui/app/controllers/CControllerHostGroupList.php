@@ -49,11 +49,11 @@ class CControllerHostGroupList extends CController {
 	}
 
 	protected function doAction(): void {
-		$sort_field = $this->getInput('sort', CProfile::get('web.hostgroups.php.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.hostgroups.php.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.hostgroups.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.hostgroups.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.hostgroups.php.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.hostgroups.php.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.hostgroups.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.hostgroups.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.groups.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);

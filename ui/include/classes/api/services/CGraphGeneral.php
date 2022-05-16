@@ -437,6 +437,8 @@ abstract class CGraphGeneral extends CApiService {
 	}
 
 	/**
+	 * Adds related host groups and template groups requested by "select*" options to the resulting object set.
+	 *
 	 * @param array $options
 	 * @param array $result
 	 * @param string $option

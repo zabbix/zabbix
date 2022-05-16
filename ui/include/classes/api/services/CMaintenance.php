@@ -1239,7 +1239,6 @@ class CMaintenance extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
-		// selectHostGroups
 		$this->addRelatedGroups($options, $result, 'selectGroups');
 		$this->addRelatedGroups($options, $result, 'selectHostGroups');
 
@@ -1288,6 +1287,8 @@ class CMaintenance extends CApiService {
 	}
 
 	/**
+	 * Adds related host groups requested by "select*" options to the resulting object set.
+	 *
 	 * @param array $options
 	 * @param array $result
 	 * @param string $option

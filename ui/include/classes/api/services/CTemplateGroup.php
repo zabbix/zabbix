@@ -44,7 +44,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @param array $options
 	 *
-	 * @return array
+	 * @return array|int
 	 */
 	public function get(array $options) {
 		$result = [];
@@ -397,7 +397,9 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * @param array $groups
+	 * Validates input for create function.
+	 *
+	 * @param array $groups  [IN/OUT]
 	 *
 	 * @static
 	 *
@@ -418,8 +420,10 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * @param array $groups
-	 * @param array $db_groups
+	 * Validates input for create function.
+	 *
+	 * @param array $groups     [IN/OUT]
+	 * @param array $db_groups  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -448,10 +452,10 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * Validates if groups can be deleted.
+	 * Validates delete function input fields.
 	 *
-	 * @param array      $groupids
-	 * @param array|null $db_groups
+	 * @param array      $groupids   [IN]
+	 * @param array|null $db_groups  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -477,6 +481,8 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
+	 * Validates if groups can be deleted
+	 *
 	 * @param array $db_groups
 	 *
 	 * @throws APIException if unable to delete groups.
@@ -541,7 +547,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array $groups_to_create
+	 * @param array $groups_to_create  [IN/OUT]
 	 *
 	 * @throws APIException
 	 */
@@ -589,7 +595,7 @@ class CTemplateGroup extends CApiService {
 	/**
 	 * Get links of parent groups to given groups.
 	 *
-	 * @param array $groups
+	 * @param array $groups  Template groups which group links need to be identified.
 	 *
 	 * @return array Array where keys are parent group IDs and values are the array of child group IDs.
 	 */
@@ -712,7 +718,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function massUpdate(array $data) {
+	public function massUpdate(array $data): array {
 		$this->validateMassUpdate($data, $db_groups);
 
 		$groups = self::getGroupsByData($data, $db_groups);
@@ -756,8 +762,10 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * @param array      $data
-	 * @param array|null $db_groups
+	 * Validates massAdd function's input fields.
+	 *
+	 * @param array      $data       [IN/OUT]
+	 * @param array|null $db_groups  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -802,8 +810,10 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * @param array      $data
-	 * @param array|null $db_groups
+	 * Validates massUpdate function's input fields.
+	 *
+	 * @param array      $data       [IN/OUT]
+	 * @param array|null $db_groups  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -860,8 +870,10 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
-	 * @param array      $data
-	 * @param array|null $db_groups
+	 * Validates massRemove function's input fields.
+	 *
+	 * @param array      $data       [IN/OUT]
+	 * @param array|null $db_groups  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -940,9 +952,9 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array      $templateids
-	 * @param array      $db_groups
-	 * @param array|null $db_templateids
+	 * @param array      $templateids     [IN]
+	 * @param array      $db_groups       [IN/OUT]
+	 * @param array|null $db_templateids  [OUT]
 	 */
 	private static function addAffectedObjects(array $templateids, array &$db_groups,
 			array &$db_templateids = null): void {
@@ -1127,7 +1139,7 @@ class CTemplateGroup extends CApiService {
 		return $del_hostgroupids;
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$groupIds = array_keys($result);
@@ -1191,10 +1203,12 @@ class CTemplateGroup extends CApiService {
 	}
 
 	/**
+	 * Validates propagate function's input fields.
+	 *
 	 * @param array $data
 	 * @param array $db_groups
 	 *
-	 * @throws APIException if the input is invalid
+	 * @throws APIException if the input is invalid.
 	 */
 	private function validatePropagate(array &$data, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -1280,7 +1294,7 @@ class CTemplateGroup extends CApiService {
 	/**
 	 * Returns list of child groups for template group with given name.
 	 *
-	 * @param string $name     template group name.
+	 * @param string $name     Template group name.
 	 */
 	private function getChildGroupIds(string $name): array {
 		$parent = $name.'/';

@@ -1768,6 +1768,8 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
+	 * Adds related host groups requested by "select*" options to the resulting object set.
+	 *
 	 * @param array $options
 	 * @param array $result
 	 * @param string $option

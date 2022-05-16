@@ -1270,6 +1270,8 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
+	 * Adds related template groups requested by "select*" options to the resulting object set.
+	 *
 	 * @param array  $options
 	 * @param array  $result
 	 * @param string $option

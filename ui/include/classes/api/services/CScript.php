@@ -1168,7 +1168,7 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Applies relational subselect onto alredy fetched result.
+	 * Applies relational subselect onto already fetched result.
 	 *
 	 * @param  array $options
 	 * @param  mixed $options['selectHostGroups']

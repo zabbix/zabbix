@@ -44,7 +44,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @param array $options
 	 *
-	 * @return array
+	 * @return array|int
 	 */
 	public function get(array $options) {
 		$result = [];
@@ -566,8 +566,10 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * @param array $groups
-	 * @param array $db_groups
+	 * Validates input data for update method.
+	 *
+	 * @param array $groups     [IN/OUT]
+	 * @param array $db_groups  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -1018,7 +1020,7 @@ class CHostGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function massUpdate(array $data) {
+	public function massUpdate(array $data): array {
 		$this->validateMassUpdate($data, $db_groups);
 
 		$groups = self::getGroupsByData($data, $db_groups);
@@ -1105,13 +1107,14 @@ class CHostGroup extends CApiService {
 		}
 
 		self::checkHostsNotDiscovered($db_hosts);
-
 		self::addAffectedObjects($hostids, $db_groups);
 	}
 
 	/**
-	 * @param array      $data
-	 * @param array|null $db_groups
+	 * Validation of massUpdate input fields.
+	 *
+	 * @param array      $data       [IN/OUT]
+	 * @param array|null $db_groups  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -1170,8 +1173,10 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * @param array      $data
-	 * @param array|null $db_groups
+	 * Validation of massRemove input fields.
+	 *
+	 * @param array      $data       [IN/OUT]
+	 * @param array|null $db_groups  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -1458,7 +1463,7 @@ class CHostGroup extends CApiService {
 		return $del_hostgroupids;
 	}
 
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$groupIds = array_keys($result);
@@ -1538,9 +1543,13 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 *  Apply permissions to all host group's subgroups.
+	 * Apply permissions to all host group's subgroups.
 	 *
-	 * @param array $data
+	 * @param array   $data
+	 * @param array   $data['groups']             An array with host group IDs.
+	 * @param string  $data['groups']['groupid']  Host group ID.
+	 * @param bool    $data['permissions']        True if want to apply permissions to all subgroups.
+	 * @param bool    $data['tag_filters']        True if want to apply tag filters to all subgroups.
 	 *
 	 * @return array
 	 */
@@ -1560,10 +1569,12 @@ class CHostGroup extends CApiService {
 	}
 
 	/**
-	 * @param array $data
-	 * @param array $db_groups
+	 * Validation of propagate function input fields.
 	 *
-	 * @throws APIException if the input is invalid
+	 * @param array   $data       [IN/OUT]
+	 * @param array   $db_groups  [OUT]
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	private function validatePropagate(array &$data, array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
