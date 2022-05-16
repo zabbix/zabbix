@@ -174,10 +174,10 @@ func convertValue(k registry.Key, value string) (result interface{}, stype strin
 			return nil, "", err
 		}
 		return base64.StdEncoding.EncodeToString(val), "REG_BINARY", nil
-	case registry.DWORD:
+	case registry.QWORD:
 		stype = "REG_QWORD"
 		fallthrough
-	case registry.QWORD:
+	case registry.DWORD:
 		if stype == "" {
 			stype = "REG_DWORD"
 		}
