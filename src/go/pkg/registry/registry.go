@@ -74,24 +74,24 @@ func getHive(key string) (hive registry.Key, e error) {
 	return 0, errors.New("Failed to parse key.")
 }
 
-func discoverValues(hive registry.Key, fullkey string, values []RegistryValue, current_key string, re string) (result []RegistryValue, e error) {
+func discoverValues(hive registry.Key, fullkey string, discovered_values []RegistryValue, current_key string, re string) (result []RegistryValue, e error) {
 	k, err := registry.OpenKey(hive, fullkey, registry.READ)
 	if err != nil {
 		return nil, err
 	}
 	defer k.Close()
 
-	s, err := k.ReadSubKeyNames(0)
+	subkeys, err := k.ReadSubKeyNames(0)
 	if err != nil {
 		return nil, err
 	}
 
-	v, err := k.ReadValueNames(0)
+	values, err := k.ReadValueNames(0)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, v := range v {
+	for _, v := range values {
 		data, valtype, err := convertValue(k, v)
 
 		if err != nil {
@@ -102,22 +102,21 @@ func discoverValues(hive registry.Key, fullkey string, values []RegistryValue, c
 			match, _ := regexp.MatchString(re, v)
 
 			if match {
-				values = append(values, RegistryValue{fullkey, current_key, v, data, valtype})
+				discovered_values = append(discovered_values,
+					RegistryValue{fullkey, current_key, v, data, valtype})
 			}
 		} else {
-			values = append(values, RegistryValue{fullkey, current_key, v, data, valtype})
+			discovered_values = append(discovered_values,
+				RegistryValue{fullkey, current_key, v, data, valtype})
 		}
-
-		k.Close()
-		registry.OpenKey(hive, fullkey, registry.READ)
 	}
 
-	for _, i := range s {
-		new_fullkey := fullkey + "\\" + i
-		values, _ = discoverValues(hive, new_fullkey, values, i, re)
+	for _, subkey := range subkeys {
+		new_fullkey := fullkey + "\\" + subkey
+		discovered_values, _ = discoverValues(hive, new_fullkey, discovered_values, subkey, re)
 	}
 
-	return values, nil
+	return discovered_values, nil
 }
 
 func discoverKeys(hive registry.Key, fullkey string, subkeys []RegistryKey) (result []RegistryKey, e error) {
@@ -147,7 +146,6 @@ func convertValue(k registry.Key, value string) (result interface{}, stype strin
 	if err != nil {
 		return nil, "", err
 	}
-	defer k.Close()
 
 	switch valueType {
 	case registry.NONE:
@@ -191,7 +189,7 @@ func convertValue(k registry.Key, value string) (result interface{}, stype strin
 		return val, "REG_MULTI_SZ", nil
 	}
 
-	return "", "", errors.New("Value not found.")
+	return "", "", err
 }
 
 func splitFullkey(fullkey string) (hive registry.Key, key string, e error) {
@@ -203,6 +201,7 @@ func splitFullkey(fullkey string) (hive registry.Key, key string, e error) {
 
 	hive, e = getHive(fullkey[:idx])
 	key = fullkey[idx+1:]
+
 	return
 }
 
