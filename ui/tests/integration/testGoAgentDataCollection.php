@@ -29,6 +29,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 	const COMPARE_AVERAGE = 0;
 	const COMPARE_LAST = 1;
+	const OFFSET_MAX = 10;
 
 	private static $hostids = [];
 	private static $itemids = [];
@@ -516,6 +517,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 	 * @dataProvider getItems
 	 */
 	public function testGoAgentDataCollection_checkData($item) {
+		
 		$data = $this->getItemData();
 		if (!array_key_exists($item['key'], $data)) {
 			$this->fail('No metrics for item "'.$item['key'].'"');
@@ -554,17 +556,33 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			case ITEM_VALUE_TYPE_UINT64:
 				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
 					$value = [];
+					$diff_values = [];
+					
 					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-						$value[$component] = 0;
-						$records = count($values[$component]);
+						for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+							$value[$component][$i] = 0;
 
-						if ($records > 0) {
-							$value[$component] = array_sum($values[$component]) / $records;
+							if (self::COMPONENT_AGENT == $component) {
+								$j = $i;
+							} else {
+								$j = 0;
+							}
+							$slice = array_slice($values[$component], $j);
+							$records = count($slice);
+
+							if ($records > 0) {
+								$value[$component][$i] = array_sum($slice) / $records;
+							}
 						}
 					}
+					
+					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+						$diff_values[$i] = abs(abs($value[self::COMPONENT_AGENT][$i]) - abs($value[self::COMPONENT_AGENT2][$i]));
+					}
+					$offset = array_search(min($diff_values), $diff_values);
 
-					$a = $value[self::COMPONENT_AGENT];
-					$b = $value[self::COMPONENT_AGENT2];
+					$a = $value[self::COMPONENT_AGENT][$offset];
+					$b = $value[self::COMPONENT_AGENT2][$offset];
 				}
 				else {
 					$a = end($values[self::COMPONENT_AGENT]);
