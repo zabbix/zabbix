@@ -503,7 +503,6 @@ class CControllerPopupGeneric extends CController {
 			'with_monitored_triggers' =>			'in 1',
 			'with_monitored_items' =>				'in 1',
 			'with_httptests' => 					'in 1',
-			'with_hosts_and_templates' =>			'in 1',
 			'with_webitems' =>						'in 1',
 			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
@@ -732,7 +731,7 @@ class CControllerPopupGeneric extends CController {
 			$templategroup_options['with_templates'] = 1;
 		}
 		elseif ($this->source_table !== 'templates' && $this->source_table !== 'host_templates') {
-			$group_options['with_hosts_and_templates'] = 1;
+			$group_options['with_hosts'] = 1;
 		}
 
 		if ($this->hasInput('groupid')) {
@@ -1202,8 +1201,7 @@ class CControllerPopupGeneric extends CController {
 					'real_hosts' => $this->hasInput('real_hosts') ? '1' : null,
 					'with_httptests' => $this->hasInput('with_httptests') ? '1' : null,
 					'with_items' => $this->hasInput('with_items') ? true : null,
-					'with_triggers' => $this->hasInput('with_triggers') ? true : null,
-					'templated_hosts' => $this->hasInput('with_hosts_and_templates') ? true : null
+					'with_triggers' => $this->hasInput('with_triggers') ? true : null
 				];
 
 				if ($this->hasInput('with_monitored_triggers')) {
@@ -1254,10 +1252,6 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->hasInput('with_httptests')) {
 					$options['with_httptests'] = true;
-				}
-
-				if ($this->hasInput('with_hosts_and_templates')) {
-					$options['with_hosts'] = true;
 				}
 
 				if ($this->hasInput('with_items')) {

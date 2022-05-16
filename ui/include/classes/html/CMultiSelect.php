@@ -252,8 +252,8 @@ class CMultiSelect extends CTag {
 					'hostid', 'parent_discoveryid', 'webitems', 'normal_only', 'numeric', 'with_graphs',
 					'with_graph_prototypes', 'with_items', 'with_simple_graph_items',
 					'with_simple_graph_item_prototypes', 'with_triggers', 'value_types', 'excludeids', 'disableids',
-					'enrich_parent_groups', 'with_monitored_items', 'with_httptests', 'with_hosts_and_templates',
-					'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context', 'enabled_only'
+					'enrich_parent_groups', 'with_monitored_items', 'with_httptests', 'user_type', 'disable_selected',
+					'hostids', 'with_inherited', 'context', 'enabled_only'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -327,11 +327,6 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('with_templates', $parameters) && $parameters['with_templates']) {
 					$popup_parameters['templated_hosts'] = '1';
 					$autocomplete_parameters['with_templates'] = true;
-				}
-
-				if (array_key_exists('with_hosts_and_templates', $parameters) && $parameters['with_hosts_and_templates']) {
-					$popup_parameters['with_hosts_and_templates'] = '1';
-					$autocomplete_parameters['with_hosts_and_templates'] = true;
 				}
 
 				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
