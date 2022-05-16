@@ -4886,7 +4886,7 @@ static void	vmware_service_get_hv_alarms_data(zbx_vmware_service_t *service, CUR
 clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, alarms->values_num);
 }
 
 /******************************************************************************
