@@ -162,12 +162,10 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 	DWORD			cchClassName = MAX_PATH, cSubKeys=0, cValues, cbName, i, retCode,
 				cchValue = MAX_VALUE_NAME;
 	char			*uroot, *usubkey;
-	//zbx_vector_ptr_t	wsubkeys;
 	zbx_vector_wchar_ptr_t	wsubkeys;
 
 	retCode = RegQueryInfoKey(hKey, achClass, &cchClassName, NULL, &cSubKeys, NULL, NULL, &cValues, NULL, NULL, NULL, NULL);
 
-	//zbx_vector_ptr_create(&wsubkeys);
 	zbx_vector_wchar_ptr_create(&wsubkeys);
 
 	uroot = zbx_unicode_to_utf8(root);
@@ -191,7 +189,6 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 		if (ERROR_SUCCESS == retCode)
 		{
-			//zbx_vector_ptr_append
 			zbx_vector_wchar_ptr_append(&wsubkeys, wcsdup(achClass));
 		}
 	}
