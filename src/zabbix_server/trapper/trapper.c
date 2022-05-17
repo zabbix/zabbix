@@ -953,7 +953,7 @@ static void	active_passive_misconfig(zbx_socket_t *sock)
 
 static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 {
-	char		host[HOST_HOST_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
+	char		host[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
 			hbfreq[ZBX_MAX_UINT64_LEN];
 	zbx_uint64_t	hostid;
 	DC_HOST		dc_host;

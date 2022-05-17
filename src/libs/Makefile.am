@@ -8,9 +8,6 @@ DIST_SUBDIRS = \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
-	zbxgetopt \
-	zbxlog \
-	zbxnix \
 	zbxconf \
 	zbxcrypto \
 	zbxcyberark \
@@ -25,6 +22,7 @@ DIST_SUBDIRS = \
 	zbxeval \
 	zbxexec \
 	zbxexport \
+	zbxgetopt \
 	zbxha \
 	zbxhash \
 	zbxhashicorp \
@@ -43,6 +41,7 @@ DIST_SUBDIRS = \
 	zbxregexp \
 	zbxrtc \
 	zbxself \
+	zbxserialize \
 	zbxserver \
 	zbxservice \
 	zbxshmem \
@@ -51,13 +50,7 @@ DIST_SUBDIRS = \
 	zbxthreads \
 	zbxtrends \
 	zbxvault \
-	zbxxml \
-	zbxaudit \
-	zbxeval \
-	zbxserialize \
-	zbxxml \
-	zbxha \
-	zbxrtc
+	zbxxml
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -84,6 +77,7 @@ SERVER_SUBDIRS = \
 	zbxprometheus \
 	zbxrtc \
 	zbxself \
+	zbxserialize \
 	zbxserver \
 	zbxservice \
 	zbxshmem \
@@ -91,13 +85,6 @@ SERVER_SUBDIRS = \
 	zbxtrends \
 	zbxvault \
 	zbxxml
-	zbxavailability \
-	zbxservice \
-	zbxaudit \
-	zbxeval \
-	zbxserialize \
-	zbxha \
-	zbxrtc
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -121,26 +108,17 @@ PROXY_SUBDIRS = \
 	zbxprometheus \
 	zbxrtc \
 	zbxself \
+	zbxserialize \
 	zbxserver \
 	zbxshmem \
 	zbxtasks \
 	zbxtrends \
 	zbxvault \
 	zbxxml
-	zbxavailability \
-	zbxaudit \
-	zbxeval \
-	zbxserialize \
-	zbxrtc
 endif
 endif
 
 SUBDIRS = \
-	zbxhash \
-	zbxcrypto \
-	zbxcommon \
-	zbxgetopt \
-	zbxlog \
 	zbxalgo \
 	zbxcommon \
 	zbxcomms \
@@ -151,6 +129,7 @@ SUBDIRS = \
 	zbxdbschema \
 	zbxdiscovery \
 	zbxexec \
+	zbxgetopt \
 	zbxhash \
 	zbxhttp \
 	zbxipcservice \

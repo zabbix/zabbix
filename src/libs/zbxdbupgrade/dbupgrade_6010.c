@@ -352,7 +352,7 @@ static int	DBpatch_6010024(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select hi.itemid,hi.type,ht.name"
@@ -393,7 +393,7 @@ static int	DBpatch_6010024(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -419,7 +419,7 @@ static int	DBpatch_6010025(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select hi.itemid,hi.type,hs.name,ht.name"
@@ -461,7 +461,7 @@ static int	DBpatch_6010025(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
