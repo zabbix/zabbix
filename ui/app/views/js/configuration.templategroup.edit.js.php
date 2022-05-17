@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,31 +17,19 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
 <script>
-	const view = {
-		groupid: null,
-		name: null,
-
-		overlay: null,
-		dialogue: null,
-		form: null,
-		footer: null,
+	const view = new class {
 
 		init({groupid, name}) {
 			this.form = document.getElementById('templategroupForm');
 			this.groupid = groupid;
 			this.name = name;
 
-			this.form.addEventListener('submit', this.events.submit);
+			this.form.addEventListener('submit', (e) => this.events_submit(e));
 			this.initActionButtons();
-		},
+		}
 
 		initActionButtons() {
 			document.addEventListener('click', (e) => {
@@ -58,29 +46,14 @@
 					this.delete();
 				}
 			});
-		},
+		}
 
 		submit() {
 			const fields = getFormFields(this.form);
-
-			if (this.groupid !== null) {
-				fields.groupid = this.groupid;
-			}
-
 			fields.name = fields.name.trim();
 
-			for (const el of this.form.parentNode.children) {
-				if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-					el.parentNode.removeChild(el);
-				}
-			}
-
-			const update_url = new Curl('zabbix.php', false);
-			update_url.setArgument('action', 'templategroup.update');
-			const create_url = new Curl('zabbix.php', false);
-			create_url.setArgument('action', 'templategroup.create');
-
-			const curl = this.groupid === null ? create_url : update_url;
+			const curl = new Curl('zabbix.php', false);
+			curl.setArgument('action', this.groupid !== null ? 'templategroup.update' : 'templategroup.create');
 
 			this._post(curl.getUrl(), fields, (response) => {
 				postMessageOk(response.success.title);
@@ -94,11 +67,7 @@
 
 				location.href = url.getUrl();
 			});
-		},
-
-		cancel() {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-		},
+		}
 
 		clone() {
 			this.groupid = null;
@@ -107,7 +76,7 @@
 			curl.setArgument('action', 'templategroup.edit');
 
 			post(curl.getUrl(), {name: fields.name});
-		},
+		}
 
 		delete() {
 			const curl = new Curl('zabbix.php', false);
@@ -126,26 +95,22 @@
 
 				location.href = url.getUrl();
 			});
-		},
+		}
 
 		setLoading(active_button) {
 			active_button.classList.add('is-loading');
 
-			const footer = this.form.querySelector('.tfoot-buttons');
-
-			for (const button of footer.querySelectorAll('button:not(.js-cancel)')) {
+			for (const button of this.form.querySelectorAll('.tfoot-buttons button:not(.js-cancel)')) {
 				button.disabled = true;
 			}
-		},
+		}
 
 		unsetLoading() {
-			const footer = this.form.querySelector('.tfoot-buttons');
-
-			for (const button of footer.querySelectorAll('button:not(.js-cancel)')) {
+			for (const button of this.form.querySelectorAll('.tfoot-buttons button:not(.js-cancel)')) {
 				button.classList.remove('is-loading');
 				button.disabled = false;
 			}
-		},
+		}
 
 		_post(url, data, success_callback) {
 			fetch(url, {
@@ -186,15 +151,13 @@
 				.finally(() => {
 					this.unsetLoading();
 				});
-		},
+		}
 
-		events: {
-			submit(event) {
-				event.preventDefault();
-				const submit_button = view.form.querySelector('.tfoot-buttons button[type="submit"]');
+		events_submit(event) {
+			event.preventDefault();
+			const submit_button = view.form.querySelector('.tfoot-buttons button[type="submit"]');
 
-				view.setLoading(submit_button);
-			}
+			view.setLoading(submit_button);
 		}
 	}
 </script>
