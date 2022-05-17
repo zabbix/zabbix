@@ -127,10 +127,9 @@ class testTemplateGroup extends CAPITest {
 		$result = $this->call('templategroup.create', $templategroup, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
-				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $templategroup[$key]['name']);
+			foreach ($result['result']['groupids'] as $index => $groupid) {
+				$dbRow = CDBHelper::getRow('SELECT * FROM hstgrp WHERE groupid='.$groupid);
+				$this->assertEquals($dbRow['name'], $templategroup[$index]['name']);
 			}
 		}
 	}
@@ -279,16 +278,17 @@ class testTemplateGroup extends CAPITest {
 		$result = $this->call('templategroup.update', $templategroups, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
-				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $templategroups[$key]['name']);
+			foreach ($result['result']['groupids'] as $index => $groupid) {
+				$dbRow = CDBHelper::getRow('SELECT name FROM hstgrp WHERE groupid='.$groupid);
+				$this->assertEquals($dbRow['name'], $templategroups[$index]['name']);
 			}
 		}
 		else {
 			foreach ($templategroups as $templategroup) {
-				if (array_key_exists('name', $templategroup) && $templategroup['name'] !== 'Templates'){
-					$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($templategroup['name'])));
+				if (array_key_exists('name', $templategroup) && $templategroup['name'] !== 'Templates') {
+					$this->assertEquals(0,
+						CDBHelper::getCount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($templategroup['name']))
+					);
 				}
 			}
 		}
@@ -378,8 +378,8 @@ class testTemplateGroup extends CAPITest {
 		$result = $this->call('templategroup.delete', $templategroups, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['groupids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount('select * from hstgrp where groupid='.zbx_dbstr($id)));
+			foreach ($result['result']['groupids'] as $groupid) {
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hstgrp WHERE groupid='.zbx_dbstr($groupid)));
 			}
 		}
 	}
@@ -578,16 +578,15 @@ class testTemplateGroup extends CAPITest {
 		$result = $this->call('templategroup.massAdd', $templategroup, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['groupids'] as $key => $id) {
+			foreach ($result['result']['groupids'] as $index => $groupid) {
 				foreach($templategroup['templates'] as $template) {
-					$dbResult = DBSelect(
+					$dbRow = CDBHelper::getRow(
 						'SELECT groupid'.
 						' FROM hosts_groups'.
-						' WHERE groupid='.$id.
+						' WHERE groupid='.$groupid.
 							'AND hostid='.$template['templateid']
 					);
-					$dbRow = DBFetch($dbResult);
-					$this->assertEquals($dbRow['groupid'], $templategroup['groups'][$key]['groupid']);
+					$this->assertEquals($dbRow['groupid'], $templategroup['groups'][$index]['groupid']);
 				}
 
 			}
@@ -709,20 +708,18 @@ class testTemplateGroup extends CAPITest {
 		$result = $this->call('templategroup.massUpdate', $templategroup, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['groupids'] as $id) {
+			foreach ($result['result']['groupids'] as $groupid) {
 				if (array_key_exists('templateid', $templategroup['templates'])) {
-					$dbResult = DBSelect(
+					$dbRow = CDBHelper::getRow(
 						'SELECT groupid'.
 						' FROM hosts_groups'.
-						' WHERE groupid='.$id.
+						' WHERE groupid='.$groupid.
 							'AND hostid='.$templategroup['templates']['templateid']
 					);
-					$dbRow = DBFetch($dbResult);
 					$this->assertEquals($dbRow['groupid'], $templategroup['groups']['groupid']);
 				}
 				else {
-					$dbResult = DBSelect('SELECT NULL FROM hosts_groups WHERE groupid='.$id);
-					$dbRow = DBFetch($dbResult);
+					$dbRow = CDBHelper::getRow('SELECT NULL FROM hosts_groups WHERE groupid='.$groupid);
 					$this->assertSame($dbRow, false);
 				}
 			}
@@ -811,17 +808,21 @@ class testTemplateGroup extends CAPITest {
 		$result = $this->call('templategroup.massRemove', $templategroup, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['groupids'] as $key => $id) {
+			foreach ($result['result']['groupids'] as $groupid) {
 				foreach($templategroup['templateids'] as $templateid) {
-					$dbResult = DBSelect('SELECT NULL FROM hosts_groups WHERE groupid='.$id.' AND hostid='.$templateid);
-					$dbRow = DBFetch($dbResult);
+					$dbRow = CDBHelper::getRow(
+						'SELECT NULL'.
+						' FROM hosts_groups'.
+						' WHERE groupid='.$groupid.
+							' AND hostid='.$templateid
+					);
 					$this->assertSame($dbRow, false);
 				}
 			}
 		}
 	}
 
-	public static function templategroup_propagate() {
+	public static function templategroup_Propagate() {
 		return [
 			// Check groupid
 			[
@@ -919,17 +920,14 @@ class testTemplateGroup extends CAPITest {
 		$result = $this->call('templategroup.propagate', $templategroups, $expected_error);
 
 		if ($expected_error === null) {
-			$db_rights = DBSelect('select * from rights where groupid='.zbx_dbstr(self::$data['usrgrpids']));
-			$db_rights_row = DBfetchArray($db_rights);
+			$db_rights_row = CDBHelper::getAll('SELECT * FROM rights WHERE groupid='.self::$data['usrgrpid']);
 			$rights_groupids = array_column($db_rights_row, 'id');
 			$rights_groupids = array_flip($rights_groupids);
 
 			foreach ($result['result']['groupids'] as $groupid) {
-				$db_template_groups = DBselect('select * from hstgrp where groupid='.zbx_dbstr($groupid));
-				$db_template_groups_row = DBfetch($db_template_groups);
+				$db_template_groups_row = CDBHelper::getRow('SELECT * FROM hstgrp WHERE groupid='.$groupid);
 				$group_name = $db_template_groups_row['name'].'/%';
-				$db_subgroups = DBselect('select * from hstgrp where name like '.zbx_dbstr($group_name));
-				$db_subgroups_row = DBfetchArray($db_subgroups);
+				$db_subgroups_row = CDBHelper::getAll('SELECT * FROM hstgrp WHERE name LIKE '.zbx_dbstr($group_name));
 				$groupids = [];
 				$groupids[] = $db_template_groups_row['groupid'];
 				$groupids = array_merge($groupids, array_column($db_subgroups_row, 'groupid'));
@@ -946,7 +944,7 @@ class testTemplateGroup extends CAPITest {
 	 */
 	protected static $data = [
 		'groupids' => ['groupid_1', 'groupid_2', 'groupid_3', 'groupid_4', 'groupid_5', 'groupid_6'],
-		'usrgrpids' => null
+		'usrgrpid' => null
 	];
 
 	/**
@@ -968,11 +966,11 @@ class testTemplateGroup extends CAPITest {
 			['name' => 'API template group propagate test']
 		]);
 		$this->assertArrayHasKey('usrgrpids', $response);
-		self::$data['usrgrpids'] = $response['usrgrpids'][0];
+		self::$data['usrgrpid'] = $response['usrgrpids'][0];
 
 		$response = CDataHelper::call('usergroup.update', [
 			[
-				'usrgrpid' => self::$data['usrgrpids'],
+				'usrgrpid' => self::$data['usrgrpid'],
 				'templategroup_rights' => [
 					[
 						'id' => self::$data['groupids']['groupid_1'],

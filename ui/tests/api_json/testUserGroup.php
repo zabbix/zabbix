@@ -125,9 +125,11 @@ class testUserGroup extends CAPITest {
 		$result = $this->call('usergroup.create', $group, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['usrgrpids'] as $key => $id) {
-				$dbResult = DBSelect('select * from usrgrp where usrgrpid='.zbx_dbstr($id));
-				$dbRow = DBFetch($dbResult);
+			foreach ($result['result']['usrgrpids'] as $key => $usrgrpid) {
+				$dbRow = CDBHelper::getRow(
+					'SELECT name,gui_access,users_status,debug_mode'.
+					' FROM usrgrp'.
+					' WHERE usrgrpid='.$usrgrpid);
 				$this->assertEquals($dbRow['name'], $group[$key]['name']);
 				$this->assertEquals($dbRow['gui_access'], GROUP_GUI_ACCESS_SYSTEM);
 				$this->assertEquals($dbRow['users_status'], 0);
@@ -327,7 +329,11 @@ class testUserGroup extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['usrgrpids'] as $key => $usrgrpid) {
-				$db_usrgrp = DBfetch(DBselect('SELECT * FROM usrgrp WHERE usrgrpid='.$usrgrpid));
+				$db_usrgrp = CDBHelper::getRow(
+					'SELECT name,gui_access,users_status,debug_mode'.
+					' FROM usrgrp'.
+					' WHERE usrgrpid='.$usrgrpid
+				);
 				$this->assertSame($db_usrgrp['name'], $groups[$key]['name']);
 				$this->assertSame($db_usrgrp['gui_access'], (string) GROUP_GUI_ACCESS_SYSTEM);
 				$this->assertSame($db_usrgrp['users_status'], '0');
@@ -335,13 +341,13 @@ class testUserGroup extends CAPITest {
 
 				if (array_key_exists('hostgroup_rights', $groups[$key])){
 					foreach ($groups[$key]['hostgroup_rights'] as $rights) {
-						$db_right = DBfetch(DBselect(
+						$db_right = CDBHelper::getRow(
 							'SELECT r.id,r.permission'.
 							' FROM rights r,hstgrp hg'.
 							' WHERE r.id=hg.groupid'.
 								' AND r.groupid='.$usrgrpid.
 								' AND hg.type='.HOST_GROUP_TYPE_HOST_GROUP
-						));
+						);
 						$this->assertSame($db_right['id'], $rights['id']);
 						$this->assertSame($db_right['permission'], $rights['permission']);
 					}
@@ -349,13 +355,13 @@ class testUserGroup extends CAPITest {
 
 				if (array_key_exists('templategroup_rights', $groups[$key])){
 					foreach ($groups[$key]['templategroup_rights'] as $rights) {
-						$db_right = DBfetch(DBselect(
+						$db_right = CDBHelper::getRow(
 							'SELECT r.id,r.permission'.
 							' FROM rights r,hstgrp hg'.
 							' WHERE r.id=hg.groupid'.
 								' AND r.groupid='.$usrgrpid.
 								' AND hg.type='.HOST_GROUP_TYPE_TEMPLATE_GROUP
-						));
+						);
 						$this->assertSame($db_right['id'], $rights['id']);
 						$this->assertSame($db_right['permission'], $rights['permission']);
 					}
@@ -365,8 +371,9 @@ class testUserGroup extends CAPITest {
 		else {
 			foreach ($groups as $group) {
 				if (array_key_exists('name', $group) && $group['name'] != 'Zabbix administrators'){
-					$dbResult = 'select * from usrgrp where name='.zbx_dbstr($group['name']);
-					$this->assertEquals(0, CDBHelper::getCount($dbResult));
+					$this->assertEquals(0,
+						CDBHelper::getCount('SELECT * FROM usrgrp WHERE name='.zbx_dbstr($group['name']))
+					);
 				}
 			}
 		}
@@ -593,7 +600,7 @@ class testUserGroup extends CAPITest {
 
 			if ($expected_error === null) {
 				$db_group = CDBHelper::getRow(
-					'SELECT * FROM usrgrp WHERE usrgrpid='.zbx_dbstr($result['result']['usrgrpids'][0])
+					'SELECT * FROM usrgrp WHERE usrgrpid='.$result['result']['usrgrpids'][0]
 				);
 				$this->assertSame($group['name'], $db_group['name']);
 				$this->assertEquals($group['gui_access'], $db_group['gui_access']);
@@ -603,7 +610,7 @@ class testUserGroup extends CAPITest {
 				$this->assertEquals(count($group['users']), CDBHelper::getCount(
 					'SELECT NULL'.
 					' FROM users_groups'.
-					' WHERE usrgrpid='.zbx_dbstr($result['result']['usrgrpids'][0])
+					' WHERE usrgrpid='.$result['result']['usrgrpids'][0]
 				));
 
 				$db_right = CDBHelper::getRow('SELECT * FROM rights WHERE groupid='.$result['result']['usrgrpids'][0]);
@@ -615,7 +622,7 @@ class testUserGroup extends CAPITest {
 					$this->assertEquals(0, CDBHelper::getCount(
 						'SELECT NULL'.
 						' FROM usrgrp'.
-						' WHERE usrgrpid='.zbx_dbstr($group['usrgrpid']).
+						' WHERE usrgrpid='.$group['usrgrpid'].
 							' AND name='.zbx_dbstr($group['name'])
 					));
 				}
@@ -702,9 +709,8 @@ class testUserGroup extends CAPITest {
 		$result = $this->call('usergroup.delete', $group, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['usrgrpids'] as $id) {
-				$dbResult = 'select * from usrgrp where usrgrpid='.zbx_dbstr($id);
-				$this->assertEquals(0, CDBHelper::getCount($dbResult));
+			foreach ($result['result']['usrgrpids'] as $usrgrpid) {
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM usrgrp WHERE usrgrpid='.$usrgrpid));
 			}
 		}
 	}
