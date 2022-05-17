@@ -26,6 +26,7 @@ class CopyWidgetsDashboards {
 	 * !!! Please, add new widgets to "Dashboard for Copying widgets _2" if necessary.
 	 * If "Dashboard for Copying widgets _2" is run out of space, create new dashboard with this exact name:
 	 * "Dashboard for Copying widgets _3", etc.
+	 * Second page on new dashboard for paste widgets should be named "Test_page".
 	 *
 	 * @return array
 	 */
