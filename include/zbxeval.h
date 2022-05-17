@@ -179,7 +179,7 @@ typedef zbx_uint32_t zbx_token_type_t;
  *                                                                            *
  ******************************************************************************/
 typedef	int (*zbx_eval_function_cb_t)(const char *name, size_t len, int args_num, const zbx_variant_t *args,
-		void *um_data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
+		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
 
 typedef struct
 {

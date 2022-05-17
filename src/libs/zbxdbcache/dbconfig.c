@@ -13251,7 +13251,7 @@ int	zbx_dc_maintenance_has_tags(void)
  *                                  ZBX_MACRO_ENV_NONSECURE                   *
  *                                  ZBX_MACRO_ENV_SECURE                      *
  *                                  ZBX_MACRO_ENV_DEFAULT (last opened or     *
- *                                    nonsecure evironment)                   *
+ *                                    non-secure environment)                 *
  *                                                                            *
  * Return value: the handle for macro resolving, must be closed with          *
  *        zbx_dc_close_user_macros()                                          *
@@ -13358,6 +13358,7 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
  *             text        - [IN/OUT] the text value with macros to expand    *
  *             hostids     - [IN] an array of host identifiers                *
  *             hostids_num - [IN] the number of host identifiers              *
+ *             error       - [OUT] the error message                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
