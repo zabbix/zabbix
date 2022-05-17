@@ -468,7 +468,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 
 int	zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *type, const char *id,
 		const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
-		zbx_vector_custquery_param_t *query_instance);
+		zbx_vector_custquery_param_t *query_params);
 zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t *service, const char *type,
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode);
 
