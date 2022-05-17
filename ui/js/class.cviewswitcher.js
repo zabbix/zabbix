@@ -126,7 +126,7 @@ CViewSwitcher.prototype = {
 			}
 		}
 
-		if (isset(myValue, this.depObjects)) {
+		if (isset(myValue, this.depObjects) && !this.mainObj.disabled) {
 			for (var key in this.depObjects[myValue]) {
 				if (empty(this.depObjects[myValue][key])) {
 					continue;
