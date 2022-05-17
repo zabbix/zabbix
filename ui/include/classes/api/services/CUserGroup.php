@@ -263,7 +263,8 @@ class CUserGroup extends CApiService {
 		$this->checkDuplicates(array_column($usrgrps, 'name'));
 		$this->checkUsers($usrgrps);
 		$this->checkHimself($usrgrps, __FUNCTION__);
-		$this->checkGroups($usrgrps);
+		$this->checkTemplateGroups($usrgrps);
+		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
 	}
@@ -384,7 +385,8 @@ class CUserGroup extends CApiService {
 		$this->checkUsers($usrgrps);
 		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
 		$this->checkUsersWithoutGroups($usrgrps);
-		$this->checkGroups($usrgrps);
+		$this->checkTemplateGroups($usrgrps);
+		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
 		self::checkUserDirectories($usrgrps);
 	}
@@ -448,27 +450,61 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Check for valid host groups and template groups.
+	 * Check for valid template groups.
 	 *
 	 * @param array  $usrgrps
-	 * @param array  $usrgrps[]['hostgroup_rights']     (optional)
-	 * @param array  $usrgrps[]['templategroup_rights'] (optional)
-	 * @param array  $usrgrps[]['tag_filters']          (optional)
+	 * @param array  $usrgrps[]['templategroup_rights']  (optional)
 	 *
 	 * @throws APIException
 	 */
-	private function checkGroups(array $usrgrps) {
+	private function checkTemplateGroups(array $usrgrps) {
+		$groupids = [];
+
+		foreach ($usrgrps as $usrgrp) {
+			if (array_key_exists('templategroup_rights', $usrgrp)) {
+				foreach ($usrgrp['templategroup_rights'] as $right) {
+					$groupids[$right['id']] = true;
+				}
+			}
+		}
+
+		if (!$groupids) {
+			return;
+		}
+
+		$groupids = array_keys($groupids);
+
+		$db_groups = DB::select('hstgrp', [
+			'output' => [],
+			'groupids' => $groupids,
+			'filter' => ['type' => HOST_GROUP_TYPE_TEMPLATE_GROUP],
+			'preservekeys' => true
+		]);
+
+		foreach ($groupids as $groupid) {
+			if (!array_key_exists($groupid, $db_groups)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Template group with ID "%1$s" is not available.', $groupid)
+				);
+			}
+		}
+	}
+
+	/**
+	 * Check for valid host groups.
+	 *
+	 * @param array  $usrgrps
+	 * @param array  $usrgrps[]['hostgroup_rights']  (optional)
+	 * @param array  $usrgrps[]['tag_filters']       (optional)
+	 *
+	 * @throws APIException
+	 */
+	private function checkHostGroups(array $usrgrps) {
 		$groupids = [];
 
 		foreach ($usrgrps as $usrgrp) {
 			if (array_key_exists('hostgroup_rights', $usrgrp)) {
 				foreach ($usrgrp['hostgroup_rights'] as $right) {
-					$groupids[$right['id']] = true;
-				}
-			}
-
-			if (array_key_exists('templategroup_rights', $usrgrp)) {
-				foreach ($usrgrp['templategroup_rights'] as $right) {
 					$groupids[$right['id']] = true;
 				}
 			}
@@ -489,6 +525,7 @@ class CUserGroup extends CApiService {
 		$db_groups = DB::select('hstgrp', [
 			'output' => [],
 			'groupids' => $groupids,
+			'filter' => ['type' => HOST_GROUP_TYPE_HOST_GROUP],
 			'preservekeys' => true
 		]);
 
