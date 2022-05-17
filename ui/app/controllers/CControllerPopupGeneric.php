@@ -736,12 +736,10 @@ class CControllerPopupGeneric extends CController {
 
 		if ($this->hasInput('groupid')) {
 			$host_options['groupid'] = $this->getInput('groupid');
-			$group_options['groupid'] = $this->getInput('groupid');
 		}
 
 		if ($this->hasInput('templategroupid')) {
-			$host_options['templategroupid'] = $this->getInput('templategroupid');
-			$templategroup_options['groupid'] = $this->getInput('templategroupid');
+			$template_options['groupid'] = $this->getInput('templategroupid');
 		}
 
 		if ($this->hasInput('enrich_parent_groups') || $this->group_preselect_required
@@ -958,9 +956,7 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($this->template_groupids) {
-			CProfile::updateArray(
-				'web.popup.generic.filter_templategroupid',
-				$this->template_groupids,
+			CProfile::updateArray( 'web.popup.generic.filter_templategroupid', $this->template_groupids,
 				PROFILE_TYPE_ID
 			);
 		}
