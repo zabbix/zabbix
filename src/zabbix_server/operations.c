@@ -20,6 +20,7 @@
 #include "operations.h"
 
 #include "log.h"
+#include "zbxavailability.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
 
@@ -215,7 +216,7 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
 	unsigned char		svc_type, interface_type;
-	zbx_db_insert_t		db_insert;
+	zbx_db_insert_t		db_insert, db_insert_host_rtdata;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, event->eventid);
 
@@ -436,6 +437,13 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
+				zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid",
+						"active_available", NULL);
+
+				zbx_db_insert_add_values(&db_insert_host_rtdata, hostid, INTERFACE_AVAILABLE_UNKNOWN);
+				zbx_db_insert_execute(&db_insert_host_rtdata);
+				zbx_db_insert_clean(&db_insert_host_rtdata);
+
 				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
@@ -583,6 +591,13 @@ static zbx_uint64_t	add_discovered_host(const ZBX_DB_EVENT *event, int *status, 
 
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
+
+				zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid",
+						"active_available", NULL);
+
+				zbx_db_insert_add_values(&db_insert_host_rtdata, hostid, INTERFACE_AVAILABLE_UNKNOWN);
+				zbx_db_insert_execute(&db_insert_host_rtdata);
+				zbx_db_insert_clean(&db_insert_host_rtdata);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
 					DBadd_host_inventory(hostid, cfg->default_inventory_mode);

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -64,6 +64,7 @@ if ($data['warning']) {
 
 (new CWidget())
 	->setTitle(($data['hostid'] == 0) ? _('New host') : _('Host'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_EDIT))
 	->addItem(new CPartial('configuration.host.edit.html', $data))
 	->show();
 

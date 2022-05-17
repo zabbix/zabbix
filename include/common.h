@@ -1262,7 +1262,6 @@ int	is_ip(const char *ip);
 
 int	zbx_validate_hostname(const char *hostname);
 
-void	zbx_on_exit(int ret); /* calls exit() at the end! */
 void	zbx_backtrace(void);
 
 int	int_in_list(char *list, int value);

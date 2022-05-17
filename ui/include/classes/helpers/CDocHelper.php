@@ -36,6 +36,7 @@ class CDocHelper {
 	const ADMINISTRATION_MEDIATYPE_EDIT =					'config/notifications/media#common-parameters';
 	const ADMINISTRATION_MEDIATYPE_LIST =					'web_interface/frontend_sections/administration/mediatypes';
 	const ADMINISTRATION_MISCCONFIG_EDIT =					'web_interface/frontend_sections/administration/general#other-parameters';
+	const ADMINISTRATION_MODULE_EDIT =						'modules#manifest-preparation';
 	const ADMINISTRATION_MODULE_LIST =						'web_interface/frontend_sections/administration/general#modules';
 	const ADMINISTRATION_PROXY_EDIT =						'distributed_monitoring/proxies#configuration';
 	const ADMINISTRATION_PROXY_LIST =						'web_interface/frontend_sections/administration/proxies';
@@ -69,6 +70,7 @@ class CDocHelper {
 	const CONFIGURATION_HOST_HTTPCONF_LIST =				'web_interface/frontend_sections/configuration/hosts/web';
 	const CONFIGURATION_HOST_ITEM_LIST =					'web_interface/frontend_sections/configuration/hosts/items';
 	const CONFIGURATION_HOST_ITEM_PROTOTYPE_LIST =			'web_interface/frontend_sections/configuration/hosts/discovery/item_prototypes';
+	const CONFIGURATION_HOST_EDIT =							'config/hosts/host#configuration';
 	const CONFIGURATION_HOST_LIST =							'web_interface/frontend_sections/configuration/hosts';
 	const CONFIGURATION_HOST_PROTOTYPE_EDIT =				'vm_monitoring#host-prototypes';
 	const CONFIGURATION_HOST_PROTOTYPE_LIST =				'web_interface/frontend_sections/configuration/hosts/discovery/host_prototypes';
@@ -96,9 +98,10 @@ class CDocHelper {
 	const CONFIGURATION_TRIGGER_PROTOTYPE_EDIT =			'discovery/low_level_discovery/trigger_prototypes';
 	const CONFIGURATION_TEMPLATES_PROTOTYPE_LIST =			'web_interface/frontend_sections/configuration/templates/discovery/host_prototypes';
 	const CONFIGURATION_TRIGGERS_EDIT =						'config/triggers/trigger#configuration';
+	const DASHBOARD_PAGE_PROPERTIES_EDIT =					'web_interface/frontend_sections/monitoring/dashboard#adding-pages';
 	const DASHBOARD_PROPERTIES_EDIT =						'web_interface/frontend_sections/monitoring/dashboard#creating-a-dashboard';
-	const HOSTINVENTORIESOVERVIEW =							'web_interface/frontend_sections/inventory/overview';
 	const INVENTORY_HOST_LIST =								'web_interface/frontend_sections/inventory/hosts';
+	const INVENTORY_HOST_OVERVIEW =							'web_interface/frontend_sections/inventory/overview';
 	const MONITORING_CHARTS_VIEW =							'web_interface/frontend_sections/monitoring/hosts/graphs';
 	const MONITORING_DASHBOARD_LIST =						'web_interface/frontend_sections/monitoring/dashboard';
 	const MONITORING_DASHBOARD_VIEW =						'web_interface/frontend_sections/monitoring/dashboard';
@@ -106,6 +109,7 @@ class CDocHelper {
 	const MONITORING_DISCOVERY_VIEW =						'web_interface/frontend_sections/monitoring/discovery';
 	const MONITORING_HOST_DASHBOARD_VIEW =					'config/visualization/host_screens';
 	const MONITORING_HOST_VIEW =							'web_interface/frontend_sections/monitoring/hosts';
+	const MONITORING_HISTORY =								'web_interface/frontend_sections/monitoring/latest_data#graphs';
 	const MONITORING_LATEST_VIEW =							'web_interface/frontend_sections/monitoring/latest_data';
 	const MONITORING_PROBLEM_VIEW =							'web_interface/frontend_sections/monitoring/problems';
 	const MONITORING_SYSMAP_EDIT =							'config/visualization/maps/map#creating-a-map';
@@ -114,8 +118,8 @@ class CDocHelper {
 	const MONITORING_SYSMAP_CONSTRUCTOR =					'config/visualization/maps/map#overview';
 	const MONITORING_WEB_VIEW =								'web_interface/frontend_sections/monitoring/hosts/web';
 	const POPUP_ACKNOWLEDGE_EDIT =							'acknowledges#updating-problems';
-	const POPUP_HOST_EDIT =									'config/hosts/host#configuration';
 	const POPUP_HOST_IMPORT =								'xml_export_import/hosts#importing';
+	const POPUP_HTTP_STEP_EDIT =							'web_monitoring#configuring-steps';
 	const POPUP_MAPS_IMPORT =								'xml_export_import/maps#importing';
 	const POPUP_MAP_ELEMENT =								'config/visualization/maps/map#adding-elements';
 	const POPUP_MAP_SHAPE =									'config/visualization/maps/map#adding-shapes';
@@ -131,6 +135,7 @@ class CDocHelper {
 	const POPUP_SLA_EDIT =									'web_interface/frontend_sections/services/sla#configuration';
 	const POPUP_TEMPLATE_IMPORT =							'xml_export_import/templates#importing';
 	const POPUP_TOKEN_EDIT =								'web_interface/frontend_sections/administration/general#api-tokens';
+	const POPUP_TEST_EDIT =									'config/items/item#testing';
 	const QUEUE_DETAILS =									'web_interface/frontend_sections/administration/queue#list-of-waiting-items';
 	const QUEUE_OVERVIEW =									'web_interface/frontend_sections/administration/queue#overview-by-item-type';
 	const QUEUE_OVERVIEW_PROXY =							'web_interface/frontend_sections/administration/queue#overview-by-proxy';

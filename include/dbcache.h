@@ -135,7 +135,7 @@ typedef struct
 	unsigned char	ipmi_privilege;
 	char		ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];
 	char		ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];
-	char		inventory_mode;
+	signed char	inventory_mode;
 	unsigned char	status;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
@@ -710,6 +710,7 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num);
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid);
 int	DCconfig_get_hostid_by_name(const char *host, zbx_uint64_t *hostid);
 void	DCconfig_get_hosts_by_itemids(DC_HOST *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
+void	DCconfig_get_hosts_by_hostids(DC_HOST *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	DCconfig_get_items_by_keys(DC_ITEM *items, zbx_host_key_t *keys, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,

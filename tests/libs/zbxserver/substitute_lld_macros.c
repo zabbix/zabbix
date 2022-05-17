@@ -115,7 +115,7 @@ void	zbx_mock_test_entry(void **state)
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	returned_ret = substitute_lld_macros(&expression, &jp, &macros, flags, NULL, 0);
+	returned_ret = zbx_substitute_lld_macros(&expression, &jp, &macros, flags, NULL, 0);
 
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
 	zbx_mock_assert_str_eq("resulting expression", expected_expression, expression);

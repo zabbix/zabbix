@@ -19,9 +19,9 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.2.0alpha2])
+AC_INIT([Zabbix],[6.2.0rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
+AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1987,6 +1987,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
 		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
@@ -2079,10 +2080,12 @@ AC_OUTPUT([
 	src/libs/zbxconf/Makefile
 	src/libs/zbxdbcache/Makefile
 	src/libs/zbxdbhigh/Makefile
+	src/libs/zbxgetopt/Makefile
 	src/libs/zbxmedia/Makefile
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
+	src/libs/zbxsysinfo/alias/Makefile
 	src/libs/zbxsysinfo/common/Makefile
 	src/libs/zbxsysinfo/simple/Makefile
 	src/libs/zbxsysinfo/linux/Makefile
@@ -2109,6 +2112,7 @@ AC_OUTPUT([
 	src/libs/zbxserver/Makefile
 	src/libs/zbxicmpping/Makefile
 	src/libs/zbxeval/Makefile
+	src/libs/zbxserialize/Makefile
 	src/libs/zbxexec/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxmodules/Makefile
@@ -2141,6 +2145,7 @@ AC_OUTPUT([
 	src/zabbix_server/alerter/Makefile
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/dbconfig/Makefile
+	src/zabbix_server/diag/Makefile
 	src/zabbix_server/discoverer/Makefile
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
@@ -2153,6 +2158,7 @@ AC_OUTPUT([
 	src/zabbix_server/escalator/Makefile
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/selfmon/Makefile
+	src/zabbix_server/stats/Makefile
 	src/zabbix_server/vmware/Makefile
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/ipmi/Makefile
@@ -2164,10 +2170,12 @@ AC_OUTPUT([
 	src/zabbix_server/lld/Makefile
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/datasender/Makefile
+	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_java/Makefile
 	man/Makefile

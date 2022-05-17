@@ -22,7 +22,10 @@
 #include "log.h"
 #include "zbxipcservice.h"
 
-void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
+ZBX_PTR_VECTOR_IMPL(proxy_hostdata_ptr, zbx_proxy_hostdata_t *)
+ZBX_PTR_VECTOR_IMPL(host_active_avail_ptr, zbx_host_active_avail_t *)
+
+void	zbx_availability_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response)
 {
 	static zbx_ipc_socket_t	socket;
 
@@ -37,13 +40,18 @@ void	zbx_availability_flush(unsigned char *data, zbx_uint32_t size)
 			exit(EXIT_FAILURE);
 		}
 	}
-#define ZBX_IPC_AVAILABILITY_REQUEST	1
-	if (FAIL == zbx_ipc_socket_write(&socket, ZBX_IPC_AVAILABILITY_REQUEST, data, size))
+
+	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to availability manager service");
 		exit(EXIT_FAILURE);
 	}
-#undef ZBX_IPC_AVAILABILITY_REQUEST
+
+	if (NULL != response && FAIL == zbx_ipc_socket_read(&socket, response))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from service");
+		exit(EXIT_FAILURE);
+	}
 }
 
 void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities)
@@ -54,12 +62,54 @@ void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_ava
 
 	for (i = 0; i < interface_availabilities->values_num; i++)
 	{
-		zbx_availability_serialize(&data, &data_alloc, &data_offset,
+		zbx_availability_serialize_interface(&data, &data_alloc, &data_offset,
 				interface_availabilities->values[i]);
 	}
 
-	zbx_availability_flush(data, data_offset);
+	zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, (zbx_uint32_t)data_offset, NULL);
 	zbx_free(data);
+}
+
+void	zbx_availability_serialize_json_hostdata(zbx_vector_proxy_hostdata_ptr_t *hostdata, struct zbx_json *j)
+{
+	int	i;
+
+	if (0 == hostdata->values_num)
+		return;
+
+	zbx_json_addarray(j, ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA);
+
+	for (i = 0; i < hostdata->values_num; i++)
+	{
+		zbx_proxy_hostdata_t	*hd = hostdata->values[i];
+
+		zbx_json_addobject(j, NULL);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_HOSTID, hd->hostid);
+		zbx_json_addint64(j, ZBX_PROTO_TAG_ACTIVE_STATUS, hd->status);
+		zbx_json_close(j);
+	}
+
+	zbx_json_close(j);
+}
+
+int	zbx_get_active_agent_availability(zbx_uint64_t hostid)
+{
+	zbx_ipc_message_t	response;
+	unsigned char		*data = NULL;
+	zbx_uint32_t		data_len = 0;
+	int			status = INTERFACE_AVAILABLE_UNKNOWN;
+
+	zbx_ipc_message_init(&response);
+	data_len = zbx_availability_serialize_active_status_request(&data, hostid);
+	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_STATUS, data, data_len, &response);
+
+	if (0 != response.size)
+		zbx_availability_deserialize_active_status_response(response.data, &status);
+
+	zbx_ipc_message_clean(&response);
+	zbx_free(data);
+
+	return status;
 }
 
 /******************************************************************************

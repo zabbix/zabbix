@@ -574,6 +574,7 @@ class testFormUserRoles extends CWebTest {
 						'Close problems' => false,
 						'Execute scripts' => false,
 						'Manage API tokens' => false,
+						'Invoke "Execute now" on read-only hosts' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -596,6 +597,7 @@ class testFormUserRoles extends CWebTest {
 						'Manage API tokens' => false,
 						'Manage scheduled reports' => false,
 						'Manage SLA' => false,
+						'Invoke "Execute now" on read-only hosts' => false,
 						'Default access to new actions' => false
 					],
 					'message_header' => 'User role created'
@@ -833,7 +835,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->assertHeader('User roles');
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
-		$this->assertEquals($roles, $this->query('id:user-type')->one()->asZDropdown()->getOptions()->asText());
+		$this->assertEquals($roles, $this->query('id:user-type')->one()->asDropdown()->getOptions()->asText());
 
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
@@ -850,7 +852,7 @@ class testFormUserRoles extends CWebTest {
 
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
-			$this->query('id:user-type')->one()->asZDropdown()->select($role);
+			$this->query('id:user-type')->one()->asDropdown()->select($role);
 
 			if ($role === 'Super admin') {
 				$form->invalidate();
@@ -974,7 +976,8 @@ class testFormUserRoles extends CWebTest {
 						'token.get', 'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete',
 						'trigger.deletedependencies', 'trigger.get', 'trigger.update', 'triggerprototype.create',
 						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
-						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'usergroup.create',
+						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'userdirectory.create',
+						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update', 'usergroup.create',
 						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create', 'usermacro.createglobal',
 						'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get', 'usermacro.update', 'usermacro.updateglobal',
 						'valuemap.create', 'valuemap.delete', 'valuemap.get', 'valuemap.update'
@@ -1451,7 +1454,7 @@ class testFormUserRoles extends CWebTest {
 					if (is_array($tags)) {
 						if (count($tags) > 3) {
 							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
-									->query('class:icon-wzrd-action')->one()->click();
+									->query('class:icon-wizard-action')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
 							foreach ($tags as $tag) {
 								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")

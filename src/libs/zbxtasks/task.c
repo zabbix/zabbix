@@ -230,8 +230,8 @@ zbx_tm_data_t	*zbx_tm_data_create(zbx_uint64_t parent_taskid, const char *str, s
 	zbx_tm_data_t	*data;
 
 	data = (zbx_tm_data_t *)zbx_malloc(NULL, sizeof(zbx_tm_data_t));
-	data->data = zbx_malloc(NULL, len + 1);
-	memcpy(data->data, str, len);
+	data->data = zbx_malloc(NULL, (size_t)len + 1);
+	memcpy(data->data, str, (size_t)len);
 	data->data[len] = '\0';
 	data->parent_taskid = parent_taskid;
 	data->type = type;
@@ -998,7 +998,7 @@ static zbx_tm_data_t	*tm_json_deserialize_data(const struct zbx_json_parse *jp)
 	}
 	type = atoi(value);
 
-	data = zbx_tm_data_create(parent_taskid, str, strlen(str), type);
+	data = zbx_tm_data_create(parent_taskid, str, (int)strlen(str), type);
 out:
 	zbx_free(str);
 

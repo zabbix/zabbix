@@ -8,6 +8,9 @@ DIST_SUBDIRS = \
 	zbxcomms \
 	zbxcommshigh \
 	zbxcompress \
+	zbxgetopt \
+	zbxlog \
+	zbxnix \
 	zbxconf \
 	zbxcrypto \
 	zbxcyberark \
@@ -48,7 +51,13 @@ DIST_SUBDIRS = \
 	zbxthreads \
 	zbxtrends \
 	zbxvault \
-	zbxxml
+	zbxxml \
+	zbxaudit \
+	zbxeval \
+	zbxserialize \
+	zbxxml \
+	zbxha \
+	zbxrtc
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -82,6 +91,13 @@ SERVER_SUBDIRS = \
 	zbxtrends \
 	zbxvault \
 	zbxxml
+	zbxavailability \
+	zbxservice \
+	zbxaudit \
+	zbxeval \
+	zbxserialize \
+	zbxha \
+	zbxrtc
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -111,10 +127,20 @@ PROXY_SUBDIRS = \
 	zbxtrends \
 	zbxvault \
 	zbxxml
+	zbxavailability \
+	zbxaudit \
+	zbxeval \
+	zbxserialize \
+	zbxrtc
 endif
 endif
 
 SUBDIRS = \
+	zbxhash \
+	zbxcrypto \
+	zbxcommon \
+	zbxgetopt \
+	zbxlog \
 	zbxalgo \
 	zbxcommon \
 	zbxcomms \

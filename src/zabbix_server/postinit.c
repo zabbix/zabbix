@@ -163,7 +163,7 @@ static void	preprocess_trigger_name(ZBX_DB_TRIGGER *trigger, int *historical)
 	event.objectid = trigger->triggerid;
 	event.trigger = *trigger;
 
-	substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	zbx_substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			&trigger->description, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 	if (SUCCEED == *historical)
@@ -307,7 +307,7 @@ static int	process_event_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_
 
 		name = zbx_strdup(NULL, trigger->description);
 
-		substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		zbx_substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&name, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		name_esc = DBdyn_escape_string_len(name, EVENT_NAME_LEN);

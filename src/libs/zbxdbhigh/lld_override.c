@@ -240,8 +240,8 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 		override_operation->severity = FAIL == DBis_null(row[10]) ? (unsigned char)atoi(row[10]) :
 				TRIGGER_SEVERITY_COUNT;
 
-		override_operation->inventory_mode = FAIL == DBis_null(row[11]) ?
-				(unsigned char)atoi(row[11]) : HOST_INVENTORY_COUNT;
+		override_operation->inventory_mode = FAIL == DBis_null(row[11]) ? (signed char)atoi(row[11]) :
+				HOST_INVENTORY_COUNT;
 
 		zbx_vector_ptr_append(ops, override_operation);
 

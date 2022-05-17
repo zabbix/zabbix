@@ -2771,6 +2771,33 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	return records_num;
 }
 
+int	proxy_get_host_active_availability(struct zbx_json *j)
+{
+	zbx_ipc_message_t	response;
+	int			records_num = 0;
+
+	zbx_ipc_message_init(&response);
+	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA, 0, 0, &response);
+
+	if (0 != response.size)
+	{
+		zbx_vector_proxy_hostdata_ptr_t	hostdata;
+
+		zbx_vector_proxy_hostdata_ptr_create(&hostdata);
+		zbx_availability_deserialize_hostdata(response.data, &hostdata);
+		zbx_availability_serialize_json_hostdata(&hostdata, j);
+
+		records_num = hostdata.values_num;
+
+		zbx_vector_proxy_hostdata_ptr_clear_ext(&hostdata, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
+		zbx_vector_proxy_hostdata_ptr_destroy(&hostdata);
+	}
+
+	zbx_ipc_message_clean(&response);
+
+	return records_num;
+}
+
 void	calc_timestamp(const char *line, int *timestamp, const char *format)
 {
 	int		hh, mm, ss, yyyy, dd, MM;
@@ -3640,7 +3667,7 @@ static int	sender_item_validator(DC_ITEM *item, zbx_socket_t *sock, void *args, 
 		int	ret;
 
 		allowed_peers = zbx_strdup(NULL, item->trapper_hosts);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
 				&allowed_peers, MACRO_TYPE_ALLOWED_HOSTS, NULL, 0);
 		ret = zbx_tcp_check_allowed_peers(sock, allowed_peers);
 		zbx_free(allowed_peers);
@@ -4703,6 +4730,83 @@ int	process_proxy_data(const DC_PROXY *proxy, struct zbx_json_parse *jp, zbx_tim
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_TASKS, &jp_data))
 		process_tasks_contents(&jp_data);
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA, &jp_data))
+	{
+		const char			*ptr;
+		zbx_vector_proxy_hostdata_ptr_t	host_avails;
+		struct zbx_json_parse		jp_host;
+		char				buffer[ZBX_KIBIBYTE];
+
+		zbx_vector_proxy_hostdata_ptr_create(&host_avails);
+
+		for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
+		{
+			zbx_proxy_hostdata_t	*host;
+
+			if (SUCCEED != zbx_json_brackets_open(ptr, &jp_host))
+				continue;
+
+			if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_HOSTID, buffer, sizeof(buffer), NULL))
+			{
+				host = (zbx_proxy_hostdata_t *)zbx_malloc(NULL, sizeof(zbx_proxy_hostdata_t));
+				host->hostid = atoi(buffer);
+			}
+			else
+				continue;
+
+			if (FAIL == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_ACTIVE_STATUS, buffer, sizeof(buffer), NULL))
+			{
+				zbx_free(host);
+				continue;
+			}
+
+			host->status = atoi(buffer);
+
+			zbx_vector_proxy_hostdata_ptr_append(&host_avails, host);
+		}
+
+		if (0 != host_avails.values_num)
+		{
+			unsigned char			*data = NULL;
+			zbx_uint32_t			data_len;
+			DC_HOST				*hosts;
+			int				i, *errcodes;
+			zbx_vector_uint64_t		hostids;
+			zbx_vector_proxy_hostdata_ptr_t	proxy_host_avails;
+
+			zbx_vector_uint64_create(&hostids);
+
+			for (i = 0; i < host_avails.values_num; i++)
+				zbx_vector_uint64_append(&hostids, host_avails.values[i]->hostid);
+
+			hosts = (DC_HOST *)zbx_malloc(NULL, sizeof(DC_HOST) * host_avails.values_num);
+			errcodes = (int *)zbx_malloc(NULL, sizeof(int) * host_avails.values_num);
+			DCconfig_get_hosts_by_hostids(hosts, hostids.values, errcodes, hostids.values_num);
+
+			zbx_vector_uint64_destroy(&hostids);
+
+			zbx_vector_proxy_hostdata_ptr_create(&proxy_host_avails);
+
+			for (i = 0; i < host_avails.values_num; i++)
+			{
+				if (SUCCEED == errcodes[i] && hosts[i].proxy_hostid == proxy->hostid)
+					zbx_vector_proxy_hostdata_ptr_append(&proxy_host_avails, host_avails.values[i]);
+			}
+
+			zbx_free(errcodes);
+			zbx_free(hosts);
+
+			data_len = zbx_availability_serialize_proxy_hostdata(&data, &proxy_host_avails, proxy->hostid);
+			zbx_availability_send(ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA, data, data_len, NULL);
+
+			zbx_vector_proxy_hostdata_ptr_destroy(&proxy_host_avails);
+			zbx_vector_proxy_hostdata_ptr_clear_ext(&host_avails, (zbx_proxy_hostdata_ptr_free_func_t)zbx_ptr_free);
+			zbx_free(data);
+		}
+
+		zbx_vector_proxy_hostdata_ptr_destroy(&host_avails);
+	}
 
 out:
 	zbx_free(error_step);

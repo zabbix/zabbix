@@ -27,7 +27,7 @@ import (
 	"regexp"
 	"testing"
 
-	"zabbix.com/pkg/std"
+	"git.zabbix.com/ap/plugin-support/std"
 	"zabbix.com/pkg/zbxregexp"
 )
 

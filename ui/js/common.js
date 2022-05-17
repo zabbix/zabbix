@@ -524,8 +524,7 @@ function closeDialogHandler(event) {
  * @return {object|undefined|null}  Overlay object, if found.
  */
 function removeFromOverlaysStack(dialogueid, return_focus) {
-	var overlay = null,
-		index;
+	var overlay = null;
 
 	if (return_focus !== false) {
 		return_focus = true;
@@ -1013,11 +1012,11 @@ function openMassupdatePopup(action, parameters = {}, {
 
 	switch (action) {
 		case 'popup.massupdate.host':
-			parameters.hostids = chkbxRange.getSelectedIds();
+			parameters.hostids = Object.keys(chkbxRange.getSelectedIds());
 			break;
 
 		default:
-			parameters.ids = chkbxRange.getSelectedIds();
+			parameters.ids = Object.keys(chkbxRange.getSelectedIds());
 	}
 
 	switch (action) {
@@ -1084,16 +1083,17 @@ function visibilityStatusChanges(value, objectid, replace_to) {
  *
  * @param {string}       page
  * @param {array|Object} keepids
+ * @param {boolean}      mvc
  */
-function uncheckTableRows(page, keepids = []) {
-	// This key only works for new MVC pages.
-	const key = (page === '') ? 'cb_zabbix' : 'cb_zabbix_'+page;
+function uncheckTableRows(page, keepids = [], mvc = true) {
+	const key = mvc ? 'cb_zabbix_'+page : 'cb_'+page;
 
 	if (keepids.length) {
-		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		let keepids_formatted = {};
+		const current = chkbxRange.getSelectedIds();
+
 		for (const id of Object.values(keepids)) {
-			keepids_formatted[id.toString()] = id.toString();
+			keepids_formatted[id.toString()] = (id in current) ? current[id] : '';
 		}
 
 		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));

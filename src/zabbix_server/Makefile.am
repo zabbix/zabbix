@@ -4,6 +4,7 @@ SUBDIRS = \
 	alerter \
 	dbsyncer \
 	dbconfig \
+	diag \
 	discoverer \
 	housekeeper \
 	httppoller \
@@ -20,6 +21,7 @@ SUBDIRS = \
 	ipmi \
 	odbc \
 	scripts \
+	stats \
 	preprocessor \
 	availability \
 	lld \
@@ -40,7 +42,8 @@ libzbxserver_a_SOURCES = \
 	operations.c \
 	operations.h \
 	postinit.c \
-	postinit.h
+	postinit.h \
+	zbxreport.h
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \
@@ -52,6 +55,7 @@ zabbix_server_LDADD = \
 	alerter/libzbxalerter.a \
 	dbsyncer/libzbxdbsyncer.a \
 	dbconfig/libzbxdbconfig.a \
+	diag/libzbxdiag_server.a \
 	discoverer/libzbxdiscoverer.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
@@ -86,10 +90,12 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_builddir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_builddir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
+	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_builddir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
@@ -103,6 +109,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_builddir)/src/libs/zbxgetopt/libzbxgetopt.a \
 	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
@@ -118,10 +125,10 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_builddir)/src/libs/zbxtasks/libzbxtasks.a \
-	$(top_builddir)/src/libs/zbxdiag/libzbxdiag_server.a \
+	$(top_builddir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
-	$(top_builddir)/src/libs/zbxserver/libzbxserver_server.a \
+	stats/libzbxserver_server.a \
 	$(top_builddir)/src/libs/zbxha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_server.a \

@@ -649,9 +649,9 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 	if (MACRO_EXPAND_YES == expand_macros)
 	{
-		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, service_alarm,
+		zbx_substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, service_alarm,
 				service, tz, &subject, macro_type, NULL, 0);
-		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
+		zbx_substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
 				service_alarm, service, tz, &message, macro_type, NULL, 0);
 	}
 
@@ -1437,7 +1437,7 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 
 		if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 		{
-			if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
+			if (SUCCEED != zbx_substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL, &host,
 					NULL, NULL, ack, service_alarm, service, default_timezone, &script.command,
 					macro_type, error,
 					sizeof(error)))
@@ -1447,7 +1447,7 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 			}
 
 			/* expand macros in command_orig used for non-secure logging */
-			if (SUCCEED != substitute_simple_macros(&actionid, event, r_event, NULL, NULL, &host,
+			if (SUCCEED != zbx_substitute_simple_macros(&actionid, event, r_event, NULL, NULL, &host,
 					NULL, NULL, ack, service_alarm, service, default_timezone, &script.command_orig,
 					macro_type, error, sizeof(error)))
 			{
@@ -1468,7 +1468,7 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 
 			for (i = 0; i < webhook_params.values_num; i++)
 			{
-				if (SUCCEED != substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
+				if (SUCCEED != zbx_substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
 						&host, NULL, NULL, ack, service_alarm, service, default_timezone,
 						(char **)&webhook_params.values[i].second, macro_type, error,
 						sizeof(error)))
@@ -1560,9 +1560,9 @@ static void	get_mediatype_params(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *
 		name = zbx_strdup(NULL, row[0]);
 		value = zbx_strdup(NULL, row[1]);
 
-		substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
+		zbx_substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
 				ack, service_alarm, service, tz, &name, message_type, NULL, 0);
-		substitute_simple_macros_unmasked(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
+		zbx_substitute_simple_macros_unmasked(&actionid, event, r_event, &userid, NULL, NULL, NULL, &alert,
 				ack, service_alarm, service, tz, &value, message_type, NULL, 0);
 
 		zbx_json_addstring(&json, name, value, ZBX_JSON_TYPE_STRING);
@@ -1638,7 +1638,7 @@ static void	add_message_alert(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_e
 		ZBX_STR2UINT64(mediatypeid, row[0]);
 		severity = atoi(row[2]);
 		period = zbx_strdup(period, row[3]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&period, MACRO_TYPE_COMMON, NULL, 0);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "severity:%d, media severity:%d, period:'%s', userid:" ZBX_FS_UI64,
@@ -1879,7 +1879,7 @@ static void	escalation_execute_operations(DB_ESCALATION *escalation, const ZBX_D
 		ZBX_STR2UINT64(operationid, row[0]);
 
 		tmp = zbx_strdup(NULL, row[2]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
 				MACRO_TYPE_COMMON, NULL, 0);
 		if (SUCCEED != is_time_suffix(tmp, &esc_period, ZBX_LENGTH_UNLIMITED))
 		{
