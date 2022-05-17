@@ -393,7 +393,7 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("runtime.connectionState"),		/* ZBX_VMWARE_HVPROP_CONNECTIONSTATE */
 	ZBX_HVPROPMAP_EXT("hardware.systemInfo.serialNumber", NULL, 67),/* ZBX_VMWARE_HVPROP_HW_SERIALNUMBER */
 	ZBX_HVPROPMAP_EXT("runtime.healthSystemRuntime.hardwareStatusInfo",
-			zbx_xmlnode_to_json, 0)			/* ZBX_VMWARE_HVPROP_SENSOR */
+			zbx_xmlnode_to_json, 0),		/* ZBX_VMWARE_HVPROP_HW_SENSOR */
 };
 
 static zbx_vmware_propmap_t	vm_propmap[] = {
@@ -466,6 +466,10 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 #define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID(id)								\
 		ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='" id "']") "/"	\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='ResourcePool']"
+
+#define ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID(id)							\
+		ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='" id "']") "/"	\
+		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type!='ResourcePool']"
 
 /* hypervisor hashset support */
 static zbx_hash_t	vmware_hv_hash(const void *data)
@@ -3603,25 +3607,37 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
 		}
 
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_RESOURCEPOOL_PARENTID("%s"), id_esc);
-		zbx_free(id_esc);
 		id = zbx_xml_doc_read_value(xdoc , tmp);
 
-		if (NULL == *path)	/* we always resolve the first 'ResourcePool' name */
-		{
-			if (NULL != id)
-				*parentid = zbx_strdup(*parentid, id);
 
-			*path = name;
-			name = NULL;
-		}
-		else if (NULL != id)	/* we do not include the last default 'ResourcePool' */
+		if (NULL != id)	/* we do not include the last default 'ResourcePool' */
 		{
-			*path = zbx_dsprintf(*path, "%s/%s", name, *path);
-		}
+			if (NULL == *path)
+			{
+				*path = name;
+				name = NULL;
+			}
+			else
+				*path = zbx_dsprintf(*path, "%s/%s", name, *path);
 
+		}
+		else
+			zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID("%s"), id_esc);
+
+		zbx_free(id_esc);
 		zbx_free(name);
 	}
 	while (NULL != id);
+
+
+	if (SUCCEED == ret)
+	{
+		if (NULL != *path && NULL == (*parentid = zbx_xml_doc_read_value(xdoc , tmp)))
+			zbx_free(*path);
+
+		if (NULL == *path)
+			ret = FAIL;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s resource pool path: '%s', parentid: '%s'", __func__,
 			zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*path), ZBX_NULL2EMPTY_STR(*parentid));
@@ -6280,17 +6296,19 @@ static int	vmware_service_get_clusters_and_resourcepools(CURL *easyhandle, zbx_v
 	for (i = 0; i < rpools_uniq.values_num; i++)
 	{
 		zbx_vmware_resourcepool_t	*rpool;
+		char				*path, *parentid;
+		const char			*id = rpools_uniq.values[i];
 
-		rpool = (zbx_vmware_resourcepool_t *)zbx_malloc(NULL, sizeof(zbx_vmware_resourcepool_t));
-		rpool->id = zbx_strdup(NULL, rpools_uniq.values[i]);
-
-		if (SUCCEED != vmware_service_get_resourcepool_data(cluster_data, rpool->id, &rpool->parentid,
-				&rpool->path))
+		if (SUCCEED != vmware_service_get_resourcepool_data(cluster_data, id, &parentid, &path))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find resource pool name for id:%s", __func__,
-					rpool->id);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find resource pool name for id:%s", __func__, id);
+			continue;
 		}
 
+		rpool = (zbx_vmware_resourcepool_t *)zbx_malloc(NULL, sizeof(zbx_vmware_resourcepool_t));
+		rpool->id = zbx_strdup(NULL, id);
+		rpool->path = path;
+		rpool->parentid = parentid;
 		zbx_vector_vmware_resourcepool_append(resourcepools, rpool);
 	}
 
