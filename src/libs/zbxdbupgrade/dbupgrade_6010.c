@@ -539,6 +539,7 @@ static int	DBpatch_6010030_split_groups(void)
 	zbx_db_insert_t		db_insert;
 
 	zbx_vector_hstgrp_create(&hstgrps);
+	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
 
 	result = DBselect(
 			"select o.groupid,o.name,o.uuid from hstgrp o"
@@ -563,7 +564,6 @@ static int	DBpatch_6010030_split_groups(void)
 		goto out;
 
 	zbx_vector_hstgrp_sort(&hstgrps, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
 	nextid = DBget_maxid_num("hstgrp", hstgrps.values_num);
 
 	for (i = 0; i < hstgrps.values_num; i++)
