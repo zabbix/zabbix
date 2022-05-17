@@ -31,17 +31,27 @@ $this->includeJsFile('reports.auditlog.list.js.php');
 $filter = (new CFilter())
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', $data['action']));
 
-$select_filter_resourcetype = (new CSelect('filter_resourcetype'))
+$filter_resourcetype = (new CSelect('filter_resourcetype'))
 	->setId('resourcetype-select')
 	->setValue($data['resourcetype'])
 	->setFocusableElementId('filter-resourcetype')
 	->addOptions(CSelect::createOptionsFromArray($data['resources']));
 
-$select_filter_action = (new CSelect('filter_action'))
-	->setId('action-select')
-	->setValue($data['auditlog_action'])
-	->setFocusableElementId('filter-action')
-	->addOptions(CSelect::createOptionsFromArray($data['actions']));
+$filter_actions_options = [];
+
+foreach ($data['actions'] as $value => $name) {
+	$filter_actions_options[] = [
+		'name' => $name,
+		'value' => $value,
+		'checked' => in_array($value, $data['auditlog_actions'])
+	];
+}
+
+$filter_actions = (new CCheckBoxList('filter_actions'))
+	->setId('filter-actions')
+	->addClass(ZBX_STYLE_COLUMNS)
+	->addClass(ZBX_STYLE_COLUMNS_3)
+	->setOptions($filter_actions_options);
 
 $filter_form = (new CFormList())
 	->addRow(new CLabel(_('Users'), 'filter_userids__ms'), [
@@ -61,18 +71,16 @@ $filter_form = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	])
-	->addRow(new CLabel(_('Resource'), $select_filter_resourcetype->getFocusableElementId()),
-		$select_filter_resourcetype
+	->addRow(new CLabel(_('Resource'), $filter_resourcetype->getFocusableElementId()),
+		$filter_resourcetype
 	)
 	->addRow(_('Resource ID'), (new CTextBox('filter_resourceid', $data['resourceid']))
 		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow(new CLabel(_('Action'), $select_filter_action->getFocusableElementId()),
-		$select_filter_action
-	)
 	->addRow(_('Recordset ID'), (new CTextBox('filter_recordsetid', $data['recordsetid']))
 		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
-	);
+	)
+	->addRow(_('Actions'), $filter_actions);
 
 $widget = (new CWidget())
 	->setTitle(_('Audit log'))
@@ -125,12 +133,11 @@ foreach ($data['auditlogs'] as $auditlog) {
 		(new CDiv([
 			new CDiv(zbx_nl2br($auditlog['short_details'])),
 			($auditlog['details_button'] == 1)
-				? (new CDiv (
-					(new CLinkAction(_('Details')))->onClick('openAuditDetails('.json_encode($auditlog['details']).')')
+				? (new CDiv(
+					(new CLinkAction(_('Details')))->setAttribute('data-details', json_encode($auditlog['details']))
 				))->addClass('audit-show-details-btn-wrapper')
 				: ''
 		]))->addClass('audit-details-wrapper')
-
 	]);
 }
 
@@ -146,7 +153,14 @@ $obj = [
 	'timeControl.processObjects();')
 )->show();
 
-$widget->addItem((new CForm('get'))
-	->setName('auditForm')
-	->addItem([$table, $data['paging']])
-)->show();
+$widget
+	->addItem(
+		(new CForm('get'))
+			->setName('auditForm')
+			->addItem([$table, $data['paging']])
+	)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

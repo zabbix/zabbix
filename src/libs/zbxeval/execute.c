@@ -2073,7 +2073,7 @@ static int	eval_execute_function_ascii(const zbx_eval_context_t *ctx, const zbx_
 
 	arg = &output->values[output->values_num - 1];
 
-	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR) || 0 > *arg->data.str)
+	if (SUCCEED != zbx_variant_convert(arg, ZBX_VARIANT_STR) || 1 != zbx_utf8_char_len(arg->data.str))
 	{
 		*error = zbx_dsprintf(*error, "invalid function argument at \"%s\"", ctx->expression + token->loc.l);
 		return FAIL;

@@ -1,6 +1,11 @@
 Changes for 6.0.5rc1
 
 New features:
+..F....... [ZBXNEXT-6893] implemented audit log filtering by multiple actions (rdetlavs)
+....I..... [ZBXNEXT-7693] replaced filename-length-max=99 option with tar-pax in configure.ac (yurii)
+..F....... [ZBX-20946] enabled German and Vietnamese languages in frontend (miks)
+.......PS. [ZBXNEXT-7604] modified functionality to ignore NaN in Prometheus preprocessing aggregate functions (akozlovs)
+..F....... [ZBXNEXT-7526] added number of items for Latest data column in Monitoring -> Hosts page (Ivo)
 A.F....... [ZBXNEXT-7476] disabled php 8 strict type validation (ashubin)
 ..F....... [ZBXNEXT-7461] implemented expandable subfilters in latest data page; fixed clickable tags (miks)
 .........T [ZBXNEXT-7607] added template Envoy Proxy by HTTP (ychukina)
@@ -8,10 +13,17 @@ A.F....... [ZBXNEXT-7476] disabled php 8 strict type validation (ashubin)
 A.F....... [ZBXNEXT-7491] fixed PHP 8.1 runtime warnings with PostgreSQL backend (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
+........S. [ZBX-20823] fixed inability to update hosts that were created by LLD on aarch64 (vso)
+..F....... [ZBX-20945] fixed broken trigger link in trigger mass update => dependencies (esekace)
+...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent2 (vso)
+...G...... [ZBX-20886] fixed handle leak on Zabbix agent 2 in vfs.fs.get (vso)
+..F....... [ZBX-21008] fixed broken popup for SLA selection for User role (averza)
+..F....... [ZBX-20380] fixed maintenance highlighting having priority over problem severity highlighting for map elements of map, host group and trigger types (agriscenko)
 ..F....... [ZBX-20573] fixed service filter functionality in SLA report page (rdetlavs)
 .........T [ZBX-20982] fixed api request by coordinates in openweathermap template (vkhaliev)
 ........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
-..F....... [ZBX-20458] fixed broken host link not opening in Inventory (rdetlavs)
+..F....... [ZBX-20548] fixed broken host link not opening in Inventory (rdetlavs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.4
@@ -1879,8 +1891,14 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.24rc1
 
 New features:
+..F....... [ZBX-20946] enabled German, Greek, Romanian, Spanish and Vietnamese languages in frontend (miks)
 
 Bug fixes:
+.......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
+...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent2 (vso)
+...G...... [ZBX-20886] fixed handle leak on Zabbix agent 2 in vfs.fs.get (vso)
+........S. [ZBX-20823] fixed inability to update hosts that were created by LLD on aarch64 (vso)
+..F....... [ZBX-20380] fixed maintenance highlighting having priority over problem severity highlighting for map elements of map, host group and trigger types (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.23
@@ -4364,8 +4382,10 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.41rc1
 
 New features:
+..F....... [ZBX-20946] enabled Bulgarian, Chinese (zh_TW), German, Greek, Indonesian, Romanian, Spanish and Vietnamese languages in frontend (miks)
 
 Bug fixes:
+.......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.40
