@@ -29,6 +29,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 	use TableTrait;
 
+	private $remove_ldap = true;
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -38,165 +40,6 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		return [
 			CMessageBehavior::class
 		];
-	}
-
-	public function getCreateData() {
-		return [
-			[
-				[
-					'error' => 'Incorrect value for field "authentication_type": LDAP is not configured.'
-				]
-			],
-			[
-				[
-					'ldap_settings' => [[]],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "host": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
-				]
-			],
-			[
-				[
-					'ldap_settings' => [
-						[
-							'Host' => 'ldap.forumsys.com'
-						]
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
-				]
-			],
-			[
-				[
-					'ldap_settings' => [
-						[
-							'Host' => 'ldap.forumsys.com',
-							'Base DN' => 'dc=example,dc=com'
-						]
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
-				]
-			],
-			[
-				[
-					'ldap_settings' => [
-						[
-							'Host' => 'ldap.forumsys.com',
-							'Base DN' => 'dc=example,dc=com',
-							'Search attribute' => 'uid'
-						]
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
-				]
-			],
-//			[
-//				[
-//					'ldap_settings' => [
-//						[
-//							'Name' => 'TEST',
-//							'Host' => 'ldap.forumsys.com',
-//							'Base DN' => 'dc=example,dc=com',
-//							'Search attribute' => 'uid'
-//						],
-//						[
-//							'Name' => 'TEST',
-//							'Host' => 'ldap.forumsys.com',
-//							'Base DN' => 'dc=example,dc=com',
-//							'Search attribute' => 'uid'
-//						]
-//					],
-//					'error' => 'Invalid parameter "/2": value (name)=(TEST) already exists.'
-//				]
-//			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'ldap_settings' => [
-						[
-							'Name' => 'LDAP',
-							'Host' => 'ldap.forumsys.com',
-							'Port' => '389',
-							'Base DN' => 'dc=example,dc=com',
-							'Search attribute' => 'uid',
-							'Bind DN' => 'cn=read-only-admin,dc=example,dc=com',
-							'Bind password' => 'password',
-							'Description' => 'description',
-							'Advanced configuration' => true,
-							'StartTLS' => true,
-							'Search filter' => 'filter'
-						]
-					],
-					'db_check' => [
-						'name' => 'LDAP',
-						'host' => 'ldap.forumsys.com',
-						'port' => '389',
-						'base_dn' => 'dc=example,dc=com',
-						'bind_dn' => 'cn=read-only-admin,dc=example,dc=com',
-						'bind_password' => 'password',
-						'search_attribute' => 'uid'
-					]
-				]
-			]
-		];
-	}
-
-	/**
-	 * @dataProvider getCreateData
-	 *
-	 * Check authentication with LDAP settings.
-	 */
-	public function testFormAdministrationAuthenticationLdap_Create($data) {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
-		$this->page->assertTitle('Configuration of authentication');
-
-		$form = $this->query('id:authentication-form')->asForm()->one();
-		$form->fill(['Default authentication' => 'LDAP']);
-
-		// Configuration at 'LDAP settings' tab.
-		if (array_key_exists('ldap_settings', $data)) {
-			$this->addLdap($data['ldap_settings']);
-
-			// Check error message in ldap creation form.
-			if (array_key_exists('ldap_error', $data)) {
-				$this->assertMessage(TEST_BAD, $data['ldap_error'], $data['ldap_error_details']);
-				COverlayDialogElement::find()->one()->close();
-			}
-		}
-
-		$form->submit();
-		$this->page->acceptAlert();
-
-		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
-			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-
-			// Check DB configuration.
-			$sql = 'SELECT name, host, port, base_dn, bind_dn, bind_password, search_attribute FROM userdirectory';
-			$result = CDBHelper::getRow($sql);
-			$this->assertEquals($data['db_check'], $result);
-		}
-		else {
-			$this->assertMessage(TEST_BAD, $data['error']);
-		}
 	}
 
 	public function getTestData() {
@@ -406,9 +249,348 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 		// Submit changes and check that LDAP server removed.
 		$form->submit();
-		$this->page->acceptAlert();
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM userdirectory'));
+	}
+
+	/**
+	 * Check default LDAP server change.
+	 */
+	public function testFormAdministrationAuthenticationLdap_Default() {
+		// Navigate to User Group and set LDAP server as Default.
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form->selectTab('LDAP settings');
+		$table = $form->query('id:ldap-servers')->asTable()->one();
+
+		// To check default we need at least 2 LDAP servers.
+		for ($i = 0; $i <=1; $i++) {
+			if ($table->getRows()->count() < 2) {
+				$this->ifNoLdap('test_'.$i);
+			}
+			else {
+				break;
+			}
+		}
+
+		$hosts = $this->getTableResult('Host', 'id:ldap-servers');
+		foreach ($hosts as $host) {
+			$radio = $table->findRow('Host', $host)->getColumn('Default');
+
+			// Check if LDAP server is set as Default.
+			if ($radio->query('name:ldap_default_row_index')->one()->isAttributePresent('checked') === true) {
+				$userdirectoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory WHERE host='.zbx_dbstr($host));
+				$this->assertEquals($userdirectoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+			}
+			else {
+				// Set another LDAP server as default.
+				$userdirectoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory WHERE host='.zbx_dbstr($host));
+				$this->assertNotEquals($userdirectoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$radio->query('name:ldap_default_row_index')->one()->click();
+				$form->submit();
+				$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+				$this->assertEquals($userdirectoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+			}
+		}
+
+		// Default LDAP server host name.
+		$hostname = CDBHelper::getValue('SELECT host FROM userdirectory ud INNER JOIN config co ON '.
+				'ud.userdirectoryid = co.ldap_userdirectoryid');
+		$form->selectTab('LDAP settings');
+
+		// Find default LDAP server, delete it and check that another LDAP server set as default.
+		$table->findRow('Host', $hostname)->getColumn('')->query('button:Remove')->one()->click();
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		$new_hostname = CDBHelper::getValue('SELECT host FROM userdirectory ud INNER JOIN config co ON '.
+				'ud.userdirectoryid = co.ldap_userdirectoryid');
+
+		// Check that old LDAP server (by host name) is not default now.
+		$this->assertNotEquals($hostname, $new_hostname);
+	}
+
+	public function getUpdateData() {
+		return [
+			[
+				[
+					'ldap_settings' => [
+						[
+							'Name' => '',
+							'Host' => '',
+							'Base DN' => '',
+							'Search attribute' => ''
+						]
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "host": cannot be empty.',
+						'Incorrect value for field "base_dn": cannot be empty.',
+						'Incorrect value for field "search_attribute": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'ldap_settings' => [
+						[
+							'Name' => '',
+							'Host' => 'updated_host',
+							'Base DN' => '',
+							'Search attribute' => ''
+						]
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "base_dn": cannot be empty.',
+						'Incorrect value for field "search_attribute": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'ldap_settings' => [
+						[
+							'Name' => '',
+							'Host' => 'updated_host',
+							'Base DN' => 'updated_dn',
+							'Search attribute' => ''
+						]
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "search_attribute": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'ldap_settings' => [
+						[
+							'Name' => '',
+							'Host' => 'updated_host',
+							'Base DN' => 'updated_dn',
+							'Search attribute' => 'updated_search'
+						]
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'ldap_settings' => [
+						[
+							'Name' => 'updated_name',
+							'Host' => 'updated_host',
+							'Port' => '777',
+							'Base DN' => 'updated_dn',
+							'Search attribute' => 'updated_search',
+							'Bind DN' => 'updated_bin_dn',
+							'Description' => 'updated_description',
+							'Advanced configuration' => true,
+							'StartTLS' => true,
+							'Search filter' => 'updated_filter'
+						]
+					],
+					'db_check' => [
+						'name' => 'updated_name',
+						'host' => 'updated_host',
+						'port' => '777',
+						'base_dn' => 'updated_dn',
+						'bind_dn' => 'updated_bin_dn',
+						'description' => 'updated_description',
+						'search_attribute' => 'updated_search',
+						'search_filter' => 'updated_filter',
+						'start_tls' => '1'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUpdateData
+	 *
+	 *  Update LDAP server settings.
+	 */
+	public function testFormAdministrationAuthenticationLdap_Update($data) {
+		if (!array_key_exists('expected', $data)) {
+			$hash_before = CDBHelper::getHash('SELECT * FROM userdirectory');
+		}
+
+		$this->CreateUpdate($data, 'xpath://tbody/tr/td/a');
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+
+		if (!array_key_exists('expected', $data)) {
+			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM userdirectory'));
+		}
+		else {
+			$sql = 'SELECT name, host, port, base_dn, bind_dn, description, search_attribute, '.
+					'search_filter, start_tls FROM userdirectory';
+			$result = CDBHelper::getRow($sql);
+			$this->assertEquals($data['db_check'], $result);
+		}
+	}
+
+	public function getCreateData() {
+		return [
+			// #0 Only default authentication added.
+			[
+				[
+					'error' => 'Incorrect value for field "authentication_type": LDAP is not configured.'
+				]
+			],
+			// #1 LDAP server without any parameters.
+			[
+				[
+					'ldap_settings' => [[]],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "host": cannot be empty.',
+						'Incorrect value for field "base_dn": cannot be empty.',
+						'Incorrect value for field "search_attribute": cannot be empty.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #2 LDAP server without name, Base DN and Search attribute.
+			[
+				[
+					'ldap_settings' => [
+						[
+							'Host' => 'ldap.forumsys.com'
+						]
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "base_dn": cannot be empty.',
+						'Incorrect value for field "search_attribute": cannot be empty.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #3 LDAP server without name and search attribute.
+			[
+				[
+					'ldap_settings' => [
+						[
+							'Host' => 'ldap.forumsys.com',
+							'Base DN' => 'dc=example,dc=com'
+						]
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "search_attribute": cannot be empty.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			//#4 LDAP server without name.
+			[
+				[
+					'ldap_settings' => [
+						[
+							'Host' => 'ldap.forumsys.com',
+							'Base DN' => 'dc=example,dc=com',
+							'Search attribute' => 'uid'
+						]
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Incorrect value for field "name": cannot be empty.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #5 Two LDAP servers with same names.
+			// TODO: Uncomment this part after ZBX-21061 fix.
+//			[
+//				[
+//					'ldap_settings' => [
+//						[
+//							'Name' => 'TEST',
+//							'Host' => 'ldap.forumsys.com',
+//							'Base DN' => 'dc=example,dc=com',
+//							'Search attribute' => 'uid'
+//						],
+//						[
+//							'Name' => 'TEST',
+//							'Host' => 'ldap.forumsys.com',
+//							'Base DN' => 'dc=example,dc=com',
+//							'Search attribute' => 'uid'
+//						]
+//					],
+//					'error' => 'Invalid parameter "/2": value (name)=(TEST) already exists.'
+//				]
+//			],
+			// #6 LDAP server with everyfield filled.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'ldap_settings' => [
+						[
+							'Name' => 'AAAA',
+							'Host' => 'ldap.forumsys.com',
+							'Port' => '389',
+							'Base DN' => 'dc=example,dc=com',
+							'Search attribute' => 'uid',
+							'Bind DN' => 'cn=read-only-admin,dc=example,dc=com',
+							'Bind password' => 'password',
+							'Description' => 'description',
+							'Advanced configuration' => true,
+							'StartTLS' => true,
+							'Search filter' => 'filter'
+						]
+					],
+					'db_check' => [
+						'name' => 'AAAA',
+						'host' => 'ldap.forumsys.com',
+						'port' => '389',
+						'base_dn' => 'dc=example,dc=com',
+						'bind_dn' => 'cn=read-only-admin,dc=example,dc=com',
+						'bind_password' => 'password',
+						'search_attribute' => 'uid'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 *
+	 * @dataProvider getCreateData
+	 *
+	 * Check authentication with LDAP settings.
+	 */
+	public function testFormAdministrationAuthenticationLdap_Create($data) {
+		if ($this->remove_ldap) {
+			$this->removeAllLdap();
+			$this->remove_ldap = false;
+		}
+
+		$this->CreateUpdate($data, 'button:Add');
+
+		// Check error messages.
+		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+
+			// Check DB configuration.
+			$sql = 'SELECT name, host, port, base_dn, bind_dn, bind_password, search_attribute FROM userdirectory';
+			$result = CDBHelper::getRow($sql);
+			$this->assertEquals($data['db_check'], $result);
+		}
+		else {
+			$this->assertMessage(TEST_BAD, $data['error']);
+		}
 	}
 
 	/**
@@ -438,45 +620,26 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		$this->page->open('zabbix.php?action=authentication.edit')->waitUntilReady();
 		$form->selectTab('LDAP settings');
 		$this->assertEquals(['1'], $this->getTableResult('User groups', 'id:ldap-servers'));
+		$this->assertFalse($this->query('xpath://button[text()="Remove"][1]')->one()->isEnabled());
 	}
 
 	/**
-	 * Check default LDAP server change.
+	 * Removes all existing LDAP servers.
 	 */
-	public function testFormAdministrationAuthenticationLdap_Default() {
-		// Navigate to User Group and set LDAP server as Default.
+	private function removeAllLdap() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form->fill(['Default authentication' => 'Internal']);
 		$form->selectTab('LDAP settings');
+		$form->fill(['Enable LDAP authentication' => false]);
 		$table = $form->query('id:ldap-servers')->asTable()->one();
-
-		// To check default we need at least 2 LDAP servers.
-		for ($i = 0; $i <=1; $i++) {
-			if ($table->getRows()->count() < 2) {
-				$this->ifNoLdap('test_'.$i);
-			}
-			else {
-				break;
-			}
+		$rows_amount = $table->getRows()->count();
+		for ($i = $rows_amount; $i > 0; $i--) {
+			$this->query('xpath://button[text()="Remove"]['.$i.']')->one()->click();
 		}
-
-		$default = $this->getTableResult('Host', 'id:ldap-servers');
-		foreach ($default as $host) {
-			$radio = $table->findRow('Host', $host)->getColumn('Default')->highlight();
-
-			// Check if LDAP server is set as Default.
-			if ($radio->query('name:ldap_default_row_index')->one()->isAttributePresent('checked') === true) {
-				$userdirectoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory WHERE host='.zbx_dbstr($host));
-				$this->assertEquals($userdirectoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
-			}
-			else {
-				$userdirectoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory WHERE host='.zbx_dbstr($host));
-				$this->assertNotEquals($userdirectoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
-				$radio->query('name:ldap_default_row_index')->one()->click();
-				$form->submit();
-				$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-				$this->assertEquals($userdirectoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
-			}
+		$form->submit();
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
 		}
 	}
 
@@ -485,16 +648,16 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 *
 	 * @param string $name		LDAP server name
 	 */
-	private function ifNoLdap($name = 'test') {
+	private function ifNoLdap($name = 'atest') {
 		$form = $this->query('id:authentication-form')->asForm()->one();
-		$this->addLdap([
+		$this->setLdap([
 				[
 					'Name' => $name,
 					'Host' => $name,
 					'Base DN' => $name,
 					'Search attribute' => $name
 				]
-		], false);
+		], 'button:Add', false);
 		$form->submit();
 		$form->selectTab('LDAP settings');
 	}
@@ -503,9 +666,10 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 * Fill and submit LDAP server settings.
 	 *
 	 * @param strings $ldaps				form parameters to fill
-	 * @param boolean $ldap_configured		Enable/Disable LDAP authentication checkbox.
+	 * @param strings $selection			create or update LDAP server
+	 * @param boolean $ldap_configured		enable/Disable LDAP authentication checkbox.
 	 */
-	private function addLdap($ldaps, $ldap_configured = true) {
+	private function setLdap($ldaps, $selection, $ldap_configured = true) {
 		$form = $this->query('id:authentication-form')->asForm()->one();
 
 		// Select LDAP setting tab if it is not selected.
@@ -516,9 +680,40 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		// Open and fill LDAP settings form.
 		$this->query('id:ldap_configured')->asCheckbox()->one()->set($ldap_configured);
 		foreach ($ldaps as $ldap) {
-			$form->query('button:Add')->one()->click();
+			$form->query($selection)->one()->click();
 			$ldap_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 			$ldap_form->fill($ldap)->submit();
+		}
+	}
+
+	/**
+	 * Create or update LDAP server values.
+	 *
+	 * @param type $data		data provider
+	 * @param string $action	click on Add button to create new LDAP server or click on name to update it.
+	 */
+	private function CreateUpdate($data, $action) {
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
+		$this->page->assertTitle('Configuration of authentication');
+
+		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form->fill(['Default authentication' => 'LDAP']);
+
+		// Configuration at 'LDAP settings' tab.
+		if (array_key_exists('ldap_settings', $data)) {
+			$this->setLdap($data['ldap_settings'], $action);
+
+			// Check error message in ldap creation form.
+			if (array_key_exists('ldap_error', $data)) {
+				$this->assertMessage(TEST_BAD, $data['ldap_error'], $data['ldap_error_details']);
+				COverlayDialogElement::find()->one()->close();
+			}
+		}
+
+		$form->submit();
+		if ($this->page->isAlertPresent()) {
+			$this->page->acceptAlert();
 		}
 	}
 }
