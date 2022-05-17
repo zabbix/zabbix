@@ -61,7 +61,7 @@ zbx_um_cache_t;
 zbx_hash_t	um_macro_hash(const void *d);
 int	um_macro_compare(const void *d1, const void *d2);
 
-zbx_um_cache_t	*um_cache_create();
+zbx_um_cache_t	*um_cache_create(void);
 void	um_cache_release(zbx_um_cache_t *cache);
 void	um_macro_release(zbx_um_macro_t *macro);
 

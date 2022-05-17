@@ -3515,7 +3515,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	while (SUCCEED == parse_history_data_by_itemids(jp_data, &pnext, values, itemids, &values_num, &read_num,
 			&unique_shift, &error) && 0 != values_num)
 	{
-		DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, (size_t)values_num, mode);
+		DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, values_num, mode);
 
 		for (i = 0; i < values_num; i++)
 		{

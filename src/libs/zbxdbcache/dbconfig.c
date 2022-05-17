@@ -102,7 +102,7 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 
 static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num);
 
-static void	dc_reschedule_items();
+static void	dc_reschedule_items(void);
 
 extern char		*CONFIG_VAULTTOKEN;
 extern char		*CONFIG_VAULT;
@@ -3301,11 +3301,11 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_handle,
 		const zbx_trigger_timer_t *timer, zbx_uint64_t seed, time_t *nextcheck, char **error)
 {
-	int		offsets[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10,
+	unsigned int	offsets[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10,
 			SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
 			SEC_PER_HOUR + SEC_PER_MIN * 10, SEC_PER_HOUR + SEC_PER_MIN * 10,
 			SEC_PER_HOUR + SEC_PER_MIN * 10};
-	int		periods[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10, SEC_PER_HOUR,
+	unsigned int	periods[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, SEC_PER_MIN * 10, SEC_PER_HOUR,
 			SEC_PER_HOUR * 11, SEC_PER_DAY - SEC_PER_HOUR, SEC_PER_DAY - SEC_PER_HOUR,
 			SEC_PER_DAY - SEC_PER_HOUR};
 
@@ -3386,7 +3386,7 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 	}
 out:
 	if (SUCCEED == ret)
-		*nextcheck += offsets[trend_base] + seed % periods[trend_base];
+		*nextcheck += (time_t)(offsets[trend_base] + seed % periods[trend_base]);
 
 	zbx_free(param);
 
@@ -3407,7 +3407,7 @@ out:
  *           to directly use user macro cache                                 *
  *                                                                            *
  ******************************************************************************/
-static int	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handle, const zbx_trigger_timer_t *timer,
+static time_t	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handle, const zbx_trigger_timer_t *timer,
 		time_t from, zbx_uint64_t seed)
 {
 	if (ZBX_TRIGGER_TIMER_FUNCTION_TIME == timer->type || ZBX_TRIGGER_TIMER_TRIGGER == timer->type)
@@ -3604,7 +3604,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 			/* if the trigger was scheduled during next 10 minutes         */
 			/* schedule its evaluation later to reduce server startup load */
 			if (old->eval_ts.sec < now + 10 * SEC_PER_MIN)
-				ts.sec = now + 10 * SEC_PER_MIN + timer->triggerid % (10 * SEC_PER_MIN);
+				ts.sec = now + 10 * SEC_PER_MIN + (int)(timer->triggerid % (10 * SEC_PER_MIN));
 			else
 				ts.sec = old->eval_ts.sec;
 
@@ -3612,7 +3612,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		}
 		else
 		{
-			if (0 == (ts.sec = dc_function_calculate_nextcheck(NULL, timer, now, timer->triggerid)))
+			if (0 == (ts.sec = (int)dc_function_calculate_nextcheck(NULL, timer, now, timer->triggerid)))
 			{
 				dc_trigger_timer_free(timer);
 				function->timer_revision = 0;
@@ -3640,7 +3640,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (NULL == (timer = dc_trigger_timer_create(trigger)))
 			continue;
 
-		if (0 == (ts.sec = dc_function_calculate_nextcheck(NULL, timer, now, timer->triggerid)))
+		if (0 == (ts.sec = (int)dc_function_calculate_nextcheck(NULL, timer, now, timer->triggerid)))
 		{
 			dc_trigger_timer_free(timer);
 			trigger->timer_revision = 0;
@@ -7740,10 +7740,10 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, DC_ITE
 	}
 }
 
-void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, size_t num,
+void	DCconfig_get_items_by_itemids_partial(DC_ITEM *items, const zbx_uint64_t *itemids, int *errcodes, int num,
 		unsigned int mode)
 {
-	size_t			i;
+	int			i;
 	const ZBX_DC_ITEM	*dc_item;
 	const ZBX_DC_HOST	*dc_host = NULL;
 	zbx_config_hk_t		config_hk;
@@ -8680,7 +8680,7 @@ void	zbx_dc_reschedule_trigger_timers(zbx_vector_ptr_t *timers, int now)
 
 		if (0 == timer->check_ts.sec)
 		{
-			if (0 != (timer->check_ts.sec = dc_function_calculate_nextcheck(um_handle, timer, now,
+			if (0 != (timer->check_ts.sec = (int)dc_function_calculate_nextcheck(um_handle, timer, now,
 					timer->triggerid)))
 			{
 				timer->eval_ts = timer->check_ts;
@@ -9823,7 +9823,7 @@ int	DCset_interfaces_availability(zbx_vector_availability_ptr_t *availabilities)
 	zbx_interface_availability_t	*ia;
 	int				ret = FAIL, now;
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	WRLOCK_CACHE;
 
@@ -10332,7 +10332,7 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 		if (ZBX_TOKEN_USER_MACRO != token.type)
 			continue;
 
-		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - last_pos);
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - (size_t)last_pos);
 		um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, &value);
 
 		if (NULL != value)
@@ -10348,7 +10348,7 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 		zbx_free(name);
 		zbx_free(context);
 
-		pos = token.loc.r;
+		pos = (int)token.loc.r;
 		last_pos = pos + 1;
 	}
 
@@ -10391,7 +10391,7 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 	int			now, nitems = 0, data_expected_from, delay;
 	zbx_queue_item_t	*queue_item;
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	RDLOCK_CACHE;
 
@@ -13389,7 +13389,7 @@ int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, 
 		else
 			zbx_replace_string(text, token.loc.l, &token.loc.r, value);
 
-		pos = token.loc.r;
+		pos = (int)token.loc.r;
 	}
 
 	ret = SUCCEED;
@@ -13486,7 +13486,7 @@ static void	dc_get_items_to_reschedule(zbx_vector_item_delay_t *items)
  *           user macro changes affects item queues.                          *
  *                                                                            *
  ******************************************************************************/
-static void	dc_reschedule_items()
+static void	dc_reschedule_items(void)
 {
 	zbx_vector_item_delay_t	items;
 

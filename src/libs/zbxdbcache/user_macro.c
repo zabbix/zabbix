@@ -125,7 +125,7 @@ int	um_macro_compare(const void *d1, const void *d2)
  * Purpose: create user macro cache                                              *
  *                                                                               *
  *********************************************************************************/
-zbx_um_cache_t	*um_cache_create()
+zbx_um_cache_t	*um_cache_create(void)
 {
 	zbx_um_cache_t	*cache;
 
