@@ -87,8 +87,6 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_AddFavouriteGraphs() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('zabbix.php?action=charts.view');
 		$this->zbxTestCheckHeader('Graphs');
 		$this->query('xpath://a[text()="Filter"]')->one()->click();
