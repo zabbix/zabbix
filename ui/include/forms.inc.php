@@ -1606,6 +1606,7 @@ function getCopyElementsFormData($elements_field, $title = null) {
 					'templateids' => $data['copy_targetids'],
 					'editable' => true
 				]), ['templateid' => 'id']);
+				break;
 
 			case COPY_TYPE_TO_TEMPLATE_GROUP:
 				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
