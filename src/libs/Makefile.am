@@ -100,6 +100,7 @@ PROXY_SUBDIRS = \
 	zbxdiag \
 	zbxembed \
 	zbxeval \
+	zbxexport \
 	zbxhashicorp \
 	zbxhistory \
 	zbxhttp \
