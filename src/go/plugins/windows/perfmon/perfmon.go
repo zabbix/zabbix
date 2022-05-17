@@ -262,6 +262,8 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) Stop() {
+	p.counters = make(map[perfCounterIndex]*perfCounter)
+
 	_ = win32.PdhCloseQuery(p.query)
 	p.query = 0
 }

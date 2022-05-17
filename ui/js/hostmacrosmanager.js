@@ -243,4 +243,4 @@ class HostMacrosManager {
 			$element.val(macro_part.toUpperCase() + context_part);
 		}
 	}
-};
+}

@@ -922,7 +922,7 @@ function urlEncodeData(parameters, prefix = '') {
 		else {
 			result.push([encodeURIComponent(prefixed_name), encodeURIComponent(value)].join('='));
 		}
-	};
+	}
 
 	return result.join('&');
 }

@@ -1057,7 +1057,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$this->zbxTestLogin('graphs.php?parent_discoveryid=133800&context=host&form=Create+graph+prototype');
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
@@ -1086,7 +1085,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestClick('add_item');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
-			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+			$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')->asMultiselect()->one();
 			$host->fill([
 				'values' => $this->host,
 				'context' => $this->hostGroup

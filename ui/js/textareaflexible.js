@@ -72,9 +72,7 @@
 	}
 
 	var methods = {
-		init: function(options) {
-			var settings = $.extend({}, options);
-
+		init: function() {
 			return this.each(function() {
 				var $textarea = $(this);
 

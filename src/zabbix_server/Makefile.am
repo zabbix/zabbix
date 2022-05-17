@@ -41,7 +41,8 @@ libzbxserver_a_SOURCES = \
 	operations.c \
 	operations.h \
 	postinit.c \
-	postinit.h
+	postinit.h \
+	zbxreport.h
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \

@@ -21,14 +21,6 @@
 
 #include "zbxjson.h"
 
-#define ZBX_REPORT_STATUS_ENABLED	0
-#define ZBX_REPORT_STATUS_DISABLED	1
-
-#define ZBX_REPORT_PERIOD_DAY		0
-#define ZBX_REPORT_PERIOD_WEEK		0
-#define ZBX_REPORT_PERIOD_MONTH		0
-#define ZBX_REPORT_PERIOD_YEAR		0
-
 void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j);
 
 #endif
