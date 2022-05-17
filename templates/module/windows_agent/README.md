@@ -369,7 +369,7 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$SERVICE.NAME.MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^.*$` |
-|{$SERVICE.NAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc)$` |
+|{$SERVICE.NAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv)$` |
 |{$SERVICE.STARTUPNAME.MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:automatic|automatic delayed)$` |
 |{$SERVICE.STARTUPNAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:manual|disabled)$` |
 

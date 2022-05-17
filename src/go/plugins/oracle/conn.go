@@ -28,12 +28,12 @@ import (
 	"sync"
 	"time"
 
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/uri"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/zbxerr"
 )
 
 type OraClient interface {
