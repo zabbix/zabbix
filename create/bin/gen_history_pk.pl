@@ -5,7 +5,6 @@ use warnings;
 
 my ($db, $table) = @ARGV;
 
-my @l = ('timescaledb');
 my @dbs = ('mysql', 'oracle', 'postgresql', 'timescaledb');
 my @tables = ('history', 'history_uint', 'history_str', 'history_log', 'history_text');
 
@@ -148,7 +147,9 @@ SELECT create_hypertable('%HISTTBL', 'clock', chunk_time_interval => 86400, migr
 INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (itemid,clock,ns) DO NOTHING;
 
 SELECT set_integer_now_func('%HISTTBL', 'zbx_ts_unix_now', true);
-ALTER TABLE %HISTTBL SET (timescaledb.compress,timescaledb.compress_segmentby='itemid',timescaledb.compress_orderby='clock,ns');
+
+ALTER TABLE %HISTTBL
+	SET (timescaledb.compress,timescaledb.compress_segmentby='itemid',timescaledb.compress_orderby='clock,ns');
 
 DO $$
 DECLARE
@@ -160,15 +161,18 @@ BEGIN
 	IF (tsdb_version_major < 2)
 	THEN
 		PERFORM add_compress_chunks_policy('%HISTTBL', (
-				SELECT (p.older_than).integer_interval FROM _timescaledb_config.bgw_policy_compress_chunks p
-				INNER JOIN _timescaledb_catalog.hypertable h ON (h.id=p.hypertable_id) WHERE h.table_name='%HISTTBL_old'
+				SELECT (p.older_than).integer_interval
+				FROM _timescaledb_config.bgw_policy_compress_chunks p
+				INNER JOIN _timescaledb_catalog.hypertable h ON (h.id=p.hypertable_id)
+				WHERE h.table_name='%HISTTBL_old'
 			)::integer
 		);
 	ELSE
 		SELECT add_compression_policy('%HISTTBL', (
 			SELECT extract(epoch FROM (config::json->>'compress_after')::interval)
 			FROM timescaledb_information.jobs
-			WHERE application_name LIKE 'Compression%%' AND hypertable_schema='public' AND hypertable_name='%HISTTBL_old'
+			WHERE application_name LIKE 'Compression%%' AND hypertable_schema='public'
+				AND hypertable_name='%HISTTBL_old'
 			)::integer
 		) INTO jobid;
 
@@ -194,7 +198,8 @@ sub output_table {
 	$create_table =~ s/%TBL/$tbl/g;
 
 	my $pk_constraint = @$db{'pk_constraint'};
-	if ($pk_substitute_tbl == 1) {
+	if ($pk_substitute_tbl == 1)
+	{
 		my $utbl = uc($tbl);
 		$pk_constraint =~ s/%UTBL/$utbl/g;
 	}
@@ -219,7 +224,8 @@ sub validate_args {
 	die 'No argument were provided' if (!$db);
 	die 'Wrong database was provided' if (! grep { $_ eq $db } @dbs);
 
-	if ($db eq 'timescaledb') {
+	if ($db eq 'timescaledb')
+	{
 		die 'Table name should be provided to generate timescaledb per-table migration script' if (!$table);
 		die 'Non-existent table name was provided' if (! grep { $_ eq $table } @tables);
 	}
@@ -227,23 +233,37 @@ sub validate_args {
 
 validate_args();
 
-if ($db eq 'timescaledb') {
+if ($db eq 'timescaledb')
+{
 	output_tsdb($table);
-} else {
-	if ($db eq 'mysql') {
-		foreach my $tbl (@tables) {
+}
+else
+{
+	if ($db eq 'mysql')
+	{
+		foreach my $tbl (@tables)
+		{
 			output_table(\%mysql, $tbl, 0);
 		}
-	} elsif ($db eq 'oracle') {
-		foreach my $tbl (@tables) {
+	}
+	elsif ($db eq 'oracle')
+	{
+		foreach my $tbl (@tables)
+		{
 			output_table(\%oracle, $tbl, 1);
 		}
-	} elsif ($db eq 'postgresql') {
-		foreach my $tbl (@tables) {
+	}
+	elsif ($db eq 'postgresql')
+	{
+		foreach my $tbl (@tables)
+		{
 			output_table(\%postgresql, $tbl, 0);
 		}
-	} elsif ($db eq 'timescaledb') {
-		foreach my $tbl (@tables) {
+	}
+	elsif ($db eq 'timescaledb')
+	{
+		foreach my $tbl (@tables)
+		{
 			output_tsdb($tbl);
 		}
 	}
