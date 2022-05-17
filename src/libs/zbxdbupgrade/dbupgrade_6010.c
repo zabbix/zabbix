@@ -22,6 +22,7 @@
 #include "dbupgrade.h"
 #include "zbxalgo.h"
 #include "log.h"
+#include "sysinfo.h"
 
 extern unsigned char	program_type;
 
@@ -334,6 +335,147 @@ static int	DBpatch_6010023(void)
 	return ret;
 }
 
+#define HTTPSTEP_ITEM_TYPE_RSPCODE	0
+#define HTTPSTEP_ITEM_TYPE_TIME		1
+#define HTTPSTEP_ITEM_TYPE_IN		2
+#define HTTPSTEP_ITEM_TYPE_LASTSTEP	3
+#define HTTPSTEP_ITEM_TYPE_LASTERROR	4
+
+static int	DBpatch_6010024(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
+	char		*out = NULL;
+
+	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select hi.itemid,hi.type,ht.name"
+			" from httptestitem hi,httptest ht"
+			" where hi.httptestid=ht.httptestid");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+		char		*esc;
+		size_t		out_offset = 0;
+		unsigned char	type;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(type, row[1]);
+
+		switch (type)
+		{
+			case HTTPSTEP_ITEM_TYPE_IN:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Download speed for scenario \"%s\".", row[2]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Failed step of scenario \"%s\".", row[2]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_LASTERROR:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Last error message of scenario \"%s\".", row[2]);
+				break;
+		}
+		esc = DBdyn_escape_field("items", "name", out);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
+				ZBX_FS_UI64 ";\n", esc, itemid);
+		zbx_free(esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+	zbx_free(out);
+
+	return ret;
+}
+
+static int	DBpatch_6010025(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
+	char		*out = NULL;
+
+	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select hi.itemid,hi.type,hs.name,ht.name"
+			" from httpstepitem hi,httpstep hs,httptest ht"
+			" where hi.httpstepid=hs.httpstepid"
+				" and hs.httptestid=ht.httptestid");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+		char		*esc;
+		size_t		out_offset = 0;
+		unsigned char	type;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(type, row[1]);
+
+		switch (type)
+		{
+			case HTTPSTEP_ITEM_TYPE_IN:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Download speed for step \"%s\" of scenario \"%s\".", row[2], row[3]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_TIME:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Response time for step \"%s\" of scenario \"%s\".", row[2], row[3]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_RSPCODE:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Response code for step \"%s\" of scenario \"%s\".", row[2], row[3]);
+				break;
+		}
+		esc = DBdyn_escape_field("items", "name", out);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
+				ZBX_FS_UI64 ";\n", esc, itemid);
+		zbx_free(esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+	zbx_free(out);
+
+	return ret;
+}
+
 #define DBPATCH_HOST_STATUS_TEMPLATE	"3"
 #define DBPATCH_GROUPIDS(cmp)									\
 		"select distinct g.groupid"							\
@@ -356,36 +498,36 @@ hstgrp_t;
 ZBX_PTR_VECTOR_DECL(hstgrp, hstgrp_t *)
 ZBX_PTR_VECTOR_IMPL(hstgrp, hstgrp_t *)
 
-static int	DBpatch_6010024(void)
+static int	DBpatch_6010026(void)
 {
 	return DBdrop_field("hstgrp", "internal");
 }
 
-static int	DBpatch_6010025(void)
+static int	DBpatch_6010027(void)
 {
 	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hstgrp", &field);
 }
 
-static int	DBpatch_6010026(void)
+static int	DBpatch_6010028(void)
 {
 	return DBdrop_index("hstgrp", "hstgrp_1");
 }
 
-static int	DBpatch_6010027(void)
+static int	DBpatch_6010029(void)
 {
 	return DBcreate_index("hstgrp", "hstgrp_1", "type,name", 1);
 }
 
-static void	DBpatch_6010028_hstgrp_free(hstgrp_t *hstgrp)
+static void	DBpatch_6010030_hstgrp_free(hstgrp_t *hstgrp)
 {
 	zbx_free(hstgrp->name);
 	zbx_free(hstgrp->uuid);
 	zbx_free(hstgrp);
 }
 
-static int	DBpatch_6010028_split_groups(void)
+static int	DBpatch_6010030_split_groups(void)
 {
 	int			i, permission, ret = SUCCEED;
 	zbx_uint64_t		nextid, groupid;
@@ -489,7 +631,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010028(void)
+static int	DBpatch_6010030(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -497,7 +639,7 @@ static int	DBpatch_6010028(void)
 	return DBpatch_6010028_split_groups();
 }
 
-static int	DBpatch_6010029(void)
+static int	DBpatch_6010031(void)
 {
 	int	ret = SUCCEED;
 
@@ -514,7 +656,7 @@ static int	DBpatch_6010029(void)
 	return ret;
 }
 
-static int	DBpatch_6010030_startfrom(const zbx_vector_str_t *names, const char *name)
+static int	DBpatch_6010032_startfrom(const zbx_vector_str_t *names, const char *name)
 {
 	int	i;
 
@@ -550,7 +692,7 @@ static int	DBpatch_6010030_startfrom(const zbx_vector_str_t *names, const char *
 	return FAIL;
 }
 
-static int	DBpatch_6010030_update_empty(void)
+static int	DBpatch_6010032_update_empty(void)
 {
 	int			ret = SUCCEED;
 	char			*sql = NULL;
@@ -612,13 +754,14 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010030(void)
+static int	DBpatch_6010032(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	return DBpatch_6010030_update_empty();
 }
+
 #endif
 
 DBPATCH_START(6010)
@@ -656,5 +799,7 @@ DBPATCH_ADD(6010027, 0, 1)
 DBPATCH_ADD(6010028, 0, 1)
 DBPATCH_ADD(6010029, 0, 1)
 DBPATCH_ADD(6010030, 0, 1)
+DBPATCH_ADD(6010031, 0, 1)
+DBPATCH_ADD(6010032, 0, 1)
 
 DBPATCH_END()

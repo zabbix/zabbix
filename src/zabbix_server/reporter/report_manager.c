@@ -22,12 +22,15 @@
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "base64.h"
-#include "zbxreport.h"
+#include "../zbxreport.h"
 #include "zbxhash.h"
 #include "zbxcrypto.h"
 #include "zbxalert.h"
 #include "zbxserver.h"
 #include "report_protocol.h"
+
+#define ZBX_REPORT_STATUS_ENABLED	0
+#define ZBX_REPORT_STATUS_DISABLED	1
 
 #define ZBX_REPORT_INCLUDE_USER		0
 #define ZBX_REPORT_EXCLUDE_USER		1
@@ -1362,6 +1365,9 @@ static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+#undef ZBX_REPORT_STATUS_ENABLED
+#undef ZBX_REPORT_STATUS_DISABLED
 
 /******************************************************************************
  *                                                                            *
