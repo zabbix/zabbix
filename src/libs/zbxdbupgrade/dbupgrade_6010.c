@@ -625,7 +625,7 @@ static int	DBpatch_6010030_split_groups(void)
 out:
 	zbx_free(sql);
 	zbx_db_insert_clean(&db_insert);
-	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010028_hstgrp_free);
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010030_hstgrp_free);
 	zbx_vector_hstgrp_destroy(&hstgrps);
 
 	return ret;
@@ -636,7 +636,7 @@ static int	DBpatch_6010030(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010028_split_groups();
+	return DBpatch_6010030_split_groups();
 }
 
 static int	DBpatch_6010031(void)
@@ -727,7 +727,7 @@ static int	DBpatch_6010032_update_empty(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (FAIL == DBpatch_6010030_startfrom(&names, row[1]))
+		if (FAIL == DBpatch_6010032_startfrom(&names, row[1]))
 			continue;
 
 		zbx_vector_str_append(&names, zbx_strdup(NULL, row[1]));
@@ -759,7 +759,7 @@ static int	DBpatch_6010032(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010030_update_empty();
+	return DBpatch_6010032_update_empty();
 }
 
 #endif
