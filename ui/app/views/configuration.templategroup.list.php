@@ -130,7 +130,7 @@ foreach ($data['groups'] as $group) {
 	$table->addRow([
 		new CCheckBox('groupids['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		$count,
+		(new CCol($count))->addClass(ZBX_STYLE_CELL_WIDTH),
 		$templates_output ? $templates_output : ''
 	]);
 }

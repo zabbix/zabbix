@@ -160,7 +160,7 @@ foreach ($data['groups'] as $group) {
 	$table->addRow([
 		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		$count,
+		(new CCol($count))->addClass(ZBX_STYLE_CELL_WIDTH),
 		$hosts_output ? $hosts_output : '',
 		makeInformationList($info_icons)
 	]);
