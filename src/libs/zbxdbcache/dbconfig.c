@@ -1978,7 +1978,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
-	unsigned char		tag, context_op, type, macro_discovery;
+	unsigned char		tag, context_op, type, state;
 	ZBX_DC_HMACRO		*hmacro;
 	int			found, context_existed, update_index, ret, i;
 	zbx_uint64_t		hostmacroid, hostid;
@@ -1999,7 +1999,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(hostmacroid, row[0]);
 		ZBX_STR2UINT64(hostid, row[1]);
 		ZBX_STR2UCHAR(type, row[4]);
-		ZBX_STR2UCHAR(macro_discovery, row[5]);
+		ZBX_STR2UCHAR(state, row[5]);
 
 		if (SUCCEED != zbx_user_macro_parse_dyn(row[2], &macro, &context, NULL, &context_op))
 		{
@@ -2059,7 +2059,7 @@ static void	DCsync_hmacros(zbx_dbsync_t *sync)
 		/* store new information in macro structure */
 		hmacro->hostid = hostid;
 		hmacro->type = type;
-		hmacro->macro_discovery = macro_discovery;
+		hmacro->state = state;
 		hmacro->context_op = context_op;
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);

@@ -1104,7 +1104,7 @@ static int	dbsync_compare_host_macro(const ZBX_DC_HMACRO *hmacro, const DB_ROW d
 	if (FAIL == dbsync_compare_uchar(dbrow[4], hmacro->type))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_uchar(dbrow[5], hmacro->macro_discovery))
+	if (FAIL == dbsync_compare_uchar(dbrow[5], hmacro->state))
 		return FAIL;
 
 	if (FAIL == dbsync_compare_str(dbrow[3], hmacro->value))
@@ -1160,7 +1160,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	ZBX_DC_HMACRO		*macro;
 
 	if (NULL == (result = DBselect(
-			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type,m.macro_discovery"
+			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type,m.state"
 			" from hostmacro m"
 			" inner join hosts h on m.hostid=h.hostid"
 			" where h.flags<>%d", ZBX_FLAG_DISCOVERY_PROTOTYPE)))

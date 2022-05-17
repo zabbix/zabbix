@@ -335,9 +335,20 @@ static int	DBpatch_6010023(void)
 
 static int	DBpatch_6010024(void)
 {
-	const	ZBX_FIELD field = {"macro_discovery", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const	ZBX_FIELD field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hostmacro", &field);
+}
+
+static int	DBpatch_6010025(void)
+{
+	if (ZBX_DB_OK > DBexecute("update hostmacro set state=1 where hostid in"	/* ZBX_MACRO_STATE_AUTOMATIC */
+			"(select hostid from host_discovery where parent_hostid is not null)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 #endif
@@ -371,5 +382,6 @@ DBPATCH_ADD(6010021, 0,	1)
 DBPATCH_ADD(6010022, 0,	1)
 DBPATCH_ADD(6010023, 0,	1)
 DBPATCH_ADD(6010024, 0,	1)
+DBPATCH_ADD(6010025, 0,	1)
 
 DBPATCH_END()

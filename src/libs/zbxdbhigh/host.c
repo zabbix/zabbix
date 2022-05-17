@@ -1909,6 +1909,7 @@ typedef struct
 	char		*description;
 	unsigned char	type_orig;
 	unsigned char	type;
+	unsigned char	state;
 #define ZBX_FLAG_HPMACRO_RESET_FLAG		__UINT64_C(0x00000000)
 #define ZBX_FLAG_HPMACRO_UPDATE_VALUE		__UINT64_C(0x00000001)
 #define ZBX_FLAG_HPMACRO_UPDATE_DESCRIPTION	__UINT64_C(0x00000002)
@@ -2840,7 +2841,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hostid,macro,value,description,type"
+			"select hostid,macro,value,description,type,state"
 			" from hostmacro"
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
@@ -2871,6 +2872,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 		hostmacro->value = zbx_strdup(NULL, row[2]);
 		hostmacro->description = zbx_strdup(NULL, row[3]);
 		ZBX_STR2UCHAR(hostmacro->type, row[4]);
+		ZBX_STR2UCHAR(hostmacro->state, row[5]);
 		hostmacro->flags = ZBX_FLAG_HPMACRO_RESET_FLAG;
 		hostmacro->value_orig = NULL;
 		hostmacro->description_orig = NULL;
@@ -3702,7 +3704,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		new_hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
 		zbx_db_insert_prepare(&db_insert_hmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value",
-				"description", "type", NULL);
+				"description", "type", "state", NULL);
 	}
 
 	if (0 != new_tags)
@@ -3889,12 +3891,12 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			{
 				zbx_db_insert_add_values(&db_insert_hmacro, new_hostmacroid, host_prototype->hostid,
 						hostmacro->macro, hostmacro->value, hostmacro->description,
-						(int)hostmacro->type);
+						(int)hostmacro->type, (int)hostmacro->state);
 
 				zbx_audit_host_prototype_update_json_add_hostmacro(host_prototype->hostid,
 						new_hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
 						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
-						hostmacro->description, (int)hostmacro->type);
+						hostmacro->description, (int)hostmacro->type, (int)hostmacro->state);
 				new_hostmacroid++;
 			}
 			else if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE))

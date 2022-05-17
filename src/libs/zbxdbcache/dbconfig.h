@@ -452,7 +452,7 @@ typedef struct
 	const char	*value;
 	zbx_dc_kv_t	*kv;
 	unsigned char	type;
-	unsigned char	macro_discovery;
+	unsigned char	state;
 	unsigned char	context_op;
 }
 ZBX_DC_HMACRO;

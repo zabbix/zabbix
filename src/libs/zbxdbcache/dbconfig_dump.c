@@ -372,9 +372,9 @@ static void	DCdump_hmacros(void)
 	{
 		hmacro = (ZBX_DC_HMACRO *)index.values[i];
 		zabbix_log(LOG_LEVEL_TRACE, "hostmacroid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " macro:'%s' value:'%s'"
-				" context '%s' op:%d type:%d macro_discovery:%d", hmacro->hostmacroid, hmacro->hostid,
+				" context '%s' op:%d type:%d state:%d", hmacro->hostmacroid, hmacro->hostid,
 				hmacro->macro, hmacro->value, ZBX_NULL2EMPTY_STR(hmacro->context), hmacro->context_op,
-				hmacro->type, hmacro->macro_discovery);
+				hmacro->type, hmacro->state);
 	}
 
 	zbx_vector_ptr_destroy(&index);
