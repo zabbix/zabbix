@@ -687,7 +687,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Event correlation',
 						'Discovery'
 					],
-					'link' => ['hostgroups.php']
+					'link' => ['zabbix.php?action=hostgroup.list']
 				]
 			],
 			[

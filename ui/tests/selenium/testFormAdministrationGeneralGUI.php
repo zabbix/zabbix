@@ -940,7 +940,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Max count of elements to show inside table cell' => '2'
 					],
-					'link' => 'hostgroups.php?filter_name=Templates&filter_set=1',
+					'link' => 'zabbix.php?action=templategroup.list&filter_name=Templates&filter_set=1',
 					'element_count' => 2
 				]
 			],
