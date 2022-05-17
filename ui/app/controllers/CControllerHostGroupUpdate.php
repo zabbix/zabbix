@@ -21,15 +21,17 @@
 
 class CControllerHostGroupUpdate extends CController {
 
+	private $group;
+
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'groupid' => 			'fatal|required|db hstgrp.groupid',
-			'name' => 				'db hstgrp.name',
-			'subgroups' => 			'in 0,1'
+			'groupid'   => 'fatal|required|db hstgrp.groupid',
+			'name'      => 'db hstgrp.name',
+			'subgroups' => 'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -53,11 +55,17 @@ class CControllerHostGroupUpdate extends CController {
 			return false;
 		}
 
-		return (bool) API::HostGroup()->get([
-			'output' => [],
+		$db_groups = API::HostGroup()->get([
+			'output' => ['flags'],
 			'groupids' => $this->getInput('groupid'),
 			'editable' => true
 		]);
+
+		if ($db_groups) {
+			$this->group = $db_groups[0];
+		}
+
+		return (bool) $db_groups;
 	}
 
 	protected function doAction(): void {
@@ -65,10 +73,12 @@ class CControllerHostGroupUpdate extends CController {
 		$name = $this->getInput('name');
 
 		DBstart();
-		$result = API::HostGroup()->update([
-			'groupid' => $groupid,
-			'name' => $name
-		]);
+		$result = $this->group['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
+			? API::HostGroup()->update([
+				'groupid' => $groupid,
+				'name' => $name
+			])
+			: true;
 
 		if ($result && $this->getInput('subgroups', 0)) {
 			$result = API::HostGroup()->propagate([
