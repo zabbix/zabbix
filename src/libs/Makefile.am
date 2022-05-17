@@ -1,142 +1,141 @@
 ## Process this file with automake to produce Makefile.in
 
 DIST_SUBDIRS = \
-	zbxdbcache \
-	zbxdbhigh \
-	zbxdb \
-	zbxdbupgrade \
-	zbxshmem \
 	zbxalgo \
-	zbxmedia \
-	zbxcrypto \
-	zbxhash \
+	zbxaudit \
+	zbxavailability \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
-	zbxdbschema \
-	zbxdiscovery \
-	zbxlog \
-	zbxnix \
+	zbxcompress \
 	zbxconf \
-	zbxsysinfo \
-	zbxthreads \
-	zbxmutexs \
-	zbxjson \
-	zbxserver \
-	zbxicmpping \
+	zbxcrypto \
+	zbxcyberark \
+	zbxdb \
+	zbxdbcache \
+	zbxdbhigh \
+	zbxdbschema \
+	zbxdbupgrade \
+	zbxdiag \
+	zbxdiscovery \
+	zbxembed \
+	zbxeval \
 	zbxexec \
 	zbxexport \
-	zbxself \
-	zbxmodules \
-	zbxregexp \
-	zbxtasks \
-	zbxhttp \
-	zbxipcservice \
-	zbxhistory \
-	zbxcompress \
-	zbxembed \
-	zbxprometheus \
-	zbxvault \
-	zbxcyberark \
-	zbxhashicorp \
-	zbxkvs \
-	zbxdiag \
-	zbxtrends \
-	zbxavailability \
-	zbxservice \
-	zbxaudit \
-	zbxeval \
-	zbxxml \
 	zbxha \
-	zbxrtc
+	zbxhash \
+	zbxhashicorp \
+	zbxhistory \
+	zbxhttp \
+	zbxicmpping \
+	zbxipcservice \
+	zbxjson \
+	zbxkvs \
+	zbxlog \
+	zbxmedia \
+	zbxmodules \
+	zbxmutexs \
+	zbxnix \
+	zbxprometheus \
+	zbxregexp \
+	zbxrtc \
+	zbxself \
+	zbxserver \
+	zbxservice \
+	zbxshmem \
+	zbxsysinfo \
+	zbxtasks \
+	zbxthreads \
+	zbxtrends \
+	zbxvault \
+	zbxxml
 
 if SERVER
 SERVER_SUBDIRS = \
+	zbxaudit \
+	zbxavailability \
+	zbxcompress \
+	zbxcyberark \
 	zbxdb \
 	zbxdbcache \
+	zbxdbhigh \
 	zbxdbschema \
 	zbxdbupgrade \
-	zbxdbhigh \
-	zbxhttp \
-	zbxshmem \
-	zbxserver \
-	zbxicmpping \
-	zbxmedia \
-	zbxself \
-	zbxtasks \
-	zbxhistory \
-	zbxcompress \
-	zbxxml \
-	zbxembed \
-	zbxexport \
-	zbxprometheus \
-	zbxvault \
-	zbxcyberark \
-	zbxhashicorp \
-	zbxkvs \
 	zbxdiag \
-	zbxtrends \
-	zbxavailability \
-	zbxservice \
-	zbxaudit \
+	zbxembed \
 	zbxeval \
+	zbxexport \
 	zbxha \
-	zbxrtc
+	zbxhashicorp \
+	zbxhistory \
+	zbxhttp \
+	zbxicmpping \
+	zbxkvs \
+	zbxmedia \
+	zbxprometheus \
+	zbxrtc \
+	zbxself \
+	zbxserver \
+	zbxservice \
+	zbxshmem \
+	zbxtasks \
+	zbxtrends \
+	zbxvault \
+	zbxxml
 else
 if PROXY
 PROXY_SUBDIRS = \
+	zbxaudit \
+	zbxavailability \
+	zbxcompress \
+	zbxcyberark \
 	zbxdb \
 	zbxdbcache \
+	zbxdbhigh \
 	zbxdbschema \
 	zbxdbupgrade \
-	zbxdbhigh \
-	zbxhttp \
-	zbxshmem \
-	zbxserver \
-	zbxicmpping \
-	zbxself \
-	zbxtasks \
-	zbxhistory \
-	zbxcompress \
-	zbxxml \
-	zbxembed \
-	zbxexport \
-	zbxprometheus \
-	zbxvault \
-	zbxcyberark \
-	zbxhashicorp \
-	zbxkvs \
 	zbxdiag \
-	zbxtrends \
-	zbxavailability \
-	zbxaudit \
+	zbxembed \
 	zbxeval \
-	zbxrtc
+	zbxhashicorp \
+	zbxhistory \
+	zbxhttp \
+	zbxicmpping \
+	zbxkvs \
+	zbxprometheus \
+	zbxrtc \
+	zbxself \
+	zbxserver \
+	zbxshmem \
+	zbxtasks \
+	zbxtrends \
+	zbxvault \
+	zbxxml
 endif
 endif
 
 SUBDIRS = \
-	zbxhash \
-	zbxcrypto \
-	zbxcommon \
-	zbxdbschema \
-	zbxlog \
 	zbxalgo \
-	zbxnix \
+	zbxcommon \
+	zbxcomms \
+	zbxcommshigh \
+	zbxcompress \
 	zbxconf \
+	zbxcrypto \
+	zbxdbschema \
+	zbxdiscovery \
+	zbxexec \
+	zbxhash \
 	zbxhttp \
+	zbxipcservice \
+	zbxjson \
+	zbxlog \
+	zbxmodules \
+	zbxmutexs \
+	zbxnix \
+	zbxregexp \
 	zbxsysinfo \
 	zbxthreads \
-	zbxmutexs \
-	zbxcommshigh \
-	zbxdiscovery \
-	zbxcomms \
-	zbxjson \
-	zbxexec \
-	zbxmodules \
-	zbxregexp \
-	zbxipcservice \
-	zbxcompress \
 	zbxxml \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \

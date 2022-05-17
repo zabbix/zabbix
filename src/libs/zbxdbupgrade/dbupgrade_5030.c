@@ -5299,9 +5299,9 @@ static int	DBpatch_5030168(void)
 
 		zbx_strcpy_alloc(&out, &out_alloc, &out_offset, expression + last_pos);
 #if defined(HAVE_ORACLE)
-		if (2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(out))
+		if (2048 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(out))
 #else
-		if (65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(out))
+		if (65535 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(out))
 #endif
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert calculated item \"" ZBX_FS_UI64 "\" formula:"
@@ -5433,9 +5433,9 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 
 	zbx_strcpy_alloc(str, str_alloc, str_offset, "))");
 #if defined(HAVE_ORACLE)
-	if (2048 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(*str))
+	if (2048 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(*str))
 #else
-	if (65535 /* ITEM_PARAM_LEN */ < zbx_strlen_utf8(*str))
+	if (65535 /* ZBX_ITEM_PARAM_LEN */ < zbx_strlen_utf8(*str))
 #endif
 	{
 		*error = zbx_strdup(NULL, "resulting formula is too long");

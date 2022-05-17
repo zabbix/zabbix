@@ -43,6 +43,4 @@
 #define EVENT_NAME_LEN			2048
 
 #define REPORT_ERROR_LEN		2048
-
-
 #endif /* ZABBIX_DB_LENGTHS_H */

@@ -2388,7 +2388,6 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
 		tag->flags = ZBX_FLAG_LLD_TAG_DELETE;
 	else
 		tag->flags &= ~ZBX_FLAG_LLD_TAG_DISCOVERED;
-#undef TRIGGER_COMMENTS_LEN
 }
 
 /******************************************************************************

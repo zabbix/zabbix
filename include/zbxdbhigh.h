@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DB_H
-#define ZABBIX_DB_H
+#ifndef ZABBIX_DBHIGH_H
+#define ZABBIX_DBHIGH_H
 
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -193,7 +193,6 @@ typedef struct
 	char		*name;
 }
 ZBX_DB_DRULE;
-
 
 typedef struct
 {
@@ -791,4 +790,4 @@ void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
-#endif
+#endif /* ZABBIX_DBHIGH_H */

@@ -67,7 +67,6 @@
 #include "zbxcrypto.h"
 #include "zbxhistory.h"
 #include "postinit.h"
-#include "zbxexport.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
