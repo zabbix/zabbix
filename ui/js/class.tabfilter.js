@@ -74,6 +74,12 @@ class CTabFilter extends CBaseComponent {
 
 			index++;
 		}
+
+		this._items.forEach((item, key) => {
+			if (key != 0) {
+				item.updateUnsavedState(item._data.filter_src, item._data);
+			}
+		})
 	}
 
 	/**
@@ -447,7 +453,7 @@ class CTabFilter extends CBaseComponent {
 			collapse: (ev) => {
 				let item = ev.detail.target;
 
-				if (item !== this._timeselector) {
+				if (item !== this._timeselector && item._index != 0) {
 					item.updateUnsavedState();
 				}
 
@@ -655,17 +661,17 @@ class CTabFilter extends CBaseComponent {
 					}).then(() => {
 						this._active_item.unsetExpandedSubfilters();
 						this._active_item.emptySubfilter();
-						this._active_item.updateUnsavedState();
 						this._active_item.updateApplyUrl();
 						this._active_item.setBrowserLocationToApplyUrl();
 					});
 				}
-
-				this._active_item.unsetExpandedSubfilters();
-				this._active_item.emptySubfilter();
-				this._active_item.updateUnsavedState();
-				this._active_item.updateApplyUrl();
-				this._active_item.setBrowserLocationToApplyUrl();
+				else {
+					this._active_item.unsetExpandedSubfilters();
+					this._active_item.emptySubfilter();
+					this._active_item.updateUnsavedState();
+					this._active_item.updateApplyUrl();
+					this._active_item.setBrowserLocationToApplyUrl();
+				}
 			},
 
 			/**

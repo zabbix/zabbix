@@ -1,11 +1,11 @@
 [data-indicator="mark"][data-indicator-value]:not([data-indicator-value="0"]) {
-	content: '';
-	display: inline-block;
-	margin-left: .4em;
-	margin-right: 7px;
-	width: 7px;
-	height: 7px;
-	border: none;
-	border-radius: 50%;
-	background: $indicator-mark-color;
+	&::after {
+		content: '';
+		display: inline-block;
+		margin-left: .4em;
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: $indicator-mark-color;
+	}
 }

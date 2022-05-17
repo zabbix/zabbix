@@ -127,8 +127,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 			background-color: $tab-label-expanded-bg-color;
 			border: 1px solid $tab-label-expanded-border-color;
 			border-bottom: 0;
-			padding-bottom: 8px;
-			margin-top: -1px;
+			padding-bottom: 7px;
 			vertical-align: baseline;
 
 			.tabfilter-item-link {
@@ -164,12 +163,36 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 	// Tab filter label li clickable a element.
 	.tabfilter-item-link {
+		position: relative;
 		display: inline-block;
 		color: $tab-label-expanded-color;
 		border: 1px transparent;
 		line-height: 22px;
 		vertical-align: middle;
-		padding: 0 8px;
+		padding: 0 8px 7px 8px;
+		margin-bottom: -7px;
+	}
+
+	.tabfilter-item-label:not(.selected) {
+		.tabfilter-item-link:not(.icon-filter) {
+			&::before {
+				content: ' ';
+				position: absolute;
+				top: 1px;
+				left: -2px;
+				display: inline-block;
+				height: 20px;
+				border-left: 1px solid $ui-tab-item-border-color;
+			}
+		}
+	}
+
+	.tabfilter-item-label.selected + .tabfilter-item-label {
+		.tabfilter-item-link {
+			&::before {
+				display: none;
+			}
+		}
 	}
 
 	.icon-edit {
@@ -180,6 +203,8 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 		cursor: pointer;
 		margin: 0;
+		padding-bottom: 7px !important;
+		margin-bottom: -7px;
 		vertical-align: middle;
 		display: inline-block;
 		opacity: 0;

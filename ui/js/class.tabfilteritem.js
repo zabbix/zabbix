@@ -151,8 +151,6 @@ class CTabFilterItem extends CBaseComponent {
 			defaults.filter_name = this._data.filter_name;
 		}
 
-		this.updateUnsavedState();
-
 		return PopUp('popup.tabfilter.edit', { ...defaults, ...params },
 			{dialogueid: 'tabfilter_dialogue', trigger_element}
 		);
@@ -428,12 +426,14 @@ class CTabFilterItem extends CBaseComponent {
 			green_dot.setAttribute('data-indicator-value', '1');
 			green_dot.setAttribute('data-indicator', 'mark');
 			tab_target.appendChild(green_dot);
+			this._unsaved = true;
 		}
 	}
 
 	removeFilterIndicator(tab_target) {
 		if (tab_target.querySelector("a[data-indicator='mark']")) {
 			tab_target.querySelector("a[data-indicator='mark']").remove();
+			this._unsaved = false;
 		}
 	}
 
@@ -441,58 +441,35 @@ class CTabFilterItem extends CBaseComponent {
 	 * Checks difference between original form values and to be posted values.
 	 * Updates this._unsaved according to check results
 	 *
-	 * @param {URLSearchParams} search_params  Filter field values to compare against.
+	 * @param {URLSearchParams} src_query  Filter field values to compare against.
+	 * @param search_params
 	 */
-	updateUnsavedState() {
-		let search_params = this.getFilterParams(),
-			src_query = new URLSearchParams(this._src_url),
-			ignore_fields = ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action', 'page',
-			'tags[0][operator]', 'inventory[0][field]'];
+	updateUnsavedState(src_query = this._src_url, search_params = this.getFilterParams()) {
 
-		let default_params = new URLSearchParams(this._default);
+		if (src_query === null) {
+			return;
+		}
+
+		src_query = new URLSearchParams(src_query);
+		search_params = new URLSearchParams(search_params);
+
+		let ignore_fields = ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action', 'page',
+			'tags[0][operator]', 'inventory[0][field]', 'filter_sortable', 'expanded', 'filter_configurable',
+			'filter_src', 'tab_view', 'uniqid', 'object Object', 'evaltype', 'filter_view_data'];
 
 		for (const field of ignore_fields) {
 			src_query.delete(field);
 			search_params.delete(field);
-			default_params.delete(field);
 		}
-
-		let has_filter = false;
 
 		src_query.sort();
 		search_params.sort();
-		default_params.sort();
 
-		search_params.forEach((value, key) => {
-			if (value) {
-				if (!default_params.has(key) || value != default_params.get(key)) {
-					has_filter = true;
-				}
-			}
-		});
-
-		if (this._index === 0) {
-			if (has_filter) {
-
-				this.setFilterIndicator(this._target)
-
-
-				// this._target.parentNode.setAttribute('data-indicator-value', '1');
-				// this._target.parentNode.setAttribute('data-indicator', 'mark');
-			}
-			else {
-				this.resetUnsavedState();
-			}
+		if (src_query.toString() !== search_params.toString()) {
+			this.setFilterIndicator(this._target)
 		}
 		else {
-			if (src_query.toString() !== search_params.toString()) {
-				this.setFilterIndicator(this._target)
-				// this._target.parentNode.setAttribute('data-indicator-value', '1');
-				// this._target.parentNode.setAttribute('data-indicator', 'mark');
-			}
-			else {
-				this.resetUnsavedState();
-			}
+			this.resetUnsavedState();
 		}
 	}
 
@@ -517,8 +494,6 @@ class CTabFilterItem extends CBaseComponent {
 		this._src_url = src_query.toString();
 
 		this.removeFilterIndicator(this._target);
-		// this._target.parentNode.removeAttribute('data-indicator-value');
-		// this._target.parentNode.removeAttribute('data-indicator');
 	}
 
 	/**
