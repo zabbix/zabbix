@@ -821,7 +821,8 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 											'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
-											'description' =>			['type' => XML_STRING, 'default' => '']
+											'description' =>			['type' => XML_STRING, 'default' => ''],
+											'macro_discovery' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_DISCOVERY_MANUAL, 'in' => [CXmlConstantValue::MACRO_DISCOVERY_MANUAL => CXmlConstantName::MACRO_DISCOVERY_MANUAL]]
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
@@ -1031,7 +1032,8 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
 							'value' =>					['type' => XML_STRING, 'default' => ''],
-							'description' =>			['type' => XML_STRING, 'default' => '']
+							'description' =>			['type' => XML_STRING, 'default' => ''],
+							'macro_discovery' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_DISCOVERY_MANUAL, 'in' => [CXmlConstantValue::MACRO_DISCOVERY_MANUAL => CXmlConstantName::MACRO_DISCOVERY_MANUAL]]
 						]]
 					]],
 					'inventory' =>				['type' => XML_ARRAY, 'rules' => [
@@ -1500,7 +1502,8 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 											'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 											'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
-											'description' =>			['type' => XML_STRING, 'default' => '']
+											'description' =>			['type' => XML_STRING, 'default' => ''],
+											'macro_discovery' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_DISCOVERY_MANUAL, 'in' => [CXmlConstantValue::MACRO_DISCOVERY_MANUAL => CXmlConstantName::MACRO_DISCOVERY_MANUAL]]
 										]]
 									]],
 									'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
@@ -1712,7 +1715,8 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 							'macro' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_TYPE_TEXT, 'in' => [CXmlConstantValue::MACRO_TYPE_TEXT => CXmlConstantName::MACRO_TYPE_TEXT, CXmlConstantValue::MACRO_TYPE_SECRET => CXmlConstantName::MACRO_TYPE_SECRET, CXmlConstantValue::MACRO_TYPE_VAULT => CXmlConstantName::MACRO_TYPE_VAULT]],
 							'value' =>					['type' => XML_STRING, 'default' => ''],
-							'description' =>			['type' => XML_STRING, 'default' => '']
+							'description' =>			['type' => XML_STRING, 'default' => ''],
+							'macro_discovery' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::MACRO_DISCOVERY_MANUAL, 'in' => [CXmlConstantValue::MACRO_DISCOVERY_MANUAL => CXmlConstantName::MACRO_DISCOVERY_MANUAL]]
 						]]
 					]],
 					'dashboards' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'dashboard', 'rules' => [

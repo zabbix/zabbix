@@ -21,6 +21,12 @@
 
 class CControllerHostMacrosList extends CController {
 
+	public const DISCOVERY_STATE_AUTOMATIC = 0x1;
+	public const DISCOVERY_STATE_CONVERTING = 0x2;
+	public const DISCOVERY_STATE_MANUAL = 0x3;
+
+	public const MACRO_TEXTAREA_PARENT = 'macro-textarea-parent';
+
 	/**
 	 * @var array  Array of parent host defined macros.
 	 */
@@ -31,8 +37,7 @@ class CControllerHostMacrosList extends CController {
 			'macros'				=> 'array',
 			'show_inherited_macros' => 'required|in 0,1',
 			'templateids'			=> 'array_db hosts.hostid',
-			'parent_hostid'			=> 'id',
-			'readonly'				=> 'required|in 0,1'
+			'parent_hostid'			=> 'id'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -76,14 +81,13 @@ class CControllerHostMacrosList extends CController {
 	protected function doAction() {
 		$macros = $this->getInput('macros', []);
 		$show_inherited_macros = (bool) $this->getInput('show_inherited_macros', 0);
-		$readonly = (bool) $this->getInput('readonly', 0);
 		$parent_hostid = $this->hasInput('parent_hostid') ? $this->getInput('parent_hostid') : null;
 
 		if ($macros) {
 			$macros = cleanInheritedMacros($macros);
 
 			// Remove empty new macro lines.
-			$macros = array_filter($macros, function($macro) {
+			$macros = array_filter($macros, function ($macro) {
 				$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
 
 				return (bool) array_filter(array_intersect_key($macro, $keys));
@@ -98,7 +102,7 @@ class CControllerHostMacrosList extends CController {
 
 		$macros = array_values(order_macros($macros, 'macro'));
 
-		if (!$macros && !$readonly) {
+		if (!$macros) {
 			$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
 			if ($show_inherited_macros) {
 				$macro['inherited_type'] = ZBX_PROPERTY_OWN;
@@ -106,10 +110,16 @@ class CControllerHostMacrosList extends CController {
 			$macros[] = $macro;
 		}
 
+		foreach ($macros as &$macro) {
+			if (!array_key_exists('discovery_state', $macro)) {
+				$macro['discovery_state'] = self::DISCOVERY_STATE_MANUAL;
+			}
+		}
+		unset($macro);
+
 		$data = [
 			'macros' => $macros,
 			'show_inherited_macros' => $show_inherited_macros,
-			'readonly' => $readonly,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

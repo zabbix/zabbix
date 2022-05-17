@@ -31,7 +31,8 @@
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}'),
-				new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
+				new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN),
+				new CInput('hidden', 'macros[#{rowNum}][discovery_state]', CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
@@ -78,7 +79,8 @@
 				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-					->setAttribute('placeholder', '{$MACRO}')
+					->setAttribute('placeholder', '{$MACRO}'),
+				new CInput('hidden', 'macros[#{rowNum}][discovery_state]', CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
@@ -90,9 +92,11 @@
 					->setAttribute('placeholder', _('description'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
+				new CHorList([
+					(new CSimpleButton(_('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				])
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('form_row')
@@ -121,7 +125,7 @@
 			this.form = document.getElementById(form_name);
 
 			this.initHostTab(host_interfaces, host_is_discovered);
-			this.initMacrosTab(host_is_discovered);
+			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
 		},
@@ -241,12 +245,10 @@
 		/**
 		 * Set up of macros functionality.
 		 */
-		initMacrosTab(host_is_discovered) {
+		initMacrosTab() {
 			const $show_inherited_macros = $('input[name="show_inherited_macros"]');
 
-			this.macros_manager = new HostMacrosManager({
-				'readonly': host_is_discovered
-			});
+			this.macros_manager = new HostMacrosManager({});
 
 			$('#host-tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
@@ -278,12 +280,7 @@
 					}
 
 					// Initialize macros.
-					if (host_is_discovered) {
-						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
-					}
-					else {
-						this.macros_manager.initMacroTable(show_inherited_macros);
-					}
+					this.macros_manager.initMacroTable(show_inherited_macros);
 
 					this.macros_initialized = true;
 				}

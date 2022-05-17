@@ -147,7 +147,7 @@ class CControllerHostEdit extends CController {
 						'port', 'useip'
 					],
 					'selectInventory' => array_column(getHostInventories(), 'db_field'),
-					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
+					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type', 'macro_discovery'],
 					'selectParentTemplates' => ['templateid', 'name', 'link_type'],
 					'selectTags' => ['tag', 'value'],
 					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
@@ -225,9 +225,19 @@ class CControllerHostEdit extends CController {
 				'type' => ZBX_MACRO_TYPE_TEXT,
 				'macro' => '',
 				'value' => '',
-				'description' => ''
+				'description' => '',
+				'macro_discovery' => ZBX_MACRO_DISCOVERY_MANUAL
 			];
 		}
+
+		foreach ($data['host']['macros'] as &$macro) {
+			$macro['discovery_state'] = ($macro['macro_discovery'] == ZBX_MACRO_DISCOVERY_AUTOMATIC)
+				? CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC
+				: CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
+
+			unset($macro['macro_discovery']);
+		}
+		unset($macro);
 
 		// Reset Secret text macros and set warning for cloned host.
 		if ($data['host']['hostid'] === null) {

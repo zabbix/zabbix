@@ -4849,6 +4849,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   line-height: 22px; }
   .textarea-flexible-container td.textarea-flexible-parent {
     vertical-align: top; }
+  .textarea-flexible-container td.macro-textarea-parent textarea {
+    float: left; }
+  .textarea-flexible-container td.macro-textarea-parent span {
+    margin-left: 10px; }
   .textarea-flexible-container td button {
     line-height: normal; }
 

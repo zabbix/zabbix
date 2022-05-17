@@ -3393,6 +3393,15 @@ $form-icon-btn: (
 			vertical-align: top;
 		}
 
+		&.macro-textarea-parent {
+			textarea {
+				float: left;
+			}
+			span {
+				margin-left: 10px;
+			}
+		}
+
 		button {
 			line-height: normal;
 		}

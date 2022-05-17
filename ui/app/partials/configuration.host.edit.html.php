@@ -325,8 +325,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 	)
 	->addRow(null,
 		new CPartial('hostmacros.list.html', [
-			'macros' => $data['host']['macros'],
-			'readonly' => $host_is_discovered
+			'macros' => $data['host']['macros']
 		]), 'macros_container'
 	);
 

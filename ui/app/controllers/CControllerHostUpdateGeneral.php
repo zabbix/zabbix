@@ -120,7 +120,20 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	 * @return array Macros for assigning to host.
 	 */
 	protected function processUserMacros(array $macros): array {
-		return array_filter(cleanInheritedMacros($macros),
+		$macros = cleanInheritedMacros($macros);
+
+		foreach ($macros as &$macro) {
+			if (array_key_exists('discovery_state', $macro)
+					&& $macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING) {
+				$macro['macro_discovery'] = ZBX_MACRO_DISCOVERY_MANUAL;
+			}
+
+			unset($macro['discovery_state']);
+			unset($macro['original']);
+		}
+		unset($macro);
+
+		return array_filter($macros,
 			function (array $macro): bool {
 				return (bool) array_filter(
 					array_intersect_key($macro, array_flip(['hostmacroid', 'macro', 'value', 'description']))
