@@ -262,6 +262,20 @@ class Services {
 						'tag' => 'Replace_tag_3',
 						'value' => 'Replace_value_3'
 					]
+				],
+				'status_rules' => [
+					[
+						'type' => 1,
+						'limit_value' => 50,
+						'limit_status' => 3,
+						'new_status' => 4
+					],
+					[
+						'type' => 7,
+						'limit_value' => 33,
+						'limit_status' => 2,
+						'new_status' => 5
+					]
 				]
 			],
 			[
@@ -283,17 +297,20 @@ class Services {
 			[
 				'name' => '1',
 				'algorithm' => 1,
-				'sortorder' => 2
+				'sortorder' => 2,
+				'weight' => 10
 			],
 			[
 				'name' => '2',
 				'algorithm' => 1,
-				'sortorder' => 2
+				'sortorder' => 2,
+				'weight' => 10
 			],
 			[
 				'name' => '3',
 				'algorithm' => 1,
-				'sortorder' => 2
+				'sortorder' => 2,
+				'weight' => 10
 			]
 		]);
 
