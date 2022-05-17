@@ -573,12 +573,10 @@ static int	DBpatch_6010030_split_groups(void)
 				HOSTGROUP_TYPE_TEMPLATE, hstgrps.values[i]->uuid);
 	}
 
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
-	if (SUCCEED != ret)
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
 		goto out;
 
+	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", NULL);
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
