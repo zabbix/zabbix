@@ -1022,6 +1022,16 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	for (i = 0; i < triggerids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from functions where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
 			" where");
@@ -1393,7 +1403,29 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
+	/* delete from item tags */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+	/* delete from item preprocessing */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_preproc where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+	/* delete from functions */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from functions where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
 	/* delete from items */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update items set master_itemid=null where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "and master_itemid is not null;\n");
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
@@ -1559,6 +1591,12 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 	/* delete host prototypes */
 
 	sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+			host_prototype_ids->values, host_prototype_ids->values_num);
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
@@ -5836,6 +5874,12 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	/* delete action conditions */
 	for (i = 0; i < hostids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_HOST, hostids->values[i]);
+
+	/* delete host tags */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 	/* delete host */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
