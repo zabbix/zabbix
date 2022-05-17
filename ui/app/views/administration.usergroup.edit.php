@@ -131,7 +131,7 @@ $new_templategroup_right_table = (new CTable())
 			),
 			'popup' => [
 				'parameters' => [
-					'srctbl' => 'template_group',
+					'srctbl' => 'template_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'new_templategroup_right_groupids_'

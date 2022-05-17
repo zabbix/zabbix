@@ -97,7 +97,7 @@ $template_tab
 				'data' => [],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'template_group',
+						'srctbl' => 'template_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'groups_',

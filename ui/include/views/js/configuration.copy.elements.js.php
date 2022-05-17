@@ -65,7 +65,7 @@
 			switch ($('#copy_type').find('input[name=copy_type]:checked').val()) {
 				case '<?= COPY_TYPE_TO_TEMPLATE_GROUP ?>':
 					helper_options.object_name = 'templateGroup';
-					helper_options.popup.parameters.srctbl = 'template_group';
+					helper_options.popup.parameters.srctbl = 'template_groups';
 					helper_options.popup.parameters.srcfld1 = 'groupid';
 					break;
 

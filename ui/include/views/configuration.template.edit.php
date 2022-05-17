@@ -153,7 +153,7 @@ $template_tab
 			'data' => $data['groups_ms'],
 			'popup' => [
 				'parameters' => [
-					'srctbl' => 'template_group',
+					'srctbl' => 'template_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'groups_',

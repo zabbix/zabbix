@@ -151,7 +151,7 @@ if ($data['preselect_required']) {
 // Output table rows.
 switch ($data['popup_type']) {
 	case 'hosts':
-	case 'template_group':
+	case 'template_groups':
 	case 'host_groups':
 	case 'proxies':
 	case 'host_templates':
@@ -791,7 +791,7 @@ $types = [
 	'hosts',
 	'host_templates',
 	'host_groups',
-	'template_group',
+	'template_groups',
 	'items',
 	'item_prototypes',
 	'proxies',

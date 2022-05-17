@@ -62,7 +62,7 @@ $filter_column_1
 			'data' => $data['filter_data']['groups'],
 			'popup' => [
 				'parameters' => [
-					'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_group',
+					'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_groupids_',

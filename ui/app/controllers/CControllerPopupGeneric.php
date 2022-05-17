@@ -193,7 +193,7 @@ class CControllerPopupGeneric extends CController {
 					_('Name')
 				]
 			],
-			'template_group' => [
+			'template_groups' => [
 				'title' => _('Template groups'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'groupid,name',
@@ -805,7 +805,7 @@ class CControllerPopupGeneric extends CController {
 				'selectedLimit' => 1,
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'template_group',
+						'srctbl' => 'template_groups',
 						'srcfld1' => 'groupid',
 						'dstfld1' => 'popup_template_group'
 					] + $templategroup_options
@@ -1275,7 +1275,7 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
 				break;
 
-			case 'template_group':
+			case 'template_groups':
 				$options += [
 					'output' => ['groupid', 'name'],
 					'with_triggers' => $this->hasInput('with_triggers')
