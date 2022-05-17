@@ -4806,4 +4806,119 @@ out:
 	return ret;
 }
 
+#define ALARM_TRUE_FALSE(a) (ZBX_VMWARE_TRUE == a ? "true" : "false")
+int	check_vcenter_alarm_get_common(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result, int entity_type, const char *func_parent)
+{
+	zbx_vmware_service_t	*service;
+	int			i, ret = SYSINFO_RET_FAIL;
+	const char		*url, *uuid;
+	struct zbx_json		json_data;
+	zbx_vmware_hv_t		*hv;
+	zbx_vmware_alarm_t	*alarm;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	if ('\0' == *uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	zbx_vmware_lock();
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < hv->alarms.values_num; i++)
+	{
+		alarm = hv->alarms.values[i];
+
+		if (entity_type != ZBX_VMWARE_ENTITY_ANY && entity_type != alarm->entity_type)
+			continue;
+
+		zbx_json_addobject(&json_data, NULL);
+
+		zbx_json_addstring(&json_data, "name", alarm->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "entity_name", alarm->entity_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "system_name", alarm->system_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "description", alarm->description, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "enabled", ALARM_TRUE_FALSE(alarm->enabled), ZBX_JSON_TYPE_INT);
+		zbx_json_addstring(&json_data, "key", alarm->key, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "time", alarm->time, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "overall_status", alarm->overall_status, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "acknowledged", ALARM_TRUE_FALSE(alarm->acknowledged), ZBX_JSON_TYPE_INT);
+		zbx_json_close(&json_data);
+	}
+
+	zbx_json_close(&json_data);
+
+	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+
+	zbx_json_free(&json_data);
+
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
+			zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+#undef ALARM_TRUE_FALSE
+
+int	check_vcenter_hv_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_HV, __func__);
+}
+
+int	check_vcenter_vm_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_VM, __func__);
+}
+
+int	check_vcenter_ds_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_DATASTORE, __func__);
+}
+
+int	check_vcenter_dc_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_DATACENTER, __func__);
+}
+
+int	check_vcenter_cl_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_CLUSTER, __func__);
+}
+
+int	check_vcenter_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_ANY, __func__);
+}
+
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

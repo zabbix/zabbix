@@ -1283,6 +1283,26 @@ static void	vmware_pnic_shared_free(zbx_vmware_pnic_t *nic)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: frees shared resources allocated to store alarm data              *
+ *                                                                            *
+ * Parameters: alarm - [IN] the alarm object                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_alarm_shared_free(zbx_vmware_alarm_t *alarm)
+{
+	vmware_shared_strfree(alarm->key);
+	vmware_shared_strfree(alarm->name);
+	vmware_shared_strfree(alarm->system_name);
+	vmware_shared_strfree(alarm->description);
+	vmware_shared_strfree(alarm->entity_name);
+	vmware_shared_strfree(alarm->overall_status);
+	vmware_shared_strfree(alarm->time);
+
+	__vm_shmem_free_func(alarm);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: frees shared resources allocated to store vmware hypervisor       *
  *                                                                            *
  * Parameters: hv   - [IN] the vmware hypervisor                              *
@@ -1298,6 +1318,9 @@ static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 
 	zbx_vector_vmware_pnic_clear_ext(&hv->pnics, vmware_pnic_shared_free);
 	zbx_vector_vmware_pnic_destroy(&hv->pnics);
+
+	zbx_vector_vmware_alarm_clear_ext(&hv->alarms, vmware_alarm_shared_free);
+	zbx_vector_vmware_alarm_destroy(&hv->alarms);
 
 	if (NULL != hv->uuid)
 		vmware_shared_strfree(hv->uuid);
@@ -1870,6 +1893,35 @@ static zbx_vmware_pnic_t	*vmware_pnic_shared_dup(const zbx_vmware_pnic_t *src)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: copies vmware alarm object into shared memory                     *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware alarm object                           *
+ *                                                                            *
+ * Return value: a duplicated vmware alarm object                             *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_alarm_t	*vmware_alarm_shared_dup(const zbx_vmware_alarm_t *src)
+{
+	zbx_vmware_alarm_t	*alarm;
+
+	alarm = (zbx_vmware_alarm_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_alarm_t));
+	alarm->key = vmware_shared_strdup(src->key);
+	alarm->name = vmware_shared_strdup(src->name);
+	alarm->system_name = vmware_shared_strdup(src->system_name);
+	alarm->description = vmware_shared_strdup(src->description);
+	alarm->entity_name = vmware_shared_strdup(src->entity_name);
+	alarm->overall_status = vmware_shared_strdup(src->overall_status);
+	alarm->time = vmware_shared_strdup(src->time);
+
+	alarm->entity_type = src->entity_type;
+	alarm->enabled = src->enabled;
+	alarm->acknowledged = src->acknowledged;
+
+	return alarm;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: copies vmware hypervisor object into shared memory                *
  *                                                                            *
  * Parameters: dst - [OUT] the vmware hypervisor object into shared memory    *
@@ -1883,9 +1935,11 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 	VMWARE_VECTOR_CREATE(&dst->dsnames, vmware_dsname);
 	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
 	VMWARE_VECTOR_CREATE(&dst->pnics, vmware_pnic);
+	VMWARE_VECTOR_CREATE(&dst->alarms, vmware_alarm);
 	zbx_vector_vmware_dsname_reserve(&dst->dsnames, src->dsnames.values_num);
 	zbx_vector_ptr_reserve(&dst->vms, src->vms.values_num);
 	zbx_vector_vmware_pnic_reserve(&dst->pnics, src->pnics.values_num);
+	zbx_vector_vmware_alarm_reserve(&dst->alarms, src->alarms.values_num);
 
 	dst->uuid = vmware_shared_strdup(src->uuid);
 	dst->id = vmware_shared_strdup(src->id);
@@ -1905,6 +1959,9 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 
 	for (i = 0; i < src->pnics.values_num; i++)
 		zbx_vector_vmware_pnic_append(&dst->pnics, vmware_pnic_shared_dup(src->pnics.values[i]));
+
+	for (i = 0; i < src->alarms.values_num; i++)
+		zbx_vector_vmware_alarm_append(&dst->alarms, vmware_alarm_shared_dup(src->alarms.values[i]));
 }
 
 /******************************************************************************
@@ -2299,7 +2356,6 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 
 	zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_free);
 	zbx_vector_vmware_datacenter_destroy(&data->datacenters);
-
 
 	zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_resourcepool_free);
 	zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
@@ -4754,7 +4810,6 @@ static int	vmware_service_get_hv_alarm_details(zbx_vmware_service_t *service, CU
 		ZBX_POST_VSPHERE_FOOTER
 
 	xmlDoc		*alarm_details = NULL;
-
 	int		ret = FAIL;
 	char		tmp[MAX_STRING_LEN], *value;
 
@@ -4777,7 +4832,7 @@ static int	vmware_service_get_hv_alarm_details(zbx_vmware_service_t *service, CU
 
 	if (NULL != (value = zbx_xml_doc_read_value(alarm_details, ZBX_XPATH_PROP_NAME("info.enabled"))))
 	{
-		alarm->enabled = 0 == strcmp(value, "true") ? ZBX_VMWARE_ALARM_BOOL_TRUE : ZBX_VMWARE_ALARM_BOOL_FALSE;
+		alarm->enabled = 0 == strcmp(value, "true") ? ZBX_VMWARE_TRUE : ZBX_VMWARE_FALSE;
 		zbx_free(value);
 	}
 	else
@@ -4872,8 +4927,7 @@ static void	vmware_service_get_hv_alarms_data(zbx_vmware_service_t *service, CUR
 
 		if (NULL != (value = zbx_xml_node_read_value(details, nodeset->nodeTab[i], ZBX_XNN("acknowledged"))))
 		{
-			alarm->acknowledged = 0 == strcmp(value, "true")
-				? ZBX_VMWARE_ALARM_BOOL_TRUE : ZBX_VMWARE_ALARM_BOOL_FALSE;
+			alarm->acknowledged = 0 == strcmp(value, "true") ? ZBX_VMWARE_TRUE : ZBX_VMWARE_FALSE;
 			zbx_free(value);
 		}
 
@@ -4882,7 +4936,7 @@ static void	vmware_service_get_hv_alarms_data(zbx_vmware_service_t *service, CUR
 clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, alarms->values_num);
+	zabbix_log(LOG_LEVEL_CRIT, "End of %s() found:%d", __func__, alarms->values_num);
 }
 
 /******************************************************************************

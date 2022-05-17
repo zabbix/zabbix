@@ -1215,6 +1215,14 @@ final class CItemData {
 				'description' => _('Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage'),
 				'value_type' => null
 			],
+			'vmware.alarm.get[<url>,<uuid>]' => [
+				'description' => _('VMware alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.cl.alarm.get[<url>,<uuid>]' => [
+				'description' => _('VMware cluster alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]' => [
 				'description' => _('VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
@@ -1247,8 +1255,16 @@ final class CItemData {
 				'description' => _('VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
+			'vmware.dc.alarm.get[<url>,<uuid>]' => [
+				'description' => _('VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'vmware.dc.discovery[<url>]' => [
 				'description' => _('VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			'vmware.ds.alarm.get[<url>,<uuid>]' => [
+				'description' => _('VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.dvswitch.discovery[<url>]' => [
@@ -1266,6 +1282,10 @@ final class CItemData {
 			'vmware.fullname[<url>]' => [
 				'description' => _('VMware service full name, <url> - VMware service URL'),
 				'value_type' => ITEM_VALUE_TYPE_STR
+			],
+			'vmware.hv.alarm.get[<url>,<uuid>]' => [
+				'description' => _('VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.hv.cluster.name[<url>,<uuid>]' => [
 				'description' => _('VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
@@ -1426,6 +1446,10 @@ final class CItemData {
 			'vmware.version[<url>]' => [
 				'description' => _('VMware service version, <url> - VMware service URL'),
 				'value_type' => ITEM_VALUE_TYPE_STR
+			],
+			'vmware.vm.alarm.get[<url>,<uuid>]' => [
+				'description' => _('VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.attribute[<url>,<uuid>,<name>]' => [
 				'description' => _('VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name'),
