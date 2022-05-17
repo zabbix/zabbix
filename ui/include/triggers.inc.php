@@ -93,18 +93,6 @@ function get_trigger_by_triggerid($triggerid) {
 	return false;
 }
 
-function get_hosts_by_triggerid($triggerids) {
-	zbx_value2array($triggerids);
-
-	return DBselect(
-		'SELECT DISTINCT h.*'.
-		' FROM hosts h,functions f,items i'.
-		' WHERE i.itemid=f.itemid'.
-			' AND h.hostid=i.hostid'.
-			' AND '.dbConditionInt('f.triggerid', $triggerids)
-	);
-}
-
 function get_triggers_by_hostid($hostid) {
 	return DBselect(
 		'SELECT DISTINCT t.*'.
@@ -431,22 +419,6 @@ function triggerExpressionReplaceHost(string $expression, string $src_host, stri
 	}
 
 	return $expression;
-}
-
-function replace_template_dependencies($deps, $hostid) {
-	foreach ($deps as $id => $val) {
-		$sql = 'SELECT t.triggerid'.
-				' FROM triggers t,functions f,items i'.
-				' WHERE t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND t.templateid='.zbx_dbstr($val).
-					' AND i.hostid='.zbx_dbstr($hostid);
-		if ($db_new_dep = DBfetch(DBselect($sql))) {
-			$deps[$id] = $db_new_dep['triggerid'];
-		}
-	}
-
-	return $deps;
 }
 
 /**

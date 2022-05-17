@@ -769,11 +769,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		API::Graph()->syncTemplates($link_request);
 
-		API::Trigger()->syncTemplateDependencies($link_request);
-
-		if ($ruleids) {
-			API::TriggerPrototype()->syncTemplateDependencies($link_request);
-		}
+		CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
 	}
 
 	/**
@@ -1007,8 +1003,7 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		foreach ($link_requests as $link_request){
-			API::Trigger()->syncTemplateDependencies($link_request);
-			API::TriggerPrototype()->syncTemplateDependencies($link_request);
+			CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
 		}
 
 		return $hosts_linkage_inserts;

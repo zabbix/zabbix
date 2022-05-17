@@ -421,22 +421,13 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 */
 	public function create(array $trigger_prototypes) {
 		$this->validateCreate($trigger_prototypes);
+
 		$this->createReal($trigger_prototypes);
+		$this->checkDependenciesLinks($trigger_prototypes);
+
 		$this->inherit($trigger_prototypes);
 
-		$addDependencies = false;
-
-		foreach ($trigger_prototypes as $trigger_prototype) {
-			if (isset($trigger_prototype['dependencies']) && is_array($trigger_prototype['dependencies'])
-					&& $trigger_prototype['dependencies']) {
-				$addDependencies = true;
-				break;
-			}
-		}
-
-		if ($addDependencies) {
-			$this->addDependencies($trigger_prototypes);
-		}
+		$this->updateDependencies($trigger_prototypes);
 
 		return ['triggerids' => zbx_objectValues($trigger_prototypes, 'triggerid')];
 	}
@@ -448,26 +439,15 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @return array
 	 */
-	public function update(array $trigger_prototypes) {
+	public function update(array $trigger_prototypes): array {
 		$this->validateUpdate($trigger_prototypes, $db_triggers);
 
 		$this->updateReal($trigger_prototypes, $db_triggers);
 		$this->inherit($trigger_prototypes);
 
-		$updateDependencies = false;
+		$this->updateDependencies($trigger_prototypes, $db_triggers);
 
-		foreach ($trigger_prototypes as $trigger_prototype) {
-			if (isset($trigger_prototype['dependencies']) && is_array($trigger_prototype['dependencies'])) {
-				$updateDependencies = true;
-				break;
-			}
-		}
-
-		if ($updateDependencies) {
-			$this->updateDependencies($trigger_prototypes);
-		}
-
-		return ['triggerids' => zbx_objectValues($trigger_prototypes, 'triggerid')];
+		return ['triggerids' => array_column($trigger_prototypes, 'triggerid')];
 	}
 
 	/**
@@ -525,293 +505,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 						CMacrosResolverHelper::resolveTriggerExpression($db_trigger['expression'])
 					)
 				);
-			}
-		}
-	}
-
-	/**
-	 * Update the given dependencies and inherit them on all child triggers.
-	 *
-	 * @param array $triggerPrototypes
-	 */
-	protected function updateDependencies(array $triggerPrototypes) {
-		$this->deleteDependencies($triggerPrototypes);
-
-		$this->addDependencies($triggerPrototypes);
-	}
-
-	/**
-	 * Deletes all trigger and trigger prototype dependencies from the given trigger prototypes and their children.
-	 *
-	 * @param array  $triggerPrototypes
-	 * @param string $triggerPrototypes[]['triggerid']
-	 */
-	protected function deleteDependencies(array $triggerPrototypes) {
-		$triggerPrototypeIds = zbx_objectValues($triggerPrototypes, 'triggerid');
-
-		try {
-			// Delete the dependencies from the child trigger prototypes.
-
-			$childTriggerPrototypes = API::getApiService()->select($this->tableName(), [
-				'output' => ['triggerid'],
-				'filter' => [
-					'templateid' => $triggerPrototypeIds
-				]
-			]);
-
-			if ($childTriggerPrototypes) {
-				$this->deleteDependencies($childTriggerPrototypes);
-			}
-
-			DB::delete('trigger_depends', [
-				'triggerid_down' => $triggerPrototypeIds
-			]);
-		}
-		catch (APIException $e) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete dependency'));
-		}
-	}
-
-	/**
-	 * Add the given dependencies and inherit them on all child triggers.
-	 *
-	 * @param array  $triggerPrototypes
-	 * @param string $triggerPrototypes[]['triggerid']
-	 * @param array  $triggerPrototypes[]['dependencies']
-	 * @param string $triggerPrototypes[]['dependencies'][]['triggerid']
-	 * @param bool   $inherited                                           Determines either to check permissions for
-	 *                                                                    added dependencies. Permissions are not
-	 *                                                                    validated for inherited triggers.
-	 */
-	public function addDependencies(array $triggerPrototypes, bool $inherited = false) {
-		$this->validateAddDependencies($triggerPrototypes, $inherited);
-
-		$insert = [];
-
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			if (!array_key_exists('dependencies', $triggerPrototype)) {
-				continue;
-			}
-
-			foreach ($triggerPrototype['dependencies'] as $dependency) {
-				$insert[] = [
-					'triggerid_down' => $triggerPrototype['triggerid'],
-					'triggerid_up' => $dependency['triggerid']
-				];
-			}
-		}
-
-		DB::insertBatch('trigger_depends', $insert);
-
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			// Propagate the dependencies to the child triggers.
-
-			$childTriggers = API::getApiService()->select($this->tableName(), [
-				'output' => ['triggerid'],
-				'filter' => [
-					'templateid' => $triggerPrototype['triggerid']
-				]
-			]);
-
-			if ($childTriggers) {
-				foreach ($childTriggers as &$childTrigger) {
-					$childTrigger['dependencies'] = [];
-					$childHostsQuery = get_hosts_by_triggerid($childTrigger['triggerid']);
-
-					while ($childHost = DBfetch($childHostsQuery)) {
-						foreach ($triggerPrototype['dependencies'] as $dependency) {
-							$newDependency = [$childTrigger['triggerid'] => $dependency['triggerid']];
-							$newDependency = replace_template_dependencies($newDependency, $childHost['hostid']);
-
-							$childTrigger['dependencies'][] = [
-								'triggerid' => $newDependency[$childTrigger['triggerid']]
-							];
-						}
-					}
-				}
-				unset($childTrigger);
-
-				$this->addDependencies($childTriggers, true);
-			}
-		}
-	}
-
-	/**
-	 * Validates the input for the addDependencies() method.
-	 *
-	 * @param array  $trigger_prototypes
-	 * @param string $trigger_prototypes[]['triggerid']
-	 * @param array  $trigger_prototypes[]['dependencies']
-	 * @param string $trigger_prototypes[]['dependencies'][]['triggerid']
-	 * @param bool   $inherited
-	 *
-	 * @throws APIException if the given dependencies are invalid.
-	 */
-	protected function validateAddDependencies(array $trigger_prototypes, bool $inherited = false): void {
-		$trigger_dependencies = [];
-
-		foreach ($trigger_prototypes as $trigger_prototype) {
-			if (!array_key_exists('dependencies', $trigger_prototype)) {
-				continue;
-			}
-
-			foreach ($trigger_prototype['dependencies'] as $dependency) {
-				$trigger_dependencies[$dependency['triggerid']][$trigger_prototype['triggerid']];
-			}
-		}
-
-		if (!$trigger_dependencies) {
-			return;
-		}
-
-		$trigger_prototypes_up = $this->get([
-			'output' => [],
-			'triggerids' => array_keys($trigger_dependencies),
-			'nopermissions' => $inherited ? true : null,
-			'preservekeys' => true
-		]);
-
-		$trigger_prototype_dependencies = [];
-
-		if ($trigger_prototypes_up) {
-			$triggerids = [];
-
-			foreach ($trigger_prototypes_up as $triggerid_up => $foo) {
-				$triggerids += $trigger_dependencies[$triggerid_up];
-			}
-
-			$result = DBselect(
-				'SELECT DISTINCT f.triggerid,id.parent_itemid'.
-				' FROM functions f,item_discovery id'.
-				' WHERE f.itemid=id.itemid'.
-					' AND '.dbConditionId('f.triggerid', array_keys($trigger_prototypes_up + $triggerids))
-			);
-
-			$lld_rules = [];
-
-			while ($row = DBfetch($result)) {
-				$lld_rules[$row['triggerid']] = $row['parent_itemid'];
-			}
-
-			foreach ($trigger_prototypes_up as $triggerid_up => $foo) {
-				$trigger_prototype_dependencies[$triggerid_up] = $trigger_dependencies[$triggerid_up];
-				unset($trigger_dependencies[$triggerid_up]);
-
-				foreach ($trigger_prototype_dependencies[$triggerid_up] as $triggerid => $foo) {
-					if (bccomp($lld_rules[$triggerid_up], $lld_rules[$triggerid]) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s" because dependencies on trigger prototypes from the another LLD rule are not allowed.')
-						);
-					}
-				}
-			}
-		}
-
-		if ($trigger_dependencies && !$inherited) {
-			$count = API::Trigger()->get([
-				'countOutput' => true,
-				'triggerids' => array_keys($trigger_dependencies),
-				'filter' => [
-					'flags' => [ZBX_FLAG_DISCOVERY_NORMAL]
-				]
-			]);
-
-			if ($count != count($trigger_dependencies)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-
-		self::checkDependencyDuplicates($trigger_dependencies + $trigger_prototype_dependencies);
-
-		/*
-		 * Trigger cannot depends on trigger prototypes, so it's enough to check circular dependencies only between
-		 * trigger prototypes.
-		 */
-		if ($trigger_prototype_dependencies) {
-			self::checkCircularDependencies($trigger_prototype_dependencies);
-		}
-
-		/*
-		 * Since the trigger prototypes can depends only on trigger prototypes from the same LLD rule, for such
-		 * dependencies is not necessary to perform the checks below. Only dependencies on triggers are required to
-		 * check.
-		 */
-		if ($trigger_dependencies) {
-			$trigger_hosts = self::getTriggerHosts($trigger_dependencies);
-
-			self::checkDependenciesOfHostTriggers($trigger_dependencies, $trigger_hosts);
-			self::checkDependenciesOfTemplateTriggers($trigger_dependencies, $trigger_hosts);
-		}
-	}
-
-	/**
-	 * Synchronizes the templated trigger prototype dependencies on the given hosts inherited from the given templates.
-	 * Update dependencies, do it after all triggers and trigger prototypes that can be dependent were created/updated
-	 * on all child hosts/templates. Starting from highest level template trigger prototypes select trigger prototypes
-	 * from one level lower, then for each lower trigger prototype look if it's parent has dependencies, if so
-	 * find this dependency trigger prototype child on dependent trigger prototype host and add new dependency.
-	 *
-	 * @param array			$data
-	 * @param array|string	$data['templateids']
-	 * @param array|string	$data['hostids']
-	 */
-	public function syncTemplateDependencies(array $data) {
-		$templateIds = zbx_toArray($data['templateids']);
-		$hostIds = zbx_toArray($data['hostids']);
-
-		$parentTriggers = $this->get([
-			'output' => ['triggerid'],
-			'selectDependencies' => ['triggerid'],
-			'hostids' => $templateIds,
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
-
-		if ($parentTriggers) {
-			$childTriggers = $this->get([
-				'output' => ['triggerid', 'templateid'],
-				'selectHosts' => ['hostid'],
-				'hostids' => ($hostIds) ? $hostIds : null,
-				'filter' => ['templateid' => array_keys($parentTriggers)],
-				'nopermissions' => true,
-				'preservekeys' => true
-			]);
-
-			if ($childTriggers) {
-				$newDependencies = [];
-
-				foreach ($childTriggers as $childTrigger) {
-					$parentDependencies = $parentTriggers[$childTrigger['templateid']]['dependencies'];
-
-					if ($parentDependencies) {
-						$newDependencies[$childTrigger['triggerid']] = [
-							'triggerid' => $childTrigger['triggerid'],
-							'dependencies' => []
-						];
-
-						$dependencies = [];
-						foreach ($parentDependencies as $depTrigger) {
-							$dependencies[] = $depTrigger['triggerid'];
-						}
-
-						$host = reset($childTrigger['hosts']);
-						$dependencies = replace_template_dependencies($dependencies, $host['hostid']);
-
-						foreach ($dependencies as $depTriggerId) {
-							$newDependencies[$childTrigger['triggerid']]['dependencies'][] = [
-								'triggerid' => $depTriggerId
-							];
-						}
-					}
-				}
-
-				$this->deleteDependencies($childTriggers, true);
-
-				if ($newDependencies) {
-					$this->addDependencies($newDependencies, true);
-				}
 			}
 		}
 	}
