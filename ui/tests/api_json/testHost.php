@@ -3088,7 +3088,8 @@ class testHost extends CAPITest {
 		CDataHelper::call('host.delete', $hostids);
 		CDataHelper::call('template.delete', array_values(self::$data['templateids']));
 
-		// Delete host group.
+		// Delete groups.
 		CDataHelper::call('hostgroup.delete', [self::$data['hostgroupid']]);
+		CDataHelper::call('templategroup.delete', [self::$data['templategroupid']]);
 	}
 }
