@@ -23,28 +23,26 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @onBefore prepareIds
+ * @onBefore getTemplatedIds
  *
  * @backup widget, profiles
  */
 class testDashboardCopyWidgets extends CWebTest {
 
+	// Constants for simple dashboard cases.
 	const NEW_PAGE_NAME = 'Test_page';
+	const PASTE_DASHBOARD_NAME = 'Dashboard for Paste widgets';
+
+	// Constants for templated dashboard cases.
+	const TEMPLATED_DASHBOARD_NAME = 'Templated dashboard with all widgets';
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
-	const DASHBOARD_NAME1 = 'Dashboard_1 for Copying widgets';
-	const DASHBOARD_NAME2 = 'Dashboard_2 for Copying widgets';
+	const EMPTY_DASHBOARD_NAME = 'Dashboard without widgets';
+	private static $templated_dashboardid;
+	private static $templated_empty_dashboardid;
 
+	// Values for replacing widgets.
 	private static $replaced_widget_name = "Test widget for replace";
-	private static $replaced_widget_size = [ 'width' => '13', 'height' => '8'];
-
-	private static $dashboardid_with_widgets;
-	private static $empty_dashboardid;
-	private static $templated_page_id;
-
-	protected static $dashboard_id1;
-	protected static $dashboard_id2;
-	protected static $new_page_ids;
-	protected static $paste_dashboard_id;
+	const REPLACED_WIDGET_SIZE = [ 'width' => '13', 'height' => '8'];
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -55,120 +53,85 @@ class testDashboardCopyWidgets extends CWebTest {
 		return ['class' => CMessageBehavior::class];
 	}
 
-	public static function prepareIds() {
-		self::$new_page_ids	= CDBHelper::getColumn('SELECT * FROM dashboard_page WHERE name ='.zbx_dbstr('Test_page').
-				' ORDER BY dashboard_pageid', 'dashboard_pageid');
-		self::$paste_dashboard_id = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-				zbx_dbstr('Dashboard for Paste widgets'));
-		self::$dashboardid_with_widgets = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-				zbx_dbstr('Templated dashboard with all widgets'));
-		self::$empty_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-				zbx_dbstr('Dashboard without widgets'));
-		self::$templated_page_id = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE name='.
-				zbx_dbstr(self::TEMPLATED_PAGE_NAME));
-		self::$dashboard_id1 = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.zbx_dbstr(self::DASHBOARD_NAME1));
-		self::$dashboard_id2 = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.zbx_dbstr(self::DASHBOARD_NAME2));
-	}
-
-	/**
-	 * Data provider for copying widgets from the first dashboard.
+	/*
+	 *  Get all widgets from dashboards with name starting with "Dashboard for Copying widgets".
 	 */
-	public function getCopyWidgetsFirstData() {
-		return $this->getCopyWidgetsData('Dashboard_1 for Copying widgets');
-	}
-
-	/**
-	 * Data provider for copying widgets from the second dashboard.
-	 */
-	public function getCopyWidgetsSecondData() {
-		return $this->getCopyWidgetsData('Dashboard_2 for Copying widgets');
-	}
-
-	private function getCopyWidgetsData($dashboard_name) {
-		static $data = [];
-		if (!array_key_exists($dashboard_name, $data)) {
+	public static function getDashboardsData() {
+		static $data = null;
+		if ($data === null) {
 			global $DB;
 			if (!isset($DB['DB'])) {
 				DBconnect($error);
 			}
 			CDataHelper::load('CopyWidgetsDashboards');
 
-			$dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.zbx_dbstr($dashboard_name));
-			$data[$dashboard_name] = CDBHelper::getDataProvider('SELECT * FROM widget w'.
-				' WHERE EXISTS ('.
-					'SELECT NULL'.
-					' FROM dashboard_page dp'.
-					' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-						' AND dp.dashboardid='.$dashboardid.
-				') ORDER BY w.widgetid DESC'
+			$data = CDBHelper::getDataProvider('SELECT w.name, dp.dashboardid FROM widget w'.
+					' JOIN dashboard_page dp ON w.dashboard_pageid=dp.dashboard_pageid'.
+					' WHERE dp.dashboardid IN ('.
+						'SELECT dashboardid FROM dashboard '.
+						'WHERE name LIKE \'%Dashboard for Copying widgets%\''.
+					') ORDER BY w.widgetid DESC'
 			);
 		}
 
-		return $data[$dashboard_name];
+		return $data;
+	}
+
+	/*
+	 * Get ids for templated dashboard cases.
+	 */
+	public static function getTemplatedIds() {
+		self::$templated_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
+				zbx_dbstr(self::TEMPLATED_DASHBOARD_NAME));
+		self::$templated_empty_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
+				zbx_dbstr(self::EMPTY_DASHBOARD_NAME));
 	}
 
 	/**
-	 * @dataProvider getCopyWidgetsFirstData
+	 * @dataProvider getDashboardsData
 	 */
-	public function testDashboardCopyWidgets_SameDashboard_1($data) {
-		$this->copyWidgets($data, self::$dashboard_id1);
+	public function testDashboardCopyWidgets_SameDashboard($data) {
+		$this->copyWidgets($data['dashboardid'], $data['name']);
 	}
 
 	/**
-	 * @dataProvider getCopyWidgetsSecondData
+	 * @backupOnce dashboard
+	 *
+	 * @dataProvider getDashboardsData
 	 */
-	public function testDashboardCopyWidgets_SameDashboard_2($data) {
-		$this->copyWidgets($data, self::$dashboard_id2);
+	public function testDashboardCopyWidgets_OtherDashboard($data) {
+		$this->copyWidgets($data['dashboardid'], $data['name'], true);
 	}
 
 	/**
-	 * @dataProvider getCopyWidgetsFirstData
+	 * @dataProvider getDashboardsData
 	 */
-	public function testDashboardCopyWidgets_OtherDashboard_1($data) {
-		$this->copyWidgets($data, self::$dashboard_id1, null, true);
+	public function testDashboardCopyWidgets_ReplaceWidget($data) {
+		$this->copyWidgets($data['dashboardid'], $data['name'], true, true);
 	}
 
 	/**
-	 * @dataProvider getCopyWidgetsSecondData
+	 * @dataProvider getDashboardsData
 	 */
-	public function testDashboardCopyWidgets_OtherDashboard_2($data) {
-		$this->copyWidgets($data, self::$dashboard_id2, null, true);
+	public function testDashboardCopyWidgets_NewPage($data) {
+		$this->copyWidgets($data['dashboardid'], $data['name'], false, false, true);
 	}
 
 	/**
-	 * @dataProvider getCopyWidgetsFirstData
+	 * Common function for copying widgets testing.
+	 *
+	 * @param int     $start_dashboardid    id of a dashboard with widgets for copying
+	 * @param string  $widget_name		    name of a widget to be copied
+	 * @param boolean $new_dashboard		true if the widget is copied to new dashboard, false for the same dashboard
+	 * @param boolean $replace              true if the widget is being replaced, false if copied to new place
+	 * @param boolean $new_page             true if the widget is copied to the new page, false if copied to the same page
+	 * @param boolean $templated            true if it is templated dashboard case, false if simple dashboard
 	 */
-	public function testDashboardCopyWidgets_ReplaceWidget_1($data) {
-		$this->copyWidgets($data, self::$dashboard_id1, null, true, true);
-	}
-
-	/**
-	 * @dataProvider getCopyWidgetsSecondData
-	 */
-	public function testDashboardCopyWidgets_ReplaceWidget_2($data) {
-		$this->copyWidgets($data, self::$dashboard_id2, null, true, true);
-	}
-
-	/**
-	 * @dataProvider getCopyWidgetsFirstData
-	 */
-	public function testDashboardCopyWidgets_NewPage_1($data) {
-		$this->copyWidgets($data, self::$dashboard_id1, self::$new_page_ids[0], false, false, true);
-	}
-
-	/**
-	 * @dataProvider getCopyWidgetsSecondData
-	 */
-	public function testDashboardCopyWidgets_NewPage_2($data) {
-		$this->copyWidgets($data, self::$dashboard_id2, self::$new_page_ids[1], false, false, true);
-	}
-
-	private function copyWidgets($data, $start_dashboard, $paste_page_id = null, $new_dashboard = false, $replace = false,
+	private function copyWidgets($start_dashboardid, $widget_name, $new_dashboard = false, $replace = false,
 			$new_page = false, $templated = false) {
-		$name = $data['name'];
 
 		// Exclude Map navigation tree widget from replacing tests.
-		if ($replace && $name === 'Test copy Map navigation tree') {
+		if ($replace && $widget_name === 'Test copy Map navigation tree') {
 			return;
 		}
 
@@ -176,22 +139,26 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		// Write name for replacing widget next case.
 		if ($replace) {
-			self::$replaced_widget_name = $name;
+			self::$replaced_widget_name = $widget_name;
 		}
 
 		// Use the appropriate dashboard and page in case of templated dashboard widgets.
 		if ($templated) {
-			$dashboard_id = self::$dashboardid_with_widgets;
-			$new_dashboard_id = self::$empty_dashboardid;
+			$dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
+					zbx_dbstr(self::TEMPLATED_DASHBOARD_NAME));
+			$new_dashboardid = self::$templated_empty_dashboardid;
 			$new_page_name = self::TEMPLATED_PAGE_NAME;
-			$new_page_id = self::$templated_page_id;
+			$new_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE name='.
+					zbx_dbstr(self::TEMPLATED_PAGE_NAME));
 			$url = 'zabbix.php?action=template.dashboard.edit&dashboardid=';
 		}
 		else {
-			$dashboard_id = $start_dashboard;
-			$new_dashboard_id = self::$paste_dashboard_id;
+			$dashboardid = $start_dashboardid;
+			$new_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
+					zbx_dbstr('Dashboard for Paste widgets'));
 			$new_page_name = self::NEW_PAGE_NAME;
-			$new_page_id = $paste_page_id;
+			$new_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid ='
+					.$start_dashboardid.' AND name =' .zbx_dbstr(self::NEW_PAGE_NAME));
 			$url = 'zabbix.php?action=dashboard.view&dashboardid=';
 		}
 
@@ -204,36 +171,36 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			'value'
 		];
-		$this->page->login()->open($url.$dashboard_id);
+		$this->page->login()->open($url.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 
 		// Get fields from widget form to compare them with new widget after copying.
-		$fields = $dashboard->getWidget($name)->edit()->getFields();
+		$fields = $dashboard->getWidget($widget_name)->edit()->getFields();
 
 		// Add tag fields mapping to form for problem widgets.
-		if (stristr($name, 'Problem')) {
+		if (stristr($widget_name, 'Problem')) {
 			$fields->set('', $fields->get('')->asMultifieldTable(['mapping' => $mapping]));
 		}
 
 		$original_form = $fields->asValues();
 		$original_widget_size = $replace
-			? self::$replaced_widget_size
+			? self::REPLACED_WIDGET_SIZE
 			: CDBHelper::getRow('SELECT w.width, w.height'.
 					' FROM widget w WHERE EXISTS ('.
 						'SELECT NULL FROM dashboard_page dp'.
 						' WHERE w.dashboard_pageid=dp.dashboard_pageid'.
-							' AND dp.dashboardid='.$dashboard_id.
+							' AND dp.dashboardid='.$dashboardid.
 					')'.
-					' AND w.name='.zbx_dbstr($name).' ORDER BY w.widgetid DESC'
+					' AND w.name='.zbx_dbstr($widget_name).' ORDER BY w.widgetid DESC'
 			);
 
 		// Close widget configuration overlay.
 		COverlayDialogElement::find()->one()->close();
-		$dashboard->copyWidget($name);
+		$dashboard->copyWidget($widget_name);
 
 		// Open other dashboard for paste widgets.
 		if ($new_dashboard) {
-			$this->page->open($url.$new_dashboard_id);
+			$this->page->open($url.$new_dashboardid);
 			$dashboard = CDashboardElement::find()->one();
 		}
 
@@ -259,17 +226,17 @@ class testDashboardCopyWidgets extends CWebTest {
 		$copied_widget = $dashboard->getWidgets()->last();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
-		if (($new_dashboard || $new_page) && stristr($name, 'Map from tree')) {
+		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
 			$copied_widget_form = $copied_widget->edit();
 			$copied_widget_form->fill(['Filter' => 'Test copy Map navigation tree']);
 			$copied_widget_form->submit();
 		}
 
-		$this->assertEquals($name, $copied_widget->getHeaderText());
+		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
 		$copied_fields = $copied_widget->edit()->getFields();
 
 		// Add tag fields mapping to form for newly copied problem widgets.
-		if (stristr($name, 'Problem')) {
+		if (stristr($widget_name, 'Problem')) {
 			$copied_fields->set('', $copied_fields->get('')->asMultifieldTable(['mapping' => $mapping]));
 		}
 
@@ -296,10 +263,10 @@ class testDashboardCopyWidgets extends CWebTest {
 				' FROM widget w WHERE EXISTS ('.
 					'SELECT NULL'.
 					' FROM dashboard_page dp'.
-					' WHERE w.dashboard_pageid='.($new_page ? $new_page_id : 'dp.dashboard_pageid').
-						' AND dp.dashboardid='.($new_dashboard ? $new_dashboard_id : $dashboard_id).
+					' WHERE w.dashboard_pageid='.($new_page ? $new_pageid : 'dp.dashboard_pageid').
+						' AND dp.dashboardid='.($new_dashboard ? $new_dashboardid : $dashboardid).
 				')'.
-				' AND w.name='.zbx_dbstr($name).' ORDER BY w.widgetid DESC'
+				' AND w.name='.zbx_dbstr($widget_name).' ORDER BY w.widgetid DESC'
 		);
 		$this->assertEquals($original_widget_size, $copied_widget_size);
 	}
@@ -433,19 +400,19 @@ class testDashboardCopyWidgets extends CWebTest {
 	public function testDashboardCopyWidgets_CopyTemplateWidgets($data) {
 		switch ($data['copy to']) {
 			case 'same page':
-				$this->copyWidgets($data,  self::$dashboardid_with_widgets, null, false, false, false, true);
+				$this->copyWidgets(self::$templated_dashboardid, $data['name'], false, false, false, true);
 				break;
 
 			case 'another page':
-				$this->copyWidgets($data, self::$dashboardid_with_widgets, null, false, false, true, true);
+				$this->copyWidgets(self::$templated_dashboardid, $data['name'], false, false, true, true);
 				break;
 
 			case 'another dashboard':
-				$this->copyWidgets($data, self::$dashboardid_with_widgets, null, true, false, false, true);
+				$this->copyWidgets(self::$templated_dashboardid, $data['name'], true, false, false, true);
 				break;
 
 			case 'another template':
-				$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
+				$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$templated_dashboardid);
 				$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
 				$dashboard->copyWidget($data['name']);
 
@@ -486,7 +453,7 @@ class testDashboardCopyWidgets extends CWebTest {
 	 * @dataProvider getTemplateDashboardPageData
 	 */
 	public function testDashboardCopyWidgets_CopyTemplateDashboardPage($data) {
-		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
+		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$templated_dashboardid);
 		$dashboard = CDashboardElement::find()->one()->waitUntilVisible();
 
 		$dashboard->query('xpath://span[text()= "Page with widgets"]/../button')->one()->click();
@@ -501,7 +468,7 @@ class testDashboardCopyWidgets extends CWebTest {
 				break;
 
 			case 'another dashboard':
-				$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$empty_dashboardid);
+				$this->page->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$templated_empty_dashboardid);
 				$this->page->waitUntilReady();
 
 				$this->query('id:dashboard-add')->one()->click();
