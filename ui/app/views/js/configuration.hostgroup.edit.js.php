@@ -102,10 +102,12 @@
 
 		clone() {
 			this.groupid = null;
+			const fields = getFormFields(this.form);
+			fields.name = fields.name.trim();
 			const curl = new Curl('zabbix.php', false);
 			curl.setArgument('action', 'hostgroup.edit');
 
-			post(curl.getUrl(), {name: this.name});
+			post(curl.getUrl(), {name: fields.name});
 		},
 
 		delete() {

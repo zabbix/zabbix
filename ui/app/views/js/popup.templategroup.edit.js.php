@@ -79,14 +79,12 @@ window.templategroup_edit_popup = {
 		overlayDialogueDestroy(this.overlay.dialogueid);
 	},
 
-	clone() {
+	clone({title, buttons}) {
 		this.groupid = null;
+		this.form.querySelector('#subgroups').parentElement.remove();
 
-		PopUp('popup.templategroup.edit', {name: this.name}, {
-			dialogueid: 'templategroup_edit',
-			dialogue_class: 'modal-popup-static',
-			prevent_navigation: true
-		});
+		this.overlay.unsetLoading();
+		this.overlay.setProperties({title, buttons});
 	},
 
 	delete() {

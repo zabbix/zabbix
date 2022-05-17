@@ -43,7 +43,24 @@ if ($data['groupid'] !== null) {
 			'keepOpen' => true,
 			'enabled' => CWebUser::getType() == USER_TYPE_SUPER_ADMIN,
 			'isSubmit' => false,
-			'action' => 'hostgroup_edit_popup.clone();'
+			'action' => 'hostgroup_edit_popup.clone('.json_encode([
+					'title' => _('New host group'),
+					'buttons' => [
+						[
+							'title' => _('Add'),
+							'class' => 'js-add',
+							'keepOpen' => true,
+							'isSubmit' => true,
+							'action' => 'hostgroup_edit_popup.submit();'
+						],
+						[
+							'title' => _('Cancel'),
+							'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
+							'cancel' => true,
+							'action' => ''
+						]
+					]
+				]).');'
 		],
 		[
 			'title' => _('Delete'),
