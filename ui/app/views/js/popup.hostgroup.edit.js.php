@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,21 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.hostgroup_edit_popup = {
-	groupid: null,
-	name: null,
-
-	overlay: null,
-	dialogue: null,
-	form: null,
-	footer: null,
+window.hostgroup_edit_popup = new class {
 
 	init({popup_url, groupid, name}) {
 		history.replaceState({}, '', popup_url);
@@ -43,42 +31,27 @@ window.hostgroup_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
-	},
+	}
 
 	submit() {
 		const fields = getFormFields(this.form);
-
-		if (this.groupid !== null) {
-			fields.groupid = this.groupid;
-		}
-
 		fields.name = fields.name.trim();
-
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
 
 		this.overlay.setLoading();
 
-		const update_url = new Curl('zabbix.php', false);
-		update_url.setArgument('action', 'hostgroup.update');
-		const create_url = new Curl('zabbix.php', false);
-		create_url.setArgument('action', 'hostgroup.create');
-
-		const curl = this.groupid !== null ? update_url : create_url;
+		const curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', this.groupid !== null ? 'hostgroup.update' : 'hostgroup.create');
 
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
-	},
+	}
 
 	cancel() {
 		overlayDialogueDestroy(this.overlay.dialogueid);
-	},
+	}
 
 	clone({title, buttons}) {
 		this.groupid = null;
@@ -94,11 +67,11 @@ window.hostgroup_edit_popup = {
 		curl.addSID();
 
 		this._post(curl.getUrl(), {groupids: [this.groupid]}, (response) => {
-				overlayDialogueDestroy(this.overlay.dialogueid);
+			overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
 		});
-	},
+	}
 
 	_post(url, data, success_callback) {
 		fetch(url, {
