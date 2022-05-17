@@ -107,7 +107,7 @@ const char	*zbx_result_string(int result);
 #define MAX_STRING_LEN			2048
 #define MAX_BUFFER_LEN			65536
 #define ZBX_MAX_HOSTNAME_LEN		128
-#define ZBX_MAX_HOSTNAME_LEN_ESC	(ZBX_MAX_HOSTNAME_LEN + 1)
+#define ZBX_HOSTNAME_BUF_LEN	(ZBX_MAX_HOSTNAME_LEN + 1)
 #define ZBX_MAX_DNSNAME_LEN		255	/* maximum host DNS name length from RFC 1035 */
 						/*(without terminating '\0') */
 #define MAX_EXECUTE_OUTPUT_LEN		(512 * ZBX_KIBIBYTE)

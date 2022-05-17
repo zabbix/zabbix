@@ -126,7 +126,7 @@ typedef struct
 {
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
-	char		host[ZBX_MAX_HOSTNAME_LEN_ESC];
+	char		host[ZBX_HOSTNAME_BUF_LEN];
 	char		name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
@@ -284,7 +284,7 @@ zbx_trigger_items_t;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	char		host[ZBX_MAX_HOSTNAME_LEN_ESC];
+	char		host[ZBX_HOSTNAME_BUF_LEN];
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
 	int		proxy_tasks_nextcheck;

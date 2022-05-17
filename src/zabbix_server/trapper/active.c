@@ -518,7 +518,7 @@ out:
  ******************************************************************************/
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	char			host[ZBX_MAX_HOSTNAME_LEN_ESC], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
+	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, i, version;

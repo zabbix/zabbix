@@ -333,9 +333,9 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
  ******************************************************************************/
 int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
 {
-	char	*ch_error, host[ZBX_MAX_HOSTNAME_LEN_ESC];
+	char	*ch_error, host[ZBX_HOSTNAME_BUF_LEN];
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, ZBX_MAX_HOSTNAME_LEN_ESC, NULL))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, ZBX_HOSTNAME_BUF_LEN, NULL))
 	{
 		*error = zbx_strdup(*error, "missing name of proxy");
 		return FAIL;
@@ -4311,7 +4311,7 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	int			ret = SUCCEED;
 	const char		*p = NULL;
 	time_t			itemtime;
-	char			host[ZBX_MAX_HOSTNAME_LEN_ESC], ip[ZBX_INTERFACE_IP_LEN_MAX],
+	char			host[ZBX_HOSTNAME_BUF_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				dns[ZBX_INTERFACE_DNS_LEN_MAX], tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
