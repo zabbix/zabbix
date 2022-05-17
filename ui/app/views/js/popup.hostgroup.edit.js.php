@@ -59,7 +59,7 @@ window.hostgroup_edit_popup = new class {
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
-	},
+	}
 
 	delete() {
 		const curl = new Curl('zabbix.php', false);
