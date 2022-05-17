@@ -63,7 +63,7 @@ window.popup_generic = {
 				const groups = jQuery(this).multiSelect('getData').map((item) => item.id);
 				const parameters = groups.length
 					? {templategroupid: groups[0]}
-					: {filter_groupid_rst: 1, templategroupgroupid: []};
+					: {filter_groupid_rst: 1, templategroupid: []};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogueid: e.data.overlay.dialogueid
