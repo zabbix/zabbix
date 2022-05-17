@@ -177,6 +177,18 @@ static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, ch
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "closed");
 	}
 
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_SUPPRESS))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "suppressed");
+	}
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_UNSUPPRESS))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "unsuppressed");
+	}
+
 	zbx_free(*out);
 	*out = buf;
 
@@ -1293,7 +1305,8 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 
 		if (SUCCEED == get_problem_update_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
 					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
-					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY, &actions))
+					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY |
+					ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS, &actions))
 		{
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
 			zbx_free(actions);
@@ -2832,7 +2845,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						get_problem_update_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
 								ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
 								ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
-								ZBX_PROBLEM_UPDATE_SEVERITY, &replace_to);
+								ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_SUPPRESS
+								| ZBX_PROBLEM_UPDATE_UNSUPPRESS, &replace_to);
 					}
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_STATUS))

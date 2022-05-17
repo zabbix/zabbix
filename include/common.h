@@ -805,8 +805,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
 #define ZBX_PROBLEM_UPDATE_SEVERITY		0x0008
 #define ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE	0x0010
+#define ZBX_PROBLEM_UPDATE_SUPPRESS		0x0020
+#define ZBX_PROBLEM_UPDATE_UNSUPPRESS		0x0040
 
-#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	5
+#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	7
 
 /* database double precision upgrade states */
 #define ZBX_DB_DBL_PRECISION_DISABLED	0
