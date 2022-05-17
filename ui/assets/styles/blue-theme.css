@@ -6230,11 +6230,16 @@ svg {
 .icon-count {
   font-size: 12px;
   padding: 3px 5px 2px;
-  color: #ffffff !important;
+  color: #ffffff;
   background-color: #768d99;
   border-radius: 3px; }
   .icon-count:link, .icon-count:hover, .icon-count:focus {
     border-bottom: none; }
+  .icon-count:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
+
+a.icon-count {
+  color: #ffffff; }
 
 .problem-icon-link,
 .problem-icon-list {
