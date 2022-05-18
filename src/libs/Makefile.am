@@ -134,6 +134,7 @@ SUBDIRS = \
 	zbxexec \
 	zbxmodules \
 	zbxregexp \
+	zbxvariant \
 	zbxipcservice \
 	zbxcompress \
 	zbxxml \
