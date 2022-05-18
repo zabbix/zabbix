@@ -38,6 +38,9 @@
 		else {
 			$tls_psk.hide();
 		}
+		if (($('#tls_accept').val() & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
+			$('#tls_in_cert').prop('checked', true);
+		}
 
 		// Show/hide PSK fields.
 		$('#tls_in_psk').on('click', function() {
@@ -56,6 +59,9 @@
 			}
 			else {
 				$('#tls_psk_identity, #tls_psk').val('');
+			}
+			if ($('#tls_in_cert').is(':checked')) {
+				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
 			}
 
 			$('#tls_accept').val(tls_accept);

@@ -490,7 +490,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 	else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 	{
 		result = DBselect(
-				"select proxy_hostid,host,listen_ip,listen_dns,listen_port,flags,tls_accepted"
+				"select proxy_hostid,host,listen_ip,listen_dns,listen_port,flags,tls_accepted,tls_subject,tls_issuer"
 				" from autoreg_host"
 				" where autoreg_hostid=" ZBX_FS_UI64,
 				event->objectid);
@@ -578,6 +578,12 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 					zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 					zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_accepted, tls_accepted,
 							psk_identity, psk);
+				}
+				else if (ZBX_TCP_SEC_TLS_CERT == tls_accepted)
+				{
+					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host",
+							"name", "tls_subject", "tls_issuer", "tls_accept", NULL);
+					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, row[1], row[1],row[7],row[8],ZBX_TCP_SEC_TLS_CERT);
 				}
 				else
 				{
