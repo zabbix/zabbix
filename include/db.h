@@ -180,6 +180,7 @@ zbx_host_template_link_type;
 #	define ITEM_HEADERS_LEN		65535
 #endif
 
+
 #define ITEM_PARAMETER_NAME_LEN		255
 #define ITEM_PARAMETER_VALUE_LEN	2048
 
@@ -885,7 +886,7 @@ typedef struct
 	unsigned char		operator;
 	unsigned char		status;
 	unsigned char		severity;
-	unsigned char		inventory_mode;
+	signed char		inventory_mode;
 	unsigned char		discover;
 }
 zbx_lld_override_operation_t;

@@ -104,7 +104,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vcmock_set_time(handle, "time");
 	ts = zbx_vcmock_get_ts();
 
-	if (SUCCEED != (returned_ret = evaluate_function2(&returned_value, &item, function, params, &ts, &error)))
+	if (SUCCEED != (returned_ret = evaluate_function(&returned_value, &item, function, params, &ts, &error)))
 	{
 		printf("evaluate_function returned error: %s\n", error);
 		zbx_free(error);

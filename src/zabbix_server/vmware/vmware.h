@@ -117,8 +117,8 @@ ZBX_PTR_VECTOR_DECL(vmware_diskextent, zbx_vmware_diskextent_t *)
 
 typedef struct
 {
-	char				*name;
 	char				*uuid;
+	char				*name;
 	char				*id;
 	zbx_uint64_t			capacity;
 	zbx_uint64_t			free_space;
@@ -128,6 +128,7 @@ typedef struct
 }
 zbx_vmware_datastore_t;
 
+int	vmware_ds_uuid_compare(const void *d1, const void *d2);
 int	vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
 
@@ -144,6 +145,7 @@ ZBX_VECTOR_DECL(vmware_hvdisk, zbx_vmware_hvdisk_t)
 typedef struct
 {
 	char				*name;
+	char				*uuid;
 	zbx_vector_vmware_hvdisk_t	hvdisks;
 }
 zbx_vmware_dsname_t;

@@ -246,6 +246,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_vector_ptr_pair_t	webhook_params;
 	char			*user_timezone = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
 	DB_EVENT		*problem_event = NULL, *recovery_event = NULL;
+	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 			" userid:" ZBX_FS_UI64 " clientip:%s",
@@ -392,6 +393,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	else
 		macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
 
+	um_handle = zbx_dc_open_user_macros();
+
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
 		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
@@ -457,6 +460,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		ZBX_UNUSED(audit_res);
 	}
 fail:
+	if (NULL != um_handle)
+		zbx_dc_close_user_macros(um_handle);
+
 	if (SUCCEED != ret)
 		*result = zbx_strdup(*result, error);
 

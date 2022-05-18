@@ -22,7 +22,7 @@
 #include "log.h"
 #include "cfg.h"
 #include "trapper_auth.h"
-#include "zbxreport.h"
+#include "../zbxreport.h"
 #include "db.h"
 #include "../alerter/alerter_protocol.h"
 #include "zbxipcservice.h"

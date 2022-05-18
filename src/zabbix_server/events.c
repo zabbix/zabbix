@@ -140,7 +140,7 @@ static void	substitute_item_tag_macro(const DB_EVENT* event, const DC_ITEM *dc_i
 static void	process_item_tag(DB_EVENT* event, const zbx_item_tag_t *item_tag)
 {
 	zbx_tag_t	*t;
-	DC_ITEM		dc_item; /* used to pass data into substitute_simple_macros() function */
+	DC_ITEM		dc_item; /* used to pass data into zbx_substitute_simple_macros() function */
 
 	t = duplicate_tag(&item_tag->tag);
 
@@ -218,7 +218,10 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
-		char	err[256];
+		char			err[256];
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
 
 		if (TRIGGER_VALUE_PROBLEM == value)
 			event->severity = trigger_priority;
@@ -263,9 +266,15 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 		}
 
 		zbx_vector_ptr_destroy(&item_tags);
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 	else if (EVENT_SOURCE_INTERNAL == source)
 	{
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
+
 		if (NULL != error)
 			event->name = zbx_strdup(NULL, error);
 
@@ -296,6 +305,8 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 		}
 
 		zbx_vector_ptr_destroy(&item_tags);
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	zbx_vector_ptr_append(&events, event);

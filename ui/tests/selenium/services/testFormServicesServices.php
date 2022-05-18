@@ -966,6 +966,8 @@ class testFormServicesServices extends CWebTest {
 
 				return;
 			}
+
+			$rules_form->waitUntilNotPresent();
 		}
 
 		if (array_key_exists('children', $data)) {

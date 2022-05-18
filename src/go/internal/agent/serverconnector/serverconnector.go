@@ -51,7 +51,8 @@ type Connector struct {
 	addresses                  []string
 	hostname                   string
 	localAddr                  net.Addr
-	lastErrors                 []error
+	lastActiveCheckErrors      []error
+	lastActiveHbErrors         []error
 	firstActiveChecksRefreshed bool
 	resultCache                resultcache.ResultCache
 	taskManager                scheduler.Scheduler
@@ -185,20 +186,20 @@ func (c *Connector) refreshActiveChecks() {
 		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
 	if errs != nil {
-		if !reflect.DeepEqual(errs, c.lastErrors) {
+		if !reflect.DeepEqual(errs, c.lastActiveCheckErrors) {
 			for i := 0; i < len(errs); i++ {
 				log.Warningf("[%d] %s", c.clientID, errs[i])
 			}
 			log.Warningf("[%d] active check configuration update from host [%s] started to fail", c.clientID,
 				c.hostname)
-			c.lastErrors = errs
+			c.lastActiveCheckErrors = errs
 		}
 		return
 	}
 
-	if c.lastErrors != nil {
+	if c.lastActiveCheckErrors != nil {
 		log.Warningf("[%d] active check configuration update from [%s] is working again", c.clientID, c.addresses[0])
-		c.lastErrors = nil
+		c.lastActiveCheckErrors = nil
 	}
 
 	var response activeChecksResponse
@@ -312,9 +313,9 @@ func (c *Connector) sendHeartbeatMsg() {
 	var err error
 
 	h := heartbeatMessage{
-		Request: "active check heartbeat",
+		Request:            "active check heartbeat",
 		HeartbeatFrequency: c.options.HeartbeatFrequency,
-		Host:    c.hostname,
+		Host:               c.hostname,
 	}
 
 	log.Debugf("[%d] In sendHeartbeatMsg() from %s", c.clientID, c.addresses)
@@ -322,28 +323,28 @@ func (c *Connector) sendHeartbeatMsg() {
 
 	request, err := json.Marshal(&h)
 	if err != nil {
-		log.Errf("[%d] cannot create heartbeat message to to [%s]: %s", c.clientID, c.addresses[0], err)
+		log.Errf("[%d] cannot create heartbeat message to [%s]: %s", c.clientID, c.addresses[0], err)
 		return
 	}
 
 	_, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
-		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
+		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig, true)
 
 	if errs != nil {
-		if !reflect.DeepEqual(errs, c.lastErrors) {
+		if !reflect.DeepEqual(errs, c.lastActiveHbErrors) {
 			for i := 0; i < len(errs); i++ {
 				log.Warningf("[%d] %s", c.clientID, errs[i])
 			}
 			log.Warningf("[%d] sending of heartbeat message for [%s] started to fail", c.clientID,
 				c.hostname)
-			c.lastErrors = errs
+			c.lastActiveHbErrors = errs
 		}
 		return
 	}
 
-	if c.lastErrors != nil {
+	if c.lastActiveHbErrors != nil {
 		log.Warningf("[%d] sending of heartbeat message to [%s] is working again", c.clientID, c.addresses[0])
-		c.lastErrors = nil
+		c.lastActiveHbErrors = nil
 	}
 }
 

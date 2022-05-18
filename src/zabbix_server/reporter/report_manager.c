@@ -22,12 +22,15 @@
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "base64.h"
-#include "zbxreport.h"
+#include "../zbxreport.h"
 #include "zbxhash.h"
 #include "zbxcrypto.h"
 #include "zbxalert.h"
 #include "zbxserver.h"
 #include "report_protocol.h"
+
+#define ZBX_REPORT_STATUS_ENABLED	0
+#define ZBX_REPORT_STATUS_DISABLED	1
 
 #define ZBX_REPORT_INCLUDE_USER		0
 #define ZBX_REPORT_EXCLUDE_USER		1
@@ -1363,6 +1366,9 @@ static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+#undef ZBX_REPORT_STATUS_ENABLED
+#undef ZBX_REPORT_STATUS_DISABLED
+
 /******************************************************************************
  *                                                                            *
  * Purpose: dump cached reports into log                                      *
@@ -1847,6 +1853,7 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 	zbx_uint64_t		access_userid;
 	zbx_rm_batch_t		*batch, batch_local;
 	zbx_vector_ptr_pair_t	params;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() reportid:" ZBX_FS_UI64 , __func__, report->reportid);
 
@@ -1854,6 +1861,8 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 	zbx_vector_ptr_create(&jobs);
 	zbx_vector_ptr_pair_create(&params);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < report->params.values_num; i++)
 	{
@@ -1870,6 +1879,8 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 		zbx_vector_ptr_pair_append(&params, pair);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	DBbegin();
 

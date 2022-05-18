@@ -86,8 +86,11 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	AGENT_RESULT		*results = NULL;
 	AGENT_REQUEST		request;
 	zbx_vector_ptr_t	regexps;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zbx_vector_ptr_create(&regexps);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
@@ -214,6 +217,8 @@ next:
 
 	DCconfig_clean_items(items, NULL, num);
 	zbx_free(items);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);
