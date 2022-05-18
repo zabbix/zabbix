@@ -1117,6 +1117,8 @@ out:
 	return ret;
 }
 
+#ifndef HAVE_SQLITE3
+
 #define ZBX_CHANGELOG_OP_INSERT	1
 #define ZBX_CHANGELOG_OP_UPDATE	2
 #define ZBX_CHANGELOG_OP_DELETE	3
@@ -1310,3 +1312,6 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 
 	return ret;
 }
+
+#endif
+

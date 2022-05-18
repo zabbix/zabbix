@@ -2031,11 +2031,22 @@ int	process_proxyconfig(struct zbx_json_parse *jp_data, struct zbx_json_parse *j
 			if (0 == table_ids->ids.values_num)
 				continue;
 
+			if (0 == strcmp(table_ids->table->table, "items"))
+			{
+				/* special case for item preprocessing - remove before removing items */
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_preproc where");
+				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table_ids->table->recid,
+						table_ids->ids.values, table_ids->ids.values_num);
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			}
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where",
 					table_ids->table->table);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table_ids->table->recid,
 					table_ids->ids.values, table_ids->ids.values_num);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
 		if (sql_offset > 16)	/* in ORACLE always present begin..end; */
