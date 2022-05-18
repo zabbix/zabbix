@@ -373,8 +373,9 @@ class testPageProblems extends CLegacyWebTest {
 		$form->fill(['id:evaltype_0' => $data['evaluation_type']]);
 		$this->setTagSelector('id:filter-tags_0');
 		$this->setTags($data['tags']);
+		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
 		$this->query('name:filter_apply')->one()->click();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		// We remove from the result list templates that is not displayed there.
 		if (array_key_exists('absent_problems', $data)) {
