@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-03-25 14:16+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2022-04-29 13:42+0000\n"
+"Last-Translator: Alexei Vladishev <alex@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -1762,7 +1762,7 @@ msgstr "По нижнему краю"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "N нижних значений"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -6494,6 +6494,10 @@ msgid "End of line sequence"
 msgstr "Конец строки"
 
 #: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr ""
+
+#: include/locales.inc.php:33
 msgid "English (en_US)"
 msgstr "Английский (en_US)"
 
@@ -6540,7 +6544,7 @@ msgstr "Ошибка"
 #: app/views/monitoring.widget.slareport.view.php:101
 #: app/views/slareport.list.php:166
 msgid "Error budget"
-msgstr ""
+msgstr "Бюджет времени простоя"
 
 #: include/db.inc.php:518
 #, c-format
@@ -6675,13 +6679,13 @@ msgstr "Исключить группы узлов сети"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:94
 msgid "Excluded downtime"
-msgstr ""
+msgstr "Исключенное время простоя"
 
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:167
 msgid "Excluded downtimes"
-msgstr ""
+msgstr "Исключенное время простоя"
 
 #: app/controllers/CControllerAuditLogList.php:197 jsLoader.php:219
 msgid "Execute"
@@ -7094,7 +7098,7 @@ msgstr "Фильтр"
 
 #: app/views/js/popup.tabfilter.edit.js.php:57
 msgid "Filter deleted"
-msgstr ""
+msgstr "Фильтр удален"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:117
 msgid "Filter properties"
@@ -8005,7 +8009,7 @@ msgstr[2] "Узлы сети активированы"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "Host graphs"
-msgstr ""
+msgstr "Графики узлов сети"
 
 #: app/controllers/CControllerAuditLogList.php:220
 #: app/partials/administration.usergroup.grouprights.html.php:29
@@ -8210,7 +8214,7 @@ msgstr "Маска подсети узла сети"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:91
 msgid "Host tags"
-msgstr ""
+msgstr "Теги узла сети"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:34
 msgid "Host time"
@@ -8232,7 +8236,7 @@ msgstr "Узел сети с ID \"%1$s\" недоступен."
 #: include/classes/api/services/CHostGeneral.php:127
 #, c-format
 msgid "Host with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "Узел сети с таким же именем \"%1$s\" уже существует."
 
 #: include/classes/api/services/CHost.php:2046
 #: include/classes/api/services/CHost.php:2328
@@ -8249,7 +8253,7 @@ msgstr "Узел сети с таким же видимым именем \"%1$s\
 #: include/classes/api/services/CHostGeneral.php:147
 #, c-format
 msgid "Host with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Узел сети с таким же видимым именем \"%1$s\" уже существует."
 
 #: app/controllers/CControllerHostView.php:125
 #: app/controllers/CControllerPopupGeneric.php:109
@@ -8721,7 +8725,7 @@ msgstr "Недоступная карта сети"
 
 #: app/controllers/CControllerDashboardWidgetEdit.php:362
 msgid "Inaccessible service"
-msgstr ""
+msgstr "Недоступный сервис"
 
 #: httpconf.php:661 include/graphs.inc.php:274 include/hosts.inc.php:649
 #: include/httptest.inc.php:222 include/items.inc.php:916
@@ -11957,7 +11961,7 @@ msgstr "N%"
 
 #: include/classes/helpers/CSlaHelper.php:183
 msgid "N/A"
-msgstr ""
+msgstr "Н/Д"
 
 #: include/discovery.inc.php:53
 msgid "NNTP"
@@ -12236,7 +12240,7 @@ msgstr "Новое дополнительное правило"
 
 #: app/views/popup.tophosts.column.edit.php:249
 msgid "New column"
-msgstr ""
+msgstr "Новый столбец"
 
 #: app/controllers/CControllerPopupConditionActions.php:94
 #: app/controllers/CControllerPopupConditionEventCorr.php:87
@@ -14542,7 +14546,7 @@ msgstr ""
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
-msgstr ""
+msgstr "Ежеквартальный"
 
 #: app/views/popup.httpstep.php:64
 #: include/views/configuration.host.discovery.edit.php:181
@@ -15067,7 +15071,7 @@ msgstr "Отчет успешно отправлен: %1$s."
 #: app/partials/service.info.php:61 app/views/popup.sla.edit.php:71
 #: app/views/sla.list.php:90
 msgid "Reporting period"
-msgstr ""
+msgstr "Отчетный период"
 
 #: include/classes/helpers/CMenuHelper.php:161
 #: include/classes/helpers/CRoleHelper.php:308
@@ -16561,7 +16565,7 @@ msgstr "Прототип простого графика"
 
 #: app/views/monitoring.charts.view.php:84
 msgid "Simple graphs"
-msgstr ""
+msgstr "Простые графики"
 
 #: include/views/configuration.trigger.prototype.edit.php:506
 #: include/views/configuration.triggers.edit.php:534
@@ -17222,7 +17226,7 @@ msgstr "Значение тега"
 #: app/partials/monitoring.charts.subfilter.php:199
 #: app/partials/monitoring.latest.subfilter.php:178
 msgid "Tag values"
-msgstr ""
+msgstr "Значения тегов"
 
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -17689,6 +17693,10 @@ msgstr "Этот месяц"
 msgid "This month so far"
 msgstr "В этом месяце"
 
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
 msgid "This type of information may not match the key."
@@ -17835,7 +17843,7 @@ msgstr "Отметка времени"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
-msgstr ""
+msgstr "Часовой пояс"
 
 #: app/controllers/CControllerSlaReportList.php:162
 #: app/controllers/CControllerSlaReportList.php:170
@@ -17878,7 +17886,7 @@ msgstr "По верхнему краю"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr ""
+msgstr "N верхних значений"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
@@ -19827,7 +19835,7 @@ msgstr "Виджет по X:%3$d, Y:%4$d на странице #%2$d панел�
 
 #: include/classes/widgets/CWidgetHelper.php:68
 msgid "Widget is deprecated."
-msgstr ""
+msgstr "Устаревший виджет."
 
 #: jsLoader.php:196
 msgid "Widget is too small for the specified number of columns and rows."
@@ -19882,6 +19890,10 @@ msgstr "С именем проблемы"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "С проблемами"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
@@ -20293,7 +20305,7 @@ msgstr "ожидается дата в ГГГГ-ММ-ДД формате"
 #: app/controllers/CControllerSlaReportList.php:162
 #: include/classes/widgets/fields/CWidgetFieldDatePicker.php:146
 msgid "a date is expected"
-msgstr ""
+msgstr "ожидается дата"
 
 #: app/controllers/CControllerSlaCreateUpdate.php:44
 #: app/controllers/CControllerSlaReportList.php:149

@@ -523,4 +523,4 @@ class HostInterfaceManager {
 
 		return true;
 	}
-};
+}

@@ -28,8 +28,8 @@ import (
 	"os"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/unix"
-	"zabbix.com/pkg/plugin"
 )
 
 func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {

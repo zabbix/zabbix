@@ -487,7 +487,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestTextNotVisible('Tag4');
 		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
-		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button[@class="icon-wzrd-action"]');
+		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button[@class="icon-wizard-action"]');
 
 		// Check Show tags 3
 		$this->zbxTestClickXpath('//label[@for="show_tags_30"]');
@@ -500,7 +500,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestTextNotVisible('Tag4');
 		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
-		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button[@class="icon-wzrd-action"]');
+		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button[@class="icon-wizard-action"]');
 	}
 
 	public function getTagPriorityData() {

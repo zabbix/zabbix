@@ -25,8 +25,8 @@ import (
 	"errors"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // customQueryHandler executes custom user queries from *.sql files.

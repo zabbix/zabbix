@@ -178,7 +178,6 @@ class testLanguage extends CWebTest {
 		$this->checkLanguage($data['message'], $data['page_title'], $data['html_lang'], $data['defaultdb_lang']);
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.zbx_dbstr('user-zabbix')));
 
-
 		// After logout, login menu has system language.
 		$this->page->logout();
 		$this->page->refresh();
@@ -264,6 +263,7 @@ class testLanguage extends CWebTest {
 		$this->assertEquals($data['userdb_lang'], CDBHelper::getValue('SELECT lang FROM users WHERE username='.
 				zbx_dbstr($data['fields']['Username'])));
 		$this->assertEquals($data['defaultdb_lang'], CDBHelper::getValue('SELECT default_lang FROM config'));
+		$this->page->logout();
 	}
 
 	private function checkLanguage($message, $page_title, $html_lang, $defaultdb_lang) {

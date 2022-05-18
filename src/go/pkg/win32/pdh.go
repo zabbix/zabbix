@@ -29,7 +29,7 @@ import (
 	"time"
 	"unsafe"
 
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/log"
 
 	"golang.org/x/sys/windows"
 )

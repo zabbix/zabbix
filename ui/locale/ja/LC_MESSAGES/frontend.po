@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-03-22 13:51+0000\n"
-"Last-Translator: Kodai <kodai.terashima@zabbix.com>\n"
+"PO-Revision-Date: 2022-04-22 10:02+0000\n"
+"Last-Translator: Atsushi <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -2217,13 +2217,13 @@ msgstr "ホストを削除できません"
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
+msgstr[0] "メンテナンス\"%2$s\"が少なくとも1つのホストかホストグループを設定することが必要なのでホスト %1$s を削除できません。"
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
+msgstr[0] "メンテナンス\"%2$s\"が少なくとも1つのホストかホストグループを設定することが必要なのでホストグループ %1$s を削除できません。"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2707,7 +2707,7 @@ msgstr "テンプレートをリンクできません"
 #: include/classes/api/services/CHostBase.php:520
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "親テンプレート\"%3$s\"を二回リンクすることになるのでテンプレート\"%1$s\"をホスト\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:678
 #: include/classes/api/services/CHostBase.php:755
@@ -2723,7 +2723,7 @@ msgstr "トリガー\"%3$s\"の条件式によってテンプレート\"%1$s\"�
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "親テンプレート\"%3$s\"を二回リンクすることになるのでテンプレート\"%1$s\"をホストプロトタイプ\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:675
 #: include/classes/api/services/CHostBase.php:752
@@ -2739,12 +2739,12 @@ msgstr "トリガー\"%3$s\"の条件式によってテンプレート\"%1$s\"�
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because circular linkage (%3$s) will occurs."
-msgstr ""
+msgstr "循環リンク(%3$s)が発生するためテンプレート\"%1$s\"をテンプレート\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:514
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" because its parent template \"%3$s\" will be linked twice."
-msgstr ""
+msgstr "親テンプレート\"%3$s\"を二回リンクすることになるのでテンプレート\"%1$s\"をテンプレート\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:672
 #: include/classes/api/services/CHostBase.php:749
@@ -6324,6 +6324,10 @@ msgid "End of line sequence"
 msgstr "改行コード"
 
 #: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr "英語 (en_GB)"
+
+#: include/locales.inc.php:33
 msgid "English (en_US)"
 msgstr "英語 (en_US)"
 
@@ -7987,12 +7991,12 @@ msgstr[0] "ホストのプロトタイプを更新しました"
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
-msgstr ""
+msgstr "ホスト\"%3$s\"のディスカバリルール\"%2$s\"内にホスト名\"%1$s\"のホストプロトタイプはすでに存在します。"
 
 #: include/classes/api/services/CHostPrototype.php:996
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
-msgstr ""
+msgstr "テンプレート\"%3$s\"のディスカバリルール\"%2$s\"内にホスト名\"%1$s\"のホストプロトタイプはすでに存在します。"
 
 #: include/classes/api/services/CHostPrototype.php:978
 #, c-format
@@ -8048,7 +8052,7 @@ msgstr "ID \"%1$s\"のホストは使用できません。"
 #: include/classes/api/services/CHostGeneral.php:127
 #, c-format
 msgid "Host with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "ホスト名\"%1$s\"のホストがすでに存在します。"
 
 #: include/classes/api/services/CHost.php:2046
 #: include/classes/api/services/CHost.php:2328
@@ -8065,7 +8069,7 @@ msgstr "同じホストの表示名\"%1$s\"を持つホストがすでに存在�
 #: include/classes/api/services/CHostGeneral.php:147
 #, c-format
 msgid "Host with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "表示名\"%1$s\"のホストがすでに存在します。"
 
 #: app/controllers/CControllerHostView.php:125
 #: app/controllers/CControllerPopupGeneric.php:109
@@ -17144,7 +17148,7 @@ msgstr "テンプレート値"
 #: include/classes/api/services/CHostGeneral.php:126
 #, c-format
 msgid "Template with host name \"%1$s\" already exists."
-msgstr ""
+msgstr "ホスト名\"%1$s\"のテンプレートがすでに存在します。"
 
 #: include/classes/api/services/CHost.php:2067
 #: include/classes/api/services/CHost.php:2353
@@ -17161,7 +17165,7 @@ msgstr "同じ表示名\"%1$s\"を持つテンプレートがすでに存在し�
 #: include/classes/api/services/CHostGeneral.php:146
 #, c-format
 msgid "Template with visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "表示名\"%1$s\"のテンプレートがすでに存在します。"
 
 #: app/controllers/CControllerPopupGeneric.php:121
 #: app/controllers/CControllerPopupImportCompare.php:132
@@ -17436,6 +17440,10 @@ msgstr "今月"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "今月(現在まで)"
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr "この設定は数値データにのみ適用されます。 非数値データは常にヒストリから取得されます。"
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
@@ -19607,6 +19615,10 @@ msgstr "障害名と一緒に"
 msgid "With problems"
 msgstr "障害あり"
 
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr "この設定では数値のアイテムのみがこの列に表示されます。"
+
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
 msgstr "トリガーあり"
@@ -20505,11 +20517,11 @@ msgstr "JSONに変換できません、結果の値が長すぎます"
 
 #: include/classes/api/services/CHostPrototype.php:2167
 msgid "cannot delete templated host prototype"
-msgstr ""
+msgstr "テンプレート化されたホストプロトタイプを削除できません"
 
 #: include/classes/api/services/CHostPrototype.php:1197
 msgid "cannot have more than one default interface of the same type"
-msgstr ""
+msgstr "同じタイプのデフォルトインターフェースは1つしか持てません"
 
 #: include/classes/helpers/CElasticsearchHelper.php:87
 msgid "cannot perform Scroll API request, data could be truncated"
@@ -20522,12 +20534,12 @@ msgstr "テンプレートのディスカバリルールのプロパティを更
 #: include/classes/validators/CApiInputValidator.php:3031
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of discovered object"
-msgstr ""
+msgstr "ディスカバリされたオブジェクトの読み込み専用パラメータ\"%1$s\"を更新できません"
 
 #: include/classes/validators/CApiInputValidator.php:3025
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of inherited object"
-msgstr ""
+msgstr "継承されたオブジェクトの読み込み専用パラメータ\"%1$s\"を更新できません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -21340,7 +21352,7 @@ msgstr "データなし"
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
 msgid "no default interface for \"%1$s\" type."
-msgstr ""
+msgstr "\"%1$s\"タイプのデフォルトインターフェースがありません。"
 
 #: include/classes/api/services/CEvent.php:773
 msgid "no permissions to acknowledge problems"

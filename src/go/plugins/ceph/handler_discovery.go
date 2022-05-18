@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type node struct {

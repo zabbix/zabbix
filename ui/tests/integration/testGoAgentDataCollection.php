@@ -29,6 +29,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 	const COMPARE_AVERAGE = 0;
 	const COMPARE_LAST = 1;
+	const OFFSET_MAX = 10;
 
 	private static $hostids = [];
 	private static $itemids = [];
@@ -250,13 +251,15 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'system.swap.in[,pages]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100
+			'threshold' => 100,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'system.swap.out[,pages]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100
+			'threshold' => 100,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'proc.mem[zabbix_server,zabbix,avg]',
@@ -287,25 +290,29 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'system.swap.size[,total]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100
+			'threshold' => 100,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'vfs.fs.inode[/,pfree]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.1
+			'threshold' => 0.1,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'vfs.fs.size[/tmp,free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 262144
+			'threshold' => 10000000,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'vm.memory.size[free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 10000000
+			'threshold' => 10000000,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[// Should be treated as a special case, since this metric returns JSON object.
 			// Maybe, it should e pulled to separate test suite. At this point we just compare it as string.
@@ -548,17 +555,36 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			case ITEM_VALUE_TYPE_UINT64:
 				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
 					$value = [];
-					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-						$value[$component] = 0;
-						$records = count($values[$component]);
+					$diff_values = [];
 
-						if ($records > 0) {
-							$value[$component] = array_sum($values[$component]) / $records;
+					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+						// Calculate offset between Agent and Agent2 result arrays
+						for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+							$value[$component][$i] = 0;
+
+							if (self::COMPONENT_AGENT == $component) {
+								$j = $i;
+							} else {
+								$j = 0;
+							}
+							$slice = array_slice($values[$component], $j);
+							$records = count($slice);
+
+							if ($records > 0) {
+								$value[$component][$i] = array_sum($slice) / $records;
+							}
 						}
 					}
 
-					$a = $value[self::COMPONENT_AGENT];
-					$b = $value[self::COMPONENT_AGENT2];
+					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+						$a = $value[self::COMPONENT_AGENT][$i];
+						$b = $value[self::COMPONENT_AGENT2][$i];
+						$diff_values[$i] = abs(abs($a) - abs($b));
+					}
+					$offset = array_search(min($diff_values), $diff_values);
+
+					$a = $value[self::COMPONENT_AGENT][$offset];
+					$b = $value[self::COMPONENT_AGENT2][$offset];
 				}
 				else {
 					$a = end($values[self::COMPONENT_AGENT]);
