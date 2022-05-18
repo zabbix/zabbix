@@ -59,8 +59,18 @@ class CSvgGraphHelper {
 		// Load aggregated Data for each dataset.
 		self::getMetricsAggregatedData($metrics);
 
-		// Legend single line height is 18. Value should be synchronized with $svg-legend-line-height in 'screen.scss'.
-		$legend_height = ($options['legend'] == SVG_GRAPH_LEGEND_ON) ? $options['legend_lines'] * 18 : 0;
+		// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
+		$svg_legend_line_height = 18;
+		$legend_lines = 0;
+
+		if ($options['legend'] == SVG_GRAPH_LEGEND_ON) {
+			$legend_lines = $options['legend_lines'];
+
+			if ($options['legend_statistic'] == SVG_GRAPH_LEGEND_STATISTIC_ON) {
+				// One additional line for header of statistic table.
+				$legend_lines++;
+			}
+		}
 
 		$graph = (new CSvgGraph([
 			'time_period' => $options['time_period'],
@@ -68,7 +78,7 @@ class CSvgGraphHelper {
 			'left_y_axis' => $options['left_y_axis'],
 			'right_y_axis' => $options['right_y_axis']
 		]))
-			->setSize($width, $height - $legend_height)
+			->setSize($width, $height - $legend_lines * $svg_legend_line_height)
 			->addMetrics($metrics);
 
 		// Get problems to display in graph.
@@ -82,16 +92,32 @@ class CSvgGraphHelper {
 		}
 
 		if ($options['legend'] == SVG_GRAPH_LEGEND_ON) {
-			$labels = [];
+			$items = [];
 
 			foreach ($metrics as $metric) {
-				$labels[] = [
+				$item = [
 					'name' => $metric['name'],
 					'color' => $metric['options']['color']
 				];
+
+				if ($metric['points']) {
+					$values = array_column($metric['points'], 'value');
+
+					$item += [
+						'units' => $metric['units'],
+						'min' => min($values),
+						'avg' => array_sum($values) / count($values),
+						'max' => max($values)
+					];
+				}
+
+				$items[] = $item;
 			}
 
-			$legend = new CSvgGraphLegend($labels, $legend_height);
+			$legend = (new CSvgGraphLegend($items))
+				->setColumnsCount($options['legend_columns'])
+				->setLinesCount($options['legend_lines'])
+				->showStatistic($options['legend_statistic']);
 		}
 		else {
 			$legend = '';
@@ -423,6 +449,7 @@ class CSvgGraphHelper {
 	private static function getMetricsData(array &$metrics, int $width): void {
 		// To reduce number of requests, group metrics by time range.
 		$tr_groups = [];
+
 		foreach ($metrics as $metric_num => &$metric) {
 			if ($metric['options']['aggregate_function'] != AGGREGATE_NONE) {
 				continue;

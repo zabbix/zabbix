@@ -2452,6 +2452,45 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   fill: #f2f2f2;
   fill-opacity: .5; }
 
+.svg-graph-legend {
+  position: relative;
+  top: 4px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 4), auto);
+  grid-gap: 0 10px;
+  justify-content: start;
+  max-height: calc(var(--lines) * 18px);
+  margin: 0 10px;
+  overflow: hidden;
+  line-height: 18px; }
+  .svg-graph-legend .svg-graph-legend-header {
+    color: #737373; }
+    .svg-graph-legend .svg-graph-legend-header:first-of-type {
+      grid-column: 2; }
+  .svg-graph-legend .svg-graph-legend-item {
+    min-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+    .svg-graph-legend .svg-graph-legend-item::before {
+      position: relative;
+      top: -3px;
+      content: ' ';
+      display: inline-block;
+      width: 10px;
+      height: 4px;
+      margin-right: 4px;
+      background: var(--color); }
+  .svg-graph-legend .svg-graph-legend-no-data {
+    grid-column: 2 / -1;
+    color: #737373; }
+  .svg-graph-legend.svg-graph-legend-statistic {
+    grid-template-columns: auto repeat(3, max-content);
+    justify-content: stretch; }
+    .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
+      grid-column: 1; }
+
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
@@ -5143,46 +5182,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     right: 0;
     top: 0;
     z-index: 3; }
-
-.svg-single-item-graph-legend,
-.svg-single-two-items-graph-legend,
-.svg-graph-legend {
-  overflow-y: hidden;
-  white-space: normal;
-  margin: 0 10px;
-  line-height: 18px; }
-  .svg-single-item-graph-legend div,
-  .svg-single-two-items-graph-legend div,
-  .svg-graph-legend div {
-    display: inline-block;
-    margin: 0 4px;
-    font-size: 12px;
-    line-height: 1.1;
-    vertical-align: bottom;
-    min-width: 120px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    border: 0 none transparent; }
-  .svg-single-item-graph-legend div::before,
-  .svg-single-two-items-graph-legend div::before,
-  .svg-graph-legend div::before {
-    content: ' ';
-    display: inline-block;
-    margin-right: 4px;
-    width: 10px;
-    height: 0;
-    vertical-align: middle;
-    margin-top: -4px;
-    border-top-width: 4px;
-    border-top-style: solid;
-    border-top-color: inherit; }
-
-.svg-graph-legend div {
-  max-width: 30%; }
-
-.svg-single-two-items-graph-legend div {
-  max-width: 50%; }
 
 .svg-graph-hintbox {
   font-size: 12px;
