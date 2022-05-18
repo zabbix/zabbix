@@ -1545,11 +1545,11 @@ class CHostGroup extends CApiService {
 	/**
 	 * Apply permissions to all host group's subgroups.
 	 *
-	 * @param array   $data
-	 * @param array   $data['groups']             An array with host group IDs.
-	 * @param string  $data['groups']['groupid']  Host group ID.
-	 * @param bool    $data['permissions']        True if want to apply permissions to all subgroups.
-	 * @param bool    $data['tag_filters']        True if want to apply tag filters to all subgroups.
+	 * @param array  $data
+	 * @param array  $data['groups']             An array with host group IDs.
+	 * @param string $data['groups']['groupid']  Host group ID.
+	 * @param bool   $data['permissions']        True if want to apply permissions to all subgroups.
+	 * @param bool   $data['tag_filters']        True if want to apply tag filters to all subgroups.
 	 *
 	 * @return array
 	 */
@@ -1571,8 +1571,8 @@ class CHostGroup extends CApiService {
 	/**
 	 * Validation of propagate function input fields.
 	 *
-	 * @param array   $data       [IN/OUT]
-	 * @param array   $db_groups  [OUT]
+	 * @param array $data       [IN/OUT]
+	 * @param array $db_groups  [OUT]
 	 *
 	 * @throws APIException if the input is invalid.
 	 */

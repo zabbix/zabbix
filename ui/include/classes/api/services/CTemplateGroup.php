@@ -1294,7 +1294,7 @@ class CTemplateGroup extends CApiService {
 	/**
 	 * Returns list of child groups for template group with given name.
 	 *
-	 * @param string $name     Template group name.
+	 * @param string $name  Template group name.
 	 */
 	private function getChildGroupIds(string $name): array {
 		$parent = $name.'/';
