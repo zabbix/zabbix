@@ -135,10 +135,7 @@ my $tsdb = <<'HEREDOC'
 \copy (select * from %HISTTBL_old) TO '/tmp/%HISTTBL.csv' DELIMITER ',' CSV;
 
 CREATE TEMP TABLE temp_%HISTTBL (
-	itemid                   bigint                                    NOT NULL,
-	clock                    integer         DEFAULT '0'               NOT NULL,
-	value                    numeric(20)     DEFAULT '0'               NOT NULL,
-	ns                       integer         DEFAULT '0'               NOT NULL
+%TEMPTBLDDL
 );
 
 \copy temp_%HISTTBL FROM '/tmp/%HISTTBL.csv' DELIMITER ',' CSV
@@ -216,6 +213,10 @@ sub output_table {
 sub output_tsdb {
 	my ($tbl) = @_;
 	my $tsdb_out = $tsdb;
+	my $temp_ddl = $postgresql{$tbl};
+	chomp($temp_ddl);
+	$temp_ddl =~ s/,$//;
+	$tsdb_out =~ s/%TEMPTBLDDL/$temp_ddl/g;
 	$tsdb_out =~ s/%HISTTBL/$tbl/g;
 	print $tsdb_out . "\n";
 }
