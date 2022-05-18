@@ -32,6 +32,7 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AGENT.TIMEOUT} |<p>Timeout after which agent is considered unavailable.</p> |`5m` |
 |{$MS.EXCHANGE.DB.ACTIVE.READ.TIME} |<p>The time during which the active database read operations latency may exceed the threshold.</p> |`5m` |
 |{$MS.EXCHANGE.DB.ACTIVE.READ.WARN} |<p>Threshold for active database read operations latency trigger.</p> |`0.02` |
 |{$MS.EXCHANGE.DB.ACTIVE.WRITE.TIME} |<p>The time during which the active database write operations latency may exceed the threshold.</p> |`10m` |
@@ -76,6 +77,7 @@ There are no template links in this template.
 |MS Exchange |MS Exchange [Client Access Server]: Outlook Web App: current unique users |<p>Shows the number of unique users currently logged on to Outlook Web App. This value monitors the number of unique active user sessions, so that users are only removed from this counter after they log off or their session times out. Determines current user load.</p> |ZABBIX_ACTIVE |perf_counter_en["\MSExchange OWA\Current Unique Users", {$MS.EXCHANGE.PERF.INTERVAL}] |
 |MS Exchange |MS Exchange [Client Access Server]: Outlook Web App: requests per second |<p>Shows the number of requests handled by Outlook Web App per second. Determines current user load.</p> |ZABBIX_ACTIVE |perf_counter_en["\MSExchange OWA\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}] |
 |MS Exchange |MS Exchange [Client Access Server]: MSExchangeWS: requests per second |<p>Shows the number of requests processed each second. Determines current user load.</p> |ZABBIX_ACTIVE |perf_counter_en["\MSExchangeWS\Requests/sec", {$MS.EXCHANGE.PERF.INTERVAL}] |
+|MS Exchange |MS Exchange: Active agent availability |<p>Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - unknown</p><p>1 - available</p><p>2 - not available</p> |INTERNAL |zabbix[host,active_agent,available] |
 |MS Exchange |Active Manager [{#INSTANCE}]: Database copy role |<p>Database copy active or passive role.</p> |ZABBIX_ACTIVE |perf_counter_en["\MSExchange Active Manager({#INSTANCE})\Database Copy Role Active"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p> |
 |MS Exchange |Information Store [{#INSTANCE}]: Database state |<p>Database state. Possible values:</p><p>0: Database without any copy and dismounted.</p><p>1: Database is a primary database and mounted.</p><p>2: Database is a passive copy and the state is healthy.</p> |ZABBIX_ACTIVE |perf_counter_en["\MSExchangeIS Store({#INSTANCE})\Database State"]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3m`</p> |
 |MS Exchange |Information Store [{#INSTANCE}]: Active mailboxes count |<p>Number of active mailboxes in this database.</p> |ZABBIX_ACTIVE |perf_counter_en["\MSExchangeIS Store({#INSTANCE})\Active mailboxes"] |
@@ -99,6 +101,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
+|MS Exchange: Zabbix agent: active checks are not available |<p>Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.</p> |`min(/Microsoft Exchange Server 2016 by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2` |HIGH | |
 |Information Store [{#INSTANCE}]: Page faults is too high |<p>Too much page faults stalls for database "{#INSTANCE}". This counter should be 0 on production servers.</p> |`min(/Microsoft Exchange Server 2016 by Zabbix agent active/perf_counter_en["\MSExchange Database({#INF.STORE})\Database Page Fault Stalls/sec", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.DB.FAULTS.TIME})>{$MS.EXCHANGE.DB.FAULTS.WARN}` |AVERAGE | |
 |Information Store [{#INSTANCE}]: Log records stalls is too high |<p>Stalled log records too high. The average value should be less than 10 threads waiting.</p> |`avg(/Microsoft Exchange Server 2016 by Zabbix agent active/perf_counter_en["\MSExchange Database({#INF.STORE})\Log Record Stalls/sec", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.LOG.STALLS.TIME})>{$MS.EXCHANGE.LOG.STALLS.WARN}` |AVERAGE | |
 |Information Store [{#INSTANCE}]: RPC Requests latency is too high |<p>Should be less than 50ms at all times, with spikes less than 100ms.</p> |`min(/Microsoft Exchange Server 2016 by Zabbix agent active/perf_counter_en["\MSExchangeIS Store({#INSTANCE})\RPC Average Latency", {$MS.EXCHANGE.PERF.INTERVAL}],{$MS.EXCHANGE.RPC.TIME})>{$MS.EXCHANGE.RPC.WARN}` |WARNING | |

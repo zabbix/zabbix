@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-10T20:20:35Z'
+  date: '2022-05-18T22:37:39Z'
   groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -812,11 +812,15 @@ zabbix_export:
           triggers:
             -
               uuid: 153cc67416614c13878a6f5655d99b09
-              expression: 'max(/Linux by Zabbix agent active/zabbix[host,active_agent,available],5m)=2'
+              expression: 'min(/Linux by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
               name: 'Zabbix agent: active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 0b47631fb1334f78a7fe5207194a5476
@@ -1752,6 +1756,10 @@ zabbix_export:
           value: 30m
           description: 'No data timeout for active agents. Consider to keep it relatively high.'
         -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 5m
+          description: 'Timeout after which agent is considered unavailable.'
+        -
           macro: '{$CPU.UTIL.CRIT}'
           value: '90'
         -
@@ -2290,6 +2298,19 @@ zabbix_export:
               value: '826'
               newvalue: 'Vsock monitor header'
         -
+          uuid: c75840508f98402498289c5f99e0d59e
+          name: zabbix.host.active_agent.available
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: 'not available'
+        -
           uuid: 6a21d2d8f1f645ee8ea99f7734d6c967
           name: zabbix.host.available
           mappings:
@@ -2309,19 +2330,6 @@ zabbix_export:
             -
               value: '1'
               newvalue: Up
-        -
-          uuid: c75840508f98402498289c5f99e0d59e
-          name: zabbix.host.active_agent.available
-          mappings:
-            -
-              value: '0'
-              newvalue: unknown
-            -
-              value: '1'
-              newvalue: available
-            -
-              value: '2'
-              newvalue: 'not available'
   triggers:
     -
       uuid: fa21b02aebe143b192a20cd9403a68d0
