@@ -532,7 +532,90 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 //					'error' => 'Invalid parameter "/2": value (name)=(TEST) already exists.'
 //				]
 //			],
-			// #6 LDAP server with everyfield filled.
+			// #6 Using cyrillic in settings.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'ldap_settings' => [
+						[
+							'Name' => 'кириллица',
+							'Host' => 'кириллица',
+							'Base DN' => 'кириллица',
+							'Search attribute' => 'кириллица'
+						]
+					],
+					'db_check' => [
+						'name' => 'кириллица',
+						'host' => 'кириллица',
+						'port' => '389',
+						'base_dn' => 'кириллица',
+						'bind_dn' => '',
+						'bind_password' => '',
+						'search_attribute' => 'кириллица'
+					]
+				]
+			],
+			// #7 Using symbols in settings.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'ldap_settings' => [
+						[
+							'Name' => '@#$%^&*.',
+							'Host' => '@#$%^&*.',
+							'Base DN' => '@#$%^&*.',
+							'Search attribute' => '@#$%^&*.'
+						]
+					],
+					'db_check' => [
+						'name' => '@#$%^&*.',
+						'host' => '@#$%^&*.',
+						'port' => '389',
+						'base_dn' => '@#$%^&*.',
+						'bind_dn' => '',
+						'bind_password' => '',
+						'search_attribute' => '@#$%^&*.'
+					]
+				]
+			],
+			// #8 Long values.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'ldap_settings' => [
+						[
+							'Name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+									'_long_value_long_value_long_value_long_value_long_va',
+							'Host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+									'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long'.
+									'_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
+									'value_long_value_long_v',
+							'Base DN' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value'.
+									'_long_value_long_value_long_value_long_value_long_valong_value_long_value_long_'.
+									'value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
+									'value_long_value_long_v',
+							'Search attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+									'long_value_long_value_long_value_long_value_long_value_long_va'
+						]
+					],
+					'db_check' => [
+						'name' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
+								'value_long_value_long_value_long_value_long_va',
+						'host' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_'.
+								'value_long_value_long_value_long_value_long_valong_value_long_value_long_value_long_'.
+								'value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'port' => '389',
+						'base_dn' => 'long_value_long_value_long_value_long_value_long_value_long_value_long_value_'.
+								'long_value_long_value_long_value_long_value_long_valong_value_long_value_long_value_'.
+								'long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_value_long_v',
+						'bind_dn' => '',
+						'bind_password' => '',
+						'search_attribute' => 'long_value_long_value_long_value_long_value_long_value_long_value_'.
+								'long_value_long_value_long_value_long_value_long_value_long_va'
+					]
+				]
+			],
+			// #9 LDAP server with everyfield filled.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -584,7 +667,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 			// Check DB configuration.
-			$sql = 'SELECT name, host, port, base_dn, bind_dn, bind_password, search_attribute FROM userdirectory';
+			$sql = 'SELECT name, host, port, base_dn, bind_dn, bind_password, search_attribute FROM'.
+					' userdirectory WHERE name ='.zbx_dbstr($data['db_check']['name']);
 			$result = CDBHelper::getRow($sql);
 			$this->assertEquals($data['db_check'], $result);
 		}
