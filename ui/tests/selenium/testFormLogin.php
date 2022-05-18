@@ -27,7 +27,9 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * @onBefore APILoad
  **/
 class testFormLogin extends CWebTest {
-	//Not permanent API request to create user before data_test.sql file is refactored.
+	/**
+	 * Not permanent API request to create user before data_test.sql file is refactored.
+	 **/
 	public function APILoad(){
 		CDataHelper::call('user.create', [
 			[
