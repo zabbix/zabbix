@@ -27,28 +27,30 @@
 			this.groupid = groupid;
 			this.name = name;
 
-			this.form.addEventListener('submit', (e) => this.events_submit(e));
-			this.initActionButtons();
+			this.form.addEventListener('submit', (e) => this._onSubmit(e));
+			this._initActionButtons();
 		}
 
-		initActionButtons() {
+		_initActionButtons() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-hostgroup')) {
-					this.submit();
+					this._submit(e.target);
 				}
 				else if (e.target.classList.contains('js-update-hostgroup')) {
-					this.submit();
+					this._submit(e.target);
 				}
 				else if (e.target.classList.contains('js-clone-hostgroup')) {
-					this.clone();
+					this._clone();
 				}
 				else if (e.target.classList.contains('js-delete-hostgroup')) {
-					this.delete();
+					this._delete();
 				}
 			});
 		}
 
-		submit() {
+		_submit(button) {
+			this._setLoading(button);
+
 			const fields = getFormFields(this.form);
 			fields.name = fields.name.trim();
 
@@ -69,16 +71,16 @@
 			});
 		}
 
-		clone() {
+		_clone() {
 			this.groupid = null;
 			const fields = getFormFields(this.form);
 			const curl = new Curl('zabbix.php', false);
 			curl.setArgument('action', 'hostgroup.edit');
 
 			post(curl.getUrl(), {name: fields.name});
-		},
+		}
 
-		delete() {
+		_delete() {
 			const curl = new Curl('zabbix.php', false);
 			curl.setArgument('action', 'hostgroup.delete');
 			curl.addSID();
@@ -97,7 +99,7 @@
 			});
 		}
 
-		setLoading(active_button) {
+		_setLoading(active_button) {
 			active_button.classList.add('is-loading');
 
 			for (const button of this.form.querySelectorAll('.tfoot-buttons button:not(.js-cancel)')) {
@@ -105,7 +107,7 @@
 			}
 		}
 
-		unsetLoading() {
+		_unsetLoading() {
 			for (const button of this.form.querySelectorAll('.tfoot-buttons button:not(.js-cancel)')) {
 				button.classList.remove('is-loading');
 				button.disabled = false;
@@ -149,15 +151,14 @@
 					this.form.parentNode.insertBefore(message_box, this.form);
 				})
 				.finally(() => {
-					this.unsetLoading();
+					this._unsetLoading();
 				});
 		}
 
-		events_submit(event) {
-			event.preventDefault();
-			const submit_button = view.form.querySelector('.tfoot-buttons button[type="submit"]');
-
-			view.setLoading(submit_button);
+		_onSubmit(e) {
+			e.preventDefault();
+			const button = this.form.querySelector('.tfoot-buttons button[type="submit"]');
+			this._submit(button);
 		}
 }
 </script>
