@@ -793,14 +793,14 @@ static void	tm_process_temp_suppression(const char *data)
 
 	if (FAIL == zbx_json_open(data, &jp))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppresion data request");
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request");
 		return;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_EVENTID, tmp_eventid, sizeof(tmp_eventid), NULL) ||
 			FAIL == is_uint64(tmp_eventid, &eventid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppresion data request: failed to retrieve "
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_EVENTID);
 		return;
 	}
@@ -808,7 +808,7 @@ static void	tm_process_temp_suppression(const char *data)
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_USERID, tmp_userid, sizeof(tmp_userid), NULL) ||
 			FAIL == is_uint64(tmp_userid, &userid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppresion data request: failed to retrieve "
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_USERID);
 		return;
 	}
@@ -816,7 +816,7 @@ static void	tm_process_temp_suppression(const char *data)
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SUPPRESS_UNTIL, tmp_ts, sizeof(tmp_ts), NULL) ||
 			FAIL == is_uint64(tmp_ts, &ts))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppresion data request: failed to retrieve "
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_SUPPRESS_UNTIL);
 		return;
 	}
@@ -824,7 +824,7 @@ static void	tm_process_temp_suppression(const char *data)
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACTION, tmp_action, sizeof(tmp_action), NULL) ||
 			FAIL == is_uint64(tmp_action, &action))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppresion data request: failed to retrieve "
+		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
 		return;
 	}
