@@ -88,25 +88,25 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 	if test "x$enable_static" = "xyes"; then
 		LIBPCRE2_LIBS=" $LIBPCRE2_LIBS -lpthread"
 	elif test "x$enable_static_libs" = "xyes" -a -z "$PKG_CONFIG"; then
-		LIBPCRE2_LIBS="$_libpcre2_dir_lib/libpcre2.a"
+		LIBPCRE2_LIBS="$_libpcre2_dir_lib/libpcre2-8.a"
 	elif test "x$enable_static_libs" = "xyes"; then
 
 		test "x$static_linking_support" = "xno" -a -z "$_libpcre2_dir_lib" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
 
 		if test -z "$_libpcre2_dir_lib"; then
-			PKG_CHECK_EXISTS(libpcre2,[
-				LIBPCRE2_LIBS=`$PKG_CONFIG --static --libs libpcre2`
+			PKG_CHECK_EXISTS(libpcre2-8,[
+				LIBPCRE2_LIBS=`$PKG_CONFIG --static --libs libpcre2-8`
 			],[
 				AC_MSG_ERROR([Not found libpcre2 package])
 			])
 		else
-			AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libpcre2_dir_lib/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre2]) || AC_MSG_ERROR(["Not found libpcre2 package in $_libpcre2_dir/lib/pkgconfig"])
-			LIBPCRE2_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre2_dir_lib/pkgconfig" $PKG_CONFIG --static --libs libpcre2`
-			test -z "$LIBPCRE2_LIBS" && LIBPCRE2_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre2_dir_lib/pkgconfig" $PKG_CONFIG --libs libpcre2`
+			AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libpcre2_dir_lib/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre2-8]) || AC_MSG_ERROR(["Not found libpcre2 package in $_libpcre2_dir/lib/pkgconfig"])
+			LIBPCRE2_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre2_dir_lib/pkgconfig" $PKG_CONFIG --static --libs libpcre2-8`
+			test -z "$LIBPCRE2_LIBS" && LIBPCRE2_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre2_dir_lib/pkgconfig" $PKG_CONFIG --libs libpcre2-8`
 		fi
 
 		if test "x$static_linking_support" = "xno"; then
-			LIBPCRE2_LIBS=`echo "$LIBPCRE2_LIBS"|sed "s|-lpcre2-8|$_libpcre2_dir_lib/libpcre2.a|g"`
+			LIBPCRE2_LIBS=`echo "$LIBPCRE2_LIBS"|sed "s|-lpcre2-8|$_libpcre2_dir_lib/libpcre2-8.a|g"`
 		else
 			LIBPCRE2_LIBS=`echo "$LIBPCRE2_LIBS"|sed "s/-lpcre2-8/${static_linking_support}static -lpcre2-8 ${static_linking_support}dynamic/g"`
 		fi
