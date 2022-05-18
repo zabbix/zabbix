@@ -121,7 +121,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 						->setArgument('hostids', [$host['hostid']])
 						->setArgument('filter_name', '')
 				)
-				: _('Latest data')
+				: (new CSpan(_('Latest data')))->addClass(ZBX_STYLE_DISABLED),
+				CViewHelper::showNum($host['items_count'])
 		],
 		$problems_link,
 		$host['graphs']

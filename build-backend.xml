@@ -65,6 +65,7 @@
 			<arg line="--force"/>
 			<arg line="--xml"/>
 			<arg line="--xml-version=2"/>
+			<arg line="--cppcheck-build-dir=${CPPCHECK_BUILD_DIR}"/>
 			<arg line="."/>
 		</exec>
 	</target>

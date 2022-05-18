@@ -26,7 +26,7 @@ import (
 	"os"
 	"time"
 
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/log"
 
 	"github.com/natefinch/npipe"
 )

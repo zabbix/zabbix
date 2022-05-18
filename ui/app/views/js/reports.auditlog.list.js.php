@@ -17,58 +17,42 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
+
+
 <script type="text/javascript">
-	const OPTION_ALL = '-1';
+	const view = new class {
 
-	class resourceInputManage {
-		constructor() {
-			this.action_elem = document.getElementById('action-select');
-			this.action_options = this.action_elem.getOptions();
-			this.resource_elem = document.getElementById('resourcetype-select');
+		init() {
+			this.filter_actions_checkboxes = document.querySelectorAll('#filter-actions input[type="checkbox"]');
 
-			this
-				.resource_elem
-				.addEventListener('change', this.updateHandler.bind(this));
+			this.filter_resource_select = document.getElementById('resourcetype-select');
+			this.filter_resource_select.addEventListener('change', () => this._update());
 
-			this.update(this.resource_elem.value);
-		}
+			this._update();
 
-		updateHandler(event) {
-			// Reset select to first element.
-			this.action_elem.selectedIndex = 0;
-
-			this.update(event.currentTarget.value);
-		}
-
-		update(resourceid) {
-			// Enabling all action options when selected resource option "All".
-			if (resourceid == OPTION_ALL) {
-				this.enableAllOptions();
-			}
-			else {
-				this.disableOptionsByActions(this.getActionsByResource(resourceid));
+			for (const details_link of document.forms['auditForm'].querySelectorAll('[data-details]')) {
+				details_link.addEventListener('click', (e) => {
+					this._openAuditDetails(JSON.parse(e.target.dataset.details))
+				});
 			}
 		}
 
-		enableAllOptions() {
-			[...this.action_options].map((elem) => {
-				elem.disabled = false;
-			});
+		_update() {
+			const enabled_actions = this.filter_resource_select.value !== '-1'
+				? this._getActionsByResource(this.filter_resource_select.value)
+				: null;
+
+			for (const checkbox of this.filter_actions_checkboxes) {
+				checkbox.disabled = enabled_actions !== null && !enabled_actions.includes(checkbox.value);
+
+				if (checkbox.disabled) {
+					checkbox.checked = false;
+				}
+			}
 		}
 
-		disableOptionsByActions(actions) {
-			[...this.action_options].map((elem) => {
-				elem.disabled = !actions.includes(elem.value);
-			});
-		}
-
-		getActionsByResource(resource) {
+		_getActionsByResource(resource) {
 			// [Action => [Resources]]
 			const resources = <?php echo json_encode([
 				CAudit::ACTION_ADD => [
@@ -121,50 +105,40 @@
 				CAudit::ACTION_HISTORY_CLEAR => [CAudit::RESOURCE_ITEM]
 			]); ?>
 
-			// Add action "All" to every resource.
-			const actions = [OPTION_ALL];
+			const actions = [];
 
-			for (let i in resources) {
-				if (resources.hasOwnProperty(i) && resources[i].includes(parseInt(resource))) {
-					actions.push(i);
+			for (let action in resources) {
+				if (resources.hasOwnProperty(action) && resources[action].includes(parseInt(resource))) {
+					actions.push(action);
 				}
 			}
 
 			return actions;
 		}
-	}
 
-	function openAuditDetails(details) {
-		const wrapper = document.createElement('div');
-		wrapper
-			.classList
-			.add('audit-details-popup-wrapper');
+		_openAuditDetails(details) {
+			const wrapper = document.createElement('div');
+			wrapper.classList.add('audit-details-popup-wrapper');
 
-		const textarea = document.createElement('textarea');
-		textarea.readOnly = true;
-		textarea.innerHTML = details;
-		textarea
-			.classList
-			.add('audit-details-popup-textarea', 'active-readonly');
+			const textarea = document.createElement('textarea');
+			textarea.readOnly = true;
+			textarea.innerHTML = details;
+			textarea.classList.add('audit-details-popup-textarea', 'active-readonly');
 
-		wrapper.appendChild(textarea)
+			wrapper.appendChild(textarea)
 
-		overlayDialogue({
-			title: <?= json_encode(_('Details')) ?>,
-			content: wrapper,
-			class: 'modal-popup modal-popup-generic',
-			buttons: [
-				{
-					title: <?= json_encode(_('Ok')) ?>,
-					cancel: true,
-					action: () => true
-				}
-			]
-		});
-	}
-
-	// Initialize class when DOM ready.
-	document.addEventListener('DOMContentLoaded', () => {
-		new resourceInputManage();
-	}, false);
+			overlayDialogue({
+				title: <?= json_encode(_('Details')) ?>,
+				content: wrapper,
+				class: 'modal-popup modal-popup-generic',
+				buttons: [
+					{
+						title: <?= json_encode(_('Ok')) ?>,
+						cancel: true,
+						action: () => true
+					}
+				]
+			});
+		}
+	};
 </script>

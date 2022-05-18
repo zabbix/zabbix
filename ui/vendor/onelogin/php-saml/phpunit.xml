@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="tests/bootstrap.php" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" verbose="true">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory>./src</directory>
+    </include>
+    <report>
+      <clover outputFile="tests/build/logs/clover.xml"/>
+      <html outputDirectory="tests/build/coverage" lowUpperBound="35" highLowerBound="70"/>
+      <php outputFile="tests/build/logs/coverage.cov"/>
+      <xml outputDirectory="tests/build/logfile.xml"/>
+    </report>
+  </coverage>
+  <testsuites>
+    <testsuite name="OneLogin PHP-SAML Test Suite">
+      <directory>./tests/src</directory>
+    </testsuite>
+  </testsuites>
+  <logging/>
+</phpunit>

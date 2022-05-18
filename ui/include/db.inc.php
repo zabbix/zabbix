@@ -252,7 +252,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error().']', 'sql');
+				error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', 'sql');
 			}
 
 			break;
@@ -371,7 +371,7 @@ function DBexecute($query): bool {
 
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = (bool) pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error().']', 'sql');
+				error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', 'sql');
 			}
 
 			break;
@@ -949,11 +949,11 @@ function zbx_dbstr($var) {
 		case ZBX_DB_POSTGRESQL:
 			if (is_array($var)) {
 				foreach ($var as $vnum => $value) {
-					$var[$vnum] = "'".pg_escape_string($value)."'";
+					$var[$vnum] = "'".pg_escape_string($DB['DB'], $value)."'";
 				}
 				return $var;
 			}
-			return "'".pg_escape_string($var)."'";
+			return "'".pg_escape_string($DB['DB'], $var)."'";
 
 		default:
 			return false;
