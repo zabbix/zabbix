@@ -120,7 +120,7 @@ class CControllerTemplateGroupList extends CController {
 		unset($group);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Template groups'));
+		$response->setTitle(_('Configuration of template groups'));
 		$this->setResponse($response);
 	}
 }

@@ -122,7 +122,7 @@ class CControllerHostGroupList extends CController {
 		unset($group);
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Host groups'));
+		$response->setTitle(_('Configuration of host groups'));
 		$this->setResponse($response);
 	}
 }
