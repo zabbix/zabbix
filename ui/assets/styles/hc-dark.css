@@ -7391,6 +7391,10 @@ a.link-action {
     background-color: #dddddd;
     color: #000000 !important; }
 
+.icon-count,
+a.icon-count {
+  color: #000000; }
+
 .disabled {
   opacity: .6; }
 
