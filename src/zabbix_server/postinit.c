@@ -19,6 +19,7 @@
 
 #include "postinit.h"
 
+#include "db_lengths.h"
 #include "zbxtasks.h"
 #include "log.h"
 #include "zbxserver.h"
@@ -107,14 +108,14 @@ static const char	*convert_historical_macro(int macro)
  *           better match the trigger name at event creation time.            *
  *                                                                            *
  ******************************************************************************/
-static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
+static void	preprocess_trigger_name(ZBX_DB_TRIGGER *trigger, int *historical)
 {
 	int		pos = 0, macro_len, macro_type;
 	zbx_token_t	token;
 	size_t		name_alloc, name_len, replace_alloc = 64, replace_offset, r, l;
 	char		*replace;
 	const char	*macro;
-	DB_EVENT	event;
+	ZBX_DB_EVENT	event;
 
 	*historical = FAIL;
 
@@ -157,7 +158,7 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
 		pos = token.loc.r;
 	}
 
-	memset(&event, 0, sizeof(DB_EVENT));
+	memset(&event, 0, sizeof(ZBX_DB_EVENT));
 	event.object = EVENT_OBJECT_TRIGGER;
 	event.objectid = trigger->triggerid;
 	event.trigger = *trigger;
@@ -220,7 +221,8 @@ static void	preprocess_trigger_name(DB_TRIGGER *trigger, int *historical)
  *           same and can be updated with a single sql query.                 *
  *                                                                            *
  ******************************************************************************/
-static int	process_event_bulk_update(const DB_TRIGGER *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
+static int	process_event_bulk_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_t *sql_alloc,
+		size_t *sql_offset)
 {
 	char	*name_esc;
 	int	ret;
@@ -271,15 +273,15 @@ static int	process_event_bulk_update(const DB_TRIGGER *trigger, char **sql, size
  *           event.                                                           *
  *                                                                            *
  ******************************************************************************/
-static int	process_event_update(const DB_TRIGGER *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
+static int	process_event_update(const ZBX_DB_TRIGGER *trigger, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_EVENT	event;
+	ZBX_DB_EVENT	event;
 	char		*name, *name_esc;
 	int		ret = SUCCEED;
 
-	memset(&event, 0, sizeof(DB_EVENT));
+	memset(&event, 0, sizeof(ZBX_DB_EVENT));
 
 	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged,ns,name"
 			" from events"
@@ -348,9 +350,9 @@ static int	update_event_names(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
-	DB_TRIGGER		trigger;
+	ZBX_DB_TRIGGER		trigger;
 	int			ret = SUCCEED, historical, triggers_num, processed_num = 0, completed,
-			last_completed = 0;
+				last_completed = 0;
 	char			*sql;
 	size_t			sql_alloc = 4096, sql_offset = 0;
 	zbx_dc_um_handle_t	*um_handle;
@@ -360,10 +362,10 @@ static int	update_event_names(void)
 	if (0 == (triggers_num = get_trigger_count()))
 		goto out;
 
-	memset(&trigger, 0, sizeof(DB_TRIGGER));
+	memset(&trigger, 0, sizeof(ZBX_DB_TRIGGER));
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select triggerid,description,expression,priority,comments,url,recovery_expression,"
@@ -405,7 +407,7 @@ static int	update_event_names(void)
 
 	zbx_dc_close_user_macros(um_handle);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset) /* in ORACLE always present begin..end; */
 	{
