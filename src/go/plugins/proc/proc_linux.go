@@ -150,6 +150,10 @@ type procStatus struct {
 	Name          string  `json:"name"`
 	ThreadName    string  `json:"-"`
 	Cmdline       string  `json:"cmdline"`
+	User          string  `json:"user"`
+	Group         string  `json:"group"`
+	UserID        int64   `json:"uid"`
+	GroupID       int64   `json:"gid"`
 	Vsize         int64   `json:"vsize"`
 	Pmem          float64 `json:"pmem"`
 	Rss           int64   `json:"rss"`
@@ -170,10 +174,6 @@ type procStatus struct {
 	CtxSwitches   int64   `json:"ctx_switches"`
 	Threads       int64   `json:"threads"`
 	PageFaults    int64   `json:"page_faults"`
-	User          string  `json:"user"`
-	Group         string  `json:"group"`
-	UserID        int64  `json:"uid"`
-	GroupID       int64  `json:"gid"`
 }
 
 type procSummary struct {
@@ -202,6 +202,10 @@ type thread struct {
 	Pid           int64   `json:"pid"`
 	Ppid          int64   `json:"ppid"`
 	Name          string  `json:"name"`
+	User          string  `json:"user"`
+	Group         string  `json:"group"`
+	UserID        int64   `json:"uid"`
+	GroupID       int64   `json:"gid"`
 	Tid           uint64  `json:"tid"`
 	ThreadName    string  `json:"tname"`
 	CpuTimeUser   float64 `json:"cputime_user"`
@@ -209,10 +213,6 @@ type thread struct {
 	State         string  `json:"state"`
 	CtxSwitches   int64   `json:"ctx_switches"`
 	PageFaults    int64   `json:"page_faults"`
-	User          string  `json:"user"`
-	Group         string  `json:"group"`
-	UserID        int64  `json:"uid"`
-	GroupID       int64  `json:"gid"`
 }
 
 type procStat struct {
@@ -828,33 +828,10 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			getProcessCalculatedMetrics(pid, &data)
 			getProcessCpuTimes(pid, &data)
 
-			pu, err := getProcessUserInfo(pid)
-			if err != nil {
-				continue
-			}
-
-			data.UserID = pu.uid
-			data.GroupID = pu.gid
-
-			uStr := strconv.FormatInt(pu.uid, 10)
-			gStr := strconv.FormatInt(pu.gid, 10)
-
-			u, err := user.LookupId(uStr)
-			if err == nil {
-				data.User = u.Username
-			} else {
-				data.User = uStr
-			}
-
-			g, err := user.LookupGroupId(gStr)
-			if err == nil {
-				data.Group = g.Name
-			} else {
-				data.Group = gStr
-			}
-
-			pi := procInfo{int64(data.Pid), data.Name, pu.uid, "", data.Name, ""}
+			pi := procInfo{int64(data.Pid), data.Name, 0, "", data.Name, ""}
 			if mode != "summary" {
+				setProcessUserInfo(pid, &data)
+				pi.userid = data.UserID
 				pi.cmdline = data.Cmdline
 			}
 			if query.match(&pi) {
@@ -879,36 +856,14 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			getProcessCalculatedMetrics(tid, &data)
 			getProcessCpuTimes(procPath, &data)
 
-			pu, err := getProcessUserInfo(tid)
-			if err != nil {
-				continue
-			}
+			setProcessUserInfo(tid, &data)
 
-			data.UserID = pu.uid
-			data.GroupID = pu.gid
-
-			uStr := strconv.FormatInt(pu.uid, 10)
-			gStr := strconv.FormatInt(pu.gid, 10)
-
-			u, err := user.LookupId(uStr)
-			if err == nil {
-				data.User = u.Username
-			} else {
-				data.User = uStr
-			}
-
-			g, err := user.LookupGroupId(gStr)
-			if err == nil {
-				data.Group = g.Name
-			} else {
-				data.Group = gStr
-			}
-
-			pi := procInfo{int64(data.Pid), data.Name, pu.uid, data.Cmdline, data.Name, ""}
+			pi := procInfo{int64(data.Pid), data.Name, data.UserID, data.Cmdline, data.Name, ""}
 			if query.match(&pi) {
-				threadArray = append(threadArray, thread{data.Tgid, data.Ppid, data.Name, data.Pid,
-					data.ThreadName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
-					data.PageFaults, data.User, data.Group, data.UserID, data.GroupID})
+				threadArray = append(threadArray, thread{data.Tgid, data.Ppid,
+					data.Name, data.User, data.Group, data.UserID, data.GroupID,
+					data.Pid, data.ThreadName, data.CpuTimeUser, data.CpuTimeSystem,
+					data.State, data.CtxSwitches, data.PageFaults})
 				}
 			}
 		}
@@ -970,6 +925,36 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	}
 
 	return string(jsonArray), nil
+}
+
+func setProcessUserInfo(pid string, ps *procStatus) {
+	pu, err := getProcessUserInfo(pid)
+	if err != nil {
+		ps.UserID = -1
+		ps.GroupID = -1
+
+		return
+	}
+
+	ps.UserID = pu.uid
+	ps.GroupID = pu.gid
+
+	uStr := strconv.FormatInt(pu.uid, 10)
+	gStr := strconv.FormatInt(pu.gid, 10)
+
+	u, err := user.LookupId(uStr)
+	if err == nil {
+		ps.User = u.Username
+	} else {
+		ps.User = uStr
+	}
+
+	g, err := user.LookupGroupId(gStr)
+	if err == nil {
+		ps.Group = g.Name
+	} else {
+		ps.Group = gStr
+	}
 }
 
 func getMax(a, b float64) float64 {
