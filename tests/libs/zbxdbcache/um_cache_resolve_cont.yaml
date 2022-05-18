@@ -1,0 +1,65 @@
+---
+test case: Continuous macro resolving
+include:
+  - &include01 um_cache_resolve_cont_01.inc.yaml
+  - &include02 um_cache_resolve_cont_02.inc.yaml
+  - &include03 um_cache_resolve_cont_03.inc.yaml
+  - &include04 um_cache_resolve_cont_04.inc.yaml
+  - &include00 um_cache_sync_00.inc.yaml
+in:
+  steps:
+  - config: *include01
+    hostids: [1]
+    macros:
+    - name: '{$V1.1}'
+      value: 'v1.1' 
+    - name: '{$V1.2}'
+      value: 'v1.2' 
+    - name: '{$V2.1}'
+      value: 'v2.1' 
+    - name: '{$V2.2}'
+      value: 'v2.2' 
+    - name: '{$V0.1}'
+      value: '*UNKNOWN*' 
+    - name: '{$V0.2}'
+      value: '*UNKNOWN*' 
+  - config: *include02
+    hostids: [1]
+    macros:
+    - name: '{$V1.1}'
+      value: 'v1.3' 
+    - name: '{$V1.2}'
+      value: '*UNKNOWN*' 
+    - name: '{$V2.1}'
+      value: 'a/c:k1' 
+  - config: *include03
+    hostids: [1]
+    macros:
+    - name: '{$V1.1}'
+      value: 'v1.3.3' 
+    - name: '{$V1.2}'
+      value: 'v1.4' 
+    - name: '{$V2.1}'
+      value: 'v2.1' 
+    - name: '{$V2.2}'
+      value: 'v1.2' 
+    - name: '{$V0.1}'
+      value: 'v1.2' 
+  - config: *include04
+    hostids: [1]
+    macros:
+    - name: '{$V1.1}'
+      value: 'v1.3.3' 
+    - name: '{$V1.2}'
+      value: 'v1.4' 
+    - name: '{$V2.1}'
+      value: '*UNKNOWN*' 
+    - name: '{$V2.2}'
+      value: 'v1.2' 
+    - name: '{$V0.1}'
+      value: '*UNKNOWN*' 
+  - config: *include00
+    hostids: []
+    macros: []
+out:
+  result: SUCCEED

@@ -512,8 +512,13 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 		{
 			char	buf[ZBX_MAX_DOUBLE_LEN + 1];
 
+			if (data->state == ZBX_TREND_STATE_NODATA)
+				zbx_strlcpy(buf, "none", sizeof(buf));
+			else
+				zbx_print_double(buf, sizeof(buf), data->value);
+
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%s value:%s", __func__,
-					tfc_state_str(data->state), zbx_print_double(buf, sizeof(buf), data->value));
+					tfc_state_str(data->state), buf);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():not cached", __func__);

@@ -58,6 +58,8 @@
 
 typedef void (*zbx_get_zabbix_stats_ext_func_t)(struct zbx_json *json);
 
+int	zbx_is_trigger_function(const char *name, size_t len);
+
 int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const DB_EVENT *event, const DB_EVENT *r_event,
 		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const DC_HOST *dc_host, const DC_ITEM *dc_item,
 		const DB_ALERT *alert, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
