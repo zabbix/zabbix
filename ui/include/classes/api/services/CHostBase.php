@@ -529,7 +529,10 @@ abstract class CHostBase extends CApiService {
 
 				if ($hostid_links) {
 					$links_path[$hostid] = true;
-					return self::circularLinkageExists($links, $templateid, $hostid_links, $links_path);
+
+					if (self::circularLinkageExists($links, $templateid, $hostid_links, $links_path)) {
+						return true;
+					}
 				}
 			}
 		}

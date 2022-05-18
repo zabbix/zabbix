@@ -614,7 +614,7 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * Check the existing dependencies if the trigger expressions was changed.
+	 * Check the existing dependencies if the trigger expressions were changed.
 	 *
 	 * @param array $triggers
 	 * @param array $db_triggers
@@ -636,7 +636,7 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		/*
-		 * It's necessary to perform the check of existing dependencies only if as the result of the expression change
+		 * It's necessary to perform the check of existing dependencies only if, as the result of the expression change,
 		 * the trigger no longer belongs to any of the previous hosts.
 		 */
 		$result = DBselect(
@@ -670,27 +670,27 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		/*
-		 * There is no need to perform the check on dependency duplicates, because we are checking for existing
-		 * dependencies that cannot have a duplicates. Also there is no need to perform the check on circular
-		 * dependencies, because the dependencies based on trigger IDs. Even if the expressions have changed, the
+		 * There is no need to perform a check for dependency duplicates, because we are checking for existing
+		 * dependencies that cannot have them. Also there is no need to perform the check on circular
+		 * dependencies, because the dependencies are based on trigger IDs. Even if the expressions have changed, the
 		 * trigger IDs remain the same.
 		 */
 
 		$trigger_hosts = self::getTriggerHosts($trigger_dependencies);
 
 		/*
-		 * The template trigger can become a host trigger. So after the update, the template trigger dependencies may
-		 * remain.
+		 * The template trigger can become a host trigger. Therefore the template trigger dependencies may remain
+		 * after the update.
 		 */
 		self::checkDependenciesOfHostTriggers($trigger_dependencies, $trigger_hosts);
 
 		/*
-		 * The template (or host) trigger can become a trigger of another template. So if after the update the
-		 * trigger became owned to another template and it also has remain a dependency on the trigger from another
-		 * template, then we should check that:
-		 *  - Such dependency is not became the dependency on the trigger from the parent template.
-		 *  - Such dependency is not became the dependency on the trigger from the child template or host.
-		 *  - The template of the trigger up are linked to all child templates of the new trigger's template.
+		 * The template (or host) trigger can become a trigger of another template. If after the update
+		 * the trigger became owned by another template and it also has a dependency on a trigger from another
+		 * template remaining, then we should check that:
+		 *  - Such dependency did not become a dependency on a trigger from the parent template.
+		 *  - Such dependency did not become a dependency on a trigger from the child template or host.
+		 *  - The template of the trigger-up is linked to all child templates of the new trigger's template.
 		 */
 		self::checkDependenciesOfTemplateTriggers($trigger_dependencies, $trigger_hosts);
 	}
@@ -829,8 +829,8 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Deletes all trigger dependencies from the given triggers and their children.
 	 *
-	 * @param array $triggers   an array of triggers with the 'triggerid' field defined
-	 * @param bool  $inherited  Determines either to check permissions for deleted dependencies. Permissions are not
+	 * @param array $triggers   An array of triggers with the 'triggerid' field defined.
+	 * @param bool  $inherited  Determines whether to check permissions for deleted dependencies. Permissions are not
 	 *                          validated for inherited triggers.
 	 *
 	 * @return array

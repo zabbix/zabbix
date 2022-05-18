@@ -726,7 +726,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @throws APIException
 	 */
-	protected function copyTriggerPrototypes(array $src_discovery, array $src_host, array $dst_host) {
+	protected function copyTriggerPrototypes(array $src_discovery, array $src_host, array $dst_host): array {
 		$src_triggers = API::TriggerPrototype()->get([
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
@@ -786,11 +786,13 @@ class CDiscoveryRule extends CItemGeneral {
 		$src_trigger_indexes = array_flip(array_column($src_triggers, 'triggerid'));
 
 		$dst_triggers = [];
+
 		/*
-		 * If we copy the dependencies on triggers, we need to check if the trigger up belongs to the source host.
-		 * If belongs, we need to check that the triggers with the same description and expression exists on the
+		 * A check that the trigger-up belongs to the source host needs to be performed on copying the dependencies
+		 * on triggers.
+		 * If it does, we need to check that the triggers with the same description and expression exist on the
 		 * destination host.
-		 * If no, we need to check if the dependencies from destination triggers on that triggers are valid.
+		 * If not, we need to check if the dependencies from destination triggers to these triggers are valid.
 		 */
 		$src_triggerids_up = [];
 

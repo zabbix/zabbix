@@ -510,9 +510,9 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Updates the children of the triggers on the given hosts and propagates the inheritance to all child hosts.
-	 * If the given triggers was assigned to a different template or a host, all of the child triggers, that became
-	 * obsolete will be deleted.
+	 * Updates children of triggers on the given hosts and propagates the inheritance to all child hosts.
+	 * All of the child triggers that became obsolete will be deleted if the given triggers were assigned to a different
+	 * template or host.
 	 *
 	 * @param array  $triggers
 	 * @param string $triggers[]['triggerid']
@@ -1331,7 +1331,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Check dependencies links.
+	 * Check linkage of dependencies.
 	 *
 	 * @param array      $triggers
 	 * @param array|null $db_triggers
@@ -1377,15 +1377,15 @@ abstract class CTriggerGeneral extends CApiService {
 					if ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 
 						/*
-						 * Trigger cannot depends on trigger prototypes, so it's enough to check circular dependencies
+						 * Trigger cannot depend on trigger prototypes, so it's enough to check circular dependencies
 						 * only among the trigger prototypes.
 						 */
 						$ins_dependencies_prototypes[$row['triggerid']] = $ins_dependencies[$row['triggerid']];
 
 						/*
-						 * Since the trigger prototypes can depends only on trigger prototypes from the same LLD rule,
-						 * for such dependencies is not necessary to check the dependencies of host and template
-						 * triggers. Only dependencies on triggers are required to check.
+						 * Since the trigger prototypes can depend only on trigger prototypes from the same LLD rule,
+						 * for such dependencies it is not necessary to check the dependencies of host and template
+						 * triggers. Only dependencies on triggers are required to be checked.
 						 */
 						unset($ins_dependencies[$row['triggerid']]);
 					}
@@ -2210,7 +2210,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Checks if the given dependencies already exists.
+	 * Checks if the given dependencies already exist.
 	 *
 	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
 	 *
@@ -2259,7 +2259,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Check whether circular linkage occur as a result of the given changes in trigger dependencies.
+	 * Check whether circular linkage occurs as a result of the given changes in trigger dependencies.
 	 *
 	 * @param array $ins_dependencies[<triggerid_up>][<triggerid>]
 	 * @param array $del_dependencies[<triggerid_up>][<triggerid>]
@@ -2339,7 +2339,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Recursively check whether given trigger to set a dependency on forms a circular linkage.
+	 * Recursively check whether the trigger, which a dependency is being set on, produces a circular linkage.
 	 *
 	 * @param array  $links[<triggerid_up>][<triggerid>]
 	 * @param string $triggerid_up
@@ -2363,7 +2363,10 @@ abstract class CTriggerGeneral extends CApiService {
 
 				if ($triggerid_links) {
 					$links_path[$triggerid] = true;
-					return self::circularLinkageExists($links, $triggerid_up, $triggerid_links, $links_path);
+
+					if (self::circularLinkageExists($links, $triggerid_up, $triggerid_links, $links_path)) {
+						return true;
+					}
 				}
 			}
 		}
@@ -2452,9 +2455,9 @@ abstract class CTriggerGeneral extends CApiService {
 			array $trigger_hosts): void {
 		/*
 		 * From the given trigger dependencies we should keep only the dependencies of the template triggers. There is
-		 * no need also to check the dependencies on the triggers from the same template, because it's considered as a
-		 * valid case. So among the triggers, that the template triggers depends on, we should keep only triggers from
-		 * the other templates and hosts.
+		 * also no need to check the dependencies of triggers from the same template, because that is considered a
+		 * valid case. Thus, among the triggers that the template triggers depends on, we should only keep triggers from
+		 * other templates and hosts.
 		 */
 		foreach ($trigger_dependencies as $triggerid_up => $triggerids) {
 			$templateids_up = array_key_exists('templateids', $trigger_hosts[$triggerid_up])
@@ -2463,10 +2466,10 @@ abstract class CTriggerGeneral extends CApiService {
 
 			foreach ($triggerids as $triggerid => $foo) {
 				/*
-				 * If trigger up and dependent trigger have at least one common template, even if they also have a
-				 * different templates, it is important to understand that at the moment of the trigger dependency
-				 * validation all of these different templates is already linked to all child templates, so there is no
-				 * need to check them again.
+				 * If trigger-up and dependent trigger have at least one common template, even if they also have
+				 * other templates, it is important to understand that at the moment of the trigger dependency
+				 * validation all of those different templates are already linked to all child templates,
+				 * so there is no need to check them again.
 				 */
 				if (!array_key_exists('templateids', $trigger_hosts[$triggerid])
 						|| array_intersect_key($templateids_up, $trigger_hosts[$triggerid]['templateids'])) {
@@ -2489,7 +2492,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Check that the triggers up of the given trigger dependencies are not from the parent templates of the dependent
+	 * Check that the triggers-up of the given trigger dependencies do not come from parent templates of dependent
 	 * triggers.
 	 *
 	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
@@ -2552,7 +2555,7 @@ abstract class CTriggerGeneral extends CApiService {
 			return;
 		}
 
-		// Check if the trigger up is not a trigger from the parent template of the dependent trigger.
+		// Check if the trigger-up is a trigger from the parent template of the dependent trigger.
 		foreach ($dependency_templates as $templateid => $templateids_up) {
 			if (array_key_exists($templateid, $template_links)) {
 				foreach ($templateids_up as $templateid_up => $foo) {
@@ -2590,7 +2593,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Check that the triggers up of the given trigger dependencies are not from the child templates or hosts of the
+	 * Check that the triggers-up of the given trigger dependencies are not from the child templates or hosts of the
 	 * dependent triggers.
 	 *
 	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
@@ -2657,7 +2660,7 @@ abstract class CTriggerGeneral extends CApiService {
 			return;
 		}
 
-		// Check if each trigger up is not a trigger from the child template or host of the dependent trigger.
+		// Check if each trigger-up is a trigger from the child template or host of the dependent trigger.
 		foreach ($dependency_templates as $templateid => $templateids_up) {
 			if (array_key_exists($templateid, $template_links)) {
 				foreach ($templateids_up as $templateid_up => $foo) {
@@ -2702,7 +2705,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Recursively check if the given template up exists in the chain of the given template links.
+	 * Recursively check if the given template-up exists in the chain of the given template links.
 	 *
 	 * @param array  $template_links[<templateid>][<templateid_up>]
 	 * @param string $templateid
@@ -2717,10 +2720,9 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		foreach ($template_links[$templateid] as $_templateid => $foo) {
-			if (array_key_exists($_templateid, $template_links)) {
-				if (self::checkTemplateUpExistsInTemplateLinks($template_links, $_templateid, $templateid_up)) {
-					return true;
-				}
+			if (array_key_exists($_templateid, $template_links)
+					&& self::checkTemplateUpExistsInTemplateLinks($template_links, $_templateid, $templateid_up)) {
+				return true;
 			}
 		}
 
@@ -2728,7 +2730,7 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Check that the triggers up templates of the given trigger dependencies are linked to the child templates of the
+	 * Check if the triggers-up templates of the given trigger dependencies are linked to child templates of the
 	 * dependent triggers.
 	 *
 	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
@@ -2783,15 +2785,14 @@ abstract class CTriggerGeneral extends CApiService {
 
 		foreach ($trigger_dependencies as $triggerid_up => $triggerids) {
 			/*
-			 * If trigger belongs to more than one templates, there is not possible to link only part of them to
-			 * another host or template. This means the each template ID of that trigger would have the same hosts
+			 * If trigger belongs to more than one template, then it is not possible to link only part of them to
+			 * another host or template. That means each template ID of that trigger would have the same hosts
 			 * in template links. And vice versa, if at least one of the trigger templates was not found in template
 			 * links, then the trigger is not inherited further.
 			 */
 			$templateid_up = key($trigger_hosts[$triggerid_up]['templateids']);
 
 			foreach ($triggerids as $triggerid => $foo) {
-
 				$templateid = key($trigger_hosts[$triggerid]['templateids']);
 
 				if (!array_key_exists($templateid, $template_links)) {
@@ -2909,8 +2910,8 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Get from the given dependencies only those whose dependent triggers belong to the templates that are linked to
-	 * the templates or hosts.
+	 * Filter for dependencies whose dependent triggers belong to templates that are further linked
+	 * to some templates or hosts.
 	 *
 	 * @param array $edit_dependencies[<triggerid>][<triggerid_up>]
 	 *
