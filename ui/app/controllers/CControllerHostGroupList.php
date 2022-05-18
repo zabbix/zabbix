@@ -56,22 +56,22 @@ class CControllerHostGroupList extends CController {
 		CProfile::update('web.hostgroups.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.groups.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.hostgroups.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			CProfile::delete('web.groups.filter_name');
+			CProfile::delete('web.hostgroups.filter_name');
 		}
 
 		$filter = [
-			'name' => CProfile::get('web.groups.filter_name', '')
+			'name' => CProfile::get('web.hostgroups.filter_name', '')
 		];
 
 		$data = [
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'filter' => $filter,
-			'profileIdx' => 'web.groups.filter',
-			'active_tab' => CProfile::get('web.groups.filter.active', 1),
+			'profileIdx' => 'web.hostgroups.filter',
+			'active_tab' => CProfile::get('web.hostgroups.filter.active', 1),
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],

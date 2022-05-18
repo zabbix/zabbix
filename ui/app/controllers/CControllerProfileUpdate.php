@@ -43,7 +43,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.dashboard.hostid':
 				case 'web.discovery.filter.active':
 				case 'web.discoveryconf.filter.active':
-				case 'web.groups.filter.active':
+				case 'web.hostgroups.filter.active':
 				case 'web.hostinventories.filter.active':
 				case 'web.hostinventoriesoverview.filter.active':
 				case 'web.hosts.filter.active':
