@@ -746,10 +746,10 @@ class CDiscoveryRule extends CItemGeneral {
 				unset($src_triggers[$i]);
 			}
 			else {
-				$dst_triggers[] = array_intersect_key($src_trigger, ['expression', 'description', 'url', 'status', 'priority',
-					'comments','type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-					'opdata', 'discover', 'event_name', 'tags'
-				]);
+				$dst_triggers[] = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url',
+					'status', 'priority', 'comments','type', 'recovery_mode', 'recovery_expression', 'correlation_mode',
+					'correlation_tag', 'opdata', 'discover', 'event_name', 'tags'
+				]));
 			}
 		}
 
@@ -847,7 +847,7 @@ class CDiscoveryRule extends CItemGeneral {
 					else {
 						// Add dependency on the trigger of the other templates or hosts.
 						$dst_triggers[$dst_triggerid]['dependencies'][] = ['triggerid' => $src_trigger_up['triggerid']];
-						$other_host_dependencies[$src_trigger_up['triggerid']][$src_trigger['triggerid']] = true;
+						$other_host_dependencies[$src_trigger_up['triggerid']][$dst_triggerid] = true;
 					}
 				}
 			}
@@ -855,7 +855,7 @@ class CDiscoveryRule extends CItemGeneral {
 			if ($src_host_dependencies) {
 				$dst_host_triggers = DBfetchArrayAssoc(DBselect(
 					'SELECT DISTINCT t.triggerid,t.description,t.expression,t.recovery_expression'.
-					' FROM items i,functions f,triggers t,'.
+					' FROM items i,functions f,triggers t'.
 					' WHERE i.itemid=f.itemid'.
 						' AND f.triggerid=t.triggerid'.
 						' AND '.dbConditionId('i.hostid', [$dst_host['hostid']]).
@@ -921,7 +921,8 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($dst_triggers) {
-			CTriggerGeneral::updateDependencies(array_values($dst_triggers));
+			$dst_triggers = array_values($dst_triggers);
+			CTriggerGeneral::updateDependencies($dst_triggers);
 		}
 
 		return $result;
