@@ -558,6 +558,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 					$diff_values = [];
 
 					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+						// Calculate offset between Agent and Agent2 result arrays
 						for ($i = 0; $i < self::OFFSET_MAX; $i++) {
 							$value[$component][$i] = 0;
 
@@ -576,7 +577,9 @@ class testGoAgentDataCollection extends CIntegrationTest {
 					}
 
 					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
-						$diff_values[$i] = abs(abs($value[self::COMPONENT_AGENT][$i]) - abs($value[self::COMPONENT_AGENT2][$i]));
+						$a = $value[self::COMPONENT_AGENT][$i];
+						$b = $value[self::COMPONENT_AGENT2][$i];
+						$diff_values[$i] = abs(abs($a) - abs($b));
 					}
 					$offset = array_search(min($diff_values), $diff_values);
 
