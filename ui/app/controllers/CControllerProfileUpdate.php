@@ -72,6 +72,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.sla.list.filter.active':
 				case 'web.slareport.list.filter.active':
 				case 'web.sysmapconf.filter.active':
+				case 'web.templategroups.filter.active':
 				case 'web.templates.filter.active':
 				case 'web.templates.graphs.filter.active':
 				case 'web.templates.host_discovery.filter.active':
