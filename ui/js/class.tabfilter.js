@@ -167,8 +167,7 @@ class CTabFilter extends CBaseComponent {
 			container: container,
 			data: data,
 			template: this._templates[data.tab_view] || null,
-			support_custom_time: this._options.support_custom_time,
-			default: this._options.default
+			support_custom_time: this._options.support_custom_time
 		});
 
 		this._items.push(item);

@@ -50,7 +50,6 @@ class CTabFilterItem extends CBaseComponent {
 		this._template_rendered = false;
 		this._src_url = null;
 		this._apply_url = null;
-		this._default = options.default;
 		this._subfilters_expanded = [];
 
 		this.init();
