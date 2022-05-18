@@ -804,7 +804,7 @@ class CScript extends CApiService {
 
 		$groupids = array_keys($groupids);
 
-		$db_groups = DB::select('hstgrp', [
+		$db_groups = API::HostGroup()->get([
 			'output' => [],
 			'groupids' => $groupids,
 			'preservekeys' => true
