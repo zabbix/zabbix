@@ -829,7 +829,7 @@ static void	tm_process_temp_suppression(const char *data)
 		return;
 	}
 
-	if (ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS == action || time(NULL) >= ts)
+	if (ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS == action || (0 != ts && time(NULL) >= ts))
 	{
 		DBexecute("delete from event_suppress where eventid=" ZBX_FS_UI64 " and maintenanceid is null",
 				eventid);
