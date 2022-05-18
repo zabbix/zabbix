@@ -1656,6 +1656,7 @@ static zbx_vmware_resourcepool_t	*vmware_resourcepool_shared_dup(const zbx_vmwar
 	resourcepool->id = vmware_shared_strdup(src->id);
 	resourcepool->parentid = vmware_shared_strdup(src->parentid);
 	resourcepool->path = vmware_shared_strdup(src->path);
+	resourcepool->vm_num = src->vm_num;
 
 	return resourcepool;
 }
@@ -3652,6 +3653,7 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             id           - [IN] the virtual machine id                     *
+ *             rpools       - [IN/OUT] the vector with all Resource Pools     *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: The created virtual machine object or NULL if an error was   *
@@ -3659,7 +3661,7 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service,  CURL *easyhandle,
-		const char *id, char **error)
+		const char *id, zbx_vector_vmware_resourcepool_t *rpools, char **error)
 {
 	zbx_vmware_vm_t	*vm;
 	char		*value;
@@ -3713,6 +3715,20 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	{
 		vm->props[ZBX_VMWARE_VMPROP_SNAPSHOT] = zbx_strdup(NULL, "{\"snapshot\":[],\"count\":0,"
 				"\"latestdate\":null,\"size\":0,\"uniquesize\":0}");
+	}
+
+	if (NULL != vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL])
+	{
+		int				i;
+		zbx_vmware_resourcepool_t	rpool_cmp;
+
+		rpool_cmp.id = vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL];
+
+		if (FAIL != (i = zbx_vector_vmware_resourcepool_bsearch(rpools, &rpool_cmp,
+				vmware_resourcepool_compare_id)))
+		{
+			rpools->values[i]->vm_num ++;
+		}
 	}
 
 	vmware_vm_get_nic_devices(vm, details);
@@ -4740,6 +4756,7 @@ int	vmware_resourcepool_compare_id(const void *r1, const void *r2)
  *             easyhandle   - [IN] the CURL handle                            *
  *             id           - [IN] the vmware hypervisor id                   *
  *             dss          - [IN/OUT] the vector with all Datastores         *
+ *             rpools       - [IN/OUT] the vector with all Resource Pools     *
  *             hv           - [OUT] the hypervisor object (must be allocated) *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
@@ -4748,7 +4765,8 @@ int	vmware_resourcepool_compare_id(const void *r1, const void *r2)
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, const char *id,
-		zbx_vector_vmware_datastore_t *dss, zbx_vmware_hv_t *hv, char **error)
+		zbx_vector_vmware_datastore_t *dss, zbx_vector_vmware_resourcepool_t *rpools, zbx_vmware_hv_t *hv,
+		char **error)
 {
 	char				*value;
 	xmlDoc				*details = NULL, *multipath_data = NULL;
@@ -4882,7 +4900,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	{
 		zbx_vmware_vm_t	*vm;
 
-		if (NULL != (vm = vmware_service_create_vm(service, easyhandle, vms.values[i], error)))
+		if (NULL != (vm = vmware_service_create_vm(service, easyhandle, vms.values[i], rpools, error)))
 		{
 			zbx_vector_ptr_append(&hv->vms, vm);
 		}
@@ -6309,6 +6327,7 @@ static int	vmware_service_get_clusters_and_resourcepools(CURL *easyhandle, zbx_v
 		rpool->id = zbx_strdup(NULL, id);
 		rpool->path = path;
 		rpool->parentid = parentid;
+		rpool->vm_num = 0;
 		zbx_vector_vmware_resourcepool_append(resourcepools, rpool);
 	}
 
@@ -6938,6 +6957,13 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
+	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
+			SUCCEED != vmware_service_get_clusters_and_resourcepools(easyhandle, &data->clusters,
+			&data->resourcepools, &data->error))
+	{
+		goto clean;
+	}
+
 	zbx_vector_vmware_datastore_reserve(&data->datastores, dss.values_num + data->datastores.values_alloc);
 
 	for (i = 0; i < dss.values_num; i++)
@@ -6960,8 +6986,8 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	{
 		zbx_vmware_hv_t	hv_local, *hv;
 
-		if (SUCCEED == vmware_service_init_hv(service, easyhandle, hvs.values[i], &data->datastores, &hv_local,
-				&data->error))
+		if (SUCCEED == vmware_service_init_hv(service, easyhandle, hvs.values[i], &data->datastores,
+				&data->resourcepools, &hv_local, &data->error))
 		{
 			if (NULL != (hv = zbx_hashset_search(&data->hvs, &hv_local)))
 			{
@@ -7026,13 +7052,6 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Previous events have not been read. Reading new events skipped");
-	}
-
-	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
-			SUCCEED != vmware_service_get_clusters_and_resourcepools(easyhandle, &data->clusters,
-			&data->resourcepools, &data->error))
-	{
-		goto clean;
 	}
 
 	if (ZBX_VMWARE_TYPE_VCENTER != service->type)

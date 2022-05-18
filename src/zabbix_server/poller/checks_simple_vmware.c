@@ -655,6 +655,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 			zbx_json_addobject(&json_data, NULL);
 			zbx_json_addstring(&json_data, "rid", rp->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&json_data, "vm_number", rp->vm_num);
 			zbx_json_close(&json_data);
 		}
 
@@ -1205,6 +1206,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addobject(&json_data, NULL);
 			zbx_json_addstring(&json_data, "rid", rp->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&json_data, "vm_number", rp->vm_num);
 			zbx_json_close(&json_data);
 		}
 

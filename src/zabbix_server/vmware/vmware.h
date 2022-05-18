@@ -281,6 +281,7 @@ typedef struct
 	char			*id;
 	char			*parentid;
 	char			*path;
+	zbx_uint64_t		vm_num;
 }
 zbx_vmware_resourcepool_t;
 
