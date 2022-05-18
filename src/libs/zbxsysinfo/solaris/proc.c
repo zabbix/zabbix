@@ -570,7 +570,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
-	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
@@ -678,6 +677,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	while (NULL != (entries = readdir(dir)))
 	{
 		zbx_sysinfo_proc_t	proc;
+		psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
@@ -814,7 +814,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 {
 	DIR			*dir;
 	struct dirent		*entries;
-	int			ret = FAIL, fd = -1;
+	int			ret = FAIL;
 	zbx_sysinfo_proc_t	*proc = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
