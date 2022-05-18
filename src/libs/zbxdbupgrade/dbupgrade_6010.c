@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "log.h"
+#include "sysinfo.h"
 
 extern unsigned char	program_type;
 
@@ -333,7 +334,148 @@ static int	DBpatch_6010023(void)
 	return ret;
 }
 
+#define HTTPSTEP_ITEM_TYPE_RSPCODE	0
+#define HTTPSTEP_ITEM_TYPE_TIME		1
+#define HTTPSTEP_ITEM_TYPE_IN		2
+#define HTTPSTEP_ITEM_TYPE_LASTSTEP	3
+#define HTTPSTEP_ITEM_TYPE_LASTERROR	4
+
 static int	DBpatch_6010024(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
+	char		*out = NULL;
+
+	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select hi.itemid,hi.type,ht.name"
+			" from httptestitem hi,httptest ht"
+			" where hi.httptestid=ht.httptestid");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+		char		*esc;
+		size_t		out_offset = 0;
+		unsigned char	type;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(type, row[1]);
+
+		switch (type)
+		{
+			case HTTPSTEP_ITEM_TYPE_IN:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Download speed for scenario \"%s\".", row[2]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_LASTSTEP:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Failed step of scenario \"%s\".", row[2]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_LASTERROR:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Last error message of scenario \"%s\".", row[2]);
+				break;
+		}
+		esc = DBdyn_escape_field("items", "name", out);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
+				ZBX_FS_UI64 ";\n", esc, itemid);
+		zbx_free(esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+	zbx_free(out);
+
+	return ret;
+}
+
+static int	DBpatch_6010025(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, out_alloc = 0;
+	char		*out = NULL;
+
+	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+		return SUCCEED;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect(
+			"select hi.itemid,hi.type,hs.name,ht.name"
+			" from httpstepitem hi,httpstep hs,httptest ht"
+			" where hi.httpstepid=hs.httpstepid"
+				" and hs.httptestid=ht.httptestid");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	itemid;
+		char		*esc;
+		size_t		out_offset = 0;
+		unsigned char	type;
+
+		ZBX_STR2UINT64(itemid, row[0]);
+		ZBX_STR2UCHAR(type, row[1]);
+
+		switch (type)
+		{
+			case HTTPSTEP_ITEM_TYPE_IN:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Download speed for step \"%s\" of scenario \"%s\".", row[2], row[3]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_TIME:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Response time for step \"%s\" of scenario \"%s\".", row[2], row[3]);
+				break;
+			case HTTPSTEP_ITEM_TYPE_RSPCODE:
+				zbx_snprintf_alloc(&out, &out_alloc, &out_offset,
+						"Response code for step \"%s\" of scenario \"%s\".", row[2], row[3]);
+				break;
+		}
+		esc = DBdyn_escape_field("items", "name", out);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
+				ZBX_FS_UI64 ";\n", esc, itemid);
+		zbx_free(esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+	zbx_free(out);
+
+	return ret;
+}
+
+static int	DBpatch_6010026(void)
 {
 	const ZBX_TABLE	table =
 			{"changelog", "changelogid", 0,
@@ -351,7 +493,7 @@ static int	DBpatch_6010024(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6010025(void)
+static int	DBpatch_6010027(void)
 {
 #ifdef HAVE_ORACLE
 	return DBcreate_serial_sequence("changelog");
@@ -360,7 +502,7 @@ static int	DBpatch_6010025(void)
 #endif
 }
 
-static int	DBpatch_6010026(void)
+static int	DBpatch_6010028(void)
 {
 #ifdef HAVE_ORACLE
 	return DBcreate_serial_trigger("changelog", "changelogid");
@@ -369,127 +511,127 @@ static int	DBpatch_6010026(void)
 #endif
 }
 
-static int	DBpatch_6010027(void)
+static int	DBpatch_6010029(void)
 {
 	return DBcreate_index("changelog", "changelog_1", "clock", 0);
 }
 
-static int	DBpatch_6010028(void)
+static int	DBpatch_6010030(void)
 {
 	return DBcreate_changelog_insert_trigger("hosts", "hostid");
 }
 
-static int	DBpatch_6010029(void)
+static int	DBpatch_6010031(void)
 {
 	return DBcreate_changelog_update_trigger("hosts", "hostid");
 }
 
-static int	DBpatch_6010030(void)
+static int	DBpatch_6010032(void)
 {
 	return DBcreate_changelog_delete_trigger("hosts", "hostid");
 }
 
-static int	DBpatch_6010031(void)
+static int	DBpatch_6010033(void)
 {
 	return DBcreate_changelog_insert_trigger("host_tag", "hosttagid");
 }
 
-static int	DBpatch_6010032(void)
+static int	DBpatch_6010034(void)
 {
 	return DBcreate_changelog_update_trigger("host_tag", "hosttagid");
 }
 
-static int	DBpatch_6010033(void)
+static int	DBpatch_6010035(void)
 {
 	return DBcreate_changelog_delete_trigger("host_tag", "hosttagid");
 }
 
-static int	DBpatch_6010034(void)
+static int	DBpatch_6010036(void)
 {
 	return DBcreate_changelog_insert_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010035(void)
+static int	DBpatch_6010037(void)
 {
 	return DBcreate_changelog_update_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010036(void)
+static int	DBpatch_6010038(void)
 {
 	return DBcreate_changelog_delete_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010037(void)
+static int	DBpatch_6010039(void)
 {
 	return DBcreate_changelog_insert_trigger("item_tag", "itemtagid");
 }
 
-static int	DBpatch_6010038(void)
+static int	DBpatch_6010040(void)
 {
 	return DBcreate_changelog_update_trigger("item_tag", "itemtagid");
 }
 
-static int	DBpatch_6010039(void)
+static int	DBpatch_6010041(void)
 {
 	return DBcreate_changelog_delete_trigger("item_tag", "itemtagid");
 }
 
-static int	DBpatch_6010040(void)
+static int	DBpatch_6010042(void)
 {
 	return DBcreate_changelog_insert_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_6010041(void)
+static int	DBpatch_6010043(void)
 {
 	return DBcreate_changelog_update_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_6010042(void)
+static int	DBpatch_6010044(void)
 {
 	return DBcreate_changelog_delete_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_6010043(void)
+static int	DBpatch_6010045(void)
 {
 	return DBcreate_changelog_insert_trigger("trigger_tag", "triggertagid");
 }
 
-static int	DBpatch_6010044(void)
+static int	DBpatch_6010046(void)
 {
 	return DBcreate_changelog_update_trigger("trigger_tag", "triggertagid");
 }
 
-static int	DBpatch_6010045(void)
+static int	DBpatch_6010047(void)
 {
 	return DBcreate_changelog_delete_trigger("trigger_tag", "triggertagid");
 }
 
-static int	DBpatch_6010046(void)
+static int	DBpatch_6010048(void)
 {
 	return DBcreate_changelog_insert_trigger("functions", "functionid");
 }
 
-static int	DBpatch_6010047(void)
+static int	DBpatch_6010049(void)
 {
 	return DBcreate_changelog_update_trigger("functions", "functionid");
 }
 
-static int	DBpatch_6010048(void)
+static int	DBpatch_6010050(void)
 {
 	return DBcreate_changelog_delete_trigger("functions", "functionid");
 }
 
-static int	DBpatch_6010049(void)
+static int	DBpatch_6010051(void)
 {
 	return DBcreate_changelog_insert_trigger("item_preproc", "item_preprocid");
 }
 
-static int	DBpatch_6010050(void)
+static int	DBpatch_6010052(void)
 {
 	return DBcreate_changelog_update_trigger("item_preproc", "item_preprocid");
 }
 
-static int	DBpatch_6010051(void)
+static int	DBpatch_6010053(void)
 {
 	return DBcreate_changelog_delete_trigger("item_preproc", "item_preprocid");
 }
@@ -552,5 +694,7 @@ DBPATCH_ADD(6010048, 0,	1)
 DBPATCH_ADD(6010049, 0,	1)
 DBPATCH_ADD(6010050, 0,	1)
 DBPATCH_ADD(6010051, 0,	1)
+DBPATCH_ADD(6010052, 0,	1)
+DBPATCH_ADD(6010053, 0,	1)
 
 DBPATCH_END()

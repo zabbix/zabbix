@@ -312,6 +312,7 @@ static int	um_mock_compare_macros_by_id(const void *d1, const void *d2)
 	const zbx_um_mock_macro_t	*m2 = *(const zbx_um_mock_macro_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(m1->macroid, m2->macroid);
+
 	return 0;
 }
 
@@ -448,8 +449,9 @@ static void	um_mock_dbsync_add_htmpl(zbx_dbsync_t *sync, unsigned char tag, zbx_
 
 /*********************************************************************************
  *                                                                               *
- * Purpose: compare macros on two hosts and add new/updated macros to sync and   *
- *          removed macros to del_macros vector                                  *
+ * Purpose:  compare macros on two hosts and:                                    *
+ *              1) add new/updated macros to the sync object                     *
+ *              2) remove macros by adding them into the del_macros vector       *
  *                                                                               *
  *********************************************************************************/
 static void	um_mock_host_macro_diff(const zbx_um_mock_host_t *host1, const zbx_um_mock_host_t *host2,

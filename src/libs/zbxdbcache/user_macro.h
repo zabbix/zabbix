@@ -23,8 +23,6 @@
 #include "common.h"
 #include "zbxalgo.h"
 
-typedef struct zbx_dbsync zbx_dbsync_t;
-
 typedef struct
 {
 	zbx_uint64_t	macroid;
@@ -61,12 +59,10 @@ zbx_um_cache_t;
 zbx_hash_t	um_macro_hash(const void *d);
 int	um_macro_compare(const void *d1, const void *d2);
 
-zbx_um_cache_t	*um_cache_create();
+zbx_um_cache_t	*um_cache_create(void);
 void	um_cache_release(zbx_um_cache_t *cache);
 void	um_macro_release(zbx_um_macro_t *macro);
 
-zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_dbsync_t *hmacros,
-		zbx_dbsync_t *htmpls);
 zbx_um_cache_t	*um_cache_set_value_to_macros(zbx_um_cache_t *cache, const zbx_vector_uint64_pair_t *host_macro_ids,
 		const char *value);
 

@@ -23,27 +23,20 @@ require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup widget, profiles, dashboard
+ * @dataSource TopHostsWidget
  *
- * @onBefore prepareDashboardPageData
+ * @backup widget, profiles, dashboard, items
  */
 class testDashboardTopHostsWidget extends CWebTest {
 
 	use TagTrait;
 
 	/**
-	 * Id of dashboard by name.
-	 *
-	 * @var integer
-	 */
-	protected static $dashboardids;
-
-	/**
 	 * Widget name for update.
 	 */
 	private static $updated_name = 'Top hosts update';
 
-	/*
+	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
 	 */
@@ -64,450 +57,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 		return [
 			CMessageBehavior::class
 		];
-	}
-
-	/**
-	 * Create new dashboards for autotest.
-	 */
-	public function prepareDashboardPageData() {
-		$response = CDataHelper::call('dashboard.create', [
-			[
-				'name' => 'top_host_update',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[
-						'name' => '',
-						'widgets' => [
-							[
-								'type' => 'tophosts',
-								'name' => 'Top hosts update',
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 8,
-								'view_mode' => 0,
-								'fields' => [
-									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.item.0',
-										'value' => 'Available memory'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.display.0',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.history.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'column',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.name.1',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.1',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.item.1',
-										'value' => 'Available memory in %'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.timeshift.1',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.1',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.display.1',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.history.1',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.1',
-										'value' => ''
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.1.0',
-										'value' => 'FF465C'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.1.0',
-										'value' => '100'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.1.1',
-										'value' => 'B0AF07'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.1.1',
-										'value' => '600'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.0',
-										'value' => 'FF465C'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.0',
-										'value' => '100'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.1',
-										'value' => 'B0AF07'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.1',
-										'value' => '600'
-									]
-								]
-							]
-						]
-					]
-				]
-			],
-			[
-				'name' => 'top_host_create',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[]
-				]
-			],
-			[
-				'name' => 'top_host_delete',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[
-						'name' => '',
-						'widgets' => [
-							[
-								'type' => 'tophosts',
-								'name' => 'Top hosts delete',
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 8,
-								'view_mode' => 0,
-								'fields' => [
-									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.item.0',
-										'value' => 'Available memory'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.display.0',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.history.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'column',
-										'value' => 0
-									]
-								]
-							]
-						]
-					]
-				]
-			],
-			[
-				'name' => 'top_host_remove',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[
-						'name' => '',
-						'widgets' => [
-							[
-								'type' => 'tophosts',
-								'name' => 'Top hosts for remove',
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 8,
-								'view_mode' => 0,
-								'fields' => [
-									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.item.0',
-										'value' => 'Available memory'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.display.0',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.history.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'column',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.name.1',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.1',
-										'value' => 2
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.1',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.1',
-										'value' => ''
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.0',
-										'value' => 'FF465C'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.0',
-										'value' => '100'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.color.0.1',
-										'value' => '4000FF'
-									],
-									[
-										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.1',
-										'value' => '1000'
-									],
-									[
-										'type' => 1,
-										'name' => 'tags.tag.0',
-										'value' => 'tag1'
-									],
-									[
-										'type' => 0,
-										'name' => 'tags.operator.0',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'tags.value.0',
-										'value' => 'val1'
-									],
-									[
-										'type' => 1,
-										'name' => 'tags.tag.1',
-										'value' => 'tag2'
-									],
-									[
-										'type' => 0,
-										'name' => 'tags.operator.1',
-										'value' => 0
-									],
-									[
-										'type' => 1,
-										'name' => 'tags.value.1',
-										'value' => 'val2'
-									]
-								]
-							]
-						]
-					]
-				]
-			],
-			[
-				'name' => 'top_host_screenshots',
-				'display_period' => 30,
-				'auto_start' => 1,
-				'pages' => [
-					[
-						'name' => '',
-						'widgets' => [
-							[
-								'type' => 'tophosts',
-								'name' => 'Top hosts screenshots',
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 8,
-								'view_mode' => 0,
-								'fields' => [
-									[
-										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.data.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.item.0',
-										'value' => '1_item'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.timeshift.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.display.0',
-										'value' => 1
-									],
-									[
-										'type' => 0,
-										'name' => 'columns.history.0',
-										'value' => 1
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.base_color.0',
-										'value' => ''
-									],
-									[
-										'type' => 0,
-										'name' => 'column',
-										'value' => 0
-									]
-								]
-							]
-						]
-					]
-				]
-			]
-		]);
-
-		$this->assertArrayHasKey('dashboardids', $response);
-		self::$dashboardids = CDataHelper::getIds('name');
-
-		// Add value to item displayed in Top Hosts widget.
-		CDataHelper::addItemData(99086, 1000);
 	}
 
 	public static function getCreateData() {
@@ -1245,7 +794,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardTopHostsWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_create']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -1301,7 +851,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Hash before simple update.
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_update']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_update');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit()->getWidget(self::$updated_name)->edit()->submit();
 		$dashboard->save();
@@ -1708,7 +1259,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_update']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_update');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
 
@@ -1764,7 +1316,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	public function testDashboardTopHostsWidget_Delete() {
 		$name = 'Top hosts delete';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_delete']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_delete');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$dashboard->deleteWidget($name);
 		$this->page->waitUntilReady();
@@ -1813,7 +1366,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getRemoveData
 	 */
 	public function testDashboardTopHostsWidget_Remove($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_remove']);
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_remove');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget('Top hosts for remove')->edit();
 
@@ -2023,7 +1577,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 			// #0 As is.
 			[
 				[
-					'main_fields' =>  [],
+					'main_fields' =>  [
+						'Name' => 'Simple'
+					],
 					'column_fields' => [
 						[
 							'Data' => 'Item value',
@@ -2036,9 +1592,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 			// #1 Bar.
 			[
 				[
-					'main_fields' =>  [],
+					'main_fields' =>  [
+						'Name' => 'Bar'
+					],
 					'column_fields' => [
 						[
+							'Data' => 'Item value',
+							'Item' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -2055,9 +1615,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 			// #2 Bar with threshold.
 			[
 				[
-					'main_fields' =>  [],
+					'main_fields' =>  [
+						'Name' => 'Bar threshold'
+					],
 					'column_fields' => [
 						[
+							'Data' => 'Item value',
+							'Item' => '1_item',
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
@@ -2074,9 +1638,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 			// #3 Indicators.
 			[
 				[
-					'main_fields' =>  [],
+					'main_fields' =>  [
+						'Name' => 'Indicators'
+					],
 					'column_fields' => [
 						[
+							'Data' => 'Item value',
+							'Item' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '0',
 							'Max' => '2000',
@@ -2093,9 +1661,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 			// #4 Indicators with threshold.
 			[
 				[
-					'main_fields' =>  [],
+					'main_fields' =>  [
+						'Name' => 'Indicators threshold'
+					],
 					'column_fields' => [
 						[
+							'Data' => 'Item value',
+							'Item' => '1_item',
 							'Display' => 'Indicators',
 							'Min' => '500',
 							'Max' => '2000',
@@ -2108,6 +1680,69 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'screen_name' => 'indi_thre'
 				]
+			],
+			// #5 All 5 types visually.
+			[
+				[
+					'main_fields' =>   [
+						'Name' => 'All three'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => '1_item'
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => '1_item',
+							'Display' => 'Indicators',
+							'Min' => '500',
+							'Max' => '2000',
+							'Thresholds' => [
+								[
+									'value' => '1500'
+								]
+							]
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => '1_item',
+							'Display' => 'Indicators',
+							'Min' => '0',
+							'Max' => '2000',
+							'Thresholds' => [
+								[
+									'value' => ''
+								]
+							]
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => '1_item',
+							'Display' => 'Bar',
+							'Min' => '0',
+							'Max' => '2000',
+							'Thresholds' => [
+								[
+									'value' => '500'
+								]
+							]
+						],
+						[
+							'Data' => 'Item value',
+							'Item' => '1_item',
+							'Display' => 'Bar',
+							'Min' => '0',
+							'Max' => '2000',
+							'Thresholds' => [
+								[
+									'value' => ''
+								]
+							]
+						]
+					],
+					'screen_name' => 'all_types'
+				]
 			]
 		];
 	}
@@ -2117,29 +1752,388 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 *
 	 * @dataProvider getBarScreenshotsData
 	 */
-	public function testDashboardTopHostsWidget_widgetAppearance($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids['top_host_screenshots']);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->getWidget('Top hosts screenshots')->edit();
+	public function testDashboardTopHostsWidget_WidgetAppearance($data) {
+		$this->createTopHostsWidget($data, 'top_host_screenshots');
 
-		// Update column.
-		if (array_key_exists('column_fields', $data)) {
-			$this->fillColumnForm($data, 'update');
-		}
-
-		if (array_key_exists('main_fields', $data)) {
-			$form->fill($data['main_fields']);
-		}
-
-		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
-
-		$this->page->waitUntilReady();
-		$dashboard->save();
-
-		// Check message that widget added.
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$element = $dashboard->getWidget('Top hosts screenshots')->query('class:list-table')->one();
+		// Check widget added and assert screenshots.
+		$element = CDashboardElement::find()->one()->getWidget($data['main_fields']['Name'])
+				->query('class:list-table')->one();
 		$this->assertScreenshot($element, $data['screen_name']);
+	}
+
+	/**
+	 * Check warning and info messages.
+	 */
+	public function testDashboardTopHostsWidget_CheckInfoMessages() {
+		$warnings = ['.//span[@id="tophosts-column-aggregate-function-warning"]', './/span[@id="tophosts-column-display-warning"]',
+				'.//span[@id="tophosts-column-thresholds-warning"]'];
+		$info = '//label[@for="history"]';
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill(['Type' => 'Top hosts']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
+
+		// Add column.
+		$form->query('id:add')->waitUntilClickable()->one()->click();
+		$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
+
+		// Check that no warning icon displayed before adding fields.
+		foreach ($warnings as $warning) {
+			$this->assertFalse($column_form->query('xpath:'.$warning)->one()->isVisible());
+		}
+
+
+		// Check that History data hint ID is visible.
+		$this->assertTrue($column_form->query('xpath:'.$info.'/a')->one()->isVisible());
+
+		// Adding those fields new info icons appear.
+		$column_form->fill(['Aggregation function' => 'min', 'Display' => 'Bar']);
+		$column_form->query('button:Add')->one()->click();
+		$warnings = array_merge($warnings, [$info]);
+
+		// Check warning and info icon message.
+		foreach ($warnings as $warning) {
+			$column_form->query('xpath:'.$warning.'/a')->one()->click();
+
+			// Check hint-box.
+			$hint = $column_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+			$hintbox = ($warning === $info)
+					? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
+					: 'With this setting only numeric items will be displayed in this column.';
+			$this->assertEquals($hintbox, $hint->one()->getText());
+
+			// Close the hint-box.
+			$hint->query('xpath://button[@class="overlay-close-btn"]')->one()->click();
+			$hint->waitUntilNotPresent();
+		}
+	}
+
+	public static function getCheckTextItemsData() {
+		return [
+			// #0 text item - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Text value item'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text'
+						]
+					],
+					'text' => 'Text for text item'
+				]
+			],
+			// #1 text item, history data Trends - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Text trends history'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'History data' => 'Trends'
+						]
+					],
+					'text' => 'Text for text item'
+				]
+			],
+			// #2 text item, display Bar - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Text display bar'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'Display' => 'Bar'
+						]
+					]
+				]
+			],
+			// #3 text item, display Indicators - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Text display indicators'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'Display' => 'Indicators'
+						]
+					]
+				]
+			],
+			// #4 text item, Aggregation function max - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Text aggregation function'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'Aggregation function' => 'max'
+						]
+					]
+				]
+			],
+			// #5 text item, Threshold - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Text threshold'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_text',
+							'Thresholds' => [
+								[
+									'value' => '10'
+								]
+							]
+						]
+					]
+				]
+			],
+			// #6 log item - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log value item'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log'
+						]
+					],
+					'text' => 'Logs for text item'
+				]
+			],
+			// #7 log item, history data Trends - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log trends history'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'History data' => 'Trends'
+						]
+					],
+					'text' => 'Logs for text item'
+				]
+			],
+			// #8 log item, display Bar - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log display bar'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'Display' => 'Bar'
+						]
+					]
+				]
+			],
+			// #9 log item, display Indicators - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log display indicators'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'Display' => 'Indicators'
+						]
+					]
+				]
+			],
+			// #10 log item, Aggregation function max - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log aggregation function'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'Aggregation function' => 'max'
+						]
+					]
+				]
+			],
+			// #11 log item, Threshold - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Log threshold'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_log',
+							'Thresholds' => [
+								[
+									'value' => '10'
+								]
+							]
+						]
+					]
+				]
+			],
+			// #12 char item - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char value item'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char'
+						]
+					],
+					'text' => 'characters_here'
+				]
+			],
+			// #13 char item, history data Trends - value displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char trends history'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
+							'History data' => 'Trends'
+						]
+					],
+					'text' => 'characters_here'
+				]
+			],
+			// #14 char item, display Bar - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char display bar'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
+							'Display' => 'Bar'
+						]
+					]
+				]
+			],
+			// #15 char item, display Indicators - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char display indicators'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
+							'Display' => 'Indicators'
+						]
+					]
+				]
+			],
+			// #16 char item, Aggregation function max - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char aggregation function'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
+							'Aggregation function' => 'max'
+						]
+					]
+				]
+			],
+			// #17 char item, Threshold - value not displayed.
+			[
+				[
+					'main_fields' =>  [
+						'Name' => 'Char threshold'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Item value',
+							'Item' => 'trap_char',
+							'Thresholds' => [
+								[
+									'value' => '10'
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Changing column parameters, check that text value is visible/non-visible.
+	 *
+	 * @dataProvider getCheckTextItemsData
+	 */
+	public function testDashboardTopHostsWidget_CheckTextItems($data) {
+		$this->createTopHostsWidget($data, 'top_host_text_items');
+
+		// Check if value displayed in column table.
+		$value = (array_key_exists('text', $data)) ? $data['text'] : 'No data found.';
+		$this->assertEquals($value, CDashboardElement::find()->one()->getWidget($data['main_fields']['Name'])
+				->getContent()->getText());
+	}
+
+	/**
+	 * Function used to create Top Hosts widget with special columns for CheckTextItems and WidgetAppearance scenarios.
+	 *
+	 * @param type $data	dataprovider values.
+	 * @param type $name	name of the dashboard where to create Top Hosts widget.
+	 */
+	private function createTopHostsWidget($data, $name) {
+		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.'.$name);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill(['Type' => 'Top hosts']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
+
+		// Add new column and save widget.
+		$this->fillColumnForm($data, 'create');
+		$form->fill($data['main_fields'])->submit();
+		COverlayDialogElement::ensureNotPresent();
+		$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
+		$dashboard->save();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 }

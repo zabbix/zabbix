@@ -4800,7 +4800,7 @@ static int	expand_normal_trigger_macros(zbx_eval_context_t *ctx, const DB_EVENT 
 
 		if (FAIL == substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				NULL, NULL, NULL, &token->value.data.str, MACRO_TYPE_TRIGGER_EXPRESSION, error,
-				maxerrlen))
+				(int)maxerrlen))
 		{
 			return FAIL;
 		}
@@ -5094,7 +5094,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 		*items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)itemids.values_num);
 		*items_err = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
 
-		DCconfig_get_items_by_itemids_partial(*items, itemids.values, *items_err, (size_t)itemids.values_num,
+		DCconfig_get_items_by_itemids_partial(*items, itemids.values, *items_err, itemids.values_num,
 				ZBX_ITEM_GET_SYNC);
 	}
 

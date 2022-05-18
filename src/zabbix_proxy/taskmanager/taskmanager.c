@@ -27,6 +27,7 @@
 #include "zbxdiag.h"
 #include "zbxrtc.h"
 #include "proxy.h"
+#include "dbcache.h"
 
 #include "../../zabbix_server/scripts/scripts.h"
 #include "../../zabbix_server/trapper/trapper_item_test.h"

@@ -17,13 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxalgo.h"
+#include "user_macro.h"
+
 #include "zbxshmem.h"
-#include "zbxalgo.h"
 #include "dbsync.h"
 #include "dbconfig.h"
-#include "user_macro.h"
 #include "zbxregexp.h"
 
 extern zbx_shmem_info_t	*config_mem;
@@ -98,6 +96,7 @@ static int	um_host_compare(const void *d1, const void *d2)
 	const zbx_um_host_t	*h2 = *(const zbx_um_host_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(h1->hostid, h2->hostid);
+
 	return 0;
 }
 
@@ -116,6 +115,7 @@ int	um_macro_compare(const void *d1, const void *d2)
 	const zbx_um_macro_t	*m2 = *(const zbx_um_macro_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(m1->macroid, m2->macroid);
+
 	return 0;
 }
 
@@ -125,7 +125,7 @@ int	um_macro_compare(const void *d1, const void *d2)
  * Purpose: create user macro cache                                              *
  *                                                                               *
  *********************************************************************************/
-zbx_um_cache_t	*um_cache_create()
+zbx_um_cache_t	*um_cache_create(void)
 {
 	zbx_um_cache_t	*cache;
 
@@ -226,7 +226,7 @@ static zbx_um_macro_t	*um_macro_dup(zbx_um_macro_t *macro)
  * Comment: macro references are copied over with incremented reference counters.*
  *                                                                               *
  *********************************************************************************/
-static zbx_um_host_t *um_host_dup(zbx_um_host_t *host)
+static zbx_um_host_t	*um_host_dup(zbx_um_host_t *host)
 {
 	zbx_um_host_t	*dup;
 	int		i;

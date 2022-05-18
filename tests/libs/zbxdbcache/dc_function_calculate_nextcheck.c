@@ -66,6 +66,7 @@ void	zbx_mock_test_entry(void **state)
 
 	timer.type = str_to_timer_type(zbx_mock_get_parameter_string("in.type"));
 	timer.parameter = zbx_mock_get_parameter_string("in.params");
+	timer.lastcheck = ts_from.sec;
 
 	ts_returned.ns = 0;
 	ts_returned.sec = zbx_dc_function_calculate_nextcheck(&timer, ts_from.sec, 0);
