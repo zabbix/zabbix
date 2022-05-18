@@ -1129,7 +1129,7 @@ static void	flush_user_msg(ZBX_USER_MSG **user_msg, int esc_step, const ZBX_DB_E
 		const ZBX_DB_EVENT *r_event, zbx_uint64_t actionid, const DB_ACKNOWLEDGE *ack,
 		const zbx_service_alarm_t *service_alarm, const ZBX_DB_SERVICE *service)
 {
-	ZBX_USER_MSG	*p;
+	ZBX_USER_MSG		*p;
 
 	while (NULL != *user_msg)
 	{
@@ -1227,6 +1227,7 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 	char			*buffer = NULL;
 	size_t			buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
 	zbx_vector_uint64_t	executed_on_hosts, groupids;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1315,6 +1316,8 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 
 	zbx_free(buffer);
 	zbx_vector_uint64_create(&executed_on_hosts);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1523,6 +1526,8 @@ skip:
 	DBfree_result(result);
 	zbx_vector_uint64_destroy(&executed_on_hosts);
 
+	zbx_dc_close_user_macros(um_handle);
+
 	if (0 < alerts_num)
 	{
 		zbx_db_insert_execute(&db_insert);
@@ -1539,13 +1544,17 @@ static void	get_mediatype_params(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *
 		const char *message, const DB_ACKNOWLEDGE *ack, const zbx_service_alarm_t *service_alarm,
 		const ZBX_DB_SERVICE *service, char **params, const char *tz)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	DB_ALERT	alert = {.sendto = (char *)sendto, .subject = (char *)(uintptr_t)subject,
-			.message = (char *)(uintptr_t)message};
-	struct zbx_json	json;
-	char		*name, *value;
-	int		message_type;
+	DB_RESULT		result;
+	DB_ROW			row;
+	DB_ALERT		alert = {.sendto = (char *)sendto,
+					.subject = (char *)(uintptr_t)subject,
+					.message = (char *)(uintptr_t)message
+				};
+
+	struct zbx_json		json;
+	char			*name, *value;
+	int			message_type;
+	zbx_dc_um_handle_t	*um_handle;
 
 	if (NULL != ack)
 		message_type = MACRO_TYPE_MESSAGE_UPDATE;
@@ -1553,6 +1562,8 @@ static void	get_mediatype_params(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *
 		message_type = (NULL != r_event ? MACRO_TYPE_MESSAGE_RECOVERY : MACRO_TYPE_MESSAGE_NORMAL);
 
 	zbx_json_init(&json, 1024);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	result = DBselect("select name,value from media_type_param where mediatypeid=" ZBX_FS_UI64, mediatypeid);
 	while (NULL != (row = DBfetch(result)))
@@ -1571,6 +1582,8 @@ static void	get_mediatype_params(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *
 
 	}
 	DBfree_result(result);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	*params = zbx_strdup(NULL, json.buffer);
 	zbx_json_free(&json);
@@ -2870,6 +2883,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 	zbx_vector_service_t		services;
 	zbx_hashset_t			service_roles;
 	ZBX_DB_SERVICE			service_local;
+	zbx_dc_um_handle_t		*um_handle;
 
 	zbx_vector_uint64_create(&escalationids);
 	zbx_vector_ptr_create(&diffs);
@@ -2884,6 +2898,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	add_ack_escalation_r_eventids(escalations, eventids, &event_pairs);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	get_db_actions_info(actionids, &actions);
 	zbx_db_get_events_by_eventids(eventids, &events);
@@ -3175,6 +3191,8 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_ptr_t *esc
 
 	DBcommit();
 out:
+	zbx_dc_close_user_macros(um_handle);
+
 	zbx_vector_ptr_clear_ext(&diffs, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&diffs);
 

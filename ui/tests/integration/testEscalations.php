@@ -378,10 +378,10 @@ class testEscalations extends CIntegrationTest {
 		$this->assertEquals($maintenance_id, $response['result']['maintenanceids'][0]);
 		$this->reloadConfigurationCache();
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In zbx_dc_update_maintenances()', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_update_maintenances()', true);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In zbx_dc_update_maintenances()|In escalation_execute()', true, 120, null, true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_update_maintenances()|End of escalation_execute()', true, null, 3, true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()|In zbx_dc_update_maintenances()', true, 120, null, true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()|End of zbx_dc_update_maintenances()', true, null, 3, true);
 
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]

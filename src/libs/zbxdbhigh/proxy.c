@@ -3515,7 +3515,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	while (SUCCEED == parse_history_data_by_itemids(jp_data, &pnext, values, itemids, &values_num, &read_num,
 			&unique_shift, &error) && 0 != values_num)
 	{
-		DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, (size_t)values_num, mode);
+		DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, values_num, mode);
 
 		for (i = 0; i < values_num; i++)
 		{
@@ -3861,7 +3861,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 			session = zbx_dc_get_or_create_data_session(hostid, token);
 
 		if (SUCCEED != (ret = process_history_data_by_itemids(sock, validator_func, validator_args, &jp_data,
-				session, NULL, info, ZBX_ITEM_GET_ALL)))
+				session, NULL, info, ZBX_ITEM_GET_DEFAULT)))
 		{
 			goto out;
 		}
@@ -3914,8 +3914,16 @@ int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
 {
 	zbx_host_rights_t	rights = {0};
+	int			ret;
+	zbx_dc_um_handle_t	*um_handle;
 
-	return process_client_history_data(sock, jp, ts, sender_item_validator, &rights, info);
+	um_handle = zbx_dc_open_user_macros();
+
+	ret = process_client_history_data(sock, jp, ts, sender_item_validator, &rights, info);
+
+	zbx_dc_close_user_macros(um_handle);
+
+	return ret;
 }
 
 static void	zbx_drule_ip_free(zbx_drule_ip_t *ip)

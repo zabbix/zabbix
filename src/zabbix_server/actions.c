@@ -38,8 +38,8 @@
  ******************************************************************************/
 static int	compare_events(const void *d1, const void *d2)
 {
-	const ZBX_DB_EVENT	*p1 = *(const ZBX_DB_EVENT **)d1;
-	const ZBX_DB_EVENT	*p2 = *(const ZBX_DB_EVENT **)d2;
+	const ZBX_DB_EVENT	*p1 = *(const ZBX_DB_EVENT * const *)d1;
+	const ZBX_DB_EVENT	*p2 = *(const ZBX_DB_EVENT * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->objectid, p2->objectid);
 	ZBX_RETURN_IF_NOT_EQUAL(p1->object, p2->object);
@@ -3083,6 +3083,7 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	zbx_vector_ptr_t		esc_events[EVENT_SOURCE_COUNT];
 	zbx_hashset_iter_t		iter;
 	zbx_condition_t			*condition;
+	zbx_dc_um_handle_t		*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)events->values_num);
 
@@ -3100,6 +3101,8 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 	get_escalation_events(events, esc_events);
 
+	um_handle = zbx_dc_open_user_macros();
+
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 	{
 		if (0 == esc_events[i].values_num)
@@ -3112,6 +3115,8 @@ void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pai
 		while (NULL != (condition = (zbx_condition_t *)zbx_hashset_iter_next(&iter)))
 			check_events_condition(&esc_events[i], i, condition);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
 	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION: execute operations (except command and message  */
@@ -3306,6 +3311,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 	zbx_vector_ptr_t	esc_events[EVENT_SOURCE_COUNT];
 	zbx_hashset_iter_t	iter;
 	zbx_condition_t		*condition;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3346,6 +3352,8 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 		zbx_vector_ptr_append(&esc_events[event->source], (void*)event);
 	}
 
+	um_handle = zbx_dc_open_user_macros();
+
 	for (i = 0; i < EVENT_SOURCE_COUNT; i++)
 	{
 		if (0 == esc_events[i].values_num)
@@ -3358,6 +3366,8 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 		while (NULL != (condition = (zbx_condition_t *)zbx_hashset_iter_next(&iter)))
 			check_events_condition(&esc_events[i], i, condition);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	for (i = 0; i < eventids.values_num; i++)
 	{

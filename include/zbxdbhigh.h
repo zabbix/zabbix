@@ -130,6 +130,7 @@ zbx_host_template_link_type;
 #	define ZBX_ITEM_POSTS_LEN		65535
 #	define ZBX_ITEM_HEADERS_LEN		65535
 #endif
+
 #define ZBX_ITEM_PARAMETER_NAME_LEN		255
 #define ZBX_ITEM_PARAMETER_VALUE_LEN		2048
 #define ZBX_ITEM_TAG_FIELD_LEN			255

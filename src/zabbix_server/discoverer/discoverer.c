@@ -749,10 +749,11 @@ out:
 
 static int	process_discovery(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		rule_count = 0;
-	char		*delay_str = NULL;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			rule_count = 0;
+	char			*delay_str = NULL;
+	zbx_dc_um_handle_t	*um_handle;
 
 	result = DBselect(
 			"select distinct r.druleid,r.iprange,r.name,c.dcheckid,r.proxy_hostid,r.delay"
@@ -767,6 +768,8 @@ static int	process_discovery(void)
 			(int)time(NULL),
 			CONFIG_DISCOVERER_FORKS,
 			process_num - 1);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	while (ZBX_IS_RUNNING() && NULL != (row = DBfetch(result)))
 	{
@@ -822,6 +825,8 @@ static int	process_discovery(void)
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64, now + delay, druleid);
 	}
 	DBfree_result(result);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zbx_free(delay_str);
 
