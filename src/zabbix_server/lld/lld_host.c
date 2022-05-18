@@ -2044,15 +2044,12 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 		/* check if host macro has already been added */
 		if (0 == hostmacro->hostmacroid && 0 == strcmp(hostmacro->macro, macro))
 		{
-			/* do not update/remove manual macros */
-			if (ZBX_MACRO_STATE_MANUAL == state)
-			{
-				lld_hostmacro_free(hostmacro);
-				zbx_vector_ptr_remove(hostmacros, i);
-				return;
-			}
-
 			hostmacro->hostmacroid = hostmacroid;
+
+			/* do not update manual macros */
+			if (ZBX_MACRO_STATE_MANUAL == state)
+				return;
+
 			if (0 != strcmp(hostmacro->value, value))
 			{
 				hostmacro->flags |= ZBX_FLAG_LLD_HMACRO_UPDATE_VALUE;
@@ -2071,6 +2068,10 @@ static void	lld_hostmacro_make(zbx_vector_ptr_t *hostmacros, zbx_uint64_t hostma
 			return;
 		}
 	}
+
+	/* do not remove manual macros */
+	if (ZBX_MACRO_STATE_MANUAL == state)
+		return;
 
 	/* host macro is present on the host but not in new list, it should be removed */
 	hostmacro = (zbx_lld_hostmacro_t *)zbx_malloc(NULL, sizeof(zbx_lld_hostmacro_t));
