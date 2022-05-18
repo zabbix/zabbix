@@ -206,10 +206,10 @@ foreach ($data['host_groups'] as $groupid => $group) {
 	$name_link = $group['editable'] && $data['allowed_ui_conf_host_groups']
 		? (new CLink($caption, (new CUrl('zabbix.php'))
 			->setArgument('action', 'hostgroup.edit')
-			->setArgument('groupid', $group['groupid'])
+			->setArgument('groupid', $groupid)
 		))
 			->addClass('js-edit-hostgroup')
-			->setAttribute('data-groupid', $group['groupid'])
+			->setAttribute('data-groupid', $groupid)
 		: new CSpan($caption);
 
 	$hosts_link = null;
@@ -383,10 +383,10 @@ foreach ($data['template_groups'] as $groupid => $group) {
 	$name_link = $group['editable'] && $data['allowed_ui_conf_template_groups']
 		? (new CLink($caption, (new CUrl('zabbix.php'))
 			->setArgument('action', 'templategroup.edit')
-			->setArgument('groupid', $group['groupid'])
+			->setArgument('groupid', $groupid)
 		))
 			->addClass('js-edit-templategroup')
-			->setAttribute('data-groupid', $group['groupid'])
+			->setAttribute('data-groupid', $groupid)
 		: new CSpan($caption);
 
 	$templates_link = null;
