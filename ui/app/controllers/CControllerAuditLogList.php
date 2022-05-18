@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,7 +24,7 @@ class CControllerAuditLogList extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'page' =>					'ge 1',
-			'filter_action' =>			'in -1,'.implode(',', array_keys(self::getActionsList())),
+			'filter_actions' =>			'array',
 			'filter_resourcetype' =>	'in -1,'.implode(',', array_keys(self::getResourcesList())),
 			'filter_rst' =>				'in 1',
 			'filter_set' =>				'in 1',
@@ -36,6 +36,30 @@ class CControllerAuditLogList extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$fields = [];
+
+			if ($this->getInput('filter_resourceid', '') !== '') {
+				$fields['filter_resourceid'] = 'id';
+			}
+
+			if ($this->getInput('filter_recordsetid', '') !== '') {
+				$fields['filter_recordsetid'] = 'cuid';
+			}
+
+			if ($fields) {
+				$validator = new CNewValidator($this->getInputAll(), $fields);
+
+				foreach ($validator->getAllErrors() as $error) {
+					info($error);
+				}
+
+				if ($validator->isErrorFatal() || $validator->isError()) {
+					$ret = false;
+				}
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -69,7 +93,7 @@ class CControllerAuditLogList extends CController {
 			'page' => $this->getInput('page', 1),
 			'userids' => CProfile::getArray('web.auditlog.filter.userids', []),
 			'resourcetype' => CProfile::get('web.auditlog.filter.resourcetype', -1),
-			'auditlog_action' => CProfile::get('web.auditlog.filter.action', -1),
+			'auditlog_actions' => CProfile::getArray('web.auditlog.filter.actions', []),
 			'resourceid' => CProfile::get('web.auditlog.filter.resourceid', ''),
 			'recordsetid' => CProfile::get('web.auditlog.filter.recordsetid', ''),
 			'action' => $this->getAction(),
@@ -81,21 +105,20 @@ class CControllerAuditLogList extends CController {
 		];
 		$users = [];
 		$non_existent_userids = [];
-		$filter = [];
 
-		if (array_key_exists((int) $data['auditlog_action'], $data['actions'])) {
-			$filter['action'] = $data['auditlog_action'];
-		}
+		$filter = [
+			'action' => $data['auditlog_actions']
+		];
 
-		if (array_key_exists((int) $data['resourcetype'], $data['resources'])) {
+		if ($data['resourcetype'] != -1) {
 			$filter['resourcetype'] = $data['resourcetype'];
 		}
 
-		if ($data['resourceid'] !== '' && CNewValidator::is_id($data['resourceid'])) {
+		if ($data['resourceid'] !== '') {
 			$filter['resourceid'] = $data['resourceid'];
 		}
 
-		if ($data['recordsetid'] !== '' && CNewValidator::isCuid($data['recordsetid'])) {
+		if ($data['recordsetid'] !== '') {
 			$filter['recordsetid'] = $data['recordsetid'];
 		}
 
@@ -169,7 +192,6 @@ class CControllerAuditLogList extends CController {
 		natsort($data['actions']);
 		natsort($data['resources']);
 
-		$data['actions'] = [-1 => _('All')] + $data['actions'];
 		$data['resources'] = [-1 => _('All')] + $data['resources'];
 
 		$response = new CControllerResponseData($data);
@@ -250,7 +272,7 @@ class CControllerAuditLogList extends CController {
 
 	private function updateProfiles(): void {
 		CProfile::updateArray('web.auditlog.filter.userids', $this->getInput('filter_userids', []), PROFILE_TYPE_ID);
-		CProfile::update('web.auditlog.filter.action', $this->getInput('filter_action', -1), PROFILE_TYPE_INT);
+		CProfile::updateArray('web.auditlog.filter.actions', $this->getInput('filter_actions', []), PROFILE_TYPE_INT);
 		CProfile::update('web.auditlog.filter.resourcetype', $this->getInput('filter_resourcetype', -1),
 			PROFILE_TYPE_INT
 		);
@@ -262,7 +284,7 @@ class CControllerAuditLogList extends CController {
 
 	private function deleteProfiles(): void {
 		CProfile::deleteIdx('web.auditlog.filter.userids');
-		CProfile::delete('web.auditlog.filter.action');
+		CProfile::deleteIdx('web.auditlog.filter.actions');
 		CProfile::delete('web.auditlog.filter.resourcetype');
 		CProfile::delete('web.auditlog.filter.resourceid');
 		CProfile::delete('web.auditlog.filter.recordsetid');

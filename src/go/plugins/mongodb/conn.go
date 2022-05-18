@@ -26,9 +26,9 @@ import (
 
 	"gopkg.in/mgo.v2/bson"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/uri"
 	"gopkg.in/mgo.v2"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/uri"
 )
 
 type MongoConn struct {

@@ -19,9 +19,9 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.0.4rc1])
+AC_INIT([Zabbix],[6.0.5rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
+AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 

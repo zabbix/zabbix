@@ -150,7 +150,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 			new CTag('h4', true, [
 				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 			])
-		]);
+		], ZBX_STYLE_HOVER_NOBG);
 
 	// array contains subfilters and number of items in each
 	$item_params = [

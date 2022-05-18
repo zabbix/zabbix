@@ -29,6 +29,8 @@ import (
 
 	_ "zabbix.com/plugins"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/remotecontrol"
@@ -38,8 +40,6 @@ import (
 	"zabbix.com/internal/agent/serverlistener"
 	"zabbix.com/internal/agent/statuslistener"
 	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/pidfile"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"

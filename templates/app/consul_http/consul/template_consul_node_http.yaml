@@ -1,0 +1,2471 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-05-17T15:36:35Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 884bdbeea93c4be0a11a2c92a5f8adce
+      template: 'HashiCorp Consul Node by HTTP'
+      name: 'HashiCorp Consul Node by HTTP'
+      description: |
+        Get HashiCorp Consul Node metrics by HTTP agent from metrics endpoint.
+        
+        Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.TOKEN}.
+        Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.
+        More information about metrics you can find in official documentation: https://www.consul.io/docs/agent/telemetry
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 9f90fe43daaa43369b000754e1630e41
+          name: 'Consul: ACL: resolves, rate'
+          type: DEPENDENT
+          key: consul.acl.resolves.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of ACL resolves per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_acl_ResolveToken_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: acl
+        -
+          uuid: 1c969d5d7546444e91e883661d63890b
+          name: 'Consul: Catalog: deregister, rate'
+          type: DEPENDENT
+          key: consul.catalog.deregister.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of catalog deregister operation per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_catalog_deregister_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: catalog
+        -
+          uuid: 8f01480896f8426688aee08e2ee0fc20
+          name: 'Consul: Catalog: register, rate'
+          type: DEPENDENT
+          key: consul.catalog.register.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of catalog register operation per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_catalog_register_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: catalog
+        -
+          uuid: dabcb6819c9444a6a287a6458056ef31
+          name: 'Consul: Number of checks'
+          type: DEPENDENT
+          key: consul.checks_number
+          delay: '0'
+          history: 7d
+          description: 'Number of checks on current node.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.agent.checks
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_node_info
+          tags:
+            -
+              tag: component
+              value: consul
+        -
+          uuid: 8e48706f9bda4689bec45f4a80fcc3cb
+          name: 'Consul: Number of check monitors'
+          type: DEPENDENT
+          key: consul.check_monitors_number
+          delay: '0'
+          history: 7d
+          description: 'Number of check monitors on current node.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.agent.check_monitors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_node_info
+          tags:
+            -
+              tag: component
+              value: consul
+        -
+          uuid: 2706adc5e5a64c4480269938e2b90fc1
+          name: 'Consul: Client RPC, per second'
+          type: DEPENDENT
+          key: consul.client_rpc
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Rps
+          description: |
+            Number of times per second whenever a Consul agent in client mode makes an RPC request to a Consul server.
+            This gives a measure of how much a given agent is loading the Consul servers.
+            This is only generated by agents in client mode, not Consul servers.
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_client_rpc
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: rpc
+        -
+          uuid: 3fd30bfd7c324c53a346974c9f38e9db
+          name: 'Consul: Client RPC failed ,per second'
+          type: DEPENDENT
+          key: consul.client_rpc_failed
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Rps
+          description: 'Number of times per second whenever whenever a Consul agent in client mode makes an RPC request to a Consul server and fails.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_client_rpc_failed
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: rpc
+        -
+          uuid: 12b9bbac571b431ea06a13a7154ef673
+          name: 'Consul: Process CPU seconds, total'
+          type: DEPENDENT
+          key: consul.cpu_seconds_total.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'Total user and system CPU time spent in seconds.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_cpu_seconds_total
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: cpu
+        -
+          uuid: 7513b847ac754a25972adb3547a871ca
+          name: 'Consul: GC pause, p50'
+          type: DEPENDENT
+          key: consul.gc_pause.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The 50 percentile (median) for the number of nanoseconds consumed by stop-the-world garbage collection (GC) pauses since Consul started, in milliseconds.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_runtime_gc_pause_ns{quantile="0.5"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1.0E-9'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: gs
+        -
+          uuid: 3ec74713a835498197e59df962e27bab
+          name: 'Consul: GC pause, p90'
+          type: DEPENDENT
+          key: consul.gc_pause.p90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'The 90 percentile for the number of nanoseconds consumed by stop-the-world garbage collection (GC) pauses since Consul started, in milliseconds.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_runtime_gc_pause_ns{quantile="0.9"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1.0E-9'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: gc
+        -
+          uuid: 2b3cbe778f1c4d858e43320b8c25960d
+          name: 'Consul: Get local services'
+          type: SCRIPT
+          key: consul.get_local_services
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Consul = {
+                setParams: function (params) {
+                    ['api_endpoint', 'token'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                    });
+            
+                    Consul.params = params;
+                    if (typeof Consul.params.api_endpoint === 'string' && !Consul.params.api_endpoint.endsWith('/')) {
+                        Consul.params.api_endpoint += '/';
+                    }
+                },
+            
+                request: function (query) {
+                    var response,
+                        request = new HttpRequest(),
+                        url = Consul.params.api_endpoint + query;
+            
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('X-Consul-Token: ' + Consul.params.token);
+            
+                    Zabbix.log(4, '[ Consul ] Sending request: ' + url);
+                    response = request.get(url);
+            
+                    Zabbix.log(4, '[ Consul ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                    if (response !== null) {
+                        try {
+                            response = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from Consul Agent API.';
+                        }
+                    }
+            
+                    return {
+                        status: request.getStatus(),
+                        response: response
+                    };
+                },
+            
+                getServices: function () {
+                    var result = Consul.request('v1/agent/services'),
+                        services = [];
+            
+                    if (typeof result.response !== 'object' || result.status != 200) {
+                        throw 'Cannot get service list from Consul Agent API.';
+                    }
+            
+                    Object.keys(result.response).forEach(function (service) {
+                        services.push(result.response[service]['ID']);
+                    });
+            
+                    return services;
+                },
+            
+                getServiceStats: function (service_id) {
+                    var result = Consul.request('v1/agent/health/service/id/' + service_id);
+            
+                    if (typeof result.response !== 'object' || [200, 429, 503].indexOf(result.status) === -1) {
+                        throw 'Cannot get service info from Consul Agent API.';
+                    }
+            
+                    return result.response;
+                }
+            }
+            
+            try {
+                Consul.setParams(JSON.parse(value));
+            
+                var services = Consul.getServices(),
+                    result = [];
+            
+                services.forEach(function (service) {
+                    var service_stats = Consul.getServiceStats(service);
+            
+                    result.push({
+                        'id': service,
+                        'name': service_stats['Service']['Service'],
+                        'status': service_stats['AggregatedStatus'],
+                        'checks': service_stats["Checks"]
+                    });
+                });
+            
+                return JSON.stringify(result);
+            }
+            catch (error) {
+                error += ((String(error).endsWith('.')) ? '' : '.');
+                Zabbix.log(3, '[ Consul ] ERROR: ' + error);
+            
+                return JSON.stringify({error: error + ' Check debug log for more information.'});
+            }
+          description: 'Get all the services that are registered with the local agent and their status.'
+          timeout: 15s
+          parameters:
+            -
+              name: api_endpoint
+              value: '{$CONSUL.NODE.API.URL}'
+            -
+              name: token
+              value: '{$CONSUL.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: f2fb4c76b4974319846d4773cfb64b0c
+          name: 'Consul: Get local services check'
+          type: DEPENDENT
+          key: consul.get_local_services.check
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Data collection check.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_local_services
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 5cf09b213c044033af1d8e1d8821bc38
+              expression: 'length(last(/HashiCorp Consul Node by HTTP/consul.get_local_services.check))>0'
+              name: 'Consul: Failed to get local services'
+              priority: WARNING
+              description: 'Failed to get local services. Check debug log for more information.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: c0e199969c19444fb68fd8497fcab047
+          name: 'Consul: Get instance metrics'
+          type: HTTP_AGENT
+          key: consul.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get raw metrics from Consul instance /metrics endpoint.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          timeout: 15s
+          url: '{$CONSUL.NODE.API.URL}/v1/agent/metrics?format=prometheus'
+          headers:
+            -
+              name: X-Consul-Token
+              value: '{$CONSUL.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 7e2689de8d78499fb52d718989b7ec8b
+          name: 'Consul: Get node info'
+          type: HTTP_AGENT
+          key: consul.get_node_info
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get configuration and member information of the local agent.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          timeout: 15s
+          url: '{$CONSUL.NODE.API.URL}/v1/agent/self'
+          headers:
+            -
+              name: X-Consul-Token
+              value: '{$CONSUL.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 2bcd79ab2c0a4ef88c0d2386d9bec1ff
+          name: 'Consul: Goroutine count'
+          type: DEPENDENT
+          key: consul.goroutines
+          delay: '0'
+          history: 7d
+          description: 'The number of Goroutines on Consul instance.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - go_goroutines
+                - value
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: goroutines
+        -
+          uuid: 6613be65c0794e76a210263810a4692d
+          name: 'Consul: KV store: apply, p50'
+          type: DEPENDENT
+          key: consul.kvs.apply.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The 50 percentile (median) for the time it takes to complete an update to the KV store.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_kvs_apply{quantile="0.5"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: kvs
+        -
+          uuid: 2dc05550018c4d67bab58bd8f86bc365
+          name: 'Consul: KV store: apply, p90'
+          type: DEPENDENT
+          key: consul.kvs.apply.p90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The 90 percentile for the time it takes to complete an update to the KV store.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_kvs_apply{quantile="0.9"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: kvs
+        -
+          uuid: 978bf96102d0411f8c18e92652a003c4
+          name: 'Consul: KV store: apply, rate'
+          type: DEPENDENT
+          key: consul.kvs.apply.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of updates to the KV store per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_kvs_apply_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: kvs
+        -
+          uuid: 1b21a53ce7144350af8b50e57c3acf6b
+          name: 'Consul: Memberlist: degraded'
+          type: DEPENDENT
+          key: consul.memberlist.degraded
+          delay: '0'
+          history: 7d
+          description: |
+            This metric counts the number of times the Consul agent has performed failure detection on another agent at a slower probe rate.
+            The agent uses its own health metric as an indicator to perform this action.
+            If its health score is low, it means that the node is healthy, and vice versa.
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_degraded
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 0a3b25abf7de4212bda5c92c13341593
+          name: 'Consul: Memberlist: gossip, p90'
+          type: DEPENDENT
+          key: consul.memberlist.dispatch_log.p90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The 90 percentile for the number of gossips (messages) broadcasted to a set of randomly selected nodes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_memberlist_gossip{quantile="0.9"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: gossip
+        -
+          uuid: 592fb528d5c14491892c496f7ce9a60b
+          name: 'Consul: Memberlist: gossip, p50'
+          type: DEPENDENT
+          key: consul.memberlist.gossip.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The 50 for the number of gossips (messages) broadcasted to a set of randomly selected nodes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_memberlist_gossip{quantile="0.5"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: gossip
+        -
+          uuid: 32259a799f6949e4be4f7d8722a2dbbe
+          name: 'Consul: Memberlist: health score'
+          type: DEPENDENT
+          key: consul.memberlist.health_score
+          delay: '0'
+          history: 7d
+          description: |
+            This metric describes a node's perception of its own health based on how well it is meeting the soft real-time requirements of the protocol.
+            This metric ranges from 0 to 8, where 0 indicates "totally healthy".
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_health_score
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: f964a907c55148bf80991352c7f2ae83
+              expression: 'max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
+              name: 'Consul: Node''s health score is critical'
+              event_name: 'Consul: Node''s health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
+              priority: AVERAGE
+              description: |
+                This metric ranges from 0 to 8, where 0 indicates "totally healthy".
+                This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.
+                For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: 1fedc58f33ed4b9797fb37acfceba192
+              expression: 'max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN}'
+              name: 'Consul: Node''s health score is warning'
+              event_name: 'Consul: Node''s health score is too high (over {$CONSUL.NODE.HEALTH_SCORE.MAX.WARN} for 3m)'
+              priority: WARNING
+              description: |
+                This metric ranges from 0 to 8, where 0 indicates "totally healthy".
+                This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.
+                For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf
+              dependencies:
+                -
+                  name: 'Consul: Node''s health score is critical'
+                  expression: 'max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 1ebba76d809b415488fb0591afeaef6f
+          name: 'Consul: Memberlist: msg alive'
+          type: DEPENDENT
+          key: consul.memberlist.msg.alive
+          delay: '0'
+          history: 7d
+          description: 'This metric counts the number of alive Consul agents, that the agent has mapped out so far, based on the message information given by the network layer.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_msg_alive
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 9768a2ce01de4bfe92a17935791b4da4
+          name: 'Consul: Memberlist: msg dead'
+          type: DEPENDENT
+          key: consul.memberlist.msg.dead
+          delay: '0'
+          history: 7d
+          description: 'This metric counts the number of times a Consul agent has marked another agent to be a dead node.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_msg_dead
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 43ea04dd91ba4c208e9ad09bbc0016af
+          name: 'Consul: Memberlist: msg suspect'
+          type: DEPENDENT
+          key: consul.memberlist.msg.suspect
+          delay: '0'
+          history: 7d
+          description: 'The number of times a Consul agent suspects another as failed while probing during gossip protocol.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_msg_suspect
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: health
+        -
+          uuid: 8b3ee806fcf34a46aa61cbfee460d9f7
+          name: 'Consul: Memberlist: probe node, p50'
+          type: DEPENDENT
+          key: consul.memberlist.probe_node.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The 50 percentile (median) for the time taken to perform a single round of failure detection on a select Consul agent.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_memberlist_probeNode{quantile="0.5"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: memberlist
+        -
+          uuid: 9a178ba5f7fa4d9a8ecfddfe84257ab6
+          name: 'Consul: Memberlist: probe node, p90'
+          type: DEPENDENT
+          key: consul.memberlist.probe_node.p90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The 90 percentile for the time taken to perform a single round of failure detection on a select Consul agent.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_memberlist_probeNode{quantile="0.9"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: memberlist
+        -
+          uuid: ef688e2ad7494a08a535c019fe19c0a9
+          name: 'Consul: Memberlist: push pull node, p50'
+          type: DEPENDENT
+          key: consul.memberlist.push_pull_node.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The 50 percentile (median) for the number of Consul agents that have exchanged state with this agent.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_memberlist_pushPullNode{quantile="0.5"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: memberlist
+        -
+          uuid: ae085470652242ba8a2077bebee7a2c7
+          name: 'Consul: Memberlist: push pull node, p90'
+          type: DEPENDENT
+          key: consul.memberlist.push_pull_node.p90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The 90 percentile for the number of Consul agents that have exchanged state with this agent.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_memberlist_pushPullNode{quantile="0.9"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: memberlist
+        -
+          uuid: a5d4e2e589564cc9898537c0a8c6a21a
+          name: 'Consul: TCP connections, accepted per second'
+          type: DEPENDENT
+          key: consul.memberlist.tcp_accept
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Rps
+          description: 'This metric counts the number of times a Consul agent has accepted an incoming TCP stream connection per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_tcp_accept
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: tcp
+        -
+          uuid: df0a553d811444d1ab767563a1d513a3
+          name: 'Consul: TCP connections, per second'
+          type: DEPENDENT
+          key: consul.memberlist.tcp_connect
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Rps
+          description: 'This metric counts the number of times a Consul agent has initiated a push/pull sync with an other agent per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_tcp_connect
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: tcp
+        -
+          uuid: ba12a6464199443d8d73164a8dd87f4f
+          name: 'Consul: TCP send bytes, per second'
+          type: DEPENDENT
+          key: consul.memberlist.tcp_sent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'This metric measures the total number of bytes sent by a Consul agent through the TCP protocol per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_tcp_sent
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: tcp
+        -
+          uuid: dde5f5c5c7d44f1dbbcddb4a541f41cc
+          name: 'Consul: UDP received bytes, per second'
+          type: DEPENDENT
+          key: consul.memberlist.udp_received
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'This metric measures the total number of bytes received by a Consul agent through the UDP protocol per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_udp_received
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: udp
+        -
+          uuid: fa79687f332f4136881577838476c329
+          name: 'Consul: UDP sent bytes, per second'
+          type: DEPENDENT
+          key: consul.memberlist.udp_sent
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: Bps
+          description: 'This metric measures the total number of bytes sent by a Consul agent through the UDP protocol per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_memberlist_udp_sent
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: udp
+        -
+          uuid: 59b28123e8154318aca6a283a1b18391
+          name: 'Consul: Open file descriptors, max'
+          type: DEPENDENT
+          key: consul.process_max_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Maximum number of open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_max_fds
+                - value
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: fds
+        -
+          uuid: 38ad7b5d43004865bd823f1dae61395a
+          name: 'Consul: Open file descriptors'
+          type: DEPENDENT
+          key: consul.process_open_fds
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Number of open file descriptors.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_open_fds
+                - value
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: fds
+        -
+          uuid: 8cb242ddeb7f4a0685c706a24f1f85c5
+          name: 'Consul: RSS memory usage'
+          type: DEPENDENT
+          key: consul.resident_memory_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Resident memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_resident_memory_bytes
+                - value
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: memory
+        -
+          uuid: ee52c7cd8a4d452d85564a47c44198a6
+          name: 'Consul: Role'
+          type: DEPENDENT
+          key: consul.role
+          delay: '0'
+          history: 7d
+          description: 'Role of current Consul agent.'
+          valuemap:
+            name: 'Consul Node role'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Config.Server
+            -
+              type: BOOL_TO_DECIMAL
+              parameters:
+                - ''
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_node_info
+          tags:
+            -
+              tag: component
+              value: consul
+        -
+          uuid: e311c5bdba3e45b68887bc924c7dc206
+          name: 'Consul: Serf member: failed, rate'
+          type: DEPENDENT
+          key: consul.serf.member.failed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            Increments when an agent is marked dead.
+            This can be an indicator of overloaded agents, network problems, or configuration errors where agents cannot connect to each other on the required ports.
+            Shown as events per second.
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_serf_member_failed
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: serf
+        -
+          uuid: 11ba84beb3494504bd514500ef663cff
+          name: 'Consul: Serf member: flap, rate'
+          type: DEPENDENT
+          key: consul.serf.member.flap.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            Increments when an agent is marked dead and then recovers within a short time period.
+            This can be an indicator of overloaded agents, network problems, or configuration errors where agents cannot connect to each other on the required ports.
+            Shown as events per second.
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_serf_member_flap
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: serf
+        -
+          uuid: f4c224ffb17d49029fef6647dde22c90
+          name: 'Consul: Serf member: join, rate'
+          type: DEPENDENT
+          key: consul.serf.member.join.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            Increments when an agent joins the cluster. If an agent flapped or failed this counter also increments when it re-joins.
+            Shown as events per second.
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_serf_member_join
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: serf
+        -
+          uuid: 3264823eb6774c2092b4ffe4638b61a5
+          name: 'Consul: Serf member: left, rate'
+          type: DEPENDENT
+          key: consul.serf.member.left.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Increments when an agent leaves the cluster. Shown as events per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_serf_member_left
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: serf
+        -
+          uuid: 53bb4e76cd1840e8ae9a129d592e202e
+          name: 'Consul: Serf member: update, rate'
+          type: DEPENDENT
+          key: consul.serf.member.update.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Increments when a Consul agent updates. Shown as events per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_serf_member_update
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: serf
+        -
+          uuid: 614e63c6eb254b45a5fb3dbb985c5c3c
+          name: 'Consul: Number of services'
+          type: DEPENDENT
+          key: consul.services_number
+          delay: '0'
+          history: 7d
+          description: 'Number of services on current node.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Stats.agent.services
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_node_info
+          tags:
+            -
+              tag: component
+              value: consul
+        -
+          uuid: d9988aeda27f4fb09ececcde13efc71a
+          name: 'Consul: Snapshot: append line, p50'
+          type: DEPENDENT
+          key: consul.snapshot.append_line.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The 50 percentile (median) for the time taken by the Consul agent to append an entry into the existing log.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_serf_snapshot_appendLine{quantile="0.5"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: snapshot
+        -
+          uuid: 0b701ec082e64eb19e60650c13cd44fd
+          name: 'Consul: Snapshot: append line, p90'
+          type: DEPENDENT
+          key: consul.snapshot.append_line.p90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: 'The 90 percentile for the time taken by the Consul agent to append an entry into the existing log.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_serf_snapshot_appendLine{quantile="0.9"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: snapshot
+        -
+          uuid: d56de8b09978421c9703fe327d03a32b
+          name: 'Consul: Snapshot: append line, rate'
+          type: DEPENDENT
+          key: consul.snapshot.append_line.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of snapshot appendLine operations per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_serf_snapshot_appendLine_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: snapshot
+        -
+          uuid: 12e1a4538f124c4281106b9033b1592d
+          name: 'Consul: Snapshot: compact, p50'
+          type: DEPENDENT
+          key: consul.snapshot.compact.p50
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: |
+            The 50 percentile (median) for the time taken by the Consul agent to compact a log.
+            This operation occurs only when the snapshot becomes large enough to justify the compaction.
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_serf_snapshot_compact{quantile="0.5"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: snapshot
+        -
+          uuid: c55de444dd30484eb116abfd6f28a9a0
+          name: 'Consul: Snapshot: compact, p90'
+          type: DEPENDENT
+          key: consul.snapshot.compact.p90
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: ms
+          description: |
+            The 90 percentile for the time taken by the Consul agent to compact a log.
+            This operation occurs only when the snapshot becomes large enough to justify the compaction.
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - 'consul_serf_snapshot_compact{quantile="0.9"}'
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return (isNaN(value)) ? 0 : value;'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: snapshot
+        -
+          uuid: 586be345685b4f0dbbb31f2062bebc01
+          name: 'Consul: Snapshot: compact, rate'
+          type: DEPENDENT
+          key: consul.snapshot.compact.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of snapshot compact operations per second.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_serf_snapshot_compact_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: snapshot
+        -
+          uuid: 777e8cdd1cfc4f4bba613ef08320f1bb
+          name: 'Consul: Version'
+          type: DEPENDENT
+          key: consul.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of Consul agent.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.Config.Version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_node_info
+          tags:
+            -
+              tag: component
+              value: consul
+          triggers:
+            -
+              uuid: fa78d269c01548a083085a3a98e5a59b
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.version,#1)<>last(/HashiCorp Consul Node by HTTP/consul.version,#2) and length(last(/HashiCorp Consul Node by HTTP/consul.version))>0'
+              name: 'Consul: Version has been changed'
+              priority: INFO
+              description: 'Consul version has changed. Ack to close.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 62c0bb503c084f9da10f1be3c716608b
+          name: 'Consul: Virtual memory size'
+          type: DEPENDENT
+          key: consul.virtual_memory_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: 'Virtual memory size in bytes.'
+          preprocessing:
+            -
+              type: PROMETHEUS_PATTERN
+              parameters:
+                - process_virtual_memory_bytes
+                - value
+                - ''
+          master_item:
+            key: consul.get_metrics
+          tags:
+            -
+              tag: component
+              value: memory
+      discovery_rules:
+        -
+          uuid: 565c42fc4e444433aaafd656813b82f7
+          name: 'HTTP API methods discovery'
+          type: DEPENDENT
+          key: consul.http_api_discovery
+          delay: '0'
+          description: 'Discovery HTTP API methods specific metrics.'
+          item_prototypes:
+            -
+              uuid: 4bdb2007bada4840aa453630e701059c
+              name: 'Consul: HTTP request: ["{#HTTP_METHOD}"], p50'
+              type: DEPENDENT
+              key: 'consul.http.api.p50["{#HTTP_METHOD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'The 50 percentile (median) of how long it takes to service the given HTTP request for the given verb.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'consul_api_http{method = "{#HTTP_METHOD}", quantile = "0.5"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: api
+                -
+                  tag: verb
+                  value: '{#HTTP_METHOD}'
+            -
+              uuid: 537b455889d54deab7ada216a89f1cb2
+              name: 'Consul: HTTP request: ["{#HTTP_METHOD}"], p90'
+              type: DEPENDENT
+              key: 'consul.http.api.p90["{#HTTP_METHOD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'The 90 percentile of how long it takes to service the given HTTP request for the given verb.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'consul_api_http{method = "{#HTTP_METHOD}", quantile = "0.9"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: api
+                -
+                  tag: verb
+                  value: '{#HTTP_METHOD}'
+            -
+              uuid: 53cdb47018df434381f7fc3e401a4dee
+              name: 'Consul: HTTP request: ["{#HTTP_METHOD}"], rate'
+              type: DEPENDENT
+              key: 'consul.http.api.rate["{#HTTP_METHOD}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Rps
+              description: 'Thr number of HTTP request for the given verb per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'consul_api_http_count{method = "{#HTTP_METHOD}"}'
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: api
+                -
+                  tag: verb
+                  value: '{#HTTP_METHOD}'
+          master_item:
+            key: consul.get_metrics
+          preprocessing:
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - 'consul_api_http{method =~ ".*"}'
+              error_handler: DISCARD_VALUE
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var lookup = {},
+                      result = [];
+                  
+                  JSON.parse(value).forEach(function (item) {
+                      var http_method = item.labels.method;
+                      if (!(lookup[http_method])) {
+                          lookup[http_method] = 1;
+                          result.push({ "{#HTTP_METHOD}": http_method });
+                      }
+                  })
+                  
+                  return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: dd87920ea8184ec793229878407a0993
+          name: 'Local node services discovery'
+          type: DEPENDENT
+          key: consul.node_services_lld
+          delay: '0'
+          filter:
+            conditions:
+              -
+                macro: '{#SERVICE_NAME}'
+                value: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#SERVICE_NAME}'
+                value: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discover metrics for services that are registered with the local agent.'
+          item_prototypes:
+            -
+              uuid: 44b0f82769d244d6a20b9ce0b5cc5cb6
+              name: 'Consul: ["{#SERVICE_NAME}"]: Aggregated status'
+              type: DEPENDENT
+              key: 'consul.service.aggregated_state["{#SERVICE_ID}"]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'Aggregated values of all health checks for the service instance.'
+              valuemap:
+                name: 'Consul health state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.id == "{#SERVICE_ID}")].status.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var state = ['passing', 'warning', 'critical'];
+                      
+                      return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: consul.get_local_services
+              tags:
+                -
+                  tag: component
+                  value: service
+                -
+                  tag: service
+                  value: '{#SERVICE_NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 661551e1e9e94b25b7bd6ea876640b6d
+                  expression: 'last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 2'
+                  name: 'Consul: Aggregated status is ''critical'''
+                  event_name: 'Consul: Node''s health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
+                  priority: AVERAGE
+                  description: 'Aggregated state of service on the local agent is ''critical''.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+                -
+                  uuid: 724f6a5e16f64a779a71ad9a9378fb60
+                  expression: 'last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 1'
+                  name: 'Consul: Aggregated status is ''warning'''
+                  priority: WARNING
+                  description: 'Aggregated state of service on the local agent is ''warning''.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 20a0ec9e059548a192c9c37bd7aeaaed
+              name: 'Consul: ["{#SERVICE_NAME}"]: Check ["{#SERVICE_CHECK_NAME}"]: Output'
+              type: DEPENDENT
+              key: 'consul.service.check.output["{#SERVICE_ID}/{#SERVICE_CHECK_ID}"]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              discover: NO_DISCOVER
+              value_type: CHAR
+              description: 'Current output of health check for the service.'
+              valuemap:
+                name: 'Consul health state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.id == "{#SERVICE_ID}")].checks[?(@.CheckID == "{#SERVICE_CHECK_ID}")].Output.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: consul.get_local_services
+              tags:
+                -
+                  tag: check
+                  value: '{#SERVICE_CHECK_NAME}'
+                -
+                  tag: component
+                  value: service
+                -
+                  tag: service
+                  value: '{#SERVICE_NAME}'
+            -
+              uuid: 3b67eb4df3dc4d9b9f4ab4c35a592367
+              name: 'Consul: ["{#SERVICE_NAME}"]: Check ["{#SERVICE_CHECK_NAME}"]: Status'
+              type: DEPENDENT
+              key: 'consul.service.check.state["{#SERVICE_ID}/{#SERVICE_CHECK_ID}"]'
+              delay: '0'
+              history: 7d
+              discover: NO_DISCOVER
+              description: 'Current state of health check for the service.'
+              valuemap:
+                name: 'Consul health state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.id == "{#SERVICE_ID}")].checks[?(@.CheckID == "{#SERVICE_CHECK_ID}")].Status.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var state = ['passing', 'warning', 'critical'];
+                      
+                      return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: consul.get_local_services
+              tags:
+                -
+                  tag: check
+                  value: '{#SERVICE_CHECK_NAME}'
+                -
+                  tag: component
+                  value: service
+                -
+                  tag: service
+                  value: '{#SERVICE_NAME}'
+          master_item:
+            key: consul.get_local_services
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value),
+                      result = [];
+                  
+                  if (data.length === 0) {
+                      return '[]'
+                  };
+                  data.forEach(function (service) {
+                  
+                      result.push({
+                          '{#TYPE}': 'aggregated_status',
+                          '{#SERVICE_NAME}': service.name,
+                          '{#SERVICE_ID}': service.id,
+                      });
+                  
+                      if (service['checks'] !== 0) {
+                          service['checks'].forEach(function (check) {
+                              result.push({
+                                  '{#TYPE}': 'service_check',
+                                  '{#SERVICE_NAME}': service.name,
+                                  '{#SERVICE_ID}': service.id,
+                                  '{#SERVICE_CHECK_ID}': check["CheckID"],
+                                  '{#SERVICE_CHECK_NAME}': check["Name"]
+                              });
+                          });
+                      }
+                  
+                  });
+                  
+                  return JSON.stringify(result)
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          overrides:
+            -
+              name: 'aggregated status'
+              step: '1'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: aggregated_status
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: 'Aggregated status'
+                  status: ENABLED
+                  discover: DISCOVER
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: State
+                  status: ENABLED
+                  discover: DISCOVER
+            -
+              name: checks
+              step: '2'
+              filter:
+                conditions:
+                  -
+                    macro: '{#TYPE}'
+                    value: service_check
+                    formulaid: A
+              operations:
+                -
+                  operationobject: ITEM_PROTOTYPE
+                  operator: LIKE
+                  value: Check
+                  status: ENABLED
+                  discover: DISCOVER
+        -
+          uuid: 6ff39fd6911945b2baa9b762d5a86df2
+          name: 'Raft leader metrics discovery'
+          type: DEPENDENT
+          key: consul.raft.leader.discovery
+          delay: '0'
+          description: 'Discover raft metrics for leader nodes.'
+          item_prototypes:
+            -
+              uuid: 440e2a259cd64b918ebfb607961da2c8
+              name: 'Consul: Autopilot healthy'
+              type: DEPENDENT
+              key: 'consul.autopilot.healthy[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Tracks the overall health of the local server cluster. 1 if all servers are healthy, 0 if one or more are unhealthy.'
+              valuemap:
+                name: 'Consul Autopilot healthy'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_autopilot_healthy
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: health
+            -
+              uuid: 2e4fd6c5aac84054aef867fc9d8cb3c5
+              name: 'Consul: Raft state: commit time, p50'
+              type: DEPENDENT
+              key: 'consul.raft.commit_time.p50[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'The 50 percentile (median) time it takes to commit a new entry to the raft log on the leader, in milliseconds.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'consul_raft_commitTime{quantile="0.5"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return (isNaN(value)) ? 0 : value;'
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: 9428c07a23364967aef060cf3303b996
+              name: 'Consul: Raft state: commit time, p90'
+              type: DEPENDENT
+              key: 'consul.raft.commit_time.p90[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'The 90 percentile time it takes to commit a new entry to the raft log on the leader, in milliseconds.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'consul_raft_commitTime{quantile="0.9"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return (isNaN(value)) ? 0 : value;'
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: d54c97e8c4204f8c9f79911440f1bd13
+              name: 'Consul: Raft state: commit, rate'
+              type: DEPENDENT
+              key: 'consul.raft.commit_time.rate[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Rps
+              description: 'The number of commits a new entry to the Raft log on the leader per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_raft_commitTime_count
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: 3c56ebe6e022430e861488873ac6f716
+              name: 'Consul: Raft state: dispatch log, p50'
+              type: DEPENDENT
+              key: 'consul.raft.dispatch_log.p50[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'The 50 percentile (median) time it takes for the leader to write log entries to disk, in milliseconds.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'consul_raft_leader_dispatchLog{quantile="0.5"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return (isNaN(value)) ? 0 : value;'
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: fd1e6c33254b467f8355491dc96889eb
+              name: 'Consul: Raft state: dispatch log, p90'
+              type: DEPENDENT
+              key: 'consul.raft.dispatch_log.p90[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'The 90 percentile time it takes for the leader to write log entries to disk, in milliseconds.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'consul_raft_leader_dispatchLog{quantile="0.9"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return (isNaN(value)) ? 0 : value;'
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: bc73aeda20a543ac957d1531f25fd5a9
+              name: 'Consul: Raft state: dispatch log, rate'
+              type: DEPENDENT
+              key: 'consul.raft.dispatch_log.rate[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of times a Raft leader writes a log to disk per second.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_raft_leader_dispatchLog_count
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: 526a787732224555adde561ec86844fb
+              name: 'Consul: Raft state: leader last contact, p50'
+              type: DEPENDENT
+              key: 'consul.raft.leader_last_contact.p50[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'The 50 percentile (median) of how long it takes a leader node to communicate with followers during a leader lease check, in milliseconds.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'consul_raft_leader_lastContact{quantile="0.5"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return (isNaN(value)) ? 0 : value;'
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: 1ae3d9e4647b4972b1572946a2794715
+              name: 'Consul: Raft state: leader last contact, p90'
+              type: DEPENDENT
+              key: 'consul.raft.leader_last_contact.p90[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: ms
+              description: 'The 90 percentile of how long it takes a leader node to communicate with followers during a leader lease check, in milliseconds.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - 'consul_raft_leader_lastContact{quantile="0.9"}'
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return (isNaN(value)) ? 0 : value;'
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+          master_item:
+            key: consul.get_node_info
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return JSON.stringify(JSON.parse(value)["Stats"]["leader"] === true
+                      ? [{'{#SINGLETON}': ''}] : []);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: f7dfc3d88f5440bea02080205d3f0a9b
+          name: 'Raft server metrics discovery'
+          type: DEPENDENT
+          key: consul.raft.server.discovery
+          delay: '0'
+          description: 'Discover raft metrics for server nodes.'
+          item_prototypes:
+            -
+              uuid: 428f1d7924634383aabcd5b37f561a41
+              name: 'Consul: Raft: apply, rate'
+              type: DEPENDENT
+              key: 'consul.raft.apply.rate[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Rps
+              description: |
+                Incremented whenever a leader first passes a message into the Raft commit process (called an Apply operation).
+                This metric describes the arrival rate of new logs into Raft per second.
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_raft_apply
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: 25dd098b98124fa8a9518963c8b4e5ce
+              name: 'Consul: Raft state'
+              type: DEPENDENT
+              key: 'consul.raft.state[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Current state of Consul agent.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.Stats.raft.state
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: consul.get_node_info
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: 7b030c4eac68464e8c454577ab0f0f53
+              name: 'Consul: Raft state: candidate'
+              type: DEPENDENT
+              key: 'consul.raft.state_candidate[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'The number of initiated leader elections.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_raft_state_candidate
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+            -
+              uuid: e89157e341d8409c96e31a9d541a7fe8
+              name: 'Consul: Raft state: leader'
+              type: DEPENDENT
+              key: 'consul.raft.state_leader[{#SINGLETON}]'
+              delay: '0'
+              history: 7d
+              description: 'Increments when a server becomes a leader.'
+              preprocessing:
+                -
+                  type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_raft_state_leader
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: raft
+          master_item:
+            key: consul.get_node_info
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  return JSON.stringify(JSON.parse(value)["Config"]["Server"] === true
+                      ? [{'{#SINGLETON}': ''}] : []);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: consul
+      macros:
+        -
+          macro: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable discovered services on local node.'
+        -
+          macro: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES}'
+          value: 'CHANGE IF NEEDED'
+          description: 'Filter to exclude discovered services on local node.'
+        -
+          macro: '{$CONSUL.LLD.FILTER.SERVICE_CHECK_NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable discovered service checks on local node.'
+        -
+          macro: '{$CONSUL.LLD.FILTER.SERVICE_CHECK_NAME.NOT_MATCHES}'
+          value: 'CHANGE IF NEEDED'
+          description: 'Filter to exclude discovered service checks on local node.'
+        -
+          macro: '{$CONSUL.NODE.API.URL}'
+          value: 'http://localhost:8500'
+          description: 'Consul instance URL.'
+        -
+          macro: '{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
+          value: '4'
+          description: 'Maximum acceptable value of node''s health score for AVERAGE trigger expression.'
+        -
+          macro: '{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN}'
+          value: '2'
+          description: 'Maximum acceptable value of node''s health score for WARNING trigger expression.'
+        -
+          macro: '{$CONSUL.OPEN.FDS.MAX.WARN}'
+          value: '90'
+          description: 'Maximum percentage of used file descriptors.'
+        -
+          macro: '{$CONSUL.TOKEN}'
+          value: '<PUT YOUR AUTH TOKEN>'
+          description: 'Consul auth token.'
+      valuemaps:
+        -
+          uuid: 92638a6d5a9347edb011a8c999a9895e
+          name: 'Consul Autopilot healthy'
+          mappings:
+            -
+              value: '0'
+              newvalue: Unhealthy
+            -
+              value: '1'
+              newvalue: Healthy
+        -
+          uuid: 1f966e7c41134551870c82f013f0b2cd
+          name: 'Consul health state'
+          mappings:
+            -
+              value: '0'
+              newvalue: passing
+            -
+              value: '1'
+              newvalue: warning
+            -
+              value: '2'
+              newvalue: critical
+            -
+              value: '255'
+              newvalue: unknown
+        -
+          uuid: 8d8f7d7e37a44fe8ac590147f621cb4c
+          name: 'Consul Node role'
+          mappings:
+            -
+              value: '0'
+              newvalue: Agent
+            -
+              value: '1'
+              newvalue: Server
+  triggers:
+    -
+      uuid: 9e1a0b7f49844d1db525d00d5f1060f0
+      expression: 'min(/HashiCorp Consul Node by HTTP/consul.process_open_fds,5m)/last(/HashiCorp Consul Node by HTTP/consul.process_max_fds)*100>{$CONSUL.OPEN.FDS.MAX.WARN}'
+      name: 'Consul: Current number of open files is too high'
+      event_name: 'Consul: Current number of open files is too high (over {$CONSUL.OPEN.FDS.MAX.WARN}% for 5m)'
+      priority: WARNING
+      description: '"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue."'
+      tags:
+        -
+          tag: scope
+          value: capacity
+  graphs:
+    -
+      uuid: 2411147c0f4a425394a64fcd3dc231f0
+      name: 'Consul: Catalog operations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.catalog.register.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.catalog.deregister.rate
+    -
+      uuid: 929c2527abaf447f9909003e6a43d799
+      name: 'Consul: File descriptors'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.process_open_fds
+        -
+          sortorder: '1'
+          drawtype: BOLD_LINE
+          color: 2774A4
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.process_max_fds
+    -
+      uuid: 6a987c1499f145ff8b68281f4fef3424
+      name: 'Consul: Memory usage'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.virtual_memory_bytes
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.resident_memory_bytes
+    -
+      uuid: ba792478fe3140709a06a852560307fd
+      name: 'Consul: Serf member operations'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.serf.member.update.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.serf.member.left.rate
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.serf.member.join.rate
+        -
+          sortorder: '3'
+          color: A54F10
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.serf.member.failed.rate
+        -
+          sortorder: '4'
+          color: FC6EA3
+          item:
+            host: 'HashiCorp Consul Node by HTTP'
+            key: consul.serf.member.flap.rate
