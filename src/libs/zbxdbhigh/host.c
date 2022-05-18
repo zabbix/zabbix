@@ -1591,15 +1591,20 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 	/* delete host prototypes */
 
 	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
