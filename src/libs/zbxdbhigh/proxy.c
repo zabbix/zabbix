@@ -335,7 +335,7 @@ int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, ch
 {
 	char	*ch_error, host[ZBX_HOSTNAME_BUF_LEN];
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, ZBX_HOSTNAME_BUF_LEN, NULL))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 	{
 		*error = zbx_strdup(*error, "missing name of proxy");
 		return FAIL;
