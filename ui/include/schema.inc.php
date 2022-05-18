@@ -3340,7 +3340,7 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'macro_discovery' => [
+			'state' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

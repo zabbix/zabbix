@@ -1467,8 +1467,8 @@ define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
 define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in Vault).
 
-define('ZBX_MACRO_DISCOVERY_MANUAL', 0); // Macro value controlled by user.
-define('ZBX_MACRO_DISCOVERY_AUTOMATIC', 1); // Macro value controlled by discovery rule.
+define('ZBX_MACRO_STATE_MANUAL', 0); // Macro value updated by user.
+define('ZBX_MACRO_STATE_AUTOMATIC', 1); // Macro value updated by discovery rule.
 
 define('ZBX_VAULT_TYPE_UNKNOWN', -1);
 define('ZBX_VAULT_TYPE_HASHICORP', 0);
