@@ -751,9 +751,7 @@ class CTrigger extends CTriggerGeneral {
 		]);
 
 		if ($count != count($trigger_dependencies)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!')
-			);
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		self::checkDependencyDuplicates($trigger_dependencies);
@@ -767,6 +765,7 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($db_triggers as &$db_trigger) {
 			$db_trigger['dependencies'] = [];
 		}
+		unset($db_trigger);
 	}
 
 	/**

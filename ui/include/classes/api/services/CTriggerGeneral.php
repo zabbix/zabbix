@@ -203,7 +203,7 @@ abstract class CTriggerGeneral extends CApiService {
 							'triggerid' => $chd_trigger['triggerid'],
 							'templateid' => $tpl_trigger['triggerid']
 						];
-						$db_triggers[] = $chd_trigger;
+						$db_triggers[$chd_trigger['triggerid']] = $chd_trigger;
 						$triggerids[] = $chd_trigger['triggerid'];
 
 						$check_duplicates = ($chd_trigger['description'] !== $new_trigger['description']
@@ -247,11 +247,12 @@ abstract class CTriggerGeneral extends CApiService {
 				];
 			}
 
-			foreach ($db_triggers as $tnum => $db_trigger) {
-				$db_triggers[$tnum]['tags'] = array_key_exists($db_trigger['triggerid'], $trigger_tags)
+			foreach ($db_triggers as &$db_trigger) {
+				$db_trigger['tags'] = array_key_exists($db_trigger['triggerid'], $trigger_tags)
 					? $trigger_tags[$db_trigger['triggerid']]
 					: [];
 			}
+			unset($db_trigger);
 
 			// Add discovery rule IDs.
 			if ($this instanceof CTriggerPrototype) {
@@ -268,9 +269,10 @@ abstract class CTriggerGeneral extends CApiService {
 					$drule_by_triggerid[$row['triggerid']] = $row['parent_itemid'];
 				}
 
-				foreach ($db_triggers as $tnum => $db_trigger) {
-					$db_triggers[$tnum]['discoveryRule']['itemid'] = $drule_by_triggerid[$db_trigger['triggerid']];
+				foreach ($db_triggers as &$db_trigger) {
+					$db_trigger['discoveryRule']['itemid'] = $drule_by_triggerid[$db_trigger['triggerid']];
 				}
+				unset($db_trigger);
 			}
 		}
 
@@ -1664,9 +1666,9 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param int        $triggers[<tnum>]['recovery_mode']          [IN]
 	 * @param string     $triggers[<tnum>]['recovery_expression']    [IN/OUT]
 	 * @param array|null $db_triggers                                [IN]
-	 * @param string     $db_triggers[<tnum>]['triggerid']           [IN]
-	 * @param string     $db_triggers[<tnum>]['expression']          [IN]
-	 * @param string     $db_triggers[<tnum>]['recovery_expression'] [IN]
+	 * @param string     $db_triggers[<triggerid>]['triggerid']           [IN]
+	 * @param string     $db_triggers[<triggerid>]['expression']          [IN]
+	 * @param string     $db_triggers[<triggerid>]['recovery_expression'] [IN]
 	 * @param array      $triggers_functions                         [OUT] array of the new functions which must be
 	 *                                                                     inserted into DB
 	 * @param string     $triggers_functions[<tnum>][]['functionid'] [OUT]
@@ -2716,7 +2718,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 		foreach ($template_links[$templateid] as $_templateid => $foo) {
 			if (array_key_exists($_templateid, $template_links)) {
-				return self::checkTemplateUpExistsInTemplateLinks($template_links, $_templateid, $templateid_up);
+				if (self::checkTemplateUpExistsInTemplateLinks($template_links, $_templateid, $templateid_up)) {
+					return true;
+				}
 			}
 		}
 
@@ -2866,7 +2870,7 @@ abstract class CTriggerGeneral extends CApiService {
 			unset($trigger_up);
 
 			foreach ($db_triggers_up as $db_trigger_up) {
-				$del_triggerdepids[] = $db_trigger_up['triggerid'];
+				$del_triggerdepids[] = $db_trigger_up['triggerdepid'];
 
 				$edit_dependencies[$trigger['triggerid']][$db_trigger_up['triggerid']] = false;
 			}
@@ -2922,7 +2926,7 @@ abstract class CTriggerGeneral extends CApiService {
 				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE]).
 				' AND EXISTS('.
 					'SELECT NULL'.
-					' FROM host_templates ht'.
+					' FROM hosts_templates ht'.
 					' WHERE ht.templateid=i.hostid'.
 				')'
 		), 'triggerid');
@@ -3007,7 +3011,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			foreach ($edit_dependencies as $triggerid => $triggerids_up) {
-				$triggerids_up = array_intersect_key($tpl_triggerids_up, $triggerids_up);
+				$triggerids_up = array_intersect_key($triggerids_up, $tpl_triggerids_up);
 
 				if (!$triggerids_up) {
 					continue;
@@ -3092,7 +3096,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			foreach ($edit_dependencies as $triggerid => $triggerids_up) {
-				$triggerids_up = array_intersect_key($host_triggerids_up, $triggerids_up);
+				$triggerids_up = array_intersect_key($triggerids_up, $host_triggerids_up);
 
 				if (!$triggerids_up) {
 					continue;
@@ -3102,7 +3106,7 @@ abstract class CTriggerGeneral extends CApiService {
 					$upd_child_triggerids_up = [];
 
 					if (array_key_exists($child_triggerid, $host_child_dependencies)) {
-						foreach ($tpl_child_dependencies[$child_triggerid] as $child_triggerid_up => $triggerdepid) {
+						foreach ($host_child_dependencies[$child_triggerid] as $child_triggerid_up => $triggerdepid) {
 							if (array_key_exists($child_triggerid_up, $triggerids_up)) {
 								$add = $triggerids_up[$child_triggerid_up];
 
