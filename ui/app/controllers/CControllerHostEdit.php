@@ -147,7 +147,7 @@ class CControllerHostEdit extends CController {
 						'port', 'useip'
 					],
 					'selectInventory' => array_column(getHostInventories(), 'db_field'),
-					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type', 'state'],
+					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type', 'automatic'],
 					'selectParentTemplates' => ['templateid', 'name', 'link_type'],
 					'selectTags' => ['tag', 'value'],
 					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
@@ -226,16 +226,16 @@ class CControllerHostEdit extends CController {
 				'macro' => '',
 				'value' => '',
 				'description' => '',
-				'state' => ZBX_MACRO_STATE_MANUAL
+				'automatic' => ZBX_USERMACRO_MANUAL
 			];
 		}
 
 		foreach ($data['host']['macros'] as &$macro) {
-			$macro['discovery_state'] = ($macro['state'] == ZBX_MACRO_STATE_AUTOMATIC)
+			$macro['discovery_state'] = ($macro['automatic'] == ZBX_USERMACRO_AUTOMATIC)
 				? CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC
 				: CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
 
-			unset($macro['state']);
+			unset($macro['automatic']);
 		}
 		unset($macro);
 

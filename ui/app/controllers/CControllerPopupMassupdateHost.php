@@ -350,7 +350,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 										$hostmacroid = $host_macros_by_macro[$macro['macro']]['hostmacroid'];
 										$host['macros'][$hostmacroid] = [
 											'hostmacroid' => $hostmacroid,
-											'state' => ZBX_MACRO_STATE_MANUAL
+											'automatic' => ZBX_USERMACRO_MANUAL
 										] + $macro;
 									}
 								}
@@ -366,7 +366,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 										$hostmacroid = $host_macros_by_macro[$macro['macro']]['hostmacroid'];
 										$host['macros'][$hostmacroid] = [
 											'hostmacroid' => $hostmacroid,
-											'state' => ZBX_MACRO_STATE_MANUAL
+											'automatic' => ZBX_USERMACRO_MANUAL
 										] + $macro;
 									}
 									elseif ($add_missing) {

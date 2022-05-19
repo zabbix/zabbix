@@ -373,7 +373,7 @@ class CTemplate extends CHostGeneral {
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
-				'state' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_STATE_MANUAL])]
+				'automatic' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])]
 			]]
 		]];
 
@@ -482,7 +482,7 @@ class CTemplate extends CHostGeneral {
 				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
 				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
-				'state' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_STATE_MANUAL])]
+				'automatic' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])]
 			]]
 		]];
 
@@ -820,7 +820,7 @@ class CTemplate extends CHostGeneral {
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
-				'state' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_STATE_MANUAL])]
+				'automatic' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])]
 			]],
 			'templates_link' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
@@ -933,7 +933,7 @@ class CTemplate extends CHostGeneral {
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
-				'state' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_STATE_MANUAL])]
+				'automatic' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])]
 			]],
 			'templates_link' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
