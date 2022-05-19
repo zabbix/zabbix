@@ -344,7 +344,7 @@ static void	flush_proxy_hostdata(zbx_avail_active_hb_cache_t *cache, zbx_ipc_mes
 static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_host_active_avail_t	*host, *cached_host;
+	zbx_host_active_avail_t	*host;
 
 	if (0 == cache->hosts.num_data)
 		return;
@@ -353,7 +353,7 @@ static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
 
 	while (NULL != (host = (zbx_host_active_avail_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (NULL == (cached_host = zbx_hashset_search(&cache->queue, &host->hostid)))
+		if (NULL == zbx_hashset_search(&cache->queue, &host->hostid))
 		{
 			zbx_hashset_insert(&cache->queue, host, sizeof(zbx_host_active_avail_t));
 		}
