@@ -855,9 +855,9 @@ static void	tm_process_temp_suppression(const char *data)
 			DBlock_record("events", eventid, NULL, 0);
 			DBlock_record("event_suppress", eventid, NULL, 0);
 
-			DBexecute("update event_suppress set suppress_until=" ZBX_FS_UI64 " where event_suppressid="
-					ZBX_FS_UI64, ts, event_suppressid);
-
+			DBexecute("update event_suppress set maintenanceid=NULL,suppress_until=" ZBX_FS_UI64 ",userid="
+					ZBX_FS_UI64 " where event_suppressid=" ZBX_FS_UI64, ts, userid,
+					event_suppressid);
 		}
 		else
 		{
