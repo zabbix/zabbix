@@ -19,13 +19,13 @@
 
 #include "proxy.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "zbxserver.h"
 #include "zbxtasks.h"
 
-#include "discovery.h"
+#include "zbxdiscovery.h"
 #include "zbxalgo.h"
 #include "preproc.h"
 #include "zbxcrypto.h"
@@ -40,7 +40,7 @@ extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;
 
 /* the space reserved in json buffer to hold at least one record plus service data */
-#define ZBX_DATA_JSON_RESERVED		(HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
+#define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
 
 #define ZBX_DATA_JSON_RECORD_LIMIT	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
 #define ZBX_DATA_JSON_BATCH_LIMIT	((ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED) / 2)
@@ -58,7 +58,7 @@ zbx_drule_t;
 
 typedef struct
 {
-	char			ip[INTERFACE_IP_LEN_MAX];
+	char			ip[ZBX_INTERFACE_IP_LEN_MAX];
 	zbx_vector_ptr_t	services;
 }
 zbx_drule_ip_t;
@@ -332,9 +332,9 @@ static int	zbx_host_check_permissions(const DC_HOST *host, const zbx_socket_t *s
  ******************************************************************************/
 int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error)
 {
-	char	*ch_error, host[HOST_HOST_LEN_MAX];
+	char	*ch_error, host[ZBX_HOSTNAME_BUF_LEN];
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX, NULL))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 	{
 		*error = zbx_strdup(*error, "missing name of proxy");
 		return FAIL;
@@ -1787,7 +1787,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 	/* apply update operations */
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	p = NULL;
 	/* iterate the entries (lines 9, 14 and 19 in T1) */
@@ -1914,7 +1914,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			goto clean;
@@ -2021,7 +2021,7 @@ int	process_proxyconfig(struct zbx_json_parse *jp_data, struct zbx_json_parse *j
 
 		sql = (char *)zbx_malloc(sql, sql_alloc * sizeof(char));
 
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = tables_proxy.values_num - 1; 0 <= i; i--)
 		{
@@ -2039,7 +2039,7 @@ int	process_proxyconfig(struct zbx_json_parse *jp_data, struct zbx_json_parse *j
 
 		if (sql_offset > 16)	/* in ORACLE always present begin..end; */
 		{
-			DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 			if (ZBX_DB_OK > DBexecute("%s", sql))
 				ret = FAIL;
@@ -3514,7 +3514,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	while (SUCCEED == parse_history_data_by_itemids(jp_data, &pnext, values, itemids, &values_num, &read_num,
 			&unique_shift, &error) && 0 != values_num)
 	{
-		DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, (size_t)values_num, mode);
+		DCconfig_get_items_by_itemids_partial(items, itemids, errcodes, values_num, mode);
 
 		for (i = 0; i < values_num; i++)
 		{
@@ -3860,7 +3860,7 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 			session = zbx_dc_get_or_create_data_session(hostid, token);
 
 		if (SUCCEED != (ret = process_history_data_by_itemids(sock, validator_func, validator_args, &jp_data,
-				session, NULL, info, ZBX_ITEM_GET_ALL)))
+				session, NULL, info, ZBX_ITEM_GET_DEFAULT)))
 		{
 			goto out;
 		}
@@ -3913,8 +3913,16 @@ int	process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zb
 int	process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
 {
 	zbx_host_rights_t	rights = {0};
+	int			ret;
+	zbx_dc_um_handle_t	*um_handle;
 
-	return process_client_history_data(sock, jp, ts, sender_item_validator, &rights, info);
+	um_handle = zbx_dc_open_user_macros();
+
+	ret = process_client_history_data(sock, jp, ts, sender_item_validator, &rights, info);
+
+	zbx_dc_close_user_macros(um_handle);
+
+	return ret;
 }
 
 static void	zbx_drule_ip_free(zbx_drule_ip_t *ip)
@@ -3943,11 +3951,11 @@ static void	zbx_drule_free(zbx_drule_t *drule)
 static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zbx_uint64_t druleid,
 		zbx_vector_uint64_t *dcheckids, zbx_uint64_t unique_dcheckid, int *processed_num, int ip_idx)
 {
-	DB_DHOST		dhost;
+	ZBX_DB_DHOST		dhost;
 	zbx_service_t		*service;
 	int			services_num, ret = FAIL, i, dchecks = 0;
 	zbx_vector_ptr_t	services_old;
-	DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
+	ZBX_DB_DRULE		drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4025,9 +4033,9 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 				service->dcheckid = dcheckid;
 				service->itemtime = (time_t)atoi(row[1]);
 				service->port = atoi(row[2]);
-				zbx_strlcpy_utf8(service->value, row[3], MAX_DISCOVERED_VALUE_SIZE);
+				zbx_strlcpy_utf8(service->value, row[3], ZBX_MAX_DISCOVERED_VALUE_SIZE);
 				service->status = atoi(row[4]);
-				zbx_strlcpy(service->dns, row[5], INTERFACE_DNS_LEN_MAX);
+				zbx_strlcpy(service->dns, row[5], ZBX_INTERFACE_DNS_LEN_MAX);
 				zbx_vector_ptr_append(&services_old, service);
 				zbx_vector_uint64_append(dcheckids, service->dcheckid);
 				dchecks++;
@@ -4074,7 +4082,7 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 			continue;
 		}
 
-		discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
+		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
 				service->status, service->value, service->itemtime);
 	}
 
@@ -4088,12 +4096,12 @@ static int	process_services(const zbx_vector_ptr_t *services, const char *ip, zb
 			continue;
 		}
 
-		discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
+		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
 				service->status, service->value, service->itemtime);
 	}
 
 	service = (zbx_service_t *)services->values[(*processed_num)++];
-	discovery_update_host(&dhost, service->status, service->itemtime);
+	zbx_discovery_update_host(&dhost, service->status, service->itemtime);
 
 	ret = SUCCEED;
 fail:
@@ -4126,10 +4134,10 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 	int			status, ret = SUCCEED, i, j;
 	unsigned short		port;
 	const char		*p = NULL;
-	char			ip[INTERFACE_IP_LEN_MAX],
-				tmp[MAX_STRING_LEN], *value = NULL, dns[INTERFACE_DNS_LEN_MAX];
+	char			ip[ZBX_INTERFACE_IP_LEN_MAX], tmp[MAX_STRING_LEN],
+				dns[ZBX_INTERFACE_DNS_LEN_MAX], *value = NULL;
 	time_t			itemtime;
-	size_t			value_alloc = MAX_DISCOVERED_VALUE_SIZE;
+	size_t			value_alloc = ZBX_MAX_DISCOVERED_VALUE_SIZE;
 	zbx_vector_ptr_t	drules;
 	zbx_drule_t		*drule;
 	zbx_drule_ip_t		*drule_ip;
@@ -4215,7 +4223,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 		if (FAIL == (i = zbx_vector_ptr_search(&drule->ips, ip, ZBX_DEFAULT_STR_COMPARE_FUNC)))
 		{
 			drule_ip = (zbx_drule_ip_t *)zbx_malloc(NULL, sizeof(zbx_drule_ip_t));
-			zbx_strlcpy(drule_ip->ip, ip, INTERFACE_IP_LEN_MAX);
+			zbx_strlcpy(drule_ip->ip, ip, ZBX_INTERFACE_IP_LEN_MAX);
 			zbx_vector_ptr_create(&drule_ip->services);
 			zbx_vector_ptr_append(&drule->ips, drule_ip);
 		}
@@ -4227,8 +4235,8 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, char 
 			zbx_vector_uint64_append(&drule->dcheckids, service->dcheckid);
 		service->port = port;
 		service->status = status;
-		zbx_strlcpy_utf8(service->value, value, MAX_DISCOVERED_VALUE_SIZE);
-		zbx_strlcpy(service->dns, dns, INTERFACE_DNS_LEN_MAX);
+		zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
+		zbx_strlcpy(service->dns, dns, ZBX_INTERFACE_DNS_LEN_MAX);
 		service->itemtime = itemtime;
 		zbx_vector_ptr_append(&drule_ip->services, service);
 
@@ -4310,8 +4318,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	int			ret = SUCCEED;
 	const char		*p = NULL;
 	time_t			itemtime;
-	char			host[HOST_HOST_LEN_MAX], ip[INTERFACE_IP_LEN_MAX], dns[INTERFACE_DNS_LEN_MAX],
-				tmp[MAX_STRING_LEN], *host_metadata = NULL;
+	char			host[ZBX_HOSTNAME_BUF_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
+				dns[ZBX_INTERFACE_DNS_LEN_MAX], tmp[MAX_STRING_LEN], *host_metadata = NULL;
 	unsigned short		port;
 	size_t			host_metadata_alloc = 1;	/* for at least NUL-terminating string */
 	zbx_vector_ptr_t	autoreg_hosts;
@@ -4837,7 +4845,7 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 		sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < lastaccess.values_num; i++)
 		{
@@ -4851,7 +4859,7 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);

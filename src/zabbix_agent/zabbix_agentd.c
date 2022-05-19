@@ -576,9 +576,9 @@ static void	set_defaults(void)
 			assert(*value);
 			zbx_trim_str_list(*value, ',');
 
-			if (NULL == strchr(*value, ',') && MAX_ZBX_HOSTNAME_LEN < strlen(*value))
+			if (NULL == strchr(*value, ',') && ZBX_MAX_HOSTNAME_LEN < strlen(*value))
 			{
-				(*value)[MAX_ZBX_HOSTNAME_LEN] = '\0';
+				(*value)[ZBX_MAX_HOSTNAME_LEN] = '\0';
 				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
 			}
 

@@ -41,29 +41,16 @@ void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 
 	if (0 != (mock_config.initialized & ZBX_MOCK_CONFIG_USERMACROS))
 	{
-		if (hs == &mock_config.dc.hmacros_hm)
+		if (hs == &mock_config.dc.um_cache->hosts)
 		{
-			const ZBX_DC_HMACRO_HM	*query = (const ZBX_DC_HMACRO_HM *)data;
+			zbx_uint64_t	hostid = **(zbx_uint64_t **)data;
 
-			for (i = 0; i < mock_config.host_macros.values_num; i++)
+			for (i = 0; i < mock_config.um_hosts.values_num; i++)
 			{
-				ZBX_DC_HMACRO_HM	*hm = (ZBX_DC_HMACRO_HM *)mock_config.host_macros.values[i];
-
-				if (query->hostid == hm->hostid && 0 == strcmp(hm->macro, query->macro))
-					return hm;
+				if (mock_config.um_hosts.values[i]->hostid == hostid)
+					return &mock_config.um_hosts.values[i];
 			}
-			return NULL;
-		}
-		else if (hs == &mock_config.dc.gmacros_m)
-		{
-			const ZBX_DC_GMACRO_M	*query = (const ZBX_DC_GMACRO_M *)data;
 
-			for (i = 0; i < mock_config.global_macros.values_num; i++)
-			{
-				ZBX_DC_GMACRO_M	*gm = (ZBX_DC_GMACRO_M *)mock_config.global_macros.values[i];
-				if (0 == strcmp(gm->macro, query->macro))
-					return gm;
-			}
 			return NULL;
 		}
 	}
@@ -130,6 +117,7 @@ void	mock_config_free(void)
 	if (0 != (mock_config.initialized & ZBX_MOCK_CONFIG_HOSTS))
 		mock_config_free_hosts();
 
+	zbx_free(mock_config.dc.um_cache);
 }
 
 

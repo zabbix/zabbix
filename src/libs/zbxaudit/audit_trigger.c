@@ -21,7 +21,7 @@
 
 #include "audit/zbxaudit.h"
 #include "log.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "audit.h"
 

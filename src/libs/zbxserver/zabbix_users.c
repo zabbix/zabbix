@@ -19,7 +19,7 @@
 
 #include "zabbix_users.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 
 /******************************************************************************

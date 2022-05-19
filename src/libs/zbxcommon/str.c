@@ -824,7 +824,7 @@ char	*zbx_strdcatf(char *dest, const char *f, ...)
  *                                                                            *
  * Return value: return SUCCEED if hostname is valid                          *
  *               or FAIL if hostname contains invalid chars, is empty         *
- *               or is longer than MAX_ZBX_HOSTNAME_LEN                       *
+ *               or is longer than ZBX_MAX_HOSTNAME_LEN                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_check_hostname(const char *hostname, char **error)
@@ -850,10 +850,10 @@ int	zbx_check_hostname(const char *hostname, char **error)
 		return FAIL;
 	}
 
-	if (MAX_ZBX_HOSTNAME_LEN < len)
+	if (ZBX_MAX_HOSTNAME_LEN < len)
 	{
 		if (NULL != error)
-			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", MAX_ZBX_HOSTNAME_LEN);
+			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", ZBX_MAX_HOSTNAME_LEN);
 		return FAIL;
 	}
 
