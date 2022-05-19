@@ -22,6 +22,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxalgo.h"
+#include "zbxserver.h"
 
 void	zbx_mock_test_entry(void **state)
 {
