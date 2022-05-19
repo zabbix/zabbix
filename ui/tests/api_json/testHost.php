@@ -300,7 +300,7 @@ class testHost extends CAPITest {
 		$this->assertArrayHasKey('maintenanceids', $maintenances);
 		self::$data['maintenanceids'] = $maintenances['maintenanceids'];
 
-		// Create host group.
+		// Create template group.
 		$templategroups = CDataHelper::call('templategroup.create', [
 			[
 				'name' => 'API test templates'

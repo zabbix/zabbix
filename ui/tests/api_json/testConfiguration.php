@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  * @backup hosts
  * @backup hosts_groups
  * @backup valuemap
- *
  */
 class testConfiguration extends CAPITest {
 
@@ -167,9 +166,9 @@ class testConfiguration extends CAPITest {
 			$this->call('configuration.export',
 				[
 					'options' => [
-							$options => [
-								$options
-							]
+						$options => [
+							$options
+						]
 					],
 					'format' => $parameter
 				],

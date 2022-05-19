@@ -604,7 +604,8 @@ class CConfigurationImport {
 	 * Import template groups.
 	 */
 	protected function processTemplateGroups(): void {
-		if (!$this->options['template_groups']['createMissing'] && !$this->options['template_groups']['updateExisting']) {
+		if (!$this->options['template_groups']['createMissing']
+				&& !$this->options['template_groups']['updateExisting']) {
 			return;
 		}
 

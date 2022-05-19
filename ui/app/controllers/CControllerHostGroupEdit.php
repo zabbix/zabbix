@@ -27,9 +27,9 @@ class CControllerHostGroupEdit extends CController{
 
 	protected function checkInput(): bool {
 		$fields = [
-			'groupid'   => 'db hstgrp.groupid',
-			'name'      => 'string',
-			'subgroups' => 'in 0,1'
+			'groupid' =>	'db hstgrp.groupid',
+			'name' =>		'string',
+			'subgroups' =>	'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);

@@ -762,9 +762,12 @@ abstract class CTriggerGeneral extends CApiService {
 	/**
 	 * Adds related host or template groups requested by "select*" options to the resulting object set.
 	 *
-	 * @param array $options
-	 * @param array $result
-	 * @param string $option
+	 * @param array  $options [IN] Original input options.
+	 * @param array  $result  [IN/OUT] Result output.
+	 * @param string $option  [IN] Possible values:
+	 *                               - "selectGroups" (deprecated);
+	 *                               - "selectHostGroups";
+	 *                               - "selectTemplateGroups".
 	 */
 	private function addRelatedGroups(array $options, array &$result, string $option): void {
 		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {

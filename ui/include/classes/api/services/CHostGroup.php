@@ -1332,8 +1332,8 @@ class CHostGroup extends CApiService {
 	 *
 	 * @static
 	 *
-	 * @param array  $del_hostids
-	 * @param array  $groupids
+	 * @param array $del_hostids
+	 * @param array $groupids
 	 *
 	 * @throws APIException
 	 */
@@ -1726,7 +1726,9 @@ class CHostGroup extends CApiService {
 	/**
 	 * Returns list of child groups for host group with given name.
 	 *
-	 * @param string $name     Host group name.
+	 * @param string $name  Host group name.
+	 *
+	 * @return array
 	 */
 	private function getChildGroupIds(string $name): array {
 		$parent = $name.'/';

@@ -1163,7 +1163,7 @@ class CApiInputValidator {
 	 * @param array  $rule['fields']
 	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED,
 	 *                                                                           API_ALLOW_UNEXPECTED
-	 * @param string $rule['fields'][<field_name>]['replacement']     (optional) Parameter name wich replaces the
+	 * @param string $rule['fields'][<field_name>]['replacement']     (optional) Parameter name which replaces the
 	 *                                                                           deprecated one. Can be used with
 	 *                                                                           API_DEPRECATED flag.
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)

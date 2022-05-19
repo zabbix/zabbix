@@ -439,9 +439,12 @@ abstract class CGraphGeneral extends CApiService {
 	/**
 	 * Adds related host groups and template groups requested by "select*" options to the resulting object set.
 	 *
-	 * @param array $options
-	 * @param array $result
-	 * @param string $option
+	 * @param array  $options  [IN] Original input options.
+	 * @param array  $result   [IN/OUT] Result output.
+	 * @param string $option   [IN] Possible values:
+	 *                                - "selectGroups" (deprecated);
+	 *                                - "selectHostGroups";
+	 *                                - "selectTemplateGroups".
 	 */
 	private function addRelatedGroups(array $options, array &$result, string $option): void {
 		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
@@ -449,6 +452,7 @@ abstract class CGraphGeneral extends CApiService {
 		}
 
 		$relationMap = new CRelationMap();
+
 		// discovered items
 		$dbRules = DBselect(
 			'SELECT gi.graphid,hg.groupid'.

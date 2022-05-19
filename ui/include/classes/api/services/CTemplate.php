@@ -1272,9 +1272,11 @@ class CTemplate extends CHostGeneral {
 	/**
 	 * Adds related template groups requested by "select*" options to the resulting object set.
 	 *
-	 * @param array  $options
-	 * @param array  $result
-	 * @param string $option
+	 * @param array  $options [IN] Original input options.
+	 * @param array  $result  [IN/OUT] Result output.
+	 * @param string $option  [IN] Possible values:
+	 *                               - "selectGroups" (deprecated);
+	 *                               - "selectHostGroups" (or any other value).
 	 */
 	private function addRelatedGroups(array $options, array &$result, string $option): void {
 		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {

@@ -54,8 +54,7 @@ class CConfigurationImportcompare {
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
 					'host_prototypes' => [
-						'group_links' => [
-						]
+						'group_links' => []
 					]
 				],
 				'dashboards' => [],

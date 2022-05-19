@@ -29,9 +29,9 @@ class CControllerHostGroupUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'groupid'   => 'fatal|required|db hstgrp.groupid',
-			'name'      => 'db hstgrp.name',
-			'subgroups' => 'in 0,1'
+			'groupid' => 	'fatal|required|db hstgrp.groupid',
+			'name' => 		'db hstgrp.name',
+			'subgroups' =>	'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);

@@ -126,4 +126,3 @@ class CControllerHostGroupList extends CController {
 		$this->setResponse($response);
 	}
 }
-

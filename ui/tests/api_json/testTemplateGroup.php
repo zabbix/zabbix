@@ -399,7 +399,7 @@ class testTemplateGroup extends CAPITest {
 				'user' => ['user' => 'zabbix-admin', 'password' => 'zabbix'],
 				'templategroup' => [
 					'groupid' => '52001',
-					'name' => 'API template group update as zabbix admin without peremissions'
+					'name' => 'API template group update as zabbix admin without permissions'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -990,4 +990,3 @@ class testTemplateGroup extends CAPITest {
 		$this->assertArrayHasKey('usrgrpids', $response);
 	}
 }
-
