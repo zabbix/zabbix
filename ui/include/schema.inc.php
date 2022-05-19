@@ -5035,7 +5035,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
-			]
+			],
+            'suppress_until' => [
+                'null' => true,
+                'type' => DB::FIELD_TYPE_INT,
+                'length' => 20
+            ]
 		]
 	],
 	'auditlog' => [
@@ -7571,7 +7576,12 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
-			]
+			],
+            'userid' => [
+                'null' => true,
+                'type' => DB::FIELD_TYPE_INT,
+                'length' => 10
+            ]
 		]
 	],
 	'maintenance_tag' => [
