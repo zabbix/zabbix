@@ -20,7 +20,7 @@
 #include "dbupgrade.h"
 
 #include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 /*
  * 3.4 maintenance database patches

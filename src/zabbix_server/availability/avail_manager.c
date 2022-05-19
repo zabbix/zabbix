@@ -118,13 +118,13 @@ static void	db_update_active_check_status(zbx_vector_uint64_t *hostids, int stat
 	if (0 == hostids->values_num)
 		return;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update host_rtdata set active_available=%i where", status);
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 	zbx_free(sql);
@@ -244,6 +244,8 @@ static void	process_confsync_diff(zbx_avail_active_hb_cache_t *cache, zbx_ipc_me
 
 			host_local.active_status = INTERFACE_AVAILABLE_UNKNOWN;
 			host_local.hostid = hostid;
+			host_local.lastaccess_active = 0;
+			host_local.heartbeat_freq = 0;
 
 			zbx_hashset_insert(&cache->queue, &host_local, sizeof(zbx_host_active_avail_t));
 		}
@@ -275,6 +277,8 @@ static void	init_active_availability(zbx_avail_active_hb_cache_t *cache)
 
 			ZBX_STR2UINT64(avail_local.hostid, row[0]);
 			avail_local.active_status = INTERFACE_AVAILABLE_UNKNOWN;
+			avail_local.lastaccess_active = 0;
+			avail_local.heartbeat_freq = 0;
 
 			zbx_hashset_insert(&cache->queue, &avail_local, sizeof(zbx_host_active_avail_t));
 		}
@@ -355,7 +359,7 @@ static void flush_all_hosts(zbx_avail_active_hb_cache_t *cache)
 
 	while (NULL != (host = (zbx_host_active_avail_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (NULL == (cached_host = zbx_hashset_search(&cache->queue, &cached_host->hostid)))
+		if (NULL == (cached_host = zbx_hashset_search(&cache->queue, &host->hostid)))
 		{
 			zbx_hashset_insert(&cache->queue, host, sizeof(zbx_host_active_avail_t));
 		}

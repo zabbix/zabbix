@@ -979,7 +979,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 
 	if (0 == args_num)
 	{
-		ret = evaluate_function2(value, item, func_name, "", ts, error);
+		ret = evaluate_function(value, item, func_name, "", ts, error);
 		goto out;
 	}
 
@@ -1010,7 +1010,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 		}
 	}
 
-	ret = evaluate_function2(value, item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
+	ret = evaluate_function(value, item, func_name, ZBX_NULL2EMPTY_STR(params), ts, error);
 out:
 	zbx_free(params);
 
@@ -1910,7 +1910,10 @@ void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const D
  ******************************************************************************/
 void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const DC_ITEM *item)
 {
-	int	i;
+	int			i;
+	zbx_dc_um_handle_t	*um_handle;
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < eval->queries.values_num; i++)
 	{
@@ -1919,6 +1922,8 @@ void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, cons
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
 				&query->ref.filter, MACRO_TYPE_QUERY_FILTER, NULL, 0);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 typedef struct
@@ -1951,7 +1956,7 @@ static void	host_index_free(zbx_host_index_t *index)
  *             trigger - [IN] the calculated item                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger)
+void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const ZBX_DB_TRIGGER *trigger)
 {
 	int			i, func_num, index;
 	zbx_vector_ptr_t	hosts;

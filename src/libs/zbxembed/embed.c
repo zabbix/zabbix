@@ -214,7 +214,7 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 		return FAIL;
 	}
 
-	/* initialize HttpRequest and CurlHttpRequest prototypes */
+	/* initialize HttpRequest prototype */
 	if (FAIL == zbx_es_init_httprequest(es, error))
 		goto out;
 

@@ -243,7 +243,6 @@ void	zbx_backtrace(void)
 
 void	zbx_log_fatal_info(void *context, unsigned int flags)
 {
-	FILE	*fd;
 #ifdef	HAVE_SYS_UCONTEXT_H
 
 #if defined(REG_EIP) || defined(REG_RIP)
@@ -338,6 +337,8 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 
 	if (0 != (flags & ZBX_FATAL_LOG_MEM_MAP))
 	{
+		FILE	*fd;
+
 		zabbix_log(LOG_LEVEL_CRIT, "=== Memory map: ===");
 
 		if (NULL != (fd = fopen("/proc/self/maps", "r")))

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 #include "log.h"
 #include "events.h"
@@ -37,6 +37,16 @@
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
 #	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
+#endif
+
+#ifdef HAVE_ORACLE
+#	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+#		define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
+#	else
+#		define	ZBX_SQL_EXEC_FROM	0
+#	endif
+#else
+#	define	ZBX_SQL_EXEC_FROM	0
 #endif
 
 typedef struct
@@ -1649,7 +1659,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 	if (0 != (update = autoreg_hosts->values_num - create))
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	zbx_vector_ptr_sort(autoreg_hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1700,7 +1710,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 	if (0 != update)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
 		zbx_free(sql);
 	}
@@ -1787,7 +1797,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 		/* Oracle fails with ORA-00911 if it encounters ';' w/o PL/SQL block */
 		zbx_rtrim(*sql, ZBX_WHITESPACE ";");
 #else
-		DBend_multiple_update(sql, sql_alloc, sql_offset);
+		zbx_DBend_multiple_update(sql, sql_alloc, sql_offset);
 #endif
 		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
 		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
@@ -1796,7 +1806,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 
 		*sql_offset = 0;
 
-		DBbegin_multiple_update(sql, sql_alloc, sql_offset);
+		zbx_DBbegin_multiple_update(sql, sql_alloc, sql_offset);
 	}
 
 	return ret;
@@ -2228,13 +2238,13 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	ret = DBprepare_multiple_query(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && sql_offset > 16)	/* in ORACLE always present begin..end; */
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
@@ -2966,7 +2976,7 @@ retry_oracle:
 	ret = (ZBX_DB_OK <= rc ? SUCCEED : FAIL);
 
 #else
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < self->rows.values_num; i++)
 	{
@@ -3036,7 +3046,7 @@ retry_oracle:
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 #	endif
-		DBend_multiple_update(sql, sql_alloc, sql_offset);
+		zbx_DBend_multiple_update(sql, sql_alloc, sql_offset);
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
