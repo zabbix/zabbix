@@ -19,12 +19,12 @@
 
 #include "common.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get events and flags that indicate what was filled in DB_EVENT    *
- *          structure                                                         *
+ * Purpose: get events and flags that indicate what was filled in             *
+ *           ZBX_DB_EVENT structure                                           *
  *                                                                            *
  * Parameters: eventids   - [IN] requested event ids                          *
  *             events     - [OUT] the array of events                         *
@@ -60,9 +60,9 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DB_EVENT	*event = NULL;
+		ZBX_DB_EVENT	*event = NULL;
 
-		event = (DB_EVENT *)zbx_malloc(event, sizeof(DB_EVENT));
+		event = (ZBX_DB_EVENT *)zbx_malloc(event, sizeof(ZBX_DB_EVENT));
 		ZBX_STR2UINT64(event->eventid, row[0]);
 		event->source = atoi(row[1]);
 		event->object = atoi(row[2]);
@@ -103,7 +103,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		DB_EVENT	*event;
+		ZBX_DB_EVENT	*event;
 		zbx_uint64_t	eventid;
 
 		ZBX_STR2UINT64(eventid, row[0]);
@@ -113,7 +113,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 			continue;
 		}
 
-		event = (DB_EVENT *)events->values[index];
+		event = (ZBX_DB_EVENT *)events->values[index];
 		event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
 	}
 	DBfree_result(result);
@@ -121,7 +121,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 	/* EVENT_SOURCE_TRIGGERS || EVENT_SOURCE_INTERNAL || EVENT_SOURCE_SERVICE */
 	if (0 != tagged_eventids.values_num)
 	{
-		DB_EVENT	*event = NULL;
+		ZBX_DB_EVENT	*event = NULL;
 
 		sql_offset = 0;
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", tagged_eventids.values,
@@ -145,7 +145,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 					continue;
 				}
 
-				event = (DB_EVENT *)events->values[index];
+				event = (ZBX_DB_EVENT *)events->values[index];
 			}
 
 			tag = (zbx_tag_t *)zbx_malloc(NULL, sizeof(zbx_tag_t));
@@ -180,7 +180,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 			for (i = 0; i < events->values_num; i++)
 			{
-				DB_EVENT	*event = (DB_EVENT *)events->values[i];
+				ZBX_DB_EVENT	*event = (ZBX_DB_EVENT *)events->values[i];
 
 				if (EVENT_OBJECT_TRIGGER != event->object)
 					continue;
@@ -219,7 +219,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
  * Parameters: event - [IN] event data                                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_free_event(DB_EVENT *event)
+void	zbx_db_free_event(ZBX_DB_EVENT *event)
 {
 	if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source ||
 			EVENT_SOURCE_SERVICE == event->source)

@@ -118,13 +118,13 @@ static void	db_update_active_check_status(zbx_vector_uint64_t *hostids, int stat
 	if (0 == hostids->values_num)
 		return;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"update host_rtdata set active_available=%i where", status);
 
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 	zbx_free(sql);

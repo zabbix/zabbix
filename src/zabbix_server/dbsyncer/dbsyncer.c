@@ -24,7 +24,7 @@
 #include "zbxself.h"
 
 #include "dbcache.h"
-#include "export.h"
+#include "zbxexport.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

@@ -182,8 +182,8 @@ void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 
 		maintenance_tag->maintenanceid = maintenanceid;
 		ZBX_STR2UCHAR(maintenance_tag->op, row[2]);
-		DCstrpool_replace(found, &maintenance_tag->tag, row[3]);
-		DCstrpool_replace(found, &maintenance_tag->value, row[4]);
+		dc_strpool_replace(found, &maintenance_tag->tag, row[3]);
+		dc_strpool_replace(found, &maintenance_tag->value, row[4]);
 
 		if (0 == found)
 			zbx_vector_ptr_append(&maintenance->tags, maintenance_tag);
@@ -213,8 +213,8 @@ void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 			zbx_vector_ptr_append(&maintenances, maintenance);
 		}
 
-		zbx_strpool_release(maintenance_tag->tag);
-		zbx_strpool_release(maintenance_tag->value);
+		dc_strpool_release(maintenance_tag->tag);
+		dc_strpool_release(maintenance_tag->value);
 
 		zbx_hashset_remove_direct(&config->maintenance_tags, maintenance_tag);
 	}
