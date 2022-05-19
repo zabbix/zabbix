@@ -105,6 +105,42 @@ static void	es_bin_to_hex(const unsigned char *bin, size_t len, char *out)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: export duktape data at the index into buffer                      *
+ *                                                                            *
+ * Comments: Throws an error:                                                 *
+ *               - if the top value at ctx value stack is non buffer object   *
+ *               - if the value stack is empty                                *
+ *           The returned buffer must be freed by the caller.                 *
+ *                                                                            *
+ ******************************************************************************/
+char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
+{
+	duk_int_t	type;
+	const char	*ptr;
+	char		*buf = NULL;
+
+	type = duk_get_type(ctx, index);
+
+	switch (type)
+	{
+		case DUK_TYPE_BUFFER:
+		case DUK_TYPE_OBJECT:
+			ptr = duk_require_buffer_data(ctx, index, len);
+			buf = zbx_malloc(NULL, *len);
+			memcpy(buf, ptr, *len);
+			break;
+		default:
+			ptr = duk_require_lstring(ctx, 0, len);
+			buf = zbx_malloc(NULL, *len);
+			memcpy(buf, ptr, *len);
+			break;
+	}
+
+	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: compute a md5 checksum                                            *
  *                                                                            *
  * Parameters: ctx - [IN] pointer to duk_context                              *
@@ -116,13 +152,13 @@ static void	es_bin_to_hex(const unsigned char *bin, size_t len, char *out)
  ******************************************************************************/
 static duk_ret_t	es_md5(duk_context *ctx)
 {
-	const char	*str;
+	char		*str;
 	md5_state_t	state;
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
 	char		*md5sum;
 	duk_size_t	len;
 
-	str = duk_require_lstring(ctx, 0, &len);
+	str = es_get_buffer_dyn(ctx, 0, &len);
 
 	md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
 
@@ -134,6 +170,8 @@ static duk_ret_t	es_md5(duk_context *ctx)
 
 	duk_push_string(ctx, md5sum);
 	zbx_free(md5sum);
+	zbx_free(str);
+
 	return 1;
 }
 
@@ -150,16 +188,19 @@ static duk_ret_t	es_md5(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_sha256(duk_context *ctx)
 {
-	const char	*str;
+	char		*str;
 	char		hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 	duk_size_t	len;
 
-	str = duk_require_lstring(ctx, 0, &len);
+	str = es_get_buffer_dyn(ctx, 0, &len);
 
 	zbx_sha256_hash_len(str, len, hash_res);
 	es_bin_to_hex((const unsigned char *)hash_res, ZBX_SHA256_DIGEST_SIZE, hash_res_stringhexes);
 
 	duk_push_string(ctx, hash_res_stringhexes);
+
+	zbx_free(str);
+
 	return 1;
 }
 
