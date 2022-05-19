@@ -980,7 +980,6 @@ class CopyWidgetsDashboards {
 									]
 								]
 							],
-
 							[
 								'name' => 'Test copy Web monitoring',
 								'type' => 'web',
