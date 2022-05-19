@@ -217,10 +217,11 @@ static duk_ret_t	es_sha256(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_hmac(duk_context *ctx)
 {
-	char			*out = NULL;
-	const char		*type, *key, *text;
+	char			*out = NULL, *key, *text;
+	const char		*type;
 	duk_size_t		key_len, text_len;
 	zbx_crypto_hash_t	hash_type;
+	int			ret;
 
 	type = duk_require_string(ctx, 0);
 	if (0 == strcmp(type, "md5"))
@@ -230,14 +231,20 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 	else
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "unsupported hash function");
 
-	key = duk_require_lstring(ctx, 1, &key_len);
-	text = duk_require_lstring(ctx, 2, &text_len);
+	key = es_get_buffer_dyn(ctx, 1, &key_len);
+	text = es_get_buffer_dyn(ctx, 2, &text_len);
 
-	if (FAIL == zbx_hmac(hash_type, key, key_len, text, text_len, &out))
+	ret = zbx_hmac(hash_type, key, key_len, text, text_len, &out);
+
+	zbx_free(text);
+	zbx_free(key);
+
+	if (SUCCEED != ret)
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot calculate HMAC");
 
 	duk_push_string(ctx, out);
 	zbx_free(out);
+
 	return 1;
 }
 
