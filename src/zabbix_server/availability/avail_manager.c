@@ -70,9 +70,6 @@ static void	process_new_active_check_heartbeat(zbx_avail_active_hb_cache_t *cach
 	{
 		avail_cached->heartbeat_freq = avail_new->heartbeat_freq;
 		avail_cached->lastaccess_active = avail_new->lastaccess_active;
-
-		if (NULL == zbx_hashset_search(&cache->queue, &avail_cached->hostid))
-			zbx_hashset_insert(&cache->queue, avail_cached, sizeof(zbx_host_active_avail_t));
 	}
 }
 
