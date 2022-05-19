@@ -653,9 +653,9 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 				continue;
 
 			zbx_json_addobject(&json_data, NULL);
-			zbx_json_addstring(&json_data, "rid", rp->id, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "rpid", rp->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
-			zbx_json_adduint64(&json_data, "vm_number", rp->vm_num);
+			zbx_json_adduint64(&json_data, "vm_count", rp->vm_num);
 			zbx_json_close(&json_data);
 		}
 
@@ -1204,9 +1204,9 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 				continue;
 
 			zbx_json_addobject(&json_data, NULL);
-			zbx_json_addstring(&json_data, "rid", rp->id, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "rpid", rp->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
-			zbx_json_adduint64(&json_data, "vm_number", rp->vm_num);
+			zbx_json_adduint64(&json_data, "vm_count", rp->vm_num);
 			zbx_json_close(&json_data);
 		}
 
@@ -3556,8 +3556,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				if (FAIL != (idx = zbx_vector_vmware_resourcepool_bsearch(&service->data->resourcepools,
 						&rpool_cmp, vmware_resourcepool_compare_id)))
 				{
-					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}",
-							ZBX_NULL2EMPTY_STR(service->data->resourcepools.values[idx]->path),
+					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", ZBX_NULL2EMPTY_STR(
+							service->data->resourcepools.values[idx]->path),
 							ZBX_JSON_TYPE_STRING);
 				}
 				else
