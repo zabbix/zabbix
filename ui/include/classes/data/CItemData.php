@@ -1660,7 +1660,7 @@ final class CItemData {
 				'value_type' => null
 			],
 			'zabbix[host,<type>,available]' => [
-				'description' => _('Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx.'),
+				'description' => _('Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx.'),
 				'value_type' => null
 			],
 			'zabbix[host,discovery,interfaces]' => [
