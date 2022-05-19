@@ -1460,6 +1460,12 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES 
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (50027, 99012, 1, 1, 1, '127.0.0.1', '10050');
 INSERT INTO interface_discovery (interfaceid, parent_interfaceid) VALUES (50027, 50026);
 
+-- test discovery mode change for host macro
+INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99030, 'host having discovered macros', 'host having discovered macros', 1, 4, '');
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50040, 99030, 50026);
+INSERT INTO host_discovery (hostid, parent_hostid, host) VALUES (99030, 99011, '{#VALUE}');
+INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description, automatic) VALUES (3, 99030, '{$AUTOMATIC_MACRO}', 'value', '', 1);
+
 -- token
 INSERT INTO token (tokenid, userid, name, description) VALUES (1, 2, 'test-token-exists', '');
 INSERT INTO token (tokenid, userid, name, description) VALUES (2, 5, 'test-delete-1', '');
