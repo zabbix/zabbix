@@ -55,14 +55,14 @@ class CControllerPopupGeneric extends CController {
 	 *
 	 * @array
 	 */
-	const POPUPS_HAVING_HOST_FILTER = ['triggers', 'items', 'graphs', 'graph_prototypes', 'item_prototypes'];
+	const POPUPS_HAVING_HOST_FILTER = ['items', 'item_prototypes', 'triggers', 'graphs', 'graph_prototypes'];
 
 	/**
 	 * Popups having template filter selector.
 	 *
 	 * @array
 	 */
-	const POPUPS_HAVING_TEMPLATE_FILTER = ['template_triggers'];
+	const POPUPS_HAVING_TEMPLATE_FILTER = ['template_items', 'template_triggers'];
 
 	/**
 	 * General properties for supported dialog types.
@@ -286,6 +286,22 @@ class CControllerPopupGeneric extends CController {
 				]
 			],
 			'items' => [
+				'title' => _('Items'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'itemid,name',
+				'form' => [
+					'name' => 'itemform',
+					'id' => 'items'
+				],
+				'table_columns' => [
+					_('Name'),
+					_('Key'),
+					_('Type'),
+					_('Type of information'),
+					_('Status')
+				]
+			],
+			'template_items' => [
 				'title' => _('Items'),
 				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'itemid,name',
@@ -1388,11 +1404,11 @@ class CControllerPopupGeneric extends CController {
 				];
 
 				if ($this->source_table === 'items') {
-					$options['output'] = array_merge($options['output'], ['state']);
+					$options['output'][] = 'state';
 				}
 
 				if ($this->page_options['parent_discoveryid']) {
-					$options['discoveryids'] = [$this->page_options['parent_discoveryid']];
+					$options['discoveryids'] = $this->page_options['parent_discoveryid'];
 				}
 				elseif ($this->hostids) {
 					$options['hostids'] = $this->hostids;
@@ -1418,10 +1434,30 @@ class CControllerPopupGeneric extends CController {
 						$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 					}
 
-					$records = (!$this->host_preselect_required || $this->hostids)
+					$records = !$this->host_preselect_required || $this->hostids
 						? API::Item()->get($options + ['webitems' => true])
 						: [];
 				}
+
+				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'template_items':
+				$options += [
+					'output' => ['itemid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
+					'selectHosts' => ['name']
+				];
+
+				if ($this->page_options['parent_discoveryid']) {
+					$options['discoveryids'] = $this->page_options['parent_discoveryid'];
+				}
+				elseif ($this->templateids) {
+					$options['templateids'] = $this->templateids;
+				}
+
+				$records = !$this->template_preselect_required || $this->templateids
+					? API::Item()->get($options + ['webitems' => true])
+					: [];
 
 				CArrayHelper::sort($records, ['name']);
 				break;

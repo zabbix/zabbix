@@ -460,6 +460,7 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'items':
+	case 'template_items':
 	case 'item_prototypes':
 
 		if ($options['srcfld2'] !== '' && $options['dstfld2'] !== '') {

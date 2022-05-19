@@ -30,6 +30,7 @@ $expression_form = (new CForm())
 	->addVar('action', 'popup.triggerexpr')
 	->addVar('dstfrm', $data['dstfrm'])
 	->addVar('dstfld1', $data['dstfld1'])
+	->addVar('context', $data['context'])
 	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
 	->addVar('function', $data['function'])
@@ -47,7 +48,7 @@ $expression_form_list = new CFormList();
 
 // Append item to form list.
 $popup_options = [
-	'srctbl' => 'items',
+	'srctbl' => $data['context'] === 'host' ? 'items' : 'template_items',
 	'srcfld1' => 'itemid',
 	'srcfld2' => 'name',
 	'dstfrm' => $expression_form->getName(),
@@ -56,12 +57,19 @@ $popup_options = [
 	'writeonly' => '1'
 ];
 
-if ($data['hostid']) {
-	$popup_options['hostid'] = $data['hostid'];
-}
+if ($data['context'] === 'host') {
+	if ($data['hostid']) {
+		$popup_options['hostid'] = $data['hostid'];
+	}
 
-if ($data['parent_discoveryid'] !== '') {
-	$popup_options['normal_only'] = '1';
+	$popup_options['real_hosts'] = '1';
+
+	if ($data['parent_discoveryid'] !== '') {
+		$popup_options['normal_only'] = '1';
+	}
+}
+elseif ($data['hostid']) {
+	$popup_options['templateid'] = $data['hostid'];
 }
 
 if ($data['item_required']) {
@@ -81,18 +89,15 @@ if ($data['item_required']) {
 		$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$item[] = (new CButton('select', _('Select prototype')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-			->onClick('
-				PopUp("popup.generic", {
-					srctbl: "item_prototypes",
-					srcfld1: "itemid",
-					srcfld2: "name",
-					dstfrm: "'.$expression_form->getName().'",
-					dstfld1: "itemid",
-					dstfld2: "item_description",
-					parent_discoveryid: this.dataset.parent_discoveryid
-				}, {dialogue_class: "modal-popup-generic"});
-			')
+			->onClick('return PopUp("popup.generic", '.json_encode([
+				'srctbl' => 'item_prototypes',
+				'srcfld1' => 'itemid',
+				'srcfld2' => 'name',
+				'dstfrm' => $expression_form->getName(),
+				'dstfld1' => 'itemid',
+				'dstfld2' => 'item_description',
+				'parent_discoveryid' => $data['parent_discoveryid']
+			]).');')
 			->removeId();
 	}
 

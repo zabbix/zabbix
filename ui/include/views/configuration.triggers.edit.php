@@ -131,7 +131,8 @@ if ($data['recovery_expression_field_readonly']) {
 
 $popup_parameters = [
 	'dstfrm' => $triggersForm->getName(),
-	'dstfld1' => $data['expression_field_name']
+	'dstfld1' => $data['expression_field_name'],
+	'context' => $data['context']
 ];
 
 if ($data['hostid']) {
@@ -337,7 +338,8 @@ $triggersFormList->addRow(_('OK event generation'),
 
 $popup_parameters = [
 	'dstfrm' => $triggersForm->getName(),
-	'dstfld1' => $data['recovery_expression_field_name']
+	'dstfld1' => $data['recovery_expression_field_name'],
+	'context' => $data['context']
 ];
 
 if ($data['hostid']) {
