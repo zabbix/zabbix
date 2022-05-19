@@ -1631,7 +1631,7 @@ FIELD		|event_suppressid|t_id		|	|NOT NULL	|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
 FIELD		|maintenanceid	|t_id		|	|NULL		|0			|2|maintenances
 FIELD		|suppress_until	|t_time		|'0'	|NOT NULL	|0
-FIELD		|userid		|t_id		|	|NOT NULL	|0			|3|users
+FIELD		|userid		|t_id		|	|NULL		|0			|3|users
 UNIQUE		|1		|eventid,maintenanceid
 INDEX		|2		|suppress_until
 INDEX		|3		|maintenanceid
