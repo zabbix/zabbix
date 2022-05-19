@@ -23,7 +23,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "audit.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxdb.h"
 
 void	zbx_audit_httptest_create_entry(int audit_action, zbx_uint64_t httptestid, const char *name)

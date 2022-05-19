@@ -20,7 +20,7 @@
 #include "httppoller.h"
 
 #include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"

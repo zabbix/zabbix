@@ -19,7 +19,7 @@
 
 #include "dbupgrade.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 /*
  * 4.4 development database patches

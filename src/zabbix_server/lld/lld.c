@@ -1102,8 +1102,11 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	time_t			now;
 	DC_ITEM			item;
 	zbx_config_t		cfg;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, lld_ruleid);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	zbx_vector_ptr_create(&lld_rows);
 	zbx_vector_ptr_create(&lld_macro_paths);
@@ -1226,6 +1229,8 @@ out:
 	zbx_vector_ptr_destroy(&lld_rows);
 	zbx_vector_ptr_clear_ext(&lld_macro_paths, (zbx_clean_func_t)zbx_lld_macro_path_free);
 	zbx_vector_ptr_destroy(&lld_macro_paths);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

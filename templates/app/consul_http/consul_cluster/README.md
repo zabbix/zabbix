@@ -22,7 +22,7 @@ This template was tested on:
 
 Template need to use Authorization via API token.
 
-Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.API.TOKEN}.  
+Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.TOKEN}.  
 Also, see the Macros section for a list of macros used to set trigger values.  
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
 
