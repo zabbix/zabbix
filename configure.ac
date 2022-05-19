@@ -2103,8 +2103,10 @@ AC_OUTPUT([
 	src/libs/zbxmutexs/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
+	src/libs/zbxdiscovery/Makefile
 	src/libs/zbxdb/Makefile
 	src/libs/zbxdbupgrade/Makefile
+	src/libs/zbxdbschema/Makefile
 	src/libs/zbxjson/Makefile
 	src/libs/zbxhttp/Makefile
 	src/libs/zbxserver/Makefile
@@ -2120,6 +2122,7 @@ AC_OUTPUT([
 	src/libs/zbxhistory/Makefile
 	src/libs/zbxcompress/Makefile
 	src/libs/zbxembed/Makefile
+	src/libs/zbxexport/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxvault/Makefile
 	src/libs/zbxhashicorp/Makefile

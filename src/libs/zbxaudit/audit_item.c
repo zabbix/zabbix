@@ -22,7 +22,7 @@
 #include "audit/zbxaudit.h"
 #include "log.h"
 #include "audit.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxdb.h"
 
 static int	item_flag_to_resource_type(int flag)

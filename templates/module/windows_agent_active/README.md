@@ -275,7 +275,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|System time is out of syn |<p>The host system time is different from the Zabbix server time.</p> |`fuzzytime(/Windows generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0` |WARNING |<p>Manual close: YES</p> |
+|System time is out of sync |<p>The host system time is different from the Zabbix server time.</p> |`fuzzytime(/Windows generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0` |WARNING |<p>Manual close: YES</p> |
 |System name has changed |<p>System name has changed. Ack to close.</p> |`last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2) and length(last(/Windows generic by Zabbix agent active/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
 |Host has been restarted |<p>The device uptime is less than 10 minutes.</p> |`last(/Windows generic by Zabbix agent active/system.uptime)<10m` |WARNING |<p>Manual close: YES</p> |
 

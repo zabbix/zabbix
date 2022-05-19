@@ -79,7 +79,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 {
 	DC_ITEM			*items = NULL;
 	const char		*regex;
-	char			error[ITEM_ERROR_LEN_MAX];
+	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
 	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type, regexp_ret;
 	zbx_uint64_t		*itemids = NULL;

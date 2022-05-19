@@ -19,6 +19,7 @@
 
 #include "taskmanager.h"
 
+#include "../db_lengths.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
@@ -26,7 +27,7 @@
 #include "zbxtasks.h"
 #include "../events.h"
 #include "../actions.h"
-#include "export.h"
+#include "zbxexport.h"
 #include "zbxdiag.h"
 #include "zbxservice.h"
 #include "zbxjson.h"
@@ -503,7 +504,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		zbx_dc_reschedule_items(&itemids, time(NULL), proxy_hostids);
 
 		sql_offset = 0;
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < tasks.values_num; i++)
 		{
@@ -537,7 +538,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);
@@ -745,7 +746,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t *rtc, const char *data)
 {
 	struct zbx_json_parse	jp;
-	char			hostname[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char			hostname[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	zbx_uint64_t		proxyid;
 
 	if (FAIL == zbx_json_open(data, &jp))
@@ -1083,7 +1084,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 {
 	struct zbx_json_parse	jp, jp_data;
 	const char		*ptr;
-	char			name[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char			name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	zbx_vector_ptr_t	tasks_active;
 	zbx_vector_str_t	proxynames_log;
 	char			*names_success = NULL;
