@@ -341,11 +341,11 @@ void	zbx_audit_host_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64
 }
 
 void	zbx_audit_host_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
-		const char *macro, const char *value, const char *description, int type, int state)
+		const char *macro, const char *value, const char *description, int type, int automatic)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_value[AUDIT_DETAILS_KEY_LEN], audit_key_description[AUDIT_DETAILS_KEY_LEN],
-		audit_key_type[AUDIT_DETAILS_KEY_LEN], audit_key_state[AUDIT_DETAILS_KEY_LEN];
+		audit_key_type[AUDIT_DETAILS_KEY_LEN], audit_key_automatic[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
@@ -355,7 +355,8 @@ void	zbx_audit_host_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t 
 	zbx_snprintf(audit_key_description, sizeof(audit_key_value), "host.macros[" ZBX_FS_UI64
 			"].description", macroid);
 	zbx_snprintf(audit_key_type, sizeof(audit_key_type), "host.macros[" ZBX_FS_UI64 "].type", macroid);
-	zbx_snprintf(audit_key_state, sizeof(audit_key_state), "host.macros[" ZBX_FS_UI64 "].state", macroid);
+	zbx_snprintf(audit_key_automatic, sizeof(audit_key_automatic), "host.macros[" ZBX_FS_UI64 "].automatic",
+			macroid);
 
 #define	AUDIT_TABLE_NAME	"hostmacro"
 	zbx_audit_update_json_append_no_value(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
@@ -367,8 +368,8 @@ void	zbx_audit_host_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t 
 			description, AUDIT_TABLE_NAME, "description");
 	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_type, type,
 			AUDIT_TABLE_NAME, "type");
-	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_state, state,
-			AUDIT_TABLE_NAME, "state");
+	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_automatic,
+			automatic, AUDIT_TABLE_NAME, "automatic");
 #undef AUDIT_TABLE_NAME
 }
 
@@ -763,11 +764,11 @@ void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, 
 }
 
 void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
-		const char *macro, const char *value, const char *description, int type, int state)
+		const char *macro, const char *value, const char *description, int type, int automatic)
 {
 	char	audit_key[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_value[AUDIT_DETAILS_KEY_LEN], audit_key_description[AUDIT_DETAILS_KEY_LEN],
-		audit_key_type[AUDIT_DETAILS_KEY_LEN], audit_key_state[AUDIT_DETAILS_KEY_LEN];
+		audit_key_type[AUDIT_DETAILS_KEY_LEN], audit_key_automatic[AUDIT_DETAILS_KEY_LEN];
 
 	RETURN_IF_AUDIT_OFF();
 
@@ -777,7 +778,8 @@ void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx
 	zbx_snprintf(audit_key_description, sizeof(audit_key_description), "hostprototype.macros[" ZBX_FS_UI64
 			"].description", macroid);
 	zbx_snprintf(audit_key_type, sizeof(audit_key_type), "hostprototype.macros[" ZBX_FS_UI64 "].type", macroid);
-	zbx_snprintf(audit_key_state, sizeof(audit_key_state), "hostprototype.macros[" ZBX_FS_UI64 "].state", macroid);
+	zbx_snprintf(audit_key_automatic, sizeof(audit_key_automatic), "hostprototype.macros[" ZBX_FS_UI64
+			"].automatic", macroid);
 
 #define	AUDIT_TABLE_NAME	"hostmacro"
 	zbx_audit_update_json_append_no_value(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key);
@@ -789,8 +791,8 @@ void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx
 			description, AUDIT_TABLE_NAME, "description");
 	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_type, type,
 			AUDIT_TABLE_NAME, "type");
-	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_state, state,
-			AUDIT_TABLE_NAME, "state");
+	zbx_audit_update_json_append_int(hostid, AUDIT_HOST_ID, AUDIT_DETAILS_ACTION_ADD, audit_key_automatic,
+			automatic, AUDIT_TABLE_NAME, "automatic");
 #undef AUDIT_TABLE_NAME
 }
 

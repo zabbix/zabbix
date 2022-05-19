@@ -213,7 +213,7 @@ static zbx_um_macro_t	*um_macro_dup(zbx_um_macro_t *macro)
 	dup->context = dc_strpool_acquire(macro->context);
 	dup->value = dc_strpool_acquire(macro->value);
 	dup->type = macro->type;
-	dup->state = macro->state;
+	dup->automatic = macro->automatic;
 	dup->context_op = macro->context_op;
 	dup->refcount = 1;
 
@@ -606,7 +606,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	{
 		char		*name = NULL, *context = NULL;
 		const char	*dc_name, *dc_context, *dc_value;
-		unsigned char	context_op, type, state;
+		unsigned char	context_op, type, automatic;
 		zbx_um_macro_t	*macro;
 
 		/* removed rows will be always at the end of sync list */
@@ -633,7 +633,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 			ZBX_STR2UINT64(hostid, row[1]);
 
 		ZBX_STR2UCHAR(type, row[offset + 2]);
-		ZBX_STR2UCHAR(state, row[offset + 3]);
+		ZBX_STR2UCHAR(automatic, row[offset + 3]);
 
 		/* acquire new value before releasing old value to avoid value being */
 		/*  removed and added back to string pool if it was not changed      */
@@ -701,7 +701,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		(*pmacro)->name = dc_name;
 		(*pmacro)->context = dc_context;
 		(*pmacro)->type = type;
-		(*pmacro)->state = state;
+		(*pmacro)->automatic = automatic;
 		(*pmacro)->context_op = context_op;
 
 		if (ZBX_MACRO_VALUE_VAULT == type)
@@ -1207,9 +1207,9 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 			}
 
 			zabbix_log(LOG_LEVEL_TRACE, "    macroid:" ZBX_FS_UI64 " name:'%s' context:'%s' op:'%d'"
-					" value:'%s' type:%d state:%d refcount:%d", macro->macroid, macro->name,
+					" value:'%s' type:%d automatic:%d refcount:%d", macro->macroid, macro->name,
 					ZBX_NULL2EMPTY_STR(macro->context), macro->context_op,
-					ZBX_NULL2EMPTY_STR(value), macro->type, macro->state, macro->refcount);
+					ZBX_NULL2EMPTY_STR(value), macro->type, macro->automatic, macro->refcount);
 		}
 
 		if (0 != (*phost)->templateids.values_num)

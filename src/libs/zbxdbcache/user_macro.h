@@ -32,7 +32,7 @@ typedef struct
 	const char	*value;
 	zbx_uint32_t	refcount;
 	unsigned char	type;
-	unsigned char	state;
+	unsigned char	automatic;
 	unsigned char	context_op;
 }
 zbx_um_macro_t;

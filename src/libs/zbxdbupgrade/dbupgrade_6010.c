@@ -484,8 +484,8 @@ static int	DBpatch_6010026(void)
 
 static int	DBpatch_6010027(void)
 {
-	if (ZBX_DB_OK > DBexecute("update hostmacro set state=1 where hostid in"	/* ZBX_MACRO_STATE_AUTOMATIC */
-			"(select hostid from host_discovery where parent_hostid is not null)"))
+	if (ZBX_DB_OK > DBexecute("update hostmacro set automatic=1 where hostid in"	/* ZBX_USERMACRO_AUTOMATIC */
+			" (select hostid from host_discovery where parent_hostid is not null)"))
 	{
 		return FAIL;
 	}
