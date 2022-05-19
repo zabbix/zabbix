@@ -328,7 +328,7 @@ abstract class CControllerHost extends CController {
 	}
 
 	/**
-	 * Clean passed filter fields in input from default values required for HTML presentation. Convert field
+	 * Clean and convert passed filter input fields from default values required for HTML presentation.
 	 *
 	 * @param array $input  Filter fields values.
 	 *

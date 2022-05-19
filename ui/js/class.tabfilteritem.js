@@ -420,8 +420,8 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	setFilterIndicator(tab_target) {
-		if (!tab_target.querySelector("a[data-indicator='mark']")) {
-			let green_dot = document.createElement('a');
+		if (!tab_target.querySelector("span[data-indicator='mark']")) {
+			let green_dot = document.createElement('span');
 			green_dot.setAttribute('data-indicator-value', '1');
 			green_dot.setAttribute('data-indicator', 'mark');
 			tab_target.appendChild(green_dot);
@@ -430,8 +430,8 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	removeFilterIndicator(tab_target) {
-		if (tab_target.querySelector("a[data-indicator='mark']")) {
-			tab_target.querySelector("a[data-indicator='mark']").remove();
+		if (tab_target.querySelector("span[data-indicator='mark']")) {
+			tab_target.querySelector("span[data-indicator='mark']").remove();
 			this._unsaved = false;
 		}
 	}
