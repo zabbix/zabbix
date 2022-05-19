@@ -73,7 +73,7 @@ static int	zbx_get_process_username(HANDLE hProcess, char *userName, char *sid)
 	int		iUse, res = FAIL;
 
 	/* clean result; */
-	*userName = '\0';
+	*userName = *sid = '\0';
 
 	/* open the processes token */
 	if (0 == OpenProcessToken(hProcess, TOKEN_QUERY, &tok))
@@ -97,10 +97,15 @@ static int	zbx_get_process_username(HANDLE hProcess, char *userName, char *sid)
 	if (0 == LookupAccountSid(NULL, ptu->User.Sid, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
 		goto lbl_err;
 
-	if (NULL != sid && TRUE == ConvertSidToStringSid(ptu->User.Sid, &sid_string))
+	if (NULL != sid)
 	{
-		zbx_unicode_to_utf8_static(sid_string, sid, MAX_NAME);
-		LocalFree(sid_string);
+		if (TRUE == ConvertSidToStringSid(ptu->User.Sid, &sid_string))
+		{
+			zbx_unicode_to_utf8_static(sid_string, sid, MAX_NAME);
+			LocalFree(sid_string);
+		}
+		else
+			goto lbl_err;
 	}
 
 	zbx_unicode_to_utf8_static(name, userName, MAX_NAME);
@@ -599,8 +604,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 					proc_data->ppid = pe32.th32ParentProcessID;
 					proc_data->name = zbx_strdup(NULL, baseName);
 					proc_data->tid = te32.th32ThreadID;
-					proc_data->sid = zbx_strdup(NULL, sid);
-					proc_data->user = zbx_strdup(NULL, uname);
+					proc_data->sid = zbx_strdup(NULL, SUCCEED == ret_usr ? sid : "-1");
+					proc_data->user = zbx_strdup(NULL, SUCCEED == ret_usr ? uname : "-1");
 
 					zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 				}
@@ -620,8 +625,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data->ppid = pe32.th32ParentProcessID;
 			proc_data->name = zbx_strdup(NULL, baseName);
 			proc_data->threads = pe32.cntThreads;
-			proc_data->sid = zbx_strdup(NULL, sid);
-			proc_data->user = zbx_strdup(NULL, uname);
+			proc_data->sid = zbx_strdup(NULL, SUCCEED == ret_usr ? sid : "-1");
+			proc_data->user = zbx_strdup(NULL, SUCCEED == ret_usr ? uname : "-1");
 
 			if (FALSE != GetProcessHandleCount(hProcess, &handleCount))
 				proc_data->handles = (zbx_uint64_t)handleCount;
