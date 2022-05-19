@@ -28,15 +28,13 @@ found_libpcre="yes")
 
 AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 [
+	want_libpcre=no
+
 	pcre_help_string="use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files."
 
 	AC_ARG_WITH([libpcre],[If you want to specify libpcre installation directories: AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], ["$pcre_help_string"])],
 		[
-			if test "$withval" = "no"; then
-				want_libpcre=no
-			else
-				want_libpcre=yes
-
+			if test "$withval" != "no"; then
 				if test "$withval" = "yes"; then
 					if test -f /usr/local/include/pcre.h; then
 						withval="/usr/local"
@@ -77,7 +75,7 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 		]
 	)
 
-	if test "$want_libpcre" = "yes"; then
+	if test "$1" != "flags-only"; then
 		AC_MSG_CHECKING(for libpcre support)
 
 		if test "x$enable_static_libs" = "xyes"; then

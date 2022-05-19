@@ -1873,16 +1873,38 @@ ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
-dnl Check for libpcre or libpcre2, used by Zabbix for regular expressions
-dnl Must check for both pcre and pcre2 to check if both were selected by the user and produce an error in that case
-LIBPCRE_CHECK_CONFIG([no])
-if test "x$enable_static_libs" != "xyes" || test "x$found_libpcre" != "xyes"; then
-LIBPCRE2_CHECK_CONFIG([no])
-fi
-if test "x$want_libpcre2" = "xyes"; then
-	if test "x$want_libpcre" = "xyes"; then
-		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time!])
+LIBPCRE_CHECK_CONFIG([flags-only])
+LIBPCRE2_CHECK_CONFIG([flags-only])
+
+if test "x$want_libpcre2" = "xno"; then # default to old pcre
+	if test "x$want_libpcre" = "xno"; then
+		AC_MSG_NOTICE("using old pcre library by default")
 	fi
+
+	LIBPCRE_CHECK_CONFIG([flags-only])
+
+	if test "x$found_libpcre" != "xyes"; then
+		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
+	fi
+
+	LIBPCRE_CHECK_CONFIG([no])
+
+	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE_LIBS"
+	fi
+
+	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
+	have_pcre=1
+else
+	if test "x$want_libpcre" != "xno"; then
+		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time $want_libpcre!])
+	fi
+
+	LIBPCRE2_CHECK_CONFIG([no])
 
 	if test "x$found_libpcre2" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre2 (libpcre2 check failed)])
@@ -1898,21 +1920,6 @@ if test "x$want_libpcre2" = "xyes"; then
 
 	AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
 	have_pcre2=1
-else
-	if test "x$found_libpcre" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
-	fi
-
-	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
-	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
-	if test "x$ARCH" = "xosx"; then
-		LIBS="$LIBPCRE_LIBS $LIBS"
-	else
-		LIBS="$LIBS $LIBPCRE_LIBS"
-	fi
-
-	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
-	have_pcre=1
 fi
 fi
 
