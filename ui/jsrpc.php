@@ -229,11 +229,7 @@ switch ($data['method']) {
 					$records = API::ItemPrototype()->get($options);
 				}
 				else {
-					if (array_key_exists('webitems', $data)) {
-						$options['webitems'] = $data['webitems'];
-					}
-
-					$records = API::Item()->get($options);
+					$records = API::Item()->get($options + ['webitems' => true]);
 				}
 
 				if ($records) {
@@ -665,7 +661,7 @@ switch ($data['method']) {
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
-					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
+					'webitems' => true,
 					'limit' => $limit
 				];
 

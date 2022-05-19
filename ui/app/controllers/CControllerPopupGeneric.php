@@ -503,7 +503,6 @@ class CControllerPopupGeneric extends CController {
 			'with_monitored_triggers' =>			'in 1',
 			'with_monitored_items' =>				'in 1',
 			'with_httptests' => 					'in 1',
-			'with_webitems' =>						'in 1',
 			'with_inherited' =>						'in 1',
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
@@ -1415,16 +1414,12 @@ class CControllerPopupGeneric extends CController {
 					$records = API::ItemPrototype()->get($options);
 				}
 				else {
-					if ($this->hasInput('with_webitems')) {
-						$options['webitems'] = true;
-					}
-
 					if ($this->hasInput('normal_only')) {
 						$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
 					}
 
 					$records = (!$this->host_preselect_required || $this->hostids)
-						? API::Item()->get($options)
+						? API::Item()->get($options + ['webitems' => true])
 						: [];
 				}
 

@@ -53,7 +53,6 @@ $popup_options = [
 	'dstfrm' => $expression_form->getName(),
 	'dstfld1' => 'itemid',
 	'dstfld2' => 'item_description',
-	'with_webitems' => '1',
 	'writeonly' => '1'
 ];
 
