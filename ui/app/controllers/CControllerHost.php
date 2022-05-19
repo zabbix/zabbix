@@ -335,11 +335,12 @@ abstract class CControllerHost extends CController {
 	 * @return array
 	 */
 	protected function cleanInput(array $input): array {
-		if (array_key_exists('filter_reset', $input) && $input['filter_reset']) {
+		if ($this->hasInput('filter_reset')) {
 			if (array_key_exists('filter_selected', $input) && $input['filter_selected'] == 0) {
-				$filter = (new CTabFilterProfile(self::FILTER_IDX, self::FILTER_FIELDS_DEFAULT))->read();
-				$filter->setTabFilter($input['filter_selected'], ['filter_name' => '']);
-				$filter->update();
+				(new CTabFilterProfile(self::FILTER_IDX, self::FILTER_FIELDS_DEFAULT))
+					->read()
+					->setTabFilter($input['filter_selected'], ['filter_name' => ''])
+					->update();
 			}
 			return array_intersect_key(['filter_name' => ''], $input);
 		}
