@@ -338,7 +338,7 @@ abstract class CControllerHost extends CController {
 		if (array_key_exists('filter_reset', $input) && $input['filter_reset']) {
 			if (array_key_exists('filter_selected', $input) && $input['filter_selected'] == 0) {
 				$filter = (new CTabFilterProfile(self::FILTER_IDX, self::FILTER_FIELDS_DEFAULT))->read();
-				$filter->setTabFilter(self::FILTER_IDX, ['filter_name' => '']);
+				$filter->setTabFilter($input['filter_selected'], ['filter_name' => '']);
 				$filter->update();
 			}
 			return array_intersect_key(['filter_name' => ''], $input);
