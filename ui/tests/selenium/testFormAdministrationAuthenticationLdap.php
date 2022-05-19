@@ -615,7 +615,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #9 LDAP server with everyfield filled.
+			// #9 LDAP server with every field filled.
 			[
 				[
 					'expected' => TEST_GOOD,
