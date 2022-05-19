@@ -3000,7 +3000,7 @@ abstract class CTriggerGeneral extends CApiService {
 						' AND tt.triggerid=ff.triggerid'.
 						' AND ff.itemid=ii.itemid'.
 						' AND '.dbConditionId('t.templateid', array_keys($edit_dependencies)).
-						' AND '.dbConditionId('i.hostid', array_keys($hostids)).
+						' AND '.dbConditionId('i.hostid', $hostids).
 						' AND '.dbConditionId('tt.templateid', array_keys($tpl_triggerids_up))
 				);
 			}
@@ -3085,7 +3085,7 @@ abstract class CTriggerGeneral extends CApiService {
 						' AND f.itemid=i.itemid'.
 						' AND t.triggerid=td.triggerid_down'.
 						' AND '.dbConditionId('t.templateid', array_keys($edit_dependencies)).
-						' AND '.dbConditionId('i.hostid', array_keys($hostids)).
+						' AND '.dbConditionId('i.hostid', $hostids).
 						' AND '.dbConditionId('td.triggerid_up', array_keys($host_triggerids_up))
 				);
 			}
