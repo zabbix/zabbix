@@ -477,7 +477,7 @@ static int	DBpatch_6010025(void)
 
 static int	DBpatch_6010026(void)
 {
-	const	ZBX_FIELD field = {"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const	ZBX_FIELD field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hostmacro", &field);
 }
