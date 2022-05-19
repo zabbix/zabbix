@@ -829,11 +829,10 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			getProcessCpuTimes(pid, &data)
 
 			pi := procInfo{int64(data.Pid), data.Name, 0, "", data.Name, ""}
-			if mode != "summary" {
-				setProcessUserInfo(pid, &data)
-				pi.userid = data.UserID
-				pi.cmdline = data.Cmdline
-			}
+			setProcessUserInfo(pid, &data)
+			pi.userid = data.UserID
+			pi.cmdline = data.Cmdline
+
 			if query.match(&pi) {
 				array = append(array, data)
 			}
