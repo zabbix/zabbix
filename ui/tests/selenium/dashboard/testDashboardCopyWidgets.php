@@ -157,8 +157,8 @@ class testDashboardCopyWidgets extends CWebTest {
 			$new_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
 					zbx_dbstr('Dashboard for Paste widgets'));
 			$new_page_name = self::NEW_PAGE_NAME;
-			$new_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid ='
-					.$start_dashboardid.' AND name =' .zbx_dbstr(self::NEW_PAGE_NAME));
+			$new_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid ='.
+					$start_dashboardid.' AND name ='.zbx_dbstr(self::NEW_PAGE_NAME));
 			$url = 'zabbix.php?action=dashboard.view&dashboardid=';
 		}
 
@@ -229,7 +229,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
 			$copied_widget_form = $copied_widget->edit();
 			$copied_widget_form->fill(['Filter' => 'Test copy Map navigation tree']);
-			$copied_widget_form->submit();
+			$copied_widget_form->submit()->waitUntilReady();
 		}
 
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
