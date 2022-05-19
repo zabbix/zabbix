@@ -19,6 +19,7 @@
 
 #include "lld.h"
 
+#include "../db_lengths.h"
 #include "log.h"
 #include "zbxserver.h"
 
@@ -2710,7 +2711,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 			0 != del_triggerdepids.values_num || 0 != upd_tags || 0 != del_triggertagids.values_num)
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < triggers->values_num; i++)
@@ -3096,7 +3097,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 	if (0 != upd_triggers || 0 != del_functionids.values_num ||
 			0 != del_triggerdepids.values_num || 0 != upd_tags || 0 != del_triggertagids.values_num)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
 	}
 cleanup:

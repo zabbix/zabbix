@@ -1,0 +1,318 @@
+---
+test case: Resolve {$M0}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M0}'
+  hostids: [1, 2, 3, 4, 5, 6, 7, 8]
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Resolve {$M1}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M1}'
+  hostids: [1, 2, 3, 4, 5, 6, 7, 8]
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Resolve {$M2}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M2}'
+  hostids: [1, 2, 3, 4, 5, 6, 7, 8]
+out:
+  result: SUCCEED
+  value: 2
+---
+test case: Resolve {$M3}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M3}'
+  hostids: [1, 2, 3, 4, 5, 6, 7, 8]
+out:
+  result: FAIL
+---
+test case: Resolve {$M4}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M4}'
+  hostids: [1, 2, 3, 4, 5, 6, 7, 8]
+out:
+  result: SUCCEED
+  value: 4
+---
+test case: Resolve {$M5}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M5}'
+  hostids: [1, 2, 3, 4, 5, 6, 7, 8]
+out:
+  result: SUCCEED
+  value: 5
+---
+test case: Resolve {$M6}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M6}'
+  hostids: [1, 2, 3, 4, 5, 6, 7, 8]
+out:
+  result: SUCCEED
+  value: 6
+---
+test case: Resolve {$M7}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M7}'
+  hostids: [1, 2, 3, 4, 5, 6, 7, 8]
+out:
+  result: SUCCEED
+  value: 7
+---
+test case: Resolve {$M8}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M8}'
+  hostids: [1, 2, 3, 4, 5, 6, 7, 8]
+out:
+  result: SUCCEED
+  value: 8
+---
+test case: Resolve {$M8} fail
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$M8}'
+  hostids: [1]
+out:
+  result: FAIL
+---
+test case: Resolve {$NODE:six}
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$NODE:six}'
+  hostids: [6]
+out:
+  result: SUCCEED
+  value: 60
+---
+test case: Resolve {$NODE:none} on host:6
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$NODE:none}'
+  hostids: [6]
+out:
+  result: SUCCEED
+  value: 10
+---
+test case: Resolve {$NODE:none} on host:7
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$NODE:none}'
+  hostids: [7]
+out:
+  result: SUCCEED
+  value: 00
+---
+test case: Resolve {$NODE:zero} on host:6
+include: &include um_cache_sync_01.inc.yaml
+in:
+  config: *include
+  macro: '{$NODE:zero}'
+  hostids: [6]
+out:
+  result: SUCCEED
+  value: 00-0
+---
+test case: Resolve {$M1} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M1}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Resolve {$M2} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2
+---
+test case: Resolve {$M2:1} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2:1}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2-1
+---
+test case: Resolve {$M2:2} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2:2}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2-2
+---
+test case: Resolve {$M2:3} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2:3}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2-3
+---
+test case: Resolve {$M2:4} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2:4}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2-4
+---
+test case: Resolve {$M2:5} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2:5}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2-5
+---
+test case: Resolve {$M2:6} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2:6}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2-6
+---
+test case: Resolve {$M2:7} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2:7}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2-7
+---
+test case: Resolve {$M2:8} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2:8}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2-8
+---
+test case: Resolve {$M2:9} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M2:9}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 2-9
+---
+test case: Resolve {$M3} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M3}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 3
+---
+test case: Resolve {$M4} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M4}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 4
+---
+test case: Resolve {$M4:1} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M4:1}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 4-1
+---
+test case: Resolve {$M4:2} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M4:2}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 4-2
+---
+test case: Resolve {$M5} from long macro list
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M5}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: 5
+---
+test case: Resolve {$M:regex:123} 
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M:123}'
+  hostids: [1]
+out:
+  result: SUCCEED
+  value: xyz
+---
+test case: Resolve {$M:regex:abc} 
+include: &include um_cache_resolve.inc.yaml
+in:
+  config: *include
+  macro: '{$M:abc}'
+  hostids: [1]
+out:
+  result: FAIL
+...

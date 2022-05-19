@@ -21,7 +21,7 @@
 #define ZABBIX_AVAILABILITY_H
 
 #include "zbxtypes.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 
 #define ZBX_IPC_SERVICE_AVAILABILITY		"availability"

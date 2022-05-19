@@ -30,7 +30,7 @@
 #include "trigger_linking.h"
 #include "graph_linking.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {
@@ -909,7 +909,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 
 	DBfree_result(result);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != actionids.values_num)
 	{
@@ -933,7 +933,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* in ORACLE always present begin..end; */
 	if (16 < sql_offset)
@@ -1008,7 +1008,7 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	zbx_vector_uint64_create(&selementids);
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
 	if (0 != selementids.values_num)
@@ -1028,7 +1028,7 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -1138,7 +1138,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 
 	zbx_vector_uint64_create(&profileids);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "graphid", &profile_idx, 1, graphids);
@@ -1155,7 +1155,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids->values, graphids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -1340,7 +1340,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBadd_to_housekeeper(itemids, "lldruleid", event_tables, ARRSIZE(event_tables));
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "itemid", &profile_idx, 1, itemids);
@@ -1357,7 +1357,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 clean:
@@ -3627,7 +3627,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != upd_tags.values_num)
 	{
 		sql1 = (char *)zbx_malloc(sql1, sql1_alloc);
-		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		zbx_DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 	}
 
 	if (0 != new_hosts_templates)
@@ -3638,7 +3638,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != del_inventory_modes_hostids.values_num)
 	{
 		sql2 = (char *)zbx_malloc(sql2, sql2_alloc);
-		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+		zbx_DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 	}
 
 	if (0 != del_hosttemplateids->values_num)
@@ -3843,7 +3843,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 					host_prototype->lnk_templateids.values[j]);
 
 			zbx_audit_host_prototype_update_json_add_parent_template(host_prototype->hostid, hosttemplateid,
-					host_prototype->lnk_templateids.values[j], TEMPLATE_LINK_MANUAL);
+					host_prototype->lnk_templateids.values[j], ZBX_TEMPLATE_LINK_MANUAL);
 
 			hosttemplateid++;
 		}
@@ -4188,7 +4188,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	if (SUCCEED == res && (NULL != sql1 || new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes ||
 			0 != upd_hostmacros || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_inventory_modes))
 	{
-		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		zbx_DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 
 		/* in ORACLE always present begin..end; */
 		if (16 < sql1_offset)
@@ -4200,7 +4200,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != del_interfaceids->values_num || 0 != del_snmpids->values_num ||
 			0 != del_inventory_modes_hostids.values_num))
 	{
-		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+		zbx_DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 
 		/* in ORACLE always present begin..end; */
 		if (16 < sql2_offset)
@@ -5189,7 +5189,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 				NULL);
 	}
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < httptests->values_num; i++)
 	{
@@ -5485,7 +5485,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		zbx_db_insert_clean(&db_insert_httag);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 		DBexecute("%s", sql);
@@ -5782,7 +5782,7 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	zbx_vector_uint64_destroy(&itemids);
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete host from maps */
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST, hostids);
@@ -5803,7 +5803,7 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -5877,15 +5877,18 @@ clean:
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*ip_esc, *dns_esc, *tmp = NULL;
-	zbx_uint64_t	interfaceid = 0;
-	unsigned char	main_ = 1, db_main, db_useip;
-	unsigned short	db_port;
-	const char	*db_ip, *db_dns;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*ip_esc, *dns_esc, *tmp = NULL;
+	zbx_uint64_t		interfaceid = 0;
+	unsigned char		main_ = 1, db_main, db_useip;
+	unsigned short		db_port;
+	const char		*db_ip, *db_dns;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	result = DBselect(
 			"select interfaceid,useip,ip,dns,port,main"
@@ -5995,6 +5998,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 out:
+	zbx_dc_close_user_macros(um_handle);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, interfaceid);
 
 	return interfaceid;
@@ -6296,7 +6301,7 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 
 	zbx_vector_uint64_create(&selementids);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete sysmaps_elements */
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST_GROUP, groupids);
@@ -6313,7 +6318,7 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 

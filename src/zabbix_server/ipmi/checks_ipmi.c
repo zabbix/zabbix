@@ -1957,7 +1957,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 	return SUCCEED;
 }
 
-/* function 'zbx_parse_ipmi_command' requires 'c_name' with size 'ITEM_IPMI_SENSOR_LEN_MAX' */
+/* function 'zbx_parse_ipmi_command' requires 'c_name' with size 'ZBX_ITEM_IPMI_SENSOR_LEN_MAX' */
 int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len)
 {
 	const char	*p;
@@ -1978,7 +1978,7 @@ int	zbx_parse_ipmi_command(const char *command, char *c_name, int *val, char *er
 		goto fail;
 	}
 
-	if (ITEM_IPMI_SENSOR_LEN_MAX <= sz_c_name)
+	if (ZBX_ITEM_IPMI_SENSOR_LEN_MAX <= sz_c_name)
 	{
 		zbx_snprintf(error, max_error_len, "IPMI command is too long [%.*s]", (int)sz_c_name, command);
 		goto fail;

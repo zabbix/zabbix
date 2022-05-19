@@ -16,24 +16,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#ifndef ZABBIX_ZBXREPORT_H
+#define ZABBIX_ZBXREPORT_H
 
-#ifndef ZABBIX_DISCOVERY_H
-#define ZABBIX_DISCOVERY_H
+#include "zbxjson.h"
 
-#include "db.h"
+void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j);
 
-typedef struct
-{
-	zbx_uint64_t	dcheckid;
-	unsigned short	port;
-	char		dns[INTERFACE_DNS_LEN_MAX];
-	char		value[MAX_DISCOVERED_VALUE_SIZE];
-	int		status;
-	time_t		itemtime;
-}
-zbx_service_t;
-
-void	discovery_update_host(DB_DHOST *dhost, int status, int now);
-void	discovery_update_service(const DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
-		const char *ip, const char *dns, int port, int status, const char *value, int now);
 #endif
