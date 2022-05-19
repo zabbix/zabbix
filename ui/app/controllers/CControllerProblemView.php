@@ -138,8 +138,7 @@ class CControllerProblemView extends CControllerProblem {
 					'from' => $profile->from,
 					'to' => $profile->to,
 					'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time'])
-				] + getTimeselectorActions($profile->from, $profile->to),
-				'default' => self::FILTER_FIELDS_DEFAULT
+				] + getTimeselectorActions($profile->from, $profile->to)
 			],
 			'filter_tabs' => $filter_tabs,
 			'refresh_interval' => CWebUser::getRefresh() * 1000,

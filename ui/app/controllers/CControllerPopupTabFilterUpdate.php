@@ -110,11 +110,11 @@ class CControllerPopupTabFilterUpdate extends CController {
 		}
 
 		$filter->tabfilters[$idx2] = $properties;
-		$filter->update();
 
 		if ($create) {
-			CProfile::update($idx.'.properties', json_encode(['filter_name' => '']), PROFILE_TYPE_STR);
+			$filter->setTabFilter($idx2, ['filter_name' => '']);
 		}
+		$filter->update();
 
 		$this->setResponse(new CControllerResponseData([
 			'main_block' => json_encode($properties + ['idx2' => $idx2, 'create' => $create])

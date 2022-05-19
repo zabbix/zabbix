@@ -119,8 +119,7 @@ class CControllerHostView extends CControllerHost {
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page'],
-				'default' => self::FILTER_FIELDS_DEFAULT
+				'page' => $filter['page']
 			]
 		] + $this->getData($filter);
 

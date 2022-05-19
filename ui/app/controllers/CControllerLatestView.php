@@ -189,8 +189,7 @@ class CControllerLatestView extends CControllerLatest {
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,
-				'page' => $filter['page'],
-				'default' => self::FILTER_FIELDS_DEFAULT
+				'page' => $filter['page']
 			],
 			'filter' => $filter,
 			'subfilters' => $subfilters,
