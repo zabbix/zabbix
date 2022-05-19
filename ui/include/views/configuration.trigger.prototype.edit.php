@@ -102,8 +102,6 @@ if ($data['recovery_expression_field_readonly']) {
 }
 
 $popup_parameters = [
-	'srctbl' => 'expression',
-	'srcfld1' => 'expression',
 	'dstfrm' => $triggersForm->getName(),
 	'dstfld1' => $data['expression_field_name'],
 	'parent_discoveryid' => $data['parent_discoveryid']
@@ -111,13 +109,14 @@ $popup_parameters = [
 if ($data['hostid']) {
 	$popup_parameters['hostid'] = $data['hostid'];
 }
-$add_expression_button = (new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
+
+$add_expression_button = (new CButton('insert', $data['expression_constructor'] == IM_TREE ? _('Edit') : _('Add')))
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setAttribute('data-parameters', json_encode($popup_parameters))
 	->onClick('
 		PopUp("popup.triggerexpr", {
 			...JSON.parse(this.dataset.parameters),
-			expression: document.getElementsByName("'.$data['expression_field_name'].'").value
+			expression: document.querySelector("[name='.$data['expression_field_name'].']").value
 		}, {dialogue_class: "modal-popup-generic"});
 	')
 	->removeId();
@@ -311,19 +310,24 @@ $triggersFormList->addRow(_('OK event generation'),
 		->setEnabled(!$data['limited'])
 );
 
+$popup_parameters = [
+	'dstfrm' => $triggersForm->getName(),
+	'dstfld1' => $data['recovery_expression_field_name'],
+	'parent_discoveryid' => $data['parent_discoveryid']
+];
+if ($data['hostid']) {
+	$popup_parameters['hostid'] = $data['hostid'];
+}
+
 $add_recovery_expression_button = (new CButton('insert',
-		($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add'))
-	)
+		$data['recovery_expression_constructor'] == IM_TREE ? _('Edit') : _('Add')
+	))
 	->addClass(ZBX_STYLE_BTN_GREY)
-	->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+	->setAttribute('data-parameters', json_encode($popup_parameters))
 	->onClick('
 		PopUp("popup.triggerexpr", {
-			srctbl: "'.$data['recovery_expression_field_name'].'",
-			srcfld1: "'.$data['recovery_expression_field_name'].'",
-			dstfrm: "'.$triggersForm->getName().'",
-			dstfld1: "'.$data['recovery_expression_field_name'].'",
-			parent_discoveryid: this.dataset.parent_discoveryid,
-			expression: document.getElementsByName("'.$data['recovery_expression_field_name'].'").value
+			...JSON.parse(this.dataset.parameters),
+			expression: document.querySelector("[name='.$data['recovery_expression_field_name'].']").value
 		}, {dialogue_class: "modal-popup-generic"});
 	');
 

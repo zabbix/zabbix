@@ -130,8 +130,6 @@ if ($data['recovery_expression_field_readonly']) {
 }
 
 $popup_parameters = [
-	'srctbl' => $data['expression_field_name'],
-	'srcfld1' => $data['expression_field_name'],
 	'dstfrm' => $triggersForm->getName(),
 	'dstfld1' => $data['expression_field_name']
 ];
@@ -150,13 +148,13 @@ $expression_row = [
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
+	(new CButton('insert', $data['expression_constructor'] == IM_TREE ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->setAttribute('data-parameters', json_encode($popup_parameters))
 		->onClick('
 			PopUp("popup.triggerexpr", {
 				...JSON.parse(this.dataset.parameters),
-				expression: document.getElementsByName("'.$data['expression_field_name'].'").value
+				expression: document.querySelector("[name='.$data['expression_field_name'].']").value
 			}, {dialogue_class: "modal-popup-generic"});
 		')
 		->setEnabled(!$readonly)
@@ -338,8 +336,6 @@ $triggersFormList->addRow(_('OK event generation'),
 );
 
 $popup_parameters = [
-	'srctbl' => $data['recovery_expression_field_name'],
-	'srcfld1' => $data['recovery_expression_field_name'],
 	'dstfrm' => $triggersForm->getName(),
 	'dstfld1' => $data['recovery_expression_field_name']
 ];
@@ -358,13 +354,13 @@ $recovery_expression_row = [
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
+	(new CButton('insert', $data['recovery_expression_constructor'] == IM_TREE ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->setAttribute('data-parameters', json_encode($popup_parameters))
 		->onClick('
 			PopUp("popup.triggerexpr", {
 				...JSON.parse(this.dataset.parameters),
-				expression: document.getElementsByName("'.$data['recovery_expression_field_name'].'").value
+				expression: document.querySelector("[name='.$data['recovery_expression_field_name'].']").value
 			}, {dialogue_class: "modal-popup-generic"});
 		')
 		->setEnabled(!$readonly)
