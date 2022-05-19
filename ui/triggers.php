@@ -36,7 +36,7 @@ $fields = [
 	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'(isset({form}) && ({form} == "update"))'],
 	'copy_type' =>								[T_ZBX_INT, O_OPT, P_SYS,
 													IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP,
-														COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE,
+														COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE
 													]),
 													'isset({copy})'
 												],
