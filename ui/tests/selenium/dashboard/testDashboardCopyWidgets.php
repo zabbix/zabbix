@@ -131,6 +131,7 @@ class testDashboardCopyWidgets extends CWebTest {
 	 */
 	private function copyWidgets($start_dashboardid, $widget_name, $new_dashboard = false, $replace = false,
 			$new_page = false, $templated = false) {
+
 		// Exclude Map navigation tree widget from replacing tests.
 		if ($replace && $widget_name === 'Test copy Map navigation tree') {
 			return;
@@ -162,7 +163,7 @@ class testDashboardCopyWidgets extends CWebTest {
 			);
 			$new_page_name = self::NEW_PAGE_NAME;
 			$new_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid ='.
-					$start_dashboardid.' AND name =' .zbx_dbstr(self::NEW_PAGE_NAME)
+					$start_dashboardid.' AND name ='.zbx_dbstr(self::NEW_PAGE_NAME)
 			);
 			$url = 'zabbix.php?action=dashboard.view&dashboardid=';
 		}
@@ -228,7 +229,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		// Wait until widget is pasted and loading spinner disappeared.
 		sleep(1);
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
-		$copied_widget = $dashboard->getWidgets()->last();
+		$copied_widget = $dashboard->getWidgets()->last()->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
