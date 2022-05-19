@@ -25,6 +25,10 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
 
+/* host macro discovery state */
+#define ZBX_USERMACRO_MANUAL	0
+#define ZBX_USERMACRO_AUTOMATIC	1
+
 typedef struct
 {
 	zbx_uint64_t	hostmacroid;

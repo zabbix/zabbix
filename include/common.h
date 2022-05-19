@@ -1789,8 +1789,4 @@ typedef enum
 }
 zbx_err_codes_t;
 
-/* host macro discovery state */
-#define ZBX_USERMACRO_MANUAL	0
-#define ZBX_USERMACRO_AUTOMATIC	1
-
 #endif
