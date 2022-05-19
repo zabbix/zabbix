@@ -4303,6 +4303,10 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				{
 					replace_to = zbx_strdup(replace_to, dc_item->key_orig);
 				}
+				else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+				{
+					ret = get_host_inventory_by_itemid(m, dc_item->itemid, &replace_to);
+				}
 			}
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR))
@@ -4381,6 +4385,10 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const ZBX
 				if (SUCCEED == (ret = DCconfig_get_interface(&interface, dc_host->hostid, 0)))
 					replace_to = zbx_strdup(replace_to, interface.addr);
 				require_address = 1;
+			}
+			else if (0 == strncmp(m, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+			{
+				ret = get_host_inventory_by_hostid(m, dc_host->hostid, &replace_to);
 			}
 			else if (NULL != userid)
 			{
