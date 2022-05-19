@@ -23,9 +23,6 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup hstgrp
- * @backup hosts
- * @backup hosts_groups
- * @backup valuemap
  */
 class testConfiguration extends CAPITest {
 
