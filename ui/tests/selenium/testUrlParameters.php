@@ -26,7 +26,7 @@ class testUrlParameters extends CLegacyWebTest {
 	public static function data() {
 		return [
 			[
-				'title' => 'Configuration of host groups',
+				'title' => 'Configuration of host group',
 				'check_server_name' => true,
 				'server_name_on_page' => true,
 				'test_cases' => [
@@ -85,7 +85,7 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Configuration of template groups',
+				'title' => 'Configuration of template group',
 				'check_server_name' => true,
 				'server_name_on_page' => true,
 				'test_cases' => [
@@ -137,7 +137,7 @@ class testUrlParameters extends CLegacyWebTest {
 						'text_present' => [
 							'Incorrect value "-1" for "groupid" field.',
 							'Controller: templategroup.edit',
-							'action: hostgrtemplategroupoup.edit',
+							'action: templategroup.edit',
 							'groupid: -1'
 						]
 					]
