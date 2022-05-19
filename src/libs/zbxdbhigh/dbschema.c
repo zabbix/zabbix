@@ -391,7 +391,6 @@ const ZBX_TABLE	tables[] = {
 		{"gui_access",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
 		{"users_status",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
 		{"debug_mode",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-		{"userdirectoryid",	"NULL",	"userdirectory",	"userdirectoryid",	0,	ZBX_TYPE_ID,	0 ,	0},
 		{0}
 		},
 		"name"
@@ -572,6 +571,12 @@ const ZBX_TABLE	tables[] = {
 		{"alert_usrgrpid",	NULL,	"usrgrp",	"usrgrpid",	0,	ZBX_TYPE_ID,	0,	0},
 		{"default_theme",	"blue-theme",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
 		{"authentication_type",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
+		{"ldap_host",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"ldap_port",	"389",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
+		{"ldap_base_dn",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"ldap_bind_dn",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"ldap_bind_password",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"ldap_search_attribute",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
 		{"discovery_groupid",	NULL,	"hstgrp",	"groupid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL | ZBX_PROXY,	0},
 		{"max_in_table",	"50",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
 		{"search_limit",	"1000",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
@@ -677,7 +682,6 @@ const ZBX_TABLE	tables[] = {
 		{"geomaps_max_zoom",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
 		{"geomaps_attribution",	"",	NULL,	NULL,	1024,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
 		{"vault_provider",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-		{"ldap_userdirectoryid",	"NULL ",	"userdirectory",	"userdirectoryid",	0,	ZBX_TYPE_ID,	0,	0},
 		{0}
 		},
 		NULL
@@ -829,7 +833,6 @@ const ZBX_TABLE	tables[] = {
 		{"hosttemplateid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
 		{"hostid",	NULL,	"hosts",	"hostid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL | ZBX_PROXY,	ZBX_FK_CASCADE_DELETE},
 		{"templateid",	NULL,	"hosts",	"hostid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL | ZBX_PROXY,	ZBX_FK_CASCADE_DELETE},
-		{"link_type",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL | ZBX_PROXY,	0},
 		{0}
 		},
 		"hostid,templateid"
@@ -1406,76 +1409,76 @@ const ZBX_TABLE	tables[] = {
 		{
 		{"hostid",	NULL,	"hosts",	"hostid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE},
 		{"inventory_mode",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-		{"type",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"type_full",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"name",	"",	NULL,	NULL,	128,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"alias",	"",	NULL,	NULL,	128,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"os",	"",	NULL,	NULL,	128,			ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"os_full",	"",	NULL,	NULL,	255,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"os_short",	"",	NULL,	NULL,	128,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"serialno_a",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"serialno_b",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"tag",	"",	NULL,	NULL,	64,			ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"asset_tag",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"macaddress_a",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"macaddress_b",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"hardware",	"",	NULL,	NULL,	255,		ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-		{"hardware_full",	"",	NULL,	NULL,		ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"software",	"",	NULL,	NULL,	255,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"software_full",	"",	NULL,	NULL,		ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"software_app_a",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"software_app_b",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"software_app_c",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"software_app_d",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"software_app_e",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"contact",	"",	NULL,	NULL,			ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"location",	"",	NULL,	NULL,			ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"location_lat",	"",	NULL,	NULL,	16,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"location_lon",	"",	NULL,	NULL,	16,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"notes",	"",	NULL,	NULL,			ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"chassis",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"model",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"hw_arch",	"",	NULL,	NULL,	32,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"vendor",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"contract_number",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"installer_name",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"deployment_status",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"url_a",	"",	NULL,	NULL,	255,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"url_b",	"",	NULL,	NULL,	255,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"url_c",	"",	NULL,	NULL,	255,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"host_networks",	"",	NULL,	NULL,		ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
-		{"host_netmask",	"",	NULL,	NULL,	39,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"host_router",	"",	NULL,	NULL,	39,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"oob_ip",	"",	NULL,	NULL,	39,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"oob_netmask",	"",	NULL,	NULL,	39,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"oob_router",	"",	NULL,	NULL,	39,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"date_hw_purchase",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"date_hw_install",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"date_hw_expiry",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"date_hw_decomm",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"site_address_a",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"site_address_b",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"site_address_c",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"site_city",	"",	NULL,	NULL,	128,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"site_state",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"site_country",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"site_zip",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"site_rack",	"",	NULL,	NULL,	128,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"site_notes",	"",	NULL,	NULL,			ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_1_name",	"",	NULL,	NULL,	128,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_1_email",	"",	NULL,	NULL,	128,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_1_phone_a",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_1_phone_b",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_1_cell",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_1_screen",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_1_notes",	"",	NULL,	NULL,			ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
-		{"poc_2_name",	"",	NULL,	NULL,	128,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_2_email",	"",	NULL,	NULL,	128,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_2_phone_a",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_2_phone_b",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_2_cell",	"",	NULL,	NULL,	64,		ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_2_screen",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL | ZBX_PROXY,	0},
-		{"poc_2_notes",	"",	NULL,	NULL,			ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL | ZBX_PROXY,	0},
+		{"type",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"type_full",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"name",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"alias",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"os",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"os_full",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"os_short",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"serialno_a",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"serialno_b",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"tag",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"asset_tag",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"macaddress_a",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"macaddress_b",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"hardware",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"hardware_full",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
+		{"software",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"software_full",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
+		{"software_app_a",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"software_app_b",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"software_app_c",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"software_app_d",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"software_app_e",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"contact",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
+		{"location",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
+		{"location_lat",	"",	NULL,	NULL,	16,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"location_lon",	"",	NULL,	NULL,	16,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"notes",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
+		{"chassis",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"model",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"hw_arch",	"",	NULL,	NULL,	32,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"vendor",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"contract_number",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"installer_name",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"deployment_status",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"url_a",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"url_b",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"url_c",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"host_networks",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
+		{"host_netmask",	"",	NULL,	NULL,	39,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"host_router",	"",	NULL,	NULL,	39,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"oob_ip",	"",	NULL,	NULL,	39,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"oob_netmask",	"",	NULL,	NULL,	39,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"oob_router",	"",	NULL,	NULL,	39,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"date_hw_purchase",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"date_hw_install",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"date_hw_expiry",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"date_hw_decomm",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"site_address_a",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"site_address_b",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"site_address_c",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"site_city",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"site_state",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"site_country",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"site_zip",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"site_rack",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"site_notes",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
+		{"poc_1_name",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_1_email",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_1_phone_a",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_1_phone_b",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_1_cell",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_1_screen",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_1_notes",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
+		{"poc_2_name",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_2_email",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_2_phone_a",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_2_phone_b",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_2_cell",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_2_screen",	"",	NULL,	NULL,	64,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
+		{"poc_2_notes",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
 		{0}
 		},
 		NULL
@@ -2391,31 +2394,6 @@ const ZBX_TABLE	tables[] = {
 		},
 		NULL
 	},
-	{"host_rtdata",	"hostid",	0,
-		{
-		{"hostid",	NULL,	"hosts",	"hostid",	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	ZBX_FK_CASCADE_DELETE},
-		{"active_available",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-		{0}
-		},
-		NULL
-	},
-	{"userdirectory",	"userdirectoryid",	0,
-		{
-		{"userdirectoryid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
-		{"name",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-		{"description",	"",	NULL,	NULL,	ZBX_TYPE_SHORTTEXT_LEN,	ZBX_TYPE_SHORTTEXT,	ZBX_NOTNULL,	0},
-		{"host",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-		{"port",	"389",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-		{"base_dn",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-		{"bind_dn",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-		{"bind_password",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-		{"search_attribute",	"",	NULL,	NULL,	128,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-		{"start_tls",	"0",	NULL,	NULL,	0,	ZBX_TYPE_INT,	ZBX_NOTNULL,	0},
-		{"search_filter",	"",	NULL,	NULL,	255,	ZBX_TYPE_CHAR,	ZBX_NOTNULL,	0},
-		{0}
-		},
-		NULL
-	},
 	{"dbversion",	"dbversionid",	0,
 		{
 		{"dbversionid",	NULL,	NULL,	NULL,	0,	ZBX_TYPE_ID,	ZBX_NOTNULL,	0},
@@ -2771,11 +2749,9 @@ name varchar(64) DEFAULT '' NOT NULL,\n\
 gui_access integer DEFAULT '0' NOT NULL,\n\
 users_status integer DEFAULT '0' NOT NULL,\n\
 debug_mode integer DEFAULT '0' NOT NULL,\n\
-userdirectoryid bigint DEFAULT NULL NULL REFERENCES userdirectory (userdirectoryid),\n\
 PRIMARY KEY (usrgrpid)\n\
 );\n\
 CREATE UNIQUE INDEX usrgrp_1 ON usrgrp (name);\n\
-CREATE INDEX usrgrp_2 ON usrgrp (userdirectoryid);\n\
 CREATE TABLE users_groups (\n\
 id bigint  NOT NULL,\n\
 usrgrpid bigint  NOT NULL REFERENCES usrgrp (usrgrpid) ON DELETE CASCADE,\n\
@@ -2931,6 +2907,12 @@ work_period varchar(255) DEFAULT '1-5,09:00-18:00' NOT NULL,\n\
 alert_usrgrpid bigint  NULL REFERENCES usrgrp (usrgrpid),\n\
 default_theme varchar(128) DEFAULT 'blue-theme' NOT NULL,\n\
 authentication_type integer DEFAULT '0' NOT NULL,\n\
+ldap_host varchar(255) DEFAULT '' NOT NULL,\n\
+ldap_port integer DEFAULT 389 NOT NULL,\n\
+ldap_base_dn varchar(255) DEFAULT '' NOT NULL,\n\
+ldap_bind_dn varchar(255) DEFAULT '' NOT NULL,\n\
+ldap_bind_password varchar(128) DEFAULT '' NOT NULL,\n\
+ldap_search_attribute varchar(128) DEFAULT '' NOT NULL,\n\
 discovery_groupid bigint  NOT NULL REFERENCES hstgrp (groupid),\n\
 max_in_table integer DEFAULT '50' NOT NULL,\n\
 search_limit integer DEFAULT '1000' NOT NULL,\n\
@@ -3036,12 +3018,10 @@ geomaps_tile_url varchar(1024) DEFAULT '' NOT NULL,\n\
 geomaps_max_zoom integer DEFAULT '0' NOT NULL,\n\
 geomaps_attribution varchar(1024) DEFAULT '' NOT NULL,\n\
 vault_provider integer DEFAULT '0' NOT NULL,\n\
-ldap_userdirectoryid bigint DEFAULT NULL  NULL REFERENCES userdirectory (userdirectoryid),\n\
 PRIMARY KEY (configid)\n\
 );\n\
 CREATE INDEX config_1 ON config (alert_usrgrpid);\n\
 CREATE INDEX config_2 ON config (discovery_groupid);\n\
-CREATE INDEX config_3 ON config (ldap_userdirectoryid);\n\
 CREATE TABLE triggers (\n\
 triggerid bigint  NOT NULL,\n\
 expression varchar(2048) DEFAULT '' NOT NULL,\n\
@@ -3179,7 +3159,6 @@ CREATE TABLE hosts_templates (\n\
 hosttemplateid bigint  NOT NULL,\n\
 hostid bigint  NOT NULL REFERENCES hosts (hostid) ON DELETE CASCADE,\n\
 templateid bigint  NOT NULL REFERENCES hosts (hostid) ON DELETE CASCADE,\n\
-link_type integer DEFAULT '0' NOT NULL,\n\
 PRIMARY KEY (hosttemplateid)\n\
 );\n\
 CREATE UNIQUE INDEX hosts_templates_1 ON hosts_templates (hostid,templateid);\n\
@@ -4508,32 +4487,13 @@ value varchar(255) DEFAULT '' NOT NULL,\n\
 PRIMARY KEY (sla_service_tagid)\n\
 );\n\
 CREATE INDEX sla_service_tag_1 ON sla_service_tag (slaid);\n\
-CREATE TABLE host_rtdata (\n\
-hostid bigint  NOT NULL REFERENCES hosts (hostid) ON DELETE CASCADE,\n\
-active_available integer DEFAULT '0' NOT NULL,\n\
-PRIMARY KEY (hostid)\n\
-);\n\
-CREATE TABLE userdirectory (\n\
-userdirectoryid bigint  NOT NULL,\n\
-name varchar(128) DEFAULT '' NOT NULL,\n\
-description text DEFAULT '' NOT NULL,\n\
-host varchar(255) DEFAULT '' NOT NULL,\n\
-port integer DEFAULT '389' NOT NULL,\n\
-base_dn varchar(255) DEFAULT '' NOT NULL,\n\
-bind_dn varchar(255) DEFAULT '' NOT NULL,\n\
-bind_password varchar(128) DEFAULT '' NOT NULL,\n\
-search_attribute varchar(128) DEFAULT '' NOT NULL,\n\
-start_tls integer DEFAULT '0' NOT NULL,\n\
-search_filter varchar(255) DEFAULT '' NOT NULL,\n\
-PRIMARY KEY (userdirectoryid)\n\
-);\n\
 CREATE TABLE dbversion (\n\
 dbversionid bigint  NOT NULL,\n\
 mandatory integer DEFAULT '0' NOT NULL,\n\
 optional integer DEFAULT '0' NOT NULL,\n\
 PRIMARY KEY (dbversionid)\n\
 );\n\
-INSERT INTO dbversion VALUES ('1','6010023','6010023');\n\
+INSERT INTO dbversion VALUES ('1','6010003','6010003');\n\
 ";
 const char	*const db_schema_fkeys[] = {
 	NULL
