@@ -3727,7 +3727,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 		if (FAIL != (i = zbx_vector_vmware_resourcepool_bsearch(rpools, &rpool_cmp,
 				vmware_resourcepool_compare_id)))
 		{
-			rpools->values[i]->vm_num ++;
+			rpools->values[i]->vm_num += 1;
 		}
 	}
 
