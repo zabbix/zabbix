@@ -790,7 +790,7 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @throws APIException if the given input is invalid
 	 */
-	private function validateDeleteDependencies(array $triggers, ?array &$db_triggers): void {
+	private function validateDeleteDependencies(array &$triggers, ?array &$db_triggers): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['triggerid']], 'fields' => [
 			'triggerid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
