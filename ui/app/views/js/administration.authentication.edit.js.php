@@ -62,9 +62,7 @@
 				.prop('disabled', !this.checked);
 		});
 
-		if (document.getElementById('bind-password-btn') !== null) {
-			document.getElementById('bind-password-btn').addEventListener('click', showPasswordField);
-		}
+		$form.find('#bind-password-btn').on('click', showPasswordField);
 
 		$form.find('[name=ldap_test]').click(function() {
 			warn = false;
@@ -73,10 +71,10 @@
 
 	function showPasswordField(e) {
 		const form_field = e.target.parentNode;
-		const password_field = form_field.querySelector('[name="ldap_bind_password"][type="password"]');
+		const password_field = form_field.querySelector('[name="ldap_bind_password"]');
 
 		password_field.disabled = false;
-		password_field.style.display = '';
+		password_field.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 
 		form_field.removeChild(e.target);
 

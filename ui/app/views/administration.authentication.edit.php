@@ -146,12 +146,12 @@ if ($data['change_bind_password']) {
 else {
 	$password_box = [
 		(new CSimpleButton(_('Change password')))
+			->setId('bind-password-btn')
 			->setEnabled($data['ldap_enabled'])
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->setId('bind-password-btn'),
+			->addClass(ZBX_STYLE_BTN_GREY),
 		(new CPassBox('ldap_bind_password', '', DB::getFieldLength('config', 'ldap_bind_password')))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->addStyle('display: none;')
+			->addClass(ZBX_STYLE_DISPLAY_NONE)
 			->setEnabled(false)
 	];
 }

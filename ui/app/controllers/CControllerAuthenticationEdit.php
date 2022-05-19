@@ -96,7 +96,7 @@ class CControllerAuthenticationEdit extends CController {
 			'ldap_test_password' => '',
 			'ldap_test_user' => CWebUser::$data['username'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
-			'change_bind_password' => 1,
+			'change_bind_password' => 0,
 			'form_refresh' => 0
 		];
 
