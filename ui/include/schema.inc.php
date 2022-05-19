@@ -5036,11 +5036,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-            'suppress_until' => [
-                'null' => true,
-                'type' => DB::FIELD_TYPE_INT,
-                'length' => 20
-            ]
+			'suppress_until' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
 		]
 	],
 	'auditlog' => [
@@ -7577,11 +7578,13 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-            'userid' => [
-                'null' => true,
-                'type' => DB::FIELD_TYPE_INT,
-                'length' => 10
-            ]
+			'userid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
+			]
 		]
 	],
 	'maintenance_tag' => [
