@@ -42,7 +42,7 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 						withval="/usr"
 					fi
 				else
-					_libpcre_dir_lib="$withval/lib"
+					_libpcre_lib_dir="$withval/lib"
 				fi
 			fi
 			_libpcre_dir="$withval"
@@ -69,7 +69,7 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 		),
 		[
 			_libpcre_dir="$withval"
-			_libpcre_dir_lib="$withval"
+			_libpcre_lib_dir="$withval"
 			LIBPCRE_LDFLAGS="-L$withval"
 			_libpcre_dir_set="yes"
 		]
@@ -81,7 +81,7 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 		if test "x$enable_static_libs" = "xyes"; then
 			AC_REQUIRE([PKG_PROG_PKG_CONFIG])
 			PKG_PROG_PKG_CONFIG()
-			test -z "$PKG_CONFIG" -a -z "$_libpcre_dir_lib" && AC_MSG_ERROR([Not found pkg-config library])
+			test -z "$PKG_CONFIG" -a -z "$_libpcre_lib_dir" && AC_MSG_ERROR([Not found pkg-config library])
 			m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
 		fi
 
@@ -90,25 +90,25 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 		if test "x$enable_static" = "xyes"; then
 			LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
 		elif test "x$enable_static_libs" = "xyes" -a -z "$PKG_CONFIG"; then
-			LIBPCRE_LIBS="$_libpcre_dir_lib/libpcre.a"
+			LIBPCRE_LIBS="$_libpcre_lib_dir/libpcre.a"
 		elif test "x$enable_static_libs" = "xyes"; then
 
-			test "x$static_linking_support" = "xno" -a -z "$_libpcre_dir_lib" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
+			test "x$static_linking_support" = "xno" -a -z "$_libpcre_lib_dir" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
 
-			if test -z "$_libpcre_dir_lib"; then
+			if test -z "$_libpcre_lib_dir"; then
 				PKG_CHECK_EXISTS(libpcre,[
 					LIBPCRE_LIBS=`$PKG_CONFIG --static --libs libpcre`
 				],[
 					AC_MSG_ERROR([Not found libpcre package])
 				])
 			else
-				AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libpcre_dir_lib/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre]) || AC_MSG_ERROR(["Not found libpcre package in $_libpcre_dir/lib/pkgconfig"])
-				LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_dir_lib/pkgconfig" $PKG_CONFIG --static --libs libpcre`
-				test -z "$LIBPCRE_LIBS" && LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_dir_lib/pkgconfig" $PKG_CONFIG --libs libpcre`
+				AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libpcre_lib_dir/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre]) || AC_MSG_ERROR(["Not found libpcre package in $_libpcre_dir/lib/pkgconfig"])
+				LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_lib_dir/pkgconfig" $PKG_CONFIG --static --libs libpcre`
+				test -z "$LIBPCRE_LIBS" && LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_lib_dir/pkgconfig" $PKG_CONFIG --libs libpcre`
 			fi
 
 			if test "x$static_linking_support" = "xno"; then
-				LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s|-lpcre|$_libpcre_dir_lib/libpcre.a|g"`
+				LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s|-lpcre|$_libpcre_lib_dir/libpcre.a|g"`
 			else
 				LIBPCRE_LIBS=`echo "$LIBPCRE_LIBS"|sed "s/-lpcre/${static_linking_support}static -lpcre ${static_linking_support}dynamic/g"`
 			fi
