@@ -630,10 +630,14 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		zbx_free(context);
 
 		if (2 == offset)
+		{
 			ZBX_STR2UINT64(hostid, row[1]);
+			ZBX_STR2UCHAR(automatic, row[5]);
+		}
+		else
+			automatic = 0;
 
 		ZBX_STR2UCHAR(type, row[offset + 2]);
-		ZBX_STR2UCHAR(automatic, row[offset + 3]);
 
 		/* acquire new value before releasing old value to avoid value being */
 		/*  removed and added back to string pool if it was not changed      */
