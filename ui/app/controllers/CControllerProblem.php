@@ -155,10 +155,9 @@ abstract class CControllerProblem extends CController {
 	protected function cleanInput(array $input): array {
 		if ($this->hasInput('filter_reset')) {
 			if (array_key_exists('filter_selected', $input) && $input['filter_selected'] == 0) {
-				(new CTabFilterProfile(self::FILTER_IDX, self::FILTER_FIELDS_DEFAULT))
-					->read()
-					->setTabFilter($input['filter_selected'], ['filter_name' => ''])
-					->update();
+				$filter = (new CTabFilterProfile(self::FILTER_IDX, self::FILTER_FIELDS_DEFAULT))->read();
+				$filter->setTabFilter($input['filter_selected'], ['filter_name' => '']);
+				$filter->update();
 			}
 			return array_intersect_key(['filter_name' => ''], $input);
 		}
