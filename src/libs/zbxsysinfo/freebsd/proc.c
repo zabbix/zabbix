@@ -879,8 +879,6 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 		}
-
-
 	}
 
 	zbx_free(proc);
