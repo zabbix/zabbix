@@ -931,6 +931,8 @@ func setProcessUserInfo(pid string, ps *procStatus) {
 	if err != nil {
 		ps.UserID = -1
 		ps.GroupID = -1
+		ps.User = "-1"
+		ps.Group = "-1"
 
 		return
 	}
