@@ -421,15 +421,13 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_dbsync_changelog_t	changelog_local;
-	int			changelog_num;
+	int			changelog_num = 0;
 	size_t			i;
 
 	zbx_hashset_create(&dbsync_env.strpool, 100, dbsync_strpool_hash_func, dbsync_strpool_compare_func);
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
 		zbx_dbsync_journal_init(&dbsync_env.journals[i]);
-
-	changelog_num = dbsync_env.changelog.num_data;
 
 	if (ZBX_DBSYNC_INIT == mode)
 	{
@@ -476,6 +474,8 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 					zbx_vector_uint64_append(&journal->deletes, obj.objectid);
 					break;
 			}
+
+			changelog_num++;
 		}
 	}
 	DBfree_result(result);
@@ -496,7 +496,7 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 		dbsync_remove_duplicate_ids(&dbsync_env.journals[i].updates, &dbsync_env.journals[i].inserts);
 	}
 
-	return dbsync_env.changelog.num_data - changelog_num;
+	return changelog_num;
 }
 
 void	zbx_dbsync_env_set_sync(int object, const zbx_dbsync_t *sync)
@@ -541,6 +541,10 @@ void	zbx_dbsync_env_flush_changelog(void)
 
 	for (i = 0; i < (int)ARRSIZE(dbsync_env.journals); i++)
 		dbsync_env_flush_journal(&dbsync_env.journals[i]);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : %d (%d slots)", __func__,
+			dbsync_env.changelog.num_data, dbsync_env.changelog.num_slots);
+
 }
 
 void	zbx_dbsync_env_clear(void)
@@ -1855,64 +1859,29 @@ static int	dbsync_compare_prototype_item(const ZBX_DC_PROTOTYPE_ITEM *item, cons
  ******************************************************************************/
 int	zbx_dbsync_compare_prototype_items(zbx_dbsync_t *sync)
 {
-	DB_ROW			dbrow;
-	DB_RESULT		result;
-	zbx_hashset_t		ids;
-	zbx_hashset_iter_t	iter;
-	zbx_uint64_t		rowid;
-	ZBX_DC_PROTOTYPE_ITEM	*item;
-	char			**row;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
 
-	if (NULL == (result = DBselect(
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select i.itemid,i.hostid,i.templateid from items i where i.flags=%d",
-				ZBX_FLAG_DISCOVERY_PROTOTYPE)))
-	{
-		return FAIL;
-	}
+				ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	dbsync_prepare(sync, 3, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		sync->dbresult = result;
-		return SUCCEED;
+		if (NULL == (sync->dbresult = DBselect("%s", sql)))
+			ret = FAIL;
+		goto out;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->prototype_items.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "i.itemid", "and",
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)]);
+out:
+	zbx_free(sql);
 
-	while (NULL != (dbrow = DBfetch(result)))
-	{
-		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
-
-		ZBX_STR2UINT64(rowid, dbrow[0]);
-		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
-
-		row = dbsync_preproc_row(sync, dbrow);
-
-		if (NULL == (item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_search(&dbsync_env.cache->prototype_items,
-				&rowid)))
-		{
-			tag = ZBX_DBSYNC_ROW_ADD;
-		}
-		else if (FAIL == dbsync_compare_prototype_item(item, row))
-			tag = ZBX_DBSYNC_ROW_UPDATE;
-
-		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, row);
-	}
-
-	zbx_hashset_iter_reset(&dbsync_env.cache->prototype_items, &iter);
-	while (NULL != (item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL == zbx_hashset_search(&ids, &item->itemid))
-			dbsync_add_row(sync, item->itemid, ZBX_DBSYNC_ROW_REMOVE, NULL);
-	}
-
-	zbx_hashset_destroy(&ids);
-	DBfree_result(result);
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
