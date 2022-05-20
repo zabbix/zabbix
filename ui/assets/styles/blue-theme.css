@@ -2511,7 +2511,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     vertical-align: middle;
     padding: 0 8px 7px 8px;
     margin-bottom: -7px; }
-  .filter-container.tabfilter-container .tabfilter-item-label:not(.selected) .tabfilter-item-link:not(.icon-filter)::before {
+  .filter-container.tabfilter-container .tabfilter-item-label:not(.selected) .tabfilter-item-link:not(.icon-filter, .btn-time)::before {
     content: ' ';
     position: absolute;
     top: 1px;

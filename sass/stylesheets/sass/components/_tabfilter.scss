@@ -174,7 +174,7 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 	}
 
 	.tabfilter-item-label:not(.selected) {
-		.tabfilter-item-link:not(.icon-filter) {
+		.tabfilter-item-link:not(.icon-filter, .btn-time) {
 			&::before {
 				content: ' ';
 				position: absolute;
