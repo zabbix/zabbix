@@ -112,8 +112,9 @@ class CControllerPopupTabFilterUpdate extends CController {
 		$filter->tabfilters[$idx2] = $properties;
 
 		if ($create) {
-			$filter->setTabFilter($idx2, ['filter_name' => '']);
+			$filter->tabfilters[0] = ['filter_name' => ''];
 		}
+
 		$filter->update();
 
 		$this->setResponse(new CControllerResponseData([
