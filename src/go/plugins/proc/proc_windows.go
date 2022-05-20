@@ -75,6 +75,9 @@ func getProcessUsername(pid uint32) (result string, sidStr string, err error) {
 		return
 	}
 	sidStr, err = sid.String()
+	if err != nil {
+		sidStr = "-1"
+	}
 	return windows.UTF16ToString(name), sidStr, nil
 }
 
