@@ -364,12 +364,19 @@ class CScreenProblem extends CScreenBase {
 	public static function addSuppressedByNames(array &$problems) {
 		$maintenanceids = [];
 		$userid = null;
+		$user_unknown = 'Unknown';
 
 		foreach ($problems as $problem) {
 			foreach ($problem['suppression_data'] as $data) {
-				$data['maintenanceid'] != 0
-					? $maintenanceids[] = $data['maintenanceid']
-					: $userid = $data['userid'];
+				if ($data['maintenanceid'] != 0) {
+					$maintenanceids[] = $data['maintenanceid'];
+				}
+				elseif ($data['userid'] != 0) {
+					$userid = $data['userid'];
+				}
+				else {
+					$userid = $user_unknown;
+				}
 			}
 		}
 
@@ -381,18 +388,15 @@ class CScreenProblem extends CScreenBase {
 			]);
 		}
 
-		if ($userid !== null && $userid != 0) {
+		if ($userid !== null && $userid != $user_unknown) {
 			$user = API::User()->get([
 				'output' => ['username', 'name', 'surname'],
 				'userids' => $userid,
 				'preservekeys' => true
 			]);
 		}
-		else {
-			$user = null;
-		}
 
-		if ($maintenanceids || $user) {
+		if ($maintenanceids || $userid) {
 			foreach ($problems as &$problem) {
 				foreach ($problem['suppression_data'] as &$data) {
 					if ($data['maintenanceid'] != 0) {
@@ -403,9 +407,10 @@ class CScreenProblem extends CScreenBase {
 						$data['username'] = getUserFullname($user[$data['userid']]);
 					}
 
-					if ($data['maintenanceid'] != 0 && $data['userid'] != 0) {
+					if ($userid == $user_unknown) {
 						$data['username'] = _('Unknown');
 					}
+
 					unset($data);
 				}
 			}
