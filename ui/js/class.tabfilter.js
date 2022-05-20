@@ -75,11 +75,11 @@ class CTabFilter extends CBaseComponent {
 			index++;
 		}
 
-		this._items.forEach((item, key) => {
+		for (const item of this._items) {
 			if (item._index != 0) {
 				item.updateUnsavedState();
 			}
-		})
+		}
 	}
 
 	/**
