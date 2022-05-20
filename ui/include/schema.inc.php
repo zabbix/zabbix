@@ -7665,7 +7665,7 @@ return [
 				'length' => 255,
 				'default' => ''
 			],
-			'type' => [
+			'automatic' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

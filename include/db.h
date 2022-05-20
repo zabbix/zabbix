@@ -841,10 +841,10 @@ int	zbx_db_check_instanceid(void);
 /* tags */
 typedef enum
 {
-	ZBX_HOST_TAG_TYPE_MANUAL = 0,
-	ZBX_HOST_TAG_TYPE_AUTOMATIC = 1
+	ZBX_TAG_MANUAL = 0,
+	ZBX_TAG_AUTOMATIC = 1
 }
-zbx_host_tag_type_t;
+zbx_tag_type_t;
 
 typedef struct
 {
@@ -862,13 +862,13 @@ typedef struct
 		ZBX_FLAG_DB_TAG_UPDATE_VALUE |			\
 		ZBX_FLAG_DB_TAG_UPDATE_TYPE)
 	zbx_uint64_t	flags;
-	zbx_host_tag_type_t	host_tag_type_orig;
-	zbx_host_tag_type_t	host_tag_type;
+	zbx_tag_type_t	tag_type_orig;
+	zbx_tag_type_t	tag_type;
 }
 zbx_db_tag_t;
 
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
-zbx_db_tag_t	*zbx_db_host_tag_create(const char *tag_tag, const char *tag_value, zbx_host_tag_type_t host_tag_type);
+zbx_db_tag_t	*zbx_db_host_tag_create(const char *tag_tag, const char *tag_value, zbx_tag_type_t tag_type);
 void		zbx_db_tag_free(zbx_db_tag_t *tag);
 int		zbx_db_tag_compare_func(const void *d1, const void *d2);
 int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);

@@ -335,15 +335,15 @@ static int	DBpatch_6010023(void)
 
 static int	DBpatch_6010024(void)
 {
-	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("host_tag", &field);
 }
 
 static int	DBpatch_6010025(void)
 {
-	/* set ZBX_HOST_TAG_TYPE_AUTOMATIC as type */
-	if (ZBX_DB_OK > DBexecute("update host_tag set type=1"
+	/* set ZBX_TAG_AUTOMATIC as automatic */
+	if (ZBX_DB_OK > DBexecute("update host_tag set automatic=1"
 			" where hostid in (select hostid from host_discovery where parent_hostid is not null)"))
 	{
 		return FAIL;

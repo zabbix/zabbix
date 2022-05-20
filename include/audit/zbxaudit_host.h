@@ -115,17 +115,11 @@ PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO_H(type, int)
 
 void	zbx_audit_host_update_json_delete_hostmacro(zbx_uint64_t hostid, zbx_uint64_t hostmacroid);
 
-void	zbx_audit_host_update_json_add_tag(zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag,
-		const char* value, int type);
-
-void	zbx_audit_host_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t tagid,
-		const char* tag_old, const char *tag_new);
-
-void	zbx_audit_host_update_json_update_tag_value(zbx_uint64_t hostid, zbx_uint64_t tagid,
-		const char* value_old, const char *value_new);
+void	zbx_audit_host_update_json_add_tag(zbx_uint64_t hostid, zbx_uint64_t tagid, const char* tag, const char* value,
+		int automatic);
 
 void	zbx_audit_host_update_json_update_tag_type(zbx_uint64_t hostid, zbx_uint64_t tagid,
-		int type_old, int type_new);
+		int automatic_old, int automatic_new);
 
 void	zbx_audit_host_update_json_delete_tag(zbx_uint64_t hostid, zbx_uint64_t tagid);
 

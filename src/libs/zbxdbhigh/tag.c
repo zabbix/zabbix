@@ -35,13 +35,13 @@ zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value)
 	return tag;
 }
 
-zbx_db_tag_t	*zbx_db_host_tag_create(const char *tag_tag, const char *tag_value, zbx_host_tag_type_t host_tag_type)
+zbx_db_tag_t	*zbx_db_host_tag_create(const char *tag_tag, const char *tag_value, zbx_tag_type_t tag_type)
 {
 	zbx_db_tag_t	*tag;
 
 	tag = zbx_db_tag_create(tag_tag, tag_value);
-	tag->host_tag_type = host_tag_type;
-	tag->host_tag_type_orig = 0;
+	tag->tag_type = tag_type;
+	tag->tag_type_orig = 0;
 
 	return tag;
 }
