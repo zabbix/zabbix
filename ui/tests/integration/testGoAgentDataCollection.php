@@ -29,16 +29,16 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 	const COMPARE_AVERAGE = 0;
 	const COMPARE_LAST = 1;
-	const OFFSET_MAX = 10;
+	const OFFSET_MAX = 20;
 
 	private static $hostids = [];
 	private static $itemids = [];
 
 	// List of items to check.
 	private static $items = [
-		/*[
+		[
 			'key' => 'agent.ping',
-			'type' -[=> ITEM_TYPE_ZABBIX_ACTIVE,
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
@@ -299,14 +299,14 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
 			'threshold' => 0.1,
 			'compareType' => self::COMPARE_AVERAGE
-		],*/
+		],
 		[
 			'key' => 'vfs.fs.size[/tmp,free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'threshold' => 10000000,
 			'compareType' => self::COMPARE_AVERAGE
-		]/*,
+		],
 		[
 			'key' => 'vm.memory.size[free]',
 			'type' => ITEM_TYPE_ZABBIX,
@@ -320,7 +320,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 			'threshold' => 50
-		]*/
+		]
 	];
 
 	/**
@@ -448,7 +448,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		}
 
 		// Delay to ensure that all metrics were collected.
-		sleep(90);
+		sleep(110);
 	}
 
 	/**
@@ -559,7 +559,6 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
 						// Calculate offset between Agent and Agent2 result arrays
-						print_r($values[$component]);
 						for ($i = 0; $i < self::OFFSET_MAX; $i++) {
 							$value[$component][$i] = 0;
 
@@ -576,16 +575,13 @@ class testGoAgentDataCollection extends CIntegrationTest {
 							}
 						}
 					}
-					print_r($value);
 
 					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
 						$a = $value[self::COMPONENT_AGENT][$i];
 						$b = $value[self::COMPONENT_AGENT2][$i];
 						$diff_values[$i] = abs(abs($a) - abs($b));
 					}
-					print_r($diff_values);
 					$offset = array_search(min($diff_values), $diff_values);
-					print_r($offset);
 
 					$a = $value[self::COMPONENT_AGENT][$offset];
 					$b = $value[self::COMPONENT_AGENT2][$offset];
