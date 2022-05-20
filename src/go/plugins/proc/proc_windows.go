@@ -75,10 +75,7 @@ func getProcessUsername(pid uint32) (result string, sidStr string, err error) {
 		return
 	}
 	sidStr, err = sid.String()
-	if err != nil {
-		sidStr = "-1"
-	}
-	return windows.UTF16ToString(name), sidStr, nil
+	return windows.UTF16ToString(name), sidStr, err
 }
 
 type processEnumerator interface {
@@ -429,6 +426,10 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		var uname string
 		var sid string
 		uname, sid, err = getProcessUsername(pe.ProcessID)
+		if err != nil {
+			uname = "-1"
+			sid = "-1"
+		}
 		if userName != "" && strings.ToUpper(uname) != userName {
 			continue
 		}
