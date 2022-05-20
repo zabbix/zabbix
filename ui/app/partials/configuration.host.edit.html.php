@@ -178,7 +178,17 @@ $templates_field_items[] = (new CMultiSelect([
 
 $host_tab
 	->addItem([
-		new CLabel(_('Templates'), 'add_templates__ms'),
+		new CLabel([
+			_('Templates'),
+			$host_is_discovered
+				? makeHelpIcon([
+					(new CList([
+						_('Templates linked by host discovery cannot be unlinked.'),
+						_('Use host prototype configuration form to remove automatically linked templates on upcoming discovery.')
+					]))
+				])
+				: null
+		], 'add_templates__ms'),
 		(new CFormField(
 			(count($templates_field_items) > 1)
 				? (new CDiv($templates_field_items))->addClass('linked-templates')
