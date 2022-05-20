@@ -113,7 +113,7 @@ static void	es_bin_to_hex(const unsigned char *bin, size_t len, char *out)
  *           The returned buffer must be freed by the caller.                 *
  *                                                                            *
  ******************************************************************************/
-char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
+static char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 {
 	duk_int_t	type;
 	const char	*ptr;
