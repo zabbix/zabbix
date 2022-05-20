@@ -693,7 +693,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 #endif
 			if (SUCCEED != check_procstate(&psinfo, zbx_proc_stat))
+			{
+				zbx_sysinfo_proc_clear(&proc);
 				continue;
+			}
 
 			proccount++;
 		}
