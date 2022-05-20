@@ -94,6 +94,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.5rc1
 
 New features:
+.........T [ZBXNEXT-7453] added templates HashiCorp Consul by HTTP (ychukina)
 ..F....... [ZBXNEXT-6893] implemented audit log filtering by multiple actions (rdetlavs)
 ....I..... [ZBXNEXT-7693] replaced filename-length-max=99 option with tar-pax in configure.ac (yurii)
 ..F....... [ZBX-20946] enabled German and Vietnamese languages in frontend (miks)
@@ -106,6 +107,12 @@ A.F....... [ZBXNEXT-7476] disabled php 8 strict type validation (ashubin)
 A.F....... [ZBXNEXT-7491] fixed PHP 8.1 runtime warnings with PostgreSQL backend (Sasha)
 
 Bug fixes:
+...G...... [ZBX-20911] added process state check in PROC_NUM() for Oracle Solaris (Andris)
+..F....... [ZBX-20752] fixed saved properties of classic graphs being lost when reopening graph configuration (agriscenko)
+..F....... [ZBX-19381] fixed resolving of macros in item key parameters when testing items in web interface (Sasha)
+..F....... [ZBX-18520] fixed showing of fields that do not belong to selected item type in item edit form (miks)
+.........T [ZBX-20950] updated regular expressions for services discovery in windows templates (vkhaliev)
+..F....... [ZBX-20684] fixed item value widget not showing trailing zeros (mkrisjanis)
 .......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
 ........S. [ZBX-20823] fixed inability to update hosts that were created by LLD on aarch64 (vso)
 ..F....... [ZBX-20945] fixed broken trigger link in trigger mass update => dependencies (esekace)
