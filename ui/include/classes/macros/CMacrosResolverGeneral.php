@@ -649,14 +649,14 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	private function getItemKeyParameters($params_raw) {
+	public static function getItemKeyParameters($params_raw) {
 		$item_key_parameters = [];
 
 		foreach ($params_raw as $param_raw) {
 			switch ($param_raw['type']) {
 				case CItemKey::PARAM_ARRAY:
 					$item_key_parameters = array_merge($item_key_parameters,
-						$this->getItemKeyParameters($param_raw['parameters'])
+						self::getItemKeyParameters($param_raw['parameters'])
 					);
 					break;
 
@@ -686,7 +686,7 @@ class CMacrosResolverGeneral {
 
 		$item_key_parameters = [];
 		if ($item_key_parser->parse($key) == CParser::PARSE_SUCCESS) {
-			$item_key_parameters = $this->getItemKeyParameters($item_key_parser->getParamsRaw());
+			$item_key_parameters = self::getItemKeyParameters($item_key_parser->getParamsRaw());
 		}
 
 		return self::extractMacros($item_key_parameters, $types);
@@ -732,14 +732,14 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return string
 	 */
-	private function resolveItemKeyParamsMacros($key_chain, array $params_raw, array $macros, array $types) {
+	private static function resolveItemKeyParamsMacros($key_chain, array $params_raw, array $macros, array $types) {
 		foreach (array_reverse($params_raw) as $param_raw) {
 			$param = $param_raw['raw'];
 			$forced = false;
 
 			switch ($param_raw['type']) {
 				case CItemKey::PARAM_ARRAY:
-					$param = $this->resolveItemKeyParamsMacros($param, $param_raw['parameters'], $macros, $types);
+					$param = self::resolveItemKeyParamsMacros($param, $param_raw['parameters'], $macros, $types);
 					break;
 
 				case CItemKey::PARAM_QUOTED:
@@ -748,13 +748,7 @@ class CMacrosResolverGeneral {
 					// break; is not missing here
 
 				case CItemKey::PARAM_UNQUOTED:
-					$matched_macros = $this->getMacroPositions($param, $types);
-
-					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-						$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
-					}
-
-					$param = quoteItemKeyParam($param, $forced);
+					$param = quoteItemKeyParam(strtr($param, $macros), $forced);
 					break;
 			}
 
@@ -773,11 +767,11 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return string
 	 */
-	protected function resolveItemKeyMacros($key, array $macros, array $types) {
+	public static function resolveItemKeyMacros($key, array $macros, array $types) {
 		$item_key_parser = new CItemKey();
 
 		if ($item_key_parser->parse($key) == CParser::PARSE_SUCCESS) {
-			$key = $this->resolveItemKeyParamsMacros($key, $item_key_parser->getParamsRaw(), $macros, $types);
+			$key = self::resolveItemKeyParamsMacros($key, $item_key_parser->getParamsRaw(), $macros, $types);
 		}
 
 		return $key;
