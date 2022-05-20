@@ -570,7 +570,6 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
-	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
@@ -678,6 +677,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	while (NULL != (entries = readdir(dir)))
 	{
 		zbx_sysinfo_proc_t	proc;
+		psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
@@ -692,13 +692,20 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 
 #endif
+			if (SUCCEED != check_procstate(&psinfo, zbx_proc_stat))
+			{
+				zbx_sysinfo_proc_clear(&proc);
+				continue;
+			}
+
 			proccount++;
 		}
 
 		zbx_sysinfo_proc_clear(&proc);
 	}
 
-	closedir(dir);
+	if (0 != closedir(dir))
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot close /proc: %s", __func__, zbx_strerror(errno));
 out:
 	SET_UI64_RESULT(result, proccount);
 
@@ -811,7 +818,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 {
 	DIR			*dir;
 	struct dirent		*entries;
-	int			ret = FAIL, fd = -1;
+	int			ret = FAIL;
 	zbx_sysinfo_proc_t	*proc = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
@@ -884,8 +891,9 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	zoneid_t		zoneid;
 #endif
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%d", __func__,
-			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline), flags);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%llu", __func__,
+			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline),
+			(long long unsigned)flags);
 
 	if (NULL != username)
 	{
