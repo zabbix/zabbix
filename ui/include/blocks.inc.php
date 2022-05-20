@@ -144,7 +144,7 @@ function getSystemStatusData(array $filter) {
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 		unset($options['suppressed']);
-		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until'];
+		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until', 'userid'];
 	}
 
 	if ($filter_ext_ack == EXTACK_OPTION_UNACK) {
@@ -257,7 +257,9 @@ function getSystemStatusData(array $filter) {
 		$problems_data = API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'severity'],
 			'eventids' => array_keys($visible_problems),
-			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+				'suppress_until'
+			],
 			'selectTags' => ['tag', 'value'],
 			'preservekeys' => true
 		]);
@@ -603,7 +605,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 	$tags = makeTags($problems);
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
-		CScreenProblem::addMaintenanceNames($problems);
+		CScreenProblem::addSuppressedByNames($problems);
 	}
 
 	foreach ($problems as $problem) {

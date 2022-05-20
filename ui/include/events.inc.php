@@ -155,7 +155,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param bool   $allowed['change_severity']         Whether user is allowed to change problems severity.
  * @param bool   $allowed['acknowledge']             Whether user is allowed to acknowledge problems.
  * @param bool   $allowed['close']                   Whether user is allowed to close problems.
- *
+ * @param bool   $allowed['suppress_problems']		 Whether user is allowed to manually suppress/unsuppress problems.
  * @return CTableInfo
  */
 function make_event_details(array $event, array $allowed) {
@@ -194,7 +194,8 @@ function make_event_details(array $event, array $allowed) {
 		])
 		->addRow([
 			_('Acknowledged'),
-			($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge'] || $can_be_closed)
+			($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge'] || $can_be_closed
+					|| $allowed['suppress_problems'])
 				? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 					->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 					->addClass(ZBX_STYLE_LINK_ALT)
@@ -294,7 +295,9 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 	$events = API::Event()->get([
 		'output' => ['eventid', 'source', 'object', 'objectid', 'acknowledged', 'clock', 'ns', 'severity', 'r_eventid'],
-		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
+		'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'suppress_until'
+		],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,
@@ -389,7 +392,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 		// Create acknowledge link.
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-				|| $can_be_closed)
+				|| $can_be_closed || $allowed['suppress_problems'])
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)

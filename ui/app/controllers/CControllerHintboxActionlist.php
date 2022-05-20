@@ -41,7 +41,7 @@ class CControllerHintboxActionlist extends CController {
 			$events = API::Event()->get([
 				'output' => ['eventid', 'r_eventid', 'clock'],
 				'select_acknowledges' => ['userid', 'action', 'message', 'clock', 'new_severity',
-					'old_severity'
+					'old_severity', 'suppress_until'
 				],
 				'eventids' => (array) $this->getInput('eventid')
 			]);

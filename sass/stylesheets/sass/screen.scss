@@ -6,7 +6,7 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20211222';
+$sprite-path: '../img/icon-sprite.svg?20220519';
 $browser-sprite-path: '../img/browser-sprite.png?20211222';
 
 @import "utils/mixins";
@@ -5367,6 +5367,7 @@ svg {
 .icon-action-ack,
 .icon-action-unack,
 .icon-invisible,
+.icon-visible,
 .icon-problem-generated,
 .icon-problem-recovery,
 .icon-actions-number-gray,
@@ -5397,7 +5398,8 @@ svg {
 	}
 }
 
-.icon-invisible {
+.icon-invisible,
+.icon-visible	{
 	&:link,
 	&:hover,
 	&:focus {
@@ -5420,6 +5422,8 @@ button {
 	&.icon-action-severity-changed,
 	&.icon-action-message,
 	&.icon-action-ack,
+	&.icon-invisible,
+	&.icon-visible,
 	&.icon-problem-generated,
 	&.icon-problem-recovery,
 	&.icon-actions-number-gray,
@@ -5488,6 +5492,10 @@ button {
 
 .icon-invisible::before {
 	background-position: -89px -803px;
+}
+
+.icon-visible::before {
+	background-position: -89px -836px;
 }
 
 .icon-problem-generated::before {

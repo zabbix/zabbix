@@ -1283,18 +1283,75 @@ function eventType($type = null) {
  * @return array
  */
 function getEventsActionsIconsData(array $events, array $triggers) {
+    $suppressions = getEventsSuppressions($events);
 	$messages = getEventsMessages($events);
 	$severities = getEventsSeverityChanges($events, $triggers);
 	$actions = getEventsAlertsOverview($events);
 
 	return [
 		'data' => [
+            'suppressions' => $suppressions['data'],
 			'messages' => $messages['data'],
 			'severities' => $severities['data'],
 			'actions' => $actions
 		],
-		'userids' => $messages['userids'] + $severities['userids']
+		'userids' => $messages['userids'] + $severities['userids'] + $suppressions['userids']
 	];
+}
+
+/**
+ * Get data, required to create suppressed problem icon with popup with event suppression data.
+ *
+ * @param array  $events                               			 Array with event objects with acknowledges.
+ * @param string $events[]['eventid']                  			 Problem event ID.
+ * @param array  $events[]['acknowledges']             			 Array with manual updates to problem.
+ * @param string $events[]['acknowledges'][]['action']  		 Action that was performed by problem update.
+ * @param string $events[]['acknowledges'][]['suppress_until']   Time until problem suppressed.
+ * @param string $events[]['acknowledges'][]['clock']   		 Time when manual suppression was added.
+ * @param string $events[]['acknowledges'][]['userid']  		 Author's userid.
+ *
+ * @return array
+ */
+function getEventsSuppressions(array $events){
+    $suppressions = [];
+    $userids = [];
+
+    // Create array of suppressions for each event
+    foreach ($events as $event) {
+        $event_suppressions = [];
+
+        foreach ($event['acknowledges'] as $ack) {
+            if (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
+                $event_suppressions[] = [
+                    'suppress_until' => $ack['suppress_until'],
+                    'userid' => $ack['userid'],
+                    'clock' => $ack['clock']
+                ];
+
+                $userids[$ack['userid']] = true;
+            }
+            elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+                $event_suppressions[] = [
+                    'userid' => $ack['userid'],
+                    'clock' => $ack['clock']
+                ];
+
+                $userids[$ack['userid']] = true;
+            }
+        }
+
+        CArrayHelper::sort($event_suppressions, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+
+        $suppressions[$event['eventid']] = [
+            'suppress_until' => array_values($event_suppressions),
+            'count' => count($event_suppressions)
+        ];
+    }
+
+    return [
+        'data' => $suppressions,
+        'userids' => $userids
+    ];
 }
 
 /**
@@ -1653,23 +1710,28 @@ function getEventUpdates(array $event) {
 }
 
 /**
- * Make icons (messages, severity changes, actions) for actions column.
+ * Make icons (suppressions, messages, severity changes, actions) for actions column.
  *
- * @param string $eventid                Id for event, for which icons are created.
- * @param array  $actions                Array of actions data.
- * @param array  $actions['messages']    Messages icon data.
- * @param array  $actions['severities']  Severity change icon data.
- * @param array  $actions['actions']     Actions icon data.
- * @param array  $users                  User name, surname and username.
+ * @param string $eventid               	Id for event, for which icons are created.
+ * @param array  $actions               	Array of actions data.
+ * @param array  $actions['suppressions']   Suppression icon data.
+ * @param array  $actions['messages']   	Messages icon data.
+ * @param array  $actions['severities'] 	Severity change icon data.
+ * @param array  $actions['actions']    	Actions icon data.
+ * @param array  $users                 	User name, surname and username.
  *
  * @return CCol|string
  */
 function makeEventActionsIcons($eventid, $actions, $users) {
+	$suppression_icon = makeEventSuppressionsProblemIcon($actions['suppressions'][$eventid], $users);
 	$messages_icon = makeEventMessagesIcon($actions['messages'][$eventid], $users);
 	$severities_icon = makeEventSeverityChangesIcon($actions['severities'][$eventid], $users);
 	$actions_icon = makeEventActionsIcon($actions['actions'][$eventid], $eventid);
 
 	$action_icons = [];
+	if ($suppression_icon !== null) {
+		$action_icons[] = $suppression_icon;
+	}
 	if ($messages_icon !== null) {
 		$action_icons[] = $messages_icon;
 	}
@@ -1681,6 +1743,67 @@ function makeEventActionsIcons($eventid, $actions, $users) {
 	}
 
 	return $action_icons ? (new CCol($action_icons))->addClass(ZBX_STYLE_NOWRAP) : '';
+}
+
+/**
+ * Create icon with hintbox for event suppresions.
+ *
+ * @param array  $data
+ * @param array  $data['suppress_until'][]['suppress_until']	Time until problem is suppressed by user.
+ * @param string $data['messages'][]['clock']  					Suppression creation time.
+ * @param array  $users                         				User name, surname and username.
+ *
+ * @return CButton|null
+ */
+function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
+	$total = $data['count'];
+	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Action'), _('Suppress until')]);
+
+	foreach ($data['suppress_until'] as $suppression) {
+		// Added in order to reuse makeActionTableUser().
+		$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
+
+		if (array_key_exists('suppress_until', $suppression)) {
+			$icon = ZBX_STYLE_ICON_INVISIBLE;
+			$suppress_until = $suppression['suppress_until'];
+			$suppress_until = $suppress_until == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE
+				? 'Indefinitely'
+				: ($suppress_until < strtotime('tomorrow') && $suppress_until > time()
+					? zbx_date2str(TIME_FORMAT, $suppress_until)
+					: zbx_date2str(DATE_TIME_FORMAT, $suppress_until));
+		}
+		else {
+			$icon = ZBX_STYLE_ICON_VISIBLE;
+			$suppress_until = '';
+		}
+
+		$table->addRow([
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $suppression['clock']),
+			makeActionTableUser($suppression, $users),
+			makeActionIcon(['icon' => $icon]),
+			$suppress_until,
+		]);
+	}
+
+	return $total
+		? makeActionIcon([
+			'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
+				? ZBX_STYLE_ICON_INVISIBLE
+				: ZBX_STYLE_ICON_VISIBLE,
+			'button' => true,
+			'hint' => [
+				$table,
+				($total > ZBX_WIDGET_ROWS)
+					? (new CDiv(
+					(new CDiv(
+						(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
+							->addClass(ZBX_STYLE_TABLE_STATS)
+					))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				))->addClass(ZBX_STYLE_TABLE_PAGING)
+					: null
+			]
+		])
+		: null;
 }
 
 /**
@@ -2077,6 +2200,24 @@ function makeActionTableIcon(array $action) {
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) {
 				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_UNACK, 'title' => _('Unacknowledged')]);
+			}
+
+			if (($action['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
+				$suppress_until = $action['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE
+					? 'Indefinitely'
+					: ($action['suppress_until'] < strtotime('tomorrow') && $action['suppress_until'] > time()
+						? zbx_date2str(TIME_FORMAT, $action['suppress_until'])
+						: zbx_date2str(DATE_TIME_FORMAT, $action['suppress_until']));
+
+				$action_icons[] = makeActionIcon([
+					'icon' => ZBX_STYLE_ICON_INVISIBLE,
+					'button' => true,
+					'hint' => 'Suppressed till: '.$suppress_until
+				]);
+			}
+
+			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ICON_VISIBLE, 'title' => 'Unsuppressed']);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {

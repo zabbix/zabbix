@@ -966,25 +966,42 @@ function makeMaintenanceIcon($type, $name, $description) {
  * @param array  $icon_data
  * @param string $icon_data[]['suppress_until']    Time until the problem is suppressed.
  * @param string $icon_data[]['maintenance_name']  Name of the maintenance.
+ * @param string $icon_data[]['username']  User who created manual suppression.
  *
  * @return CLink
  */
 function makeSuppressedProblemIcon(array $icon_data) {
-	$suppress_until = max(zbx_objectValues($icon_data, 'suppress_until'));
+	$suppress_until_values = array_column($icon_data, 'suppress_until');
+
+	if (in_array(ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE, $suppress_until_values)) {
+		$suppressed_till = 'Indefinitely';
+	}
+	else {
+		$max_value = max($suppress_until_values);
+		$suppressed_till = $max_value < strtotime('tomorrow')
+			? zbx_date2str(TIME_FORMAT, $max_value)
+			: zbx_date2str(DATE_TIME_FORMAT, $max_value);
+	}
 
 	CArrayHelper::sort($icon_data, ['maintenance_name']);
-	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
+	$maintenance_names = implode(', ', array_column($icon_data, 'maintenance_name'));
+	$maintenance = $maintenance_names != null
+		? _s('Maintenance: %1$s', $maintenance_names)."\n"
+		: '';
+
+	$username = implode(', ', array_column($icon_data, 'username'));
+	$manually_by = $username != null
+		? _s('Manually by: %1$s', $username)."\n"
+		: '';
 
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INVISIBLE)
 		->setHint(
-			_s('Suppressed till: %1$s', ($suppress_until < strtotime('tomorrow'))
-				? zbx_date2str(TIME_FORMAT, $suppress_until)
-				: zbx_date2str(DATE_TIME_FORMAT, $suppress_until)
-			).
+			_s('Suppressed till: %1$s', $suppressed_till).
 			"\n".
-			_s('Maintenance: %1$s', $maintenance_names)
-		);
+			$manually_by.
+			$maintenance
+        );
 }
 
 /**

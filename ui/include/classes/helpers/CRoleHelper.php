@@ -67,6 +67,7 @@ class CRoleHelper {
 	public const ACTIONS_CHANGE_SEVERITY = 'actions.change_severity';
 	public const ACTIONS_ACKNOWLEDGE_PROBLEMS = 'actions.acknowledge_problems';
 	public const ACTIONS_CLOSE_PROBLEMS = 'actions.close_problems';
+    public const ACTIONS_SUPPRESS_PROBLEMS = 'actions.suppress_problems';
 	public const ACTIONS_EXECUTE_SCRIPTS = 'actions.execute_scripts';
 	public const ACTIONS_MANAGE_API_TOKENS = 'actions.manage_api_tokens';
 	public const ACTIONS_MANAGE_SCHEDULED_REPORTS = 'actions.manage_scheduled_reports';
@@ -280,7 +281,7 @@ class CRoleHelper {
 		$rules = [
 			self::ACTIONS_EDIT_DASHBOARDS, self::ACTIONS_EDIT_MAPS, self::ACTIONS_ACKNOWLEDGE_PROBLEMS,
 			self::ACTIONS_CLOSE_PROBLEMS, self::ACTIONS_CHANGE_SEVERITY, self::ACTIONS_ADD_PROBLEM_COMMENTS,
-			self::ACTIONS_EXECUTE_SCRIPTS, self::ACTIONS_MANAGE_API_TOKENS
+			self::ACTIONS_EXECUTE_SCRIPTS, self::ACTIONS_MANAGE_API_TOKENS, self::ACTIONS_SUPPRESS_PROBLEMS
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
@@ -466,7 +467,8 @@ class CRoleHelper {
 			self::ACTIONS_ACKNOWLEDGE_PROBLEMS => _('Acknowledge problems'),
 			self::ACTIONS_CLOSE_PROBLEMS => _('Close problems'),
 			self::ACTIONS_EXECUTE_SCRIPTS => _('Execute scripts'),
-			self::ACTIONS_MANAGE_API_TOKENS => _('Manage API tokens')
+			self::ACTIONS_MANAGE_API_TOKENS => _('Manage API tokens'),
+			self::ACTIONS_SUPPRESS_PROBLEMS => _('Suppress problems')
 		];
 
 		if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {

@@ -34,7 +34,9 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'severity' =>				'ge '.TRIGGER_SEVERITY_NOT_CLASSIFIED.'|le '.TRIGGER_SEVERITY_COUNT,
 			'acknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
 			'unacknowledge_problem' =>	'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE,
-			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE
+			'close_problem' =>			'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_CLOSE,
+			'suppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_SUPPRESS,
+			'unsuppress_problem' =>		'db acknowledges.action|in '.ZBX_PROBLEM_UPDATE_NONE.','.ZBX_PROBLEM_UPDATE_UNSUPPRESS
 		];
 
 		$ret = $this->validateInput($fields);
@@ -56,7 +58,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 		if (!$this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
 				&& !$this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 				&& !$this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
-				&& !$this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)) {
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
 			return false;
 		}
 
@@ -81,19 +84,26 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'acknowledge_problem' => $this->getInput('acknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'unacknowledge_problem' => $this->getInput('unacknowledge_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'close_problem' => $this->getInput('close_problem', ZBX_PROBLEM_UPDATE_NONE),
+			'suppress_problem' => $this->getInput('suppress_problem', ZBX_PROBLEM_UPDATE_NONE),
+			'unsuppress_problem' => $this->getInput('unsuppress_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'related_problems_count' => 0,
 			'problem_can_be_closed' => false,
 			'problem_severity_can_be_changed' => false,
 			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 			'allowed_close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
 			'allowed_change_severity' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
-			'allowed_add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS)
+			'allowed_add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+			'allowed_suppress' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
+			'suppress_until_problem' => CProfile::get('web.problem_suppress_action_time_until', 'now+1d')
 		];
 
 		// Select events.
 		$events = API::Event()->get([
 			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid'],
-			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
+			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+				'suppress_until'
+			],
+			'selectSuppressionData' => ['userid', 'suppress_until'],
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -156,6 +166,26 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			}
 
 			$ack_count += ($event['acknowledged'] == EVENT_ACKNOWLEDGED) ? 1 : 0;
+
+			$can_be_suppressed = true;
+
+			// Problems already resolved are not allowed to be manually suppressed.
+			if ($event['r_eventid'] != 0 || $event['value'] == TRIGGER_VALUE_FALSE) {
+				$can_be_suppressed = false;
+			}
+
+			$can_be_unsuppressed = false;
+
+			// Problems with active manual suppression can be unsuppressed.
+			foreach ($event['suppression_data'] as $suppression) {
+				if ($suppression['userid'] != 0) {
+					$can_be_unsuppressed = true;
+				}
+			}
+
+			$data['problem_can_be_suppressed'] = $can_be_suppressed;
+			$data['problem_can_be_unsuppressed'] = $can_be_unsuppressed;
+
 		}
 
 		$data['has_ack_events'] = ($ack_count > 0);

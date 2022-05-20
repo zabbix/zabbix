@@ -72,6 +72,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			'actions_acknowledge_problems' => 			'in 0,1',
 			'actions_close_problems' => 				'in 0,1',
 			'actions_change_severity' => 				'in 0,1',
+			'actions_suppress_problems' => 				'in 0,1',
 			'actions_add_problem_comments' => 			'in 0,1',
 			'actions_execute_scripts' => 				'in 0,1',
 			'actions_manage_api_tokens' => 				'in 0,1',

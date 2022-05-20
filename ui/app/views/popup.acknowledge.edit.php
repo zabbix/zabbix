@@ -77,10 +77,49 @@ $form_list
 			(new CSeverity('severity', (int) $data['severity'], $data['change_severity']))
 		]))
 			->addClass(ZBX_STYLE_HOR_LIST)
+	)
+	->addRow(
+		(new CLabel([_('Suppress'),
+			makeHelpIcon([
+				_('Manual problem suppression. Date-time input accepts relative and absolute time format.')
+			])
+		])),
+		(new CList([
+			(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
+				->setChecked($data['suppress_problem'])
+				->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed']),
+			(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE))
+				->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
+				->addValue(_('Until'), ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE)
+				->setEnabled(false)
+				->setModern(true),
+			(new CDateSelector('suppress_until_problem', $data['suppress_until_problem']))
+				->setDateFormat(ZBX_FULL_DATE_TIME)
+				->setPlaceholder(_($data['suppress_until_problem']))
+				->setAriaRequired()
+				->setEnabled(false)
+		]))->addClass(ZBX_STYLE_HOR_LIST)
+	)
+	->addRow(
+		(new CLabel([_('Unsuppress'),
+			makeHelpIcon([
+				_('Deactivates manual suppression.')
+			])
+		])),
+		(new CList([
+			(new CCheckBox('unsuppress_problem', ZBX_PROBLEM_UPDATE_UNSUPPRESS))
+				->setChecked($data['unsuppress_problem'])
+				->setEnabled($data['allowed_suppress'] && $data['problem_can_be_unsuppressed'])
+		]))->addClass(ZBX_STYLE_HOR_LIST)
 	);
 
 if ($data['has_unack_events']) {
-	$form_list->addRow(_('Acknowledge'),
+	$form_list->addRow(
+		(new CLabel([_('Acknowledge'),
+			makeHelpIcon([
+				_('Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation.')
+			])
+		])),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
 			->onChange("$('#unacknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
@@ -105,7 +144,13 @@ $form_list
 		(new CDiv((new CLabel(_('At least one update operation or message must exist.')))->setAsteriskMark()))
 	);
 
-$form->addItem($form_list);
+$form
+	->addItem($form_list)
+	->addItem(
+		(new CScriptTag('
+			update_problem_popup.init();
+		'))->setOnDocumentReady()
+	);
 
 $output = [
 	'header' => $data['title'],
@@ -117,7 +162,7 @@ $output = [
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'return submitAcknowledge(overlay);'
+			'action' => 'update_problem_popup.submitAcknowledge(overlay);'
 		]
 	],
 	'script_inline' => $this->readJsFile('popup.acknowledge.edit.js.php')
