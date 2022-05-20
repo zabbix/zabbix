@@ -1211,7 +1211,7 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 			}
 
 			zabbix_log(LOG_LEVEL_TRACE, "    macroid:" ZBX_FS_UI64 " name:'%s' context:'%s' op:'%d'"
-					" value:'%s' type:%d automatic:%d refcount:%d", macro->macroid, macro->name,
+					" value:'%s' type:%d automatic:%d refcount:%u", macro->macroid, macro->name,
 					ZBX_NULL2EMPTY_STR(macro->context), macro->context_op,
 					ZBX_NULL2EMPTY_STR(value), macro->type, macro->automatic, macro->refcount);
 		}
