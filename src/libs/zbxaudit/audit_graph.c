@@ -21,7 +21,7 @@
 
 #include "audit/zbxaudit.h"
 #include "log.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "audit.h"
 
 static int	graph_flag_to_resource_type(int flag)

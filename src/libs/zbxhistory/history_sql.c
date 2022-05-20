@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "zbxalgo.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "dbcache.h"
 #include "zbxhistory.h"
 

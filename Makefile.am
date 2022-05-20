@@ -82,7 +82,7 @@ dbschema_sqlite3:
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql
 
 dbschema_c:
-	cd src/libs/zbxdbhigh && \
+	cd src/libs/zbxdbschema && \
 	$(MAKE) $(AM_MAKEFLAGS) dbschema.c
 
 dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_sqlite3 dbschema_c
