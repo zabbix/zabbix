@@ -28,7 +28,7 @@
 	<tr class="form_row">
 		<td>
 			<input name="group_prototypes[#{i}][name]" type="text" value="#{name}" style="width: 448px"
-				placeholder="{#MACRO}" maxlength="255"/>
+				placeholder="{#MACRO}" maxlength="255" />
 		</td>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<button class="<?= ZBX_STYLE_BTN_LINK ?> group-prototype-remove" type="button" name="remove">
