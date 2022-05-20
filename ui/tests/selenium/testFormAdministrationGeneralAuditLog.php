@@ -18,16 +18,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 
-/*
+/**
  * @backup config
  */
-class testFormAdministrationGeneralAuditLog extends CWebTest {
+class testFormAdministrationGeneralAuditLog extends testFormAdministrationGeneral {
 
-	/*
+	public $config_link = 'zabbix.php?action=audit.settings.edit';
+	public $form_selector = 'id:audit-settings';
+	public $default_values = [
+		'Enable audit logging' => true,
+		'Enable internal housekeeping' => true,
+		'Data storage period' => '365d'
+	];
+	
+	public $custom_values = [
+		'Enable audit logging' => true,
+		'Enable internal housekeeping' => true,
+		'Data storage period' => '400d'
+	];
+	
+	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
@@ -42,93 +55,53 @@ class testFormAdministrationGeneralAuditLog extends CWebTest {
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Audit log');
 	}
 
-	// Check if default values are present.
-	private function DefaultValuesPresent() {
-		$this->page->login()->open('zabbix.php?action=audit.settings.edit');
-		$form = $this->query('id:audit-settings')->asForm()->one();
-		$form->checkValue(['Data storage period' => '365d', 'Enable audit logging' => true,
-			'Enable internal housekeeping' => true]);
-	}
-
 	// Reset and check default values.
 	private function ResetValues(){
 		$form = $this->query('id:audit-settings')->asForm()->one();
 		$form->query('id:resetDefaults')->one()->click();
 		COverlayDialogElement::find()->waitUntilVisible()->one()->query('button', 'Reset defaults')->one()->click();
 		$form->submit();
-		$this->DefaultValuesPresent();
+		$form->checkValue(['Enable audit logging' => true,'Enable internal housekeeping' => true,
+			'Data storage period' => '365d']);
 	}
 
-	/*
+	/**
 	* The function's main purpose is to check if the layout of the page is not broken and fields are in their place,
 	* Additional checkups are made and committed within the function.
 	*/
-	public function testFormAdministrationGeneralAuditLog_CheckAuditLogLayout(){
-		$this->NavigateToAuditLog();
+	public function testFormAdministrationGeneralAuditLog_CheckLayout(){
+		$this->page->login()->open('zabbix.php?action=audit.settings.edit');
 		$form = $this->query('id:audit-settings')->asForm()->one();
 		$form->fill(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
-			'Data storage period' => null]);
-		$form->submit();
-		$this->assertMessage(TEST_BAD, 'Cannot update configuration',
-			'Incorrect value for field "hk_audit": a time unit is expected.');
-		$this->query('xpath://output[@class="msg-bad"]/button')->one()->click();
-
+			'Data storage period' => '365d']);
+		$form->checkValue(['Enable audit logging' => true, 'Enable internal housekeeping' => true, 
+			'Data storage period' => '365d']);
+		
 		// Check if field "Data storage period" is disabled when options are false
 		$form->fill(['Enable audit logging' => true, 'Enable internal housekeeping' => false]);
 		$form->query('class:form-field')->one()->isEnabled(false);
 
 		// Check if buttons in view are clickable
-		$form->query('class:table-forms')->one()->isClickable('submit');
-		$form->query('class:table-forms')->one()->isClickable('button');
+		$this->assertTrue($form->query('button:Update')->one()->isClickable());
+		$this->assertTrue($form->query('button:Reset defaults')->one()->isClickable());
 
 		// Check if Header and Title are as expected
 		$this->page->assertHeader('Audit log');
 		$this->page->assertTitle('Configuration of audit log');
-		$this->ResetValues();
 	}
 
-	/*
-	* Function checks whole "Reset defaults" buttons functions, additionally doing check in DB, if values are not
-	* changed when in the confirmation pop-up window actions are canceled.
+	/**
+	* Test for checking 'Reset defaults' button.
 	*/
 	public function testFormAdministrationGeneralAuditLog_CheckResetDefaultButtonsFunctions(){
-		$this->page->login()->open('zabbix.php?action=audit.settings.edit');
-		$sql = 'SELECT * FROM config ORDER BY configid';
-		$old_hash = CDBHelper::getHash($sql);
-		$form = $this->query('id:audit-settings')->asForm()->one();
-		$form->fill(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
-			'Data storage period' => '400d']);
-		$form->query('id:resetDefaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilVisible()->one()->query('button', 'Cancel')->one()->click();
-		$new_hash = CDBHelper::getHash($sql);
-		$this->assertEquals($old_hash, $new_hash);
-		$this->ResetValues();
+		$this->executeResetButtonTest();
 	}
 
-	/*
-	* The function's purpose is to check if default values in the Audit log view are present.
-	* It is using two private functions in order to reduce recurred code.
+	/**
+	* Test for checking form update without changing any data.
 	*/
-	public function testFormAdministrationGeneralAuditLog_CheckDefaultValues(){
-		$this->NavigateToAuditLog();
-		$this->DefaultValuesPresent();
-	}
-
-	/*
-	* Check if values are not changed in the database after simple "Update" buttons execution.
-	*/
-	public function testFormAdministrationGeneralAuditLog_GhostUpdate(){
-		$this->NavigateToAuditLog();
-		$form = $this->query('id:audit-settings')->asForm()->one();
-		$form->fill(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
-			'Data storage period' => '400d']);
-		$form->submit();
-		$sql = 'SELECT * FROM config ORDER BY configid';
-		$old_hash = CDBHelper::getHash($sql);
-		$form->submit();
-		$new_hash = CDBHelper::getHash($sql);
-		$this->assertEquals($old_hash, $new_hash);
-		$this->ResetValues();
+	public function testFormAdministrationGeneralAuditLog_SimpleUpdate(){
+		$this->executeSimpleUpdate();
 	}
 
 	public static function getUpdateValueData() {
@@ -349,7 +322,202 @@ class testFormAdministrationGeneralAuditLog extends CWebTest {
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
+						'Data storage period' => '1439m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1439m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1440m'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '13140000m'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '13139999m'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '13140001m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '13140001m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
 						'Data storage period' => '1h'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1h'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '23h'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '24h'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '24h'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '219000h'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '219000h'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '218999h'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '218999h'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '219001h'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '219001h'
 					],
 					'message' => 'Cannot update configuration',
 					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
@@ -683,7 +851,6 @@ class testFormAdministrationGeneralAuditLog extends CWebTest {
 			$form->fill($data['fields']);
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, $data['message']);
-			$this->query('xpath://output[@class="msg-good"]/button')->one()->click();
 			$this->ResetValues();
 		}
 		else{
@@ -691,7 +858,6 @@ class testFormAdministrationGeneralAuditLog extends CWebTest {
 			$form->submit();
 			$this->assertMessage(TEST_BAD, $data['message'],$data['msgdetails']);
 			$this->query('xpath://output[@class="msg-bad"]/button')->one()->click();
-			$this->ResetValues();
 		}
 	}
 }
