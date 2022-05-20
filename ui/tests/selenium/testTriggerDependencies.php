@@ -114,8 +114,8 @@ class testTriggerDependencies extends CLegacyWebTest {
 					'template' => self::TEMPLATE_FREEBSD,
 					'dependency' => '/etc/passwd has been changed on FreeBSD by Zabbix agent',
 					'error_message' => 'Trigger "Zabbix agent is not available" cannot depend on the trigger "/etc/passwd has been changed'.
-							' on {HOST.NAME}" from the template "FreeBSD by Zabbix agent" because dependencies on triggers'.
-							' from the child template or host are not allowed.'
+							' on {HOST.NAME}" from the template "FreeBSD by Zabbix agent", because dependencies on triggers'.
+							' from a child template or host are not allowed.'
 				]
 			],
 			[
@@ -125,8 +125,8 @@ class testTriggerDependencies extends CLegacyWebTest {
 					'template' => self::TEMPLATE_APACHE,
 					'dependency' => 'Apache: Service response time is too high',
 					'error_message' => 'Trigger "Apache: Service is down" cannot depend on the trigger "Apache: Service response'.
-							' time is too high" because a circular linkage ("Apache: Service response time is too high" ->'.
-							' "Apache: Service is down" -> "Apache: Service response time is too high") will occur.'
+							' time is too high", because a circular linkage ("Apache: Service response time is too high" ->'.
+							' "Apache: Service is down" -> "Apache: Service response time is too high") would occur.'
 				]
 			],
 			[
@@ -135,9 +135,9 @@ class testTriggerDependencies extends CLegacyWebTest {
 					'trigger' => 'Apache: has been restarted',
 					'template' => self::TEMPLATE_APACHE,
 					'dependency' => 'Apache: has been restarted',
-					'error_message' => 'Trigger "Apache: has been restarted" cannot depend on the trigger "Apache: has been restarted" '.
-							'because a circular linkage ("Apache: has been restarted" -> 1 -> "Apache: has been restarted") '.
-							'will occur.'
+					'error_message' => 'Trigger "Apache: has been restarted" cannot depend on the trigger "Apache: '.
+							'has been restarted", because a circular linkage ("Apache: has been restarted" -> "Apache: '.
+							'has been restarted") would occur.'
 				]
 			],
 			[
