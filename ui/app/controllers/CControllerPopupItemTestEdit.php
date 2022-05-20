@@ -260,20 +260,31 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				}
 			}
 			elseif (strstr($inputs[$field], '{') !== false) {
+				if ($field === 'key') {
+					$item_key_parser = new CItemKey();
+
+					$texts_having_macros = $item_key_parser->parse($key) == CParser::PARSE_SUCCESS
+						? CMacrosResolverGeneral::getItemKeyParameters($item_key_parser->getParamsRaw())
+						: [];
+				}
+				else {
+					$texts_having_macros = [$inputs[$field]];
+				}
+
 				// Field support macros like {HOST.*}, {ITEM.*} etc.
 				if ($macros) {
 					$supported_macros = array_merge_recursive($supported_macros, $macros);
-					$texts_support_macros[] = $inputs[$field];
+					$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
 				}
 
 				// Check if LLD macros are supported in field.
 				if ($support_lldmacros && $this->macros_by_item_props[$field]['support_lld_macros']) {
-					$texts_support_lld_macros[] = $inputs[$field];
+					$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
 				}
 
 				// Check if user macros are supported in field.
 				if ($this->macros_by_item_props[$field]['support_user_macros']) {
-					$texts_support_user_macros[] = $inputs[$field];
+					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
 				}
 			}
 		}
