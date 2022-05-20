@@ -28,7 +28,7 @@ class testUrlParameters extends CLegacyWebTest {
 			[
 				'title' => 'Configuration of host group',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
 						'url' => 'zabbix.php?action=hostgroup.edit&groupid=4',
@@ -87,7 +87,7 @@ class testUrlParameters extends CLegacyWebTest {
 			[
 				'title' => 'Configuration of template group',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
 						'url' => 'zabbix.php?action=templategroup.edit&groupid=1',
