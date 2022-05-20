@@ -33,13 +33,13 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 		'Enable internal housekeeping' => true,
 		'Data storage period' => '365d'
 	];
-	
+
 	public $custom_values = [
 		'Enable audit logging' => true,
 		'Enable internal housekeeping' => true,
 		'Data storage period' => '400d'
 	];
-	
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -74,9 +74,9 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 		$form = $this->query('id:audit-settings')->asForm()->one();
 		$form->fill(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
 			'Data storage period' => '365d']);
-		$form->checkValue(['Enable audit logging' => true, 'Enable internal housekeeping' => true, 
+		$form->checkValue(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
 			'Data storage period' => '365d']);
-		
+
 		// Check if field "Data storage period" is disabled when options are false
 		$form->fill(['Enable audit logging' => true, 'Enable internal housekeeping' => false]);
 		$form->query('class:form-field')->one()->isEnabled(false);
