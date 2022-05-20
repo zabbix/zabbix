@@ -704,7 +704,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_sysinfo_proc_clear(&proc);
 	}
 
-	closedir(dir);
+	if (0 != closedir(dir))
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot close /proc: %s", __func__, zbx_strerror(errno));
 out:
 	SET_UI64_RESULT(result, proccount);
 
