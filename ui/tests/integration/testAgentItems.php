@@ -298,7 +298,7 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 1
+			'result_exec' => 'netstat -lt --numeric-hosts --numeric-ports | grep 10051| wc -l'
 		],
 		[
 			'key' => 'net.tcp.socket.count[,,127.127.127.127]',
@@ -319,7 +319,7 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 1
+			'result_exec' => 'netstat -lt --numeric-hosts --numeric-ports | grep 10051| wc -l'
 		],
 		[
 			'key' => 'net.tcp.socket.count[,,127.127.127.127]',
@@ -699,6 +699,7 @@ class testAgentItems extends CIntegrationTest {
 	/**
 	 * Test if both active and passive go agent checks are processed.
 	 *
+	 * @required-components server, agent, agent2
 	 * @depends testAgentItems_checkDataCollection
 	 * @dataProvider getItems
 	 */
