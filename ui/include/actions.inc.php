@@ -1283,14 +1283,14 @@ function eventType($type = null) {
  * @return array
  */
 function getEventsActionsIconsData(array $events, array $triggers) {
-    $suppressions = getEventsSuppressions($events);
+	$suppressions = getEventsSuppressions($events);
 	$messages = getEventsMessages($events);
 	$severities = getEventsSeverityChanges($events, $triggers);
 	$actions = getEventsAlertsOverview($events);
 
 	return [
 		'data' => [
-            'suppressions' => $suppressions['data'],
+			'suppressions' => $suppressions['data'],
 			'messages' => $messages['data'],
 			'severities' => $severities['data'],
 			'actions' => $actions
@@ -1313,45 +1313,45 @@ function getEventsActionsIconsData(array $events, array $triggers) {
  * @return array
  */
 function getEventsSuppressions(array $events){
-    $suppressions = [];
-    $userids = [];
+	$suppressions = [];
+	$userids = [];
 
-    // Create array of suppressions for each event
-    foreach ($events as $event) {
-        $event_suppressions = [];
+	// Create array of suppressions for each event
+	foreach ($events as $event) {
+		$event_suppressions = [];
 
-        foreach ($event['acknowledges'] as $ack) {
-            if (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
-                $event_suppressions[] = [
-                    'suppress_until' => $ack['suppress_until'],
-                    'userid' => $ack['userid'],
-                    'clock' => $ack['clock']
-                ];
+		foreach ($event['acknowledges'] as $ack) {
+			if (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
+				$event_suppressions[] = [
+					'suppress_until' => $ack['suppress_until'],
+					'userid' => $ack['userid'],
+					'clock' => $ack['clock']
+				];
 
-                $userids[$ack['userid']] = true;
-            }
-            elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
-                $event_suppressions[] = [
-                    'userid' => $ack['userid'],
-                    'clock' => $ack['clock']
-                ];
+				$userids[$ack['userid']] = true;
+			}
+			elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+				$event_suppressions[] = [
+					'userid' => $ack['userid'],
+					'clock' => $ack['clock']
+				];
 
-                $userids[$ack['userid']] = true;
-            }
-        }
+				$userids[$ack['userid']] = true;
+			}
+		}
 
-        CArrayHelper::sort($event_suppressions, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+		CArrayHelper::sort($event_suppressions, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 
-        $suppressions[$event['eventid']] = [
-            'suppress_until' => array_values($event_suppressions),
-            'count' => count($event_suppressions)
-        ];
-    }
+		$suppressions[$event['eventid']] = [
+			'suppress_until' => array_values($event_suppressions),
+			'count' => count($event_suppressions)
+		];
+	}
 
-    return [
-        'data' => $suppressions,
-        'userids' => $userids
-    ];
+	return [
+		'data' => $suppressions,
+		'userids' => $userids
+	];
 }
 
 /**

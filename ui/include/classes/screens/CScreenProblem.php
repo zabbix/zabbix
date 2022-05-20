@@ -363,7 +363,7 @@ class CScreenProblem extends CScreenBase {
 	 */
 	public static function addSuppressedByNames(array &$problems) {
 		$maintenanceids = [];
-        $userid = null;
+		$userid = null;
 
 		foreach ($problems as $problem) {
 			foreach ($problem['suppression_data'] as $data) {
@@ -374,25 +374,25 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($maintenanceids) {
-            $maintenances = API::Maintenance()->get([
-                'output' => ['name'],
-                'maintenanceids' => $maintenanceids,
-                'preservekeys' => true
-            ]);
-        }
+			$maintenances = API::Maintenance()->get([
+				'output' => ['name'],
+				'maintenanceids' => $maintenanceids,
+				'preservekeys' => true
+			]);
+		}
 
-        if ($userid !== null && $userid != 0) {
-            $user = API::User()->get([
-                'output' => ['username', 'name', 'surname'],
-                'userids' => $userid,
-                'preservekeys' => true
-            ]);
-        }
+		if ($userid !== null && $userid != 0) {
+			$user = API::User()->get([
+				'output' => ['username', 'name', 'surname'],
+				'userids' => $userid,
+				'preservekeys' => true
+			]);
+		}
 		else {
 			$user = null;
 		}
 
-        if ($maintenanceids || $user) {
+		if ($maintenanceids || $user) {
 			foreach ($problems as &$problem) {
 				foreach ($problem['suppression_data'] as &$data) {
 					if ($data['maintenanceid'] != 0) {
@@ -410,7 +410,7 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 		}
-        unset($problem);
+		unset($problem);
 	}
 
 	/**
@@ -940,7 +940,7 @@ class CScreenProblem extends CScreenBase {
 				'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
 				'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 				'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
-                'suppress' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
+				'suppress' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 			];
 
 			// Add problems to table.

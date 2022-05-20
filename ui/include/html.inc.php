@@ -1001,7 +1001,7 @@ function makeSuppressedProblemIcon(array $icon_data) {
 			"\n".
 			$manually_by.
 			$maintenance
-        );
+		);
 }
 
 /**

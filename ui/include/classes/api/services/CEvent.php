@@ -786,15 +786,15 @@ class CEvent extends CApiService {
 	 * @param string|array  $data['eventids'] 		 An event ID or an array of event IDs.
 	 * @param string        $data['message']   		 Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
 	 * @param string        $data['severity'] 		 New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-     * @param int           $data['suppress_until']  Time until problem is manually suppressed is passed.
+	 * @param int           $data['suppress_until']  Time until problem is manually suppressed is passed.
 	 * @param int           $data['action']   		 Flags of performed operations combined:
 	 *                                         		  - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
 	 *                                          	  - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
 	 *                                         		  - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
 	 *                                         		  - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
 	 *                                          	  - 0x10 - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
-     *                                         		  - 0x20 - ZBX_PROBLEM_UPDATE_SUPPRESS
-     *                                         		  - 0x40 - ZBX_PROBLEM_UPDATE_UNSUPPRESS
+	 *                                         		  - 0x20 - ZBX_PROBLEM_UPDATE_SUPPRESS
+	 *                                         		  - 0x40 - ZBX_PROBLEM_UPDATE_UNSUPPRESS
 	 *
 	 * @throws APIException                    If the input is invalid.
 	 */
@@ -804,7 +804,7 @@ class CEvent extends CApiService {
 			'action' => null,
 			'message' => '',
 			'severity' => '',
-            'suppress_until' => ''
+			'suppress_until' => ''
 		];
 
 		if (!check_db_fields($db_fields, $data)) {
@@ -817,7 +817,7 @@ class CEvent extends CApiService {
 		// Check that at least one valid flag is set.
 		$action_mask = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
 				| ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS
-                | ZBX_PROBLEM_UPDATE_UNSUPPRESS;
+				| ZBX_PROBLEM_UPDATE_UNSUPPRESS;
 
 		if (($data['action'] & $action_mask) != $data['action']) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
@@ -830,8 +830,8 @@ class CEvent extends CApiService {
 		$has_message_action = (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE);
 		$has_severity_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY);
 		$has_unack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE);
-        $has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
-        $has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
+		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
+		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
 
 		// Check access rules.
 		if ($has_close_action && !self::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)) {
@@ -856,13 +856,14 @@ class CEvent extends CApiService {
 					: _('no permissions to unacknowledge problems')
 			));
 		}
-        if (($has_suppress_action || $has_unsuppress_action) && !self::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
-            self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
-                $has_suppress_action
-                    ? _('no permissions to suppress problems')
-                    : _('no permissions to unsuppress problems')
-            ));
-        }
+		if (($has_suppress_action || $has_unsuppress_action)
+				&& !self::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				$has_suppress_action
+					? _('no permissions to suppress problems')
+					: _('no permissions to unsuppress problems')
+			));
+		}
 
 		if ($has_ack_action && $has_unack_action) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
@@ -872,13 +873,13 @@ class CEvent extends CApiService {
 			));
 		}
 
-        if ($has_suppress_action && $has_unsuppress_action) {
-            self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
-                _s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_SUPPRESS,
-                    ZBX_PROBLEM_UPDATE_UNSUPPRESS
-                ]))
-            ));
-        }
+		if ($has_suppress_action && $has_unsuppress_action) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_SUPPRESS,
+					ZBX_PROBLEM_UPDATE_UNSUPPRESS
+				]))
+			));
+		}
 
 		if ($has_close_action && ($has_suppress_action || $has_unsuppress_action)) {
 			$action = $has_suppress_action ? ZBX_PROBLEM_UPDATE_SUPPRESS : ZBX_PROBLEM_UPDATE_UNSUPPRESS;
