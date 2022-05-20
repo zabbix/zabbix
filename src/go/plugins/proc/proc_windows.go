@@ -41,7 +41,7 @@ type Plugin struct {
 
 var impl Plugin
 
-func getProcessUsername(pid uint32) (result string, sidStr string, err error) {
+func getProcessUsername(pid uint32, wsid bool) (result string, sidStr string, err error) {
 	h, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, pid)
 	if err != nil {
 		return
@@ -74,8 +74,14 @@ func getProcessUsername(pid uint32) (result string, sidStr string, err error) {
 	if err = syscall.LookupAccountSid(nil, sid, &name[0], &nameLen, &domain[0], &domainLen, &use); err != nil {
 		return
 	}
-	sidStr, err = sid.String()
-	return windows.UTF16ToString(name), sidStr, err
+
+	result = windows.UTF16ToString(name)
+
+	if wsid == true {
+		sidStr, err = sid.String()
+	}
+
+	return
 }
 
 type processEnumerator interface {
@@ -113,7 +119,7 @@ type numEnumerator struct {
 
 func (e *numEnumerator) inspect(p *syscall.ProcessEntry32) {
 	if e.user != "" {
-		if procUser, _, err := getProcessUsername(p.ProcessID); err != nil || e.user != strings.ToUpper(procUser) {
+		if procUser, _, err := getProcessUsername(p.ProcessID, false); err != nil || e.user != strings.ToUpper(procUser) {
 			return
 		}
 	}
@@ -425,13 +431,15 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		}
 		var uname string
 		var sid string
-		uname, sid, err = getProcessUsername(pe.ProcessID)
+		uname, sid, err = getProcessUsername(pe.ProcessID, true)
+
+		if userName != "" && (err != nil || strings.ToUpper(uname) != userName) {
+			continue
+		}
+
 		if err != nil {
 			uname = "-1"
 			sid = "-1"
-		}
-		if userName != "" && strings.ToUpper(uname) != userName {
-			continue
 		}
 
 		proc := procStatus{Pid: pe.ProcessID, PPid: pe.ParentProcessID, Name: procName, Threads: pe.Threads,
@@ -501,7 +509,7 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 			for _, proc := range array {
 				if te.OwnerProcessID == proc.Pid {
 					threadArray = append(threadArray, thread{proc.Pid, proc.PPid, proc.Name,
-						proc.Sid, proc.User, te.ThreadID})
+						proc.User, proc.Sid, te.ThreadID})
 					break
 				}
 			}
