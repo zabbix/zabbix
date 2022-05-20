@@ -1322,7 +1322,7 @@ abstract class CTriggerGeneral extends CApiService {
 				foreach ($triggerids as $triggerid) {
 					if (bccomp($lld_rules[$triggerid_up], $lld_rules[$triggerid]) != 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s" because dependencies on trigger prototypes from the another LLD rule are not allowed.')
+							_('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because dependencies on trigger prototypes from another LLD rule are not allowed.')
 						);
 					}
 				}
@@ -2314,20 +2314,27 @@ abstract class CTriggerGeneral extends CApiService {
 						]);
 
 						foreach ($triggers as $_triggerid => $trigger) {
+							$description = '"'.$trigger['description'].'"';
+
 							if (bccomp($_triggerid, $triggerid_up) == 0) {
-								$trigger_up_name = '"'.$trigger['description'].'"';
+								$trigger_up_name = $description;
+
+								if (array_key_exists($_triggerid, $links_path)) {
+									$links_path = [];
+									break;
+								}
 							}
 							else {
-								$links_path[$_triggerid] = '"'.$trigger['description'].'"';
+								$links_path[$_triggerid] = $description;
 							}
 						}
 
-						$circular_linkage = $trigger_up_name.' -> '.implode(' -> ', $links_path).' -> '.
-							$trigger_up_name;
+						$circular_linkage = $trigger_up_name.($links_path ? ' -> '.implode(' -> ', $links_path) : '').
+							' -> '.$trigger_up_name;
 
 						$error = ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-							? _('Trigger "%1$s" cannot depend on the trigger "%2$s" because a circular linkage (%3$s) will occur.')
-							: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s" because a circular linkage (%3$s) will occur.');
+							? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur.')
+							: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur.');
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
 							$triggers[$triggerid_up]['description'], $circular_linkage
@@ -2431,8 +2438,8 @@ abstract class CTriggerGeneral extends CApiService {
 						]);
 
 						$error = ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-							? _('Trigger "%1$s" cannot depend on the trigger "%2$s" because dependencies of the host triggers on the template triggers are not allowed.')
-							: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" because dependencies of the host triggers on the template triggers are not allowed.');
+							? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because dependencies of host triggers on template triggers are not allowed.')
+							: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s", because dependencies of host triggers on template triggers are not allowed.');
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
 							$triggers[$triggerid_up]['description']
@@ -2580,8 +2587,8 @@ abstract class CTriggerGeneral extends CApiService {
 						]);
 
 						$error = ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-							? _('Trigger "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s" because dependencies on triggers from the parent template are not allowed.')
-							: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s" because dependencies on triggers from the parent template are not allowed.');
+							? _('Trigger "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s", because dependencies on triggers from the parent template are not allowed.')
+							: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s", because dependencies on triggers from the parent template are not allowed.');
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
 							$triggers[$triggerid_up]['description'], $templates[0]['host']
@@ -2686,13 +2693,13 @@ abstract class CTriggerGeneral extends CApiService {
 
 						if ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 							$error = ($templates[0]['status'] == HOST_STATUS_TEMPLATE)
-								? _('Trigger "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s" because dependencies on triggers from the child template or host are not allowed.')
-								: _('Trigger "%1$s" cannot depend on the trigger "%2$s" from the host "%3$s" because dependencies on triggers from the child template or host are not allowed.');
+								? _('Trigger "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s", because dependencies on triggers from a child template or host are not allowed.')
+								: _('Trigger "%1$s" cannot depend on the trigger "%2$s" from the host "%3$s", because dependencies on triggers from a child template or host are not allowed.');
 						}
 						else {
 							$error = ($templates[0]['status'] == HOST_STATUS_TEMPLATE)
-								? _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s" because dependencies on triggers from the child template or host are not allowed.')
-								: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" from the host "%3$s" because dependencies on triggers from the child template or host are not allowed.');
+								? _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" from the template "%3$s", because dependencies on triggers from a child template or host are not allowed.')
+								: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" from the host "%3$s", because dependencies on triggers from a child template or host are not allowed.');
 						}
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],

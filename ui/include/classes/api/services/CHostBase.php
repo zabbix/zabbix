@@ -484,18 +484,26 @@ abstract class CHostBase extends CApiService {
 						]);
 
 						foreach ($templates as $template) {
+							$description = '"'.$template['host'].'"';
+
 							if (bccomp($template['hostid'], $templateid) == 0) {
-								$template_name = '"'.$template['host'].'"';
+								$template_name = $description;
+
+								if (array_key_exists($template['hostid'], $links_path)) {
+									$links_path = [];
+									break;
+								}
 							}
 							else {
-								$links_path[$template['hostid']] = '"'.$template['host'].'"';
+								$links_path[$template['hostid']] = $description;
 							}
 						}
 
-						$circular_linkage = $template_name.' -> '.implode(' -> ', $links_path).' -> '.$template_name;
+						$circular_linkage = $template_name.($links_path ? ' -> '.implode(' -> ', $links_path) : '').
+							' -> '.$template_name;
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot link template "%1$s" to template "%2$s" because circular linkage (%3$s) will occurs.',
+							'Cannot link template "%1$s" to template "%2$s", because circular linkage (%3$s) would occur.',
 							$templates[$templateid]['host'], $templates[$hostid]['host'], $circular_linkage
 						));
 					}
@@ -631,13 +639,13 @@ abstract class CHostBase extends CApiService {
 				]);
 
 				if ($objects[$hostid]['status'] == HOST_STATUS_TEMPLATE) {
-					$error = _('Cannot link template "%1$s" to template "%2$s" because its parent template "%3$s" will be linked twice.');
+					$error = _('Cannot link template "%1$s" to template "%2$s", because its parent template "%3$s" would be linked twice.');
 				}
 				elseif ($objects[$hostid]['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$error = _('Cannot link template "%1$s" to host prototype "%2$s" because its parent template "%3$s" will be linked twice.');
+					$error = _('Cannot link template "%1$s" to host prototype "%2$s", because its parent template "%3$s" would be linked twice.');
 				}
 				else {
-					$error = _('Cannot link template "%1$s" to host "%2$s" because its parent template "%3$s" will be linked twice.');
+					$error = _('Cannot link template "%1$s" to host "%2$s", because its parent template "%3$s" would be linked twice.');
 				}
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $objects[$ins_templateid]['host'],
