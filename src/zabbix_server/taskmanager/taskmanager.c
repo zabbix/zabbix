@@ -785,7 +785,7 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 	zbx_audit_flush();
 }
 
-static int	tm_process_temp_suppression(const char *data)
+static void	tm_process_temp_suppression(const char *data)
 {
 	struct zbx_json_parse	jp;
 	char			tmp_eventid[MAX_ID_LEN], tmp_userid[MAX_ID_LEN], tmp_ts[MAX_ID_LEN], tmp_action[3];
@@ -794,7 +794,7 @@ static int	tm_process_temp_suppression(const char *data)
 	if (FAIL == zbx_json_open(data, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request");
-		return SUCCEED;
+		return;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_EVENTID, tmp_eventid, sizeof(tmp_eventid), NULL) ||
@@ -802,7 +802,7 @@ static int	tm_process_temp_suppression(const char *data)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_EVENTID);
-		return SUCCEED;
+		return;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_USERID, tmp_userid, sizeof(tmp_userid), NULL) ||
@@ -810,7 +810,7 @@ static int	tm_process_temp_suppression(const char *data)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_USERID);
-		return SUCCEED;
+		return;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SUPPRESS_UNTIL, tmp_ts, sizeof(tmp_ts), NULL) ||
@@ -818,7 +818,7 @@ static int	tm_process_temp_suppression(const char *data)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_SUPPRESS_UNTIL);
-		return SUCCEED;
+		return;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACTION, tmp_action, sizeof(tmp_action), NULL) ||
@@ -826,7 +826,7 @@ static int	tm_process_temp_suppression(const char *data)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
-		return SUCCEED;
+		return;
 	}
 
 	if (ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS == action || (0 != ts && time(NULL) >= ts))
@@ -853,10 +853,10 @@ static int	tm_process_temp_suppression(const char *data)
 		if (0 != event_suppressid)
 		{
 			if (SUCCEED != DBlock_record("events", eventid, NULL, 0))
-				return FAIL;
+				return;
 
 			if (SUCCEED != DBlock_record("event_suppress", eventid, NULL, 0))
-				return FAIL;
+				return;
 
 			DBexecute("update event_suppress set maintenanceid=NULL,suppress_until=" ZBX_FS_UI64 ",userid="
 					ZBX_FS_UI64 " where event_suppressid=" ZBX_FS_UI64, ts, userid,
@@ -871,8 +871,6 @@ static int	tm_process_temp_suppression(const char *data)
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -935,10 +933,8 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
 			case ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION:
-				if (SUCCEED == tm_process_temp_suppression(row[2]))
-				{
-					zbx_vector_uint64_append(&done_taskids, taskid);
-				}
+				tm_process_temp_suppression(row[2]);
+				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
