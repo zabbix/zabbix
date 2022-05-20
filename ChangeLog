@@ -4,6 +4,10 @@ New features:
 ..F....... [ZBX-20946] enabled German, Greek, Romanian, Spanish and Vietnamese languages in frontend (miks)
 
 Bug fixes:
+...G...... [ZBX-20911] added process state check in PROC_NUM() for Oracle Solaris (Andris)
+..F....... [ZBX-19381] fixed resolving of macros in item key parameters when testing items in web interface (Sasha)
+..F....... [ZBX-18520] fixed showing of fields that do not belong to selected item type in item edit form (miks)
+.........T [ZBX-20950] updated regular expressions for services discovery in windows templates (vkhaliev)
 .......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
 ...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent2 (vso)
 ...G...... [ZBX-20886] fixed handle leak on Zabbix agent 2 in vfs.fs.get (vso)
