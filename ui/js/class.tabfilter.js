@@ -76,8 +76,8 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		this._items.forEach((item, key) => {
-			if (key != 0) {
-				item.updateUnsavedState(item._data.filter_src, item._data);
+			if (item._index != 0) {
+				item.updateUnsavedState();
 			}
 		})
 	}
@@ -651,11 +651,11 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Apply' button press.
 			 */
 			buttonApplyAction: () => {
-				if (this._active_item._index === 0) {
+				if (this._active_item._index == 0) {
 					var params = this._active_item.getFilterParams();
 
 					this.profileUpdate('properties', {
-						idx2: this._active_item._index,
+						idx2: 0,
 						value_str: params.toString()
 					}).then(() => {
 						this._active_item.unsetExpandedSubfilters();

@@ -150,6 +150,8 @@ class CTabFilterItem extends CBaseComponent {
 			defaults.filter_name = this._data.filter_name;
 		}
 
+		this.updateUnsavedState();
+
 		return PopUp('popup.tabfilter.edit', { ...defaults, ...params },
 			{dialogueid: 'tabfilter_dialogue', trigger_element}
 		);
@@ -419,31 +421,27 @@ class CTabFilterItem extends CBaseComponent {
 		this.setBrowserLocation(new URLSearchParams(this._apply_url));
 	}
 
-	setFilterIndicator(tab_target) {
-		if (!tab_target.querySelector("span[data-indicator='mark']")) {
+	showIndicator() {
+		if (!this._target.querySelector("span[data-indicator='mark']")) {
 			let green_dot = document.createElement('span');
 			green_dot.setAttribute('data-indicator-value', '1');
 			green_dot.setAttribute('data-indicator', 'mark');
-			tab_target.appendChild(green_dot);
-			this._unsaved = true;
+			this._target.appendChild(green_dot);
 		}
 	}
 
-	removeFilterIndicator(tab_target) {
+	hideIndicator(tab_target) {
 		if (tab_target.querySelector("span[data-indicator='mark']")) {
 			tab_target.querySelector("span[data-indicator='mark']").remove();
-			this._unsaved = false;
 		}
 	}
 
 	/**
 	 * Checks difference between original form values and to be posted values.
 	 * Updates this._unsaved according to check results
-	 *
-	 * @param {URLSearchParams} src_query  Filter field values to compare against.
-	 * @param search_params
 	 */
-	updateUnsavedState(src_query = this._src_url, search_params = this.getFilterParams()) {
+	updateUnsavedState() {
+		let src_query = this._src_url, search_params = this.getFilterParams();
 
 		if (src_query === null) {
 			return;
@@ -465,9 +463,11 @@ class CTabFilterItem extends CBaseComponent {
 		search_params.sort();
 
 		if (src_query.toString() !== search_params.toString()) {
-			this.setFilterIndicator(this._target)
+			this._unsaved = true;
+			this.showIndicator()
 		}
 		else {
+			this._unsaved = false;
 			this.resetUnsavedState();
 		}
 	}
@@ -492,7 +492,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		this._src_url = src_query.toString();
 
-		this.removeFilterIndicator(this._target);
+		this.hideIndicator(this._target);
 	}
 
 	/**
