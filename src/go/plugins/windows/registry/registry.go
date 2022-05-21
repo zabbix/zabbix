@@ -23,15 +23,15 @@
 package registry
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
 
 	"golang.org/x/sys/windows/registry"
 	"zabbix.com/pkg/plugin"
-	zbxregistry "zabbix.com/pkg/registry"
+	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -
@@ -55,37 +55,68 @@ type registryValue struct {
 }
 
 const (
-	RegistryDiscoveryModeKeys   = 0
-	RegistryDiscoveryModeValues = 1
+	RegistryDiscoveryModeValues = iota
+	RegistryDiscoveryModeKeys
 )
 
 func getHive(key string) (hive registry.Key, e error) {
-	switch {
-	case key == "HKLM":
-		fallthrough
-	case key == "HKEY_LOCAL_MACHINE":
+	switch key {
+	case "HKLM", "HKEY_LOCAL_MACHINE":
 		return registry.LOCAL_MACHINE, nil
-	case key == "HKCU":
-		fallthrough
-	case key == "HKEY_CURRENT_USER":
+	case "HKCU", "HKEY_CURRENT_USER":
 		return registry.CURRENT_USER, nil
-	case key == "HKCR":
-		fallthrough
-	case key == "HKEY_CLASSES_ROOT":
+	case "HKCR", "HKEY_CLASSES_ROOT":
 		return registry.CLASSES_ROOT, nil
-	case key == "HKU":
-		fallthrough
-	case key == "HKEY_USERS":
+	case "HKU", "HKEY_USERS":
 		return registry.USERS, nil
-	case key == "HKPD":
-		fallthrough
-	case key == "HKEY_PERFORMANCE_DATA":
+	case "HKPD", "HKEY_PERFORMANCE_DATA":
 		return registry.PERFORMANCE_DATA, nil
 	}
+
 	return 0, errors.New("Failed to parse key.")
 }
 
-func discoverValues(hive registry.Key, fullkey string, discovered_values []registryValue, current_key string, re string) (result []registryValue, e error) {
+func convertValue(k registry.Key, value string) (result interface{}, stype string, err error) {
+	_, valueType, err := k.GetValue(value, nil)
+	if err != nil {
+		return nil, "", err
+	}
+
+	switch valueType {
+	case registry.NONE:
+		return "", "REG_NONE", nil
+	case registry.EXPAND_SZ:
+		stype = "REG_EXPAND_SZ"
+		result, _, err = k.GetStringValue(value)
+	case registry.SZ:
+		stype = "REG_SZ"
+		result, _, err = k.GetStringValue(value)
+	case registry.BINARY:
+		stype = "REG_BINARY"
+		if val, _, err := k.GetBinaryValue(value); err == nil {
+			result = base64.StdEncoding.EncodeToString(val)
+		} else {
+			return nil, "", err
+		}
+	case registry.QWORD:
+		stype = "REG_QWORD"
+		result, _, err = k.GetIntegerValue(value)
+	case registry.DWORD:
+		stype = "REG_DWORD"
+		result, _, err = k.GetIntegerValue(value)
+	case registry.MULTI_SZ:
+		stype = "REG_MULTI_SZ"
+		result, _, err = k.GetStringsValue(value)
+	default:
+		return nil, "", errors.New("Unsupported registry data type.")
+	}
+
+	return result, stype, err
+}
+
+func discoverValues(hive registry.Key, fullkey string, discovered_values []registryValue, current_key string,
+	re *regexp.Regexp) (result []registryValue, e error) {
+
 	k, err := registry.OpenKey(hive, fullkey, registry.READ)
 	if err != nil {
 		return nil, err
@@ -103,16 +134,14 @@ func discoverValues(hive registry.Key, fullkey string, discovered_values []regis
 	}
 
 	for _, v := range values {
-		data, valtype, err := zbxregistry.ConvertValue(k, v)
+		data, valtype, err := convertValue(k, v)
 
 		if err != nil {
 			continue
 		}
 
-		if re != "" {
-			match, _ := regexp.MatchString(re, v)
-
-			if match {
+		if re != nil {
+			if re.MatchString(v) {
 				discovered_values = append(discovered_values,
 					registryValue{fullkey, current_key, v, data, valtype})
 			}
@@ -140,7 +169,6 @@ func discoverKeys(hive registry.Key, fullkey string, subkeys []registryKey) (res
 	defer k.Close()
 
 	if err != nil {
-		fmt.Print(2)
 		return nil, err
 	}
 
@@ -149,7 +177,7 @@ func discoverKeys(hive registry.Key, fullkey string, subkeys []registryKey) (res
 	for _, i := range s {
 		current_key := fullkey + "\\" + i
 		subkeys = append(subkeys, registryKey{current_key, i})
-		discoverKeys(hive, current_key, subkeys)
+		_, _ = discoverKeys(hive, current_key, subkeys)
 	}
 
 	return subkeys, nil
@@ -170,7 +198,7 @@ func splitFullkey(fullkey string) (hive registry.Key, key string, e error) {
 
 func getValue(params []string) (result interface{}, err error) {
 	if len(params) > 2 {
-		return nil, errors.New("Too many parameters.")
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	if len(params) < 1 {
@@ -191,12 +219,12 @@ func getValue(params []string) (result interface{}, err error) {
 	}
 
 	handle, err := registry.OpenKey(hive, key, registry.QUERY_VALUE)
-	defer handle.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer handle.Close()
 
-	result, _, err = zbxregistry.ConvertValue(handle, value)
+	result, _, err = convertValue(handle, value)
 	if err != nil {
 		return nil, err
 	}
@@ -212,10 +240,10 @@ func getValue(params []string) (result interface{}, err error) {
 
 func discover(params []string) (result string, err error) {
 	var j []byte
-	var re string
+	var re *regexp.Regexp
 
 	if len(params) > 3 {
-		return "", errors.New("Too many parameters.")
+		return "", zbxerr.ErrorTooManyParameters
 	}
 
 	if len(params) < 1 {
@@ -229,31 +257,37 @@ func discover(params []string) (result string, err error) {
 		return "", e
 	}
 
-	mode := -1
+	mode := RegistryDiscoveryModeValues
 
 	if len(params) > 1 {
-		if params[1] == "keys" || params[1] == "" {
+		switch params[1] {
+		case "values", "":
+			// default mode - RegistryDiscoveryModeValues
+		case "keys":
 			mode = RegistryDiscoveryModeKeys
-		} else if params[1] == "values" {
-			mode = RegistryDiscoveryModeValues
-			if len(params) == 3 {
-				re = params[2]
+		default:
+			return "", errors.New("Invalid 'mode' parameter.")
+		}
+
+		if len(params) == 3 {
+			if mode != RegistryDiscoveryModeValues {
+				return "", zbxerr.ErrorTooManyParameters
+			}
+			if re, err = regexp.Compile(params[2]); err != nil {
+				return "", err
 			}
 		}
-	} else {
-		mode = RegistryDiscoveryModeValues
-	}
 
-	if mode == RegistryDiscoveryModeKeys {
+	}
+	switch mode {
+	case RegistryDiscoveryModeKeys:
 		results := make([]registryKey, 0)
 		results, err = discoverKeys(hive, key, results)
 		j, _ = json.Marshal(results)
-	} else if mode == RegistryDiscoveryModeValues {
+	case RegistryDiscoveryModeValues:
 		results := make([]registryValue, 0)
 		results, err = discoverValues(hive, key, results, "", re)
 		j, _ = json.Marshal(results)
-	} else {
-		return "", errors.New("Invalid 'mode' parameter.")
 	}
 
 	return string(j), err
