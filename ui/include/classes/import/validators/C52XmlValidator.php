@@ -397,7 +397,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 					'ipmi_username' =>			['type' => XML_STRING, 'default' => ''],
 					'ipmi_password' =>			['type' => XML_STRING, 'default' => ''],
 					'tls_connect' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO_ENCRYPTION, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]],
-					'tls_accept' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'option', 'default' => CXmlConstantValue::NO_ENCRYPTION, 'export' => [$this, 'hostTlsAcceptExport'], 'rules' => [
+					'tls_accept' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'option', 'default' => CXmlConstantValue::NO_ENCRYPTION, 'rules' => [
 						'option' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::NO_ENCRYPTION => CXmlConstantName::NO_ENCRYPTION, CXmlConstantValue::TLS_PSK => CXmlConstantName::TLS_PSK, CXmlConstantValue::TLS_CERTIFICATE => CXmlConstantName::TLS_CERTIFICATE]]
 					]],
 					'tls_issuer' =>				['type' => XML_STRING, 'default' => ''],
@@ -457,7 +457,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'units' =>					['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
-							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
 							'username' =>				['type' => XML_STRING, 'default' => ''],
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
@@ -476,7 +476,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
+									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
 									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
@@ -566,7 +566,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
-							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
 							'username' =>				['type' => XML_STRING, 'default' => ''],
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
@@ -602,7 +602,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 									'units' =>					['type' => XML_STRING, 'default' => ''],
 									'params' =>					['type' => XML_STRING, 'default' => ''],
 									'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
-									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
 									'username' =>				['type' => XML_STRING, 'default' => ''],
 									'password' =>				['type' => XML_STRING, 'default' => ''],
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
@@ -626,7 +626,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 									'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 										'step' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
+											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
 												'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 											]],
 											'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
@@ -754,10 +754,10 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 									'percent_right' =>			['type' => XML_STRING, 'default' => '0'],
 									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
 									'ymin_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymin_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']],
+									'ymin_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem']],
 									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
 									'ymax_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
+									'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem']],
 									'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'ex_validate' => [$this, 'validateGraphItems'], 'rules' => [
 										'graph_item' =>				['type' => XML_ARRAY, 'rules' => [
 											'sortorder' =>				['type' => XML_STRING, 'default' => '0'],
@@ -884,7 +884,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
+									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
 									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
@@ -1124,7 +1124,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'units' =>					['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
-							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
 							'username' =>				['type' => XML_STRING, 'default' => ''],
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
@@ -1143,7 +1143,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
+									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
 									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
@@ -1232,7 +1232,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
 							'params' =>					['type' => XML_STRING, 'default' => ''],
 							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
-							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
 							'username' =>				['type' => XML_STRING, 'default' => ''],
 							'password' =>				['type' => XML_STRING, 'default' => ''],
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
@@ -1267,7 +1267,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 									'units' =>					['type' => XML_STRING, 'default' => ''],
 									'params' =>					['type' => XML_STRING, 'default' => ''],
 									'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
-									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules'], 'export' => [$this, 'itemAuthtypeExport']],
+									'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
 									'username' =>				['type' => XML_STRING, 'default' => ''],
 									'password' =>				['type' => XML_STRING, 'default' => ''],
 									'publickey' =>				['type' => XML_STRING, 'default' => ''],
@@ -1291,7 +1291,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 									'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 										'step' =>					['type' => XML_ARRAY, 'rules' => [
 											'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE],
-											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
+											'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
 												'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 											]],
 											'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
@@ -1418,10 +1418,10 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 									'percent_right' =>			['type' => XML_STRING, 'default' => '0'],
 									// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
 									'ymin_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymin_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']],
+									'ymin_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem']],
 									// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
 									'ymax_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-									'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
+									'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem']],
 									'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'ex_validate' => [$this, 'validateGraphItems'], 'rules' => [
 										'graph_item' =>				['type' => XML_ARRAY, 'rules' => [
 											'sortorder' =>				['type' => XML_STRING, 'default' => '0'],
@@ -1548,7 +1548,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'export' => [$this, 'preprocessingParametersExport'], 'rules' => [
+									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
 										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
 									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
@@ -1750,10 +1750,10 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 					'percent_right' =>			['type' => XML_STRING, 'default' => '0'],
 					// The tag 'ymin_type_1' should be validated before the 'ymin_item_1' because it is used in 'ex_validate' method.
 					'ymin_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-					'ymin_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem'], 'export' => [$this, 'graphMinItemExport']],
+					'ymin_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMinItem']],
 					// The tag 'ymax_type_1' should be validated before the 'ymax_item_1' because it is used in 'ex_validate' method.
 					'ymax_type_1' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CALCULATED, 'in' => $this->GRAPH_Y_TYPE],
-					'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem'], 'export' => [$this, 'graphMaxItemExport']],
+					'ymax_item_1' =>			['type' => 0, 'default' => '0', 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateYMaxItem']],
 					'graph_items' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_item', 'ex_validate' => [$this, 'validateGraphItems'], 'rules' => [
 						'graph_item' =>				['type' => XML_ARRAY, 'rules' => [
 							'sortorder' =>				['type' => XML_STRING, 'default' => '0'],
@@ -1822,7 +1822,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 						'selement' =>				['type' => XML_ARRAY, 'rules' => [
 							// The tag 'elementtype' should be validated before the 'elements' because it is used in 'ex_required' and 'ex_validate' methods.
 							'elementtype' =>			['type' => XML_STRING | XML_REQUIRED],
-							'elements' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElements'], 'ex_rules' => [$this, 'getMapElementsExtendedRules'], 'export' => [$this, 'mapElementsExport']],
+							'elements' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElements'], 'ex_rules' => [$this, 'getMapElementsExtendedRules']],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
 							'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
 							'x' =>						['type' => XML_STRING | XML_REQUIRED],
@@ -1925,7 +1925,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 					'password' =>				['type' => XML_STRING, 'default' => ''],
 					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::CONTENT_TYPE_HTML, 'in' => [CXmlConstantValue::CONTENT_TYPE_TEXT => CXmlConstantName::CONTENT_TYPE_TEXT, CXmlConstantValue::CONTENT_TYPE_HTML => CXmlConstantName::CONTENT_TYPE_HTML]],
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
-					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules'], 'export' => [$this, 'mediaTypeParametersExport']],
+					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
 					'max_sessions' =>			['type' => XML_STRING, 'default' => '1'],
@@ -2381,131 +2381,6 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	}
 
 	/**
-	 * Export check for ymax_item_1 if ymax_type_1 === ITEM.
-	 *
-	 * @param array $data  Export data.
-	 *
-	 * @throws Exception if the element is invalid.
-	 * @return array
-	 */
-	public function graphMaxItemExport(array $data) {
-		if ($data['ymax_type_1'] == CXmlConstantValue::ITEM
-				&& array_key_exists('ymax_item_1', $data)
-				&& (!array_key_exists('host', $data['ymax_item_1'])
-					|| !array_key_exists('key', $data['ymax_item_1']))) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', 'ymax_item_1', _('an array is expected')));
-		}
-
-		return $data['ymax_item_1'];
-	}
-
-	/**
-	 * Export check for ymin_item_1 if ymin_type_1 === ITEM.
-	 *
-	 * @param array $data  Export data.
-	 *
-	 * @throws Exception if the element is invalid.
-	 * @return array
-	 */
-	public function graphMinItemExport(array $data) {
-		if ($data['ymin_type_1'] == CXmlConstantValue::ITEM
-				&& array_key_exists('ymin_item_1', $data)
-				&& (!array_key_exists('host', $data['ymin_item_1'])
-					|| !array_key_exists('key', $data['ymin_item_1']))) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', 'ymin_item_1', _('an array is expected')));
-		}
-
-		return $data['ymin_item_1'];
-	}
-
-	/**
-	 * Export check for authtype tag.
-	 *
-	 * @param array $data  Export data.
-	 *
-	 * @throws Exception if the element is invalid.
-	 * @return string Tag constant.
-	 */
-	public function itemAuthtypeExport(array $data) {
-		if ($data['type'] != CXmlConstantValue::ITEM_TYPE_HTTP_AGENT
-				&& $data['type'] != CXmlConstantValue::ITEM_TYPE_SSH) {
-			return CXmlConstantName::NONE;
-		}
-
-		$rules = $this->getAuthTypeExtendedRules($data);
-
-		if (!array_key_exists($data['authtype'], $rules['in'])) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
-				'authtype', _s('unexpected constant value "%1$s"', $data['type'])
-			));
-		}
-
-		return $rules['in'][$data['authtype']];
-	}
-
-	/**
-	 * Export transformation for tls_accept tag.
-	 *
-	 * @param array $data  Export data.
-	 *
-	 * @throws Exception if the element is invalid.
-	 * @return array
-	 */
-	public function hostTlsAcceptExport(array $data) {
-		$consts = [
-			CXmlConstantValue::NO_ENCRYPTION => [CXmlConstantName::NO_ENCRYPTION],
-			CXmlConstantValue::TLS_PSK=> [CXmlConstantName::TLS_PSK],
-			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK => [
-				CXmlConstantName::NO_ENCRYPTION,
-				CXmlConstantName::TLS_PSK
-			],
-			CXmlConstantValue::TLS_CERTIFICATE => [CXmlConstantName::TLS_CERTIFICATE],
-			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_CERTIFICATE => [
-				CXmlConstantName::NO_ENCRYPTION,
-				CXmlConstantName::TLS_CERTIFICATE
-			],
-			CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
-				CXmlConstantName::TLS_PSK,
-				CXmlConstantName::TLS_CERTIFICATE
-			],
-			CXmlConstantValue::NO_ENCRYPTION | CXmlConstantValue::TLS_PSK | CXmlConstantValue::TLS_CERTIFICATE => [
-				CXmlConstantName::NO_ENCRYPTION,
-				CXmlConstantName::TLS_PSK,
-				CXmlConstantName::TLS_CERTIFICATE
-			]
-		];
-
-		if (!array_key_exists($data['tls_accept'], $consts)) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
-				'tls_accept', _s('unexpected constant "%1$s"', $data['tls_accept'])
-			));
-		}
-
-		return $consts[$data['tls_accept']];
-	}
-
-	/**
-	 * Export transformation for media type "parameters" tag.
-	 *
-	 * @param array $data  Export data.
-	 *
-	 * @throws Exception if the element is invalid.
-	 * @return array
-	 */
-	public function mediaTypeParametersExport(array $data) {
-		switch ($data['type']) {
-			case CXmlConstantValue::MEDIA_TYPE_SCRIPT:
-				return $this->scriptParameterExport($data);
-
-			case CXmlConstantValue::MEDIA_TYPE_WEBHOOK:
-				return $data['parameters'];
-
-			default:
-				return [];
-		}
-	}
-
-	/**
 	 * Import check for filter tag.
 	 * API validation throws an error when filter tag is an empty array.
 	 *
@@ -2523,65 +2398,5 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 		}
 
 		return $data['filter'];
-	}
-
-	/**
-	 * Converts script parameters to an array.
-	 *
-	 * @param array  $data               Export data.
-	 * @param string $data['parameters]  Script parameters.
-	 *
-	 * @return array
-	 */
-	public function scriptParameterExport(array $data) {
-		return explode("\n", substr($data['parameters'], 0, -1));
-	}
-
-	/**
-	 * Function prepares map element for export builder.
-	 *
-	 * @param array $data  Export data.
-	 *
-	 * @throws Exception on invalid input.
-	 * @return array
-	 */
-	public function mapElementsExport(array $data): array {
-		$element_types = [SYSMAP_ELEMENT_TYPE_HOST, SYSMAP_ELEMENT_TYPE_MAP, SYSMAP_ELEMENT_TYPE_TRIGGER,
-			SYSMAP_ELEMENT_TYPE_HOST_GROUP
-		];
-
-		if (!array_key_exists('elementtype', $data) || !in_array($data['elementtype'], $element_types)) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.',
-				'elementtype', _s('value must be one of %1$s', implode(', ', $element_types))
-			));
-		}
-
-		if (!array_key_exists('elements', $data) || !is_array($data['elements'])) {
-			throw new Exception(_s('Invalid tag "%1$s": %2$s.', 'elements', _('an array is expected')));
-		}
-
-		return ($data['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-			? array_map(function($trigger) {
-					if (array_key_exists('expression', $trigger)) {
-						$trigger['expression'] = str_replace("\r\n", "\n", $trigger['expression']);
-					}
-					if (array_key_exists('recovery_expression', $trigger)) {
-						$trigger['recovery_expression'] = str_replace("\r\n", "\n", $trigger['recovery_expression']);
-					}
-					return $trigger;
-				}, $data['elements'])
-			: $data['elements'];
-	}
-
-	/**
-	 * Function prepares preprocessing parameters for export builder.
-	 *
-	 * @param array $data  Export data.
-	 *
-	 * @throws Exception on invalid input.
-	 * @return array
-	 */
-	public function preprocessingParametersExport(array $data): array {
-		return $data['parameters'];
 	}
 }
