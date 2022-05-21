@@ -2269,7 +2269,7 @@ class CHost extends CHostGeneral {
 		]);
 
 		$update_discovered_validator = new CUpdateDiscoveredValidator([
-			'allowed' => ['hostid', 'status', 'inventory', 'description', 'templates', 'templates_clear'],
+			'allowed' => ['hostid', 'status', 'description', 'tags', 'inventory', 'templates', 'templates_clear'],
 			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
 		]);
 
