@@ -930,7 +930,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 */
-	protected function updateTagsNew(array &$hosts, array $db_hosts = null): void {
+	protected function updateTags(array &$hosts, array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_tags = [];
@@ -941,7 +941,15 @@ abstract class CHostBase extends CApiService {
 				continue;
 			}
 
-			$db_tags = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['tags'] : [];
+			$db_tags = [];
+
+			if ($db_hosts !== null) {
+				foreach ($db_hosts[$host[$id_field_name]]['tags'] as $db_tag) {
+					if ($db_tag['automatic'] == ZBX_TAG_MANUAL) {
+						$db_tags[$db_tag['hosttagid']] = $db_tag;
+					}
+				}
+			}
 
 			$hosttagid_by_tag_value = [];
 			foreach ($db_tags as $db_tag) {
@@ -1395,60 +1403,6 @@ abstract class CHostBase extends CApiService {
 	}
 
 	/**
-	 * Updates tags by deleting existing tags if they are not among the input tags, and adding missing ones.
-	 *
-	 * @param array  $host_tags
-	 * @param int    $host_tags[<hostid>]
-	 * @param string $host_tags[<hostid>][]['tag']
-	 * @param string $host_tags[<hostid>][]['value']
-	 */
-	protected function updateTags(array $host_tags): void {
-		if (!$host_tags) {
-			return;
-		}
-
-		$insert = [];
-		$db_tags = DB::select('host_tag', [
-			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
-			'filter' => ['hostid' => array_keys($host_tags)],
-			'preservekeys' => true
-		]);
-
-		$db_host_tags = [];
-		foreach ($db_tags as $db_tag) {
-			$db_host_tags[$db_tag['hostid']][] = $db_tag;
-		}
-
-		foreach ($host_tags as $hostid => $tags) {
-			foreach (zbx_toArray($tags) as $tag) {
-				if (array_key_exists($hostid, $db_host_tags)) {
-					$tag += ['value' => ''];
-
-					foreach ($db_host_tags[$hostid] as $db_tag) {
-						if ($tag['tag'] === $db_tag['tag'] && $tag['value'] === $db_tag['value']) {
-							unset($db_tags[$db_tag['hosttagid']]);
-							$tag = null;
-							break;
-						}
-					}
-				}
-
-				if ($tag !== null) {
-					$insert[] = ['hostid' => $hostid] + $tag;
-				}
-			}
-		}
-
-		if ($db_tags) {
-			DB::delete('host_tag', ['hosttagid' => array_keys($db_tags)]);
-		}
-
-		if ($insert) {
-			DB::insert('host_tag', $insert);
-		}
-	}
-
-	/**
 	 * Creates user macros for hosts, templates and host prototypes.
 	 *
 	 * @param array  $hosts
@@ -1728,7 +1682,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	private function addAffectedTags(array $hosts, array &$db_hosts): void {
+	protected function addAffectedTags(array $hosts, array &$db_hosts): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$hostids = [];
@@ -1745,7 +1699,7 @@ abstract class CHostBase extends CApiService {
 		}
 
 		$options = [
-			'output' => ['hosttagid', 'hostid', 'tag', 'value'],
+			'output' => ['hosttagid', 'hostid', 'tag', 'value', 'automatic'],
 			'filter' => ['hostid' => $hostids]
 		];
 		$db_tags = DBselect(DB::makeSql('host_tag', $options));

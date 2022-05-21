@@ -527,7 +527,7 @@ class CHostPrototype extends CHostBase {
 		self::updateGroupLinks($host_prototypes);
 		self::updateGroupPrototypes($host_prototypes);
 		$this->updateTemplates($host_prototypes);
-		$this->updateTagsNew($host_prototypes);
+		$this->updateTags($host_prototypes);
 		$this->updateMacros($host_prototypes);
 		self::updateHostInventories($host_prototypes);
 
@@ -792,7 +792,7 @@ class CHostPrototype extends CHostBase {
 		self::updateGroupLinks($host_prototypes, $db_host_prototypes);
 		self::updateGroupPrototypes($host_prototypes, $db_host_prototypes);
 		$this->updateTemplates($host_prototypes, $db_host_prototypes);
-		$this->updateTagsNew($host_prototypes, $db_host_prototypes);
+		$this->updateTags($host_prototypes, $db_host_prototypes);
 		$this->updateMacros($host_prototypes, $db_host_prototypes);
 		self::updateHostInventories($host_prototypes, $db_host_prototypes);
 
