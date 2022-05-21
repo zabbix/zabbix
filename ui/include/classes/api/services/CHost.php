@@ -2450,8 +2450,6 @@ class CHost extends CHostGeneral {
 	 * @param array|null $db_hosts
 	 *
 	 * @throws APIException
-	 *
-	 * @return void
 	 */
 	private static function checkTags(array $hosts, array $db_hosts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
