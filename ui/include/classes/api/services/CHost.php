@@ -2462,34 +2462,6 @@ class CHost extends CHostGeneral {
 		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		if ($db_hosts === null) {
-			return;
-		}
-
-		foreach ($hosts as $host) {
-			if (!array_key_exists('tags', $host)) {
-				continue;
-			}
-
-			$db_tags_automatic = [];
-
-			foreach ($db_hosts[$host['hostid']]['tags'] as $db_tag) {
-				if ($db_tag['automatic'] == ZBX_TAG_AUTOMATIC) {
-					$db_tags_automatic[$db_tag['tag']][$db_tag['value']] = true;
-				}
-			}
-
-			foreach ($host['tags'] as $tag) {
-				if (array_key_exists($tag['tag'], $db_tags_automatic)
-						&& array_key_exists($tag['value'], $db_tags_automatic[$tag['tag']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot override the host prototype tag with name "%1$s" and value "%2$s" for host "%3$s".',
-						$tag['tag'], $tag['value'], $db_hosts[$host['hostid']]['host']
-					));
-				}
-			}
-		}
 	}
 
 	protected function requiresPostSqlFiltering(array $options) {

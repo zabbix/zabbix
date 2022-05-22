@@ -941,15 +941,7 @@ abstract class CHostBase extends CApiService {
 				continue;
 			}
 
-			$db_tags = [];
-
-			if ($db_hosts !== null) {
-				foreach ($db_hosts[$host[$id_field_name]]['tags'] as $db_tag) {
-					if ($db_tag['automatic'] == ZBX_TAG_MANUAL) {
-						$db_tags[$db_tag['hosttagid']] = $db_tag;
-					}
-				}
-			}
+			$db_tags = ($db_hosts !== null) ? $db_hosts[$host[$id_field_name]]['tags'] : [];
 
 			$hosttagid_by_tag_value = [];
 			foreach ($db_tags as $db_tag) {
@@ -968,7 +960,11 @@ abstract class CHostBase extends CApiService {
 			}
 			unset($tag);
 
-			$del_hosttagids = array_merge($del_hosttagids, array_keys($db_tags));
+			$del_hosttagids = array_merge($del_hosttagids, array_keys(array_filter($db_tags,
+				static function (array $db_tag): bool {
+					return $db_tag['automatic'] == ZBX_TAG_MANUAL;
+				}
+			)));
 		}
 		unset($host);
 
