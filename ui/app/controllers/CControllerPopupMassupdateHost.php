@@ -307,75 +307,72 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					if (array_key_exists('tags', $visible)) {
 						switch ($this->getInput('mass_update_tags', ZBX_ACTION_ADD)) {
 							case ZBX_ACTION_ADD:
-								$host_tags = [];
-								$host_tags_map = [];
+								$tags_map = [];
 
 								foreach ($host['tags'] as $tag) {
-									if ($tag['automatic'] != ZBX_TAG_AUTOMATIC) {
-										$host_tags[] = array_diff_key($tag, array_flip(['automatic']));
-									}
-
-									$host_tags_map[$tag['tag']][$tag['value']] = true;
+									unset($tag['automatic']);
+									$tags_map[$tag['tag']][$tag['value']] = $tag;
 								}
 
 								foreach ($tags as $tag) {
-									if (!array_key_exists($tag['tag'], $host_tags_map)
-											|| !array_key_exists($tag['value'], $host_tags_map[$tag['tag']])) {
-										$host_tags[] = $tag;
-										$host_tags_map[$tag['tag']][$tag['value']] = true;
+									if (!array_key_exists($tag['tag'], $tags_map)
+											|| !array_key_exists($tag['value'], $tags_map[$tag['tag']])) {
+										$tags_map[$tag['tag']][$tag['value']] = $tag;
 									}
 								}
 
-								$host['tags'] = $host_tags;
+								$host['tags'] = [];
+
+								foreach ($tags_map as $tags_map_2) {
+									foreach ($tags_map_2 as $tag) {
+										$host['tags'][] = $tag;
+									}
+								}
 								break;
 
 							case ZBX_ACTION_REPLACE:
-								$host_tags = [];
-								$host_tags_map = [];
+								$tags_map = [];
 
 								foreach ($tags as $tag) {
-									$host_tags_map[$tag['tag']][$tag['value']] = $tag;
+									$tags_map[$tag['tag']][$tag['value']] = $tag;
 								}
 
 								foreach ($host['tags'] as $tag) {
 									if ($tag['automatic'] == ZBX_TAG_AUTOMATIC) {
-										if (!array_key_exists($tag['tag'], $host_tags_map)
-												|| !array_key_exists($tag['value'], $host_tags_map[$tag['tag']])) {
+										if (!array_key_exists($tag['tag'], $tags_map)
+												|| !array_key_exists($tag['value'], $tags_map[$tag['tag']])) {
 											error(_s(
 												'Cannot remove the tag with name "%1$s" and value "%2$s", defined in a host prototype, from host "%3$s".',
 												$tag['tag'], $tag['value'], $host['host']
 											));
 											throw new Exception();
 										}
-
-										unset($host_tags_map[$tag['tag']][$tag['value']]);
 									}
 								}
 
-								foreach ($host_tags_map as $host_tags_map_2) {
-									foreach ($host_tags_map_2 as $upd_tag) {
-										$host_tags[] = $upd_tag;
+								$host['tags'] = [];
+
+								foreach ($tags_map as $tags_map_2) {
+									foreach ($tags_map_2 as $tag) {
+										$host['tags'][] = $tag;
 									}
 								}
-
-								$host['tags'] = $host_tags;
 								break;
 
 							case ZBX_ACTION_REMOVE:
-								$host_tags = [];
-								$host_tags_map = [];
+								$tags_map = [];
 
 								foreach ($host['tags'] as $tag) {
-									$host_tags_map[$tag['tag']][$tag['value']] = $tag;
+									$tags_map[$tag['tag']][$tag['value']] = $tag;
 								}
 
 								foreach ($tags as $tag) {
-									if (!array_key_exists($tag['tag'], $host_tags_map)
-											|| !array_key_exists($tag['value'], $host_tags_map[$tag['tag']])) {
+									if (!array_key_exists($tag['tag'], $tags_map)
+											|| !array_key_exists($tag['value'], $tags_map[$tag['tag']])) {
 										continue;
 									}
 
-									if ($host_tags_map[$tag['tag']][$tag['value']]['automatic'] == ZBX_TAG_AUTOMATIC) {
+									if ($tags_map[$tag['tag']][$tag['value']]['automatic'] == ZBX_TAG_AUTOMATIC) {
 										error(_s(
 											'Cannot remove the tag with name "%1$s" and value "%2$s", defined in a host prototype, from host "%3$s".',
 											$tag['tag'], $tag['value'], $host['host']
@@ -383,16 +380,17 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 										throw new Exception();
 									}
 
-									unset($host_tags_map[$tag['tag']][$tag['value']]);
+									unset($tags_map[$tag['tag']][$tag['value']]);
 								}
 
-								foreach ($host_tags_map as $host_tags_map_2) {
-									foreach ($host_tags_map_2 as $upd_tag) {
-										$host_tags[] = array_diff_key($upd_tag, array_flip(['automatic']));
+								$host['tags'] = [];
+
+								foreach ($tags_map as $tags_map_2) {
+									foreach ($tags_map_2 as $tag) {
+										unset($tag['automatic']);
+										$host['tags'][] = $tag;
 									}
 								}
-
-								$host['tags'] = $host_tags;
 								break;
 						}
 					}
