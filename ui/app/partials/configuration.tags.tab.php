@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 if (!$data['readonly']) {
@@ -38,7 +39,7 @@ $table = (new CTable())
 	->setHeader([
 		_('Name'),
 		_('Value'),
-		_('Action'),
+		'',
 		$show_inherited_tags ? _('Parent templates') : null
 	]);
 
@@ -46,11 +47,10 @@ $allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION
 
 // fields
 foreach ($data['tags'] as $i => $tag) {
-	if (!array_key_exists('type', $tag)) {
-		$tag['type'] = ZBX_PROPERTY_OWN;
-	}
+	$tag += ['type' => ZBX_PROPERTY_OWN, 'automatic' => ZBX_TAG_MANUAL];
 
-	$readonly = ($data['readonly'] || ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED));
+	$readonly = $data['readonly'] || ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED)
+		|| $tag['automatic'] == ZBX_TAG_AUTOMATIC;
 
 	$tag_input = (new CTextAreaFlexible('tags['.$i.'][tag]', $tag['tag'], ['readonly' => $readonly]))
 		->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
@@ -66,24 +66,35 @@ foreach ($data['tags'] as $i => $tag) {
 		->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
+	$actions = [];
+
+	if ($tag['automatic'] == ZBX_TAG_AUTOMATIC) {
+		switch ($data['source']) {
+			case 'host':
+				$actions[] = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
+				break;
+		}
+	}
+	elseif ($show_inherited_tags && ($tag['type'] & ZBX_PROPERTY_INHERITED) != 0) {
+		$actions[] = (new CButton('tags['.$i.'][disable]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-disable')
+			->setEnabled(!$readonly);
+	}
+	else {
+		$actions[] = (new CButton('tags['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+			->setEnabled(!$readonly);
+	}
+
 	$row = [
 		(new CCol($tag_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+		(new CCol($value_input))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol($actions))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass(ZBX_STYLE_TOP)
 	];
-
-	$row[] = (new CCol(
-		($show_inherited_tags && ($tag['type'] & ZBX_PROPERTY_INHERITED))
-			? (new CButton('tags['.$i.'][disable]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-disable')
-				->setEnabled(!$readonly)
-			: (new CButton('tags['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->setEnabled(!$readonly)
-	))
-		->addClass(ZBX_STYLE_NOWRAP)
-		->addClass(ZBX_STYLE_TOP);
 
 	if ($show_inherited_tags) {
 		$template_list = [];
