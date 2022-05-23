@@ -974,7 +974,7 @@ function makeSuppressedProblemIcon(array $icon_data) {
 	$suppress_until_values = array_column($icon_data, 'suppress_until');
 
 	if (in_array(ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE, $suppress_until_values)) {
-		$suppressed_till = 'Indefinitely';
+		$suppressed_till = _s('Indefinitely');
 	}
 	else {
 		$max_value = max($suppress_until_values);
