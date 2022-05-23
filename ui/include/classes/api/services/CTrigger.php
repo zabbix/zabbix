@@ -549,6 +549,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$this->updateReal($triggers, $db_triggers);
 		self::checkExistingDependencies($triggers, $db_triggers);
+
 		$this->inherit($triggers);
 
 		$this->updateDependencies($triggers, $db_triggers);
@@ -624,8 +625,7 @@ class CTrigger extends CTriggerGeneral {
 		$hostids = [];
 
 		foreach ($triggers as $trigger) {
-			if (!array_key_exists('dependencies', $trigger)
-					&& array_key_exists('hosts', $db_triggers[$trigger['triggerid']])) {
+			if (array_key_exists('hosts', $db_triggers[$trigger['triggerid']])) {
 				$triggerids[$trigger['triggerid']] = true;
 				$hostids += $db_triggers[$trigger['triggerid']]['hosts'];
 			}
@@ -655,13 +655,18 @@ class CTrigger extends CTriggerGeneral {
 
 		$trigger_dependencies = [];
 
-		foreach ($triggerids as $triggerid => $foo) {
-			if ($db_triggers[$triggerid]['hosts']) {
+		foreach ($triggers as $trigger) {
+			if (!array_key_exists($trigger['triggerid'], $triggerids)
+					|| !$db_triggers[$trigger['triggerid']]['hosts']) {
 				continue;
 			}
 
-			foreach ($db_triggers[$triggerid]['dependencies'] as $trigger_up) {
-				$trigger_dependencies[$trigger_up['triggerid']][$triggerid] = true;
+			$dependencies = array_key_exists('dependencies', $trigger)
+				? $trigger['dependencies']
+				: $db_triggers[$trigger['triggerid']]['dependencies'];
+
+			foreach ($dependencies as $trigger_up) {
+				$trigger_dependencies[$trigger_up['triggerid']][$trigger['triggerid']] = true;
 			}
 		}
 
