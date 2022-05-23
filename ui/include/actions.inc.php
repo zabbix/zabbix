@@ -1302,13 +1302,13 @@ function getEventsActionsIconsData(array $events, array $triggers) {
 /**
  * Get data, required to create suppressed problem icon with popup with event suppression data.
  *
- * @param array  $events                               			 Array with event objects with acknowledges.
- * @param string $events[]['eventid']                  			 Problem event ID.
- * @param array  $events[]['acknowledges']             			 Array with manual updates to problem.
- * @param string $events[]['acknowledges'][]['action']  		 Action that was performed by problem update.
- * @param string $events[]['acknowledges'][]['suppress_until']   Time until problem suppressed.
- * @param string $events[]['acknowledges'][]['clock']   		 Time when manual suppression was added.
- * @param string $events[]['acknowledges'][]['userid']  		 Author's userid.
+ * @param array  $events                                        Array with event objects with acknowledges.
+ * @param string $events[]['eventid']                           Problem event ID.
+ * @param array  $events[]['acknowledges']                      Array with manual updates to problem.
+ * @param string $events[]['acknowledges'][]['action']          Action that was performed by problem update.
+ * @param string $events[]['acknowledges'][]['suppress_until']  Time until problem suppressed.
+ * @param string $events[]['acknowledges'][]['clock']           Time when manual suppression was added.
+ * @param string $events[]['acknowledges'][]['userid']          Author's userid.
  *
  * @return array
  */
@@ -1712,13 +1712,13 @@ function getEventUpdates(array $event) {
 /**
  * Make icons (suppressions, messages, severity changes, actions) for actions column.
  *
- * @param string $eventid               	Id for event, for which icons are created.
- * @param array  $actions               	Array of actions data.
- * @param array  $actions['suppressions']   Suppression icon data.
- * @param array  $actions['messages']   	Messages icon data.
- * @param array  $actions['severities'] 	Severity change icon data.
- * @param array  $actions['actions']    	Actions icon data.
- * @param array  $users                 	User name, surname and username.
+ * @param string $eventid                  Id for event, for which icons are created.
+ * @param array  $actions                  Array of actions data.
+ * @param array  $actions['suppressions']  Suppression icon data.
+ * @param array  $actions['messages']      Messages icon data.
+ * @param array  $actions['severities']    Severity change icon data.
+ * @param array  $actions['actions']       Actions icon data.
+ * @param array  $users                    User name, surname and username.
  *
  * @return CCol|string
  */
@@ -1749,9 +1749,9 @@ function makeEventActionsIcons($eventid, $actions, $users) {
  * Create icon with hintbox for event suppresions.
  *
  * @param array  $data
- * @param array  $data['suppress_until'][]['suppress_until']	Time until problem is suppressed by user.
- * @param string $data['messages'][]['clock']  					Suppression creation time.
- * @param array  $users                         				User name, surname and username.
+ * @param array  $data['suppress_until'][]['suppress_until']  Time until problem is suppressed by user.
+ * @param string $data['messages'][]['clock']                 Suppression creation time.
+ * @param array  $users                                       User name, surname and username.
  *
  * @return CButton|null
  */
