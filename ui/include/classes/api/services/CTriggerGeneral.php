@@ -1237,11 +1237,11 @@ abstract class CTriggerGeneral extends CApiService {
 		$edit_triggerids_up = [];
 
 		foreach ($triggers as $trigger) {
-			if (!array_key_exists('dependencies', $triggers)) {
+			if (!array_key_exists('dependencies', $trigger)) {
 				continue;
 			}
 
-			$triggerids_up = array_column($triggers['dependencies'], 'triggerid');
+			$triggerids_up = array_column($trigger['dependencies'], 'triggerid');
 
 			if ($db_triggers === null) {
 				$edit_triggerids_up += array_flip($triggerids_up);
