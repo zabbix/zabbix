@@ -125,7 +125,7 @@ AC_DEFUN([LIBPCRE2_CHECK_CONFIG],
 			#
 
 			AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-			PKG_PROG_PKG_CONFIG()
+			m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG()], [:])
 
 			if test -n "$PKG_CONFIG"; then
 				m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
@@ -159,11 +159,6 @@ AC_DEFUN([LIBPCRE2_CHECK_CONFIG],
 				#
 
 				AC_MSG_WARN([proceeding without pkg-config])
-
-				if test "x$enable_static_libs" = "xyes"; then
-					AC_MSG_RESULT(no)
-					AC_MSG_ERROR([cannot configure static library linking without pkg-config])
-				fi
 
 				LIBPCRE2_LIBS="-lpcre2-8"
 

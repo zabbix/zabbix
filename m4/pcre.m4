@@ -80,7 +80,7 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 
 		if test "x$enable_static_libs" = "xyes"; then
 			AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-			PKG_PROG_PKG_CONFIG()
+			m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG()], [:])
 			test -z "$PKG_CONFIG" -a -z "$_libpcre_lib_dir" && AC_MSG_ERROR([Not found pkg-config library])
 			m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
 		fi
@@ -96,11 +96,14 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 			test "x$static_linking_support" = "xno" -a -z "$_libpcre_lib_dir" && AC_MSG_ERROR(["Compiler not support statically linked libs from default folders"])
 
 			if test -z "$_libpcre_lib_dir"; then
-				PKG_CHECK_EXISTS(libpcre,[
-					LIBPCRE_LIBS=`$PKG_CONFIG --static --libs libpcre`
-				],[
-					AC_MSG_ERROR([Not found libpcre package])
-				])
+				m4_ifdef([PKG_CHECK_EXISTS], [
+					PKG_CHECK_EXISTS(libpcre,[
+						LIBPCRE_LIBS=`$PKG_CONFIG --static --libs libpcre`
+					],[
+						AC_MSG_ERROR([Not found libpcre package])
+					])],
+					[:]
+				)
 			else
 				AC_RUN_LOG([PKG_CONFIG_LIBDIR="$_libpcre_lib_dir/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre]) || AC_MSG_ERROR(["Not found libpcre package in $_libpcre_dir/lib/pkgconfig"])
 				LIBPCRE_LIBS=`PKG_CONFIG_LIBDIR="$_libpcre_lib_dir/pkgconfig" $PKG_CONFIG --static --libs libpcre`

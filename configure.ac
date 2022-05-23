@@ -155,6 +155,9 @@ AC_CHECK_HEADERS(libperfstat.h, [], [], [
 #endif
 ])
 
+dnl Kluge for building wihout pkg-config
+m4_ifdef([PKG_PROG_PKG_CONFIG], [], [ AC_DEFUN([PKG_PROG_PKG_CONFIG], []) ])
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                     Checks for libraries                      *
