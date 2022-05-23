@@ -3170,7 +3170,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$ins_dependencies_prototypes = [];
 		$ins_trigger_deps = [];
 
-		foreach ($_edit_dependencies as $child_triggerid  => $triggerid_up_state) {
+		foreach ($_edit_dependencies as $child_triggerid => $triggerid_up_state) {
 			foreach ($triggerid_up_state as $triggerid_up => $add) {
 				if ($add) {
 					if ($trigger_flags[$child_triggerid] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
@@ -3182,7 +3182,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 					$ins_trigger_deps[] = [
 						'triggerid_down' => $child_triggerid,
-						'triggerid_up' => $child_triggerid_up
+						'triggerid_up' => $triggerid_up
 					];
 				}
 				else {
