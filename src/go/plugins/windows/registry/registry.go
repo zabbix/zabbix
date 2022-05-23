@@ -115,7 +115,7 @@ func convertValue(k registry.Key, value string) (result interface{}, stype strin
 }
 
 func discoverValues(hive registry.Key, fullkey string, discovered_values []registryValue, current_key string,
-	re *regexp.Regexp) (result []registryValue, e error) {
+	re *regexp.Regexp, shive string) (result []registryValue, e error) {
 
 	k, err := registry.OpenKey(hive, fullkey, registry.READ)
 	if err != nil {
@@ -143,23 +143,23 @@ func discoverValues(hive registry.Key, fullkey string, discovered_values []regis
 		if re != nil {
 			if re.MatchString(v) {
 				discovered_values = append(discovered_values,
-					registryValue{fullkey, current_key, v, data, valtype})
+					registryValue{shive + "\\" + fullkey, current_key, v, data, valtype})
 			}
 		} else {
 			discovered_values = append(discovered_values,
-				registryValue{fullkey, current_key, v, data, valtype})
+				registryValue{shive + "\\" + fullkey, current_key, v, data, valtype})
 		}
 	}
 
 	for _, subkey := range subkeys {
 		new_fullkey := fullkey + "\\" + subkey
-		discovered_values, _ = discoverValues(hive, new_fullkey, discovered_values, subkey, re)
+		discovered_values, _ = discoverValues(hive, new_fullkey, discovered_values, subkey, re, shive)
 	}
 
 	return discovered_values, nil
 }
 
-func discoverKeys(hive registry.Key, fullkey string, subkeys []registryKey) (result []registryKey, e error) {
+func discoverKeys(hive registry.Key, fullkey string, subkeys []registryKey, shive string) (result []registryKey, e error) {
 	k, err := registry.OpenKey(hive, fullkey, registry.ENUMERATE_SUB_KEYS)
 	if err != nil {
 		return nil, err
@@ -172,25 +172,24 @@ func discoverKeys(hive registry.Key, fullkey string, subkeys []registryKey) (res
 		return nil, err
 	}
 
-	subkeys = append(subkeys, registryKey{fullkey, ""})
-
 	for _, i := range s {
 		current_key := fullkey + "\\" + i
-		subkeys = append(subkeys, registryKey{current_key, i})
-		_, _ = discoverKeys(hive, current_key, subkeys)
+		subkeys = append(subkeys, registryKey{shive + "\\" + current_key, i})
+		subkeys, _ = discoverKeys(hive, current_key, subkeys, shive)
 	}
 
 	return subkeys, nil
 }
 
-func splitFullkey(fullkey string) (hive registry.Key, key string, e error) {
+func splitFullkey(fullkey string) (hive registry.Key, key string, shive string, e error) {
 	idx := strings.Index(fullkey, "\\")
 
 	if idx == -1 {
-		return 0, "", errors.New("Failed to parse registry key.")
+		return 0, "", "", errors.New("Failed to parse registry key.")
 	}
 
-	hive, e = getHive(fullkey[:idx])
+	shive = fullkey[:idx]
+	hive, e = getHive(shive)
 	key = fullkey[idx+1:]
 
 	return
@@ -207,7 +206,7 @@ func getValue(params []string) (result interface{}, err error) {
 
 	fullkey := params[0]
 
-	hive, key, e := splitFullkey(fullkey)
+	hive, key, _, e := splitFullkey(fullkey)
 	if e != nil {
 		return nil, e
 	}
@@ -252,7 +251,7 @@ func discover(params []string) (result string, err error) {
 
 	fullkey := params[0]
 
-	hive, key, e := splitFullkey(fullkey)
+	hive, key, shive, e := splitFullkey(fullkey)
 	if e != nil {
 		return "", e
 	}
@@ -277,16 +276,15 @@ func discover(params []string) (result string, err error) {
 				return "", err
 			}
 		}
-
 	}
 	switch mode {
 	case RegistryDiscoveryModeKeys:
 		results := make([]registryKey, 0)
-		results, err = discoverKeys(hive, key, results)
+		results, err = discoverKeys(hive, key, results, shive)
 		j, _ = json.Marshal(results)
 	case RegistryDiscoveryModeValues:
 		results := make([]registryValue, 0)
-		results, err = discoverValues(hive, key, results, "", re)
+		results, err = discoverValues(hive, key, results, "", re, shive)
 		j, _ = json.Marshal(results)
 	}
 

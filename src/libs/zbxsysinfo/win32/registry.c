@@ -159,10 +159,13 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 	if (REGISTRY_DISCOVERY_MODE_KEYS == mode)
 	{
-		zbx_json_addobject(j, NULL);
-		zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, uroot, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, usubkey, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(j);
+		if (*usubkey != '\0')
+		{
+			zbx_json_addobject(j, NULL);
+			zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_FULLKEY, uroot, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, ZBX_SYSINFO_REGISTRY_TAG_LASTKEY, usubkey, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(j);
+		}
 
 		zbx_free(uroot);
 		zbx_free(usubkey);
@@ -212,7 +215,7 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 			cchValue = MAX_VALUE_NAME;
 			achValue[0] = L'\0';
 
-			value_len = 1024;
+			value_len = MAX_DATA_LENGTH;
 			buffer = zbx_malloc(NULL, value_len);
 
 			if (ERROR_SUCCESS != RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType, buffer, &value_len))
@@ -282,7 +285,7 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 	zbx_free(usubkey);
 }
 
-static int	split_fullkey(char **fullkey, HKEY *hive_handle)
+static int	split_fullkey(char **fullkey, HKEY *hive_handle, char **hive_str)
 {
 	char	*end;
 
@@ -291,8 +294,11 @@ static int	split_fullkey(char **fullkey, HKEY *hive_handle)
 
 	*end = '\0';
 
-	if (0 == (*hive_handle = get_hkey_from_fullkey(*fullkey)))
+	if (NULL == (*hive_handle = get_hkey_from_fullkey(*fullkey)))
 		return FAIL;
+
+	if (NULL != hive_str)
+		*hive_str = *fullkey;
 
 	*fullkey = *fullkey + (end - *fullkey) + 1;
 
@@ -301,13 +307,14 @@ static int	split_fullkey(char **fullkey, HKEY *hive_handle)
 
 static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const char *regexp)
 {
-	wchar_t		*wkey;
+	wchar_t		*wkey, *wfullkey = NULL;;
 	HKEY		hkey, hive_handle;
 	struct zbx_json	j;
 	DWORD		retCode;
 	int		ret = SUCCEED;
+	char		*hive_str, *fullkey = NULL;
 
-	if (FAIL == split_fullkey(&key, &hive_handle))
+	if (FAIL == split_fullkey(&key, &hive_handle, &hive_str))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to parse registry key."));
 		return FAIL;
@@ -319,7 +326,9 @@ static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const ch
 
 	if (ERROR_SUCCESS == (retCode = RegOpenKeyEx(hive_handle, wkey, 0, KEY_READ, &hkey)))
 	{
-		discovery_get_regkey_values(hkey, L"", &j, mode, wkey, regexp);
+		fullkey = zbx_dsprintf(fullkey, "%s\\%s", hive_str, key);
+		wfullkey = zbx_utf8_to_unicode(fullkey);
+		discovery_get_regkey_values(hkey, L"", &j, mode, wfullkey, regexp);
 	}
 	else
 	{
@@ -335,6 +344,8 @@ static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const ch
 out:
 	zbx_json_free(&j);
 	zbx_free(wkey);
+	zbx_free(fullkey);
+	zbx_free(wfullkey);
 
 	return SUCCEED;
 }
@@ -348,7 +359,7 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 	HKEY		hive_handle;
 	int		ret = SUCCEED;
 
-	if (FAIL == split_fullkey(&key, &hive_handle))
+	if (FAIL == split_fullkey(&key, &hive_handle, NULL))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Failed to parse registry key."));
 		return FAIL;
