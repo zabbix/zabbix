@@ -86,22 +86,24 @@ class CPieGraphDraw extends CGraphDraw {
 		$count *= $this->exploderad;
 		$anglemid = (int) (($anglestart + $angleend) / 2);
 
-		$y+= round($count * sin(deg2rad($anglemid)));
-		$x+= round($count * cos(deg2rad($anglemid)));
+		$y += round($count * sin(deg2rad($anglemid)));
+		$x += round($count * cos(deg2rad($anglemid)));
 
-		return [$x, $y];
+		return [(int) $x, (int) $y];
 	}
 
 	protected function calcExplodedRadius($sizeX, $sizeY, $count) {
 		$count *= $this->exploderad * 2;
 		$sizeX -= $count;
 		$sizeY -= $count;
+
 		return [$sizeX, $sizeY];
 	}
 
 	protected function calc3DAngle($sizeX, $sizeY) {
 		$sizeY *= GRAPH_3D_ANGLE / 90;
-		return [$sizeX, round($sizeY)];
+
+		return [$sizeX, (int) round($sizeY)];
 	}
 
 	protected function selectData() {
