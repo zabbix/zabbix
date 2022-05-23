@@ -365,8 +365,8 @@ class CScreenProblem extends CScreenBase {
 		$maintenanceids = [];
 		$userids = [];
 
-		foreach ($problems as &$problem) {
-			foreach ($problem['suppression_data'] as &$data) {
+		foreach ($problems as $problem) {
+			foreach ($problem['suppression_data'] as $data) {
 				if ($data['maintenanceid'] != 0) {
 					$maintenanceids[] = $data['maintenanceid'];
 				}
@@ -399,7 +399,6 @@ class CScreenProblem extends CScreenBase {
 						$data['maintenance_name'] = $maintenances[$data['maintenanceid']]['name'];
 					}
 
-
 					$data['username'] = $data['userid'] != 0
 						? getUserFullname($user[$data['userid']])
 						: 'Inaccessible user';
@@ -408,7 +407,6 @@ class CScreenProblem extends CScreenBase {
 				}
 			}
 		}
-
 		unset($problem);
 	}
 
