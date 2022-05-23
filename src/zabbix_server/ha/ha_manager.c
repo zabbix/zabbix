@@ -20,7 +20,7 @@
 #include "ha.h"
 #include "zbxha.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxthreads.h"

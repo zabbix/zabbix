@@ -58,7 +58,7 @@ class CTabFilter extends CBaseComponent {
 
 		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
 			this._templates[template.getAttribute('data-template')] = template;
-		};
+		}
 
 		for (const title of this._target.querySelectorAll('nav [data-target]')) {
 			item = this.create(title, options.data[index] || {});
@@ -279,7 +279,6 @@ class CTabFilter extends CBaseComponent {
 
 			if (item) {
 				item.updateCounter(value);
-				return;
 			}
 		});
 

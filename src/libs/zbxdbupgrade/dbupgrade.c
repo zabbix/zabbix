@@ -20,7 +20,7 @@
 #include "zbxdbupgrade.h"
 #include "dbupgrade.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 
 typedef struct

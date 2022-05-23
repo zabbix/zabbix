@@ -2177,7 +2177,7 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (9
 -- testPageTriggerUrl
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1020, 'Dashboard for Trigger overview widget', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (1567, 1020);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10003, 1020, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (10003, 1567, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1345, 10003, 0, 'style', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1346, 10003, 2, 'groupids', 0, 50011);
 
