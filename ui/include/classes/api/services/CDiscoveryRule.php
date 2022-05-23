@@ -728,9 +728,9 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	protected function copyTriggerPrototypes(array $src_discovery, array $src_host, array $dst_host): array {
 		$src_triggers = API::TriggerPrototype()->get([
-			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
-				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'opdata', 'discover', 'event_name'
+			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'opdata', 'discover',
+				'event_name'
 			],
 			'selectItems' => ['itemid', 'type'],
 			'selectTags' => ['tag', 'value'],
@@ -906,9 +906,17 @@ class CDiscoveryRule extends CItemGeneral {
 						$src_triggerid = key($src_host_dependencies[$src_trigger_up['triggerid']]);
 						$src_trigger = $src_triggers[$src_trigger_indexes[$src_triggerid]];
 
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Trigger prototype "%1$s" cannot depend on the non-existent trigger "%2$s" on the host "%3$s".',
-							$src_trigger['description'], $src_trigger_up['description'], $dst_host['host']
+						$hosts = DB::select('hosts', [
+							'output' => ['status'],
+							'hostids' => $dst_host['hostid']
+						]);
+
+						$error = ($hosts[0]['status'] == HOST_STATUS_TEMPLATE)
+							? _('Trigger prototype "%1$s" cannot depend on the non-existent trigger "%2$s" on the template "%3$s".')
+							: _('Trigger prototype "%1$s" cannot depend on the non-existent trigger "%2$s" on the host "%3$s".');
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $src_trigger['description'],
+							$src_trigger_up['description'], $dst_host['host']
 						));
 					}
 				}
