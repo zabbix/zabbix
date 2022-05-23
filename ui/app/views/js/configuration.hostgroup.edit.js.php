@@ -72,7 +72,6 @@
 		}
 
 		_clone() {
-			this.groupid = null;
 			const fields = getFormFields(this.form);
 			const curl = new Curl('zabbix.php', false);
 			curl.setArgument('action', 'hostgroup.edit');

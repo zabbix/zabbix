@@ -43,24 +43,7 @@ if ($data['groupid'] !== null) {
 			'keepOpen' => true,
 			'enabled' => CWebUser::getType() == USER_TYPE_SUPER_ADMIN,
 			'isSubmit' => false,
-			'action' => 'templategroup_edit_popup.clone('.json_encode([
-					'title' => _('New template group'),
-					'buttons' => [
-						[
-							'title' => _('Add'),
-							'class' => 'js-add',
-							'keepOpen' => true,
-							'isSubmit' => true,
-							'action' => 'templategroup_edit_popup.submit();'
-						],
-						[
-							'title' => _('Cancel'),
-							'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-							'cancel' => true,
-							'action' => ''
-						]
-					]
-				]).');'
+			'action' => 'templategroup_edit_popup.clone();'
 		],
 		[
 			'title' => _('Delete'),
