@@ -553,45 +553,42 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
-				$value = [];
-				$diff_values = [];
+				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
+					$value = [];
+					$diff_values = [];
 
-				foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-					// Calculate offset between Agent and Agent2 result arrays
-					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
-						$value[$component][$i] = 0;
+					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+						// Calculate offset between Agent and Agent2 result arrays
+						for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+							$value[$component][$i] = 0;
 
-						if (self::COMPONENT_AGENT == $component) {
-							$j = $i;
-						} else {
-							$j = 0;
-						}
-						$slice = array_slice($values[$component], $j);
-						$records = count($slice);
+							if (self::COMPONENT_AGENT == $component) {
+								$j = $i;
+							} else {
+								$j = 0;
+							}
+							$slice = array_slice($values[$component], $j);
+							$records = count($slice);
 
-						if ($records > 0) {
-							$value[$component][$i] = array_sum($slice) / $records;
+							if ($records > 0) {
+								$value[$component][$i] = array_sum($slice) / $records;
+							}
 						}
 					}
-				}
 
-				for ($i = 0; $i < self::OFFSET_MAX; $i++) {
-					$a = $value[self::COMPONENT_AGENT][$i];
-					$b = $value[self::COMPONENT_AGENT2][$i];
-					$diff_values[$i] = abs(abs($a) - abs($b));
-				}
-				$offset = array_search(min($diff_values), $diff_values);
-				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
+					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+						$a = $value[self::COMPONENT_AGENT][$i];
+						$b = $value[self::COMPONENT_AGENT2][$i];
+						$diff_values[$i] = abs(abs($a) - abs($b));
+					}
+					$offset = array_search(min($diff_values), $diff_values);
+
 					$a = $value[self::COMPONENT_AGENT][$offset];
 					$b = $value[self::COMPONENT_AGENT2][$offset];
 				}
 				else {
-					$a_max = count($values[self::COMPONENT_AGENT]) - $offset;
-					$a2_max = count($values[self::COMPONENT_AGENT2]);
-					$a2_last = min($a_max , $a2_max) - 1;
-					$a_last = $a2_last + $offset;
-					$a = $values[self::COMPONENT_AGENT][$a_last];
-					$b = $values[self::COMPONENT_AGENT2][$a2_last ];
+					$a = end($values[self::COMPONENT_AGENT]);
+					$b = end($values[self::COMPONENT_AGENT2]);
 				}
 
 				$diff = abs(abs($a) - abs($b));
