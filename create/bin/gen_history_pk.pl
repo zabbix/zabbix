@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-my ($db, $table) = @ARGV;
+my ($db, $table, $tsdb_compression) = @ARGV;
 
 my @dbs = ('mysql', 'oracle', 'postgresql', 'timescaledb');
 my @tables = ('history', 'history_uint', 'history_str', 'history_log', 'history_text');
@@ -131,20 +131,7 @@ HEREDOC
 HEREDOC
 );
 
-my $tsdb = <<'HEREDOC'
-\copy (select * from %HISTTBL_old) TO '/tmp/%HISTTBL.csv' DELIMITER ',' CSV;
-
-CREATE TEMP TABLE temp_%HISTTBL (
-%TEMPTBLDDL
-);
-
-\copy temp_%HISTTBL FROM '/tmp/%HISTTBL.csv' DELIMITER ',' CSV
-
-SELECT create_hypertable('%HISTTBL', 'clock', chunk_time_interval => 86400, migrate_data => true);
-INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (itemid,clock,ns) DO NOTHING;
-
-SELECT set_integer_now_func('%HISTTBL', 'zbx_ts_unix_now', true);
-
+my $tsdb_compress_sql = <<'HEREDOC'
 ALTER TABLE %HISTTBL
 	SET (timescaledb.compress,timescaledb.compress_segmentby='itemid',timescaledb.compress_orderby='clock,ns');
 
@@ -185,6 +172,23 @@ END $$;
 HEREDOC
 ;
 
+my $tsdb = <<'HEREDOC'
+\copy (select * from %HISTTBL_old) TO '/tmp/%HISTTBL.csv' DELIMITER ',' CSV;
+
+CREATE TEMP TABLE temp_%HISTTBL (
+%TEMPTBLDDL
+);
+
+\copy temp_%HISTTBL FROM '/tmp/%HISTTBL.csv' DELIMITER ',' CSV
+
+SELECT create_hypertable('%HISTTBL', 'clock', chunk_time_interval => 86400, migrate_data => true);
+INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (itemid,clock,ns) DO NOTHING;
+
+SELECT set_integer_now_func('%HISTTBL', 'zbx_ts_unix_now', true);
+%COMPRESS
+HEREDOC
+;
+
 sub output_table {
 	my ($db, $tbl, $pk_substitute_tbl) = @_;
 	my $alter_table = @$db{'alter_table'};
@@ -212,17 +216,28 @@ sub output_table {
 
 sub output_tsdb {
 	my ($tbl) = @_;
+
 	my $tsdb_out = $tsdb;
+
+	if (not(defined $tsdb_compression))
+	{
+		$tsdb_out =~ s/%COMPRESS//g;
+	}
+	elsif ($tsdb_compression eq 'with_compression')
+	{
+		$tsdb_out =~ s/%COMPRESS/$tsdb_compress_sql/g;
+	}
+
 	my $temp_ddl = $postgresql{$tbl};
 	chomp($temp_ddl);
 	$temp_ddl =~ s/,$//;
 	$tsdb_out =~ s/%TEMPTBLDDL/$temp_ddl/g;
 	$tsdb_out =~ s/%HISTTBL/$tbl/g;
-	print $tsdb_out . "\n";
+	print $tsdb_out;
 }
 
 sub validate_args {
-	die 'No argument were provided' if (!$db);
+	die 'No arguments were provided' if (!$db);
 	die 'Wrong database was provided' if (! grep { $_ eq $db } @dbs);
 
 	if ($db eq 'timescaledb')
