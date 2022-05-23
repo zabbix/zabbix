@@ -209,13 +209,15 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 		for (i = 0, retCode = ERROR_SUCCESS; i < cValues; i++)
 		{
-			DWORD	valueType, value_len = 0;
+			DWORD	valueType, value_len = MAX_DATA_LENGTH;
 			char	*uvaluename, *out = NULL;
 
 			cchValue = MAX_VALUE_NAME;
 			achValue[0] = L'\0';
 
-			if (ERROR_SUCCESS != RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType, buffer, &value_len))
+			retCode = RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType, buffer, &value_len);
+
+			if (ERROR_SUCCESS != retCode && ERROR_MORE_DATA != retCode)
 				continue;
 
 			if (value_len > buffer_alloc)
