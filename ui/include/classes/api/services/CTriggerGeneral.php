@@ -2355,16 +2355,20 @@ abstract class CTriggerGeneral extends CApiService {
 									? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur for host "%4$s".')
 									: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur for host "%4$s".');
 							}
+
+							self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
+								$triggers[$triggerid_up]['description'], $circular_linkage, $host['host']
+							));
 						}
 						else {
 							$error = $non_prototype
 								? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur.')
 								: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur.');
-						}
 
-						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
-							$triggers[$triggerid_up]['description'], $circular_linkage, $host['host']
-						));
+							self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
+								$triggers[$triggerid_up]['description'], $circular_linkage
+							));
+						}
 					}
 				}
 			}
