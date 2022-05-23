@@ -2263,10 +2263,12 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @param array $ins_dependencies[<triggerid_up>][<triggerid>]
 	 * @param array $del_dependencies[<triggerid_up>][<triggerid>]
+	 * @param bool  $inherited  Whether the check gets performed during inherit.
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkCircularDependencies(array $ins_dependencies, array $del_dependencies = []): void {
+	protected static function checkCircularDependencies(array $ins_dependencies, array $del_dependencies = [],
+			bool $inherited = false): void {
 		$links = [];
 		$_triggerids_down = $ins_dependencies;
 
@@ -2288,7 +2290,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 				$links[$row['triggerid_up']][$row['triggerid_down']] = true;
 			}
-		} while($_triggerids_down);
+		} while ($_triggerids_down);
 
 		foreach ($ins_dependencies as $triggerid_up => $triggerids) {
 			if (array_key_exists($triggerid_up, $links)) {
@@ -2332,12 +2334,36 @@ abstract class CTriggerGeneral extends CApiService {
 						$circular_linkage = $trigger_up_name.($links_path ? ' -> '.implode(' -> ', $links_path) : '').
 							' -> '.$trigger_up_name;
 
-						$error = ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-							? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur.')
-							: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur.');
+						$non_prototype = $triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL;
+
+						if ($inherited) {
+							$host = DBfetch(DBselect(
+								'SELECT DISTINCT h.host,h.status'.
+								' FROM functions f,items i,hosts h'.
+								' WHERE f.itemid=i.itemid'.
+									' AND i.hostid=h.hostid'.
+									' AND '.dbConditionId('f.triggerid', [$triggerid_up])
+							));
+
+							if ($host['status'] == HOST_STATUS_TEMPLATE) {
+								$error = $non_prototype
+									? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur for template "%4$s".')
+									: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur for template "%4$s".');
+							}
+							else {
+								$error = $non_prototype
+									? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur for host "%4$s".')
+									: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur for host "%4$s".');
+							}
+						}
+						else {
+							$error = $non_prototype
+								? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because a circular linkage (%3$s) would occur.')
+								: _('Trigger prototype "%1$s" cannot depend on the trigger prototype "%2$s", because a circular linkage (%3$s) would occur.');
+						}
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
-							$triggers[$triggerid_up]['description'], $circular_linkage
+							$triggers[$triggerid_up]['description'], $circular_linkage, $host['host']
 						));
 					}
 				}
@@ -2822,13 +2848,13 @@ abstract class CTriggerGeneral extends CApiService {
 
 						if ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 							$error = ($hosts[$hostid]['status'] == HOST_STATUS_TEMPLATE)
-								? _('Trigger "%1$s" cannot depend on the trigger "%2$s" because the template "%3$s" is not linked to the template "%4$s".')
-								: _('Trigger "%1$s" cannot depend on the trigger "%2$s" because the template "%3$s" is not linked to the host "%4$s".');
+								? _('Trigger "%1$s" cannot depend on the trigger "%2$s", because the template "%3$s" is not linked to the template "%4$s".')
+								: _('Trigger "%1$s" cannot depend on the trigger "%2$s", because the template "%3$s" is not linked to the host "%4$s".');
 						}
 						else {
 							$error = ($hosts[$hostid]['status'] == HOST_STATUS_TEMPLATE)
-								? _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" because the template "%3$s" is not linked to the template "%4$s".')
-								: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s" because the template "%3$s" is not linked to the host "%4$s".');
+								? _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s", because the template "%3$s" is not linked to the template "%4$s".')
+								: _('Trigger prototype "%1$s" cannot depend on the trigger "%2$s", because the template "%3$s" is not linked to the host "%4$s".');
 						}
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $triggers[$triggerid]['description'],
@@ -2960,7 +2986,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$hostids_condition = ($hostids !== null) ? ' AND '.dbConditionId('i.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT DISTINCT t.templateid,t.triggerid,i.hostid'.
+			'SELECT DISTINCT t.templateid,t.triggerid,t.flags,i.hostid'.
 			' FROM triggers t,functions f,items i'.
 			' WHERE t.triggerid=f.triggerid'.
 				' AND f.itemid=i.itemid'.
@@ -2968,18 +2994,19 @@ abstract class CTriggerGeneral extends CApiService {
 				$hostids_condition
 		);
 
+		$trigger_flags = [];
 		$trigger_links = [];
 		$tpl_triggerids_up = [];
 
 		while ($row = DBfetch($result)) {
 			$trigger_links[$row['templateid']][$row['hostid']] = $row['triggerid'];
+			$trigger_flags[$row['triggerid']] = $row['flags'];
 
 			if (array_key_exists($row['templateid'], $all_triggerids_up)) {
 				$tpl_triggerids_up[$row['templateid']] = true;
 			}
 		}
 
-		$ins_trigger_deps = [];
 		$del_triggerdepids = [];
 		$_edit_dependencies = [];
 
@@ -3059,11 +3086,6 @@ abstract class CTriggerGeneral extends CApiService {
 							$child_triggerid_up = $trigger_links[$triggerid_up][$hostid];
 
 							if (!in_array($child_triggerid_up, $upd_child_triggerids_up)) {
-								$ins_trigger_deps[] = [
-									'triggerid_down' => $child_triggerid,
-									'triggerid_up' => $child_triggerid_up
-								];
-
 								$_edit_dependencies[$child_triggerid][$child_triggerid_up] = true;
 							}
 						}
@@ -3132,16 +3154,45 @@ abstract class CTriggerGeneral extends CApiService {
 
 					foreach ($triggerids_up as $triggerid_up => $add) {
 						if ($add && !in_array($triggerid_up, $upd_child_triggerids_up)) {
-							$ins_trigger_deps[] = [
-								'triggerid_down' => $child_triggerid,
-								'triggerid_up' => $triggerid_up
-							];
-
 							$_edit_dependencies[$child_triggerid][$triggerid_up] = true;
 						}
 					}
 				}
 			}
+		}
+
+		$ins_dependencies = [];
+		$del_dependencies = [];
+		$ins_dependencies_prototypes = [];
+		$ins_trigger_deps = [];
+
+		foreach ($_edit_dependencies as $child_triggerid  => $triggerid_up_state) {
+			foreach ($triggerid_up_state as $triggerid_up => $add) {
+				if ($add) {
+					if ($trigger_flags[$child_triggerid] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+						$ins_dependencies_prototypes[$triggerid_up][$child_triggerid] = true;
+					}
+					else {
+						$ins_dependencies[$triggerid_up][$child_triggerid] = true;
+					}
+
+					$ins_trigger_deps[] = [
+						'triggerid_down' => $child_triggerid,
+						'triggerid_up' => $child_triggerid_up
+					];
+				}
+				else {
+					$del_dependencies[$triggerid_up][$child_triggerid] = true;
+				}
+			}
+		}
+
+		if ($ins_dependencies_prototypes) {
+			self::checkCircularDependencies($ins_dependencies_prototypes, $del_dependencies, true);
+		}
+
+		if ($ins_dependencies) {
+			self::checkCircularDependencies($ins_dependencies, $del_dependencies, true);
 		}
 
 		if ($del_triggerdepids) {
