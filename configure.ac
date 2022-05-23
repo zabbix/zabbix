@@ -1888,7 +1888,7 @@ if test "x$want_libpcre2" = "xno"; then # default to old pcre
 		AC_MSG_NOTICE([using old pcre library by default])
 	fi
 
-	LIBPCRE_CHECK_CONFIG([flags-only])
+	LIBPCRE_CHECK_CONFIG([mandatory])
 
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([unable to use libpcre (libpcre check failed)])
