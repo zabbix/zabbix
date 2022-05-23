@@ -643,7 +643,7 @@ static int	DBpatch_6010031(void)
 		return ret;
 
 	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where type<>%d and groupid in"
-			" (select groupid from (" DBPATCH_TPLGRP_GROUPIDS "))",
+			" (select t.groupid from (" DBPATCH_TPLGRP_GROUPIDS ") as t)",
 			HOSTGROUP_TYPE_TEMPLATE, HOSTGROUP_TYPE_TEMPLATE))
 	{
 		ret = FAIL;
@@ -758,6 +758,29 @@ static int	DBpatch_6010032(void)
 	return DBpatch_6010032_update_empty();
 }
 
+#define PROFILE_OLD_TO_NEW(old, new)								\
+												\
+do {												\
+	if (ZBX_DB_OK > DBexecute("update profiles set idx='" #new "' where idx='" #old "'"))	\
+		ret = FAIL;									\
+} while (0)
+
+static int	DBpatch_6010033(void)
+{
+	int ret = SUCCEED;
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return ret;
+
+	PROFILE_OLD_TO_NEW(web.hostgroups.php.sort, web.hostgroups.sort);
+	PROFILE_OLD_TO_NEW(web.hostgroups.php.sortorder, web.hostgroups.sortorder);
+	PROFILE_OLD_TO_NEW(web.groups.filter_name, web.hostgroups.filter_name);
+	PROFILE_OLD_TO_NEW(web.groups.filter.active, web.hostgroups.filter.active);
+
+	return ret;
+}
+
+#undef PROFILE_OLD_TO_NEW
 #undef DBPATCH_HOST_STATUS_TEMPLATE
 #undef DBPATCH_GROUPIDS
 #undef DBPATCH_TPLGRP_GROUPIDS
@@ -802,5 +825,6 @@ DBPATCH_ADD(6010029, 0, 1)
 DBPATCH_ADD(6010030, 0, 1)
 DBPATCH_ADD(6010031, 0, 1)
 DBPATCH_ADD(6010032, 0, 1)
+DBPATCH_ADD(6010033, 0, 1)
 
 DBPATCH_END()
