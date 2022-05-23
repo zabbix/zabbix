@@ -24,6 +24,8 @@
 #include "log.h"
 #include "sha512crypt.h"
 
+#define	ZBX_SID_AUTH_TOKEN_LENGTH	64
+
 /******************************************************************************
  *                                                                            *
  * Purpose: takes a string token, hashes it with sha-512 and then formats the *
@@ -75,7 +77,7 @@ int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, ch
 	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SID, buffer, sizeof(buffer), NULL))
 	{
 		size_t	buf_len = strlen(buffer);
-
+#define	SID_SESSION_LENGTH	32
 		if (ZBX_SID_SESSION_LENGTH == buf_len)
 		{
 			ret = DBget_user_by_active_session(buffer, user);
@@ -93,6 +95,7 @@ int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, ch
 					ZBX_PROTO_TAG_SID, (unsigned long) buf_len);
 			ret = FAIL;
 		}
+#undefine	SID_SESSION_LENGTH
 	}
 	else
 	{
@@ -117,3 +120,4 @@ out:
 
 	return ret;
 }
+#undef	ZBX_SID_AUTH_TOKEN_LENGTH

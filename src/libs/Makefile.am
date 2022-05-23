@@ -46,6 +46,7 @@ DIST_SUBDIRS = \
 	zbxservice \
 	zbxshmem \
 	zbxsysinfo \
+	zbxstr \
 	zbxtasks \
 	zbxthreads \
 	zbxtrends \
@@ -82,6 +83,7 @@ SERVER_SUBDIRS = \
 	zbxserver \
 	zbxservice \
 	zbxshmem \
+	zbxstr \
 	zbxtasks \
 	zbxtrends \
 	zbxvariant \
@@ -114,6 +116,7 @@ PROXY_SUBDIRS = \
 	zbxserialize \
 	zbxserver \
 	zbxshmem \
+	zbxstr \
 	zbxtasks \
 	zbxtrends \
 	zbxvariant \
@@ -144,6 +147,7 @@ SUBDIRS = \
 	zbxnix \
 	zbxregexp \
 	zbxsysinfo \
+	zbxstr \
 	zbxthreads \
 	zbxvariant \
 	zbxxml \

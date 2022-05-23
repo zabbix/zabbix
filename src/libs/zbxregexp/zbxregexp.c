@@ -257,7 +257,10 @@ static unsigned long int compute_recursion_limit(void)
 	else
 		return 10000;	/* if stack size cannot be retrieved then assume ~8 MB */
 #else
-	return ZBX_REGEXP_RECURSION_LIMIT;
+#define REGEXP_RECURSION_LIMIT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
+
+	return REGEXP_RECURSION_LIMIT;
+#undef REGEXP_RECURSION_LIMIT
 #endif
 }
 

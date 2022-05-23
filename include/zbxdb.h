@@ -240,4 +240,16 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 void zbx_db_set_character_set(const char *char_set);
 #endif
 
+typedef enum
+{
+	ERR_Z3001 = 3001,
+	ERR_Z3002,
+	ERR_Z3003,
+	ERR_Z3004,
+	ERR_Z3005,
+	ERR_Z3006,
+	ERR_Z3007,
+	ERR_Z3008
+}
+zbx_err_codes_t;
 #endif

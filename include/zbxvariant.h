@@ -76,6 +76,7 @@ int		zbx_variant_convert(zbx_variant_t *value, int type);
 const char	*zbx_get_variant_type_desc(unsigned char type);
 const char	*zbx_variant_value_desc(const zbx_variant_t *value);
 const char	*zbx_variant_type_desc(const zbx_variant_t *value);
+int		zbx_validate_value_dbl(double value, int dbl_precision);
 
 int		zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2);
 

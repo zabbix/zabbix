@@ -381,12 +381,9 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 /* Has to be rewritten to avoid malloc */
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
-	char *new_str = NULL;
-	const char *p;
-	const char *q;
-	const char *r;
-	char *t;
-	long len, diff, count = 0;
+	char		*t, *new_str = NULL;
+	const char	*p, *q, *r;
+	long		len, diff, count = 0;
 
 	assert(str);
 	assert(sub_str1);
@@ -402,20 +399,20 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 
 	diff = (long)strlen(sub_str2) - len;
 
-        /* allocate new memory */
+	/* allocate new memory */
 	new_str = (char *)zbx_malloc(new_str, (size_t)(strlen(str) + count*diff + 1)*sizeof(char));
 
-        for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
-        {
-                /* copy until next occurrence of sub_str1 */
-                for ( ; q < p; *t++ = *q++);
-                q += len;
-                p = q;
-                for ( r = sub_str2; (*t++ = *r++); );
-                --t;
-        }
-        /* copy the tail of str */
-        for( ; *q ; *t++ = *q++ );
+	for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
+	{
+		/* copy until next occurrence of sub_str1 */
+		for ( ; q < p; *t++ = *q++);
+		q += len;
+		p = q;
+		for ( r = sub_str2; (*t++ = *r++); );
+		--t;
+	}
+	/* copy the tail of str */
+	for( ; *q ; *t++ = *q++ );
 
 	*t = '\0';
 
@@ -2127,6 +2124,8 @@ size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen)
 	return n;
 }
 
+#define ZBX_UTF8_REPLACE_CHAR	'?'
+
 /******************************************************************************
  *                                                                            *
  * Purpose: check UTF-8 sequences                                             *
@@ -2326,6 +2325,8 @@ void	zbx_replace_invalid_utf8(char *text)
 	*out = '\0';
 }
 
+#undef ZBX_UTF8_REPLACE_CHAR
+
 /******************************************************************************
  *                                                                            *
  * Purpose: decodes 3-byte utf-8 sequence                                     *
@@ -2453,6 +2454,149 @@ int	is_ascii_string(const char *str)
 			return FAIL;
 
 		str++;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is boolean                                    *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is boolean                             *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	is_boolean(const char *str, zbx_uint64_t *value)
+{
+	double	dbl_tmp;
+	int	res;
+
+	if (SUCCEED == (res = is_double(str, &dbl_tmp)))
+		*value = (0 != dbl_tmp);
+	else
+	{
+		char	tmp[16];
+
+		strscpy(tmp, str);
+		zbx_strlower(tmp);
+
+		if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up,running,enabled,available,ok,master", tmp, ',')))
+		{
+			*value = 1;
+		}
+		else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down,unused,disabled,unavailable,err,slave",
+				tmp, ',')))
+		{
+			*value = 0;
+		}
+	}
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is unsigned octal                             *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned octal                      *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	is_uoct(const char *str)
+{
+	int	res = FAIL;
+
+	while (' ' == *str)	/* trim left spaces */
+		str++;
+
+	for (; '\0' != *str; str++)
+	{
+		if (*str < '0' || *str > '7')
+			break;
+
+		res = SUCCEED;
+	}
+
+	while (' ' == *str)	/* check right spaces */
+		str++;
+
+	if ('\0' != *str)
+		return FAIL;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is unsigned hexadecimal representation of     *
+ *          data in the form "0-9, a-f or A-F"                                *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned hexadecimal                *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	is_uhex(const char *str)
+{
+	int	res = FAIL;
+
+	while (' ' == *str)	/* trim left spaces */
+		str++;
+
+	for (; '\0' != *str; str++)
+	{
+		if (0 == isxdigit(*str))
+			break;
+
+		res = SUCCEED;
+	}
+
+	while (' ' == *str)	/* check right spaces */
+		str++;
+
+	if ('\0' != *str)
+		return FAIL;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is a hexadecimal representation of data in    *
+ *          the form "F4 CE 46 01 0C 44 8B F4\nA0 2C 29 74 5D 3F 13 49\n"     *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is formatted like the example above    *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	is_hex_string(const char *str)
+{
+	if ('\0' == *str)
+		return FAIL;
+
+	while ('\0' != *str)
+	{
+		if (0 == isxdigit(*str))
+			return FAIL;
+
+		if (0 == isxdigit(*(str + 1)))
+			return FAIL;
+
+		if ('\0' == *(str + 2))
+			break;
+
+		if (' ' != *(str + 2) && '\n' != *(str + 2))
+			return FAIL;
+
+		str += 3;
 	}
 
 	return SUCCEED;
@@ -2680,6 +2824,8 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
 	return strcmp(s1, s2);
 }
 
+#define ZBX_MACRO_REGEX_PREFIX		"regex:"
+
 /******************************************************************************
  *                                                                            *
  * Purpose:                                                                   *
@@ -2856,6 +3002,8 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 
 	return SUCCEED;
 }
+
+#undef ZBX_MACRO_REGEX_PREFIX
 
 /******************************************************************************
  *                                                                            *

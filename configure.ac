@@ -1967,29 +1967,30 @@ fi
 if test "x$agent2" = "xyes"; then
 	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
-		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
-		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
 		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
 		\${abs_top_builddir}/src/libs/zbxconf/libzbxconf.a \
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
+		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
 		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
+		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
-		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
-		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
+		\${abs_top_builddir}/src/libs/zbxstr/libzbxstr.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
+		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
+		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
 		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
+		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -2073,113 +2074,114 @@ AC_OUTPUT([
 	src/Makefile
 	src/go/Makefile
 	src/libs/Makefile
-	src/libs/zbxlog/Makefile
 	src/libs/zbxalgo/Makefile
-	src/libs/zbxshmem/Makefile
-	src/libs/zbxhash/Makefile
-	src/libs/zbxcrypto/Makefile
-	src/libs/zbxconf/Makefile
-	src/libs/zbxdbcache/Makefile
-	src/libs/zbxdbhigh/Makefile
-	src/libs/zbxgetopt/Makefile
-	src/libs/zbxmedia/Makefile
-	src/libs/zbxsysinfo/Makefile
+	src/libs/zbxaudit/Makefile
+	src/libs/zbxavailability/Makefile
 	src/libs/zbxcommon/Makefile
-	src/libs/zbxsysinfo/agent/Makefile
-	src/libs/zbxsysinfo/alias/Makefile
-	src/libs/zbxsysinfo/common/Makefile
-	src/libs/zbxsysinfo/simple/Makefile
-	src/libs/zbxsysinfo/linux/Makefile
-	src/libs/zbxsysinfo/aix/Makefile
-	src/libs/zbxsysinfo/freebsd/Makefile
-	src/libs/zbxsysinfo/hpux/Makefile
-	src/libs/zbxsysinfo/openbsd/Makefile
-	src/libs/zbxsysinfo/osx/Makefile
-	src/libs/zbxsysinfo/solaris/Makefile
-	src/libs/zbxsysinfo/osf/Makefile
-	src/libs/zbxsysinfo/netbsd/Makefile
-	src/libs/zbxsysinfo/unknown/Makefile
-	src/libs/zbxnix/Makefile
-	src/libs/zbxthreads/Makefile
-	src/libs/zbxmutexs/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
-	src/libs/zbxdiscovery/Makefile
-	src/libs/zbxdb/Makefile
-	src/libs/zbxdbupgrade/Makefile
-	src/libs/zbxdbschema/Makefile
-	src/libs/zbxjson/Makefile
-	src/libs/zbxhttp/Makefile
-	src/libs/zbxserver/Makefile
-	src/libs/zbxicmpping/Makefile
-	src/libs/zbxeval/Makefile
-	src/libs/zbxserialize/Makefile
-	src/libs/zbxexec/Makefile
-	src/libs/zbxself/Makefile
-	src/libs/zbxmodules/Makefile
-	src/libs/zbxregexp/Makefile
-	src/libs/zbxtasks/Makefile
-	src/libs/zbxipcservice/Makefile
-	src/libs/zbxhistory/Makefile
 	src/libs/zbxcompress/Makefile
-	src/libs/zbxembed/Makefile
-	src/libs/zbxexport/Makefile
-	src/libs/zbxprometheus/Makefile
-	src/libs/zbxvault/Makefile
-	src/libs/zbxhashicorp/Makefile
+	src/libs/zbxconf/Makefile
+	src/libs/zbxcrypto/Makefile
 	src/libs/zbxcyberark/Makefile
-	src/libs/zbxkvs/Makefile
+	src/libs/zbxdb/Makefile
+	src/libs/zbxdbcache/Makefile
+	src/libs/zbxdbhigh/Makefile
+	src/libs/zbxdbschema/Makefile
+	src/libs/zbxdbupgrade/Makefile
 	src/libs/zbxdiag/Makefile
-	src/libs/zbxtrends/Makefile
-	src/libs/zbxavailability/Makefile
-	src/libs/zbxaudit/Makefile
-	src/libs/zbxservice/Makefile
-	src/libs/zbxxml/Makefile
+	src/libs/zbxdiscovery/Makefile
+	src/libs/zbxembed/Makefile
+	src/libs/zbxeval/Makefile
+	src/libs/zbxexec/Makefile
+	src/libs/zbxexport/Makefile
+	src/libs/zbxgetopt/Makefile
 	src/libs/zbxha/Makefile
+	src/libs/zbxhash/Makefile
+	src/libs/zbxhashicorp/Makefile
+	src/libs/zbxhistory/Makefile
+	src/libs/zbxhttp/Makefile
+	src/libs/zbxicmpping/Makefile
+	src/libs/zbxipcservice/Makefile
+	src/libs/zbxjson/Makefile
+	src/libs/zbxkvs/Makefile
+	src/libs/zbxlog/Makefile
+	src/libs/zbxmedia/Makefile
+	src/libs/zbxmodules/Makefile
+	src/libs/zbxmutexs/Makefile
+	src/libs/zbxnix/Makefile
+	src/libs/zbxprometheus/Makefile
+	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
+	src/libs/zbxself/Makefile
+	src/libs/zbxserialize/Makefile
+	src/libs/zbxserver/Makefile
+	src/libs/zbxservice/Makefile
+	src/libs/zbxshmem/Makefile
+	src/libs/zbxstr/Makefile
+	src/libs/zbxsysinfo/Makefile
+	src/libs/zbxsysinfo/agent/Makefile
+	src/libs/zbxsysinfo/aix/Makefile
+	src/libs/zbxsysinfo/alias/Makefile
+	src/libs/zbxsysinfo/common/Makefile
+	src/libs/zbxsysinfo/freebsd/Makefile
+	src/libs/zbxsysinfo/hpux/Makefile
+	src/libs/zbxsysinfo/linux/Makefile
+	src/libs/zbxsysinfo/netbsd/Makefile
+	src/libs/zbxsysinfo/openbsd/Makefile
+	src/libs/zbxsysinfo/osf/Makefile
+	src/libs/zbxsysinfo/osx/Makefile
+	src/libs/zbxsysinfo/simple/Makefile
+	src/libs/zbxsysinfo/solaris/Makefile
+	src/libs/zbxsysinfo/unknown/Makefile
+	src/libs/zbxtasks/Makefile
+	src/libs/zbxthreads/Makefile
+	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
+	src/libs/zbxvault/Makefile
+	src/libs/zbxxml/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
+	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
-	src/zabbix_sender/Makefile
-	src/zabbix_server/Makefile
-	src/zabbix_server/alerter/Makefile
-	src/zabbix_server/dbsyncer/Makefile
-	src/zabbix_server/dbconfig/Makefile
-	src/zabbix_server/diag/Makefile
-	src/zabbix_server/discoverer/Makefile
-	src/zabbix_server/ha/Makefile
-	src/zabbix_server/housekeeper/Makefile
-	src/zabbix_server/httppoller/Makefile
-	src/zabbix_server/pinger/Makefile
-	src/zabbix_server/poller/Makefile
-	src/zabbix_server/snmptrapper/Makefile
-	src/zabbix_server/timer/Makefile
-	src/zabbix_server/trapper/Makefile
-	src/zabbix_server/escalator/Makefile
-	src/zabbix_server/proxypoller/Makefile
-	src/zabbix_server/selfmon/Makefile
-	src/zabbix_server/stats/Makefile
-	src/zabbix_server/vmware/Makefile
-	src/zabbix_server/taskmanager/Makefile
-	src/zabbix_server/ipmi/Makefile
-	src/zabbix_server/odbc/Makefile
-	src/zabbix_server/scripts/Makefile
-	src/zabbix_server/preprocessor/Makefile
-	src/zabbix_server/availability/Makefile
-	src/zabbix_server/service/Makefile
-	src/zabbix_server/lld/Makefile
-	src/zabbix_server/reporter/Makefile
 	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/diag/Makefile
 	src/zabbix_proxy/heart/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
-	src/zabbix_proxy/datasender/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
-	src/zabbix_java/Makefile
+	src/zabbix_sender/Makefile
+	src/zabbix_server/Makefile
+	src/zabbix_server/alerter/Makefile
+	src/zabbix_server/availability/Makefile
+	src/zabbix_server/dbconfig/Makefile
+	src/zabbix_server/dbsyncer/Makefile
+	src/zabbix_server/diag/Makefile
+	src/zabbix_server/discoverer/Makefile
+	src/zabbix_server/escalator/Makefile
+	src/zabbix_server/ha/Makefile
+	src/zabbix_server/housekeeper/Makefile
+	src/zabbix_server/httppoller/Makefile
+	src/zabbix_server/ipmi/Makefile
+	src/zabbix_server/lld/Makefile
+	src/zabbix_server/odbc/Makefile
+	src/zabbix_server/pinger/Makefile
+	src/zabbix_server/poller/Makefile
+	src/zabbix_server/preprocessor/Makefile
+	src/zabbix_server/proxypoller/Makefile
+	src/zabbix_server/reporter/Makefile
+	src/zabbix_server/scripts/Makefile
+	src/zabbix_server/selfmon/Makefile
+	src/zabbix_server/service/Makefile
+	src/zabbix_server/snmptrapper/Makefile
+	src/zabbix_server/stats/Makefile
+	src/zabbix_server/taskmanager/Makefile
+	src/zabbix_server/timer/Makefile
+	src/zabbix_server/trapper/Makefile
+	src/zabbix_server/vmware/Makefile
 	man/Makefile
 	])
 

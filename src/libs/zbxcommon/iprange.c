@@ -19,6 +19,7 @@
 
 #include "common.h"
 
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if the specified character is allowed whitespace character *
@@ -110,6 +111,9 @@ static void	iprange_apply_mask(zbx_iprange_t *iprange, int bits)
 		iprange->range[i].to |= mask_fill;
 	}
 }
+
+#define ZBX_IPRANGE_GROUPS_V4	4
+#define ZBX_IPRANGE_GROUPS_V6	8
 
 /******************************************************************************
  *                                                                            *
@@ -336,6 +340,9 @@ check_fill:
 
 	return SUCCEED;
 }
+
+#undef	ZBX_IPRANGE_GROUPS_V4
+#undef	ZBX_IPRANGE_GROUPS_V6
 
 /******************************************************************************
  *                                                                            *
