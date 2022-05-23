@@ -120,7 +120,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected static function build(array $schema, array $data, $main_tag = null) {
+	private static function build(array $schema, array $data, $main_tag = null) {
 		$n = 0;
 		$result = [];
 
@@ -171,7 +171,7 @@ class CConfigurationExportBuilder {
 	public function buildGroups(array $schema, array $groups) {
 		$groups = $this->formatGroups($groups);
 
-		$this->data['groups'] = $this->build($schema, $groups, 'groups');
+		$this->data['groups'] = self::build($schema, $groups, 'groups');
 	}
 
 	/**
@@ -184,7 +184,7 @@ class CConfigurationExportBuilder {
 	public function buildTemplates(array $schema, array $templates, array $simple_triggers) {
 		$templates = $this->formatTemplates($templates, $simple_triggers);
 
-		$this->data['templates'] = $this->build($schema, $templates, 'templates');
+		$this->data['templates'] = self::build($schema, $templates, 'templates');
 	}
 
 	/**
@@ -197,7 +197,7 @@ class CConfigurationExportBuilder {
 	public function buildHosts(array $schema, array $hosts, array $simple_triggers) {
 		$hosts = $this->formatHosts($hosts, $simple_triggers);
 
-		$this->data['hosts'] = $this->build($schema, $hosts, 'hosts');
+		$this->data['hosts'] = self::build($schema, $hosts, 'hosts');
 	}
 
 	/**
@@ -209,7 +209,7 @@ class CConfigurationExportBuilder {
 	public function buildTriggers(array $schema, array $triggers) {
 		$triggers = $this->formatTriggers($triggers);
 
-		$this->data['triggers'] = $this->build($schema, $triggers, 'triggers');
+		$this->data['triggers'] = self::build($schema, $triggers, 'triggers');
 	}
 
 	/**
@@ -221,7 +221,7 @@ class CConfigurationExportBuilder {
 	public function buildGraphs(array $schema, array $graphs) {
 		$graphs = $this->formatGraphs($graphs);
 
-		$this->data['graphs'] = $this->build($schema, $graphs, 'graphs');
+		$this->data['graphs'] = self::build($schema, $graphs, 'graphs');
 	}
 
 	/**
@@ -233,7 +233,7 @@ class CConfigurationExportBuilder {
 	public function buildMediaTypes(array $schema, array $media_types) {
 		$media_types = $this->formatMediaTypes($media_types);
 
-		$this->data['media_types'] = $this->build($schema, $media_types, 'media_types');
+		$this->data['media_types'] = self::build($schema, $media_types, 'media_types');
 	}
 
 	/**
@@ -397,7 +397,7 @@ class CConfigurationExportBuilder {
 			];
 		}
 
-		$this->data['maps'] = $this->build($schema, $this->data['maps'], 'maps');
+		$this->data['maps'] = self::build($schema, $this->data['maps'], 'maps');
 	}
 
 	/**
