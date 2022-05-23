@@ -61,35 +61,35 @@ class CElementCollection implements Iterator {
 	/**
 	 * @inheritdoc
 	 */
-	public function rewind() {
+	public function rewind(): void {
 		reset($this->elements);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function current() {
+	public function current(): mixed {
 		return current($this->elements);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function key() {
+	public function key(): mixed {
 		return key($this->elements);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function next() {
-		return next($this->elements);
+	public function next(): void {
+		next($this->elements);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function valid() {
+	public function valid(): bool {
 		$key = $this->key();
 
 		return ($key !== null && $key !== false);
@@ -100,7 +100,7 @@ class CElementCollection implements Iterator {
 	 *
 	 * @return integer
 	 */
-	public function count() {
+	public function count(): int {
 		return count($this->elements);
 	}
 
@@ -109,7 +109,7 @@ class CElementCollection implements Iterator {
 	 *
 	 * @return boolean
 	 */
-	public function isEmpty() {
+	public function isEmpty(): bool {
 		return ($this->elements === []);
 	}
 
@@ -120,7 +120,7 @@ class CElementCollection implements Iterator {
 	 *
 	 * @throws Exception
 	 */
-	public function first() {
+	public function first(): mixed {
 		$element = reset($this->elements);
 
 		if ($element === false) {
@@ -137,7 +137,7 @@ class CElementCollection implements Iterator {
 	 *
 	 * @throws Exception
 	 */
-	public function last() {
+	public function last(): mixed {
 		$element = end($this->elements);
 
 		if ($element === false) {
@@ -154,7 +154,7 @@ class CElementCollection implements Iterator {
 	 *
 	 * @return boolean
 	 */
-	public function exists($key) {
+	public function exists($key): bool {
 		return array_key_exists($key, $this->elements);
 	}
 
@@ -165,7 +165,7 @@ class CElementCollection implements Iterator {
 	 *
 	 * @return boolean
 	 */
-	public function get($key) {
+	public function get($key): mixed {
 		return $this->elements[$key];
 	}
 
@@ -175,7 +175,7 @@ class CElementCollection implements Iterator {
 	 * @param mixed $key        array key
 	 * @param mixed $element    element to be set
 	 */
-	public function set($key, $element) {
+	public function set($key, $element): void {
 		$this->elements[$key] = $element;
 	}
 
