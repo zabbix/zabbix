@@ -204,30 +204,30 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 	if (REGISTRY_DISCOVERY_MODE_VALUES == mode && 0 != cValues)
 	{
-		DWORD	buffer_alloc = 0;
-		char	*buffer = NULL;
+		DWORD	buffer_alloc = 1024;
+		char	*buffer;
+
+		buffer = zbx_malloc(NULL, buffer_alloc);
 
 		for (i = 0, retCode = ERROR_SUCCESS; i < cValues; i++)
 		{
-			DWORD	valueType, value_len = MAX_DATA_LENGTH;
+			DWORD	valueType, value_len = buffer_alloc;
 			char	*uvaluename, *out = NULL;
 
 			cchValue = MAX_VALUE_NAME;
 			achValue[0] = L'\0';
 
-			retCode = RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType, buffer, &value_len);
-
-			if (ERROR_SUCCESS != retCode && ERROR_MORE_DATA != retCode)
-				continue;
-
-			if (value_len > buffer_alloc)
+			if (ERROR_MORE_DATA == (retCode = RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType,
+				buffer, &value_len)))
 			{
 				buffer = zbx_realloc(buffer, value_len);
 				buffer_alloc = value_len;
+
+				cchValue = MAX_VALUE_NAME;
+				retCode = RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType, buffer, &value_len);
 			}
 
-			cchValue = MAX_VALUE_NAME;
-			if (ERROR_SUCCESS != (retCode = RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType, buffer, &value_len)))
+			if (ERROR_SUCCESS != retCode)
 				continue;
 
 			uvaluename = zbx_unicode_to_utf8(achValue);
