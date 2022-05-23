@@ -6275,15 +6275,17 @@ static int	vmware_service_get_clusters_and_resourcepools(CURL *easyhandle, zbx_v
 	if (SUCCEED != vmware_service_get_cluster_data(easyhandle, &cluster_data, error))
 		goto out;
 
-	zbx_xml_read_values(cluster_data, "//*[@type='ClusterComputeResource']", &ids);
+	zbx_xml_read_values(cluster_data, "/*/*/*/*/*[local-name()='objects']/*[local-name()='obj']"
+			"[@type='" ZBX_VMWARE_SOAP_CLUSTER "']", &ids);
 	zbx_vector_ptr_reserve(clusters, ids.values_num + clusters->values_alloc);
 
 	for (i = 0; i < ids.values_num; i++)
 	{
 		char	*status, *name;
 
-		zbx_snprintf(xpath, sizeof(xpath), "//*[@type='ClusterComputeResource'][.='%s']"
-				"/.." ZBX_XPATH_LN2("propSet", "val"), ids.values[i]);
+		zbx_snprintf(xpath, sizeof(xpath), "/*/*/*/*/*[local-name()='objects'][*[local-name()='obj']"
+				"[@type='" ZBX_VMWARE_SOAP_CLUSTER "'][.='%s']]/" ZBX_XPATH_PROP_NAME_NODE("name"),
+				ids.values[i]);
 
 		if (NULL == (name = zbx_xml_doc_read_value(cluster_data, xpath)))
 			continue;
