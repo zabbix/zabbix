@@ -483,6 +483,8 @@ static int	DBpatch_6010025(void)
 			" h.status" cmp DBPATCH_HOST_STATUS_TEMPLATE
 #define DBPATCH_TPLGRP_GROUPIDS	DBPATCH_GROUPIDS("=")
 #define DBPATCH_HSTGRP_GROUPIDS	DBPATCH_GROUPIDS("<>")
+#define DBPATCH_HOSTPROTOTYPE_GROUPIDS								\
+		"select groupid from group_prototype"
 
 typedef struct
 {
@@ -543,7 +545,8 @@ static int	DBpatch_6010030_split_groups(void)
 			"select groupid,name,uuid"
 			" from hstgrp"
 			" where groupid in (" DBPATCH_TPLGRP_GROUPIDS ")"
-				" and groupid in (" DBPATCH_HSTGRP_GROUPIDS ")"
+				" and (groupid in (" DBPATCH_HSTGRP_GROUPIDS ")"
+					" or groupid in (" DBPATCH_HOSTPROTOTYPE_GROUPIDS "))"
 			" order by groupid");
 
 	while (NULL != (row = DBfetch(result)))
@@ -758,7 +761,7 @@ static int	DBpatch_6010032(void)
 	return DBpatch_6010032_update_empty();
 }
 
-#define PROFILE_OLD_TO_NEW(old, new)								\
+#define RENAME_PROFILE(old, new)								\
 												\
 do {												\
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='" #new "' where idx='" #old "'"))	\
@@ -775,15 +778,15 @@ static int	DBpatch_6010033(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	PROFILE_OLD_TO_NEW(web.hostgroups.php.sort, web.hostgroups.sort);
-	PROFILE_OLD_TO_NEW(web.hostgroups.php.sortorder, web.hostgroups.sortorder);
-	PROFILE_OLD_TO_NEW(web.groups.filter_name, web.hostgroups.filter_name);
-	PROFILE_OLD_TO_NEW(web.groups.filter.active, web.hostgroups.filter.active);
+	RENAME_PROFILE(web.hostgroups.php.sort, web.hostgroups.sort);
+	RENAME_PROFILE(web.hostgroups.php.sortorder, web.hostgroups.sortorder);
+	RENAME_PROFILE(web.groups.filter_name, web.hostgroups.filter_name);
+	RENAME_PROFILE(web.groups.filter.active, web.hostgroups.filter.active);
 out:
 	return ret;
 }
 
-#undef PROFILE_OLD_TO_NEW
+#undef RENAME_PROFILE
 #undef DBPATCH_HOST_STATUS_TEMPLATE
 #undef DBPATCH_GROUPIDS
 #undef DBPATCH_TPLGRP_GROUPIDS
