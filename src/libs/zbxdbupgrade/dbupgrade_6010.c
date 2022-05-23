@@ -21,8 +21,6 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "zbxalgo.h"
-#include "log.h"
-#include "sysinfo.h"
 
 extern unsigned char	program_type;
 
@@ -482,7 +480,7 @@ static int	DBpatch_6010025(void)
 		" from hosts h,hosts_groups hg,hstgrp g"					\
 		" where g.groupid=hg.groupid and"						\
 			" hg.hostid=h.hostid and"						\
-			" h.status" cmp DBPATCH_HOST_STATUS_TEMPLATE " and length(g.name)>0"
+			" h.status" cmp DBPATCH_HOST_STATUS_TEMPLATE
 #define DBPATCH_TPLGRP_GROUPIDS	DBPATCH_GROUPIDS("=")
 #define DBPATCH_HSTGRP_GROUPIDS	DBPATCH_GROUPIDS("<>")
 
@@ -542,10 +540,11 @@ static int	DBpatch_6010030_split_groups(void)
 	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
 
 	result = DBselect(
-			"select o.groupid,o.name,o.uuid from hstgrp o"
-			" where o.groupid in (" DBPATCH_TPLGRP_GROUPIDS
-			") and o.groupid in (" DBPATCH_HSTGRP_GROUPIDS
-			") order by o.groupid asc");
+			"select groupid,name,uuid"
+			" from hstgrp"
+			" where groupid in (" DBPATCH_TPLGRP_GROUPIDS ")"
+				" and groupid in (" DBPATCH_HSTGRP_GROUPIDS ")"
+			" order by groupid");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -563,7 +562,6 @@ static int	DBpatch_6010030_split_groups(void)
 	if (0 == hstgrps.values_num)
 		goto out;
 
-	zbx_vector_hstgrp_sort(&hstgrps, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	nextid = DBget_maxid_num("hstgrp", hstgrps.values_num);
 
 	for (i = 0; i < hstgrps.values_num; i++)
@@ -583,9 +581,9 @@ static int	DBpatch_6010030_split_groups(void)
 	for (i = 0; i < hstgrps.values_num; i++)
 	{
 		result = DBselect(
-				"select r.groupid,r.permission"
-				" from rights r"
-				" where r.id=" ZBX_FS_UI64,
+				"select groupid,permission"
+				" from rights"
+				" where id=" ZBX_FS_UI64,
 				hstgrps.values[i]->groupid);
 
 		while (NULL != (row = DBfetch(result)))
@@ -598,13 +596,13 @@ static int	DBpatch_6010030_split_groups(void)
 		DBfree_result(result);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update hosts_groups hg"
-				" set hg.groupid =" ZBX_FS_UI64
-				" where hg.groupid=" ZBX_FS_UI64
-				" and hg.hostid in ("
-					"select h.hostid"
-					" from hosts h"
-					" where h.status=" DBPATCH_HOST_STATUS_TEMPLATE
+				"update hosts_groups"
+				" set groupid =" ZBX_FS_UI64
+				" where groupid=" ZBX_FS_UI64
+				" and hostid in ("
+					"select hostid"
+					" from hosts"
+					" where status=" DBPATCH_HOST_STATUS_TEMPLATE
 				");\n", hstgrps.values[i]->newgroupid, hstgrps.values[i]->groupid);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
@@ -644,8 +642,8 @@ static int	DBpatch_6010031(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return ret;
 
-	if (ZBX_DB_OK > DBexecute("update hstgrp p set p.type=%d where p.type<>%d and p.groupid in"
-			" (select t.groupid from (" DBPATCH_TPLGRP_GROUPIDS ") as t)",
+	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where type<>%d and groupid in"
+			" (select groupid from (" DBPATCH_TPLGRP_GROUPIDS "))",
 			HOSTGROUP_TYPE_TEMPLATE, HOSTGROUP_TYPE_TEMPLATE))
 	{
 		ret = FAIL;
@@ -702,9 +700,9 @@ static int	DBpatch_6010032_update_empty(void)
 	DB_ROW			row;
 
 	result = DBselect(
-			"select g.name from hstgrp g"
-			" where g.type=%d"
-			" order by length(g.name) asc", HOSTGROUP_TYPE_TEMPLATE);
+			"select name from hstgrp"
+			" where type=%d"
+			" order by length(name)", HOSTGROUP_TYPE_TEMPLATE);
 
 	zbx_vector_str_create(&names);
 
@@ -719,7 +717,7 @@ static int	DBpatch_6010032_update_empty(void)
 			" left join hosts_groups hg on hg.groupid=g.groupid"
 			" left join group_prototype p on p.groupid=g.groupid"
 			" where hg.groupid is null and p.groupid is null"
-			" order by length(g.name) asc");
+			" order by length(g.name)");
 
 	zbx_vector_uint64_create(&ids);
 
@@ -737,9 +735,9 @@ static int	DBpatch_6010032_update_empty(void)
 	if (0 == ids.values_num)
 		goto out;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hstgrp g set g.type=%d where",
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hstgrp set type=%d where",
 			HOSTGROUP_TYPE_TEMPLATE);
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid", ids.values, ids.values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", ids.values, ids.values_num);
 
 	if (ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -759,6 +757,11 @@ static int	DBpatch_6010032(void)
 
 	return DBpatch_6010032_update_empty();
 }
+
+#undef DBPATCH_HOST_STATUS_TEMPLATE
+#undef DBPATCH_GROUPIDS
+#undef DBPATCH_TPLGRP_GROUPIDS
+#undef DBPATCH_HSTGRP_GROUPIDS
 
 #endif
 
