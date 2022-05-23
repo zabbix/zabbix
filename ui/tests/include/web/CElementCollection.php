@@ -120,7 +120,7 @@ class CElementCollection implements Iterator {
 	 *
 	 * @throws Exception
 	 */
-	public function first(): mixed {
+	public function first(): CElement {
 		$element = reset($this->elements);
 
 		if ($element === false) {
@@ -137,7 +137,7 @@ class CElementCollection implements Iterator {
 	 *
 	 * @throws Exception
 	 */
-	public function last(): mixed {
+	public function last(): CElement {
 		$element = end($this->elements);
 
 		if ($element === false) {
@@ -163,9 +163,9 @@ class CElementCollection implements Iterator {
 	 *
 	 * @param mixed $key    array key
 	 *
-	 * @return boolean
+	 * @return CElement
 	 */
-	public function get($key): mixed {
+	public function get($key): CElement {
 		return $this->elements[$key];
 	}
 
