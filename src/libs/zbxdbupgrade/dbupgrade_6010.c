@@ -762,7 +762,10 @@ static int	DBpatch_6010032(void)
 												\
 do {												\
 	if (ZBX_DB_OK > DBexecute("update profiles set idx='" #new "' where idx='" #old "'"))	\
+	{											\
 		ret = FAIL;									\
+		goto out;									\
+	}											\
 } while (0)
 
 static int	DBpatch_6010033(void)
@@ -776,7 +779,7 @@ static int	DBpatch_6010033(void)
 	PROFILE_OLD_TO_NEW(web.hostgroups.php.sortorder, web.hostgroups.sortorder);
 	PROFILE_OLD_TO_NEW(web.groups.filter_name, web.hostgroups.filter_name);
 	PROFILE_OLD_TO_NEW(web.groups.filter.active, web.hostgroups.filter.active);
-
+out:
 	return ret;
 }
 
