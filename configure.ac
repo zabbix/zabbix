@@ -1882,13 +1882,13 @@ LIBPCRE2_CHECK_CONFIG([flags-only])
 
 if test "x$want_libpcre2" = "xno"; then # default to old pcre
 	if test "x$want_libpcre" = "xno"; then
-		AC_MSG_NOTICE("using old pcre library by default")
+		AC_MSG_NOTICE([using old pcre library by default])
 	fi
 
 	LIBPCRE_CHECK_CONFIG([flags-only])
 
 	if test "x$found_libpcre" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
+		AC_MSG_ERROR([unable to use libpcre (libpcre check failed)])
 	fi
 
 	LIBPCRE_CHECK_CONFIG([no])
@@ -1908,11 +1908,7 @@ else
 		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time $want_libpcre!])
 	fi
 
-	LIBPCRE2_CHECK_CONFIG([no])
-
-	if test "x$found_libpcre2" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpcre2 (libpcre2 check failed)])
-	fi
+	LIBPCRE2_CHECK_CONFIG([mandatory])
 
 	CFLAGS="$CFLAGS $LIBPCRE2_CFLAGS"
 	LDFLAGS="$LDFLAGS $LIBPCRE2_LDFLAGS"
