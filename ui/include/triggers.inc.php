@@ -136,22 +136,20 @@ function utf8RawUrlDecode($source) {
 }
 
 /**
- * Copies the given triggers to the given hosts or templates.
+ * Copy the given triggers to the target hosts or templates, taking care of copied trigger dependencies.
  *
- * Without the $src_hostid parameter it will only be able to copy triggers that belong to only one host. If the
- * $src_hostid parameter is not passed, and a trigger has multiple hosts, it will throw an error. If the $src_hostid
- * parameter is passed, the given host will be replaced with the destination host.
+ * If the $src_hostid parameter is passed, the given host will be replaced with the destination host.
+ * Without $src_hostid, only triggers that belong to a single host or template can be copied.
  *
- * This function takes care of copied trigger dependencies.
- * If trigger is copied alongside with trigger on which it depends, then dependencies is replaced directly using new ids,
- * If there is target host within dependency trigger, algorithm will search for potential matching trigger in target host,
- * if matching trigger is found, then id from this trigger is used, if not rise exception,
- * otherwise original dependency will be left.
+ * If a trigger is copied alongside with the trigger which it depends on, then dependencies are replaced directly,
+ * using new IDs.
+ * If the source trigger depends on the trigger from the same host or template, the same trigger-up should exist on the
+ * target host or template.
  *
- * @param array       $dst_hostids     Hosts and templates to whom add triggers. IDs not present in DB (host table) will
- *                                     be ignored.
- * @param string|null $src_hostid      Host ID in which context trigger with multiple hosts will be treated.
- * @param array|null  $src_triggerids  Triggers which will be copied to destination hosts.
+ * @param array       $dst_hostids     Hosts and templates to copy triggers to.
+ *                                     IDs not present in the database will be ignored.
+ * @param string|null $src_hostid      ID of host to use as context for trigger when multiple hosts are involved.
+ * @param array|null  $src_triggerids  Triggers which will be copied to destination host(s).
  *
  * @return bool
  */
