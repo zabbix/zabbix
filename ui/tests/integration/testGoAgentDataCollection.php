@@ -553,9 +553,10 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
+				$diff_values = [];
+
 				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
 					$value = [];
-					$diff_values = [];
 
 					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
 						// Calculate offset between Agent and Agent2 result arrays
@@ -585,13 +586,21 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 					$a = $value[self::COMPONENT_AGENT][$offset];
 					$b = $value[self::COMPONENT_AGENT2][$offset];
+
+					$diff = abs(abs($a) - abs($b));
 				}
 				else {
-					$a = end($values[self::COMPONENT_AGENT]);
-					$b = end($values[self::COMPONENT_AGENT2]);
+					$records = count($values[self::COMPONENT_AGENT]);
+					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+						$slice = array_slice($values[self::COMPONENT_AGENT], 0, $records - $i);
+						$a = end($slice);
+						$b = end($values[self::COMPONENT_AGENT2]);
+						$diff_values[$i] = abs(abs($a) - abs($b));
+					}
+
+					$diff = min($diff_values);
 				}
 
-				$diff = abs(abs($a) - abs($b));
 				$this->assertTrue($diff < $item['threshold'], 'Difference for '.$item['key'].
 						' is more than defined threshold '.$diff.' > '.$item['threshold']
 				);
