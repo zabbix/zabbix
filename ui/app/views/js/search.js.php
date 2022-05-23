@@ -72,7 +72,8 @@
 		editTemplateGroup(parameters = {}) {
 			const overlay = PopUp('popup.templategroup.edit', parameters, {
 				dialogueid: 'templategroup_edit',
-				dialogue_class: 'modal-popup-static'
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.groupSuccess, {once: true});
@@ -85,7 +86,8 @@
 		editHostGroup(parameters = {}) {
 			const overlay = PopUp('popup.hostgroup.edit', parameters, {
 				dialogueid: 'hostgroup_edit',
-				dialogue_class: 'modal-popup-static'
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.groupSuccess, {once: true});
