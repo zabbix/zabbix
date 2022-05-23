@@ -367,7 +367,7 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 	}
 
 	wkey = zbx_utf8_to_unicode(key);
-	wvalue = zbx_utf8_to_unicode(value);
+	wvalue = (NULL != value ? zbx_utf8_to_unicode(value) : NULL);
 
 	errCode = RegGetValue(hive_handle, wkey, wvalue, RRF_RT_ANY, &type, NULL, &BufferSize);
 	if (ERROR_SUCCESS == errCode)
