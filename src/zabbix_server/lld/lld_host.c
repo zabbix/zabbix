@@ -2339,7 +2339,7 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 	/* update and delete existing LLD host tags */
 	for (i = 0; i < host->tags.values_num; i++)
 	{
-		int found_at_prototype;
+		int	found_at_prototype;
 
 		host_tag = (zbx_db_tag_t *)host->tags.values[i];
 
