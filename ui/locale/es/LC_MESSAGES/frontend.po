@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-04-29 09:26+0000\n"
+"PO-Revision-Date: 2022-05-11 06:05+0000\n"
 "Last-Translator: Óscar <oscar.zabbix@linaresdigital.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -12347,11 +12347,11 @@ msgstr ""
 
 #: triggers.php:607
 msgid "No target selected"
-msgstr ""
+msgstr "No hay seleccionado un objetivo"
 
 #: graphs.php:404 items.php:1280
 msgid "No target selected."
-msgstr ""
+msgstr "No hay seleccionado un objetivo."
 
 #: include/triggers.inc.php:275
 #, c-format
@@ -12954,7 +12954,7 @@ msgstr "Operación a realizar"
 #: include/views/configuration.triggers.edit.php:93
 #: include/views/configuration.triggers.list.php:200
 msgid "Operational data"
-msgstr ""
+msgstr "Datos operativos"
 
 #: app/views/popup.lldoverride.php:190
 #: include/views/configuration.action.edit.php:319
@@ -15125,7 +15125,7 @@ msgstr "Planificación"
 #: app/views/popup.acknowledge.edit.php:52
 msgctxt "selected problems"
 msgid "Scope"
-msgstr ""
+msgstr "Ámbito"
 
 #: app/controllers/CControllerAuditLogList.php:205
 #: include/views/monitoring.screen.edit.php:124
@@ -15384,7 +15384,7 @@ msgstr "Seleccionar widget"
 #: app/views/administration.script.edit.php:88
 #: include/views/monitoring.history.php:190
 msgid "Selected"
-msgstr ""
+msgstr "Seleccionado/s"
 
 #: actionconf.php:400
 msgid "Selected actions deleted"
@@ -15780,7 +15780,7 @@ msgstr "Mostrar líneas"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:139
 #: include/classes/widgets/forms/CWidgetFormProblems.php:159
 msgid "Show operational data"
-msgstr ""
+msgstr "Mostrar datos operativos"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:299
 msgid "Show problems"
@@ -18762,7 +18762,7 @@ msgstr ""
 #: app/views/monitoring.charts.view.php:50
 #: include/views/monitoring.history.php:91
 msgid "View as"
-msgstr ""
+msgstr "Mostrar como"
 
 #: include/classes/items/CHelpItems.php:361
 #: include/classes/items/CHelpItems.php:711
@@ -19394,7 +19394,7 @@ msgstr "Trapper ZABBIX"
 
 #: include/classes/html/CFilter.php:251
 msgid "Zoom out"
-msgstr ""
+msgstr "Disminuir zoom"
 
 #: include/func.inc.php:148
 #, c-format
