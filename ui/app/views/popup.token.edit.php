@@ -105,7 +105,6 @@ $token_from_grid->addItem([
 				->setDateFormat(DATE_TIME_FORMAT_SECONDS)
 				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 				->setAriaRequired()
-				->setId('expires-at-row')
 		)
 	])
 	->addItem([

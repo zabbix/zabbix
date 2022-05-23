@@ -76,7 +76,7 @@ $media_form = (new CFormList(_('Media')))
 		'mediatype_send_to'
 	)
 	->addRow(
-		(new CLabel(_('Send to'), 'sendto_emails[0]'))->setAsteriskMark(),
+		(new CLabel(_('Send to'), 'mediatype_email_send_to'))->setAsteriskMark(),
 		$email_send_to_table,
 		'mediatype_email_send_to'
 	)
