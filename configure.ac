@@ -1908,7 +1908,7 @@ if test "x$want_libpcre2" = "xno"; then # default to old pcre
 	have_pcre=1
 else
 	if test "x$want_libpcre" != "xno"; then
-		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time $want_libpcre!])
+		AC_MSG_ERROR([cannot use both pcre and pcre2 at the same time])
 	fi
 
 	LIBPCRE2_CHECK_CONFIG([mandatory])

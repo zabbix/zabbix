@@ -131,26 +131,26 @@ AC_DEFUN([LIBPCRE2_CHECK_CONFIG],
 				m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
 
 				if test -n "$libpcre2_dir"; then
-					AC_RUN_LOG([PKG_CONFIG_LIBDIR="$libpcre2_dir/lib/pkgconfig" $PKG_CONFIG --exists --print-errors libpcre2-8]) || {
+					export PKG_CONFIG_LIBDIR="$libpcre2_dir/lib/pkgconfig"
+				fi
+
+				if test -n "$libpcre2_dir"; then
+					AC_RUN_LOG([$PKG_CONFIG --exists --print-errors libpcre2-8]) || {
 						AC_MSG_RESULT(no)
 						AC_MSG_ERROR([cannot find libpcre2 pkg-config package in $libpcre2_dir/lib/pkgconfig])
 					}
 				fi
 
-				if test -n "$libpcre2_dir"; then
-					maybe_pkg_config_libdir="$libpcre2_dir/lib/pkgconfig"
-				else # search on the system
-					maybe_pkg_config_libdir=""
-				fi
-
-				LIBPCRE2_CFLAGS=`PKG_CONFIG_LIBDIR="$maybe_pkg_config_libdir" $PKG_CONFIG --cflags libpcre2-8`
+				LIBPCRE2_CFLAGS=`$PKG_CONFIG --cflags libpcre2-8`
 
 				if test "x$enable_static_libs" = "xyes" && test "x$static_linking_support" = "xno"; then
 					LIBPCRE2_LIBS="$libpcre2_dir/lib/libpcre2-8.a"
 				else
-					LIBPCRE2_LDFLAGS=`PKG_CONFIG_LIBDIR="$maybe_pkg_config_libdir" $PKG_CONFIG --libs-only-L libpcre2-8`
-					LIBPCRE2_LIBS=`PKG_CONFIG_LIBDIR="$maybe_pkg_config_libdir" $PKG_CONFIG --libs-only-l libpcre2-8`
+					LIBPCRE2_LDFLAGS=`$PKG_CONFIG --libs-only-L libpcre2-8`
+					LIBPCRE2_LIBS=`$PKG_CONFIG --libs-only-l libpcre2-8`
 				fi
+
+				unset PKG_CONFIG_LIBDIR
 
 				found_libpcre2="yes"
 			else
