@@ -500,7 +500,8 @@ class CElement extends CBaseElement implements IWaitable {
 	* @inheritdoc
 	*/
 	public function isEnabled($enabled = true) {
-		$classes = explode(' ', parent::getAttribute('class'));
+		$attribute = parent::getAttribute('class');
+		$classes = ($attribute !== null) ? explode(' ', $attribute) : [];
 
 		$is_enabled = parent::isEnabled()
 				&& (parent::getAttribute('disabled') === null)
