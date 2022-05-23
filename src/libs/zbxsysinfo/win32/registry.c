@@ -215,9 +215,6 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 			cchValue = MAX_VALUE_NAME;
 			achValue[0] = L'\0';
 
-			value_len = MAX_DATA_LENGTH;
-			buffer = zbx_malloc(NULL, value_len);
-
 			if (ERROR_SUCCESS != RegEnumValue(hKey, i, achValue, &cchValue, NULL, &valueType, buffer, &value_len))
 				continue;
 
@@ -279,6 +276,8 @@ static void	discovery_get_regkey_values(HKEY hKey, wchar_t *current_subkey, stru
 
 			zbx_json_close(j);
 		}
+
+		zbx_free(buffer);
 	}
 
 	zbx_free(uroot);
