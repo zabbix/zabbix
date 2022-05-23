@@ -65,8 +65,6 @@ $token_from_list = (new CFormList())
 			->setDateFormat(ZBX_FULL_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 			->setAriaRequired()
-		->setId('expires-at-row'),
-		'expires-at-row'
 	)
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', ZBX_AUTH_TOKEN_ENABLED))
