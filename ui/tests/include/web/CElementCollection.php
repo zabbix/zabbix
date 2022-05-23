@@ -68,14 +68,16 @@ class CElementCollection implements Iterator {
 	/**
 	 * @inheritdoc
 	 */
-	public function current(): mixed {
+	#[\ReturnTypeWillChange]
+	public function current() {
 		return current($this->elements);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function key(): mixed {
+	#[\ReturnTypeWillChange]
+	public function key() {
 		return key($this->elements);
 	}
 
