@@ -324,6 +324,10 @@ class CMultiSelect extends CTag {
 					$autocomplete_parameters['templated_hosts'] = true;
 				}
 
+				if ($popup_parameters['srctbl'] == 'template_triggers') {
+					$autocomplete_parameters['templated'] = true;
+				}
+
 				if (array_key_exists('with_templates', $parameters) && $parameters['with_templates']) {
 					$popup_parameters['templated_hosts'] = '1';
 					$autocomplete_parameters['with_templates'] = true;

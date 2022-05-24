@@ -195,8 +195,8 @@ switch ($data['type']) {
 								'srcfld1' => 'triggerid',
 								'dstfrm' => $form->getName(),
 								'dstfld1' => 'trigger_new_condition',
-								'with_triggers' => '1',
-								'real_hosts' => '1',
+								'with_triggers' => true,
+								'real_hosts' => true,
 								'editable' => true
 							]
 						]
@@ -213,7 +213,7 @@ switch ($data['type']) {
 								'srcfld1' => 'triggerid',
 								'dstfrm' => $form->getName(),
 								'dstfld1' => 'trigger_new_condition',
-								'with_triggers' => '1',
+								'with_triggers' => true,
 								'editable' => true
 							]
 						]

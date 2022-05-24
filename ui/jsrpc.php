@@ -370,6 +370,7 @@ switch ($data['method']) {
 					'selectHosts' => $host_fields,
 					'editable' => isset($data['editable']) ? $data['editable'] : false,
 					'monitored' => isset($data['monitored']) ? $data['monitored'] : null,
+					'templated' => array_key_exists('templated', $data) ? $data['templated'] : null,
 					'search' => isset($data['search']) ? ['description' => $data['search']] : null,
 					'limit' => $limit
 				]);
