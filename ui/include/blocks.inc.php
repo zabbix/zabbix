@@ -96,7 +96,8 @@ function getSystemStatusData(array $filter) {
 			'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 			'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
 			'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
-			'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
+			'suppress' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 		]
 	];
 
@@ -371,6 +372,7 @@ function getSystemStatusTotals(array $data) {
  * @param bool  $data['allowed']['change_severity']
  * @param bool  $data['allowed']['acknowledge']
  * @param bool  $data['allowed']['close']
+ * @param bool  $data['allowed']['suppress']
  * @param bool  $hide_empty_groups
  * @param CUrl  $groupurl
  *
@@ -421,6 +423,7 @@ function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupu
  * @param bool  $data['allowed']['change_severity']
  * @param bool  $data['allowed']['acknowledge']
  * @param bool  $data['allowed']['close']
+ * @param bool  $data['allowed']['suppress']
  *
  * @return CDiv
  */
@@ -455,6 +458,7 @@ function makeSeverityTotals(array $data) {
  * @param bool  $data['allowed']['change_severity']
  * @param bool  $data['allowed']['acknowledge']
  * @param bool  $data['allowed']['close']
+ * @param bool  $data['allowed']['suppress']
  * @param array $stat
  * @param int   $stat['count']
  * @param array $stat['problems']
@@ -547,6 +551,7 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
  * @param bool   $allowed['change_severity']
  * @param bool   $allowed['acknowledge']
  * @param bool   $allowed['close']
+ * @param bool   $allowed['suppress']
  *
  * @return CTableInfo
  */
@@ -701,7 +706,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		// Create acknowledge link.
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-				|| $can_be_closed)
+				|| $can_be_closed || $allowed['suppress'])
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)

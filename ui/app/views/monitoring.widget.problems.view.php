@@ -79,7 +79,8 @@ $allowed = [
 	'ui_problems' => $data['allowed_ui_problems'],
 	'add_comments' => $data['allowed_add_comments'],
 	'change_severity' => $data['allowed_change_severity'],
-	'acknowledge' => $data['allowed_acknowledge']
+	'acknowledge' => $data['allowed_acknowledge'],
+	'suppress' => $data['allowed_suppress']
 ];
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
@@ -260,7 +261,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	// Create acknowledge link.
 	$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-			|| $can_be_closed)
+			|| $can_be_closed || $allowed['suppress'])
 		? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)
