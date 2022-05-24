@@ -17,6 +17,14 @@ class ComposerStaticInit3e832710df7ec8c92736d5724fad7cab
             'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Component\\Yaml\\' => 23,
         ),
+        'R' => 
+        array (
+            'RobRichards\\XMLSecLibs\\' => 23,
+        ),
+        'O' => 
+        array (
+            'OneLogin\\' => 9,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -27,6 +35,14 @@ class ComposerStaticInit3e832710df7ec8c92736d5724fad7cab
         'Symfony\\Component\\Yaml\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
+        ),
+        'RobRichards\\XMLSecLibs\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/robrichards/xmlseclibs/src',
+        ),
+        'OneLogin\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/onelogin/php-saml/src',
         ),
     );
 

@@ -27,12 +27,12 @@ import (
 	"testing"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
-	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 )
 
 // getNextCheck calculates simplified nextcheck based on the specified delay string and current time
