@@ -220,7 +220,7 @@ class CControllerHostEdit extends CController {
 
 		$data['host']['macros'] = array_values(order_macros($data['host']['macros'], 'macro'));
 
-		if (!$data['host']['macros'] && $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+		if (!$data['host']['macros']) {
 			$data['host']['macros'][] = [
 				'type' => ZBX_MACRO_TYPE_TEXT,
 				'macro' => '',
