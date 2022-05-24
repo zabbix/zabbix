@@ -24,13 +24,14 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 /**
  * @backup users
  *
- * @onBefore APILoad
+ * @onBefore prepareLdapUserData
  **/
 class testFormLogin extends CWebTest {
+
 	/**
 	 * Not permanent API request to create user before data_test.sql file is refactored.
 	 **/
-	public function APILoad(){
+	public function prepareLdapUserData() {
 		CDataHelper::call('user.create', [
 			[
 				'username' => 'LDAP user',
@@ -47,7 +48,7 @@ class testFormLogin extends CWebTest {
 						'usrgrpid' => 16
 					]
 				]
-			],
+			]
 		]);
 	}
 
@@ -147,12 +148,10 @@ class testFormLogin extends CWebTest {
 	 **/
 	public function testFormLogin_LoginLogout($data) {
 		$this->page->userLogin($data['login'], $data['password']);
-		if($data['expected'] === TEST_BAD){
-		$this->assertEquals($data['error_message'], $this->query('class:red')
-			->waitUntilVisible()->one()->getText());
+		if($data['expected'] === TEST_BAD) {
+			$this->assertEquals($data['error_message'], $this->query('class:red')->waitUntilVisible()->one()->getText());
 		}
-		elseif($data['expected'] === TEST_GOOD){
-			$this->page->userLogin($data['login'], $data['password']);
+		else {
 			$this->page->assertHeader('Global view');
 			$this->query('class:icon-signout')->one()->click();
 			$this->assertEquals('Remember me for 30 days', $this->query('xpath://label[@for="autologin"]')->one()->getText());
@@ -212,7 +211,7 @@ class testFormLogin extends CWebTest {
 	 * Guest user needs to be out of "Disabled" group to have access to frontend.
 	 **/
 	public static function removeGuestFromDisabledGroup() {
-		CDataHelper::call('user.update',[
+		CDataHelper::call('user.update', [
 			[
 				'userid' => '2',
 				'usrgrps' => [
@@ -223,7 +222,7 @@ class testFormLogin extends CWebTest {
 	}
 
 	public function addGuestToDisabledGroup() {
-		CDataHelper::call('user.update',[
+		CDataHelper::call('user.update', [
 			[
 				'userid' => '2',
 				'usrgrps' => [
