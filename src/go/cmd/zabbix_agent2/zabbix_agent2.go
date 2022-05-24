@@ -300,7 +300,7 @@ func main() {
 	})
 
 	if argVersion {
-		version.Display()
+		version.Display(true)
 		os.Exit(0)
 	}
 

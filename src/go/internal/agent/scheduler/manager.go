@@ -30,6 +30,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
 	"zabbix.com/internal/agent/keyaccess"
@@ -538,6 +539,8 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
+	logPluginVersion()
+
 	monitor.Register(monitor.Scheduler)
 	go m.run()
 }
@@ -725,4 +728,8 @@ func getPluginOpts(optsRaw interface{}, name string) (pluginCap, pluginSystemCap
 	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
 
 	return
+}
+
+func logPluginVersion() {
+	log.Infof("Plugin support version %d.%d", comms.Major, comms.Minor)
 }
