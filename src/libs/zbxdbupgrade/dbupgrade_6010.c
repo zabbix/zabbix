@@ -474,6 +474,33 @@ static int	DBpatch_6010025(void)
 	return ret;
 }
 
+static int	DBpatch_6010026(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.auditlog.filter.action' and value_int=-1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010027(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set idx='web.auditlog.filter.actions'"
+			" where idx='web.auditlog.filter.action'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #define DBPATCH_HOST_STATUS_TEMPLATE	"3"
 #define DBPATCH_GROUPIDS(cmp)									\
 		"select distinct g.groupid"							\
@@ -498,36 +525,36 @@ hstgrp_t;
 ZBX_PTR_VECTOR_DECL(hstgrp, hstgrp_t *)
 ZBX_PTR_VECTOR_IMPL(hstgrp, hstgrp_t *)
 
-static int	DBpatch_6010026(void)
+static int	DBpatch_6010028(void)
 {
 	return DBdrop_field("hstgrp", "internal");
 }
 
-static int	DBpatch_6010027(void)
+static int	DBpatch_6010029(void)
 {
 	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hstgrp", &field);
 }
 
-static int	DBpatch_6010028(void)
+static int	DBpatch_6010030(void)
 {
 	return DBdrop_index("hstgrp", "hstgrp_1");
 }
 
-static int	DBpatch_6010029(void)
+static int	DBpatch_6010031(void)
 {
 	return DBcreate_index("hstgrp", "hstgrp_1", "type,name", 1);
 }
 
-static void	DBpatch_6010030_hstgrp_free(hstgrp_t *hstgrp)
+static void	DBpatch_6010032_hstgrp_free(hstgrp_t *hstgrp)
 {
 	zbx_free(hstgrp->name);
 	zbx_free(hstgrp->uuid);
 	zbx_free(hstgrp);
 }
 
-static int	DBpatch_6010030_split_groups(void)
+static int	DBpatch_6010032_split_groups(void)
 {
 	int			i, permission, ret = SUCCEED;
 	zbx_uint64_t		nextid, groupid;
@@ -579,7 +606,7 @@ static int	DBpatch_6010030_split_groups(void)
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", NULL);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < hstgrps.values_num; i++)
 	{
@@ -617,28 +644,28 @@ static int	DBpatch_6010030_split_groups(void)
 	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
 		goto out;
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_free(sql);
 	zbx_db_insert_clean(&db_insert);
-	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010030_hstgrp_free);
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010032_hstgrp_free);
 	zbx_vector_hstgrp_destroy(&hstgrps);
 
 	return ret;
 }
 
-static int	DBpatch_6010030(void)
+static int	DBpatch_6010032(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010030_split_groups();
+	return DBpatch_6010032_split_groups();
 }
 
-static int	DBpatch_6010031(void)
+static int	DBpatch_6010033(void)
 {
 	int	ret = SUCCEED;
 
@@ -657,7 +684,7 @@ static int	DBpatch_6010031(void)
 
 #define	CHECK_CHILDREN_ONLY	0
 #define CHECK_PARENTS		1
-static int	DBpatch_6010032_startfrom(const zbx_vector_str_t *names, const char *name, int check_parents)
+static int	DBpatch_6010034_startfrom(const zbx_vector_str_t *names, const char *name, int check_parents)
 {
 	int	i;
 
@@ -693,7 +720,7 @@ static int	DBpatch_6010032_startfrom(const zbx_vector_str_t *names, const char *
 	return FAIL;
 }
 
-static int	DBpatch_6010032_update_empty(void)
+static int	DBpatch_6010034_update_empty(void)
 {
 	int			ret = SUCCEED;
 	char			*sql = NULL;
@@ -728,7 +755,7 @@ static int	DBpatch_6010032_update_empty(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (FAIL == DBpatch_6010032_startfrom(&names, row[1], CHECK_PARENTS))
+		if (FAIL == DBpatch_6010034_startfrom(&names, row[1], CHECK_PARENTS))
 			continue;
 
 		zbx_vector_str_append(&names, zbx_strdup(NULL, row[1]));
@@ -755,15 +782,15 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010032(void)
+static int	DBpatch_6010034(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010032_update_empty();
+	return DBpatch_6010034_update_empty();
 }
 
-static int	DBpatch_6010033_create_empty_hostgroups(void)
+static int	DBpatch_6010035_create_empty_hostgroups(void)
 {
 	int			i, permission, ret = SUCCEED;
 	zbx_uint64_t		nextid, groupid;
@@ -804,7 +831,7 @@ static int	DBpatch_6010033_create_empty_hostgroups(void)
 		hstgrp_t	*hstgrp;
 
 		if (SUCCEED == zbx_vector_str_search(&names, row[1], ZBX_DEFAULT_STR_COMPARE_FUNC) ||
-				FAIL == DBpatch_6010032_startfrom(&names, row[1], CHECK_CHILDREN_ONLY))
+				FAIL == DBpatch_6010034_startfrom(&names, row[1], CHECK_CHILDREN_ONLY))
 			continue;
 
 		zbx_vector_str_append(&names, zbx_strdup(NULL, row[1]));
@@ -866,18 +893,18 @@ out:
 	zbx_vector_str_destroy(&names);
 
 	zbx_db_insert_clean(&db_insert);
-	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010030_hstgrp_free);
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010032_hstgrp_free);
 	zbx_vector_hstgrp_destroy(&hstgrps);
 
 	return ret;
 }
 
-static int	DBpatch_6010033(void)
+static int	DBpatch_6010035(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010033_create_empty_hostgroups();
+	return DBpatch_6010035_create_empty_hostgroups();
 }
 
 #define RENAME_PROFILE(old, new)								\
@@ -890,7 +917,7 @@ do {												\
 	}											\
 } while (0)
 
-static int	DBpatch_6010034(void)
+static int	DBpatch_6010036(void)
 {
 	int ret = SUCCEED;
 
@@ -954,5 +981,7 @@ DBPATCH_ADD(6010031, 0, 1)
 DBPATCH_ADD(6010032, 0, 1)
 DBPATCH_ADD(6010033, 0, 1)
 DBPATCH_ADD(6010034, 0, 1)
+DBPATCH_ADD(6010035, 0, 1)
+DBPATCH_ADD(6010036, 0, 1)
 
 DBPATCH_END()
