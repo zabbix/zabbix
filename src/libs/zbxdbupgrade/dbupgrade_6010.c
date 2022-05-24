@@ -502,6 +502,20 @@ static int	DBpatch_6010027(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6010028(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"delete from role_rule where value_str='trigger.adddependencies' or "
+			"value_str='trigger.deletedependencies'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6010)
@@ -536,5 +550,6 @@ DBPATCH_ADD(6010024, 0,	1)
 DBPATCH_ADD(6010025, 0,	1)
 DBPATCH_ADD(6010026, 0,	1)
 DBPATCH_ADD(6010027, 0,	1)
+DBPATCH_ADD(6010028, 0,	1)
 
 DBPATCH_END()

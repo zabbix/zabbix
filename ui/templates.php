@@ -333,17 +333,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			// copy triggers
-			$dbTriggers = API::Trigger()->get([
-				'output' => ['triggerid'],
-				'hostids' => $cloneTemplateId,
-				'inherited' => false
-			]);
-
-			if ($dbTriggers) {
-				if (!copyTriggersToHosts(zbx_objectValues($dbTriggers, 'triggerid'), $input_templateid,
-						$cloneTemplateId)) {
-					throw new Exception();
-				}
+			if (!copyTriggersToHosts([$input_templateid], $cloneTemplateId)) {
+				throw new Exception();
 			}
 
 			// copy graphs
