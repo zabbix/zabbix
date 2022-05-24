@@ -130,7 +130,7 @@ static char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 			memcpy(buf, ptr, *len);
 			break;
 		default:
-			ptr = duk_require_lstring(ctx, 0, len);
+			ptr = duk_require_lstring(ctx, index, len);
 			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
 			break;
