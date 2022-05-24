@@ -19,6 +19,7 @@
 
 #include "lld.h"
 
+#include "../db_lengths.h"
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxavailability.h"
@@ -612,7 +613,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 
 		/* visible host name is valid utf8 sequence and has a valid length */
 		if (SUCCEED == zbx_is_utf8(host->name) && '\0' != *host->name &&
-				HOST_NAME_LEN >= zbx_strlen_utf8(host->name))
+				ZBX_MAX_HOSTNAME_LEN >= zbx_strlen_utf8(host->name))
 		{
 			continue;
 		}
@@ -1785,7 +1786,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 
 	if (0 != upd_groups_num)
 	{
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < groups->values_num; i++)
@@ -1874,7 +1875,7 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 
 	if (0 != upd_groups_num)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
 		zbx_free(sql);
 	}
@@ -2484,13 +2485,13 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				/* templates which should be unlinked */
-				if (TEMPLATE_LINK_LLD == link_type)
+				if (ZBX_TEMPLATE_LINK_LLD == link_type)
 					zbx_vector_uint64_append(&host->del_templateids, templateid);
 			}
 			else
 			{
 				/* templates which are already linked */
-				if (TEMPLATE_LINK_MANUAL == link_type)
+				if (ZBX_TEMPLATE_LINK_MANUAL == link_type)
 					zbx_vector_uint64_append(&host->del_templateids, templateid);
 				else
 					zbx_vector_uint64_remove(&host->lnk_templateids, i);
@@ -2872,7 +2873,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros || 0 != upd_tags)
 	{
-		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		zbx_DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 	}
 
 	if (0 != new_hostgroups)
@@ -3435,7 +3436,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 	if (NULL != sql1)
 	{
-		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		zbx_DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 
 		/* in ORACLE always present begin..end; */
 		if (16 < sql1_offset)
@@ -3450,7 +3451,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			0 != del_host_inventory_hostids.values_num ||
 			0 != del_interfaceids.values_num || 0 != del_snmp_ids.values_num || 0 != del_tagids.values_num)
 	{
-		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+		zbx_DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 
 		if (0 != del_hostgroupids->values_num)
 		{
@@ -3521,7 +3522,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 			zbx_strcpy_alloc(&sql2, &sql2_alloc, &sql2_offset, ";\n");
 		}
 
-		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+		zbx_DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 		DBexecute("%s", sql2);
 		zbx_free(sql2);
 	}
@@ -3566,7 +3567,7 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 		if (0 != host->lnk_templateids.values_num)
 		{
-			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, TEMPLATE_LINK_LLD,
+			if (SUCCEED != DBcopy_template_elements(host->hostid, &host->lnk_templateids, ZBX_TEMPLATE_LINK_LLD,
 					&err))
 			{
 				*error = zbx_strdcatf(*error, "Cannot link template(s) %s.\n", err);
@@ -3609,7 +3610,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 	zbx_vector_uint64_create(&lc_hostids);
 	zbx_vector_uint64_create(&ts_hostids);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -3665,7 +3666,7 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		DBbegin();
 
@@ -3732,7 +3733,7 @@ static void	lld_groups_remove(const zbx_vector_ptr_t *groups, int lifetime, int 
 	zbx_vector_uint64_create(&lc_groupids);
 	zbx_vector_uint64_create(&ts_groupids);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < groups->values_num; i++)
 	{
@@ -3785,7 +3786,7 @@ static void	lld_groups_remove(const zbx_vector_ptr_t *groups, int lifetime, int 
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		DBbegin();
 

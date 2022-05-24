@@ -35,7 +35,7 @@
 #define DBexecute_multiple_query	__wrap_DBexecute_multiple_query
 #define DBbegin				__wrap_DBbegin
 #define DBcommit			__wrap_DBcommit
-#include "db.h"
+#include "zbxdbhigh.h"
 #undef __zbx_DBexecute
 #undef DBexecute_multiple_query
 #undef DBbegin

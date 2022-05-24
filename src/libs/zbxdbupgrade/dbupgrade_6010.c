@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxalgo.h"
 
@@ -63,7 +63,7 @@ static int	DBpatch_6010002(void)
 		" from triggers"
 		" where " ZBX_DB_CHAR_LENGTH(description) ">%d", 255);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -78,7 +78,7 @@ static int	DBpatch_6010002(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -117,11 +117,11 @@ static int	DBpatch_6010005(void)
 		" from hosts_templates ht, hosts h"
 		" where ht.hostid=h.hostid and h.flags=4"); /* ZBX_FLAG_DISCOVERY_CREATED */
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		/* set TEMPLATE_LINK_LLD as link_type */
+		/* set ZBX_TEMPLATE_LINK_LLD as link_type */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_templates set link_type=1 where hosttemplateid=%s;\n", row[0]);
 
@@ -129,7 +129,7 @@ static int	DBpatch_6010005(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -351,7 +351,7 @@ static int	DBpatch_6010024(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select hi.itemid,hi.type,ht.name"
@@ -392,7 +392,7 @@ static int	DBpatch_6010024(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -418,7 +418,7 @@ static int	DBpatch_6010025(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select hi.itemid,hi.type,hs.name,ht.name"
@@ -460,7 +460,7 @@ static int	DBpatch_6010025(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{

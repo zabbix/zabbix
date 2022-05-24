@@ -22,7 +22,7 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 void	zbx_lld_override_operation_free(zbx_lld_override_operation_t *override_operation)
 {
