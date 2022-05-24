@@ -1307,7 +1307,7 @@ function getEventsActionsIconsData(array $events, array $triggers) {
  * @param array  $events[]['acknowledges']                      Array with manual updates to problem.
  * @param string $events[]['acknowledges'][]['action']          Action that was performed by problem update.
  * @param string $events[]['acknowledges'][]['suppress_until']  Time until problem suppressed.
- * @param string $events[]['acknowledges'][]['clock']           Time when manual suppression was added.
+ * @param string $events[]['acknowledges'][]['clock']           Time when manual suppression was made.
  * @param string $events[]['acknowledges'][]['userid']          Author's userid.
  *
  * @return array
@@ -1747,10 +1747,11 @@ function makeEventActionsIcons($eventid, $actions, $users) {
 
 /**
  * Create icon with hintbox for event suppresions.
+ * Records must be passed in the order starting from latest by field 'clock'.
  *
  * @param array  $data
  * @param array  $data['suppress_until'][]['suppress_until']  Time until problem is suppressed by user.
- * @param string $data['messages'][]['clock']                 Suppression creation time.
+ * @param string $data['suppress_until'][]['clock']                 Suppression creation time.
  * @param array  $users                                       User name, surname and username.
  *
  * @return CButton|null
@@ -1785,7 +1786,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $suppression['clock']),
 			makeActionTableUser($suppression, $users),
 			makeActionIcon(['icon' => $icon]),
-			$suppress_until,
+			$suppress_until
 		]);
 	}
 
@@ -1799,11 +1800,11 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 				$table,
 				($total > ZBX_WIDGET_ROWS)
 					? (new CDiv(
-					(new CDiv(
-						(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
-							->addClass(ZBX_STYLE_TABLE_STATS)
-					))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-				))->addClass(ZBX_STYLE_TABLE_PAGING)
+						(new CDiv(
+							(new CDiv(_s('Displaying %1$s of %2$s found', ZBX_WIDGET_ROWS, $total)))
+								->addClass(ZBX_STYLE_TABLE_STATS)
+						))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+					))->addClass(ZBX_STYLE_TABLE_PAGING)
 					: null
 			]
 		])
