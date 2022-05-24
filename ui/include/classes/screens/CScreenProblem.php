@@ -392,19 +392,21 @@ class CScreenProblem extends CScreenBase {
 			]);
 		}
 
-		if ($maintenanceids || $userids) {
-			foreach ($problems as &$problem) {
-				foreach ($problem['suppression_data'] as &$data) {
-					if ($data['maintenanceid'] != 0) {
-						$data['maintenance_name'] = $maintenances[$data['maintenanceid']]['name'];
-					}
+		foreach ($problems as &$problem) {
+			foreach ($problem['suppression_data'] as &$data) {
+				if ($data['maintenanceid'] != 0) {
+					$data['maintenance_name'] = $maintenances[$data['maintenanceid']]['name'];
 
-					$data['username'] = $data['userid'] != 0
-						? getUserFullname($user[$data['userid']])
-						: 'Inaccessible user';
-
-					unset($data);
 				}
+				elseif ($data['userid'] != 0) {
+					$data['username'] = getUserFullname($user[$data['userid']]);
+
+				}
+				else {
+					$data['username'] = 'Inaccessible user';
+
+				}
+				unset($data);
 			}
 		}
 		unset($problem);
