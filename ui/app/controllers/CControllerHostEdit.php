@@ -231,7 +231,7 @@ class CControllerHostEdit extends CController {
 		}
 
 		foreach ($data['host']['macros'] as &$macro) {
-			if ($macro['automatic'] == ZBX_USERMACRO_AUTOMATIC) {
+			if (array_key_exists('automatic', $macro) && $macro['automatic'] == ZBX_USERMACRO_AUTOMATIC) {
 				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC;
 
 				$macro['original'] = [
