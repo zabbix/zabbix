@@ -1859,6 +1859,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_fclose(f_status);
 		zbx_free(cmdline);
 		zbx_free(prname);
+		zbx_free(user);
+		zbx_free(group);
 
 		if (FAIL == is_uint32(entries->d_name, &pid))
 			continue;
