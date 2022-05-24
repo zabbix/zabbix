@@ -23,6 +23,7 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbschema.h"
+#include "zbxstr.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;

@@ -19,7 +19,7 @@
 
 #include "zbxvariant.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "log.h"
 
 ZBX_VECTOR_IMPL(var, zbx_variant_t)

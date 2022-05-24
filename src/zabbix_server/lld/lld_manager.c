@@ -1,5 +1,5 @@
 /*
-** Zabbix
+1;95;0c** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@
 #include "log.h"
 #include "zbxipcservice.h"
 #include "lld_protocol.h"
+#include "zbxstr.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

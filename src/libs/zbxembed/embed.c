@@ -26,6 +26,7 @@
 #include "console.h"
 #include "embed_xml.h"
 #include "embed.h"
+#include "zbxstr.h"
 
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 64)
 #define ZBX_ES_TIMEOUT		10

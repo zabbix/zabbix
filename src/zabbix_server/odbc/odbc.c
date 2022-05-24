@@ -29,6 +29,7 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
+#include "zbxstr.h"
 
 struct zbx_odbc_data_source
 {

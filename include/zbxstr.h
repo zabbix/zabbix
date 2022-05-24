@@ -20,11 +20,7 @@
 #ifndef ZABBIX_STR_H
 #define ZABBIX_STR_H
 
-#include "zbxtypes.h"
-
-void	help(void);
-void	usage(void);
-void	version(void);
+#include "common.h"
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
@@ -56,19 +52,7 @@ void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
 void	zbx_strarr_free(char ***arr);
 
-#if defined(__GNUC__) || defined(__clang__)
-#	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
-#else
-#	define __zbx_attr_format_printf(idx1, idx2)
-#endif
 
-size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
-
-void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
-		__zbx_attr_format_printf(4, 5);
-
-size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
-void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
@@ -80,13 +64,9 @@ void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **righ
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
-size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 void	zbx_strlcat(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size);
 
-char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
-
-char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 char	*zbx_strdcat(char *dest, const char *src);
 char	*zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
@@ -131,7 +111,6 @@ size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
 char	*zbx_strshift_utf8(char *text, size_t num);
 size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
-size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
 size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
@@ -143,10 +122,8 @@ int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);
 
 int	zbx_check_hostname(const char *hostname, char **error);
-int	zbx_number_parse(const char *number, int *len);
 int	zbx_suffixed_number_parse(const char *number, int *len);
 
-void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_t offset, size_t sz_to,
 		const char *from, size_t sz_from);
 
@@ -154,12 +131,6 @@ void	zbx_trim_str_list(char *list, char delimiter);
 
 int	zbx_strcmp_null(const char *s1, const char *s2);
 
-int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r,
-		unsigned char *context_op);
-int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length,
-		unsigned char *context_op);
-char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
-char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
 
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 
@@ -172,142 +143,6 @@ int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t 
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 
 int	zbx_strcmp_natural(const char *s1, const char *s2);
-
-/* tokens used in expressions */
-#define ZBX_TOKEN_OBJECTID		0x00001
-#define ZBX_TOKEN_MACRO			0x00002
-#define ZBX_TOKEN_LLD_MACRO		0x00004
-#define ZBX_TOKEN_USER_MACRO		0x00008
-#define ZBX_TOKEN_FUNC_MACRO		0x00010
-#define ZBX_TOKEN_SIMPLE_MACRO		0x00020
-#define ZBX_TOKEN_REFERENCE		0x00040
-#define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
-#define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
-
-/* additional token flags */
-#define ZBX_TOKEN_JSON		0x0010000
-#define ZBX_TOKEN_REGEXP	0x0040000
-#define ZBX_TOKEN_XPATH		0x0080000
-#define ZBX_TOKEN_REGEXP_OUTPUT	0x0100000
-#define ZBX_TOKEN_PROMETHEUS	0x0200000
-#define ZBX_TOKEN_JSONPATH	0x0400000
-#define ZBX_TOKEN_STR_REPLACE	0x0800000
-#define ZBX_TOKEN_STRING	0x1000000
-
-/* location of a substring */
-typedef struct
-{
-	/* left position */
-	size_t	l;
-	/* right position */
-	size_t	r;
-}
-zbx_strloc_t;
-
-/* data used by macros, lld macros and objectid tokens */
-typedef struct
-{
-	zbx_strloc_t	name;
-}
-zbx_token_macro_t;
-
-/* data used by macros, lld macros and objectid tokens */
-typedef struct
-{
-	zbx_strloc_t	expression;
-}
-zbx_token_expression_macro_t;
-
-/* data used by user macros */
-typedef struct
-{
-	/* macro name */
-	zbx_strloc_t	name;
-	/* macro context, for macros without context the context.l and context.r fields are set to 0 */
-	zbx_strloc_t	context;
-}
-zbx_token_user_macro_t;
-
-/* data used by macro functions */
-typedef struct
-{
-	/* the macro including the opening and closing brackets {}, for example: {ITEM.VALUE} */
-	zbx_strloc_t	macro;
-	/* function + parameters, for example: regsub("([0-9]+)", \1) */
-	zbx_strloc_t	func;
-	/* parameters, for example: ("([0-9]+)", \1) */
-	zbx_strloc_t	func_param;
-}
-zbx_token_func_macro_t;
-
-/* data used by simple (host:key) macros */
-typedef struct
-{
-	/* host name, supporting simple macros as a host name, for example Zabbix server or {HOST.HOST} */
-	zbx_strloc_t	host;
-	/* key + parameters, supporting {ITEM.KEYn} macro, for example system.uname or {ITEM.KEY1}  */
-	zbx_strloc_t	key;
-	/* function + parameters, for example avg(5m) */
-	zbx_strloc_t	func;
-	/* parameters, for example (5m) */
-	zbx_strloc_t	func_param;
-}
-zbx_token_simple_macro_t;
-
-/* data used by references */
-typedef struct
-{
-	/* index of constant being referenced (1 for $1, 2 for $2, ..., 9 for $9) */
-	int	index;
-}
-zbx_token_reference_t;
-
-/* the token type specific data */
-typedef union
-{
-	zbx_token_macro_t		objectid;
-	zbx_token_macro_t		macro;
-	zbx_token_macro_t		lld_macro;
-	zbx_token_expression_macro_t	expression_macro;
-	zbx_token_user_macro_t		user_macro;
-	zbx_token_func_macro_t		func_macro;
-	zbx_token_func_macro_t		lld_func_macro;
-	zbx_token_simple_macro_t	simple_macro;
-	zbx_token_reference_t		reference;
-}
-zbx_token_data_t;
-
-/* {} token data */
-typedef struct
-{
-	/* token type, see ZBX_TOKEN_ defines */
-	int			type;
-	/* the token location in expression including opening and closing brackets {} */
-	zbx_strloc_t		loc;
-	/* the token type specific data */
-	zbx_token_data_t	data;
-}
-zbx_token_t;
-
-#define ZBX_TOKEN_SEARCH_BASIC			0x00
-#define ZBX_TOKEN_SEARCH_REFERENCES		0x01
-#define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
-#define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
-#define ZBX_TOKEN_SEARCH_SIMPLE_MACRO		0x08	/* used by the upgrade patches only */
-
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
-		zbx_token_t *token);
-
-typedef int zbx_token_search_t;
-
-int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
-
-int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
-		zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 

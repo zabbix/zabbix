@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxmedia.h"
+
+#include "zbxstr.h"
 #include "log.h"
 #include "zbxcomms.h"
 #include "base64.h"
 #include "zbxalgo.h"
-
-#include "zbxmedia.h"
 
 /* number of characters per line when wrapping Base64 data in Email */
 #define ZBX_EMAIL_B64_MAXLINE			76

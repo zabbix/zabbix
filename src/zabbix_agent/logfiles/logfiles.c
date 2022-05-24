@@ -23,6 +23,7 @@
 #include "sysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"
+#include "zbxstr.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxsymbols.h"

@@ -19,7 +19,7 @@
 
 #include "file.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "sysinfo.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"

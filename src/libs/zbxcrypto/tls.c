@@ -28,6 +28,7 @@
 #include "zbxcrypto.h"
 #include "tls_tcp.h"
 #include "tls_tcp_active.h"
+#include "zbxstr.h"
 
 #if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER)
 /* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) or LibreSSL */

@@ -19,7 +19,7 @@
 
 #include "simple.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "sysinfo.h"
 #include "zbxcomms.h"
 #include "log.h"

@@ -19,7 +19,7 @@
 
 #include "zbxshmem.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "log.h"
 
 /******************************************************************************

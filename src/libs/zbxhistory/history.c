@@ -19,7 +19,7 @@
 
 #include "history.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "log.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)

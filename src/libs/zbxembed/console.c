@@ -19,7 +19,7 @@
 
 #include "console.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "embed.h"

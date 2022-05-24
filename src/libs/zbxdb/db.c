@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
-
 #include "zbxdb.h"
+
+#include "zbxstr.h"
+#include "log.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"

@@ -27,6 +27,7 @@
 #endif
 #include "zbxalgo.h"
 #include "zbxregexp.h"
+#include "zbxstr.h"
 
 extern int	CONFIG_TIMEOUT;
 

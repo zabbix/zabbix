@@ -19,7 +19,7 @@
 
 #include "proc.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
 #include "log.h"

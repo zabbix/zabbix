@@ -20,6 +20,7 @@
 #include "zbxexport.h"
 
 #include "log.h"
+#include "zbxstr.h"
 
 #define ZBX_OPTION_EXPTYPE_EVENTS	"events"
 #define ZBX_OPTION_EXPTYPE_HISTORY	"history"

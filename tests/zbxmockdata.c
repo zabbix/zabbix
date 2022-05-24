@@ -22,7 +22,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "zbxalgo.h"
 
 FILE	*__real_fopen(const char *path, const char *mode);

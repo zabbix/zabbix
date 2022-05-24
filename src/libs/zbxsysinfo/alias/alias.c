@@ -20,7 +20,7 @@
 #include "sysinfo.h"
 #include "alias.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "log.h"
 
 static ALIAS	*aliasList = NULL;

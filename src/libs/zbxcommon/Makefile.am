@@ -8,8 +8,10 @@ libzbxcommon_a_SOURCES = \
 	iprange.c \
 	misc.c \
 	setproctitle.c \
+	temp_str.c \
 	time.c \
-	cuid.c
+	cuid.c \
+	token.c
 
 libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS)
 

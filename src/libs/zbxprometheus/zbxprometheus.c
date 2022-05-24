@@ -19,7 +19,7 @@
 
 #include "zbxprometheus.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"

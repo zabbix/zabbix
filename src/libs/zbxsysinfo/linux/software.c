@@ -25,6 +25,7 @@
 #include "cfg.h"
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #       include <sys/utsname.h>

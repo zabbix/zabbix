@@ -25,6 +25,8 @@
 #include "zbxnix.h"
 #include "log.h"
 #include "zbxdiag.h"
+#include "zbxrtc.h"
+#include "zbxstr.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)

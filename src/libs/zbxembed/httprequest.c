@@ -19,7 +19,7 @@
 
 #include "httprequest.h"
 
-#include "common.h"
+#include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
 #include "embed.h"

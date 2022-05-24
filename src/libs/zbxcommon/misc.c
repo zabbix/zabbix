@@ -21,6 +21,7 @@
 #include "log.h"
 #include "setproctitle.h"
 #include "zbxthreads.h"
+#include "zbxcrypto.h" /* temporary include */
 /* scheduler support */
 
 #define ZBX_SCHEDULER_FILTER_DAY	1
@@ -4147,4 +4148,324 @@ void	remove_param(char *param, int num)
 	}
 
 	*param = '\0';
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses function name                                              *
+ *                                                                            *
+ * Parameters: expr     - [IN] the function expression: func(p1, p2,...)      *
+ *             length   - [OUT] the function name length or the amount of     *
+ *                              characters that can be safely skipped         *
+ *                                                                            *
+ * Return value: SUCCEED - the function name was successfully parsed          *
+ *               FAIL    - failed to parse function name                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	function_parse_name(const char *expr, size_t *length)
+{
+	const char	*ptr;
+
+	for (ptr = expr; SUCCEED == is_function_char(*ptr); ptr++)
+		;
+
+	*length = ptr - expr;
+
+	return ptr != expr && '(' == *ptr ? SUCCEED : FAIL;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate parameters and give position of terminator if found and  *
+ *          not quoted                                                        *
+ *                                                                            *
+ * Parameters: expr       - [IN] string to parse that contains parameters     *
+ *                                                                            *
+ *             terminator - [IN] use ')' if parameters end with               *
+ *                               parenthesis or '\0' if ends with NULL        *
+ *                               terminator                                   *
+ *             par_r      - [OUT] position of the terminator if found         *
+ *             lpp_offset - [OUT] offset of the last parsed parameter         *
+ *             lpp_len    - [OUT] length of the last parsed parameter         *
+ *                                                                            *
+ * Return value: SUCCEED -  closing parenthesis was found or other custom     *
+ *                          terminator and not quoted and return info about a *
+ *                          last processed parameter.                         *
+ *               FAIL    -  does not look like a valid function parameter     *
+ *                          list and return info about a last processed       *
+ *                          parameter.                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	function_validate_parameters(const char *expr, char terminator, size_t *par_r, size_t *lpp_offset,
+		size_t *lpp_len)
+{
+#define ZBX_FUNC_PARAM_NEXT		0
+#define ZBX_FUNC_PARAM_QUOTED		1
+#define ZBX_FUNC_PARAM_UNQUOTED		2
+#define ZBX_FUNC_PARAM_POSTQUOTED	3
+
+	const char	*ptr;
+	int		state = ZBX_FUNC_PARAM_NEXT;
+
+	*lpp_offset = 0;
+
+	for (ptr = expr; '\0' != *ptr; ptr++)
+	{
+		if (terminator == *ptr && ZBX_FUNC_PARAM_QUOTED != state)
+		{
+			*par_r = ptr - expr;
+			return SUCCEED;
+		}
+
+		switch (state)
+		{
+			case ZBX_FUNC_PARAM_NEXT:
+				*lpp_offset = ptr - expr;
+				if ('"' == *ptr)
+					state = ZBX_FUNC_PARAM_QUOTED;
+				else if (' ' != *ptr && ',' != *ptr)
+					state = ZBX_FUNC_PARAM_UNQUOTED;
+				break;
+			case ZBX_FUNC_PARAM_QUOTED:
+				if ('"' == *ptr && '\\' != *(ptr - 1))
+					state = ZBX_FUNC_PARAM_POSTQUOTED;
+				break;
+			case ZBX_FUNC_PARAM_UNQUOTED:
+				if (',' == *ptr)
+					state = ZBX_FUNC_PARAM_NEXT;
+				break;
+			case ZBX_FUNC_PARAM_POSTQUOTED:
+				if (',' == *ptr)
+				{
+					state = ZBX_FUNC_PARAM_NEXT;
+				}
+				else if (' ' != *ptr)
+				{
+					*lpp_len = ptr - (expr + *lpp_offset);
+					return FAIL;
+				}
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+	}
+
+	*lpp_len = ptr - (expr + *lpp_offset);
+
+	if (terminator == *ptr && ZBX_FUNC_PARAM_QUOTED != state)
+	{
+		*par_r = ptr - expr;
+		return SUCCEED;
+	}
+
+	return FAIL;
+
+#undef ZBX_FUNC_PARAM_NEXT
+#undef ZBX_FUNC_PARAM_QUOTED
+#undef ZBX_FUNC_PARAM_UNQUOTED
+#undef ZBX_FUNC_PARAM_POSTQUOTED
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate parameters that end with '\0'                            *
+ *                                                                            *
+ * Parameters: expr       - [IN] string to parse that contains parameters     *
+ *             length     - [OUT] length of parameters                        *
+ *                                                                            *
+ * Return value: SUCCEED -  null termination encountered when quotes are      *
+ *                          closed and no other error                         *
+ *               FAIL    -  does not look like a valid                        *
+ *                          function parameter list                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_function_validate_parameters(const char *expr, size_t *length)
+{
+	size_t offset, len;
+
+	return function_validate_parameters(expr, '\0', length, &offset, &len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: given the position of opening function parenthesis find the       *
+ *          position of a closing one                                         *
+ *                                                                            *
+ * Parameters: expr       - [IN] string to parse                              *
+ *             par_l      - [IN] position of the opening parenthesis          *
+ *             par_r      - [OUT] position of the closing parenthesis         *
+ *             lpp_offset - [OUT] offset of the last parsed parameter         *
+ *             lpp_len    - [OUT] length of the last parsed parameter         *
+ *                                                                            *
+ * Return value: SUCCEED - closing parenthesis was found                      *
+ *               FAIL    - string after par_l does not look like a valid      *
+ *                         function parameter list                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	function_match_parenthesis(const char *expr, size_t par_l, size_t *par_r, size_t *lpp_offset,
+		size_t *lpp_len)
+{
+	if (SUCCEED == function_validate_parameters(expr + par_l + 1, ')', par_r, lpp_offset, lpp_len))
+	{
+		*par_r += par_l + 1;
+		return SUCCEED;
+	}
+
+	*lpp_offset += par_l + 1;
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check whether expression starts with a valid function             *
+ *                                                                            *
+ * Parameters: expr          - [IN] string to parse                           *
+ *             par_l         - [OUT] position of the opening parenthesis      *
+ *                                   or the amount of characters to skip      *
+ *             par_r         - [OUT] position of the closing parenthesis      *
+ *             error         - [OUT] error message                            *
+ *             max_error_len - [IN] error size                                *
+ *                                                                            *
+ * Return value: SUCCEED - string starts with a valid function                *
+ *               FAIL    - string does not start with a function and par_l    *
+ *                         characters can be safely skipped                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len)
+{
+	size_t	lpp_offset, lpp_len;
+
+	/* try to validate function name */
+	if (SUCCEED == function_parse_name(expr, par_l))
+	{
+		/* now we know the position of '(', try to find ')' */
+		if (SUCCEED == function_match_parenthesis(expr, *par_l, par_r, &lpp_offset, &lpp_len))
+			return SUCCEED;
+
+		if (NULL != error && *par_l > *par_r)
+		{
+			zbx_snprintf(error, max_error_len, "Incorrect function '%.*s' expression. "
+				"Check expression part starting from: %.*s",
+				(int)*par_l, expr, (int)lpp_len, expr + lpp_offset);
+
+			return FAIL;
+		}
+	}
+
+	if (NULL != error)
+		zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
+
+	return FAIL;
+}
+
+
+
+static const char	copyright_message[] =
+	"Copyright (C) 2022 Zabbix SIA\n"
+	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
+	"This is free software: you are free to change and redistribute it according to\n"
+	"the license. There is NO WARRANTY, to the extent permitted by law.";
+
+static const char	help_message_footer[] =
+	"Report bugs to: <https://support.zabbix.com>\n"
+	"Zabbix home page: <http://www.zabbix.com>\n"
+	"Documentation: <https://www.zabbix.com/documentation>";
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: print version and compilation time of application on stdout       *
+ *          by application request with parameter '-V'                        *
+ *                                                                            *
+ * Comments:  title_message - is global variable which must be initialized    *
+ *                            in each zabbix application                      *
+ *                                                                            *
+ ******************************************************************************/
+void	version(void)
+{
+	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
+	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
+	puts(copyright_message);
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	printf("\n");
+	zbx_tls_version();
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: print application parameters on stdout with layout suitable for   *
+ *          80-column terminal                                                *
+ *                                                                            *
+ * Comments:  usage_message - is global variable which must be initialized    *
+ *                            in each zabbix application                      *
+ *                                                                            *
+ ******************************************************************************/
+void	usage(void)
+{
+#define ZBX_MAXCOL	79
+#define ZBX_SPACE1	"  "			/* left margin for the first line */
+#define ZBX_SPACE2	"               "	/* left margin for subsequent lines */
+	const char	**p = usage_message;
+
+	if (NULL != *p)
+		printf("usage:\n");
+
+	while (NULL != *p)
+	{
+		size_t	pos;
+
+		printf("%s%s", ZBX_SPACE1, progname);
+		pos = ZBX_CONST_STRLEN(ZBX_SPACE1) + strlen(progname);
+
+		while (NULL != *p)
+		{
+			size_t	len;
+
+			len = strlen(*p);
+
+			if (ZBX_MAXCOL > pos + len)
+			{
+				pos += len + 1;
+				printf(" %s", *p);
+			}
+			else
+			{
+				pos = ZBX_CONST_STRLEN(ZBX_SPACE2) + len + 1;
+				printf("\n%s %s", ZBX_SPACE2, *p);
+			}
+
+			p++;
+		}
+
+		printf("\n");
+		p++;
+	}
+#undef ZBX_MAXCOL
+#undef ZBX_SPACE1
+#undef ZBX_SPACE2
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: print help of application parameters on stdout by application     *
+ *          request with parameter '-h'                                       *
+ *                                                                            *
+ * Comments:  help_message - is global variable which must be initialized     *
+ *                            in each zabbix application                      *
+ *                                                                            *
+ ******************************************************************************/
+void	help(void)
+{
+	const char	**p = help_message;
+
+	usage();
+	printf("\n");
+
+	while (NULL != *p)
+		printf("%s\n", *p++);
+
+	printf("\n");
+	puts(help_message_footer);
 }

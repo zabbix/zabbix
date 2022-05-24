@@ -25,6 +25,7 @@
 #include "zbxjson.h"
 #include "zbxmutexs.h"
 #include "zbxcrypto.h"
+#include "zbxstr.h"
 #if defined(_WINDOWS)
 #	include "../libs/zbxcrypto/tls.h"
 #else

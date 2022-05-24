@@ -26,6 +26,7 @@
 #include "../zbxcrypto/tls_tcp.h"
 #include "zbxcompress.h"
 #include "zbxxml.h"
+#include "zbxstr.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7
