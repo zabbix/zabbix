@@ -155,7 +155,8 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @param bool   $allowed['change_severity']         Whether user is allowed to change problems severity.
  * @param bool   $allowed['acknowledge']             Whether user is allowed to acknowledge problems.
  * @param bool   $allowed['close']                   Whether user is allowed to close problems.
- * @param bool   $allowed['suppress_problems']		 Whether user is allowed to manually suppress/unsuppress problems.
+ * @param bool   $allowed['suppress_problems']       Whether user is allowed to manually suppress/unsuppress problems.
+ *
  * @return CTableInfo
  */
 function make_event_details(array $event, array $allowed) {
@@ -278,6 +279,7 @@ function make_event_details(array $event, array $allowed) {
  * @param bool   $allowed['change_severity']  Whether user is allowed to change problems severity.
  * @param bool   $allowed['acknowledge']      Whether user is allowed to acknowledge problems.
  * @param bool   $allowed['close']            Whether user is allowed to close problems.
+ * @param bool   $allowed['suppress']         Whether user is allowed to suppress/unsuppress problems.
  *
  * @return CTableInfo
  */
