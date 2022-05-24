@@ -108,7 +108,7 @@ window.update_problem_popup = new class {
 			url = new Curl('zabbix.php', false),
 			form_data;
 
-		$form.trimValues(['#message']);
+		$form.trimValues(['#message', '#suppress_until_problem']);
 		form_data = jQuery('#message, input:visible, input[type=hidden]', $form).serialize();
 		url.setArgument('action', 'popup.acknowledge.create');
 
@@ -126,7 +126,7 @@ window.update_problem_popup = new class {
 			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
 
 			if ('error' in response) {
-				const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+				const message_box = makeMessageBox(<?= ZBX_STYLE_MSG_BAD ?>, response.error.messages, response.error.title);
 
 				message_box.insertBefore($form);
 			}
@@ -136,6 +136,4 @@ window.update_problem_popup = new class {
 			}
 		});
 	}
-}
-
-
+};

@@ -80,9 +80,7 @@ $form_list
 	)
 	->addRow(
 		(new CLabel([_('Suppress'),
-			makeHelpIcon([
-				_('Manual problem suppression. Date-time input accepts relative and absolute time format.')
-			])
+			makeHelpIcon(_('Manual problem suppression. Date-time input accepts relative and absolute time format.'))
 		])),
 		(new CList([
 			(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
@@ -101,11 +99,7 @@ $form_list
 		]))->addClass(ZBX_STYLE_HOR_LIST)
 	)
 	->addRow(
-		(new CLabel([_('Unsuppress'),
-			makeHelpIcon([
-				_('Deactivates manual suppression.')
-			])
-		])),
+		(new CLabel([_('Unsuppress'), makeHelpIcon(_('Deactivates manual suppression.'))])),
 		(new CList([
 			(new CCheckBox('unsuppress_problem', ZBX_PROBLEM_UPDATE_UNSUPPRESS))
 				->setChecked($data['unsuppress_problem'])
@@ -116,9 +110,9 @@ $form_list
 if ($data['has_unack_events']) {
 	$form_list->addRow(
 		(new CLabel([_('Acknowledge'),
-			makeHelpIcon([
+			makeHelpIcon(
 				_('Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation.')
-			])
+			)
 		])),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
 			->onChange("$('#unacknowledge_problem').prop('disabled', this.checked)")
@@ -144,13 +138,7 @@ $form_list
 		(new CDiv((new CLabel(_('At least one update operation or message must exist.')))->setAsteriskMark()))
 	);
 
-$form
-	->addItem($form_list)
-	->addItem(
-		(new CScriptTag('
-			update_problem_popup.init();
-		'))->setOnDocumentReady()
-	);
+$form->addItem($form_list);
 
 $output = [
 	'header' => $data['title'],
@@ -165,7 +153,8 @@ $output = [
 			'action' => 'update_problem_popup.submitAcknowledge(overlay);'
 		]
 	],
-	'script_inline' => $this->readJsFile('popup.acknowledge.edit.js.php')
+	'script_inline' => $this->readJsFile('popup.acknowledge.edit.js.php').
+		'update_problem_popup.init();'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

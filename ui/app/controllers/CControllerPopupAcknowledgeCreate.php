@@ -90,9 +90,9 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret && $this->getInput('suppress_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_SUPPRESS
-				&& $this->getInput('suppress_time_option') == ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE) {
+				&& $this->getInput('suppress_time_option', 0) == ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE) {
 			$this->suppress_until_time_parser = new CRangeTimeParser();
-			$this->suppress_until_time_parser->parse($this->getInput('suppress_until_problem'));
+			$this->suppress_until_time_parser->parse($this->getInput('suppress_until_problem', 0));
 
 			if ($this->suppress_until_time_parser->getDateTime(false)->getTimestamp() < time()) {
 				info(_s('Incorrect value for field "%1$s": %2$s.', _('time until suppress problem'),
@@ -470,7 +470,6 @@ class CControllerPopupAcknowledgeCreate extends CController {
 
 			$data['action'] |= ZBX_PROBLEM_UPDATE_UNSUPPRESS;
 			$eventid_groups['unsuppressible'] = array_diff($eventid_groups['unsuppressible'], $data['eventids']);
-
 		}
 
 		$eventid_groups['readable'] = array_diff($eventid_groups['readable'], $data['eventids']);
