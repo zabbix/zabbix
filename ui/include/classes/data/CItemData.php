@@ -278,6 +278,8 @@ final class CItemData {
 			'vmware.hv.uptime[<url>,<uuid>]',
 			'vmware.hv.version[<url>,<uuid>]',
 			'vmware.hv.vm.num[<url>,<uuid>]',
+			'vmware.rp.cpu.usage[<url>,<rpid>]',
+			'vmware.rp.memory[<url>,<rpid>,<mode>]',
 			'vmware.version[<url>]',
 			'vmware.vm.attribute[<url>,<uuid>,<name>]',
 			'vmware.vm.cluster.name[<url>,<uuid>]',
@@ -1421,6 +1423,14 @@ final class CItemData {
 			],
 			'vmware.hv.vm.num[<url>,<uuid>]' => [
 				'description' => _('Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.rp.cpu.usage[<url>,<rpid>]' => [
+				'description' => _('CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.rp.memory[<url>,<rpid>,<mode>]' => [
+				'description' => _('Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'vmware.version[<url>]' => [
