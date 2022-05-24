@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-16T10:23:21Z'
+  date: '2022-05-24T00:20:52Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -33,88 +33,133 @@ zabbix_export:
         -
           uuid: fff2354ba48b4deb861e47e980e9ed35
           name: 'HPE Primera: Get common provisioning groups'
-          type: SCRIPT
+          type: DEPENDENT
           key: hpe.primera.cpgs
+          delay: '0'
           history: 0d
           trends: '0'
           value_type: TEXT
-          params: |
-            var params = JSON.parse(value);
-            var fields = ['username', 'password', 'method', 'base_url'];
-            var result = {};
-            
-            fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-            		throw 'Required param is not set: "' + field + '".';
-            	}
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-            	params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('Content-Type: application/json');
-            
-            credentials = {'user' : params.username, 'password' : params.password};
-            
-            response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-            	try {
-            		auth_data = JSON.parse(response);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            sessionKey = auth_data['key'];
-            
-            request = new HttpRequest();
-            request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
-            
-            data = request.get(params.base_url + 'api/v1/' + params.method);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (data !== null) {
-            	try {
-            		result = JSON.stringify(data);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            request = new HttpRequest();
-            response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
-            
-            if (request.getStatus() !== 200) {
-            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            return data;
           description: 'A list of common provisioning groups.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.members
+                - $.cpgs.members
+          master_item:
+            key: hpe.primera.data
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 530e20083da8423e9d30c8342f1b7da3
+          name: 'HPE Primera: Get data'
+          type: SCRIPT
+          key: hpe.primera.data
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var params = JSON.parse(value),
+                fields = ['username', 'password', 'base_url'],
+                methods = ['disks', 'cpgs', 'hosts', 'ports', 'system', 'tasks', 'volumes'],
+                result = {},
+                errors = {},
+                data = {},
+                auth = 'auth',
+                logout = 'logout';
+            
+            fields.forEach(function (field) {
+                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
+                    throw 'Required param is not set: "' + field + '".';
+                }
+            });
+            
+            if (!params.base_url.endsWith('/')) {
+                params.base_url += '/';
+            }
+            
+            function getSessionKey() {
+                var response, request = new HttpRequest();
+                request.addHeader('Content-Type: application/json');
+            
+                credentials = {'user' : params.username, 'password' : params.password};
+            
+                response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
+            
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+                }
+            
+                if (response !== null) {
+                    try {
+                        auth_data = JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse auth response received from device API. Check debug log for more information.';
+                    }
+                }
+                return auth_data;
+            }
+            
+            try {
+                sessionKey = getSessionKey()['key'];
+            }
+            catch (error) {
+                errors[auth] = error.toString();
+            }
+            
+            function getHttpData(method) {
+                request = new HttpRequest();
+                request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
+            
+                raw_data = request.get(params.base_url + 'api/v1/' + method);
+            
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                }
+            
+                if (raw_data !== null) {
+                    try {
+                        result = JSON.stringify(raw_data);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from device API. Check debug log for more information.';
+                    }
+                }
+                return raw_data;
+            }
+            
+            for (var i in methods) {
+                try {
+                    data[methods[i]] = getHttpData(methods[i]);
+                }
+                catch (error) {
+                    errors[methods[i]] = error.toString();
+                }
+            }
+            
+            try {
+                request = new HttpRequest();
+                response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
+            
+                if (request.getStatus() !== 200) {
+                    throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
+                }
+            }
+            catch (error) {
+                errors[logout] = error.toString();
+            }
+            
+            data.errors = errors;
+            
+            return data;
+          description: 'The JSON with result of WSAPI requests.'
           timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
           parameters:
             -
               name: base_url
               value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: method
-              value: cpgs
             -
               name: password
               value: '{$HPE.PRIMERA.API.PASSWORD}'
@@ -128,94 +173,20 @@ zabbix_export:
         -
           uuid: 2b1fef9aacde40f2bc66cc918adad7ac
           name: 'HPE Primera: Get disks'
-          type: SCRIPT
+          type: DEPENDENT
           key: hpe.primera.disks
+          delay: '0'
           history: 0d
           trends: '0'
           value_type: TEXT
-          params: |
-            var params = JSON.parse(value);
-            var fields = ['username', 'password', 'method', 'base_url'];
-            var result = {};
-            
-            fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-            		throw 'Required param is not set: "' + field + '".';
-            	}
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-            	params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('Content-Type: application/json');
-            
-            credentials = {'user' : params.username, 'password' : params.password};
-            
-            response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-            	try {
-            		auth_data = JSON.parse(response);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            sessionKey = auth_data['key'];
-            
-            request = new HttpRequest();
-            request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
-            
-            data = request.get(params.base_url + 'api/v1/' + params.method);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (data !== null) {
-            	try {
-            		result = JSON.stringify(data);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            request = new HttpRequest();
-            response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
-            
-            if (request.getStatus() !== 200) {
-            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            return data;
           description: 'A list of physical disks.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.members
-          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: method
-              value: disks
-            -
-              name: password
-              value: '{$HPE.PRIMERA.API.PASSWORD}'
-            -
-              name: username
-              value: '{$HPE.PRIMERA.API.USERNAME}'
+                - $.disks.members
+          master_item:
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -223,97 +194,22 @@ zabbix_export:
         -
           uuid: d5b8a74991d34652973a78d58203d5fd
           name: 'HPE Primera: Disks total'
-          type: SCRIPT
+          type: DEPENDENT
           key: hpe.primera.disks.total
-          delay: 10m
+          delay: '0'
           history: 7d
-          params: |
-            var params = JSON.parse(value);
-            var fields = ['username', 'password', 'method', 'base_url'];
-            var result = {};
-            
-            fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-            		throw 'Required param is not set: "' + field + '".';
-            	}
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-            	params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('Content-Type: application/json');
-            
-            credentials = {'user' : params.username, 'password' : params.password};
-            
-            response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-            	try {
-            		auth_data = JSON.parse(response);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            sessionKey = auth_data['key'];
-            
-            request = new HttpRequest();
-            request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
-            
-            data = request.get(params.base_url + 'api/v1/' + params.method);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (data !== null) {
-            	try {
-            		result = JSON.stringify(data);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            request = new HttpRequest();
-            response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
-            
-            if (request.getStatus() !== 200) {
-            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            return data;
           description: 'Number of physical disks.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.total
+                - $.disks.total
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: method
-              value: disks
-            -
-              name: password
-              value: '{$HPE.PRIMERA.API.PASSWORD}'
-            -
-              name: username
-              value: '{$HPE.PRIMERA.API.USERNAME}'
+          master_item:
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -322,97 +218,59 @@ zabbix_export:
               tag: component
               value: storage
         -
-          uuid: fcd8380a5313449eb6cdbb06b0180a7c
-          name: 'HPE Primera: Get hosts'
-          type: SCRIPT
-          key: hpe.primera.hosts
-          delay: 10m
+          uuid: 484a6b9568234bbca9b4bcae2833bbf1
+          name: 'HPE Primera: Get errors'
+          type: DEPENDENT
+          key: hpe.primera.errors
+          delay: '0'
           history: 0d
           trends: '0'
           value_type: TEXT
-          params: |
-            var params = JSON.parse(value);
-            var fields = ['username', 'password', 'method', 'base_url'];
-            var result = {};
-            
-            fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-            		throw 'Required param is not set: "' + field + '".';
-            	}
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-            	params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('Content-Type: application/json');
-            
-            credentials = {'user' : params.username, 'password' : params.password};
-            
-            response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-            	try {
-            		auth_data = JSON.parse(response);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            sessionKey = auth_data['key'];
-            
-            request = new HttpRequest();
-            request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
-            
-            data = request.get(params.base_url + 'api/v1/' + params.method);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (data !== null) {
-            	try {
-            		result = JSON.stringify(data);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            request = new HttpRequest();
-            response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
-            
-            if (request.getStatus() !== 200) {
-            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            return data;
+          description: 'A list of errors from WSAPI requests.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.errors
+          master_item:
+            key: hpe.primera.data
+          tags:
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: 570d440e7ec9445585003208eca06e63
+              expression: 'length(last(/HPE Primera by HTTP/hpe.primera.errors))>0'
+              name: 'HPE Primera: There are errors in requests to WSAPI'
+              opdata: '{ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in requests to WSAPI.'
+              dependencies:
+                -
+                  name: 'HPE Primera: Service is unavailable'
+                  expression: 'last(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: fcd8380a5313449eb6cdbb06b0180a7c
+          name: 'HPE Primera: Get hosts'
+          type: DEPENDENT
+          key: hpe.primera.hosts
+          delay: '0'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
           description: 'A list of hosts.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.members
-          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: method
-              value: hosts
-            -
-              name: password
-              value: '{$HPE.PRIMERA.API.PASSWORD}'
-            -
-              name: username
-              value: '{$HPE.PRIMERA.API.USERNAME}'
+                - $.hosts.members
+          master_item:
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -420,94 +278,20 @@ zabbix_export:
         -
           uuid: 2aaa287a0d3849439ea16d7da4d822fe
           name: 'HPE Primera: Get ports'
-          type: SCRIPT
+          type: DEPENDENT
           key: hpe.primera.ports
+          delay: '0'
           history: 0d
           trends: '0'
           value_type: TEXT
-          params: |
-            var params = JSON.parse(value);
-            var fields = ['username', 'password', 'method', 'base_url'];
-            var result = {};
-            
-            fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-            		throw 'Required param is not set: "' + field + '".';
-            	}
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-            	params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('Content-Type: application/json');
-            
-            credentials = {'user' : params.username, 'password' : params.password};
-            
-            response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-            	try {
-            		auth_data = JSON.parse(response);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            sessionKey = auth_data['key'];
-            
-            request = new HttpRequest();
-            request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
-            
-            data = request.get(params.base_url + 'api/v1/' + params.method);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (data !== null) {
-            	try {
-            		result = JSON.stringify(data);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            request = new HttpRequest();
-            response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
-            
-            if (request.getStatus() !== 200) {
-            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            return data;
           description: 'A list of ports.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.members
-          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: method
-              value: ports
-            -
-              name: password
-              value: '{$HPE.PRIMERA.API.PASSWORD}'
-            -
-              name: username
-              value: '{$HPE.PRIMERA.API.USERNAME}'
+                - $.ports.members
+          master_item:
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -526,7 +310,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.allocatedCapacityMiB
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -558,7 +341,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.failedCapacityMiB
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -590,7 +372,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.freeCapacityMiB
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -622,7 +403,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.totalCapacityMiB
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -654,7 +434,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.chunkletSizeMiB
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -700,137 +479,22 @@ zabbix_export:
               tag: component
               value: system
         -
-          uuid: c1b34efe07d641698cefffe4beff50fc
-          name: 'HPE Primera: System health'
+          uuid: 0e0e4c5c08dd420ab26862bfa140d729
+          name: 'HPE Primera: Get system information'
           type: DEPENDENT
-          key: hpe.primera.system.health
+          key: hpe.primera.system.info
           delay: '0'
-          history: 7d
-          description: 'System availability by WSAPI.'
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          description: 'General system information.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.id
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '0'
+                - $.system
           master_item:
-            key: hpe.primera.system.info
-          tags:
-            -
-              tag: component
-              value: health
-            -
-              tag: component
-              value: system
-          triggers:
-            -
-              uuid: 570d440e7ec9445585003208eca06e63
-              expression: 'max(/HPE Primera by HTTP/hpe.primera.system.health,#3)=0'
-              name: 'HPE Primera: Failed to fetch data from WSAPI'
-              priority: AVERAGE
-              description: 'ID from system information is 0 or unable to retrieve system information.'
-              dependencies:
-                -
-                  name: 'HPE Primera: Service is unavailable'
-                  expression: 'last(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"])=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
-        -
-          uuid: 0e0e4c5c08dd420ab26862bfa140d729
-          name: 'HPE Primera: Get system information'
-          type: SCRIPT
-          key: hpe.primera.system.info
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value);
-            var fields = ['username', 'password', 'method', 'base_url'];
-            var result = {};
-            
-            fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-            		throw 'Required param is not set: "' + field + '".';
-            	}
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-            	params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('Content-Type: application/json');
-            
-            credentials = {'user' : params.username, 'password' : params.password};
-            
-            response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-            	try {
-            		auth_data = JSON.parse(response);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            sessionKey = auth_data['key'];
-            
-            request = new HttpRequest();
-            request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
-            
-            data = request.get(params.base_url + 'api/v1/' + params.method);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (data !== null) {
-            	try {
-            		result = JSON.stringify(data);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            request = new HttpRequest();
-            response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
-            
-            if (request.getStatus() !== 200) {
-            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            return data;
-          description: 'General system information.'
-          preprocessing:
-            -
-              type: CHECK_NOT_SUPPORTED
-              parameters:
-                - ''
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{}'
-          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: method
-              value: system
-            -
-              name: password
-              value: '{$HPE.PRIMERA.API.PASSWORD}'
-            -
-              name: username
-              value: '{$HPE.PRIMERA.API.USERNAME}'
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -878,7 +542,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.model
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -905,7 +568,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.name
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -929,7 +591,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.onlineNodes.length()
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -953,7 +614,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.totalNodes
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -980,7 +640,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.serialNumber
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1006,7 +665,6 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.systemVersion
-              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1020,80 +678,18 @@ zabbix_export:
         -
           uuid: 05fd350143374c73a5502011dd05b119
           name: 'HPE Primera: Get tasks'
-          type: SCRIPT
+          type: DEPENDENT
           key: hpe.primera.tasks
+          delay: '0'
           history: 0d
           trends: '0'
           value_type: TEXT
-          params: |
-            var params = JSON.parse(value);
-            var fields = ['username', 'password', 'method', 'base_url'];
-            var result = {};
-            
-            fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-            		throw 'Required param is not set: "' + field + '".';
-            	}
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-            	params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('Content-Type: application/json');
-            
-            credentials = {'user' : params.username, 'password' : params.password};
-            
-            response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-            	try {
-            		auth_data = JSON.parse(response);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            sessionKey = auth_data['key'];
-            
-            request = new HttpRequest();
-            request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
-            
-            data = request.get(params.base_url + 'api/v1/' + params.method);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (data !== null) {
-            	try {
-            		result = JSON.stringify(data);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            request = new HttpRequest();
-            response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
-            
-            if (request.getStatus() !== 200) {
-            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            return data;
           description: 'A list of latest executed, in progress or failed tasks.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.members
+                - $.tasks.members
             -
               type: JAVASCRIPT
               parameters:
@@ -1113,20 +709,8 @@ zabbix_export:
                   };
                   
                   return JSON.stringify(result);
-          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: method
-              value: tasks
-            -
-              name: password
-              value: '{$HPE.PRIMERA.API.PASSWORD}'
-            -
-              name: username
-              value: '{$HPE.PRIMERA.API.USERNAME}'
+          master_item:
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -1134,94 +718,20 @@ zabbix_export:
         -
           uuid: d1744dbb6e21418cb314e77041890f67
           name: 'HPE Primera: Get volumes'
-          type: SCRIPT
+          type: DEPENDENT
           key: hpe.primera.volumes
+          delay: '0'
           history: 0d
           trends: '0'
           value_type: TEXT
-          params: |
-            var params = JSON.parse(value);
-            var fields = ['username', 'password', 'method', 'base_url'];
-            var result = {};
-            
-            fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-            		throw 'Required param is not set: "' + field + '".';
-            	}
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-            	params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('Content-Type: application/json');
-            
-            credentials = {'user' : params.username, 'password' : params.password};
-            
-            response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-            	try {
-            		auth_data = JSON.parse(response);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            sessionKey = auth_data['key'];
-            
-            request = new HttpRequest();
-            request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
-            
-            data = request.get(params.base_url + 'api/v1/' + params.method);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-            	throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (data !== null) {
-            	try {
-            		result = JSON.stringify(data);
-            	}
-            	catch (error) {
-            		throw 'Failed to parse response received from device API. Check debug log for more information.';
-            	}
-            }
-            
-            request = new HttpRequest();
-            response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
-            
-            if (request.getStatus() !== 200) {
-            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            return data;
           description: 'A list of storage volumes.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - $.members
-          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: method
-              value: volumes
-            -
-              name: password
-              value: '{$HPE.PRIMERA.API.PASSWORD}'
-            -
-              name: username
-              value: '{$HPE.PRIMERA.API.USERNAME}'
+                - $.volumes.members
+          master_item:
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -1370,9 +880,6 @@ zabbix_export:
                 -
                   tag: component
                   value: cpg
-                -
-                  tag: component
-                  value: storage
                 -
                   tag: cpg
                   value: '{#NAME}'
@@ -4696,7 +4203,7 @@ zabbix_export:
           description: 'This macro is used in filters of CPGs discovery rule.'
         -
           macro: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          value: 3s
+          value: 15s
           description: 'Response timeout for WSAPI.'
         -
           macro: '{$HPE.PRIMERA.LLD.FILTER.TASK.NAME.MATCHES}'
