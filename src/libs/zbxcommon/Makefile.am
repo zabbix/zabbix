@@ -8,7 +8,6 @@ libzbxcommon_a_SOURCES = \
 	iprange.c \
 	misc.c \
 	setproctitle.c \
-	str.c \
 	time.c \
 	cuid.c
 

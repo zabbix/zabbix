@@ -112,9 +112,6 @@ static void	iprange_apply_mask(zbx_iprange_t *iprange, int bits)
 	}
 }
 
-#define ZBX_IPRANGE_GROUPS_V4	4
-#define ZBX_IPRANGE_GROUPS_V6	8
-
 /******************************************************************************
  *                                                                            *
  * Purpose: parse IPv4 address into IP range structure                        *
@@ -340,9 +337,6 @@ check_fill:
 
 	return SUCCEED;
 }
-
-#undef	ZBX_IPRANGE_GROUPS_V4
-#undef	ZBX_IPRANGE_GROUPS_V6
 
 /******************************************************************************
  *                                                                            *

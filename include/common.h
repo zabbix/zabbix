@@ -20,6 +20,7 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
+#include "zbxstr.h"
 #include "zbxsysinc.h"
 #include "module.h"
 #include "version.h"
@@ -1075,6 +1076,42 @@ int	is_time_suffix(const char *str, int *value, int length);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
+int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
+int	num_param(const char *p);
+char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replaces an item key, SNMP OID or their parameters                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      data      - [IN] an item key, SNMP OID or their parameter             *
+ *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
+ *      level     - [IN] for item keys and OIDs the level will be 0;          *
+ *                       for their parameters - 1 or higher (for arrays)      *
+ *      num       - [IN] parameter number; for item keys and OIDs the level   *
+ *                       will be 0; for their parameters - 1 or higher        *
+ *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
+ *      cb_data   - [IN] callback function custom data                        *
+ *      param     - [OUT] replaced item key string                            *
+ *                                                                            *
+ * Return value: SUCCEED - if parameter doesn't change or has been changed    *
+ *                         successfully                                       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: The new string should be quoted if it contains special           *
+ *           characters                                                       *
+ *                                                                            *
+ ******************************************************************************/
+typedef int	(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+		char **param);
+#define ZBX_KEY_TYPE_ITEM	0
+#define ZBX_KEY_TYPE_OID	1
+int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
+		size_t maxerrlen);
+void	remove_param(char *param, int num);
+int	get_key_param(char *param, int num, char *buf, size_t max_len);
+int	num_key_param(char *param);
+
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
 
 #define is_ushort(str, value) \
@@ -1113,13 +1150,6 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);
 
-
-#if defined(__GNUC__) || defined(__clang__)
-#	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
-#else
-#	define __zbx_attr_format_printf(idx1, idx2)
-#endif
-
 void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 #define ZBX_KIBIBYTE		1024
@@ -1157,6 +1187,8 @@ int		zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *
 int		zbx_day_in_month(int year, int mon);
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts);
 
+void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+
 /* misc functions */
 int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
@@ -1173,6 +1205,9 @@ int	ip_in_list(const char *list, const char *ip);
 /* IP range support */
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1
+
+#define ZBX_IPRANGE_GROUPS_V4	4
+#define ZBX_IPRANGE_GROUPS_V6	8
 
 typedef struct
 {

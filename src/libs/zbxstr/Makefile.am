@@ -4,6 +4,3 @@ noinst_LIBRARIES = libzbxstr.a
 
 libzbxstr_a_SOURCES = \
 	str.c
-
-
-

@@ -78,7 +78,7 @@ int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, ch
 	{
 		size_t	buf_len = strlen(buffer);
 #define	SID_SESSION_LENGTH	32
-		if (ZBX_SID_SESSION_LENGTH == buf_len)
+		if (SID_SESSION_LENGTH == buf_len)
 		{
 			ret = DBget_user_by_active_session(buffer, user);
 		}
@@ -95,7 +95,7 @@ int	zbx_get_user_from_json(const struct zbx_json_parse *jp, zbx_user_t *user, ch
 					ZBX_PROTO_TAG_SID, (unsigned long) buf_len);
 			ret = FAIL;
 		}
-#undefine	SID_SESSION_LENGTH
+#undef SID_SESSION_LENGTH
 	}
 	else
 	{

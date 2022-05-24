@@ -28,6 +28,7 @@
 #include "valuecache.h"
 #include "macrofunc.h"
 #include "zbxxml.h"
+#include "zbxstr.h"
 
 typedef struct
 {

@@ -20,6 +20,8 @@
 #ifndef ZABBIX_STR_H
 #define ZABBIX_STR_H
 
+#include "zbxtypes.h"
+
 void	help(void);
 void	usage(void);
 void	version(void);
@@ -42,45 +44,7 @@ char	*zbx_str_printable_dyn(const char *text);
 #define ZBX_WHITESPACE			" \t\r\n"
 #define zbx_remove_whitespace(str)	zbx_remove_chars(str, ZBX_WHITESPACE)
 void	del_zeros(char *s);
-int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
-int	num_param(const char *p);
-char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
 
-
-
-/******************************************************************************
- *                                                                            *
- * Purpose: replaces an item key, SNMP OID or their parameters                *
- *                                                                            *
- * Parameters:                                                                *
- *      data      - [IN] an item key, SNMP OID or their parameter             *
- *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
- *      level     - [IN] for item keys and OIDs the level will be 0;          *
- *                       for their parameters - 1 or higher (for arrays)      *
- *      num       - [IN] parameter number; for item keys and OIDs the level   *
- *                       will be 0; for their parameters - 1 or higher        *
- *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
- *      cb_data   - [IN] callback function custom data                        *
- *      param     - [OUT] replaced item key string                            *
- *                                                                            *
- * Return value: SUCCEED - if parameter doesn't change or has been changed    *
- *                         successfully                                       *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: The new string should be quoted if it contains special           *
- *           characters                                                       *
- *                                                                            *
- ******************************************************************************/
-typedef int	(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
-		char **param);
-#define ZBX_KEY_TYPE_ITEM	0
-#define ZBX_KEY_TYPE_OID	1
-int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
-		size_t maxerrlen);
-
-void	remove_param(char *param, int num);
-int	get_key_param(char *param, int num, char *buf, size_t max_len);
-int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
 int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charlist);
@@ -92,7 +56,11 @@ void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
 void	zbx_strarr_free(char ***arr);
 
-void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+#if defined(__GNUC__) || defined(__clang__)
+#	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
+#else
+#	define __zbx_attr_format_printf(idx1, idx2)
+#endif
 
 size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_format_printf(3, 4);
 
@@ -100,7 +68,6 @@ void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const cha
 		__zbx_attr_format_printf(4, 5);
 
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
-
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
@@ -327,6 +294,9 @@ zbx_token_t;
 #define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
 #define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
 #define ZBX_TOKEN_SEARCH_SIMPLE_MACRO		0x08	/* used by the upgrade patches only */
+
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
+		zbx_token_t *token);
 
 typedef int zbx_token_search_t;
 
