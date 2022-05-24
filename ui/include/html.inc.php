@@ -984,23 +984,28 @@ function makeSuppressedProblemIcon(array $icon_data) {
 	}
 
 	CArrayHelper::sort($icon_data, ['maintenance_name']);
-	$maintenance_names = implode(', ', array_column($icon_data, 'maintenance_name'));
-	$maintenance = $maintenance_names != null
-		? _s('Maintenance: %1$s', $maintenance_names)."\n"
-		: '';
 
-	$username = implode(', ', array_column($icon_data, 'username'));
-	$manually_by = $username != null
-		? _s('Manually by: %1$s', $username)."\n"
-		: '';
+	$maintenance_names = [];
+	$username = '';
+
+	foreach ($icon_data as $suppression) {
+		if (array_key_exists('maintenance_name', $suppression)) {
+			$maintenance_names[] = $suppression['maintenance_name'];
+		}
+		else {
+			$username = $suppression['username'];
+		}
+	}
+
+	$maintenances = implode(',', $maintenance_names);
 
 	return (new CLink())
 		->addClass(ZBX_STYLE_ICON_INVISIBLE)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
 			"\n".
-			$manually_by.
-			$maintenance
+			($username != '' ? _s('Manually by: %1$s', $username)."\n" : '').
+			($maintenances != '' ? _s('Maintenance: %1$s', $maintenances)."\n" : '')
 		);
 }
 
