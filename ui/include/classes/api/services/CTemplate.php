@@ -736,7 +736,7 @@ class CTemplate extends CHostGeneral {
 		$result = DBselect(DB::makeSql('hosts_templates', $options));
 
 		while ($row = DBfetch($result)) {
-			if (!in_array($row['templateid'], $templateids)) {
+			if (!in_array($row['hostid'], $templateids)) {
 				$del_links_clear[$row['templateid']][$row['hostid']] = true;
 			}
 		}
