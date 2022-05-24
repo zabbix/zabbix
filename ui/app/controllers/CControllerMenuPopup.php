@@ -716,6 +716,7 @@ class CControllerMenuPopup extends CController {
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
 							|| $can_be_closed
+							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 						)
 				);
 			}
