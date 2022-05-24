@@ -2293,7 +2293,9 @@ class C60XmlValidator extends CXmlValidatorGeneral {
 	 * @return array
 	 */
 	public function getYMinItemExtendedRules(array $data): array {
-		return $data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE || $data['ymin_type_1'] == CXmlConstantName::ITEM
+		$ymin_type_1 = array_key_exists('ymin_type_1', $data) ? $data['ymin_type_1'] : GRAPH_YAXIS_TYPE_CALCULATED;
+
+		return $ymin_type_1 == GRAPH_YAXIS_TYPE_ITEM_VALUE || $ymin_type_1 == CXmlConstantName::ITEM
 			? ['type' => XML_ARRAY, 'rules' => [
 				'host' =>	['type' => XML_STRING | XML_REQUIRED],
 				'key' =>	['type' => XML_STRING | XML_REQUIRED]
@@ -2307,7 +2309,9 @@ class C60XmlValidator extends CXmlValidatorGeneral {
 	 * @return array
 	 */
 	public function getYMaxItemExtendedRules(array $data): array {
-		return $data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE || $data['ymax_type_1'] == CXmlConstantName::ITEM
+		$ymax_type_1 = array_key_exists('ymax_type_1', $data) ? $data['ymax_type_1'] : GRAPH_YAXIS_TYPE_CALCULATED;
+
+		return $ymax_type_1 == GRAPH_YAXIS_TYPE_ITEM_VALUE || $ymax_type_1 == CXmlConstantName::ITEM
 			? ['type' => XML_ARRAY, 'rules' => [
 				'host' =>	['type' => XML_STRING | XML_REQUIRED],
 				'key' =>	['type' => XML_STRING | XML_REQUIRED]
