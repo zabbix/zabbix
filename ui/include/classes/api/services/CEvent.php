@@ -541,8 +541,8 @@ class CEvent extends CApiService {
 
 		$events = $this->get([
 			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid'],
-			'select_acknowledges' => $has_close_action? ['action'] : null,
-			'selectSuppressionData' => ['userid', 'suppress_until'],
+			'select_acknowledges' => $has_close_action ? ['action'] : null,
+			'selectSuppressionData' => ['userid'],
 			'eventids' => $data['eventids'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -554,6 +554,8 @@ class CEvent extends CApiService {
 		$unack_eventids = [];
 		$sev_change_eventids = [];
 		$acknowledges = [];
+		$suppress_eventids = [];
+		$unsuppress_eventids = [];
 
 		foreach ($events as $eventid => $event) {
 			$action = ZBX_PROBLEM_UPDATE_NONE;
@@ -605,7 +607,7 @@ class CEvent extends CApiService {
 
 			// Perform ZBX_PROBLEM_UPDATE_UNSUPPRESS action flag.
 			if (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS
-					&& array_key_exists('suppression_data', $event)) {
+					&& $event['suppression_data']['userid'] != 0) {
 				$action |= ZBX_PROBLEM_UPDATE_UNSUPPRESS;
 				$unsuppress_eventids[] = $eventid;
 			}
@@ -695,6 +697,7 @@ class CEvent extends CApiService {
 				DB::insertBatch('task_close_problem', $task_close, false);
 			}
 
+			// Create tasks for suppress/unsuppress actions.
 			$tasks = [];
 			$task_suppress = [];
 
