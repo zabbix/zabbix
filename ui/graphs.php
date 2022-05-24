@@ -96,8 +96,22 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 check_fields($fields);
 
 $gitems = [];
-foreach (getRequest('items', []) as $gitem) {
-	$gitems[] = json_decode($gitem, true);
+foreach (getRequest('items', []) as $item) {
+	$gitem = json_decode($item, true);
+
+	if (array_key_exists('itemid', $gitem)) {
+		$gitem['itemid'] = bcadd($gitem['itemid'], 0, 0);
+	}
+
+	if (array_key_exists('type', $gitem)) {
+		$gitem['type'] = (int) $gitem['type'];
+	}
+
+	if (array_key_exists('drawtype', $gitem)) {
+		$gitem['drawtype'] = (int) $gitem['drawtype'];
+	}
+
+	$gitems[] = $gitem;
 }
 
 $_REQUEST['items'] = $gitems;
@@ -620,18 +634,20 @@ elseif (isset($_REQUEST['form'])) {
 			'preservekeys' => true
 		]);
 
-		foreach ($data['items'] as &$item) {
-			$host = reset($items[$item['itemid']]['hosts']);
+		if ($items) {
+			foreach ($data['items'] as &$item) {
+				$host = reset($items[$item['itemid']]['hosts']);
 
-			$item['host'] = $host['name'];
-			$item['hostid'] = $items[$item['itemid']]['hostid'];
-			$item['name'] = $items[$item['itemid']]['name'];
-			$item['key_'] = $items[$item['itemid']]['key_'];
-			$item['flags'] = $items[$item['itemid']]['flags'];
+				$item['host'] = $host['name'];
+				$item['hostid'] = $items[$item['itemid']]['hostid'];
+				$item['name'] = $items[$item['itemid']]['name'];
+				$item['key_'] = $items[$item['itemid']]['key_'];
+				$item['flags'] = $items[$item['itemid']]['flags'];
+			}
+			unset($item);
+
+			$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 		}
-		unset($item);
-
-		$data['items'] = CMacrosResolverHelper::resolveItemNames($data['items']);
 	}
 
 	$data['items'] = array_values($data['items']);
