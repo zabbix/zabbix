@@ -1277,7 +1277,7 @@ class testFormServicesServices extends CWebTest {
 //		$this->assertMessage(TEST_GOOD, 'Service deleted');
 //		$this->assertFalse($this->query('link:Service for delete')->one(false)->isValid());
 
-//		$this->assertEquals(0, CDBHelper::getCount('SSELECT * FROM services WHERE name="Service for delete"'));
+//		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM services WHERE name="Service for delete"'));
 //	}
 
 	/**

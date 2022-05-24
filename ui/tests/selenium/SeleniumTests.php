@@ -127,6 +127,7 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 require_once dirname(__FILE__).'/services/testFormServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServices.php';
 require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php';
+require_once dirname(__FILE__).'/sla/testFormServicesSla.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
@@ -318,7 +319,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMacrosTemplate');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
-		$suite->addTestSuite('testFormServicesServices');
 		$suite->addTestSuite('testFormNetworkDiscovery');
 		$suite->addTestSuite('testFormPreprocessingCloneHost');
 		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
@@ -326,6 +326,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingItemPrototype');
 		$suite->addTestSuite('testFormPreprocessingLowLevelDiscovery');
 		$suite->addTestSuite('testFormPreprocessingTest');
+		$suite->addTestSuite('testFormServicesServices');
+		$suite->addTestSuite('testFormServicesSla');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');

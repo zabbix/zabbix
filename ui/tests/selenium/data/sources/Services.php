@@ -316,7 +316,7 @@ class Services {
 
 		$serviceids = CDataHelper::getIds('name');
 
-		$responce = CDataHelper::call('service.update', [
+		CDataHelper::call('service.update', [
 			[
 				'serviceid' =>  $serviceids['Child service of child service'],
 				'parents' => [
