@@ -1213,6 +1213,7 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
+int	zbx_function_validate_parameters(const char *expr, size_t *length);
 /* remaining temp string functions END */
 
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
