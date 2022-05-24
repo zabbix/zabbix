@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
-#include "common.h"
+#include "zbxstr.h"
 
 static const char	*read_utf8(const char *path_str, const char *path_hex)
 {
