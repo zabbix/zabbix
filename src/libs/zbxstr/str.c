@@ -2158,6 +2158,42 @@ void	dos2unix(char *str)
 	*o = '\0';
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: convert string to 64bit unsigned integer                          *
+ *                                                                            *
+ * Parameters: str   - string to convert                                      *
+ *             value - a pointer to converted value                           *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned integer                    *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Comments: the function automatically processes suffixes K, M, G, T         *
+ *                                                                            *
+ ******************************************************************************/
+int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
+{
+	size_t		sz;
+	const char	*p;
+	int		ret;
+	zbx_uint64_t	factor = 1;
+
+	sz = strlen(str);
+	p = str + sz - 1;
+
+	if (NULL != strchr(suffixes, *p))
+	{
+		factor = suffix2factor(*p);
+
+		sz--;
+	}
+
+	if (SUCCEED == (ret = is_uint64_n(str, sz, value)))
+		*value *= factor;
+
+	return ret;
+}
+
 int	is_ascii_string(const char *str)
 {
 	while ('\0' != *str)
