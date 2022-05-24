@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.2 and higher  
+For Zabbix version: 6.0 and higher  
 The template is developed for monitoring DBMS PostgreSQL and its forks.
 
 
@@ -14,12 +14,12 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1\. Create PostgreSQL user for monitoring (`<password>` at your discretion):
 
 ```bash
-CREATE USER 'zbx_monitor' WITH PASSWORD '<PASSWORD>' INHERIT;
+CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_dir(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_stat_file(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_waldir() TO zbx_monitor;
