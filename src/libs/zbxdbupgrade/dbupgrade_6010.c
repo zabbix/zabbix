@@ -655,7 +655,9 @@ static int	DBpatch_6010031(void)
 	return ret;
 }
 
-static int	DBpatch_6010032_startfrom(const zbx_vector_str_t *names, const char *name)
+#define	CHECK_CHILDREN_ONLY	0
+#define CHECK_PARENTS		1
+static int	DBpatch_6010032_startfrom(const zbx_vector_str_t *names, const char *name, int check_parents)
 {
 	int	i;
 
@@ -670,7 +672,7 @@ static int	DBpatch_6010032_startfrom(const zbx_vector_str_t *names, const char *
 		if (g_sz == t_sz)
 			continue;
 
-		if (t_sz < g_sz)
+		if (t_sz < g_sz && CHECK_CHILDREN_ONLY != check_parents)
 		{
 			zbx_strlcpy(tmp, names->values[i], sizeof(tmp));
 			zbx_strlcat(tmp, "/", sizeof(tmp));
@@ -726,7 +728,7 @@ static int	DBpatch_6010032_update_empty(void)
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		if (FAIL == DBpatch_6010032_startfrom(&names, row[1]))
+		if (FAIL == DBpatch_6010032_startfrom(&names, row[1], CHECK_PARENTS))
 			continue;
 
 		zbx_vector_str_append(&names, zbx_strdup(NULL, row[1]));
@@ -761,6 +763,123 @@ static int	DBpatch_6010032(void)
 	return DBpatch_6010032_update_empty();
 }
 
+static int	DBpatch_6010033_create_empty_hostgroups(void)
+{
+	int			i, permission, ret = SUCCEED;
+	zbx_uint64_t		nextid, groupid;
+	zbx_vector_str_t	names;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_hstgrp_t	hstgrps;
+	zbx_db_insert_t		db_insert;
+
+	zbx_vector_hstgrp_create(&hstgrps);
+
+	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
+
+	result = DBselect(
+			"select name from hstgrp"
+			" where type=%d"
+			" order by length(name)", HOSTGROUP_TYPE_HOST);
+
+	zbx_vector_str_create(&names);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_vector_str_append(&names, zbx_strdup(NULL, row[0]));
+	}
+	DBfree_result(result);
+
+	result = DBselect(
+			"select g.groupid,g.name,g.uuid from hstgrp g"
+			" left join hosts_groups hg on hg.groupid=g.groupid"
+			" left join group_prototype p on p.groupid=g.groupid"
+			" where type=%d"
+			" order by length(g.name)", HOSTGROUP_TYPE_TEMPLATE);
+
+	nextid = DBget_maxid_num("hstgrp", hstgrps.values_num);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		hstgrp_t	*hstgrp;
+
+		if (SUCCEED == zbx_vector_str_search(&names, row[1], ZBX_DEFAULT_STR_COMPARE_FUNC) ||
+				FAIL == DBpatch_6010032_startfrom(&names, row[1], CHECK_CHILDREN_ONLY))
+			continue;
+
+		zbx_vector_str_append(&names, zbx_strdup(NULL, row[1]));
+
+		hstgrp = (hstgrp_t *)zbx_malloc(NULL, sizeof(hstgrp_t));
+		memset(hstgrp, 0, sizeof(hstgrp_t));
+
+		ZBX_STR2UINT64(hstgrp->groupid, row[0]);
+		hstgrp->name = zbx_strdup(NULL, row[1]);
+		hstgrp->uuid = zbx_strdup(NULL, row[2]);
+
+		zbx_vector_hstgrp_append(&hstgrps, hstgrp);
+	}
+	DBfree_result(result);
+
+	if (0 == hstgrps.values_num)
+		goto out;
+
+	nextid = DBget_maxid_num("hstgrp", hstgrps.values_num);
+
+	for (i = 0; i < hstgrps.values_num; i++)
+	{
+		hstgrps.values[i]->newgroupid = nextid++;
+
+		zbx_db_insert_add_values(&db_insert, hstgrps.values[i]->newgroupid, hstgrps.values[i]->name,
+				HOSTGROUP_TYPE_HOST, hstgrps.values[i]->uuid);
+	}
+
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
+		goto out;
+
+	zbx_db_insert_clean(&db_insert);
+	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", NULL);
+
+	for (i = 0; i < hstgrps.values_num; i++)
+	{
+		result = DBselect(
+				"select groupid,permission"
+				" from rights"
+				" where id=" ZBX_FS_UI64,
+				hstgrps.values[i]->groupid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(groupid, row[0]);
+			permission = atoi(row[1]);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid, permission,
+					hstgrps.values[i]->newgroupid);
+		}
+		DBfree_result(result);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "rightid");
+
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
+		goto out;
+out:
+	zbx_vector_str_clear_ext(&names, zbx_str_free);
+	zbx_vector_str_destroy(&names);
+
+	zbx_db_insert_clean(&db_insert);
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010030_hstgrp_free);
+	zbx_vector_hstgrp_destroy(&hstgrps);
+
+	return ret;
+}
+
+static int	DBpatch_6010033(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBpatch_6010033_create_empty_hostgroups();
+}
+
 #define RENAME_PROFILE(old, new)								\
 												\
 do {												\
@@ -771,7 +890,7 @@ do {												\
 	}											\
 } while (0)
 
-static int	DBpatch_6010033(void)
+static int	DBpatch_6010034(void)
 {
 	int ret = SUCCEED;
 
@@ -787,6 +906,8 @@ out:
 }
 
 #undef RENAME_PROFILE
+#undef CHECK_CHILDREN_ONLY
+#undef CHECK_PARENTS
 #undef DBPATCH_HOST_STATUS_TEMPLATE
 #undef DBPATCH_GROUPIDS
 #undef DBPATCH_TPLGRP_GROUPIDS
@@ -832,5 +953,6 @@ DBPATCH_ADD(6010030, 0, 1)
 DBPATCH_ADD(6010031, 0, 1)
 DBPATCH_ADD(6010032, 0, 1)
 DBPATCH_ADD(6010033, 0, 1)
+DBPATCH_ADD(6010034, 0, 1)
 
 DBPATCH_END()
