@@ -72,6 +72,10 @@ class CDiscoveryRuleManager {
 		}
 
 		// Delete LLD rules.
+		DB::update('items', [
+			'values' => ['templateid' => 0],
+			'where' => ['itemid' => $ruleids]
+		]);
 		DB::delete('items', ['itemid' => $ruleids]);
 
 		$insert = [];
