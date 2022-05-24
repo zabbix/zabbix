@@ -2492,7 +2492,7 @@ abstract class CTriggerGeneral extends CApiService {
 			array $trigger_hosts): void {
 		/*
 		 * From the given trigger dependencies we should keep only the dependencies of the template triggers. There is
-		 * also no need to check the dependencies of triggers from the same template, because that is considered a
+		 * also no need to check the dependencies on triggers from the same template, because that is considered a
 		 * valid case. Thus, among the triggers that the template triggers depends on, we should only keep triggers from
 		 * other templates and hosts.
 		 */

@@ -834,9 +834,7 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Deletes all trigger dependencies from the given triggers and their children.
 	 *
-	 * @param array $triggers   An array of triggers with the 'triggerid' field defined.
-	 * @param bool  $inherited  Determines whether to check permissions for deleted dependencies. Permissions are not
-	 *                          validated for inherited triggers.
+	 * @param array $triggers An array of triggers with the 'triggerid' field defined.
 	 *
 	 * @return array
 	 */
