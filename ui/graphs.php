@@ -99,19 +99,11 @@ $gitems = [];
 foreach (getRequest('items', []) as $item) {
 	$gitem = json_decode($item, true);
 
-	if (array_key_exists('itemid', $gitem)) {
-		$gitem['itemid'] = bcadd($gitem['itemid'], 0, 0);
+	if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+			&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+			&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+		$gitems[] = $gitem;
 	}
-
-	if (array_key_exists('type', $gitem)) {
-		$gitem['type'] = (int) $gitem['type'];
-	}
-
-	if (array_key_exists('drawtype', $gitem)) {
-		$gitem['drawtype'] = (int) $gitem['drawtype'];
-	}
-
-	$gitems[] = $gitem;
 }
 
 $_REQUEST['items'] = $gitems;
