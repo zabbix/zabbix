@@ -2025,8 +2025,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param array  $data  Import data.
 	 * @param string $path  XML path (for error reporting).
 	 *
-	 * @throws Exception if $data does not correspond to validation rules.
-	 *
 	 * @return array  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted array is returned.
 	 */
@@ -2058,8 +2056,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @param array|null $parent_data  Data's parent array.
 	 *
-	 * @throws Exception if the check is failed.
-	 *
 	 * @return bool
 	 */
 	public function requiredMapElement(array $parent_data = null) {
@@ -2082,8 +2078,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|string      $data         Import data.
 	 * @param array|null        $parent_data  Data's parent array.
 	 * @param string            $path         XML path.
-	 *
-	 * @throws Exception if the map elements are invalid.
 	 *
 	 * @return array|string
 	 */
@@ -2115,8 +2109,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|null  $parent_data  Data's parent array.
 	 * @param string      $path         XML path.
 	 *
-	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateYMinItem($data, ?array $parent_data, $path) {
@@ -2132,8 +2124,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|null  $parent_data  Data's parent array.
 	 * @param string      $path         XML path.
 	 *
-	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateYMaxItem($data, ?array $parent_data, $path) {
@@ -2148,8 +2138,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param string      $data         Import data.
 	 * @param array|null  $parent_data  Data's parent array.
 	 * @param string      $path         XML path.
-	 *
-	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
@@ -2176,8 +2164,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|string  $data         Import data.
 	 * @param array|null    $parent_data  Data's parent array.
 	 * @param string        $path         XML path.
-	 *
-	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
@@ -2206,8 +2192,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|null  $parent_data  Data's parent array.
 	 * @param string      $path         XML path.
 	 *
-	 * @throws Exception if the element is invalid.
-	 *
 	 * @return array
 	 */
 	public function validateMasterItem($data, ?array $parent_data, $path) {
@@ -2227,8 +2211,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param string      $data         Import data.
 	 * @param array|null  $parent_data  Data's parent array.
 	 * @param string      $path         XML path.
-	 *
-	 * @throws Exception if the element is invalid.
 	 *
 	 * @return array
 	 */
@@ -2264,8 +2246,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|null    $parent_data  Data's parent array.
 	 * @param string        $path         XML path.
 	 *
-	 * @throws Exception if the element is invalid.
-	 *
 	 * @return string|array
 	 */
 	public function validatePreprocErrHandler($data, ?array $parent_data, $path) {
@@ -2286,8 +2266,6 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 	 * @param string|array  $data         Import data.
 	 * @param array|null    $parent_data  Data's parent array.
 	 * @param string        $path         XML path.
-	 *
-	 * @throws Exception if the element is invalid.
 	 *
 	 * @return string|array
 	 */

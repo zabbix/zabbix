@@ -51,7 +51,9 @@ class CConfigurationExportBuilder {
 	 * @param string $tag       Tag name.
 	 * @param string $main_tag  Main element (for error reporting).
 	 *
-	 * @return array
+	 * @throws Exception  if row is invalid.
+	 *
+	 * @return mixed
 	 */
 	private static function buildArrayRow(array $rule, array $row, string $tag, string $main_tag) {
 		if (array_key_exists('ex_rules', $rule)) {
@@ -91,6 +93,7 @@ class CConfigurationExportBuilder {
 
 		if (($is_indexed_array || $is_array) && $has_data) {
 			$temp_store = self::build($rule, $is_array ? [$value] : $value, $tag);
+
 			return ($is_required || $temp_store) ? $temp_store : null;
 		}
 
@@ -120,7 +123,7 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	private static function build(array $schema, array $data, $main_tag = null) {
+	private static function build(array $schema, array $data, string $main_tag) {
 		$n = 0;
 		$result = [];
 
