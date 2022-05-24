@@ -2210,55 +2210,6 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
-	 * Checks if the given dependencies already exist.
-	 *
-	 * @param array $trigger_dependencies[<triggerid_up>][<triggerid>]
-	 *
-	 * @throws APIException
-	 */
-	protected static function checkDependencyDuplicates(array $trigger_dependencies) {
-		$all_triggerids = [];
-
-		foreach ($trigger_dependencies as $triggerids) {
-			$all_triggerids += $triggerids;
-		}
-
-		$options = [
-			'output' => ['triggerid_down', 'triggerid_up'],
-			'filter' => [
-				'triggerid_down' => array_keys($all_triggerids),
-				'triggerid_up' => array_keys($trigger_dependencies)
-			]
-		];
-		$result = DBselect(DB::makeSql('trigger_depends', $options));
-
-		while ($row = DBfetch($result)) {
-			if (array_key_exists($row['triggerid_up'], $trigger_dependencies)
-					&& in_array($row['triggerid_down'], $trigger_dependencies[$row['triggerid_up']])) {
-				$duplicates = DB::select('triggers', [
-					'output' => ['description', 'flags'],
-					'triggerids' => [$row['triggerid_down'], $row['triggerid_up']],
-					'preservekeys' => true
-				]);
-
-				if ($duplicates[$row['triggerid_down']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-					$error = _('The dependency of trigger "%1$s" on trigger "%2$s" already exists.');
-				}
-				else {
-					$error = ($duplicates[$row['triggerid_up']]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
-						? _('The dependency of trigger prototype "%1$s" on trigger "%2$s" already exists.')
-						: _('The dependency of trigger prototype "%1$s" on trigger prototype "%2$s" already exists.');
-				}
-
-				self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error,
-					$duplicates[$row['triggerid_down']]['description'],
-					$duplicates[$row['triggerid_up']]['description']
-				));
-			}
-		}
-	}
-
-	/**
 	 * Check whether circular linkage occurs as a result of the given changes in trigger dependencies.
 	 *
 	 * @param array $ins_dependencies[<triggerid_up>][<triggerid>]
