@@ -488,19 +488,15 @@ abstract class CHostBase extends CApiService {
 
 							if (bccomp($template['hostid'], $templateid) == 0) {
 								$template_name = $description;
-
-								if (array_key_exists($template['hostid'], $links_path)) {
-									$links_path = [];
-									break;
-								}
 							}
 							else {
 								$links_path[$template['hostid']] = $description;
 							}
 						}
 
-						$circular_linkage = $template_name.($links_path ? ' -> '.implode(' -> ', $links_path) : '').
-							' -> '.$template_name;
+						$circular_linkage = (bccomp($templateid, $hostid) == 0)
+							? $template_name.' -> '.$template_name
+							: $template_name.' -> '.implode(' -> ', $links_path).' -> '.$template_name;
 
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Cannot link template "%1$s" to template "%2$s", because a circular linkage (%3$s) would occur.',

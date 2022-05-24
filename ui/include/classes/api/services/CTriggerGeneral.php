@@ -2284,6 +2284,11 @@ abstract class CTriggerGeneral extends CApiService {
 			$_triggerids_down = [];
 
 			while ($row = DBfetch($result)) {
+				if (array_key_exists($row['triggerid_up'], $del_dependencies)
+						&& array_key_exists($row['triggerid_down'], $del_dependencies[$row['triggerid_up']])) {
+					continue;
+				}
+
 				if (!array_key_exists($row['triggerid_up'], $links)) {
 					$_triggerids_down[$row['triggerid_up']] = true;
 				}
@@ -2320,19 +2325,15 @@ abstract class CTriggerGeneral extends CApiService {
 
 							if (bccomp($_triggerid, $triggerid_up) == 0) {
 								$trigger_up_name = $description;
-
-								if (array_key_exists($_triggerid, $links_path)) {
-									$links_path = [];
-									break;
-								}
 							}
 							else {
 								$links_path[$_triggerid] = $description;
 							}
 						}
 
-						$circular_linkage = $trigger_up_name.($links_path ? ' -> '.implode(' -> ', $links_path) : '').
-							' -> '.$trigger_up_name;
+						$circular_linkage = (bccomp($triggerid_up, $triggerid) == 0)
+							? $trigger_up_name.' -> '.$trigger_up_name
+							: $trigger_up_name.' -> '.implode(' -> ', $links_path).' -> '.$trigger_up_name;
 
 						$non_prototype = $triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL;
 
