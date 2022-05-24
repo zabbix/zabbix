@@ -228,7 +228,7 @@ switch ($data['type']) {
 					->addRow(_('Trigger source'),
 						(new CRadioButtonList('trigger_context', $data['trigger_context']))
 							->addValue(_('Host'), 'host')
-							->addValue(_('Trigger'), 'template')
+							->addValue(_('Template'), 'template')
 							->setModern(true)
 					)
 					->addRow(_('Triggers'), $trigger_multiselect);
