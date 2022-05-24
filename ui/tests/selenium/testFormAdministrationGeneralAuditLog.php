@@ -20,10 +20,9 @@
 
 require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
-
 /**
  * @backup config
- */
+ **/
 class testFormAdministrationGeneralAuditLog extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=audit.settings.edit';
@@ -44,36 +43,18 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
-	 */
+	 **/
 	public function getBehaviors() {
 		return ['class' => CMessageBehavior::class];
 	}
 
-	// Navigate to audit log page from dashboard page.
-	private function NavigateToAuditLog(){
-		$this->page->login()->open('zabbix.php?action=gui.edit');
-		$this->query('id:page-title-general')->asPopupButton()->one()->select('Audit log');
-	}
-
-	// Reset and check default values.
-	private function ResetValues(){
-		$form = $this->query('id:audit-settings')->asForm()->one();
-		$form->query('id:resetDefaults')->one()->click();
-		COverlayDialogElement::find()->waitUntilVisible()->one()->query('button', 'Reset defaults')->one()->click();
-		$form->submit();
-		$form->checkValue(['Enable audit logging' => true,'Enable internal housekeeping' => true,
-			'Data storage period' => '365d']);
-	}
-
 	/**
-	* The function's main purpose is to check if the layout of the page is not broken and fields are in their place,
-	* Additional checkups are made and committed within the function.
-	*/
-	public function testFormAdministrationGeneralAuditLog_CheckLayout(){
+	 * The function's main purpose is to check if the layout of the page is not broken and fields are in their place,
+	 * Additional checkups are made and committed within the function.
+	 **/
+	public function testFormAdministrationGeneralAuditLog_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=audit.settings.edit');
 		$form = $this->query('id:audit-settings')->asForm()->one();
-		$form->fill(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
-			'Data storage period' => '365d']);
 		$form->checkValue(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
 			'Data storage period' => '365d']);
 
@@ -91,16 +72,16 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	}
 
 	/**
-	* Test for checking 'Reset defaults' button.
-	*/
-	public function testFormAdministrationGeneralAuditLog_CheckResetDefaultButtonsFunctions(){
+	 * Test for checking 'Reset defaults' button.
+	 **/
+	public function testFormAdministrationGeneralAuditLog_CheckResetDefaultButtonsFunctions() {
 		$this->executeResetButtonTest();
 	}
 
 	/**
-	* Test for checking form update without changing any data.
-	*/
-	public function testFormAdministrationGeneralAuditLog_SimpleUpdate(){
+	 * Test for checking form update without changing any data.
+	 **/
+	public function testFormAdministrationGeneralAuditLog_SimpleUpdate() {
 		$this->executeSimpleUpdate();
 	}
 
@@ -150,198 +131,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '`!@#$%^&*()_+|'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '`!@#$%^&*()_+|'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => 'test'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => 'test'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => ' '
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => ' '
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '¯\_(ツ)_/¯'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '¯\_(ツ)_/¯'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '0s'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '0s'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1s'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1s'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1m'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1m'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1439m'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1439m'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
@@ -375,66 +164,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '13140001m'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '13140001m'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1h'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1h'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '23h'
-					],
-					'message' => 'Cannot update configuration',
-					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
@@ -501,11 +230,273 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1d'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1d'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1w'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1w'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '86400s'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '86400s'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '788400000s'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '788400000s'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '788399999s'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '788399999s'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '9125d'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '9125d'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1303w'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1303w'
+					],
+					'message' => 'Configuration updated'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '`!@#$%^&*()_+|'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
-						'Data storage period' => '219001h'
+						'Data storage period' => '`!@#$%^&*()_+|'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => 'test'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => 'test'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => ' '
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => ' '
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '¯\_(ツ)_/¯'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '¯\_(ツ)_/¯'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '0s'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '0s'
 					],
 					'message' => 'Cannot update configuration',
 					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
@@ -517,7 +508,103 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
-						'Data storage period' => '219001h'
+						'Data storage period' => '1s'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1s'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1439m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1439m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '13140001m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => false,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '13140001m'
+					],
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Enable audit logging' => true,
+						'Enable internal housekeeping' => true,
+						'Data storage period' => '1h'
 					],
 					'message' => 'Cannot update configuration',
 					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
@@ -537,46 +624,26 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1d'
-					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
-						'Data storage period' => '1d'
+						'Data storage period' => '219001h'
 					],
-					'message' => 'Configuration updated'
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
-						'Data storage period' => '1w'
+						'Data storage period' => '219001h'
 					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1w'
-					],
-					'message' => 'Configuration updated'
+					'message' => 'Cannot update configuration',
+					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
 			[
@@ -629,28 +696,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '86400s'
-					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '86400s'
-					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
@@ -675,50 +720,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '788400000s'
-					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '788400000s'
-					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '788399999s'
-					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '788399999s'
-					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
@@ -739,28 +740,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'message' => 'Cannot update configuration',
 					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '9125d'
-					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '9125d'
-					],
-					'message' => 'Configuration updated'
 				]
 			],
 			[
@@ -809,55 +788,34 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'message' => 'Cannot update configuration',
 					'msgdetails' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => true,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1303w'
-					],
-					'message' => 'Configuration updated'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Enable audit logging' => false,
-						'Enable internal housekeeping' => true,
-						'Data storage period' => '1303w'
-					],
-					'message' => 'Configuration updated'
 				]
 			]
 		];
 	}
 
 	/**
-	* Function tests all possible variants for the "Data storage period" field, checking boundary values,
-	* and using all possible time units (s/d/h/w/M/y) by submitting different values.
-	* After each data set values are reset, for which a private function is used.
-	*
-	* @dataProvider getUpdateValueData
-	*/
-	public function testFormAdministrationGeneralAuditLog_UpdateParameters($data){
+	 * Function tests all possible variants for the "Data storage period" field, checking boundary values,
+	 * and using all possible time units (s/d/h/w/M/y) by submitting different values.
+	 * After each data set values are reset, for which a private function is used.
+	 *
+	 * @dataProvider getUpdateValueData
+	 **/
+	public function testFormAdministrationGeneralAuditLog_UpdateParameters($data) {
 		$this->page->login()->open('zabbix.php?action=audit.settings.edit');
 		$form = $this->query('id:audit-settings')->asForm()->one();
+		$form->fill($data['fields']);
+		$form->submit();
 
-		if($data['expected'] === TEST_GOOD){
-			$form->fill($data['fields']);
-			$form->submit();
+		if($data['expected'] === TEST_GOOD) {
 			$this->assertMessage(TEST_GOOD, $data['message']);
-			$this->ResetValues();
-		}
-		else{
-			$form->fill($data['fields']);
+			$form->query('id:resetDefaults')->one()->click();
+			COverlayDialogElement::find()->waitUntilVisible()->one()->query('button', 'Reset defaults')->one()->click();
 			$form->submit();
-			$this->assertMessage(TEST_BAD, $data['message'],$data['msgdetails']);
-			$this->query('xpath://output[@class="msg-bad"]/button')->one()->click();
+			$form->checkValue(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
+				'Data storage period' => '365d']);
+		}
+		else {
+			$this->assertMessage(TEST_BAD, $data['message'], $data['msgdetails']);
 		}
 	}
 }
