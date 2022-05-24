@@ -48,10 +48,9 @@ foreach ($data['macros'] as $i => $macro) {
 	}
 
 	if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
-		$original_value = array_key_exists('value', $macro) ? $macro['value'] : '';
-		$macro_cell[] = new CVar('macros['.$i.'][original][value]', $original_value);
-		$macro_cell[] = new CVar('macros['.$i.'][original][description]', $macro['description']);
-		$macro_cell[] = new CVar('macros['.$i.'][original][macro_type]', $macro['type']);
+		$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
+		$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
+		$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
 	}
 
 	$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))

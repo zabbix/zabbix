@@ -133,6 +133,9 @@ class HostMacrosManager {
 				const macro_num = e.target.id.split('_')[1];
 				const inherited_type = $('#macros_'+macro_num+'_inherited_type').val();
 				const macro_type = $('#macros_'+macro_num+'_inherited_macro_type').val();
+				const inherited_value_field_state = (macro_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET)
+					? {'disabled': true}
+					: {'readonly': true};
 
 				if (inherited_type & HostMacrosManager.ZBX_PROPERTY_OWN) {
 					// Switching from ZBX_PROPERTY_BOTH to ZBX_PROPERTY_INHERITED.
@@ -150,12 +153,9 @@ class HostMacrosManager {
 						.val(macro_type)
 						.trigger('change');
 					$('#macros_'+macro_num+'_value')
-						.prop('readonly', true)
+						.prop(inherited_value_field_state)
 						.val($('#macros_'+macro_num+'_inherited_value').val())
 						.trigger('input');
-					if (macro_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET) {
-						jQuery('#macros_'+macro_num+'_value').prop('disabled', true);
-					}
 					$('#macros_'+macro_num+'_value')
 						.closest('.macro-input-group')
 						.find('.btn-undo')
@@ -189,6 +189,9 @@ class HostMacrosManager {
 					const original_type = $('#macros_'+num+'_original_macro_type').val();
 					const original_value = $('#macros_'+num+'_original_value', $row).val();
 					const original_descr = $('#macros_'+num+'_original_description', $row).val();
+					const original_value_field_state = (original_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET)
+						? {'disabled': true}
+						: {'readonly': true};
 
 					$('#macros_'+num+'_type_button', $row)
 						.removeClass()
@@ -200,19 +203,17 @@ class HostMacrosManager {
 						.trigger('change');
 					$('#macros_'+num+'_value', $row)
 						.val(original_value)
-						.prop('readonly', true)
+						.prop(original_value_field_state)
 						.trigger('input');
-					if (original_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET) {
-						$('#macros_'+num+'_value', $row).prop('disabled', true);
-					}
 					$('#macros_'+num+'_value', $row)
 						.closest('.macro-input-group')
 						.find('.btn-undo')
 						.hide();
-					$('#macros_'+num+'_description', $row)
+					$('#macros_'+num+'_description')
 						.val(original_descr)
 						.prop('readonly', true)
 						.trigger('input');
+					$('#macros_'+num+'_type_button', $row).trigger('change');
 					$discovery.val(HostMacrosManager.DISCOVERY_STATE_AUTOMATIC);
 					$('#macros_'+num+'_change_state').text(t('Change'));
 				}
@@ -223,7 +224,8 @@ class HostMacrosManager {
 					$('#macros_'+num+'_type_button', $row)
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
-					$('#macros_'+num+'_description', $row).prop('readonly', false);
+					$('#macros_'+num+'_description').prop('readonly', false);
+					$('#macros_'+num+'_type_button', $row).trigger('change');
 					$discovery.val(HostMacrosManager.DISCOVERY_STATE_CONVERTING);
 					$('#macros_'+num+'_change_state').text(t('Revert'));
 				}

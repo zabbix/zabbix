@@ -77,10 +77,9 @@ foreach ($data['macros'] as $i => $macro) {
 	}
 
 	if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
-		$original_value = array_key_exists('value', $macro) ? $macro['value'] : '';
-		$macro_cell[] = new CVar('macros['.$i.'][original][value]', $original_value);
-		$macro_cell[] = new CVar('macros['.$i.'][original][description]', $macro['description']);
-		$macro_cell[] = new CVar('macros['.$i.'][original][macro_type]', $macro['type']);
+		$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
+		$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
+		$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);
 	}
 
 	$macro_value = (new CMacroValue($macro['type'], 'macros['.$i.']', null, false))->setReadonly(
@@ -92,10 +91,6 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_value->addRevertButton();
 		$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
 			&& array_key_exists('hostmacroid', $macro)
-		);
-		$macro_value->setReadonly(
-			!($macro['discovery_state'] & CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING)
-				|| ($macro['inherited_type'] & ZBX_PROPERTY_BOTH)
 		);
 	}
 
@@ -179,8 +174,7 @@ foreach ($data['macros'] as $i => $macro) {
 		->setAdaptiveWidth($inherited_width)
 		->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 
-	$description_readonly = ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
-		|| ($macro['type'] == ZBX_MACRO_TYPE_SECRET && $macro['inherited_type'] & ZBX_PROPERTY_BOTH)
+	$description_readonly = ($macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC)
 		|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN);
 
 	$table

@@ -114,6 +114,8 @@ class CControllerHostMacrosList extends CController {
 			if (!array_key_exists('discovery_state', $macro)) {
 				$macro['discovery_state'] = self::DISCOVERY_STATE_MANUAL;
 			}
+
+			self::addMacroOriginalValues($macro);
 		}
 		unset($macro);
 
@@ -130,5 +132,32 @@ class CControllerHostMacrosList extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	/**
+	 * Create array of original macro values from input fields.
+	 *
+	 * @param array  $macro
+	 * @param string $macro['original_value']
+	 * @param string $macro['original_description']
+	 * @param string $macro['original_macro_type']
+	 */
+	protected static function addMacroOriginalValues(array &$macro) {
+		if ($macro['discovery_state'] == self::DISCOVERY_STATE_MANUAL) {
+			return;
+		}
+
+		$field_keys_map = [
+			'original_value' => 'value',
+			'original_description' => 'description',
+			'original_macro_type' => 'type'
+		];
+
+		$macro['original'] = array_intersect_key($macro, $field_keys_map);
+		$macro['original'] = CArrayHelper::renameKeys($macro['original'], $field_keys_map);
+
+		foreach (array_keys($field_keys_map) as $key) {
+			unset($macro[$key]);
+		}
 	}
 }

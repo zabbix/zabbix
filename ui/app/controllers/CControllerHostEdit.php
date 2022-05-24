@@ -231,9 +231,18 @@ class CControllerHostEdit extends CController {
 		}
 
 		foreach ($data['host']['macros'] as &$macro) {
-			$macro['discovery_state'] = ($macro['automatic'] == ZBX_USERMACRO_AUTOMATIC)
-				? CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC
-				: CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
+			if ($macro['automatic'] == ZBX_USERMACRO_AUTOMATIC) {
+				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC;
+
+				$macro['original'] = [
+					'value' => getMacroConfigValue($macro),
+					'description' => $macro['description'],
+					'type' => $macro['type']
+				];
+			}
+			else {
+				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
+			}
 
 			unset($macro['automatic']);
 		}
