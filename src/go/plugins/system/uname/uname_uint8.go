@@ -1,5 +1,5 @@
-//go:build (linux && arm) || (linux && ppc64le) || (linux && s390x) || (linux && mips64le) || (linux && mipsle)
-// +build linux,arm linux,ppc64le linux,s390x linux,mips64le linux,mipsle
+//go:build (linux && arm) || (linux && ppc64le) || (linux && s390x)
+// +build linux,arm linux,ppc64le linux,s390x
 
 /*
 ** Zabbix
