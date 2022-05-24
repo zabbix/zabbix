@@ -221,7 +221,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.errors
           delay: '0'
-          history: 0d
+          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'A list of errors from WSAPI requests.'
