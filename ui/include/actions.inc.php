@@ -1312,11 +1312,11 @@ function getEventsActionsIconsData(array $events, array $triggers) {
  *
  * @return array
  */
-function getEventsSuppressions(array $events){
+function getEventsSuppressions(array $events) {
 	$suppressions = [];
 	$userids = [];
 
-	// Create array of suppressions for each event
+	// Create array of suppressions for each event.
 	foreach ($events as $event) {
 		$event_suppressions = [];
 
@@ -1343,7 +1343,7 @@ function getEventsSuppressions(array $events){
 		CArrayHelper::sort($event_suppressions, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 
 		$suppressions[$event['eventid']] = [
-			'suppress_until' => array_values($event_suppressions),
+			'suppress_until' => $event_suppressions,
 			'count' => count($event_suppressions)
 		];
 	}
