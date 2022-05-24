@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-24T00:20:52Z'
+  date: '2022-05-24T01:22:35Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -12,7 +12,7 @@ zabbix_export:
       name: 'HPE Primera by HTTP'
       description: |
         The template to monitor HPE Primera by HTTP.
-        It works without any external scripts and uses the script items.
+        It works without any external scripts and uses the script item.
         
         Setup:
           1. Create user zabbix on the storage with browse role and enable it for all domains.
@@ -65,9 +65,7 @@ zabbix_export:
                 methods = ['disks', 'cpgs', 'hosts', 'ports', 'system', 'tasks', 'volumes'],
                 result = {},
                 errors = {},
-                data = {},
-                auth = 'auth',
-                logout = 'logout';
+                data = {};
             
             fields.forEach(function (field) {
                 if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
@@ -106,7 +104,7 @@ zabbix_export:
                 sessionKey = getSessionKey()['key'];
             }
             catch (error) {
-                errors[auth] = error.toString();
+                errors.auth = error.toString();
             }
             
             function getHttpData(method) {
@@ -148,7 +146,7 @@ zabbix_export:
                 }
             }
             catch (error) {
-                errors[logout] = error.toString();
+                errors.logout = error.toString();
             }
             
             data.errors = errors;

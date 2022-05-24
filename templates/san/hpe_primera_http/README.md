@@ -5,7 +5,7 @@
 
 For Zabbix version: 6.0 and higher  
 The template to monitor HPE Primera by HTTP.
-It works without any external scripts and uses the Script items.
+It works without any external scripts and uses the script item.
 
 This template was tested on:
 
