@@ -19,7 +19,7 @@
 
 #include "proxyconfig.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "proxy.h"
 #include "zbxrtc.h"

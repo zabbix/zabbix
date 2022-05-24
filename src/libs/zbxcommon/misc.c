@@ -2449,7 +2449,7 @@ int	is_ip(const char *ip)
 int	zbx_validate_hostname(const char *hostname)
 {
 	int		component;	/* periods ('.') are only allowed when they serve to delimit components */
-	int		len = MAX_ZBX_DNSNAME_LEN;
+	int		len = ZBX_MAX_DNSNAME_LEN;
 	const char	*p;
 
 	/* the first character must be an alphanumeric character */

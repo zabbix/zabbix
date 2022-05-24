@@ -82,7 +82,7 @@ typedef struct
 	ZBX_SOCKADDR			peer_info;		/* getpeername() result */
 	/* Peer host DNS name or IP address for diagnostics (after TCP connection is established). */
 	/* TLS connection may be shut down at any time and it will not be possible to get peer IP address anymore. */
-	char				peer[MAX_ZBX_DNSNAME_LEN + 1];
+	char				peer[ZBX_MAX_DNSNAME_LEN + 1];
 	int				protocol;
 }
 zbx_socket_t;

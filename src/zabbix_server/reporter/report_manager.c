@@ -19,6 +19,7 @@
 
 #include "report_manager.h"
 
+#include "../db_lengths.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "base64.h"
@@ -496,7 +497,7 @@ static void	rm_db_flush_sessions(zbx_rm_t *manager)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	DBbegin();
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_hashset_iter_reset(&manager->sessions, &iter);
 	while (NULL != (session = (zbx_rm_session_t *)zbx_hashset_iter_next(&iter)))
@@ -510,7 +511,7 @@ static void	rm_db_flush_sessions(zbx_rm_t *manager)
 		session->db_lastaccess = session->lastaccess;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 		DBexecute("%s", sql);
@@ -543,7 +544,7 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 	zbx_vector_uint64_uniq(&manager->flush_queue, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	DBbegin();
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < manager->flush_queue.values_num; i++)
 	{
@@ -594,7 +595,7 @@ static void	rm_db_flush_reports(zbx_rm_t *manager)
 		report->flags = 0;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -1639,7 +1640,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 		while (NULL != (row = DBfetch(result)) && SUCCEED == ret)
 		{
-			DB_MEDIATYPE	mt;
+			ZBX_DB_MEDIATYPE	mt;
 
 			ZBX_STR2UINT64(mt.mediatypeid, row[0]);
 
