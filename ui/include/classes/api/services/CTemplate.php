@@ -718,8 +718,8 @@ class CTemplate extends CHostGeneral {
 			' FROM hosts_templates ht,hosts_templates htt'.
 			' WHERE ht.hostid=htt.hostid'.
 				' AND ht.templateid!=htt.templateid'.
-				' AND '.dbConditionInt('ht.templateid', $templateids).
-				' AND '.dbConditionInt('htt.templateid', $templateids, true)
+				' AND '.dbConditionId('ht.templateid', $templateids).
+				' AND '.dbConditionId('htt.templateid', $templateids, true)
 		);
 
 		while ($row = DBfetch($result)) {
@@ -736,7 +736,9 @@ class CTemplate extends CHostGeneral {
 		$result = DBselect(DB::makeSql('hosts_templates', $options));
 
 		while ($row = DBfetch($result)) {
-			$del_links_clear[$row['templateid']][$row['hostid']] = true;
+			if (!in_array($row['templateid'], $templateids)) {
+				$del_links_clear[$row['templateid']][$row['hostid']] = true;
+			}
 		}
 
 		if ($del_templates) {
