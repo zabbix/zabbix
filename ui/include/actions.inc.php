@@ -1765,12 +1765,16 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 
 		if (array_key_exists('suppress_until', $suppression)) {
 			$icon = ZBX_STYLE_ICON_INVISIBLE;
-			$suppress_until = $suppression['suppress_until'];
-			$suppress_until = $suppress_until == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE
-				? _s('Indefinitely')
-				: ($suppress_until < strtotime('tomorrow') && $suppress_until > time()
-					? zbx_date2str(TIME_FORMAT, $suppress_until)
-					: zbx_date2str(DATE_TIME_FORMAT, $suppress_until));
+
+			if ($suppression['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
+				$suppress_until = _s('Indefinitely');
+			}
+			else {
+				$suppress_until = $suppression['suppress_until'] < strtotime('tomorrow')
+						&& $suppression['suppress_until'] > time()
+					? zbx_date2str(TIME_FORMAT, $suppression['suppress_until'])
+					: zbx_date2str(DATE_TIME_FORMAT, $suppression['suppress_until']);
+			}
 		}
 		else {
 			$icon = ZBX_STYLE_ICON_VISIBLE;
