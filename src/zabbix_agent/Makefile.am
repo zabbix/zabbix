@@ -59,7 +59,6 @@ zabbix_agentd_LDADD = \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
-	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
