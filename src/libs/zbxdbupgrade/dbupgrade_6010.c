@@ -798,8 +798,6 @@ static int	DBpatch_6010032_split_groups(void)
 		has_templates = zbx_vector_uint64_search(&template_groupids, hstgrps.values[i]->groupid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		groupid = hstgrps.values[i]->groupid;
-
 		if (FAIL == has_hosts && FAIL == has_templates)
 		{
 			hstgrps.values[i]->type = HOSTGROUP_TYPE_EMPTY;
