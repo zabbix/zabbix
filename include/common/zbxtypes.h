@@ -220,4 +220,14 @@ zbx_uint128_t;
 
 typedef struct zbx_variant zbx_variant_t;
 
+#define	SUCCEED		0
+#define	FAIL		-1
+#define	NOTSUPPORTED	-2
+#define	NETWORK_ERROR	-3
+#define	TIMEOUT_ERROR	-4
+#define	AGENT_ERROR	-5
+#define	GATEWAY_ERROR	-6
+#define	CONFIG_ERROR	-7
+#define	SIG_ERROR	-8
+
 #endif

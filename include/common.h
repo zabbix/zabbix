@@ -22,6 +22,7 @@
 
 #include "zbxsysinc.h"
 #include "module.h"
+#include "version.h"
 
 #if defined(__MINGW32__)
 #	define __try
@@ -87,16 +88,6 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #else
 #	define ZBX_FALLTHROUGH
 #endif
-
-#define	SUCCEED		0
-#define	FAIL		-1
-#define	NOTSUPPORTED	-2
-#define	NETWORK_ERROR	-3
-#define	TIMEOUT_ERROR	-4
-#define	AGENT_ERROR	-5
-#define	GATEWAY_ERROR	-6
-#define	CONFIG_ERROR	-7
-#define	SIG_ERROR	-8
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
@@ -1365,35 +1356,6 @@ unsigned int	zbx_alarm_off(void);
 int	zbx_alarm_timed_out(void);
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
-
-/* version block */
-#define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
-#define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
-#define ZBX_COMPONENT_VERSION_MINOR(version)	(version & 0xFFFF)
-
-#define ZBX_STR2(str)	#str
-#define ZBX_STR(str)	ZBX_STR2(str)
-
-#define APPLICATION_NAME	"Zabbix Agent"
-#define ZABBIX_REVDATE		"10 May 2022"
-#define ZABBIX_VERSION_MAJOR	6
-#define ZABBIX_VERSION_MINOR	2
-#define ZABBIX_VERSION_PATCH	0
-#ifndef ZABBIX_VERSION_REVISION
-#	define ZABBIX_VERSION_REVISION	{ZABBIX_REVISION}
-#endif
-#ifdef _WINDOWS
-#	ifndef ZABBIX_VERSION_RC_NUM
-#		define ZABBIX_VERSION_RC_NUM	{ZABBIX_RC_NUM}
-#	endif
-#endif
-#define ZABBIX_VERSION_RC	"rc1"
-#define ZABBIX_VERSION		ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
-				ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC
-#define ZABBIX_REVISION		ZBX_STR(ZABBIX_VERSION_REVISION)
-
-int	zbx_get_component_version(char *value);
-/* version block END*/
 
 #define ZBX_PREPROC_MULTIPLIER			1
 #define ZBX_PREPROC_RTRIM			2

@@ -2139,6 +2139,7 @@ AC_OUTPUT([
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile
+	src/libs/zbxversion/Makefile
 	src/libs/zbxxml/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile

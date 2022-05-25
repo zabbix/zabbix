@@ -52,6 +52,7 @@ DIST_SUBDIRS = \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
+	zbxversion \
 	zbxxml
 
 if SERVER
@@ -88,6 +89,7 @@ SERVER_SUBDIRS = \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
+	zbxversion \
 	zbxxml
 else
 if PROXY
@@ -121,6 +123,7 @@ PROXY_SUBDIRS = \
 	zbxtrends \
 	zbxvariant \
 	zbxvault \
+	zbxversion \
 	zbxxml
 endif
 endif
@@ -150,6 +153,7 @@ SUBDIRS = \
 	zbxstr \
 	zbxthreads \
 	zbxvariant \
+	zbxversion \
 	zbxxml \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
