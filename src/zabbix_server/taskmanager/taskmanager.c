@@ -40,6 +40,7 @@
 
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
+#define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -829,7 +830,8 @@ static void	tm_process_temp_suppression(const char *data)
 		return;
 	}
 
-	if (ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS == action || (0 != ts && time(NULL) >= ts))
+	if (ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS == action ||
+			(ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME != ts && time(NULL) >= ts))
 	{
 		DBexecute("delete from event_suppress where eventid=" ZBX_FS_UI64 " and maintenanceid is null",
 				eventid);
@@ -838,7 +840,7 @@ static void	tm_process_temp_suppression(const char *data)
 	{
 		DB_ROW		row;
 		DB_RESULT	result;
-		zbx_uint64_t	event_suppressid = 0;
+		zbx_uint64_t	event_suppressid;
 
 		if (SUCCEED != DBlock_record("events", eventid, NULL, 0))
 			return;
