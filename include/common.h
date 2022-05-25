@@ -1069,6 +1069,7 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
 	(data << ZBX_RTC_DATA_SHIFT))
 
+/* future param library */
 int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
 int	num_param(const char *p);
 char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
@@ -1104,7 +1105,9 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 void	remove_param(char *param, int num);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
+/* future param library END */
 
+/* future scheduler library */
 typedef struct zbx_custom_interval	zbx_custom_interval_t;
 int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
 		char **error);
@@ -1117,7 +1120,7 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
 		time_t disable_until);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);
-
+/* future scheduler library END */
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
