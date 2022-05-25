@@ -76,7 +76,7 @@ func (sl *ServerListener) run() {
 				conn.Close()
 				log.Warningf("cannot accept incoming connection for peer: %s", conn.RemoteIP())
 			} else if err := sl.processConnection(conn); err != nil {
-				log.Warningf("cannot process incoming connection: %s", err.Error())
+				log.Warningf("cannot process incoming connection for %s: %s", conn.RemoteIP(), err.Error())
 			}
 		} else {
 			if nerr, ok := err.(net.Error); ok && nerr.Temporary() {
