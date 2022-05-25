@@ -1190,7 +1190,6 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_fo
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
 
-void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
@@ -1210,6 +1209,10 @@ int	is_time_suffix(const char *str, int *value, int length);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 /* move remaining temp string functions into libzbxstr.a END */
+
+/* future proctitle library */
+void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
+/* future proctitle library END */
 
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
