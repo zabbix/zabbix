@@ -14,6 +14,10 @@ A.F....... [ZBXNEXT-7476] disabled php 8 strict type validation (ashubin)
 A.F....... [ZBXNEXT-7491] fixed PHP 8.1 runtime warnings with PostgreSQL backend (Sasha)
 
 Bug fixes:
+A......... [ZBX-20859] fixed incorrectly exported host groups in map elements (Sasha)
+A.F....... [ZBX-20613] returned the ability to edit the dependencies of inherited triggers; improved validation upon unlinking templates with triggers that have dependencies; improved performance of trigger dependency functionality; prevented the ability to fully replace trigger dependencies of inherited triggers if the new dependency was added to parent trigger; supplemented validation of trigger dependencies on templates to prevent linkage dead-ends (vmaksimovs)
+..F....... [ZBX-20814] fixed Map->Sharing user group shares table not showing saved user groups (esekace)
+.........T [ZBX-20898] fixed duplicate UUID in official template (abakaldin)
 ..F....... [ZBX-20242] fixed inability to change LDAP bind password (agriscenko)
 ...G...... [ZBX-20911] added process state check in PROC_NUM() for Oracle Solaris (Andris)
 ..F....... [ZBX-20752] fixed saved properties of classic graphs being lost when reopening graph configuration (agriscenko)
