@@ -775,7 +775,7 @@ static int	DBpatch_6010032_split_groups(void)
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
 
-		if (SUCCEED != zbx_vector_uint64_search(&host_groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (FAIL == zbx_vector_uint64_search(&host_groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			zbx_vector_uint64_append(&host_groupids, groupid);
 	}
 	DBfree_result(result);
