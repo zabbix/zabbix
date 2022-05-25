@@ -16,10 +16,10 @@ OBJS = \
 	$(OUTPUTDIR)\threads.o \
 	$(OUTPUTDIR)\str.o \
 	$(OUTPUTDIR)\temp_str.o \
+	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
 	$(OUTPUTDIR)\token.o \
-	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
 	$(OUTPUTDIR)\iprange.o \
