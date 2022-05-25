@@ -1,5 +1,5 @@
 /*
-1;95;0c** Zabbix
+** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify

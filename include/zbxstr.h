@@ -52,7 +52,6 @@ void	zbx_strarr_init(char ***arr);
 void	zbx_strarr_add(char ***arr, const char *entry);
 void	zbx_strarr_free(char ***arr);
 
-
 void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src);
 void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
@@ -131,7 +130,6 @@ void	zbx_trim_str_list(char *list, char delimiter);
 
 int	zbx_strcmp_null(const char *s1, const char *s2);
 
-
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
@@ -142,11 +140,8 @@ int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t 
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 
 int	zbx_strcmp_natural(const char *s1, const char *s2);
-
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
-
 int	zbx_str_extract(const char *text, size_t len, char **value);
-
 char	*zbx_substr(const char *src, size_t left, size_t right);
 char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 
@@ -154,11 +149,9 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
 
-
 /* time and memory size suffixes */
 #define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
 zbx_uint64_t	suffix2factor(char c);
 
 int	is_double_suffix(const char *str, unsigned char flags);
-
 #endif /* ZABBIX_STR_H */

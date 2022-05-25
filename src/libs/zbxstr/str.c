@@ -18,11 +18,6 @@
 **/
 
 #include "zbxstr.h"
-//#include "common.h"
-/* #include "zbxthreads.h" */
-/* #include "module.h" */
-
-/* #include "zbxcrypto.h" */
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>

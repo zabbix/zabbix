@@ -19,7 +19,6 @@
 
 #include "common.h"
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if the specified character is allowed whitespace character *
