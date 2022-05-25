@@ -106,7 +106,7 @@ $(OUTPUTDIR)\misc.o: $(TOPDIR)\src\libs\zbxcommon\misc.c
 $(OUTPUTDIR)\iprange.o: $(TOPDIR)\src\libs\zbxcommon\iprange.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxcommon\str.c
+$(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxstr\str.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxcommon\file.c
@@ -167,6 +167,9 @@ $(OUTPUTDIR)\sysinfo_alias.o: $(TOPDIR)\src\libs\zbxsysinfo\alias\alias.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\vector.o: $(TOPDIR)\src\libs\zbxalgo\vector.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\version.o: $(TOPDIR)\src\libs\zbxversion\version.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\algodefs.o: $(TOPDIR)\src\libs\zbxalgo\algodefs.c

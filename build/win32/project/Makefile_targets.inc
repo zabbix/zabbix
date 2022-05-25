@@ -22,6 +22,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcommon}.c{..\..\..\src\libs\zbxcommon}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxstr}.c{..\..\..\src\libs\zbxstr}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxcommshigh}.c{..\..\..\src\libs\zbxcommshigh}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
@@ -92,6 +95,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxvariant}.c{..\..\..\src\libs\zbxvariant}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxversion}.c{..\..\..\src\libs\zbxversion}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxwin32}.c{..\..\..\src\libs\zbxwin32}.o:
