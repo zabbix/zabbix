@@ -19,7 +19,7 @@
 
 #include "graph_linking.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_graph.h"
 
@@ -27,13 +27,13 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	gitemid;
-	char		key[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int		drawtype_orig;
 	int		drawtype_new;
 	int		sortorder_orig;
 	int		sortorder_new;
-	char		color_orig[GRAPH_ITEM_COLOR_LEN_MAX];
-	char		color_new[GRAPH_ITEM_COLOR_LEN_MAX];
+	char		color_orig[ZBX_GRAPH_ITEM_COLOR_LEN_MAX];
+	char		color_new[ZBX_GRAPH_ITEM_COLOR_LEN_MAX];
 	int		yaxisside_orig;
 	int		yaxisside_new;
 	int		calc_fnc_orig;
@@ -1143,8 +1143,8 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 	zbx_graph_copy_t	*found;
 
 	zbx_hashset_iter_reset(host_graphs_main_data, &iter1);
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	DBbegin_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
 	while (SUCCEED == res && NULL != (found = (zbx_graph_copy_t *)zbx_hashset_iter_next(&iter1)))
 	{
@@ -1339,7 +1339,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 		}
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == res && 16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 	{
@@ -1351,7 +1351,7 @@ static int	execute_graphs_updates(zbx_hashset_t *host_graphs_main_data, zbx_hash
 
 	if (SUCCEED == res)
 	{
-		DBend_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
+		zbx_DBend_multiple_update(&sql2, &sql_alloc2, &sql_offset2);
 
 		if (16 < sql_offset2 && (ZBX_DB_OK > DBexecute("%s", sql2)))
 		{

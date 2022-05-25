@@ -267,7 +267,7 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 		size_t	sql_offset = 0;
 
 		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < interface_availabilities->values_num; i++)
 		{
@@ -281,7 +281,7 @@ void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)
 			DBexecute("%s", sql);

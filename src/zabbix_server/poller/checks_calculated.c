@@ -29,8 +29,11 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	zbx_variant_t		value;
 	zbx_timespec_t		ts;
 	zbx_expression_eval_t	eval;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' expression:'%s'", __func__, dc_item->key_orig, dc_item->params);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	if (NULL == dc_item->formula_bin)
 	{
@@ -41,6 +44,16 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	}
 
 	zbx_eval_deserialize(&ctx, dc_item->params, ZBX_EVAL_PARSE_CALC_EXPRESSION, dc_item->formula_bin);
+
+	if (SUCCEED != zbx_eval_expand_user_macros(&ctx, &dc_item->host.hostid, 1,
+			(zbx_macro_expand_func_t)zbx_dc_expand_user_macros, um_handle, &error))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot evaluate calculated item: %s", error));
+		zbx_free(error);
+		zbx_eval_clear(&ctx);
+		goto out;
+	}
+
 	zbx_timespec(&ts);
 
 	zbx_expression_eval_init(&eval, ZBX_EXPRESSION_AGGREGATE, &ctx);
@@ -86,6 +99,8 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 	zbx_expression_eval_clear(&eval);
 	zbx_eval_clear(&ctx);
 out:
+	zbx_dc_close_user_macros(um_handle);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

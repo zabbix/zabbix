@@ -16,19 +16,24 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifndef ZABBIX_ZBXREPORT_H
-#define ZABBIX_ZBXREPORT_H
 
-#include "zbxjson.h"
+#ifndef ZABBIX_DISCOVERY_H
+#define ZABBIX_DISCOVERY_H
 
-#define ZBX_REPORT_STATUS_ENABLED	0
-#define ZBX_REPORT_STATUS_DISABLED	1
+#include "zbxdbhigh.h"
 
-#define ZBX_REPORT_PERIOD_DAY		0
-#define ZBX_REPORT_PERIOD_WEEK		0
-#define ZBX_REPORT_PERIOD_MONTH		0
-#define ZBX_REPORT_PERIOD_YEAR		0
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	unsigned short	port;
+	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
+	char		value[ZBX_MAX_DISCOVERED_VALUE_SIZE];
+	int		status;
+	time_t		itemtime;
+}
+zbx_service_t;
 
-void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j);
-
+void	zbx_discovery_update_host(ZBX_DB_DHOST *dhost, int status, int now);
+void	zbx_discovery_update_service(const ZBX_DB_DRULE *drule, zbx_uint64_t dcheckid, ZBX_DB_DHOST *dhost,
+		const char *ip, const char *dns, int port, int status, const char *value, int now);
 #endif

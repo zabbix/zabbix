@@ -23,7 +23,7 @@
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
 
-#include "export.h"
+#include "zbxexport.h"
 #include "zbxself.h"
 
 #include "cfg.h"
@@ -67,7 +67,6 @@
 #include "zbxcrypto.h"
 #include "zbxhistory.h"
 #include "postinit.h"
-#include "export.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
