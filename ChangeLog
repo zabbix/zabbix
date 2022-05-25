@@ -12,13 +12,13 @@ Bug fixes:
 A......... [ZBX-20859] fixed incorrectly exported host groups in map elements (Sasha)
 A.F.I..... [ZBX-20613] returned the ability to edit the dependencies of inherited triggers; improved validation upon unlinking templates with triggers that have dependencies; improved performance of trigger dependency functionality; prevented the ability to fully replace trigger dependencies of inherited triggers if the new dependency was added to parent trigger; supplemented validation of trigger dependencies on templates to prevent linkage dead-ends; dropped support of trigger.addDependencies and trigger.deleteDependencies API methods (vmaksimovs)
 ..F....... [ZBX-20814] fixed Map->Sharing user group shares table not showing saved user groups (esekace)
-.........T [ZBX-20898] fixed duplicate UUID in official template (abakaldin)
+.........T [ZBX-20898] fixed duplicated UUID in the official template (abakaldin)
 ...G...... [ZBX-20911] added process state check in PROC_NUM() for Oracle Solaris (Andris)
 ..F....... [ZBX-20752] fixed saved properties of classic graphs being lost when reopening graph configuration (agriscenko)
 .......PS. [ZBX-21073] added support of Int8Array(), Buffer() and also duktape plain buffers in md5, sha256 and hmac function parameters (wiper)
 ..F....... [ZBX-19381] fixed resolving of macros in item key parameters when testing items in web interface (Sasha)
-........S. [ZBX-21074] fixed active check availability status update on oracle (dgoloscapov)
-.........T [ZBX-20950] updated regular expressions for services discovery in windows templates and fixed new active agent check (vkhaliev)
+........S. [ZBX-21074] fixed active check availability status update on Oracle (dgoloscapov)
+.........T [ZBX-20950] updated regular expressions for services discovery in Windows templates and fixed new active agent check (vkhaliev)
 ..F....... [ZBX-18520] fixed showing of fields that do not belong to selected item type in item edit form (miks)
 ..F....... [ZBX-20684] fixed item value widget not showing trailing zeros (mkrisjanis)
 .......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
@@ -26,7 +26,7 @@ A.F.I..... [ZBX-20613] returned the ability to edit the dependencies of inherite
 ........S. [ZBX-20823] fixed inability to update hosts that were created by LLD on aarch64 (vso)
 ..F....... [ZBX-20945] fixed broken trigger link in trigger mass update => dependencies (esekace)
 ...G...... [ZBX-20886] fixed handle leak on Zabbix agent 2 in vfs.fs.get (vso)
-...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent2 (vso)
+...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent 2 (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta2
