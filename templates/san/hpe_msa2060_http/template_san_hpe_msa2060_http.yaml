@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-13T11:04:04Z'
+  date: '2022-05-25T04:00:41Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -28,1017 +28,76 @@ zabbix_export:
           name: Templates/SAN
       items:
         -
-          uuid: ffd35ec56c194865af5e2e51096a7cf9
-          name: 'HPE MSA: Get controllers'
-          type: SCRIPT
-          key: hpe.msa.raw.controllers
-          history: '0'
+          uuid: 078dd015f25d4778af429f9b5e391bc5
+          name: 'Get method errors'
+          type: DEPENDENT
+          key: hpe.msa.data.errors
+          delay: '0'
+          history: 1h
           trends: '0'
           value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of controllers.'
+          description: 'A list of method errors from API requests.'
           preprocessing:
             -
               type: JSONPATH
               parameters:
-                - '$.[''controllers'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
+                - '$.[''errors'']'
             -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: controllers
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: hpe.msa.raw.data
           tags:
             -
               tag: component
-              value: raw
-        -
-          uuid: 45ae4fb4c72d46ffae402c6be4ef9855
-          name: 'HPE MSA: Get controller statistics'
-          type: SCRIPT
-          key: hpe.msa.raw.controllers.statistics
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of controllers statistics.'
-          preprocessing:
+              value: errors
+          triggers:
             -
-              type: JSONPATH
-              parameters:
-                - '$.[''controller-statistics'']'
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  var result = [];
-                  JSON.parse(value).forEach(function (key) {
-                      key["durable-id"] = key["durable-id"].toLowerCase();
-                      result.push(key);
-                  });
-                  return JSON.stringify(result);
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: controller-statistics
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: da94f1ea37b941b6af25fb26d0427c88
-          name: 'HPE MSA: Get disks'
-          type: SCRIPT
-          key: hpe.msa.raw.disks
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of disks.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''drives'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: disks
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 2201fb62be854658ad6ee6ae0ffa3c41
-          name: 'HPE MSA: Get disk groups'
-          type: SCRIPT
-          key: hpe.msa.raw.disks.groups
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of disk groups.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''disk-groups'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: disk-group
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 030e64272804406aa029c8f5e999ec84
-          name: 'HPE MSA: Get disk group statistics'
-          type: SCRIPT
-          key: hpe.msa.raw.disks.groups.statistics
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of disk groups statistics.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''disk-group-statistics'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: disk-group-statistics
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 068dc58fc3ac4f23949c63f86cf276c4
-          name: 'HPE MSA: Get enclosures'
-          type: SCRIPT
-          key: hpe.msa.raw.enclosures
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of enclosures.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''enclosures'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: enclosures
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 84dd530b60524b5fbdf510c0d0b79c1a
-          name: 'HPE MSA: Get fans'
-          type: SCRIPT
-          key: hpe.msa.raw.fans
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of fans.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''fan'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: fans
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: c4edf201793e4a8abd827b849631e79b
-          name: 'HPE MSA: Get I/O modules'
-          type: SCRIPT
-          key: hpe.msa.raw.io_modules
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of I/O modules.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''io-modules'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: io-modules
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: e1eb13f74cd04797a6c1f3a5bc5e1b0d
-          name: 'HPE MSA: Get pools'
-          type: SCRIPT
-          key: hpe.msa.raw.pools
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of pools.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''pools'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: pools
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 5ffb4c725d2f4249832890018b614e23
-          name: 'HPE MSA: Get ports'
-          type: SCRIPT
-          key: hpe.msa.raw.ports
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of ports.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''port'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: ports
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 960d609954c742449afa0ac718bf6616
-          name: 'HPE MSA: Get power supplies'
-          type: SCRIPT
-          key: hpe.msa.raw.power_supplies
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of power supplies.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''power-supplies'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: power-supplies
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
+              uuid: 2133ddf10a3641d78e609948d6842687
+              expression: 'length(last(/HPE MSA 2060 Storage by HTTP/hpe.msa.data.errors))>0'
+              name: 'There are errors in method requests to API'
+              priority: AVERAGE
+              description: 'There are errors in method requests to API.'
+              dependencies:
+                -
+                  name: 'Service is down or unavailable'
+                  expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}"],5m)=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: bafec666b170480f941fe25cb3cf903d
-          name: 'HPE MSA: Get system'
+          name: 'HPE MSA: Get data'
           type: SCRIPT
-          key: hpe.msa.raw.system
+          key: hpe.msa.raw.data
           history: '0'
           trends: '0'
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
+                fields = ['username', 'password', 'base_url'],
+                methods = [
+                    'system',
+                    'controllers',
+                    'controller-statistics',
+                    'frus',
+                    'disk-group',
+                    'disk-group-statistics',
+                    'disks',
+                    'enclosures',
+                    'fans',
+                    'pools',
+                    'ports',
+                    'power-supplies',
+                    'volumes',
+                    'volume-statistics'
+                ],
+                result = {},
+                data = {},
+                methodError = {},
+                methodErrorArr = [];
             
             fields.forEach(function (field) {
                 if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
@@ -1058,7 +117,7 @@ zabbix_export:
             response = request.get(params.base_url + 'api/login/' + auth_string);
             
             if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
             }
             
             if (response !== null) {
@@ -1076,212 +135,65 @@ zabbix_export:
             request.addHeader('sessionKey: ' + sessionKey);
             request.addHeader('datatype: json');
             
-            response = request.get(params.base_url + 'api/show/' + params.method);
             
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
+            methods.forEach(function (method) {
+                response = request.get(params.base_url + 'api/show/' + method);
+                
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    methodError['method-name'] = method;
+                    methodError['return-code-error'] = 'Request failed with status code ' + request.getStatus() + ': ' + response;
                 }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
+            
+                if (response !== null) {
+                    try {
+                        result = JSON.parse(response);
+                        switch (method) {
+                            case 'controller-statistics':
+                                var statsArray = result['controller-statistics'] || [];
+                                for (var i = 0; i < statsArray.length; i++) {
+                                    result['controller-statistics'][i]['durable-id'] = result['controller-statistics'][i]['durable-id'].toLowerCase();
+                                }
+                                data[method] = result[method];
+                                break;
+                            case 'frus':
+                                data[method] = result['enclosure-fru'];
+                                break;
+                            case 'disk-group':
+                                data[method] = result['disk-groups'];
+                                break;
+                            case 'disks':
+                                data[method] = result['drives'];
+                                break;
+                            case 'fans':
+                                data[method] = result['fan'];
+                                break;
+                            case 'ports':
+                                data[method] = result['port'];
+                                break;
+                            default:
+                                data[method] = result[method];
+                        }
+                    }
+                    catch (error) {
+                        methodError['method-name'] = method;
+                        methodError['parse-error'] = 'Failed to parse response received from device API. Check debug log for more information.';
+                    }
                 }
-            }
             
-            return response;
-          description: 'General system information.'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: system
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: b3c87e828efc4a94a87e5fcbd76ae18a
-          name: 'HPE MSA: Get volumes'
-          type: SCRIPT
-          key: hpe.msa.raw.volumes
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
+                if (methodError.length > 1) {
+                    methodErrorArr.push(methodError);
                 }
             });
             
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
+            data.errors = methodErrorArr;
             
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of volumes.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''volumes'']'
+            return data;
+          description: 'The JSON with result of API requests.'
           timeout: '{$HPE.MSA.DATA.TIMEOUT}'
           parameters:
             -
               name: base_url
               value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: volumes
-            -
-              name: username
-              value: '{$HPE.MSA.API.USERNAME}'
-            -
-              name: password
-              value: '{$HPE.MSA.API.PASSWORD}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 1ad24c2457194064a3ef2ad758cd13a0
-          name: 'HPE MSA: Get volume statistics'
-          type: SCRIPT
-          key: hpe.msa.raw.volumes.statistics
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'method', 'base_url'],
-                result = {};
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            var response, request = new HttpRequest();
-            request.addHeader('datatype: json');
-            
-            auth_string = sha256(params.username + '_' + params.password)
-            
-            response = request.get(params.base_url + 'api/login/' + auth_string);
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            sessionKey = auth_data['status'][0]['response'];
-            
-            request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
-            request.addHeader('datatype: json');
-            
-            response = request.get(params.base_url + 'api/show/' + params.method);
-            
-            
-            if (request.getStatus() < 200 || request.getStatus() >= 300) {
-               throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            }
-            
-            if (response !== null) {
-                try {
-                   result = JSON.stringify(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse response received from device API. Check debug log for more information.';
-                }
-            }
-            
-            return response;
-          description: 'The list of volumes statistics.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - '$.[''volume-statistics'']'
-          timeout: '{$HPE.MSA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.MSA.API.SCHEME}://{HOST.CONN}:{$HPE.MSA.API.PORT}/'
-            -
-              name: method
-              value: volume-statistics
             -
               name: username
               value: '{$HPE.MSA.API.USERNAME}'
@@ -1313,7 +225,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.system
+            key: hpe.msa.raw.data
           tags:
             -
               tag: component
@@ -1336,7 +248,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '4'
           master_item:
-            key: hpe.msa.raw.system
+            key: hpe.msa.raw.data
           tags:
             -
               tag: component
@@ -1345,21 +257,6 @@ zabbix_export:
               tag: component
               value: system
           triggers:
-            -
-              uuid: a73eb539c2ec4ef992206e1c5564bb38
-              expression: 'nodata(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health,5m)=1'
-              name: 'Failed to fetch API data'
-              event_name: 'Failed to fetch API data (or no data for 5m)'
-              priority: AVERAGE
-              description: 'Zabbix has not received data for items for the last 5 minutes.'
-              dependencies:
-                -
-                  name: 'Service is down or unavailable'
-                  expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}"],5m)=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
             -
               uuid: 49e8c1d8a14f40b5acb2723e370ccccb
               expression: 'last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=1'
@@ -1411,7 +308,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.system
+            key: hpe.msa.raw.data
           tags:
             -
               tag: component
@@ -1437,7 +334,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.system
+            key: hpe.msa.raw.data
           tags:
             -
               tag: component
@@ -1463,7 +360,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.system
+            key: hpe.msa.raw.data
           tags:
             -
               tag: component
@@ -1489,7 +386,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.system
+            key: hpe.msa.raw.data
           tags:
             -
               tag: component
@@ -1515,7 +412,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.system
+            key: hpe.msa.raw.data
           tags:
             -
               tag: component
@@ -1571,13 +468,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''read-cache-hits''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''read-cache-hits''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1597,13 +494,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''read-cache-misses''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''read-cache-misses''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1623,13 +520,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-hits''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-hits''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1649,13 +546,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-misses''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-misses''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1676,9 +573,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-used''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-used''].first()'
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1699,7 +596,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''cache-memory-size''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''cache-memory-size''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1709,7 +606,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1730,9 +627,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''cpu-load''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''cpu-load''].first()'
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1766,13 +663,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''data-read-numeric''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''data-read-numeric''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1793,9 +690,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''bytes-per-second-numeric''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''bytes-per-second-numeric''].first()'
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1817,13 +714,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''data-written-numeric''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''data-written-numeric''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1845,13 +742,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-reads''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-reads''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1872,9 +769,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''iops''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''iops''].first()'
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1896,13 +793,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-writes''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-writes''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1922,13 +819,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''disks''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''disks''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1948,13 +845,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''virtual-disks''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''virtual-disks''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -1976,13 +873,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''sc-fw''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''sc-fw''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2004,7 +901,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -2012,7 +909,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2080,13 +977,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''ip-address''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''ip-address''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2108,13 +1005,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2134,13 +1031,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-storage-pools''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''number-of-storage-pools''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2162,13 +1059,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2190,13 +1087,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
+                    - '$.[''controllers''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.controllers
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2231,9 +1128,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''power-on-time''].first()'
+                    - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''power-on-time''].first()'
               master_item:
-                key: hpe.msa.raw.controllers.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2330,7 +1227,7 @@ zabbix_export:
                     host: 'HPE MSA 2060 Storage by HTTP'
                     key: 'hpe.msa.controllers.iops.write["{#CONTROLLER.ID}",rate]'
           master_item:
-            key: hpe.msa.raw.controllers
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
               lld_macro: '{#CONTROLLER.ID}'
@@ -2339,6 +1236,11 @@ zabbix_export:
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''controllers'']'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2364,13 +1266,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''blocksize''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''blocksize''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2390,13 +1292,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''blocks''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''blocks''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2440,13 +1342,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''ssd-life-left-numeric''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''ssd-life-left-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2468,14 +1370,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''disk-group''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''disk-group''].first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2497,7 +1399,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -2505,7 +1407,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2561,13 +1463,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''model''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''model''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2589,14 +1491,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''storage-pool-name''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''storage-pool-name''].first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2618,13 +1520,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2645,14 +1547,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''temperature-numeric''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''temperature-numeric''].first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2674,7 +1576,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''temperature-status-numeric''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''temperature-status-numeric''].first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: IN_RANGE
@@ -2688,7 +1590,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2748,13 +1650,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''description-numeric''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''description-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2776,13 +1678,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''vendor''].first()'
+                    - '$.[''disks''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''vendor''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.disks
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2791,7 +1693,7 @@ zabbix_export:
                   tag: disk
                   value: '{#DURABLE.ID}'
           master_item:
-            key: hpe.msa.raw.disks
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
@@ -2800,6 +1702,11 @@ zabbix_export:
               lld_macro: '{#TYPE}'
               path: '$.[''description-numeric'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''disks'']'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2843,13 +1750,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''avg-read-rsp-time''].first()'
+                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''avg-read-rsp-time''].first()'
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.000001'
               master_item:
-                key: hpe.msa.raw.disks.groups.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2871,13 +1778,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''avg-rsp-time''].first()'
+                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''avg-rsp-time''].first()'
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.000001'
               master_item:
-                key: hpe.msa.raw.disks.groups.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2899,13 +1806,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''avg-write-rsp-time''].first()'
+                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''avg-write-rsp-time''].first()'
                 -
                   type: MULTIPLIER
                   parameters:
                     - '0.000001'
               master_item:
-                key: hpe.msa.raw.disks.groups.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2925,13 +1832,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''freespace-numeric''].first()'
+                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''freespace-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks.groups
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2952,13 +1859,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''blocksize''].first()'
+                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''blocksize''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks.groups
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -2978,13 +1885,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''blocks''].first()'
+                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''blocks''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks.groups
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3006,13 +1913,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''data-read-numeric''].first()'
+                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''data-read-numeric''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.disks.groups.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3033,9 +1940,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
+                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
               master_item:
-                key: hpe.msa.raw.disks.groups.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3057,13 +1964,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''data-written-numeric''].first()'
+                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''data-written-numeric''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.disks.groups.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3085,13 +1992,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''number-of-reads''].first()'
+                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''number-of-reads''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.disks.groups.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3112,9 +2019,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''iops''].first()'
+                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''iops''].first()'
               master_item:
-                key: hpe.msa.raw.disks.groups.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3136,13 +2043,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''number-of-writes''].first()'
+                    - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''number-of-writes''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.disks.groups.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3164,13 +2071,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''raidtype-numeric''].first()'
+                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''raidtype-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.disks.groups
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3212,13 +2119,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''pool-percentage''].first()'
+                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''pool-percentage''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks.groups
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3308,14 +2215,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''diskcount''].first()'
+                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''diskcount''].first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks.groups
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3337,7 +2244,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
+                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -3345,7 +2252,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks.groups
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3416,13 +2323,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''status-numeric''].first()'
+                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''status-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.disks.groups
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3596,12 +2503,17 @@ zabbix_export:
                     host: 'HPE MSA 2060 Storage by HTTP'
                     key: 'hpe.msa.disks.groups.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.raw.disks.groups
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
               path: '$.[''name'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''disk-group'']'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -3628,7 +2540,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -3636,7 +2548,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.enclosures
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3692,13 +2604,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''midplane-serial-number''].first()'
+                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''midplane-serial-number''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.enclosures
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3720,13 +2632,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''model''].first()'
+                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''model''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.enclosures
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3748,13 +2660,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
+                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.enclosures
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3776,9 +2688,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''enclosure-power''].first()'
+                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''enclosure-power''].first()'
               master_item:
-                key: hpe.msa.raw.enclosures
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3800,7 +2712,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
+                    - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '6'
                 -
@@ -3808,7 +2720,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.enclosures
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3871,12 +2783,17 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.msa.raw.enclosures
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''enclosures'']'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -3903,7 +2820,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''fans''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -3911,7 +2828,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.fans
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3966,9 +2883,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''speed''].first()'
+                    - '$.[''fans''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''speed''].first()'
               master_item:
-                key: hpe.msa.raw.fans
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -3990,13 +2907,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
+                    - '$.[''fans''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.fans
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4049,205 +2966,172 @@ zabbix_export:
                     host: 'HPE MSA 2060 Storage by HTTP'
                     key: 'hpe.msa.fans["{#DURABLE.ID}",speed]'
           master_item:
-            key: hpe.msa.raw.fans
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''fans'']'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
         -
-          uuid: eaf913faf35b41eebb0f6177bc3a457a
-          name: 'I/O modules discovery'
+          uuid: 30f91e8f7fba489aa649759219efa67c
+          name: 'FRU discovery'
           type: DEPENDENT
-          key: hpe.msa.io_modules.discovery
+          key: hpe.msa.frus.discovery
           delay: '0'
-          description: 'Discover I/O modules.'
+          filter:
+            conditions:
+              -
+                macro: '{#TYPE}'
+                value: ^(POWER_SUPPLY|RAID_IOM|CHASSIS_MIDPLANE)$
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+          description: 'Discover FRU.'
           item_prototypes:
             -
-              uuid: 5d43d0b89d714df4896be2bab5aa0eb5
-              name: 'I/O module [{#DURABLE.ID}]: Health'
+              uuid: 8cbf62d188084ea4a72eaa37987d8d8e
+              name: 'FRU [{#ENCLOSURE.ID}: {#LOCATION}]: Part number'
               type: DEPENDENT
-              key: 'hpe.msa.io_modules["{#DURABLE.ID}",health]'
+              key: 'hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",part_number]'
               delay: '0'
               history: 7d
-              description: 'I/O module health status.'
-              valuemap:
-                name: Health
+              trends: '0'
+              value_type: CHAR
+              description: '{#DESCRIPTION}. Part number of the FRU.'
               preprocessing:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
-                  error_handler: CUSTOM_VALUE
-                  error_handler_params: '4'
+                    - '$.[''frus''][?(@[''name''] == "{#TYPE}" && @[''fru-location''] == "{#LOCATION}")].[''part-number''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.msa.raw.data
+              tags:
+                -
+                  tag: component
+                  value: fru
+                -
+                  tag: fru
+                  value: 'Enclosure {#ENCLOSURE.ID}: {#LOCATION}'
+            -
+              uuid: 49c52c2c5b174c78a60756eb7a9e34f1
+              name: 'FRU [{#ENCLOSURE.ID}: {#LOCATION}]: Serial number'
+              type: DEPENDENT
+              key: 'hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",serial_number]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: '{#DESCRIPTION}. FRU serial number.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[''frus''][?(@[''name''] == "{#TYPE}" && @[''fru-location''] == "{#LOCATION}")].[''serial-number''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.msa.raw.data
+              tags:
+                -
+                  tag: component
+                  value: fru
+                -
+                  tag: fru
+                  value: 'Enclosure {#ENCLOSURE.ID}: {#LOCATION}'
+            -
+              uuid: d72f7be111ae4335b92d6a1d0ad9e3ee
+              name: 'FRU [{#ENCLOSURE.ID}: {#LOCATION}]: Status'
+              type: DEPENDENT
+              key: 'hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",status]'
+              delay: '0'
+              history: 7d
+              description: |
+                {#DESCRIPTION}. FRU status:
+                
+                Absent: The FRU is not present.
+                Fault: The FRU's health is Degraded or Fault.
+                Invalid data: The FRU ID data is invalid. The FRU's EEPROM is improperly programmed.
+                OK: The FRU is operating normally.
+                Power off: The FRU is powered off.
+              valuemap:
+                name: 'FRU status'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[''frus''][?(@[''name''] == "{#TYPE}" && @[''fru-location''] == "{#LOCATION}")].[''fru-status-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.io_modules
+                key: hpe.msa.raw.data
               tags:
+                -
+                  tag: component
+                  value: fru
                 -
                   tag: component
                   value: health
                 -
-                  tag: component
-                  value: io-module
-                -
-                  tag: io-module
-                  value: '{#DURABLE.ID}'
+                  tag: fru
+                  value: 'Enclosure {#ENCLOSURE.ID}: {#LOCATION}'
               trigger_prototypes:
                 -
-                  uuid: 4b2e0511c4e44191bc6721d15474dd8e
-                  expression: 'last(/HPE MSA 2060 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",health])=1'
-                  name: 'I/O module [{#DURABLE.ID}]: I/O module health is in degraded state'
+                  uuid: 2533eb2e4344494d9ec72629dab7b1a8
+                  expression: 'last(/HPE MSA 2060 Storage by HTTP/hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",status])=0'
+                  name: 'FRU [{#ENCLOSURE.ID}: {#LOCATION}]: FRU ID data is invalid'
                   priority: WARNING
-                  description: 'I/O module health is in degraded state.'
+                  description: 'The FRU ID data is invalid. The FRU''s EEPROM is improperly programmed.'
                   tags:
                     -
                       tag: scope
                       value: performance
                 -
-                  uuid: 39ebf5366155403592dac6e66e96cd51
-                  expression: 'last(/HPE MSA 2060 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",health])=2'
-                  name: 'I/O module [{#DURABLE.ID}]: I/O module health is in fault state'
+                  uuid: 7a994469e45f467c8582c24258d0eb75
+                  expression: 'last(/HPE MSA 2060 Storage by HTTP/hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",status])=1'
+                  name: 'FRU [{#ENCLOSURE.ID}: {#LOCATION}]: FRU status is Degraded or Fault'
                   priority: AVERAGE
-                  description: 'I/O module health is in fault state.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
-                  uuid: 6695d1d9fc5649c79fe504ecc1cb5332
-                  expression: 'last(/HPE MSA 2060 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",health])=3'
-                  name: 'I/O module [{#DURABLE.ID}]: I/O module health is in unknown state'
-                  priority: INFO
-                  description: 'I/O module health is in unknown state.'
-                  tags:
-                    -
-                      tag: scope
-                      value: notice
-            -
-              uuid: 07c0c7e1822c41028804fd2c873a861b
-              name: 'I/O module [{#DURABLE.ID}]: Part number'
-              type: DEPENDENT
-              key: 'hpe.msa.io_modules["{#DURABLE.ID}",part_number]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: 'Part number of the I/O module.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1d
-              master_item:
-                key: hpe.msa.raw.io_modules
-              tags:
-                -
-                  tag: component
-                  value: io-module
-                -
-                  tag: io-module
-                  value: '{#DURABLE.ID}'
-            -
-              uuid: 67810330da554f5ea0fe8d0951cd763c
-              name: 'I/O module [{#DURABLE.ID}]: Serial number'
-              type: DEPENDENT
-              key: 'hpe.msa.io_modules["{#DURABLE.ID}",serial_number]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: 'I/O module serial number.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1d
-              master_item:
-                key: hpe.msa.raw.io_modules
-              tags:
-                -
-                  tag: component
-                  value: io-module
-                -
-                  tag: io-module
-                  value: '{#DURABLE.ID}'
-            -
-              uuid: 6d196abdf7574556bdd050fc08daa5ff
-              name: 'I/O module [{#DURABLE.ID}]: Status'
-              type: DEPENDENT
-              key: 'hpe.msa.io_modules["{#DURABLE.ID}",status]'
-              delay: '0'
-              history: 7d
-              description: 'I/O module status.'
-              valuemap:
-                name: 'I/O module status'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
-                  error_handler: CUSTOM_VALUE
-                  error_handler_params: '3'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: hpe.msa.raw.io_modules
-              tags:
-                -
-                  tag: component
-                  value: health
-                -
-                  tag: component
-                  value: io-module
-                -
-                  tag: io-module
-                  value: '{#DURABLE.ID}'
-              trigger_prototypes:
-                -
-                  uuid: bcbd4f7d545c4614a8fed9b852f219ab
-                  expression: 'last(/HPE MSA 2060 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",status])=3'
-                  name: 'I/O module [{#DURABLE.ID}]: I/O module has unknown status'
-                  priority: INFO
-                  description: 'I/O module has unknown status.'
-                  tags:
-                    -
-                      tag: scope
-                      value: notice
-                -
-                  uuid: 6d2ea6ce4da442aeac0d388c978e611f
-                  expression: 'last(/HPE MSA 2060 Storage by HTTP/hpe.msa.io_modules["{#DURABLE.ID}",status])=1'
-                  name: 'I/O module [{#DURABLE.ID}]: I/O module is down'
-                  priority: AVERAGE
-                  description: 'I/O module is down.'
+                  description: 'FRU status is Degraded or Fault.'
                   tags:
                     -
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.msa.raw.io_modules
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
-              lld_macro: '{#DURABLE.ID}'
-              path: '$.[''durable-id'']'
+              lld_macro: '{#DESCRIPTION}'
+              path: '$.[''description'']'
+            -
+              lld_macro: '{#ENCLOSURE.ID}'
+              path: '$.[''enclosure-id'']'
+            -
+              lld_macro: '{#LOCATION}'
+              path: '$.[''fru-location'']'
+            -
+              lld_macro: '{#TYPE}'
+              path: '$.[''name'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[frus]'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -4272,13 +3156,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''total-avail-numeric''].first()'
+                    - '$.[''pools''][?(@[''name''] == "{#NAME}")].[''total-avail-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.pools
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4299,13 +3183,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''blocksize''].first()'
+                    - '$.[''pools''][?(@[''name''] == "{#NAME}")].[''blocksize''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.pools
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4325,13 +3209,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''total-size-numeric''].first()'
+                    - '$.[''pools''][?(@[''name''] == "{#NAME}")].[''total-size-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.pools
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4444,7 +3328,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
+                    - '$.[''pools''][?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -4452,7 +3336,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.pools
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4511,12 +3395,17 @@ zabbix_export:
                     host: 'HPE MSA 2060 Storage by HTTP'
                     key: 'hpe.msa.pools.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.raw.pools
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
               path: '$.[''name'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''pools'']'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -4543,7 +3432,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''port''] == "{#NAME}")].[''health-numeric''].first()'
+                    - '$.[''ports''][?(@[''port''] == "{#NAME}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -4551,7 +3440,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.ports
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4607,7 +3496,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''port''] == "{#NAME}")].[''status-numeric''].first()'
+                    - '$.[''ports''][?(@[''port''] == "{#NAME}")].[''status-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -4615,7 +3504,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.ports
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4671,13 +3560,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''port''] == "{#NAME}")].[''port-type-numeric''].first()'
+                    - '$.[''ports''][?(@[''port''] == "{#NAME}")].[''port-type-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.ports
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4686,12 +3575,17 @@ zabbix_export:
                   tag: port
                   value: '{#NAME}'
           master_item:
-            key: hpe.msa.raw.ports
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
               path: '$.[''port'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''ports'']'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -4718,7 +3612,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
+                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -4726,7 +3620,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.power_supplies
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4782,13 +3676,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
+                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''part-number''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.power_supplies
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4810,13 +3704,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
+                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''serial-number''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.power_supplies
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4838,7 +3732,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
+                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''status-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -4846,7 +3740,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.power_supplies
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4889,12 +3783,17 @@ zabbix_export:
                       tag: scope
                       value: performance
           master_item:
-            key: hpe.msa.raw.power_supplies
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
               path: '$.[''durable-id'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''power-supplies'']'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -4919,13 +3818,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''allocated-size-numeric''].first()'
+                    - '$.[''volumes''][?(@[''volume-name''] == "{#NAME}")].[''allocated-size-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.volumes
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4946,13 +3845,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''blocksize''].first()'
+                    - '$.[''volumes''][?(@[''volume-name''] == "{#NAME}")].[''blocksize''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.volumes
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4972,13 +3871,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''blocks''].first()'
+                    - '$.[''volumes''][?(@[''volume-name''] == "{#NAME}")].[''blocks''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.volumes
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -4998,13 +3897,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''read-cache-hits''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''read-cache-hits''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5024,13 +3923,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''read-cache-misses''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''read-cache-misses''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5050,13 +3949,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''write-cache-hits''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''write-cache-hits''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5076,13 +3975,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''write-cache-misses''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''write-cache-misses''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5104,13 +4003,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''data-read-numeric''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''data-read-numeric''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5131,9 +4030,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5155,13 +4054,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''data-written-numeric''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''data-written-numeric''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5183,13 +4082,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''number-of-reads''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''number-of-reads''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5210,9 +4109,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''iops''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''iops''].first()'
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5234,13 +4133,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[?(@[''volume-name''] == "{#NAME}")].[''number-of-writes''].first()'
+                    - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''number-of-writes''].first()'
                 -
                   type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.volumes.statistics
+                key: hpe.msa.raw.data
               tags:
                 -
                   tag: component
@@ -5364,12 +4263,17 @@ zabbix_export:
                     host: 'HPE MSA 2060 Storage by HTTP'
                     key: 'hpe.msa.volumes.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.raw.volumes
+            key: hpe.msa.raw.data
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
               path: '$.[''volume-name'']'
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$.[''volumes'']'
+              error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -5407,7 +4311,7 @@ zabbix_export:
           description: 'The critical threshold of the CPU utilization in %.'
         -
           macro: '{$HPE.MSA.DATA.TIMEOUT}'
-          value: 5s
+          value: 30s
           description: 'Response timeout for API.'
         -
           macro: '{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT}'
@@ -5553,6 +4457,25 @@ zabbix_export:
               value: '3'
               newvalue: Missing
         -
+          uuid: 284ed898fb7c46ecb8d719646445264c
+          name: 'FRU status'
+          mappings:
+            -
+              value: '0'
+              newvalue: 'Invalid data'
+            -
+              value: '1'
+              newvalue: Fault
+            -
+              value: '2'
+              newvalue: Absent
+            -
+              value: '3'
+              newvalue: 'Power off'
+            -
+              value: '4'
+              newvalue: OK
+        -
           uuid: cb8c3d00dfd4456181765b8b350ea4d2
           name: Health
           mappings:
@@ -5571,22 +4494,6 @@ zabbix_export:
             -
               value: '4'
               newvalue: N/A
-        -
-          uuid: 604220d02ff84f0da63e9032a261e006
-          name: 'I/O module status'
-          mappings:
-            -
-              value: '0'
-              newvalue: Operational
-            -
-              value: '1'
-              newvalue: Down
-            -
-              value: '2'
-              newvalue: 'Not installed'
-            -
-              value: '3'
-              newvalue: Unknown
         -
           uuid: ec101e7d212747779ed56ef9dbf72e2b
           name: 'Port type'
