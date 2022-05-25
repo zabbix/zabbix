@@ -845,8 +845,8 @@ static void	tm_process_temp_suppression(const char *data)
 		if (SUCCEED != DBlock_record("events", eventid, NULL, 0))
 			return;
 
-		result = DBselect("select event_suppressid,suppress_until from event_suppress where maintenanceid is "
-				"null and eventid=" ZBX_FS_UI64 ZBX_FOR_UPDATE, eventid);
+		result = DBselect("select event_suppressid,suppress_until from event_suppress where eventid="
+				ZBX_FS_UI64 " and maintenanceid is null" ZBX_FOR_UPDATE, eventid);
 
 		if (NULL != (row = DBfetch(result)))
 		{
