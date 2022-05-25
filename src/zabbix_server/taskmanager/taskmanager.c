@@ -789,7 +789,7 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 static void	tm_process_temp_suppression(const char *data)
 {
 	struct zbx_json_parse	jp;
-	char			tmp_eventid[MAX_ID_LEN], tmp_userid[MAX_ID_LEN], tmp_ts[MAX_ID_LEN], tmp_action[3];
+	char			tmp_eventid[MAX_ID_LEN], tmp_userid[MAX_ID_LEN], tmp_ts[MAX_ID_LEN], tmp_action[12];
 	zbx_uint64_t		eventid, userid, action;
 	unsigned int		ts;
 
@@ -823,11 +823,28 @@ static void	tm_process_temp_suppression(const char *data)
 		return;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACTION, tmp_action, sizeof(tmp_action), NULL) ||
-			FAIL == is_uint64(tmp_action, &action))
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACTION, tmp_action, sizeof(tmp_action), NULL))
+	{
+		if (0 == strcmp(ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS, tmp_action))
+		{
+			action = ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS;
+		}
+		else if (0 == strcmp(ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS, tmp_action))
+		{
+			action = ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to "
+				"retrieve \"%s\" tag's value '%s'", ZBX_PROTO_TAG_ACTION, tmp_action);
+
+			return;
+		}
+	}
+	else
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
-				" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
+			" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
 		return;
 	}
 

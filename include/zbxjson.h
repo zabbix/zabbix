@@ -233,6 +233,9 @@
 
 #define ZBX_PROTO_VALUE_REPORT_TEST		"report.test"
 
+#define ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS	"suppress"
+#define ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS	"unsuppress"
+
 typedef enum
 {
 	ZBX_JSON_TYPE_UNKNOWN = 0,
