@@ -715,7 +715,7 @@ class CEvent extends CApiService {
 						'type' => ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION,
 						'data' => json_encode([
 							'eventid' => strval($suppress_eventids[$k]),
-							'action' => ZBX_PROBLEM_UPDATE_SUPPRESS,
+							'action' => 'suppress',
 							'userid' => $acknowledgement['userid'],
 							'suppress_until' => $suppress_until
 						]),
@@ -736,7 +736,7 @@ class CEvent extends CApiService {
 						'type' => ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION,
 						'data' => json_encode([
 							'eventid' => strval($unsuppress_eventids[$k]),
-							'action' => ZBX_PROBLEM_UPDATE_UNSUPPRESS,
+							'action' => 'unsuppress',
 							'userid' => $acknowledgement['userid'],
 							'suppress_until' => 0
 						]),
