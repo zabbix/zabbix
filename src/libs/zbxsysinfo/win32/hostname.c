@@ -19,6 +19,7 @@
 
 #include "sysinfo.h"
 #include "log.h"
+#include "zbxstr.h"
 
 ZBX_METRIC	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */

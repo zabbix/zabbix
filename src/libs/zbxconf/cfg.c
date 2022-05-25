@@ -19,9 +19,8 @@
 
 #include "cfg.h"
 
-#include "common.h"
-#include "log.h"
 #include "zbxstr.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 

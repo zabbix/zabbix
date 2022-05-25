@@ -152,4 +152,9 @@ void	zbx_rtrim_utf8(char *str, const char *charlist);
 zbx_uint64_t	suffix2factor(char c);
 
 int	is_double_suffix(const char *str, unsigned char flags);
+
+#if defined(_WINDOWS)
+int	__zbx_stat(const char *path, zbx_stat_t *buf);
+#endif	/* _WINDOWS */
+
 #endif /* ZABBIX_STR_H */

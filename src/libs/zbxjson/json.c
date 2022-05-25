@@ -22,6 +22,7 @@
 #include "zbxjson.h"
 #include "json_parser.h"
 #include "jsonpath.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *

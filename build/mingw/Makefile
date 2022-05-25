@@ -15,8 +15,11 @@ WINDRES = windres.exe
 OBJS = \
 	$(OUTPUTDIR)\threads.o \
 	$(OUTPUTDIR)\str.o \
+	$(OUTPUTDIR)\temp_str.o \
 	$(OUTPUTDIR)\misc.o \
 	$(OUTPUTDIR)\time.o \
+	$(OUTPUTDIR)\token.o \
+	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
 	$(OUTPUTDIR)\iprange.o \
@@ -109,10 +112,19 @@ $(OUTPUTDIR)\iprange.o: $(TOPDIR)\src\libs\zbxcommon\iprange.c
 $(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxstr\str.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
+$(OUTPUTDIR)\temp_str.o: $(TOPDIR)\src\libs\zbxcommon\temp_str.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
 $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxcommon\file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxcommon\time.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\token.o: $(TOPDIR)\src\libs\zbxcommon\token.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\components_strings_representations.o: $(TOPDIR)\src\libs\zbxcommon\components_strings_representations.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\tls_version.o: $(TOPDIR)\src\libs\zbxcrypto\tls_version.c

@@ -23,6 +23,7 @@
 #include "log.h"
 #include "zbxmutexs.h"
 #include "sysinfo.h"
+#include "zbxstr.h"
 
 #define OBJECT_CACHE_REFRESH_INTERVAL	60
 #define NAMES_UPDATE_INTERVAL		60

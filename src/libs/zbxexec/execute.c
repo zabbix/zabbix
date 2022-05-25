@@ -19,7 +19,6 @@
 
 #include "zbxexec.h"
 
-#include "common.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "log.h"

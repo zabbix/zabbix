@@ -26,6 +26,7 @@
 #include <strsafe.h>
 #include <delayimp.h>
 #include <sddl.h>
+#include "zbxstr.h"
 
 #define MAX_NAME			256
 
