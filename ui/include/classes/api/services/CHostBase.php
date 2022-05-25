@@ -1487,7 +1487,7 @@ abstract class CHostBase extends CApiService {
 		unset($db_host);
 
 		$options = [
-			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'value', 'description'],
+			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'value', 'description', 'automatic'],
 			'filter' => ['hostid' => array_keys($db_hosts)]
 		];
 		$db_macros = DBselect(DB::makeSql('hostmacro', $options));
@@ -1553,6 +1553,14 @@ abstract class CHostBase extends CApiService {
 					}
 
 					$db_hostmacro = $db_host['macros'][$hostmacro['hostmacroid']];
+
+					// If at least one editable property is changed, convert automatic macro to manual.
+					if (array_key_exists('automatic', $db_hostmacro)
+							&& $db_hostmacro['automatic'] == ZBX_USERMACRO_AUTOMATIC
+							&& array_diff_key($hostmacro, array_flip(['hostmacroid']))) {
+						$hostmacro['automatic'] = ZBX_USERMACRO_MANUAL;
+					}
+
 					$hostmacro += array_intersect_key($db_hostmacro, array_flip(['macro', 'type']));
 
 					if ($hostmacro['type'] != $db_hostmacro['type']) {

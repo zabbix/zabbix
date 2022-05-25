@@ -51,6 +51,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
 				'tls_subject', 'flags', 'inventory_mode'
 			],
+			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
 			'hostids' => $this->getInput('hostid'),
 			'editable' => true
 		]);
@@ -93,7 +94,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 					$this->getInput('add_templates', []), $this->getInput('templates', [])
 				]),
 				'templates_clear' => zbx_toObject($clear_templates, 'templateid'),
-				'macros' => $this->processUserMacros($this->getInput('macros', [])),
+				'macros' => $this->processUserMacros($this->getInput('macros', []), $this->host['macros']),
 				'inventory' => $inventory_enabled ? $this->getInput('host_inventory', []) : [],
 				'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
 				'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])

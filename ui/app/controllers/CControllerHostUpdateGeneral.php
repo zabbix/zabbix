@@ -119,19 +119,29 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	 *
 	 * @return array Macros for assigning to host.
 	 */
-	protected function processUserMacros(array $macros): array {
+	protected function processUserMacros(array $macros, array $db_macros = []): array {
+		$db_macros = array_column($db_macros, null, 'hostmacroid');
+		$macro_fields = array_flip(['macro', 'value', 'type', 'description']);
 		$macros = cleanInheritedMacros($macros);
 
 		foreach ($macros as &$macro) {
-			if (array_key_exists('discovery_state', $macro)
-					&& $macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING) {
-				$macro['automatic'] = ZBX_USERMACRO_MANUAL;
-			}
+			if (array_key_exists('hostmacroid', $macro) && array_key_exists($macro['hostmacroid'], $db_macros)) {
+				$db_macro = $db_macros[$macro['hostmacroid']];
+				$macro_diff = array_diff_assoc(array_intersect_key($macro, $macro_fields), $db_macro);
 
-			unset($macro['discovery_state']);
-			unset($macro['original_value']);
-			unset($macro['original_description']);
-			unset($macro['original_macro_type']);
+				if (array_key_exists('discovery_state', $macro)
+						&& $macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING) {
+					$macro_diff += array_intersect_key($db_macro, $macro_fields);
+				}
+
+				$macro = ['hostmacroid' => $macro['hostmacroid']] + $macro_diff;
+			}
+			else {
+				unset($macro['discovery_state']);
+				unset($macro['original_value']);
+				unset($macro['original_description']);
+				unset($macro['original_macro_type']);
+			}
 		}
 		unset($macro);
 
