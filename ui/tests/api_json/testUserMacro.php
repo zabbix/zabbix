@@ -85,8 +85,7 @@ class testUserMacro extends CAPITest {
 					'value' => 'test',
 					'type' => '0',
 					'hostid' => '90020',
-					'description' => '',
-					'automatic' => '0'
+					'description' => ''
 				],
 				'expected_error' => null,
 				'expect_db_row' => [
@@ -94,8 +93,7 @@ class testUserMacro extends CAPITest {
 					'value' => 'test',
 					'type' => '0',
 					'hostid' => '90020',
-					'description' => '',
-					'automatic' => '0'
+					'description' => ''
 				]
 			],
 			[
@@ -133,26 +131,6 @@ class testUserMacro extends CAPITest {
 					'hostid' => '90020'
 				],
 				'expected_error' => 'Invalid parameter "/1/value": incorrect syntax near "/".'
-			],
-			// Create macros for discovered hosts.
-			[
-				'hostmacro' => [
-					'macro' => '{$MANUAL_MACRO}',
-					'value' => 'value',
-					'type' => '0',
-					'hostid' => '99030'
-				],
-				'expected_error' => null
-			],
-			[
-				'hostmacro' => [
-					'macro' => '{$AUTOMATIC_MACRO_CREATED_USING_API}',
-					'value' => 'value',
-					'type' => '0',
-					'hostid' => '99030',
-					'automatic' => ZBX_USERMACRO_AUTOMATIC
-				],
-				'expected_error' => 'Invalid parameter "/1/automatic": value must be 0.'
 			]
 		];
 	}
@@ -492,22 +470,6 @@ class testUserMacro extends CAPITest {
 						'hostmacroid' => '2',
 						'value' => 'test',
 						'description' => 'notes'
-					]
-				]
-			],
-			// Transform automatic to manual.
-			[
-				'hostmacro' => [
-					[
-						'hostmacroid' => '3',
-						'automatic' => '0'
-					]
-				],
-				'expected_error' => null,
-				'expect_db_rows' => [
-					[
-						'hostmacroid' => '3',
-						'automatic' => '0'
 					]
 				]
 			]
