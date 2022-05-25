@@ -1066,15 +1066,6 @@ zbx_proxy_suppress_t;
 	(data << ZBX_RTC_DATA_SHIFT))
 
 
-#define ZBX_FLAG_DOUBLE_PLAIN	0x00
-#define ZBX_FLAG_DOUBLE_SUFFIX	0x01
-int	is_double_suffix(const char *str, unsigned char flags);
-int	is_double(const char *str, double *value);
-#define ZBX_LENGTH_UNLIMITED	0x7fffffff
-int	is_time_suffix(const char *str, int *value, int length);
-int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
-int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
-
 int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
 int	num_param(const char *p);
 char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
@@ -1214,6 +1205,16 @@ size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
+
+
+
+#define ZBX_FLAG_DOUBLE_PLAIN	0x00
+#define ZBX_FLAG_DOUBLE_SUFFIX	0x01
+int	is_double(const char *str, double *value);
+#define ZBX_LENGTH_UNLIMITED	0x7fffffff
+int	is_time_suffix(const char *str, int *value, int length);
+int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
+int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 /* remaining temp string functions END */
 
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
@@ -1279,10 +1280,6 @@ int	_wis_uint(const wchar_t *wide_string);
 #endif
 
 
-
-/* time and memory size suffixes */
-#define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
-zbx_uint64_t	suffix2factor(char c);
 
 #if defined(_WINDOWS)
 typedef struct __stat64	zbx_stat_t;

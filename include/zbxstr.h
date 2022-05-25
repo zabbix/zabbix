@@ -154,5 +154,12 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
 
+
+/* time and memory size suffixes */
+#define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
+zbx_uint64_t	suffix2factor(char c);
+
+int	is_double_suffix(const char *str, unsigned char flags);
+
 #endif /* ZABBIX_STR_H */
 
