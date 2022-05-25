@@ -855,9 +855,14 @@ static void	tm_process_temp_suppression(const char *data)
 		}
 		else
 		{
-			DBexecute("insert into event_suppress (event_suppressid,eventid,maintenanceid,suppress_until,"
-					"userid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",NULL," ZBX_FS_UI64 ","
-					ZBX_FS_UI64 ")", DBget_maxid("event_suppress"), eventid, ts, userid);
+			zbx_db_insert_t	db_insert;
+
+			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "suppress_until", "userid", NULL);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, ts, userid);
+
+			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
+			zbx_db_insert_execute(&db_insert);
+			zbx_db_insert_clean(&db_insert);
 		}
 
 		DBfree_result(result);
