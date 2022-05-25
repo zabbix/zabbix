@@ -521,7 +521,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' &&
 
 		DBstart();
 
-		$result = copyTriggersToHosts(getRequest('g_triggerid'), $hostids, getRequest('hostid'));
+		$result = copyTriggersToHosts($hostids, getRequest('hostid'), getRequest('g_triggerid'));
 		$result = DBend($result);
 
 		$triggers_count = count(getRequest('g_triggerid'));

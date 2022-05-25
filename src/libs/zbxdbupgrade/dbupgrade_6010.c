@@ -501,6 +501,21 @@ static int	DBpatch_6010027(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6010028(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"delete from role_rule where value_str='trigger.adddependencies' or "
+			"value_str='trigger.deletedependencies'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #define DBPATCH_HOST_STATUS_TEMPLATE	"3"
 #define DBPATCH_GROUPIDS(cmp)									\
 		"select distinct g.groupid"							\
@@ -528,36 +543,36 @@ hstgrp_t;
 ZBX_PTR_VECTOR_DECL(hstgrp, hstgrp_t *)
 ZBX_PTR_VECTOR_IMPL(hstgrp, hstgrp_t *)
 
-static int	DBpatch_6010028(void)
+static int	DBpatch_6010029(void)
 {
 	return DBdrop_field("hstgrp", "internal");
 }
 
-static int	DBpatch_6010029(void)
+static int	DBpatch_6010030(void)
 {
 	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hstgrp", &field);
 }
 
-static int	DBpatch_6010030(void)
+static int	DBpatch_6010031(void)
 {
 	return DBdrop_index("hstgrp", "hstgrp_1");
 }
 
-static int	DBpatch_6010031(void)
+static int	DBpatch_6010032(void)
 {
 	return DBcreate_index("hstgrp", "hstgrp_1", "type,name", 1);
 }
 
-static void	DBpatch_6010032_hstgrp_free(hstgrp_t *hstgrp)
+static void	DBpatch_6010033_hstgrp_free(hstgrp_t *hstgrp)
 {
 	zbx_free(hstgrp->name);
 	zbx_free(hstgrp->uuid);
 	zbx_free(hstgrp);
 }
 
-static int	DBpatch_6010032_update_group_type(hstgrp_t *hstgrp)
+static int	DBpatch_6010033_update_group_type(hstgrp_t *hstgrp)
 {
 	int	ret = SUCCEED;
 
@@ -567,7 +582,7 @@ static int	DBpatch_6010032_update_group_type(hstgrp_t *hstgrp)
 	return ret;
 }
 
-static int	DBpatch_6010032_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps, int *type)
+static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps, int *type)
 {
 	int	i;
 
@@ -609,7 +624,7 @@ static int	DBpatch_6010032_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps,
 	return FAIL;
 }
 
-static int	DBpatch_6010032_update_empty(zbx_vector_hstgrp_t *hstgrps)
+static int	DBpatch_6010033_update_empty(zbx_vector_hstgrp_t *hstgrps)
 {
 	int	i, ret = SUCCEED;
 
@@ -620,12 +635,12 @@ static int	DBpatch_6010032_update_empty(zbx_vector_hstgrp_t *hstgrps)
 		if (HOSTGROUP_TYPE_EMPTY != hstgrps->values[i]->type)
 			continue;
 
-		if (SUCCEED != DBpatch_6010032_starts_with(hstgrps->values[i]->name, hstgrps, &group_type))
+		if (SUCCEED != DBpatch_6010033_starts_with(hstgrps->values[i]->name, hstgrps, &group_type))
 			hstgrps->values[i]->type = HOSTGROUP_TYPE_HOST;
 		else
 			hstgrps->values[i]->type = group_type;
 
-		if (SUCCEED != DBpatch_6010032_update_group_type(hstgrps->values[i]))
+		if (SUCCEED != DBpatch_6010033_update_group_type(hstgrps->values[i]))
 		{
 			ret = FAIL;
 			goto out;
@@ -635,7 +650,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010032_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
+static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 {
 	int			i, new_count = 0, permission, ret = SUCCEED;
 	zbx_uint64_t		nextid, groupid;
@@ -725,7 +740,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_6010032_split_groups(void)
+static int	DBpatch_6010033_split_groups(void)
 {
 	int			i, permission, has_hosts, has_templates, ret = SUCCEED;
 	zbx_uint64_t		nextid, groupid;
@@ -805,37 +820,37 @@ static int	DBpatch_6010032_split_groups(void)
 		else if (FAIL == has_templates)
 		{
 			hstgrps.values[i]->type = HOSTGROUP_TYPE_HOST;
-			if (SUCCEED != (ret = DBpatch_6010032_update_group_type(hstgrps.values[i])))
+			if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps.values[i])))
 				goto out;
 		}
 		else if (FAIL == has_hosts)
 		{
 			hstgrps.values[i]->type = HOSTGROUP_TYPE_TEMPLATE;
-			if (SUCCEED != (ret = DBpatch_6010032_update_group_type(hstgrps.values[i])))
+			if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps.values[i])))
 				goto out;
 		}
 		else
 			hstgrps.values[i]->type = HOSTGROUP_TYPE_MIXED;
 	}
 
-	if (SUCCEED != DBpatch_6010032_update_empty(&hstgrps) ||
-			SUCCEED != DBpatch_6010032_create_template_groups(&hstgrps))
+	if (SUCCEED != DBpatch_6010033_update_empty(&hstgrps) ||
+			SUCCEED != DBpatch_6010033_create_template_groups(&hstgrps))
 		goto out;
 out:
 	zbx_vector_uint64_destroy(&host_groupids);
 	zbx_vector_uint64_destroy(&template_groupids);
-	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010032_hstgrp_free);
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010033_hstgrp_free);
 	zbx_vector_hstgrp_destroy(&hstgrps);
 
 	return ret;
 }
 
-static int	DBpatch_6010032(void)
+static int	DBpatch_6010033(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	return DBpatch_6010032_split_groups();
+	return DBpatch_6010033_split_groups();
 }
 
 #define RENAME_PROFILE(old, new)								\
@@ -848,7 +863,7 @@ do {												\
 	}											\
 } while (0)
 
-static int	DBpatch_6010033(void)
+static int	DBpatch_6010034(void)
 {
 	int ret = SUCCEED;
 
@@ -911,5 +926,6 @@ DBPATCH_ADD(6010030, 0, 1)
 DBPATCH_ADD(6010031, 0, 1)
 DBPATCH_ADD(6010032, 0, 1)
 DBPATCH_ADD(6010033, 0, 1)
+DBPATCH_ADD(6010034, 0, 1)
 
 DBPATCH_END()

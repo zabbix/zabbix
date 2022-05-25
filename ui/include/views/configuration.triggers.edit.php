@@ -604,7 +604,7 @@ $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
 	->setId('dependency-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Name'), $readonly ? null : _('Action')]);
+	->setHeader([_('Name'), $discovered_trigger ? null : _('Action')]);
 
 foreach ($data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
@@ -622,7 +622,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 					->setArgument('context', $data['context'])
 			))->setTarget('_blank'),
 			(new CCol(
-				$readonly
+				$discovered_trigger
 					? null
 					: (new CButton('remove', _('Remove')))
 						->setAttribute('data-triggerid', $dependency['triggerid'])
@@ -636,7 +636,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 
 $buttons = null;
 
-if (!$readonly) {
+if (!$discovered_trigger) {
 	$buttons = $data['context'] === 'host'
 		? (new CButton('add_dep_trigger', _('Add')))
 			->setAttribute('data-hostid', $data['hostid'])
