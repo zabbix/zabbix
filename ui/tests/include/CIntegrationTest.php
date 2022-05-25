@@ -394,7 +394,7 @@ class CIntegrationTest extends CAPITest {
 						break;
 					}
 				}
-			} 
+			}
 
 			for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 				if (!file_exists(self::getPidPath($component))) {
