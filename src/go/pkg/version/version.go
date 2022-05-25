@@ -147,7 +147,7 @@ func Display(pluginVersion bool) {
 	fmt.Printf("Revision %s %s, compilation time: %s %s\n", Revision(), RevDate(), CompileDate(), CompileTime())
 
 	if pluginVersion {
-		fmt.Printf("Plugin support version %d.%d\n", comms.Major, comms.Minor)
+		fmt.Printf("Plugin support version %d.%d\n", comms.MajorVersion, comms.MinorVersion)
 	}
 
 	fmt.Println()

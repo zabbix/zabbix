@@ -3,7 +3,7 @@ module zabbix.com
 go 1.16
 
 require (
-	git.zabbix.com/ap/plugin-support v0.0.0-20220524082638-7fd18350f78d
+	git.zabbix.com/ap/plugin-support v0.0.0-20220525103006-9363aae69d10
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/cakturk/go-netstat v0.0.0-20200220111822-e5b49efee7a5
 	github.com/chromedp/cdproto v0.0.0-20210104223854-2cc87dae3ee3

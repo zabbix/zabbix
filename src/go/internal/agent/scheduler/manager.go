@@ -731,5 +731,5 @@ func getPluginOpts(optsRaw interface{}, name string) (pluginCap, pluginSystemCap
 }
 
 func logPluginVersion() {
-	log.Infof("Plugin support version %d.%d", comms.Major, comms.Minor)
+	log.Infof("Plugin support version %d.%d", comms.MajorVersion, comms.MinorVersion)
 }
