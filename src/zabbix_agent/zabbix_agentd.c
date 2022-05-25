@@ -1468,6 +1468,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_SHOW_VERSION:
 			zbx_version();
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			printf("\n");
 			zbx_tls_version();
 #endif
 #ifdef _AIX

@@ -32,7 +32,6 @@
  ******************************************************************************/
 void	zbx_tls_version(void)
 {
-	printf("\n");
 #if defined(HAVE_GNUTLS)
 	printf("Compiled with GnuTLS %s\nRunning with GnuTLS %s\n", GNUTLS_VERSION, gnutls_check_version(NULL));
 #elif defined(HAVE_OPENSSL)

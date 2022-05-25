@@ -118,7 +118,7 @@ void zbx_md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
 
 /* SHA BLOCK */
-#include "zbxsysinc.h"
+/* Based on SHA256 implementation released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 
 #define ZBX_SHA256_DIGEST_SIZE	32
 
@@ -138,7 +138,8 @@ void	*zbx_sha256_finish(sha256_ctx *ctx, void *resbuf);
 void	zbx_sha256_hash(const char *in, char *out);
 void	zbx_sha256_hash_len(const char *in, size_t len, char *out);
 
+/* Based on SHA512 implementation released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 void	zbx_sha512_hash(const char *in, char *out);
 /* SHA BLOCK END */
 
-#endif /* ZABBIX_HASH_H */
+#endif /* ZABBIX_ZBXHASH_H */

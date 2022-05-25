@@ -235,8 +235,8 @@ out:
  *     f        - [IN] file descriptor                                        *
  *     offset   - [IN] start position of the part                             *
  *     length   - [IN] length of the part in bytes. Maximum is 512 bytes.     *
- *     md5buf   - [OUT] output buffer, ZBX_MD5_DIGEST_SIZE-bytes long, where the  *
- *                calculated MD5 sum is placed                                *
+ *     md5buf   - [OUT] output buffer, ZBX_MD5_DIGEST_SIZE-bytes long, where  *
+ *                the calculated MD5 sum is placed                            *
  *     filename - [IN] file name, used in error logging                       *
  *     err_msg  - [IN/OUT] error message why FAIL-ed                          *
  *                                                                            *

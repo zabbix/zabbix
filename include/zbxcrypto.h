@@ -38,4 +38,4 @@ zbx_crypto_hash_t;
 
 int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
 		char **out);
-#endif /* ZABBIX_CRYPTO_H */
+#endif /* ZABBIX_ZBXCRYPTO_H */

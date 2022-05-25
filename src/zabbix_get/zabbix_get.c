@@ -378,6 +378,7 @@ int	main(int argc, char **argv)
 			case 'V':
 				zbx_version();
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
 				zbx_tls_version();
 #endif
 				exit(EXIT_SUCCESS);
