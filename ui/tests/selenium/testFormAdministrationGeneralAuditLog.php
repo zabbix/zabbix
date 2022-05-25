@@ -56,7 +56,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 		$this->page->login()->open('zabbix.php?action=audit.settings.edit');
 		$form = $this->query('id:audit-settings')->asForm()->one();
 		$form->checkValue(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
-			'Data storage period' => '365d']);
+				'Data storage period' => '365d']);
 
 		// Check if field "Data storage period" is disabled when options are false
 		$form->fill(['Enable audit logging' => true, 'Enable internal housekeeping' => false]);
@@ -103,8 +103,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => false
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -114,8 +113,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '365d'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -125,8 +123,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '365d'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -136,8 +133,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1440m'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -147,8 +143,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '13140000m'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -158,8 +153,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '13139999m'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -169,8 +163,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '24h'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -180,8 +173,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '24h'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -191,8 +183,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '219000h'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -202,8 +193,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '219000h'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -213,8 +203,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '218999h'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -224,8 +213,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '218999h'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -235,8 +223,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1d'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -246,8 +233,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1d'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -257,8 +243,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1w'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -268,8 +253,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1w'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -279,8 +263,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '86400s'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -290,8 +273,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '86400s'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -301,8 +283,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788400000s'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -312,8 +293,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788400000s'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -323,8 +303,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788399999s'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -334,8 +313,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788399999s'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -345,8 +323,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '9125d'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -356,8 +333,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '9125d'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -367,8 +343,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1303w'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -378,8 +353,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1303w'
-					],
-					'message' => 'Configuration updated'
+					]
 				]
 			],
 			[
@@ -804,15 +778,15 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 		$this->page->login()->open('zabbix.php?action=audit.settings.edit');
 		$form = $this->query('id:audit-settings')->asForm()->one();
 		$form->fill($data['fields']);
-		$form->submit();
+		$form->submit()->waitUntilReloaded();
 
 		if($data['expected'] === TEST_GOOD) {
-			$this->assertMessage(TEST_GOOD, $data['message']);
+			$this->assertMessage(TEST_GOOD, 'Configuration updated');
+			$form->checkValue($data['fields']);
 			$form->query('id:resetDefaults')->one()->click();
 			COverlayDialogElement::find()->waitUntilVisible()->one()->query('button', 'Reset defaults')->one()->click();
-			$form->submit();
-			$form->checkValue(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
-				'Data storage period' => '365d']);
+			$form->submit()->waitUntilReloaded();
+			$form->checkValue($this->default_values);
 		}
 		else {
 			$this->assertMessage(TEST_BAD, $data['message'], $data['msgdetails']);
