@@ -1947,7 +1947,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 				SUCCEED == zbx_db_lock_maintenanceids(maintenanceids))
 		{
 			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
-					"maintenanceid", "suppress_until", "userid", NULL);
+					"maintenanceid", "suppress_until", NULL);
 
 			for (j = 0; j < event_queries.values_num; j++)
 			{
@@ -1966,7 +1966,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), query->eventid,
 							query->maintenances.values[i].first,
-							(int)query->maintenances.values[i].second, NULL);
+							(int)query->maintenances.values[i].second);
 
 					((DB_EVENT *)event_refs->values[j])->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
 				}
