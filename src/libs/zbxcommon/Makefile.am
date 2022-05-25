@@ -11,7 +11,8 @@ libzbxcommon_a_SOURCES = \
 	temp_str.c \
 	time.c \
 	cuid.c \
-	token.c
+	token.c \
+	components_strings_representations.c
 
 libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS)
 

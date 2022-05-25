@@ -232,6 +232,8 @@ zbx_item_authtype_t;
 #define EVENT_SOURCE_SERVICE		4
 #define EVENT_SOURCE_COUNT		5
 
+const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
+
 /* event objects */
 #define EVENT_OBJECT_TRIGGER		0
 #define EVENT_OBJECT_DHOST		1
@@ -533,6 +535,8 @@ zbx_group_status_type_t;
 #define ZBX_PROGRAM_TYPE_AGENTD		0x08
 #define ZBX_PROGRAM_TYPE_SENDER		0x10
 #define ZBX_PROGRAM_TYPE_GET		0x20
+const char	*get_process_type_string(unsigned char proc_type);
+int		get_process_type_by_name(const char *proc_type_str);
 const char	*get_program_type_string(unsigned char program_type);
 
 /* process type */
@@ -583,9 +587,6 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_EXT_LAST		127
 
 #define ZBX_PROCESS_TYPE_UNKNOWN		255
-
-const char	*get_process_type_string(unsigned char proc_type);
-int		get_process_type_by_name(const char *proc_type_str);
 
 /* maintenance */
 typedef enum

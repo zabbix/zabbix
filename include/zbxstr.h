@@ -87,8 +87,6 @@ char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	cmp_key_id(const char *key_1, const char *key_2);
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
-const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
-
 #if defined(_WINDOWS) || defined(__MINGW32__)
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
@@ -154,4 +152,5 @@ void	zbx_rtrim_utf8(char *str, const char *charlist);
 zbx_uint64_t	suffix2factor(char c);
 
 int	is_double_suffix(const char *str, unsigned char flags);
+
 #endif /* ZABBIX_STR_H */

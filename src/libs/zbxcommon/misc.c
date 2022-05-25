@@ -3194,6 +3194,167 @@ int	is_discovery_macro(const char *name)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: advances pointer to first invalid character in string             *
+ *          ensuring that everything before it is a valid key                 *
+ *                                                                            *
+ *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
+ *                                                                            *
+ * Parameters: exp - [IN/OUT] pointer to the first char of key                *
+ *                                                                            *
+ *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
+ *              ^                                                             *
+ * Return value: returns FAIL only if no key is present (length 0),           *
+ *               or the whole string is invalid. SUCCEED otherwise.           *
+ *                                                                            *
+ * Comments: the pointer is advanced to the first invalid character even if   *
+ *           FAIL is returned (meaning there is a syntax error in item key).  *
+ *           If necessary, the caller must keep a copy of pointer original    *
+ *           value.                                                           *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_key(const char **exp)
+{
+	const char	*s;
+
+	for (s = *exp; SUCCEED == is_key_char(*s); s++)
+		;
+
+	if (*exp == s)	/* the key is empty */
+		return FAIL;
+
+	if ('[' == *s)	/* for instance, net.tcp.port[,80] */
+	{
+		int	state = 0;	/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+		int	array = 0;	/* array nest level */
+
+		for (s++; '\0' != *s; s++)
+		{
+			switch (state)
+			{
+				/* init state */
+				case 0:
+					if (',' == *s)
+						;
+					else if ('"' == *s)
+						state = 1;
+					else if ('[' == *s)
+					{
+						if (0 == array)
+							array = 1;
+						else
+							goto fail;	/* incorrect syntax: multi-level array */
+					}
+					else if (']' == *s && 0 != array)
+					{
+						array = 0;
+						s++;
+
+						while (' ' == *s)	/* skip trailing spaces after closing ']' */
+							s++;
+
+						if (']' == *s)
+							goto succeed;
+
+						if (',' != *s)
+							goto fail;	/* incorrect syntax */
+					}
+					else if (']' == *s && 0 == array)
+						goto succeed;
+					else if (' ' != *s)
+						state = 2;
+					break;
+				/* quoted */
+				case 1:
+					if ('"' == *s)
+					{
+						while (' ' == s[1])	/* skip trailing spaces after closing quotes */
+							s++;
+
+						if (0 == array && ']' == s[1])
+						{
+							s++;
+							goto succeed;
+						}
+
+						if (',' != s[1] && !(0 != array && ']' == s[1]))
+						{
+							s++;
+							goto fail;	/* incorrect syntax */
+						}
+
+						state = 0;
+					}
+					else if ('\\' == *s && '"' == s[1])
+						s++;
+					break;
+				/* unquoted */
+				case 2:
+					if (',' == *s || (']' == *s && 0 != array))
+					{
+						s--;
+						state = 0;
+					}
+					else if (']' == *s && 0 == array)
+						goto succeed;
+					break;
+			}
+		}
+fail:
+		*exp = s;
+		return FAIL;
+succeed:
+		s++;
+	}
+
+	*exp = s;
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return hostname and key                                           *
+ *          <hostname:>key                                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *         exp - pointer to the first char of hostname                        *
+ *                host:key[key params]                                        *
+ *                ^                                                           *
+ *                                                                            *
+ * Return value: return SUCCEED or FAIL                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	parse_host_key(char *exp, char **host, char **key)
+{
+	char	*p, *s;
+
+	if (NULL == exp || '\0' == *exp)
+		return FAIL;
+
+	for (p = exp, s = exp; '\0' != *p; p++)	/* check for optional hostname */
+	{
+		if (':' == *p)	/* hostname:vfs.fs.size[/,total]
+				 * --------^
+				 */
+		{
+			*p = '\0';
+			*host = zbx_strdup(NULL, s);
+			*p++ = ':';
+
+			s = p;
+			break;
+		}
+
+		if (SUCCEED != is_hostname_char(*p))
+			break;
+	}
+
+	*key = zbx_strdup(NULL, s);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Returns function type based on its name                           *
  *                                                                            *
  * Return value:  Function type.                                              *
@@ -4350,4 +4511,70 @@ int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *
 		zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
 
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Secure version of snprintf function.                              *
+ *          Add zero character at the end of string.                          *
+ *                                                                            *
+ * Parameters: str - destination buffer pointer                               *
+ *             count - size of destination buffer                             *
+ *             fmt - format                                                   *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...)
+{
+	size_t	written_len;
+	va_list	args;
+
+	va_start(args, fmt);
+	written_len = zbx_vsnprintf(str, count, fmt, args);
+	va_end(args);
+
+	return written_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Secure version of snprintf function.                              *
+ *          Add zero character at the end of string.                          *
+ *          Reallocs memory if not enough.                                    *
+ *                                                                            *
+ * Parameters: str       - [IN/OUT] destination buffer pointer                *
+ *             alloc_len - [IN/OUT] already allocated memory                  *
+ *             offset    - [IN/OUT] offset for writing                        *
+ *             fmt       - [IN] format                                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
+{
+	va_list	args;
+	size_t	avail_len, written_len;
+retry:
+	if (NULL == *str)
+	{
+		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
+		/* so we have to use the standard function                                   */
+		va_start(args, fmt);
+		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 2;	/* '\0' + one byte to prevent the operation retry */
+		va_end(args);
+		*offset = 0;
+		*str = (char *)zbx_malloc(*str, *alloc_len);
+	}
+
+	avail_len = *alloc_len - *offset;
+	va_start(args, fmt);
+	written_len = zbx_vsnprintf(*str + *offset, avail_len, fmt, args);
+	va_end(args);
+
+	if (written_len == avail_len - 1)
+	{
+		*alloc_len *= 2;
+		*str = (char *)zbx_realloc(*str, *alloc_len);
+
+		goto retry;
+	}
+
+	*offset += written_len;
 }
