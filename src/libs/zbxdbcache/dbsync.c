@@ -1838,17 +1838,6 @@ int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
 	return SUCCEED;
 }
 
-static int	dbsync_compare_prototype_item(const ZBX_DC_PROTOTYPE_ITEM *item, const DB_ROW dbrow)
-{
-	if (FAIL == dbsync_compare_uint64(dbrow[1], item->hostid))
-		return FAIL;
-
-	if (FAIL == dbsync_compare_uint64(dbrow[2], item->templateid))
-		return FAIL;
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: compares lld item prototypes with configuration cache             *
