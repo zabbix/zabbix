@@ -1011,10 +1011,10 @@ class CEvent extends CApiService {
 	/**
 	 * Checks if unsuppress action can be executed for all given events.
 	 *
-	 * @param array $events                 Array of event objects.
+	 * @param array $events  Array of event objects.
 	 *
-	 * @throws APIException                 Throws an exception:
-	 *                                        - If event is not manually suppressed;
+	 * @throws APIException  Throws an exception:
+	 *                        - If event is not manually suppressed;
 	 */
 	protected function checkCanUnsuppress(array $events) {
 		foreach ($events as $event) {
@@ -1058,9 +1058,9 @@ class CEvent extends CApiService {
 	/**
 	 * Checks if time is valid future time.
 	 *
-	 * @param array $data                              Input data.
-	 * @param array $data['suppress_until']            Suppress until unix time. O for Indefinite time.
-	 * @param int   $time                              Current unix time.
+	 * @param array $data                    Input data.
+	 * @param array $data['suppress_until']  Suppress until unix time. O for Indefinite time.
+	 * @param int   $time                    Current unix time.
 	 */
 	protected function isFutureTime(array $data, $time) {
 		if ($data['suppress_until'] <= $time && $data['suppress_until'] != 0) {
