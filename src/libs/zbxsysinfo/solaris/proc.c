@@ -18,11 +18,11 @@
 **/
 
 #include <procfs.h>
-#include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
+#include "zbxstr.h"
 
 #if !defined(HAVE_ZONE_H) && defined(HAVE_SYS_UTSNAME_H)
 #	include <sys/utsname.h>

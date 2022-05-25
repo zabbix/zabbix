@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
 
 #include <tlhelp32.h>
@@ -27,6 +26,7 @@
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
+#include "zbxstr.h"
 
 #define MAX_PROCESSES	4096
 #define MAX_NAME	256
