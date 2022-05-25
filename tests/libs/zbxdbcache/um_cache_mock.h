@@ -68,8 +68,8 @@ typedef struct
 }
 zbx_um_mock_cache_t;
 
-void	um_mock_config_init();
-void	um_mock_config_destroy();
+void	um_mock_config_init(void);
+void	um_mock_config_destroy(void);
 
 void	um_mock_cache_init(zbx_um_mock_cache_t *cache, zbx_mock_handle_t handle);
 void	um_mock_cache_init_from_config(zbx_um_mock_cache_t *cache, zbx_um_cache_t *cfg);

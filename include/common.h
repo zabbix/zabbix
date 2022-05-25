@@ -1154,7 +1154,7 @@ int		zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *
 int		zbx_day_in_month(int year, int mon);
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts);
 
-/* remaining temp string functions */
+/* move remaining temp string functions into libzbxstr.a */
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
 
 #define is_ushort(str, value) \
@@ -1208,8 +1208,6 @@ char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
 int	zbx_function_validate_parameters(const char *expr, size_t *length);
 
-
-
 #define ZBX_FLAG_DOUBLE_PLAIN	0x00
 #define ZBX_FLAG_DOUBLE_SUFFIX	0x01
 int	is_double(const char *str, double *value);
@@ -1217,24 +1215,24 @@ int	is_double(const char *str, double *value);
 int	is_time_suffix(const char *str, int *value, int length);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
-/* remaining temp string functions END */
+/* move remaining temp string functions into libzbxstr.a END */
 
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 /* misc functions */
-int	is_ip6(const char *ip);
-int	is_ip4(const char *ip);
-int	is_supported_ip(const char *ip);
-int	is_ip(const char *ip);
-
 int	zbx_validate_hostname(const char *hostname);
 
 void	zbx_backtrace(void);
 
 int	int_in_list(char *list, int value);
-int	ip_in_list(const char *list, const char *ip);
 
-/* IP range support */
+/* future IP library */
+int	is_ip6(const char *ip);
+int	is_ip4(const char *ip);
+int	is_supported_ip(const char *ip);
+int	is_ip(const char *ip);
+
+int	ip_in_list(const char *list, const char *ip);
 #define ZBX_IPRANGE_V4	0
 #define ZBX_IPRANGE_V6	1
 
@@ -1268,6 +1266,7 @@ void	iprange_first(const zbx_iprange_t *iprange, int *address);
 int	iprange_next(const zbx_iprange_t *iprange, int *address);
 int	iprange_validate(const zbx_iprange_t *iprange, const int *address);
 zbx_uint64_t	iprange_volume(const zbx_iprange_t *iprange);
+/* future IP library END */
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
@@ -1277,7 +1276,6 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 #if defined(_WINDOWS) || defined(__MINGW32__)
 const OSVERSIONINFOEX	*zbx_win_getversion(void);
 void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeout, char **utf8_value);
-);
 int	_wis_uint(const wchar_t *wide_string);
 #endif
 

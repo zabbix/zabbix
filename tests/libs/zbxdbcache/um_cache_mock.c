@@ -642,7 +642,7 @@ static int	mock_strpool_compare(const void *d1, const void *d2)
  *          pool                                                                 *
  *                                                                               *
  *********************************************************************************/
-void	um_mock_config_init()
+void	um_mock_config_init(void)
 {
 	config = (ZBX_DC_CONFIG *)zbx_malloc(NULL, sizeof(ZBX_DC_CONFIG));
 	memset(config, 0, sizeof(ZBX_DC_CONFIG));
@@ -675,7 +675,7 @@ static void	um_mock_kv_path_free(zbx_dc_kvs_path_t *kvspath)
  * Purpose: destroy configuration cache                                          *
  *                                                                               *
  *********************************************************************************/
-void	um_mock_config_destroy()
+void	um_mock_config_destroy(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_um_macro_t		**pmacro;

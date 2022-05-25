@@ -162,4 +162,3 @@ zbx_uint64_t	suffix2factor(char c);
 int	is_double_suffix(const char *str, unsigned char flags);
 
 #endif /* ZABBIX_STR_H */
-
