@@ -844,7 +844,7 @@ static void	tm_process_temp_suppression(const char *data)
 	else
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
-			" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
+				" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
 		return;
 	}
 
