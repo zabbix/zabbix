@@ -71,6 +71,23 @@ class testHost extends CAPITest {
 			'api_test_hosts_tpl_with_item' => null
 		],
 		'maintenanceids' => null,
+		'discovered_host_macros' => [
+			'{$DISCOVERED_MACRO_1}' => [
+				'macro' => '{$DISCOVERED_MACRO_1}',
+				'value' => 'text',
+				'type' => ZBX_MACRO_TYPE_TEXT
+			],
+			'{$DISCOVERED_MACRO_2}' => [
+				'macro' => '{$DISCOVERED_MACRO_2}',
+				'value' => 'secret',
+				'type' => ZBX_MACRO_TYPE_SECRET
+			],
+			'{$DISCOVERED_MACRO_3}' => [
+				'macro' => '{$DISCOVERED_MACRO_3}',
+				'value' => 'path/to:macro',
+				'type' => ZBX_MACRO_TYPE_VAULT
+			]
+		],
 		// Created hosts during host.create test (deleted at the end).
 		'created' => []
 	];
@@ -507,6 +524,16 @@ class testHost extends CAPITest {
 						'templateid' => self::$data['templateids'][ 'api_test_hosts_d_tpl']
 					]
 				]
+			],
+			[
+				'host' => '{#HOST}_with_macros',
+				'ruleid' => $discoveryrules['itemids'][0],
+				'groupLinks' => [
+					[
+						'groupid' => self::$data['hostgroupid']
+					]
+				],
+				'macros' => array_values(self::$data['discovered_host_macros'])
 			]
 		];
 		$host_prototypes = CDataHelper::call('hostprototype.create', $host_prototypes_data);
@@ -519,6 +546,7 @@ class testHost extends CAPITest {
 			$hosts_data[] = [
 				'host' => str_replace('{#HOST}', 'discovered', $host_prototype['host']),
 				'groups' => $host_prototype['groupLinks'],
+				'macros' => array_key_exists('macros', $host_prototype) ? $host_prototype['macros'] : [],
 				'templates' => array_key_exists('templates', $host_prototype) ? $host_prototype['templates'] : []
 			];
 		}
@@ -531,6 +559,17 @@ class testHost extends CAPITest {
 		self::$data['hostids']['discovered_auto_and_manual_templates'] = $hosts['hostids'][3];
 		self::$data['hostids']['discovered_clear'] = $hosts['hostids'][4];
 		self::$data['hostids']['discovered_limit_selects'] = $hosts['hostids'][5];
+		self::$data['hostids']['discovered_with_macros'] = $hosts['hostids'][6];
+
+		$db_hostmacros = CDBHelper::getAll(
+			'SELECT macro, hostmacroid'.
+			' FROM hostmacro'.
+			' WHERE '.dbConditionId('hostid', [self::$data['hostids']['discovered_with_macros']])
+		);
+
+		foreach ($db_hostmacros as $macro) {
+			self::$data['discovered_host_macros'][$macro['macro']]['hostmacroid'] = $macro['hostmacroid'];
+		}
 
 		$host_discovery = [];
 		$upd_hosts = [];
@@ -569,6 +608,16 @@ class testHost extends CAPITest {
 		$this->assertSame(true, $res);
 
 		$res = DB::update('hosts_templates', $upd_hosts_templates);
+		$this->assertSame(true, $res);
+
+		$res = DB::update('hostmacro', [[
+			'values' => [
+				'automatic' => ZBX_USERMACRO_AUTOMATIC
+			],
+			'where' => [
+				'hostmacroid' => array_column(self::$data['discovered_host_macros'], 'hostmacroid')
+			]
+		]]);
 		$this->assertSame(true, $res);
 
 		/*
@@ -985,6 +1034,90 @@ class testHost extends CAPITest {
 				$this->assertEquals($host[$field], $expected_value, 'Returned value should match.');
 			}
 		}
+	}
+
+	/**
+	 * host.update data provider.
+	 *
+	 * @return array
+	 */
+	public static function getHostUpdateMacrosData() {
+		return [
+			'Test host "discovered_with_macros" automatic macros being modified to manual' => [
+				'params' => [
+					'macros' => [
+						// No actual changes, so macro remains automatic.
+						'{$DISCOVERED_MACRO_1}' => [],
+
+						// Changed to manual since description was changed.
+						'{$DISCOVERED_MACRO_2}' => [
+							'macro' => '{$DISCOVERED_MACRO_2}',
+							'value' => 'secret',
+							'type' => ZBX_MACRO_TYPE_SECRET,
+							'description' => 'description'
+						],
+
+						// No actual changes but since unchanged values are passed, macro is converted to manual.
+						'{$DISCOVERED_MACRO_3}' => [
+							'macro' => '{$DISCOVERED_MACRO_3}',
+							'value' => 'path/to:macro',
+							'type' => ZBX_MACRO_TYPE_VAULT
+						]
+					]
+				],
+				'expected_result' => [
+					'macros' => [
+						'{$DISCOVERED_MACRO_1}' => [
+							'macro' => '{$DISCOVERED_MACRO_1}',
+							'value' => 'text',
+							'type' => ZBX_MACRO_TYPE_TEXT,
+							'automatic' => ZBX_USERMACRO_AUTOMATIC,
+							'description' => ''
+						],
+						'{$DISCOVERED_MACRO_2}' => [
+							'macro' => '{$DISCOVERED_MACRO_2}',
+							'type' => ZBX_MACRO_TYPE_SECRET,
+							'automatic' => ZBX_USERMACRO_MANUAL,
+							'description' => 'description'
+						],
+						'{$DISCOVERED_MACRO_3}' => [
+							'macro' => '{$DISCOVERED_MACRO_3}',
+							'value' => 'path/to:macro',
+							'type' => ZBX_MACRO_TYPE_VAULT,
+							'automatic' => ZBX_USERMACRO_MANUAL,
+							'description' => ''
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test host macro update. Test intended to check if 'automatic' property is changed for discovered host macros.
+	 *
+	 * @dataProvider getHostUpdateMacrosData
+	 */
+	public function testHost_UpdateMacros($params, $expected_result) {
+		foreach (self::$data['discovered_host_macros'] as $macro_name => $macro_data) {
+			$params['macros'][$macro_name]['hostmacroid'] = $macro_data['hostmacroid'];
+			$expected_result['macros'][$macro_name]['hostmacroid'] = $macro_data['hostmacroid'];
+		}
+
+		$this->call('host.update', [
+			'hostid' => self::$data['hostids']['discovered_with_macros'],
+			'macros' => array_values($params['macros'])
+		]);
+
+		$hosts = $this->call('host.get', [
+			'output' => [],
+			'hostids' => [self::$data['hostids']['discovered_with_macros']],
+			'selectMacros' => ['macro', 'value', 'type', 'hostmacroid', 'description', 'automatic']
+		]);
+
+		$expected = array_values($expected_result['macros']);
+		$result = array_values($hosts['result'][0]['macros']);
+		$this->assertEquals($expected, $result);
 	}
 
 	/**
