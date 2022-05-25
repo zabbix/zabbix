@@ -59,8 +59,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 				'key_' => 'snmptrap.fallback',
 				'type' => 17,
 				'value_type' => 0,
-				'interfaceid' => self::SNMP2_INTERFACE_ID,
-				'delay' => '3m'
+				'interfaceid' => self::SNMP2_INTERFACE_ID
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -68,8 +67,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 				'key_' => 'snmptrap[regexp]',
 				'type' => 17,
 				'value_type' => 1,
-				'interfaceid' => self::SNMP2_INTERFACE_ID,
-				'delay' => '4m'
+				'interfaceid' => self::SNMP2_INTERFACE_ID
 			],
 			[
 				'hostid' => self::HOSTID,
