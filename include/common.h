@@ -961,6 +961,10 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
+void	usage(void);
+void	help(void);
+void	version(void);
+
 const char	*get_program_name(const char *path);
 
 typedef enum
@@ -1065,7 +1069,6 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
 	(data << ZBX_RTC_DATA_SHIFT))
 
-
 int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
 int	num_param(const char *p);
 char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
@@ -1101,31 +1104,6 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 void	remove_param(char *param, int num);
 int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
-
-#define ZBX_SIZE_T_MAX	(~(size_t)0)
-
-#define is_ushort(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
-
-#define is_uint32(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0xFFFFFFFF)
-
-#define is_uint64(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
-
-#define is_uint64_n(str, n, value) \
-	is_uint_n_range(str, n, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
-
-#define is_uint31(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFF)
-
-#define ZBX_MAX_UINT31_1	0x7FFFFFFE
-#define is_uint31_1(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, ZBX_MAX_UINT31_1)
-
-#define is_uint_range(str, value, min, max) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
-
 
 typedef struct zbx_custom_interval	zbx_custom_interval_t;
 int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
@@ -1177,6 +1155,30 @@ int		zbx_day_in_month(int year, int mon);
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts);
 
 /* remaining temp string functions */
+#define ZBX_SIZE_T_MAX	(~(size_t)0)
+
+#define is_ushort(str, value) \
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
+
+#define is_uint32(str, value) \
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0xFFFFFFFF)
+
+#define is_uint64(str, value) \
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
+
+#define is_uint64_n(str, n, value) \
+	is_uint_n_range(str, n, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
+
+#define is_uint31(str, value) \
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFF)
+
+#define ZBX_MAX_UINT31_1	0x7FFFFFFE
+#define is_uint31_1(str, value) \
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, ZBX_MAX_UINT31_1)
+
+#define is_uint_range(str, value, min, max) \
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
+
 int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r,
 		unsigned char *context_op);
 int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length,
@@ -1279,8 +1281,6 @@ void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeou
 int	_wis_uint(const wchar_t *wide_string);
 #endif
 
-
-
 #if defined(_WINDOWS)
 typedef struct __stat64	zbx_stat_t;
 int	__zbx_stat(const char *path, zbx_stat_t *buf);
@@ -1364,8 +1364,6 @@ unsigned int	zbx_alarm_off(void);
 int	zbx_alarm_timed_out(void);
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
-
-
 
 #define ZBX_COMPONENT_VERSION(major, minor)	((major << 16) | minor)
 #define ZBX_COMPONENT_VERSION_MAJOR(version)	(version >> 16)
@@ -1491,7 +1489,7 @@ zbx_tag_t;
 
 void	zbx_free_tag(zbx_tag_t *tag);
 
-/* token */
+/* future token library */
 /* tokens used in expressions */
 #define ZBX_TOKEN_OBJECTID		0x00001
 #define ZBX_TOKEN_MACRO			0x00002
@@ -1627,12 +1625,5 @@ int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_toke
 int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
 		zbx_token_t *token);
-
-/* token END*/
-
-
-void	help(void);
-void	usage(void);
-void	version(void);
-
+/* future token library END */
 #endif
