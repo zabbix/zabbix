@@ -361,7 +361,6 @@ char	*zbx_str_printable_dyn(const char *text)
 	return out;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Appends src to string dst of size siz (unlike strncat, size is    *
@@ -2137,18 +2136,6 @@ int	zbx_strcmp_natural(const char *s1, const char *s2)
 	return *s1 - *s2;
 }
 
-
-/* /\****************************************************************************** */
-/*  *                                                                            * */
-/*  * Purpose: public wrapper for token_parse_nested_macro() function            * */
-/*  *                                                                            * */
-/*  ******************************************************************************\/ */
-/* int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find, */
-/* 		zbx_token_t *token) */
-/* { */
-/* 	return token_parse_nested_macro(expression, macro, simple_macro_find, token); */
-/* } */
-
 /******************************************************************************
  *                                                                            *
  * Purpose: count calculated item (prototype) formula characters that can be  *
@@ -2327,102 +2314,6 @@ int	zbx_suffixed_number_parse(const char *number, int *len)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find number of parameters in parameter list                       *
- *                                                                            *
- * Parameters:                                                                *
- *      p - [IN] parameter list                                               *
- *                                                                            *
- * Return value: number of parameters (starting from 1) or                    *
- *               0 if syntax error                                            *
- *                                                                            *
- * Comments:  delimiter for parameters is ','. Empty parameter list or a list *
- *            containing only spaces is handled as having one empty parameter *
- *            and 1 is returned.                                              *
- *                                                                            *
- ******************************************************************************/
-int	num_param(const char *p)
-{
-/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
-	int	ret = 1, state, array;
-
-	if (p == NULL)
-		return 0;
-
-	for (state = 0, array = 0; '\0' != *p; p++)
-	{
-		switch (state) {
-		/* Init state */
-		case 0:
-			if (',' == *p)
-			{
-				if (0 == array)
-					ret++;
-			}
-			else if ('"' == *p)
-				state = 1;
-			else if ('[' == *p)
-			{
-				if (0 == array)
-					array = 1;
-				else
-					return 0;	/* incorrect syntax: multi-level array */
-			}
-			else if (']' == *p && 0 != array)
-			{
-				array = 0;
-
-				while (' ' == p[1])	/* skip trailing spaces after closing ']' */
-					p++;
-
-				if (',' != p[1] && '\0' != p[1])
-					return 0;	/* incorrect syntax */
-			}
-			else if (']' == *p && 0 == array)
-				return 0;		/* incorrect syntax */
-			else if (' ' != *p)
-				state = 2;
-			break;
-		/* Quoted */
-		case 1:
-			if ('"' == *p)
-			{
-				while (' ' == p[1])	/* skip trailing spaces after closing quotes */
-					p++;
-
-				if (',' != p[1] && '\0' != p[1] && (0 == array || ']' != p[1]))
-					return 0;	/* incorrect syntax */
-
-				state = 0;
-			}
-			else if ('\\' == *p && '"' == p[1])
-				p++;
-			break;
-		/* Unquoted */
-		case 2:
-			if (',' == *p || (']' == *p && 0 != array))
-			{
-				p--;
-				state = 0;
-			}
-			else if (']' == *p && 0 == array)
-				return 0;		/* incorrect syntax */
-			break;
-		}
-	}
-
-	/* missing terminating '"' character */
-	if (state == 1)
-		return 0;
-
-	/* missing terminating ']' character */
-	if (array != 0)
-		return 0;
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: check if string is contained in a list of delimited strings       *
  *                                                                            *
  * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
@@ -2477,76 +2368,6 @@ int	str_n_in_list(const char *list, const char *value, size_t len, char delimite
 int	str_in_list(const char *list, const char *value, char delimiter)
 {
 	return str_n_in_list(list, value, strlen(value), delimiter);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: return parameter by index (num) from parameter list (param)       *
- *          to be used for keys: key[param1,param2]                           *
- *                                                                            *
- * Parameters:                                                                *
- *      param   - parameter list                                              *
- *      num     - requested parameter index                                   *
- *      buf     - pointer of output buffer                                    *
- *      max_len - size of output buffer                                       *
- *                                                                            *
- * Return value:                                                              *
- *      1 - requested parameter missing                                       *
- *      0 - requested parameter found (value - 'buf' can be empty string)     *
- *                                                                            *
- * Comments:  delimiter for parameters is ','                                 *
- *                                                                            *
- ******************************************************************************/
-int	get_key_param(char *param, int num, char *buf, size_t max_len)
-{
-	int	ret;
-	char	*pl, *pr;
-
-	pl = strchr(param, '[');
-	pr = strrchr(param, ']');
-
-	if (NULL == pl || NULL == pr || pl > pr)
-		return 1;
-
-	*pr = '\0';
-	ret = get_param(pl + 1, num, buf, max_len, NULL);
-	*pr = ']';
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: calculate count of parameters from parameter list (param)         *
- *          to be used for keys: key[param1,param2]                           *
- *                                                                            *
- * Parameters:                                                                *
- *      param  - parameter list                                               *
- *                                                                            *
- * Return value: count of parameters                                          *
- *                                                                            *
- * Comments:  delimiter for parameters is ','                                 *
- *                                                                            *
- ******************************************************************************/
-int	num_key_param(char *param)
-{
-	int	ret;
-	char	*pl, *pr;
-
-	if (NULL == param)
-		return 0;
-
-	pl = strchr(param, '[');
-	pr = strrchr(param, ']');
-
-	if (NULL == pl || NULL == pr || pl > pr)
-		return 0;
-
-	*pr = '\0';
-	ret = num_param(pl + 1);
-	*pr = ']';
-
-	return ret;
 }
 
 /******************************************************************************
@@ -2745,32 +2566,6 @@ void	zbx_trim_integer(char *str)
 void	zbx_trim_float(char *str)
 {
 	zbx_trim_number(str, 0);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: extracts protocol version from value                              *
- *                                                                            *
- * Parameters:                                                                *
- *     value      - [IN] textual representation of version                    *
- *                                                                            *
- * Return value: The protocol version if it was successfully extracted,       *
- *               otherwise -1                                                 *
- *                                                                            *
- ******************************************************************************/
-int	zbx_get_component_version(char *value)
-{
-	char	*pminor, *ptr;
-
-	if (NULL == (pminor = strchr(value, '.')))
-		return FAIL;
-
-	*pminor++ = '\0';
-
-	if (NULL != (ptr = strchr(pminor, '.')))
-		*ptr = '\0';
-
-	return ZBX_COMPONENT_VERSION(atoi(value), atoi(pminor));
 }
 
 /******************************************************************************
@@ -3203,7 +2998,6 @@ void	zbx_rtrim_utf8(char *str, const char *charlist)
 	*last = '\0';
 }
 
-
 zbx_uint64_t	suffix2factor(char c)
 {
 	switch (c)
@@ -3251,7 +3045,6 @@ double	str2double(const char *str)
 
 	return atof(str) * suffix2factor(str[sz]);
 }
-
 
 /******************************************************************************
  *                                                                            *
