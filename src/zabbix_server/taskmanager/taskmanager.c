@@ -838,29 +838,20 @@ static void	tm_process_temp_suppression(const char *data)
 	{
 		DB_ROW		row;
 		DB_RESULT	result;
-		zbx_uint64_t	event_suppressid = 0, ts_existing;
+		zbx_uint64_t	event_suppressid = 0;
+
+		if (SUCCEED != DBlock_record("events", eventid, NULL, 0))
+			return;
 
 		result = DBselect("select event_suppressid,suppress_until from event_suppress where maintenanceid is "
-				"null and eventid=" ZBX_FS_UI64, eventid);
+				"null and eventid=" ZBX_FS_UI64 ZBX_FOR_UPDATE, eventid);
 
 		if (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(event_suppressid, row[0]);
-			ZBX_STR2UINT64(ts_existing, row[1]);
-		}
-		DBfree_result(result);
 
-		if (0 != event_suppressid)
-		{
-			if (SUCCEED != DBlock_record("events", eventid, NULL, 0))
-				return;
-
-			if (SUCCEED != DBlock_record("event_suppress", eventid, NULL, 0))
-				return;
-
-			DBexecute("update event_suppress set maintenanceid=NULL,suppress_until=" ZBX_FS_UI64 ",userid="
-					ZBX_FS_UI64 " where event_suppressid=" ZBX_FS_UI64, ts, userid,
-					event_suppressid);
+			DBexecute("update event_suppress set suppress_until=" ZBX_FS_UI64 ",userid=" ZBX_FS_UI64
+					" where event_suppressid=" ZBX_FS_UI64, ts, userid, event_suppressid);
 		}
 		else
 		{
@@ -868,6 +859,8 @@ static void	tm_process_temp_suppression(const char *data)
 					"userid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",NULL," ZBX_FS_UI64 ","
 					ZBX_FS_UI64 ")", DBget_maxid("event_suppress"), eventid, ts, userid);
 		}
+
+		DBfree_result(result);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
