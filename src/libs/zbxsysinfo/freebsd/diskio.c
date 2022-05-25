@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "sysinfo.h"
 #include "stats.h"
 #include "diskdevices.h"
+#include "zbxstr.h"
 
 #define ZBX_DEV_PFX	"/dev/"
 #define ZBX_DEV_READ	0
