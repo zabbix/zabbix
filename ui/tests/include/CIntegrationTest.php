@@ -379,11 +379,11 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$pid = @file_get_contents(self::getPidPath($component));
-		
+
 		$pids = explode("\n", shell_exec('pgrep -P '.$pid));
 		$pids_count = count($pids);
 		$iterations = 0;
-		
+
 		do {
 			for ($i = count($pids) -1; $i >= 1; $i--) {
 				$child_pid = $pids[$i];
@@ -395,7 +395,7 @@ class CIntegrationTest extends CAPITest {
 					}
 				}
 			} 
-			
+
 			for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 				if (!file_exists(self::getPidPath($component))) {
 					return;
@@ -406,14 +406,14 @@ class CIntegrationTest extends CAPITest {
 			$pids = explode("\n", shell_exec('pgrep -P '.$pid));
 			$iterations++;
 		} while (count($pids) > 0 && $iterations < $pids_count );
-		
+
 		if  (is_numeric($pid) && posix_kill($pid, 0)) {
 			$killed = system('kill -9 '.$pid );
 			if ($killed) {
 				return;
 			}
 		}
-		
+
 		throw new Exception('Failed to wait for component "'.$component.'" to stop.');
 	}
 
