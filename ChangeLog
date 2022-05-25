@@ -1,6 +1,7 @@
 Changes for 6.2.0rc1
 
 New features:
+.......PS. [ZBXNEXT-2578] added support for vmware.rp.cpu.usage and vmware.rp.memory (MVekslers)
 .......PS. [ZBXNEXT-2837] allowed {INVENTORY.*} macros for script type item and manual scripts (ssimonenko)
 ..F....... [ZBXNEXT-6893] implemented audit log filtering by multiple actions (rdetlavs)
 .......PS. [ZBXNEXT-7553] added user macro cache (wiper)
@@ -8,6 +9,10 @@ New features:
 .......PS. [ZBXNEXT-7494] removed deprecated CurlHttpRequest (mprihodko)
 
 Bug fixes:
+A......... [ZBX-20859] fixed incorrectly exported host groups in map elements (Sasha)
+A.F.I..... [ZBX-20613] returned the ability to edit the dependencies of inherited triggers; improved validation upon unlinking templates with triggers that have dependencies; improved performance of trigger dependency functionality; prevented the ability to fully replace trigger dependencies of inherited triggers if the new dependency was added to parent trigger; supplemented validation of trigger dependencies on templates to prevent linkage dead-ends; dropped support of trigger.addDependencies and trigger.deleteDependencies API methods (vmaksimovs)
+..F....... [ZBX-20814] fixed Map->Sharing user group shares table not showing saved user groups (esekace)
+.........T [ZBX-20898] fixed duplicate UUID in official template (abakaldin)
 ...G...... [ZBX-20911] added process state check in PROC_NUM() for Oracle Solaris (Andris)
 ..F....... [ZBX-20752] fixed saved properties of classic graphs being lost when reopening graph configuration (agriscenko)
 .......PS. [ZBX-21073] added support of Int8Array(), Buffer() and also duktape plain buffers in md5, sha256 and hmac function parameters (wiper)
