@@ -1813,7 +1813,6 @@ void	zbx_strarr_free(char ***arr)
 	zbx_free(*arr);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: remove whitespace surrounding a string list item delimiters       *
