@@ -129,7 +129,9 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			}
 
 			unset($macro['discovery_state']);
-			unset($macro['original']);
+			unset($macro['original_value']);
+			unset($macro['original_description']);
+			unset($macro['original_macro_type']);
 		}
 		unset($macro);
 
