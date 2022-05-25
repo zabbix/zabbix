@@ -142,7 +142,7 @@ $(OUTPUTDIR)\jsonpath.o: $(TOPDIR)\src\libs\zbxjson\jsonpath.c
 $(OUTPUTDIR)\sha256crypt.o: $(TOPDIR)\src\libs\zbxhash\sha256crypt.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
-$(OUTPUTDIR)\variant.o: $(TOPDIR)\src\libs\zbxcommon\variant.c
+$(OUTPUTDIR)\variant.o: $(TOPDIR)\src\libs\zbxvariant\variant.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
 $(OUTPUTDIR)\json.o: $(TOPDIR)\src\libs\zbxjson\json.c

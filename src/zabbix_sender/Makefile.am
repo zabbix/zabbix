@@ -13,6 +13,7 @@ zabbix_sender_LDADD = \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxgetopt/libzbxgetopt.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \

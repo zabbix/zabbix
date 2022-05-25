@@ -40,7 +40,6 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
-	..\..\..\src\libs\zbxcommon\variant.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\file.o \
 	..\..\..\src\libs\zbxcommon\time.o \
@@ -97,6 +96,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\win32\system.o \
 	..\..\..\src\libs\zbxsysinfo\win32\hostname.o \
 	..\..\..\src\libs\zbxsysinfo\alias\alias.o \
+	..\..\..\src\libs\zbxvariant\variant.o \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwin32\service.o \
 	..\..\..\src\zabbix_agent\active.o \

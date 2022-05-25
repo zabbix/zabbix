@@ -39,6 +39,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
 	$(top_builddir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \

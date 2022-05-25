@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.2.0rc1])
+AC_INIT([Zabbix],[6.2.0beta3])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1978,6 +1978,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 		\${abs_top_builddir}/src/libs/zbxhttp/libzbxhttp.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
+		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
@@ -2136,6 +2137,7 @@ AC_OUTPUT([
 	src/libs/zbxxml/Makefile
 	src/libs/zbxha/Makefile
 	src/libs/zbxrtc/Makefile
+	src/libs/zbxvariant/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
