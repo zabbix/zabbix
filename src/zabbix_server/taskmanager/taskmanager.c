@@ -790,7 +790,8 @@ static void	tm_process_temp_suppression(const char *data)
 {
 	struct zbx_json_parse	jp;
 	char			tmp_eventid[MAX_ID_LEN], tmp_userid[MAX_ID_LEN], tmp_ts[MAX_ID_LEN], tmp_action[3];
-	zbx_uint64_t		eventid, userid, ts, action;
+	zbx_uint64_t		eventid, userid, action;
+	unsigned int		ts;
 
 	if (FAIL == zbx_json_open(data, &jp))
 	{
@@ -815,7 +816,7 @@ static void	tm_process_temp_suppression(const char *data)
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SUPPRESS_UNTIL, tmp_ts, sizeof(tmp_ts), NULL) ||
-			FAIL == is_uint64(tmp_ts, &ts))
+			FAIL == is_uint32(tmp_ts, &ts))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_SUPPRESS_UNTIL);
@@ -840,7 +841,6 @@ static void	tm_process_temp_suppression(const char *data)
 	{
 		DB_ROW		row;
 		DB_RESULT	result;
-		zbx_uint64_t	event_suppressid;
 
 		if (SUCCEED != DBlock_record("events", eventid, NULL, 0))
 			return;
@@ -850,16 +850,15 @@ static void	tm_process_temp_suppression(const char *data)
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			ZBX_STR2UINT64(event_suppressid, row[0]);
-
-			DBexecute("update event_suppress set suppress_until=" ZBX_FS_UI64 ",userid=" ZBX_FS_UI64
-					" where event_suppressid=" ZBX_FS_UI64, ts, userid, event_suppressid);
+			DBexecute("update event_suppress set suppress_until=%u,userid=" ZBX_FS_UI64
+					" where event_suppressid=%s", ts, userid, row[0]);
 		}
 		else
 		{
 			zbx_db_insert_t	db_insert;
 
-			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "suppress_until", "userid", NULL);
+			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
+					"suppress_until", "userid", NULL);
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, ts, userid);
 
 			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
