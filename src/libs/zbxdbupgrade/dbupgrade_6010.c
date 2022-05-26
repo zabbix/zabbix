@@ -549,14 +549,13 @@ static void	DBpatch_6010033_hstgrp_free(hstgrp_t *hstgrp)
 
 static int	DBpatch_6010033_update_group_type(hstgrp_t *hstgrp)
 {
-	if (DBPATCH_HOSTGROUP_TYPE_MIXED == hstgrp->type)
-		return SUCCEED;
+	int	type = hstgrp->type;
 
-	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where groupid=" ZBX_FS_UI64,
-			hstgrp->type, hstgrp->groupid))
-	{
+	if (DBPATCH_HOSTGROUP_TYPE_MIXED == type || DBPATCH_HOSTGROUP_TYPE_EMPTY == type)
+		type = DBPATCH_HOSTGROUP_TYPE_HOST;
+
+	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where groupid=" ZBX_FS_UI64, type, hstgrp->groupid))
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
