@@ -5,8 +5,8 @@ on:
     branches:
      - 'master'
      - 'release/*'
-  pull_request:
-    types: [opened, synchronize, reopened]
+  #pull_request:
+  #  types: [opened, synchronize, reopened]
 
 jobs:
   SonarCloud-others:
@@ -21,7 +21,7 @@ jobs:
         with:
           args: >
             -Dsonar.sources=ui/
-            -Dsonar.test.exclusions=ui/tests/
+            -Dsonar.test.exclusions=ui/tests/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
