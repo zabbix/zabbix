@@ -186,7 +186,7 @@ class CTableElement extends CElement {
 	public function findRows($param, $data = []) {
 		$rows = [];
 
-		if (is_callable($param)) {
+		if ($param instanceof \Closure) {
 			foreach ($this->getRows() as $i => $row) {
 				if (call_user_func($param, $row)) {
 					$rows[$i] = $row;

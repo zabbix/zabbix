@@ -20,7 +20,7 @@
 #include "trends.h"
 
 #include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
@@ -203,7 +203,7 @@ static int	trends_parse_timeshift(time_t from, const char *timeshift, zbx_time_u
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char **error)
+int	zbx_trends_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char **error)
 {
 	return trends_parse_timeshift(from, timeshift, ZBX_TIME_UNIT_UNKNOWN, tm, error);
 }

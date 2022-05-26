@@ -197,7 +197,6 @@ function createFontSelect(string $name): CSelect {
 										'dstfld1' => 'elementNameTriggers',
 										'with_triggers' => true,
 										'editable' => true,
-										'noempty' => true,
 										'real_hosts' => true
 									]
 								]
@@ -824,8 +823,7 @@ function createFontSelect(string $name): CSelect {
 										'reference' => 'linktrigger',
 										'multiselect' => '1',
 										'real_hosts' => '1',
-										'with_triggers' => '1',
-										'noempty' => '1'
+										'with_triggers' => '1'
 									]).', {dialogue_class: "modal-popup-generic"});'
 								)
 						]))

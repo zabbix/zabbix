@@ -1380,54 +1380,6 @@ class CUser extends CApiService {
 		}
 	}
 
-	/**
-	 * Authenticate a user using LDAP.
-	 *
-	 * The $user array must have the following attributes:
-	 * - username   - user name
-	 * - password   - user password
-	 *
-	 * @param array $user
-	 *
-	 * @return bool
-	 */
-	protected function ldapLogin(array $user) {
-		$cnf = [];
-		$auth_params = [
-			CAuthenticationHelper::LDAP_CASE_SENSITIVE,
-			CAuthenticationHelper::LDAP_CONFIGURED,
-			CAuthenticationHelper::LDAP_HOST,
-			CAuthenticationHelper::LDAP_PORT,
-			CAuthenticationHelper::LDAP_BASE_DN,
-			CAuthenticationHelper::LDAP_BIND_DN,
-			CAuthenticationHelper::LDAP_SEARCH_ATTRIBUTE,
-			CAuthenticationHelper::LDAP_BIND_PASSWORD
-		];
-
-		foreach ($auth_params as $param) {
-			$cnf[str_replace('ldap_', '', $param)] = CAuthenticationHelper::get($param);
-		}
-
-		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
-
-		if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $ldap_status['error']);
-		}
-
-		$ldapValidator = new CLdapAuthValidator(['conf' => $cnf]);
-
-		if ($ldapValidator->validate($user)) {
-			return true;
-		}
-		else {
-			self::exception($ldapValidator->isConnectionError()
-					? ZBX_API_ERROR_PARAMETERS
-					: ZBX_API_ERROR_PERMISSIONS,
-				$ldapValidator->getError()
-			);
-		}
-	}
-
 	public function logout($user) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
@@ -1535,7 +1487,34 @@ class CUser extends CApiService {
 		try {
 			switch ($group_to_auth_map[$db_user['gui_access']]) {
 				case ZBX_AUTH_LDAP:
-					$this->ldapLogin($user);
+					if (CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CONFIGURED) == ZBX_AUTH_LDAP_DISABLED) {
+						self::exception(ZBX_API_ERROR_INTERNAL, _('LDAP authentication is disabled.'));
+					}
+
+					$id = $db_user['userdirectoryid'] != 0
+						? $db_user['userdirectoryid']
+						: CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
+					$userdirectory = [];
+
+					if ($id != 0) {
+						$userdirectory = API::UserDirectory()->get([
+							'output' => ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn', 'search_attribute',
+								'search_filter', 'start_tls'
+							],
+							'userdirectoryids' => $id
+						]);
+						$userdirectory = reset($userdirectory);
+					}
+
+					if (!$userdirectory) {
+						self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot find user directory for LDAP.'));
+					}
+
+					$userdirectory += [
+						'test_username' => $user['username'],
+						'test_password' => $user['password']
+					];
+					API::UserDirectory()->test($userdirectory);
 					break;
 
 				case ZBX_AUTH_INTERNAL:
@@ -1548,7 +1527,6 @@ class CUser extends CApiService {
 
 				default:
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
-					break;
 			}
 		}
 		catch (APIException $e) {
@@ -1784,25 +1762,65 @@ class CUser extends CApiService {
 		$permissions = [
 			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
 			'users_status' => GROUP_STATUS_ENABLED,
-			'gui_access' => GROUP_GUI_ACCESS_SYSTEM
+			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
+			'userdirectoryid' => 0
 		];
 
 		$db_usrgrps = DBselect(
-			'SELECT g.debug_mode,g.users_status,g.gui_access'.
+			'SELECT g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
 			' FROM usrgrp g,users_groups ug'.
 			' WHERE g.usrgrpid=ug.usrgrpid'.
 				' AND ug.userid='.$userid
 		);
 
+		$userdirectoryids = [];
+
 		while ($db_usrgrp = DBfetch($db_usrgrps)) {
 			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 				$permissions['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
 			}
+
 			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
 				$permissions['users_status'] = GROUP_STATUS_DISABLED;
 			}
+
 			if ($db_usrgrp['gui_access'] > $permissions['gui_access']) {
 				$permissions['gui_access'] = $db_usrgrp['gui_access'];
+				$userdirectoryids = [];
+			}
+
+			if ($permissions['gui_access'] === $db_usrgrp['gui_access']
+					&& ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_LDAP
+						|| ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM
+							&& CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_LDAP
+			))) {
+				$userdirectoryids[$db_usrgrp['userdirectoryid']] = true;
+			}
+		}
+
+		if ($userdirectoryids) {
+			if (array_key_exists(0, $userdirectoryids)) {
+				unset($userdirectoryids[0]);
+				$default_userdirectoryid = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
+
+				if ($default_userdirectoryid != 0) {
+					$userdirectoryids[$default_userdirectoryid] = true;
+				}
+			}
+
+			if (count($userdirectoryids) === 1) {
+				$permissions['userdirectoryid'] = array_keys($userdirectoryids)[0];
+			}
+			elseif (count($userdirectoryids) > 1) {
+				$db_userdirectoryids = API::UserDirectory()->get([
+					'output' => [],
+					'userdirectoryids' => array_keys($userdirectoryids),
+					'sortfield' => ['name'],
+					'limit' => 1,
+					'preservekeys' => true
+				]);
+
+				$permissions['userdirectoryid'] = array_keys($db_userdirectoryids)[0];
 			}
 		}
 
@@ -2037,6 +2055,7 @@ class CUser extends CApiService {
 	 * @param array  $permissions
 	 * @param string $permissions['debug_mode']
 	 * @param string $permissions['gui_access']
+	 * @param string $permissions['userdirectoryid']
 	 */
 	private function addExtraFields(array $db_user, array $permissions): array {
 		$db_user['type'] = $this->getUserType($db_user['roleid']);
@@ -2044,6 +2063,7 @@ class CUser extends CApiService {
 
 		$db_user['debug_mode'] = $permissions['debug_mode'];
 		$db_user['gui_access'] = $permissions['gui_access'];
+		$db_user['userdirectoryid'] = $permissions['userdirectoryid'];
 
 		if ($db_user['lang'] === LANG_DEFAULT) {
 			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);

@@ -684,7 +684,7 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 	{
 		char	*buffer = zbx_strdup(NULL, name_proto);
 
-		substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+		zbx_substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 != strcmp(graph->name, buffer))
@@ -726,7 +726,7 @@ static void 	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr
 
 		graph->name = zbx_strdup(NULL, name_proto);
 		graph->name_orig = NULL;
-		substitute_lld_macros(&graph->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+		zbx_substitute_lld_macros(&graph->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(graph->name, ZBX_WHITESPACE);
 
 		lld_override_graph(&lld_row->overrides, graph->name, &discover_proto);
@@ -832,7 +832,7 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 		graph = (zbx_lld_graph_t *)graphs->values[i];
 
 		lld_validate_graph_field(graph, &graph->name, &graph->name_orig,
-				ZBX_FLAG_LLD_GRAPH_UPDATE_NAME, GRAPH_NAME_LEN, error);
+				ZBX_FLAG_LLD_GRAPH_UPDATE_NAME, ZBX_GRAPH_NAME_LEN, error);
 	}
 
 	/* checking duplicated graph names */
@@ -1071,7 +1071,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < graphs->values_num; i++)
@@ -1401,7 +1401,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
 		zbx_free(sql);
 	}

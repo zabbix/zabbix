@@ -264,7 +264,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+			->setAttribute('data-eventid', $problem['eventid'])
+			->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
 		: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
 			$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
 		);

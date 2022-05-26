@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxwinservice.h"
+
 #include "common.h"
 #include "sysinfo.h"
-
-#include "service.h"
 
 ZBX_METRIC	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
@@ -39,6 +39,7 @@ ZBX_METRIC	parameters_specific[] =
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	VM_MEMORY_SIZE,		"free"},
 
+	{"proc.get",		CF_HAVEPARAMS,	PROC_GET,		"svchost.exe"},
 	{"proc.num",		CF_HAVEPARAMS,	PROC_NUM,		"svchost.exe"},
 
 	{"system.cpu.util",	CF_HAVEPARAMS,	SYSTEM_CPU_UTIL,	"all,system,avg1"},

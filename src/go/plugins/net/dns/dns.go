@@ -26,9 +26,9 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const (

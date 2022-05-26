@@ -26,7 +26,13 @@
 
 <script>
 	const view = {
-		init() {
+		checkbox_object: null,
+		checkbox_hash: null,
+
+		init({checkbox_hash, checkbox_object}) {
+			this.checkbox_hash = checkbox_hash;
+			this.checkbox_object = checkbox_object;
+
 			// Disable the status filter when using the state filter.
 			$('#filter_state')
 				.on('change', () => {
@@ -56,6 +62,48 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		massCheckNow(button) {
+			button.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'item.masscheck_now');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({itemids: Object.keys(chkbxRange.getSelectedIds()), discovery_rule: 1})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					clearMessages();
+
+					if ('error' in response) {
+						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
+					}
+					else if('success' in response) {
+						addMessage(makeMessageBox('good', [], response.success.title, true, false));
+
+						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+						uncheckTableRows('host_discovery_' + this.checkbox_hash, [], false);
+						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
+						chkbxRange.update(this.checkbox_object);
+					}
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					button.classList.remove('is-loading');
+
+					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
+					button.blur();
+				});
 		},
 
 		events: {

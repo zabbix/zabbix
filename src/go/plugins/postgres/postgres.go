@@ -25,13 +25,13 @@ import (
 	"net/url"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/tlsconfig"
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
 
 	"github.com/omeid/go-yarn"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 const (

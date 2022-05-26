@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -238,7 +238,6 @@ if (array_key_exists('render_html', $data)) {
 			popup: {
 				parameters: {
 					multiselect: '1',
-					noempty: '1',
 					srctbl: 'host_groups',
 					srcfld1: 'groupid',
 					dstfrm: 'zbx_filter',

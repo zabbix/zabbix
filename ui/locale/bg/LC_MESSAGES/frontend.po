@@ -331,6 +331,14 @@ msgstr "10 секунди"
 msgid "100 busiest triggers"
 msgstr ""
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:184
+msgid "12-hour"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:183
+msgid "24-hour"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
 msgstr ""
@@ -675,6 +683,10 @@ msgstr "Активен"
 msgctxt "maintenance status"
 msgid "Active"
 msgstr "Активно"
+
+#: include/hosts.inc.php:497
+msgid "Active checks"
+msgstr ""
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -1165,6 +1177,10 @@ msgstr ""
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:73
+msgid "Analog"
+msgstr ""
+
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
 #: app/views/popup.lldoverride.php:68 include/triggers.inc.php:1060
@@ -1334,6 +1350,10 @@ msgstr ""
 #: app/views/popup.maintenance.period.php:154
 msgid "At (hour:minute)"
 msgstr "В (час:минута)"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:125
+msgid "At least one LDAP server must exist."
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
@@ -1797,6 +1817,10 @@ msgstr ""
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1429
+msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
 msgstr ""
@@ -2107,6 +2131,11 @@ msgid_plural "Cannot copy triggers"
 msgstr[0] ""
 msgstr[1] ""
 
+#: include/triggers.inc.php:246
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+msgstr ""
+
 #: include/triggers.inc.php:226
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
@@ -2215,6 +2244,10 @@ msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] ""
 msgstr[1] ""
+
+#: include/classes/api/services/CUserDirectory.php:383
+msgid "Cannot delete default user directory."
+msgstr ""
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2448,6 +2481,11 @@ msgid_plural "Cannot delete users"
 msgstr[0] "Не може да се изтрие потребителя"
 msgstr[1] ""
 
+#: include/classes/api/services/CUserDirectory.php:398
+#, c-format
+msgid "Cannot delete user directory \"%1$s\"."
+msgstr ""
+
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
@@ -2629,6 +2667,11 @@ msgstr[1] ""
 msgid "Cannot evaluate expression"
 msgstr ""
 
+#: app/controllers/CControllerItemMassCheckNow.php:243
+#: app/controllers/CControllerItemMassCheckNow.php:251
+msgid "Cannot execute operation"
+msgstr ""
+
 #: app/controllers/CControllerPopupScriptExec.php:123
 msgid "Cannot execute script."
 msgstr ""
@@ -2756,6 +2799,10 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Не може да се намери тригера \"%1$s\" използван в карта \"%2$s\"."
 
+#: include/classes/api/services/CUser.php:1510
+msgid "Cannot find user directory for LDAP."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
@@ -2812,6 +2859,11 @@ msgstr ""
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostBase.php:644
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
@@ -2826,6 +2878,11 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:802
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:641
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:381
@@ -2847,6 +2904,16 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:799
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:502
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:638
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:705
@@ -3027,6 +3094,26 @@ msgstr "Не може да се премахнат и изчистят уеб с
 #: include/classes/api/services/CHost.php:1095
 msgid "Cannot unlink template"
 msgstr "Не може да се премахне шаблона"
+
+#: include/classes/api/services/CHostBase.php:331
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:415
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:414
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:330
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
@@ -3642,6 +3729,10 @@ msgstr ""
 #: include/classes/widgets/CWidgetConfig.php:53
 msgid "Clock"
 msgstr "Часовник"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:72
+msgid "Clock type"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:139
@@ -4970,6 +5061,10 @@ msgstr "По подразбиране"
 msgid "Default (%1$s)"
 msgstr ""
 
+#: app/controllers/CControllerAuthenticationUpdate.php:134
+msgid "Default LDAP server must be specified."
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
 msgstr ""
@@ -5498,6 +5593,10 @@ msgstr "Критерии уникалност на устройството "
 msgid "Digest"
 msgstr ""
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:74
+msgid "Digital"
+msgstr ""
+
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
 msgstr ""
@@ -5757,6 +5856,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1282
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1379
+msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1306
@@ -6869,6 +6972,10 @@ msgstr ""
 msgid "Failed to paste widget."
 msgstr ""
 
+#: app/controllers/CControllerAuthenticationUpdate.php:390
+msgid "Failed to select default LDAP server."
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:141
 #: app/controllers/CControllerTemplateDashboardUpdate.php:135
 #: app/views/js/configuration.dashboard.edit.js.php:156
@@ -7147,6 +7254,11 @@ msgstr ""
 
 #: app/views/popup.httpstep.php:85
 msgid "Form data"
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:182
+#: include/classes/widgets/forms/CWidgetFormClock.php:242
+msgid "Format"
 msgstr ""
 
 #: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
@@ -9750,6 +9862,13 @@ msgstr ""
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "Невалиден JSON. Възникна грешка на сървъра, при разбор на текст JSON."
 
+#: app/controllers/CControllerPopupLdapCheck.php:52
+#: app/controllers/CControllerPopupLdapEdit.php:49
+#: app/controllers/CControllerPopupLdapTestEdit.php:44
+#: app/controllers/CControllerPopupLdapTestSend.php:50
+msgid "Invalid LDAP configuration"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr ""
@@ -10139,6 +10258,10 @@ msgstr "Поле за инвентаризация"
 #: app/views/popup.massupdate.host.php:179
 msgid "Inventory mode"
 msgstr "Режим на инвентарните данни"
+
+#: include/classes/helpers/CRoleHelper.php:480
+msgid "Invoke \"Execute now\" on read-only hosts"
+msgstr ""
 
 #: app/views/administration.user.list.php:112
 msgid "Is online?"
@@ -10558,9 +10681,18 @@ msgstr "Корейски (ko_KR)"
 msgid "LDAP"
 msgstr "LDAP"
 
+#: app/views/administration.usergroup.edit.php:88
+#: app/views/popup.ldap.edit.php:157
+msgid "LDAP Server"
+msgstr ""
+
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "LDAP автентификация"
+
+#: include/classes/api/services/CUser.php:1491
+msgid "LDAP authentication is disabled."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -10573,6 +10705,10 @@ msgstr ""
 #: app/controllers/CControllerAuthenticationUpdate.php:273
 msgid "LDAP login successful"
 msgstr "Успешно влизане чрез LDAP"
+
+#: include/classes/api/services/CAuthentication.php:171
+msgid "LDAP must be enabled"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:336
 msgid "LDAP settings"
@@ -10879,6 +11015,10 @@ msgstr ""
 msgid "List is empty"
 msgstr "Списъкът е празен"
 
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
@@ -10953,6 +11093,10 @@ msgstr ""
 msgid "Local"
 msgstr ""
 
+#: include/classes/widgets/fields/CWidgetFieldTimeZone.php:58
+msgid "Local default"
+msgstr ""
+
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
 #: include/views/monitoring.history.php:292
@@ -11011,9 +11155,17 @@ msgstr ""
 msgid "Login blocking interval"
 msgstr ""
 
+#: app/controllers/CControllerPopupLdapTestSend.php:86
+msgid "Login failed"
+msgstr ""
+
 #: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
 msgstr "Неправилно въведено потребителско име или парола."
+
+#: app/controllers/CControllerPopupLdapTestSend.php:76
+msgid "Login successful"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:193
 msgid "Logout"
@@ -11528,6 +11680,10 @@ msgstr "Членове на групата"
 #: include/classes/debug/CProfiler.php:165
 #, c-format
 msgid "Memory limit: %1$s"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1433
+msgid "Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1210
@@ -12170,6 +12326,10 @@ msgstr "Никога"
 
 #: app/views/popup.token.edit.php:162
 msgid "New API token"
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:145
+msgid "New LDAP server"
 msgstr ""
 
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
@@ -15047,6 +15207,10 @@ msgstr ""
 msgid "Request sent successfully"
 msgstr ""
 
+#: app/controllers/CControllerItemMassCheckNow.php:236
+msgid "Request sent successfully. Some items are filtered due to access permissions or type."
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.item.edit.php:328
 #: include/views/configuration.item.prototype.edit.php:314
@@ -15263,6 +15427,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:1594
 #: include/classes/data/CItemData.php:1674
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
+msgstr ""
+
+#: include/classes/data/CItemData.php:1673
+msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
 msgstr ""
 
 #: include/classes/data/CItemData.php:1614
@@ -15854,6 +16022,10 @@ msgstr "Търсене"
 msgid "Search attribute"
 msgstr "Търсене на атрибут"
 
+#: app/views/popup.ldap.edit.php:128
+msgid "Search filter"
+msgstr ""
+
 #: app/controllers/CControllerSearch.php:73
 msgid "Search pattern is empty"
 msgstr "Шаблона за търсене е празен"
@@ -15894,6 +16066,10 @@ msgstr "Вторичен телефон Б за контакт"
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
 msgstr "Вторичен прякор за контакт"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:173
+msgid "Seconds"
+msgstr ""
 
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
@@ -16065,6 +16241,10 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 msgid "Server time"
 msgstr "Време на сървъра"
+
+#: app/views/administration.authentication.edit.php:146
+msgid "Servers"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:225
 #: app/views/js/slareport.list.js.php:39
@@ -16322,6 +16502,10 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1261
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
+msgstr ""
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:243
+msgid "Short"
 msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:154
@@ -16719,6 +16903,10 @@ msgstr ""
 #: include/classes/api/services/CSla.php:605
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
+msgstr ""
+
+#: app/views/popup.ldap.edit.php:121
+msgid "StartTLS"
 msgstr ""
 
 #: include/classes/validators/CLdapAuthValidator.php:81
@@ -17959,6 +18147,61 @@ msgstr "Тригер \"%1$s\" вече съществува в \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr ""
 
+#: include/triggers.inc.php:372 include/triggers.inc.php:433
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/triggers.inc.php:373 include/triggers.inc.php:434
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2679
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2678
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2572
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2305
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2300
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2316
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2423
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2808
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2807
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
@@ -18059,6 +18302,66 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:1817
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:916
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:915
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2684
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2683
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2573
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2424
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2813
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2812
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2306
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2301
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2317
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:1325
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
 msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1715
@@ -18850,6 +19153,15 @@ msgid_plural "Users deleted"
 msgstr[0] "Потребител изтрит"
 msgstr[1] ""
 
+#: app/controllers/CControllerAuditLogList.php:246
+msgid "User directory"
+msgstr ""
+
+#: include/classes/api/services/CUserDirectory.php:330
+#, c-format
+msgid "User directory \"%1$s\" already exists."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
 #: app/partials/popup.operations.php:85
@@ -19102,6 +19414,14 @@ msgstr ""
 msgid "Users"
 msgstr "Потребители"
 
+#: include/classes/data/CItemData.php:1255
+msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1259
+msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1702
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr ""
@@ -19112,6 +19432,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1251
+msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1250
@@ -19155,6 +19479,10 @@ msgstr ""
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1275
+msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr ""
@@ -19187,6 +19515,10 @@ msgstr ""
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1387
+msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr ""
@@ -19205,6 +19537,14 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1351
+msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1355
+msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1382
@@ -19251,6 +19591,10 @@ msgstr ""
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1431
+msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr ""
@@ -19261,6 +19605,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1558
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1439
+msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1566
@@ -19315,8 +19663,20 @@ msgstr ""
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1555
+msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1559
+msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1591
+msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1486
@@ -21590,6 +21950,10 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr ""
 
+#: include/classes/api/services/CAuthentication.php:180
+msgid "no LDAP servers"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1464
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
@@ -21785,6 +22149,11 @@ msgstr ""
 
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:110
 msgid "reference to a non-existent tree element"
+msgstr ""
+
+#: include/classes/api/services/CAuthentication.php:154
+#: include/classes/api/services/CUserGroup.php:1208
+msgid "referred object does not exist"
 msgstr ""
 
 #: app/controllers/CControllerQueueDetails.php:110
@@ -22464,6 +22833,11 @@ msgstr ""
 
 #: include/classes/api/services/CTask.php:444
 msgid "wrong item type"
+msgstr ""
+
+#: app/controllers/CControllerItemMassCheckNow.php:178
+#: include/classes/api/services/CTask.php:591
+msgid "wrong master item type"
 msgstr ""
 
 #: include/func.inc.php:591 jsLoader.php:221

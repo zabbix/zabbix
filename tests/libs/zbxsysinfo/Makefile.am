@@ -53,6 +53,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_srcdir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
@@ -83,6 +84,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
@@ -103,6 +105,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
@@ -121,6 +124,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 

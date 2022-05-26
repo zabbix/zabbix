@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -27,6 +27,7 @@ $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.tabfilter.js');
 $this->addJsFile('class.tabfilteritem.js');
+$this->addJsFile('class.expandable.subfilter.js');
 
 $this->includeJsFile('monitoring.latest.view.js.php');
 
@@ -46,7 +47,9 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	$filter = (new CTabFilter())
 		->setId('monitoring_latest_filter')
 		->setOptions($data['tabfilter_options'])
-		->addSubfilter(new CPartial('monitoring.latest.subfilter', $data['subfilters']))
+		->addSubfilter(new CPartial('monitoring.latest.subfilter',
+			array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
+		)
 		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
 	foreach ($data['filter_tabs'] as $tab) {
@@ -64,7 +67,7 @@ else {
 
 $widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
 	array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
-		'tags', 'maintenances'
+		'tags', 'maintenances', 'items_rw'
 	])
 )));
 
@@ -75,7 +78,8 @@ $widget->show();
 		'filter_options' => $data['filter_options'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_data' => $data['refresh_data'],
-		'refresh_interval' => $data['refresh_interval']
+		'refresh_interval' => $data['refresh_interval'],
+		'checkbox_object' => 'itemids'
 	]).');
 '))
 	->setOnDocumentReady()

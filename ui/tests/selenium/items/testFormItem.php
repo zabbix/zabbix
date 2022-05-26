@@ -2065,14 +2065,15 @@ class testFormItem extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertElementPresentXpath("//z-select[@id='value_type']//li[text()='$value_type']");
 
-			// "Check now" button availability
+			// "Execute now" button availability
 			if (in_array($type, ['Zabbix agent', 'Simple check', 'SNMP agent', 'Zabbix internal', 'External check',
-					'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Calculated'])) {
-				$this->zbxTestClick('check_now');
+					'Database monitor', 'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Calculated',
+					'Dependent item'])) {
+				$this->zbxTestClickButtonText('Execute now');
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Request sent successfully');
 			}
 			else {
-				$this->zbxTestAssertElementPresentXpath("//button[@id='check_now'][@disabled]");
+				$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
 			}
 
 			if (isset($data['ipmi_sensor'])) {
