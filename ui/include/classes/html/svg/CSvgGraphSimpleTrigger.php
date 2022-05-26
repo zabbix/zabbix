@@ -97,17 +97,15 @@ class CSvgGraphSimpleTrigger extends CSvgGroup {
 				]);
 		}
 
-		if ($y >= $this->y && $y <= $this->height + $this->y) {
-			$label_x = $this->side == GRAPH_YAXIS_SIDE_RIGHT
-				? $this->width + $this->x - self::LABEL_MARGIN
-				: $this->x + self::LABEL_MARGIN;
+		$label_x = $this->side == GRAPH_YAXIS_SIDE_RIGHT
+			? $this->width + $this->x - self::LABEL_MARGIN
+			: $this->x + self::LABEL_MARGIN;
 
-			$this->addItem([
-				new CSvgLine($this->x, $y, $this->x + $this->width, $y),
-				(new CSvgText($this->constant, $label_x, $y - self::LABEL_MARGIN / 2))
-					->setAttribute('text-anchor', $this->side == GRAPH_YAXIS_SIDE_RIGHT ? 'end' : null)
-			]);
-		}
+		$this->addItem([
+			new CSvgLine($this->x, $y, $this->x + $this->width, $y),
+			(new CSvgText($this->constant, $label_x, $y - self::LABEL_MARGIN / 2))
+				->setAttribute('text-anchor', $this->side == GRAPH_YAXIS_SIDE_RIGHT ? 'end' : null)
+		]);
 	}
 
 	public function toString($destroy = true): string {
