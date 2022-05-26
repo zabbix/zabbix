@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-25T04:00:41Z'
+  date: '2022-05-26T12:34:46Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -55,7 +55,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2133ddf10a3641d78e609948d6842687
-              expression: 'length(last(/HPE MSA 2060 Storage by HTTP/hpe.msa.data.errors))>0'
+              expression: 'length(last(/HPE MSA 2060 Storage by HTTP/hpe.msa.data.errors))>2'
               name: 'There are errors in method requests to API'
               priority: AVERAGE
               description: 'There are errors in method requests to API.'
@@ -83,7 +83,7 @@ zabbix_export:
                     'controllers',
                     'controller-statistics',
                     'frus',
-                    'disk-group',
+                    'disk-groups',
                     'disk-group-statistics',
                     'disks',
                     'enclosures',
@@ -95,9 +95,7 @@ zabbix_export:
                     'volume-statistics'
                 ],
                 result = {},
-                data = {},
-                methodError = {},
-                methodErrorArr = [];
+                data = {};
             
             fields.forEach(function (field) {
                 if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
@@ -135,9 +133,11 @@ zabbix_export:
             request.addHeader('sessionKey: ' + sessionKey);
             request.addHeader('datatype: json');
             
+            data['errors'] = [];
             
             methods.forEach(function (method) {
                 response = request.get(params.base_url + 'api/show/' + method);
+                methodError = {};
                 
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
                     methodError['method-name'] = method;
@@ -158,9 +158,6 @@ zabbix_export:
                             case 'frus':
                                 data[method] = result['enclosure-fru'];
                                 break;
-                            case 'disk-group':
-                                data[method] = result['disk-groups'];
-                                break;
                             case 'disks':
                                 data[method] = result['drives'];
                                 break;
@@ -180,14 +177,12 @@ zabbix_export:
                     }
                 }
             
-                if (methodError.length > 1) {
-                    methodErrorArr.push(methodError);
+                if (Object.keys(methodError).length > 0) {
+                    data['errors'].push(methodError);
                 }
             });
             
-            data.errors = methodErrorArr;
-            
-            return data;
+            return JSON.stringify(data);
           description: 'The JSON with result of API requests.'
           timeout: '{$HPE.MSA.DATA.TIMEOUT}'
           parameters:
@@ -213,7 +208,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The name of the the person who administers the system.'
+          description: 'The name of the person who administers the system.'
           inventory_link: CONTACT
           preprocessing:
             -
@@ -1832,7 +1827,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''freespace-numeric''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''freespace-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1859,7 +1854,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''blocksize''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''blocksize''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1885,7 +1880,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''blocks''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''blocks''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2071,7 +2066,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''raidtype-numeric''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''raidtype-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2119,7 +2114,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''pool-percentage''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''pool-percentage''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2215,7 +2210,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''diskcount''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''diskcount''].first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2244,7 +2239,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -2323,7 +2318,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''status-numeric''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''status-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2512,7 +2507,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.[''disk-group'']'
+                - '$.[''disk-groups'']'
               error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3130,7 +3125,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.[frus]'
+                - '$.[''frus'']'
               error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-25T04:00:35Z'
+  date: '2022-05-26T12:34:40Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -28,7 +28,7 @@ zabbix_export:
           name: Templates/SAN
       items:
         -
-          uuid: 90b2c67cf0954392bf2943298eaec9be
+          uuid: 51d0ae1b4663471d868c27ccd2fb4fed
           name: 'Get method errors'
           type: DEPENDENT
           key: hpe.msa.data.errors
@@ -54,8 +54,8 @@ zabbix_export:
               value: errors
           triggers:
             -
-              uuid: 2133ddf10a3641d78e609948d6842687
-              expression: 'length(last(/HPE MSA 2040 Storage by HTTP/hpe.msa.data.errors))>0'
+              uuid: 7f80562a0b4f4329be454c418de3f517
+              expression: 'length(last(/HPE MSA 2040 Storage by HTTP/hpe.msa.data.errors))>2'
               name: 'There are errors in method requests to API'
               priority: AVERAGE
               description: 'There are errors in method requests to API.'
@@ -83,7 +83,7 @@ zabbix_export:
                     'controllers',
                     'controller-statistics',
                     'frus',
-                    'disk-group',
+                    'disk-groups',
                     'disk-group-statistics',
                     'disks',
                     'enclosures',
@@ -97,9 +97,7 @@ zabbix_export:
                 data_temp = {},
                 result_tmp = {},
                 sessionKey,
-                data = {},
-                methodError = {},
-                methodErrorArr = [];
+                data = {};
             
             fields.forEach(function (field) {
                 if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
@@ -145,8 +143,12 @@ zabbix_export:
             request.addHeader('sessionKey: ' + sessionKey);
             request.addHeader('datatype: api-embed');
             
+            data['errors'] = [];
+            
             methods.forEach(function (method) {
                 response = request.get(params.base_url + 'api/show/' + method);
+                methodError = {};
+            
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
                     methodError['method-name'] = method;
                     methodError['return-code-error'] = 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -183,12 +185,10 @@ zabbix_export:
                     }
                 }
             
-                if (methodError.length > 1) {
-                    methodErrorArr.push(methodError);
+                if (Object.keys(methodError).length > 0) {
+                    data['errors'].push(methodError);
                 }
             });
-            
-            data.errors = methodErrorArr;
             
             response = request.get(params.base_url + 'api/exit');
             
@@ -196,7 +196,7 @@ zabbix_export:
                 throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
             }
             
-            return data;
+            return JSON.stringify(data);
           description: 'The JSON with result of API requests.'
           timeout: '{$HPE.MSA.DATA.TIMEOUT}'
           parameters:
@@ -222,7 +222,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The name of the the person who administers the system.'
+          description: 'The name of the person who administers the system.'
           inventory_link: CONTACT
           preprocessing:
             -
@@ -266,21 +266,6 @@ zabbix_export:
               tag: component
               value: system
           triggers:
-            -
-              uuid: 018ee960d16a4ac8aea9f1d838faa264
-              expression: 'nodata(/HPE MSA 2040 Storage by HTTP/hpe.msa.system.health,5m)=1'
-              name: 'Failed to fetch API data'
-              event_name: 'Failed to fetch API data (or no data for 5m)'
-              priority: AVERAGE
-              description: 'Zabbix has not received data for items for the last 5 minutes.'
-              dependencies:
-                -
-                  name: 'Service is down or unavailable'
-                  expression: 'max(/HPE MSA 2040 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}"],5m)=0'
-              tags:
-                -
-                  tag: scope
-                  value: availability
             -
               uuid: ee37a443b22a4161a88014a0c32dfdfa
               expression: 'last(/HPE MSA 2040 Storage by HTTP/hpe.msa.system.health)=1'
@@ -1972,7 +1957,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''raidtype-numeric''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''raidtype-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1999,7 +1984,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''freespace-numeric''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''freespace-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2030,7 +2015,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''pool-percentage''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''pool-percentage''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2057,7 +2042,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''size-numeric''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''size-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2136,7 +2121,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''diskcount''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''diskcount''].first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2165,7 +2150,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''health-numeric''].first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '4'
                 -
@@ -2244,7 +2229,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.[''disk-group''][?(@[''name''] == "{#NAME}")].[''status-numeric''].first()'
+                    - '$.[''disk-groups''][?(@[''name''] == "{#NAME}")].[''status-numeric''].first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2433,7 +2418,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - '$.[''disk-group'']'
+                - '$.[''disk-groups'']'
               error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3666,6 +3651,42 @@ zabbix_export:
                     -
                       tag: scope
                       value: performance
+            -
+              uuid: 8b4399f3d9624239be2e6ac15971300b
+              name: 'Power supply [{#DURABLE.ID}]: Temperature'
+              type: DEPENDENT
+              key: 'hpe.msa.power_supplies["{#DURABLE.ID}",temperature]'
+              delay: '0'
+              history: 7d
+              description: 'Power supply temperature.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.[''power-supplies''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''dctemp''].first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hpe.msa.raw.data
+              tags:
+                -
+                  tag: component
+                  value: power-supply
+                -
+                  tag: power-supply
+                  value: '{#DURABLE.ID}'
+          graph_prototypes:
+            -
+              uuid: 538040f8853648058e10830ddc2cba70
+              name: 'Power supply [{#DURABLE.ID}]: Temperature'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'HPE MSA 2040 Storage by HTTP'
+                    key: 'hpe.msa.power_supplies["{#DURABLE.ID}",temperature]'
           master_item:
             key: hpe.msa.raw.data
           lld_macro_paths:
