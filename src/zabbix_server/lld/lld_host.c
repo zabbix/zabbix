@@ -2340,20 +2340,18 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_host_
 	/* update and delete existing LLD host tags */
 	for (i = 0; i < host->tags.values_num; i++)
 	{
-		int	found_at_prototype;
-
 		host_tag = (zbx_db_host_tag_t *)host->tags.values[i];
 
 		if (FAIL == zbx_vector_db_host_tag_ptr_bsearch(&proto_tags, host_tag, zbx_db_host_tag_compare_func))
-			found_at_prototype = FAIL;
-		else
-			found_at_prototype = SUCCEED;
-
-		if (FAIL == found_at_prototype && ZBX_TAG_AUTOMATIC == host_tag->automatic)
 		{
-			host_tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
+			if (ZBX_TAG_AUTOMATIC == host_tag->automatic)
+			{
+				host_tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
+			}
+			continue;
 		}
-		else if (SUCCEED == found_at_prototype && ZBX_TAG_MANUAL == host_tag->automatic)
+
+		if (ZBX_TAG_MANUAL == host_tag->automatic)
 		{
 			host_tag->automatic_orig = ZBX_TAG_MANUAL;
 			host_tag->automatic = ZBX_TAG_AUTOMATIC;
