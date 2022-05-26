@@ -681,10 +681,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 		if (DBPATCH_HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
 			continue;
 
-		result = DBselect(
-				"select groupid,permission"
-				" from rights"
-				" where id=" ZBX_FS_UI64,
+		result = DBselect("select groupid,permission from rights where id=" ZBX_FS_UI64,
 				hstgrps->values[i]->groupid);
 
 		while (NULL != (row = DBfetch(result)))
@@ -698,13 +695,13 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_groups"
-				" set groupid =" ZBX_FS_UI64
+				" set groupid=" ZBX_FS_UI64
 				" where groupid=" ZBX_FS_UI64
-				" and hostid in ("
-					"select hostid"
-					" from hosts"
-					" where status=" DBPATCH_HOST_STATUS_TEMPLATE
-				");\n", hstgrps->values[i]->newgroupid, hstgrps->values[i]->groupid);
+					" and hostid in ("
+						"select hostid"
+						" from hosts"
+						" where status=" DBPATCH_HOST_STATUS_TEMPLATE
+					");\n", hstgrps->values[i]->newgroupid, hstgrps->values[i]->groupid);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 			goto out;
@@ -760,11 +757,10 @@ static int	DBpatch_6010033_split_groups(void)
 
 	result = DBselect(
 			"select distinct g.groupid"
-			" from hosts h,hosts_groups hg,hstgrp g"
-			" where g.groupid=hg.groupid and"
-				" hg.hostid=h.hostid and"
-				" h.status<>" DBPATCH_HOST_STATUS_TEMPLATE
-			);
+			" from hstgrp g,hosts_groups hg,hosts h"
+			" where g.groupid=hg.groupid"
+				" and hg.hostid=h.hostid"
+				" and h.status<>" DBPATCH_HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -773,11 +769,7 @@ static int	DBpatch_6010033_split_groups(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect(
-			"select distinct groupid"
-			" from group_prototype"
-			" where groupid is not null"
-			);
+	result = DBselect("select distinct groupid from group_prototype where groupid is not null");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -788,11 +780,10 @@ static int	DBpatch_6010033_split_groups(void)
 
 	result = DBselect(
 			"select distinct g.groupid"
-			" from hosts h,hosts_groups hg,hstgrp g"
-			" where g.groupid=hg.groupid and"
-				" hg.hostid=h.hostid and"
-				" h.status=" DBPATCH_HOST_STATUS_TEMPLATE
-			);
+			" from hstgrp g,hosts_groups hg,hosts h"
+			" where g.groupid=hg.groupid"
+				" and hg.hostid=h.hostid"
+				" and h.status=" DBPATCH_HOST_STATUS_TEMPLATE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -876,7 +867,7 @@ static int	DBpatch_6010034(void)
 	return SUCCEED;
 }
 
-#undef DBPATCH_TPLGRP_GROUPIDS
+#undef DBPATCH_HOST_STATUS_TEMPLATE
 #undef DBPATCH_HOSTGROUP_TYPE_HOST
 #undef DBPATCH_HOSTGROUP_TYPE_TEMPLATE
 #undef DBPATCH_HOSTGROUP_TYPE_EMPTY
