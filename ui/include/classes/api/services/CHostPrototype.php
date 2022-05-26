@@ -235,7 +235,7 @@ class CHostPrototype extends CHostBase {
 		$hostids = array_keys($result);
 
 		// adding discovery rule
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+		if ($options['selectDiscoveryRule'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'parent_itemid', 'host_discovery');
 			$discoveryRules = API::DiscoveryRule()->get([
 				'output' => $options['selectDiscoveryRule'],
@@ -250,7 +250,7 @@ class CHostPrototype extends CHostBase {
 		self::addRelatedGroupPrototypes($options, $result);
 
 		// adding host
-		if ($options['selectParentHost'] !== null && $options['selectParentHost'] != API_OUTPUT_COUNT) {
+		if ($options['selectParentHost'] !== null) {
 			$hosts = [];
 			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
@@ -311,7 +311,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// adding tags
-		if ($options['selectTags'] !== null && $options['selectTags'] !== API_OUTPUT_COUNT) {
+		if ($options['selectTags'] !== null) {
 			$tags = API::getApiService()->select('host_tag', [
 				'output' => $this->outputExtend($options['selectTags'], ['hostid', 'hosttagid']),
 				'filter' => ['hostid' => $hostids],
@@ -323,7 +323,7 @@ class CHostPrototype extends CHostBase {
 			$result = $relation_map->mapMany($result, $tags, 'tags');
 		}
 
-		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
+		if ($options['selectInterfaces'] !== null) {
 			$interfaces = API::HostInterface()->get([
 				'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
 				'hostids' => $hostids,
