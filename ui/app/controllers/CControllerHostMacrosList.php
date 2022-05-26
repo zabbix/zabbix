@@ -141,7 +141,6 @@ class CControllerHostMacrosList extends CController {
 	 * @param string $macro['original_macro']
 	 * @param string $macro['original_value']
 	 * @param string $macro['original_description']
-	 * @param string $macro['original_description']
 	 * @param string $macro['original_macro_type']
 	 */
 	protected static function addMacroOriginalValues(array &$macro) {
