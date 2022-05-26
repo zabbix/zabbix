@@ -1142,7 +1142,7 @@ class CWidgetHelper {
 	 * @return CListItem
 	 */
 	private static function getGraphDataSetLayout($field_name, array $value, $form_name, $row_num, $is_opened) {
-		$dataset = 0;
+		$dataset = 1;
 
 		$dataset_head = [
 			new CDiv((new CSimpleButton('&nbsp;'))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE))

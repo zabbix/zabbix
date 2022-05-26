@@ -207,7 +207,7 @@ class CSvgGraphAxis extends CSvgGroup {
 				$text_tag_x = $this->x + $x;
 			}
 
-			$labels[] = new CSvgText($text_tag_x, $this->y + $y, $label);
+			$labels[] = new CSvgText($label, $text_tag_x, $this->y + $y);
 		}
 
 		return $labels;

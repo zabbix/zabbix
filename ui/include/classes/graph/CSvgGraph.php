@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,9 +19,6 @@
 **/
 
 
-/**
- * General class for SVG Graph usage.
- */
 class CSvgGraph extends CSvg {
 
 	public const SVG_GRAPH_X_AXIS_HEIGHT = 20;
@@ -34,10 +31,10 @@ class CSvgGraph extends CSvg {
 	public const SVG_GRAPH_Y_AXIS_LEFT_LABEL_MARGIN = 5;
 	public const SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN = 12;
 
-	private $canvas_height;
-	private $canvas_width;
 	private $canvas_x;
 	private $canvas_y;
+	private $canvas_width;
+	private $canvas_height;
 
 	private $graph_theme;
 
@@ -62,21 +59,17 @@ class CSvgGraph extends CSvg {
 	 */
 	private $paths = [];
 
-	/**
-	 * Array of graph problems to display.
-	 *
-	 * @var array
-	 */
-	private $problems = [];
+	private $show_simple_triggers;
+	private $show_working_time;
+	private $show_percentile_left;
+	private $percentile_left_value;
+	private $show_percentile_right;
+	private $percentile_right_value;
 
-	private $working_time;
+	private $time_from;
+	private $time_till;
 
-	private $max_value_left;
-	private $max_value_right;
-	private $min_value_left;
-	private $min_value_right;
-
-	private $left_y_show = false;
+	private $show_left_y_axis;
 	private $left_y_min;
 	private $left_y_min_calculated;
 	private $left_y_max;
@@ -86,8 +79,9 @@ class CSvgGraph extends CSvg {
 	private $left_y_is_binary;
 	private $left_y_power;
 	private $left_y_empty = true;
+	private $left_y_zero;
 
-	private $right_y_show = false;
+	private $show_right_y_axis;
 	private $right_y_min;
 	private $right_y_min_calculated;
 	private $right_y_max;
@@ -96,12 +90,18 @@ class CSvgGraph extends CSvg {
 	private $right_y_units;
 	private $right_y_is_binary;
 	private $right_y_power;
-	private $right_y_empty;
-
+	private $right_y_empty = true;
 	private $right_y_zero;
-	private $left_y_zero;
 
-	private $x_show;
+	private $show_x_axis;
+
+	private $simple_triggers = [];
+	private $problems = [];
+
+	private $max_value_left;
+	private $max_value_right;
+	private $min_value_left;
+	private $min_value_right;
 
 	/**
 	 * Value for graph left offset. Is used as width for left Y axis container.
@@ -126,8 +126,7 @@ class CSvgGraph extends CSvg {
 
 	private $cell_height_min = 30;
 
-	private $time_from;
-	private $time_till;
+
 
 	/**
 	 * Height for X axis container.
@@ -147,69 +146,52 @@ class CSvgGraph extends CSvg {
 
 		$this->graph_theme = getUserGraphTheme();
 
-		$this
-			->addClass(ZBX_STYLE_SVG_GRAPH)
-			->setTimePeriod($options['time_period']['time_from'], $options['time_period']['time_to'])
-			->setXAxis($options['x_axis'])
-			->setYAxisLeft($options['left_y_axis'])
-			->setYAxisRight($options['right_y_axis']);
+		$this->show_simple_triggers = $options['displaying']['show_simple_triggers'];
+		$this->show_working_time = $options['displaying']['show_working_time'];
+		$this->show_percentile_left = $options['displaying']['show_percentile_left'];
+		$this->percentile_left_value = $options['displaying']['percentile_left_value'];
+		$this->show_percentile_right = $options['displaying']['show_percentile_right'];
+		$this->percentile_right_value = $options['displaying']['percentile_right_value'];
 
-		$this->working_time = true;
+		$this->time_from = $options['time_period']['time_from'];
+		$this->time_till =  $options['time_period']['time_to'];
+
+		$this->show_left_y_axis = $options['axes']['show_left_y_axis'];
+		$this->left_y_min = $options['axes']['left_y_min'];
+		$this->left_y_max = $options['axes']['left_y_max'];
+		$this->left_y_units = $options['axes']['left_y_units'] !== null
+			? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $options['left_y_units'])))
+			: null;
+
+		$this->show_right_y_axis = $options['axes']['show_right_y_axis'];
+		$this->right_y_min = $options['axes']['right_y_min'];
+		$this->right_y_max = $options['axes']['right_y_max'];
+		$this->right_y_units = $options['axes']['right_y_units'] !== null
+			? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $options['right_y_units'])))
+			: null;
+
+		$this->show_x_axis = $options['axes']['show_x_axis'];
+
+		$this->addClass(ZBX_STYLE_SVG_GRAPH);
 	}
 
-	/**
-	 * Get graph canvas X offset.
-	 *
-	 * @return int
-	 */
 	public function getCanvasX(): int {
 		return $this->canvas_x;
 	}
 
-	/**
-	 * Get graph canvas Y offset.
-	 *
-	 * @return int
-	 */
 	public function getCanvasY(): int {
 		return $this->canvas_y;
 	}
 
-	/**
-	 * Get graph canvas width.
-	 *
-	 * @return int
-	 */
 	public function getCanvasWidth(): int {
 		return $this->canvas_width;
 	}
 
-	/**
-	 * Get graph canvas height.
-	 *
-	 * @return int
-	 */
 	public function getCanvasHeight(): int {
 		return $this->canvas_height;
 	}
 
-	/**
-	 * Set problems data for graph.
-	 *
-	 * @param array $problems  Array of problems data.
-	 */
-	public function addProblems(array $problems): void {
-		$this->problems = $problems;
-	}
-
-	/**
-	 * Set metrics data for graph.
-	 *
-	 * @param array $metrics  Array of metrics data.
-	 *
-	 * @return CSvgGraph
-	 */
-	public function addMetrics(array $metrics = []): self {
+	public function addMetrics(array $metrics): CSvgGraph {
 		$metrics_for_each_axes = [
 			GRAPH_YAXIS_SIDE_LEFT => 0,
 			GRAPH_YAXIS_SIDE_RIGHT => 0
@@ -266,6 +248,18 @@ class CSvgGraph extends CSvg {
 		return $this;
 	}
 
+	public function addSimpleTriggers(array $simple_triggers): CSvgGraph {
+		$this->simple_triggers = $simple_triggers;
+
+		return $this;
+	}
+
+	public function addProblems(array $problems): CSvgGraph {
+		$this->problems = $problems;
+
+		return $this;
+	}
+
 	/**
 	 * Add UI selection box element to graph.
 	 *
@@ -274,7 +268,7 @@ class CSvgGraph extends CSvg {
 	public function addSBox(): self {
 		$this->addItem([
 			(new CSvgRect(0, 0, 0, 0))->addClass('svg-graph-selection'),
-			(new CSvgText(0, 0, ''))->addClass('svg-graph-selection-text')
+			(new CSvgText(''))->addClass('svg-graph-selection-text')
 		]);
 
 		return $this;
@@ -292,92 +286,7 @@ class CSvgGraph extends CSvg {
 	}
 
 	/**
-	 * Set graph time period.
-	 *
-	 * @param int $time_from  Timestamp.
-	 * @param int @time_till  Timestamp.
-	 *
-	 * @return CSvgGraph
-	 */
-	private function setTimePeriod(int $time_from, int $time_till): self {
-		$this->time_from = $time_from;
-		$this->time_till = $time_till;
-
-		return $this;
-	}
-
-	/**
-	 * Show or hide X axis.
-	 *
-	 * @param array $options
-	 *
-	 * @return CSvgGraph
-	 */
-	private function setXAxis(array $options): self {
-		$this->x_show = ($options['show'] == SVG_GRAPH_AXIS_SHOW);
-
-		return $this;
-	}
-
-	/**
-	 * Set left side Y axis display options.
-	 *
-	 * @param array  $options
-	 * @param int    $options['show']
-	 * @param string $options['min']
-	 * @param string $options['max']
-	 * @param string $options['units']
-	 *
-	 * @return CSvgGraph
-	 */
-	private function setYAxisLeft(array $options): self {
-		$this->left_y_show = ($options['show'] == SVG_GRAPH_AXIS_SHOW);
-
-		if ($options['min'] !== '') {
-			$this->left_y_min = $options['min'];
-		}
-		if ($options['max'] !== '') {
-			$this->left_y_max = $options['max'];
-		}
-		if ($options['units'] !== null) {
-			$units = trim(preg_replace('/\s+/', ' ', $options['units']));
-			$this->left_y_units = htmlspecialchars($units);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Set right side Y axis display options.
-	 *
-	 * @param array  $options
-	 * @param int    $options['show']
-	 * @param string $options['min']
-	 * @param string $options['max']
-	 * @param string $options['units']
-	 *
-	 * @return void
-	 */
-	private function setYAxisRight(array $options): void {
-		$this->right_y_show = ($options['show'] == SVG_GRAPH_AXIS_SHOW);
-
-		if ($options['min'] !== '') {
-			$this->right_y_min = $options['min'];
-		}
-		if ($options['max'] !== '') {
-			$this->right_y_max = $options['max'];
-		}
-		if ($options['units'] !== null) {
-			$units = trim(preg_replace('/\s+/', ' ', $options['units']));
-			$this->right_y_units = htmlspecialchars($units);
-		}
-	}
-
-	/**
-	 * Render graph.
-	 *
 	 * @throws Exception
-	 * @return CSvgGraph
 	 */
 	public function draw(): self {
 		$this->applyMissingDataFunc();
@@ -386,25 +295,18 @@ class CSvgGraph extends CSvg {
 		if ($this->canvas_width > 0 && $this->canvas_height > 0) {
 			$this->calculatePaths();
 
-			if ($this->working_time) {
-				$this->drawWorkingTime();
-			}
+			$this->drawWorkingTime();
 
 			$this->drawGrid();
-
-			if ($this->left_y_show) {
-				$this->drawLeftYaxis();
-			}
-			if ($this->right_y_show) {
-				$this->drawRightYAxis();
-			}
-			if ($this->x_show) {
-				$this->drawXAxis();
-			}
+			$this->drawYaxes();
+			$this->drawXAxis();
 
 			$this->drawMetricsLine();
 			$this->drawMetricsPoint();
 			$this->drawMetricsBar();
+
+			$this->drawPercentiles();
+			$this->drawSimpleTriggers();
 
 			$this->drawProblems();
 
@@ -549,7 +451,7 @@ class CSvgGraph extends CSvg {
 
 		$approx_width = 10;
 
-		if ($this->left_y_show) {
+		if ($this->show_left_y_axis) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 
 			if ($values) {
@@ -558,7 +460,7 @@ class CSvgGraph extends CSvg {
 			}
 		}
 
-		if ($this->right_y_show) {
+		if ($this->show_right_y_axis) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
 			if ($values) {
@@ -664,6 +566,10 @@ class CSvgGraph extends CSvg {
 	}
 
 	private function drawWorkingTime(): void {
+		if (!$this->show_working_time) {
+			return;
+		}
+
 		if (($this->time_till - $this->time_from) > SEC_PER_MONTH * 3) {
 			return;
 		}
@@ -702,21 +608,21 @@ class CSvgGraph extends CSvg {
 	 * @throws Exception
 	 */
 	private function drawGrid(): void {
-		$time_points = $this->x_show ? $this->getTimeGridWithPosition() : [];
+		$time_points = $this->show_x_axis ? $this->getTimeGridWithPosition() : [];
 		$value_points = [];
 
-		if ($this->left_y_show) {
+		if ($this->show_left_y_axis) {
 			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 
 			unset($time_points[0]);
 		}
-		elseif ($this->right_y_show) {
+		elseif ($this->show_right_y_axis) {
 			$value_points = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
 			unset($time_points[$this->canvas_width]);
 		}
 
-		if ($this->x_show) {
+		if ($this->show_x_axis) {
 			unset($value_points[0]);
 		}
 
@@ -728,38 +634,44 @@ class CSvgGraph extends CSvg {
 		);
 	}
 
-	private function drawLeftYaxis(): void {
-		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
-		$this->addItem(
-			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_LEFT))
-				->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
-				->setSize($this->offset_left, $this->canvas_height)
-				->setLineColor('#'.$this->graph_theme['gridcolor'])
-				->setTextColor('#'.$this->graph_theme['textcolor'])
-		);
-	}
-
-	private function drawRightYAxis(): void {
-		$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
-
-		// Do not draw label at the bottom of right Y axis to avoid label averlapping with horizontal axis arrow.
-		if (array_key_exists(0, $grid_values)) {
-			unset($grid_values[0]);
+	private function drawYaxes(): void {
+		if ($this->show_left_y_axis) {
+			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
+			$this->addItem(
+				(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_LEFT))
+					->setPosition($this->canvas_x - $this->offset_left, $this->canvas_y)
+					->setSize($this->offset_left, $this->canvas_height)
+					->setLineColor('#'.$this->graph_theme['gridcolor'])
+					->setTextColor('#'.$this->graph_theme['textcolor'])
+			);
 		}
 
-		$this->addItem(
-			(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))
-				->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
-				->setSize($this->offset_right, $this->canvas_height)
-				->setLineColor('#'.$this->graph_theme['gridcolor'])
-				->setTextColor('#'.$this->graph_theme['textcolor'])
-		);
+		if ($this->show_right_y_axis) {
+			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
+
+			// Do not draw label at the bottom of right Y axis to avoid label averlapping with horizontal axis arrow.
+			if (array_key_exists(0, $grid_values)) {
+				unset($grid_values[0]);
+			}
+
+			$this->addItem(
+				(new CSvgGraphAxis($grid_values, GRAPH_YAXIS_SIDE_RIGHT))
+					->setPosition($this->canvas_x + $this->canvas_width, $this->canvas_y)
+					->setSize($this->offset_right, $this->canvas_height)
+					->setLineColor('#'.$this->graph_theme['gridcolor'])
+					->setTextColor('#'.$this->graph_theme['textcolor'])
+			);
+		}
 	}
 
 	/**
 	 * @throws Exception
 	 */
 	private function drawXAxis(): void {
+		if (!$this->show_x_axis) {
+			return;
+		}
+
 		$this->addItem(
 			(new CSvgGraphAxis($this->getTimeGridWithPosition(), GRAPH_YAXIS_SIDE_BOTTOM))
 				->setPosition($this->canvas_x, $this->canvas_y + $this->canvas_height)
@@ -865,6 +777,91 @@ class CSvgGraph extends CSvg {
 
 				$this->addItem(new CSvgGraphBar(reset($this->paths[$index]), $metric));
 			}
+		}
+	}
+
+	private function drawPercentiles(): void {
+		$values = [];
+
+		if ($this->show_percentile_left && $this->percentile_left_value > 0) {
+			$values[GRAPH_YAXIS_SIDE_LEFT] = [];
+		}
+
+		if ($this->show_percentile_right && $this->percentile_right_value > 0) {
+			$values[GRAPH_YAXIS_SIDE_RIGHT] = [];
+		}
+
+		foreach ($this->metrics as $index => $metric) {
+			if (!array_key_exists($index, $this->points) || !array_key_exists($metric['options']['axisy'], $values)) {
+				continue;
+			}
+
+			$values[$metric['options']['axisy']] = array_merge(
+				$values[$metric['options']['axisy']],
+				array_values($this->points[$index])
+			);
+		}
+
+		foreach ($values as $side => $points) {
+			if ($side == GRAPH_YAXIS_SIDE_LEFT) {
+				$percent = $this->percentile_left_value;
+				$units = $this->left_y_units;
+				$y_min = $this->left_y_min;
+				$y_max = $this->left_y_max;
+				$color = $this->graph_theme['leftpercentilecolor'];
+			}
+			else {
+				$percent = $this->percentile_right_value;
+				$units = $this->right_y_units;
+				$y_min = $this->right_y_min;
+				$y_max = $this->right_y_max;
+				$color = $this->graph_theme['rightpercentilecolor'];
+			}
+
+			if ($points) {
+				sort($points);
+
+				$value = $points[((int) ceil($percent / 100 * count($points))) - 1];
+				$label = convertUnits([
+					'value' => $value,
+					'units' => $units
+				]);
+			}
+			else {
+				$value = 0;
+				$label = '-';
+			}
+
+			$this->addItem(
+				(new CSvgGraphPercentile(_s('%1$sth percentile: %2$s', $percent, $label), $value, $y_min, $y_max))
+					->setPosition($this->canvas_x, $this->canvas_y)
+					->setSize($this->canvas_width, $this->canvas_height)
+					->setColor('#'.$color)
+					->setSide($side)
+			);
+		}
+	}
+
+	private function drawSimpleTriggers(): void {
+		foreach ($this->simple_triggers as $index => $simple_triggers) {
+			if ($simple_triggers['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
+				$y_min = $this->left_y_min;
+				$y_max = $this->left_y_max;
+			}
+			else {
+				$y_min = $this->right_y_min;
+				$y_max = $this->right_y_max;
+			}
+
+			$this->addItem(
+				(new CSvgGraphSimpleTrigger($simple_triggers['constant'], $simple_triggers['description'],
+						$simple_triggers['value'], $y_min, $y_max))
+					->setPosition($this->canvas_x, $this->canvas_y)
+					->setIndex($index)
+					->setSize($this->canvas_width, $this->canvas_height)
+					->setColor('#'.$simple_triggers['color'])
+					->setSide($simple_triggers['axisy'])
+			);
 		}
 	}
 

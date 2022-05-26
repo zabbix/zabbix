@@ -40,7 +40,7 @@ class CSvgGraphHelper {
 	 * @param array  $options['problems']         Graph problems options.
 	 * @param array  $options['overrides']        Graph override options.
 	 *
-	 * @return array
+	 * @throws Exception
 	 */
 	public static function get(array $options, int $width, int $height): array {
 		$metrics = [];
@@ -59,72 +59,18 @@ class CSvgGraphHelper {
 		// Load aggregated Data for each dataset.
 		self::getMetricsAggregatedData($metrics);
 
-		// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
-		$svg_legend_line_height = 18;
-		$legend_lines = 0;
-
-		if ($options['legend'] == SVG_GRAPH_LEGEND_ON) {
-			$legend_lines = $options['legend_lines'];
-
-			if ($options['legend_statistic'] == SVG_GRAPH_LEGEND_STATISTIC_ON) {
-				// One additional line for header of statistic table.
-				$legend_lines++;
-			}
-		}
+		$legend = self::getLegend($metrics, $options['legend']);
 
 		$graph = (new CSvgGraph([
+			'displaying' => $options['displaying'],
 			'time_period' => $options['time_period'],
-			'x_axis' => $options['x_axis'],
-			'left_y_axis' => $options['left_y_axis'],
-			'right_y_axis' => $options['right_y_axis']
+			'axes' => $options['axes']
 		]))
-			->setSize($width, $height - $legend_lines * $svg_legend_line_height)
-			->addMetrics($metrics);
-
-		// Get problems to display in graph.
-		if ($options['problems']['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
-			$options['problems']['itemids'] =
-				($options['problems']['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
-					? array_unique(array_column($metrics, 'itemid'))
-					: null;
-
-			$graph->addProblems(self::getProblems($options['problems'], $options['time_period']));
-		}
-
-		if ($options['legend'] == SVG_GRAPH_LEGEND_ON) {
-			$items = [];
-
-			foreach ($metrics as $metric) {
-				$item = [
-					'name' => $metric['name'],
-					'color' => $metric['options']['color']
-				];
-
-				if ($metric['points']) {
-					$values = array_column($metric['points'], 'value');
-
-					$item += [
-						'units' => $metric['units'],
-						'min' => min($values),
-						'avg' => array_sum($values) / count($values),
-						'max' => max($values)
-					];
-				}
-
-				$items[] = $item;
-			}
-
-			$legend = (new CSvgGraphLegend($items))
-				->setColumnsCount($options['legend_columns'])
-				->setLinesCount($options['legend_lines'])
-				->showStatistic($options['legend_statistic']);
-		}
-		else {
-			$legend = '';
-		}
-
-		// Draw graph.
-		$graph->draw();
+			->setSize($width, $height - ($legend !== null ? $legend->getLinesCount() * CSvgGraphLegend::LINE_HEIGHT : 0))
+			->addMetrics($metrics)
+			->addSimpleTriggers(self::getSimpleTriggers($metrics, $options['displaying']))
+			->addProblems(self::getProblems($metrics, $options['problems'], $options['time_period']))
+			->draw();
 
 		// SBox available only for graphs without overridden relative time.
 		if ($options['dashboard_time']) {
@@ -136,7 +82,7 @@ class CSvgGraphHelper {
 
 		return [
 			'svg' => $graph,
-			'legend' => $legend,
+			'legend' => $legend ?? '',
 			'data' => [
 				'dims' => [
 					'x' => $graph->getCanvasX(),
@@ -224,7 +170,7 @@ class CSvgGraphHelper {
 	/**
 	 * Apply overrides for each pattern matching metric.
 	 */
-	private static function applyOverrides(array &$metrics = [], array $overrides = []): void {
+	private static function applyOverrides(array &$metrics, array $overrides = []): void {
 		foreach ($overrides as $override) {
 			if ($override['hosts'] === '' || $override['items'] === '') {
 				continue;
@@ -506,7 +452,7 @@ class CSvgGraphHelper {
 	/**
 	 * Select aggregated data to show in graph for each metric.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics = []): void {
+	private static function getMetricsAggregatedData(array &$metrics): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -640,10 +586,111 @@ class CSvgGraphHelper {
 		}
 	}
 
+	private static function getLegend(array $metrics, array $legend_options): ?CSvgGraphLegend {
+		if ($legend_options['show_legend'] != SVG_GRAPH_LEGEND_ON) {
+			return null;
+		}
+
+		$items = [];
+
+		foreach ($metrics as $metric) {
+			$item = [
+				'name' => $metric['name'],
+				'color' => $metric['options']['color']
+			];
+
+			if ($metric['points']) {
+				$values = array_column($metric['points'], 'value');
+
+				$item += [
+					'units' => $metric['units'],
+					'min' => min($values),
+					'avg' => array_sum($values) / count($values),
+					'max' => max($values)
+				];
+			}
+
+			$items[] = $item;
+		}
+
+		return (new CSvgGraphLegend($items))
+			->setColumnsCount($legend_options['legend_columns'])
+			->setLinesCount($legend_options['legend_lines'])
+			->showStatistic($legend_options['legend_statistic']);
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private static function getSimpleTriggers(array $metrics, $displaying_options): array {
+		if ($displaying_options['show_simple_triggers'] != SVG_GRAPH_SIMPLE_TRIGGERS_ON) {
+			return [];
+		}
+
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+		$simple_triggers = [];
+		$limit = 3;
+
+		foreach ($metrics as &$metric) {
+			$db_triggers = DBselect(
+				'SELECT DISTINCT h.host,tr.description,tr.triggerid,tr.expression,tr.priority,tr.value'.
+				' FROM triggers tr,functions f,items i,hosts h'.
+				' WHERE tr.triggerid=f.triggerid'.
+				" AND f.name IN ('last','min','avg','max')".
+				' AND tr.status='.TRIGGER_STATUS_ENABLED.
+				' AND i.itemid=f.itemid'.
+				' AND h.hostid=i.hostid'.
+				' AND f.itemid='.zbx_dbstr($metric['itemid']).
+				' ORDER BY tr.priority'
+			);
+
+			while ($limit && ($trigger = DBfetch($db_triggers))) {
+				$functions_count = DBfetch(DBselect(
+					'SELECT COUNT(*) AS cnt'.
+					' FROM functions f'.
+					' WHERE f.triggerid='.zbx_dbstr($trigger['triggerid'])
+				));
+
+				if ($functions_count['cnt'] != 1) {
+					continue;
+				}
+
+				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpressions([$trigger],
+					['resolve_usermacros' => true, 'resolve_functionids' => false]
+				)[0]['expression'];
+
+				if (!preg_match('/^\{\d+\}\s*(?<operator>[><]=?|=)\s*(?<constant>.*)$/', $trigger['expression'],
+					$matches)) {
+					continue;
+				}
+
+				if ($number_parser->parse($matches['constant']) != CParser::PARSE_SUCCESS) {
+					continue;
+				}
+
+				$simple_triggers[] = [
+					'axisy' => $metric['options']['axisy'],
+					'value' => $number_parser->calcValue(),
+					'color' => CSeverityHelper::getColor((int) $trigger['priority']),
+					'description' => _('Trigger').NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger),
+					'constant' => $matches['operator'].' '.$matches['constant']
+				];
+
+				$limit--;
+			}
+		}
+
+		return $simple_triggers;
+	}
+
 	/**
 	 * Find problems at given time period that matches specified problem options.
 	 */
-	private static function getProblems(array $problem_options, array $time_period): array {
+	private static function getProblems(array $metrics, array $problem_options, array $time_period): array {
+		if ($problem_options['show_problems'] != SVG_GRAPH_PROBLEMS_SHOW) {
+			return [];
+		}
+
 		$options = [
 			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
 			'select_acknowledges' => ['action'],
@@ -673,7 +720,9 @@ class CSvgGraphHelper {
 		$options['objectids'] = array_keys(API::Trigger()->get([
 			'output' => [],
 			'hostids' => $options['hostids'] ?? null,
-			'itemids' => $problem_options['itemids'],
+			'itemids' => $problem_options['graph_item_problems']
+				? array_unique(array_column($metrics, 'itemid'))
+				: null,
 			'monitored' => true,
 			'preservekeys' => true
 		]));

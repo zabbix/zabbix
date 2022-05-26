@@ -2428,6 +2428,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   fill: #ffffff;
   fill-opacity: .5; }
 
+.svg-graph-percentile text,
+.svg-graph-simple-trigger text {
+  filter: drop-shadow(1px 1px 0px rgba(128, 128, 128, 0.1)); }
+
 .svg-graph-legend {
   position: relative;
   top: 4px;
