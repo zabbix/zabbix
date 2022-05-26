@@ -42,6 +42,7 @@ $jq_templates = [];
 $graph_preview = (new CDiv())
 	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
 	->addItem((new CDiv())->setId('svg-graph-preview'));
+	// ->addStyle('height: 10px !important; overflow: hidden;'); // FIXME: debug
 
 $form_tabs = (new CTabView())
 	->addTab('data_set',  _('Data set'), getDatasetTab($fields, $scripts, $jq_templates, $form->getName()),
@@ -63,8 +64,8 @@ $scripts[] = $form_tabs->makeJavascript();
 
 $form
 	->addItem($form_list)
-//	->addItem($graph_preview)
-	->addItem((new CDiv())->addStyle('width: 960px;'))	// TODO: debug
+	->addItem($graph_preview)
+	// ->addItem((new CDiv())->addStyle('width: 960px;'))	// TODO: debug
 	->addItem($form_tabs)
 	->addItem(
 		(new CScriptTag('
@@ -81,9 +82,46 @@ return [
 	'jq_templates' => $jq_templates
 ];
 
+function getGraphDataSetItemRow() {
+	return (new CRow([
+		(new CCol(
+			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+		))
+			->addClass('table-col-handle')
+			->addClass(ZBX_STYLE_TD_DRAG_ICON),
+		(new CCol(
+			(new CColor('ds[#{dsNum}][color][]', '#{color}', 'items_#{dsNum}_#{rowNum}_color'))
+				->appendColorPickerJs(false)
+		))->addClass('table-col-color'),
+		(new CCol(new CSpan('#{rowNum}:')))->addClass('table-col-no'),
+		(new CCol(
+			(new CLink('#{name}'))
+				->setId('items_#{dsNum}_#{rowNum}_name')
+				->addClass('js-click-expend')
+		))->addClass('table-col-name'),
+		(new CCol([
+			(new CButton('button', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove'),
+			(new CVar('ds[#{dsNum}][itemids][]', '#{itemid}', 'items_#{dsNum}_#{rowNum}_input'))
+		]))
+			->addClass('table-col-action')
+			->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->addClass('sortable')
+		->addClass('single-item-table-row')
+		->setAttribute('data-number', '#{rowNum}')
+		->toString();
+}
+
 function getDatasetTab(array $fields, array &$scripts, array &$jq_templates, string $form_name): CFormGrid {
-	$scripts[] = CWidgetHelper::getGraphDataSetJavascript();
-	$jq_templates['dataset-row'] = CWidgetHelper::getGraphDataSetTemplate($fields['ds'], $form_name);
+	$jq_templates['dataset-single-item-tmpl'] = CWidgetHelper::getGraphDataSetTemplate($fields['ds'], $form_name,
+		CWidgetHelper::DATASET_TYPE_SINGLE_ITEM
+	);
+	$jq_templates['dataset-pattern-item-tmpl'] = CWidgetHelper::getGraphDataSetTemplate($fields['ds'], $form_name,
+		CWidgetHelper::DATASET_TYPE_PATTERN_ITEM
+	);
+	$jq_templates['dataset-item-row-tmpl'] = getGraphDataSetItemRow();
 
 	return (new CFormGrid())
 		->addItem([
@@ -288,4 +326,3 @@ function getOverridesTab(array $fields, array &$scripts, array &$jq_templates, s
 			new CFormField(CWidgetHelper::getGraphOverride($fields['or'], $form_name))
 		]);
 }
-

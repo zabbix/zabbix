@@ -41,8 +41,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-			'hosts'					=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
-			'items'					=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
+			'dataset_type'			=> ['type' => API_INT32, 'in' => implode(',', [CWidgetHelper::DATASET_TYPE_SINGLE_ITEM, CWidgetHelper::DATASET_TYPE_PATTERN_ITEM])],
+			'hosts'					=> ['type' => API_STRINGS_UTF8],
+			'items'					=> ['type' => API_STRINGS_UTF8],
+			'itemids'				=> ['type' => API_IDS],
 			'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 			'stacked'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_STACKED_OFF, SVG_GRAPH_STACKED_ON])],
@@ -108,8 +110,10 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	 */
 	public static function getDefaults() {
 		return [
+			'dataset_type' => CWidgetHelper::DATASET_TYPE_PATTERN_ITEM,
 			'hosts' => [],
 			'items' => [],
+			'itemids' => [],
 			'color' => self::DEFAULT_COLOR,
 			'type' => SVG_GRAPH_TYPE_LINE,
 			'stacked' => SVG_GRAPH_STACKED_OFF,
@@ -128,6 +132,60 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 	}
 
 	/**
+	 * @param bool $strict  Widget form submit validation?
+	 *
+	 * @return array  Errors.
+	 */
+	public function validate(bool $strict = false): array {
+		$errors = [];
+
+		$validation_rules = ($strict && $this->strict_validation_rules !== null)
+			? $this->strict_validation_rules
+			: $this->validation_rules;
+		$validation_rules += $this->ex_validation_rules;
+		$value = ($this->value === null) ? $this->default : $this->value;
+
+		if ($this->full_name !== null) {
+			$label = $this->full_name;
+		}
+		else {
+			$label = ($this->label === null) ? $this->name : $this->label;
+		}
+
+		foreach ($value as $data) {
+			$validation_rules_by_type = $validation_rules;
+
+			if ($data['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+				$validation_rules_by_type['fields']['itemids']['flags'] = API_REQUIRED;
+				$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
+
+				unset($data['hosts'], $data['items']);
+			}
+			else {
+				$validation_rules_by_type['fields']['hosts']['flags'] = API_REQUIRED;
+				$validation_rules_by_type['fields']['items']['flags'] = API_REQUIRED;
+
+				unset($data['itemids']);
+			}
+
+			$data = [$data];
+
+			if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label, $error)) {
+				$errors[] = $error;
+			}
+		}
+
+		if (!$errors) {
+			$this->setValue($value);
+		}
+		else {
+			$this->setValue($this->default);
+		}
+
+		return $errors;
+	}
+
+	/**
 	 * Prepares array entry for widget field, ready to be passed to CDashboard API functions.
 	 * Reference is needed here to avoid array merging in CWidgetForm::fieldsToApi method. With large number of widget
 	 * fields it causes significant performance decrease.
@@ -138,7 +196,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$value = $this->getValue();
 
 		$dataset_fields = [
-			'color' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'dataset_type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'stacked' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'width' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -156,12 +214,12 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$dataset_defaults = self::getDefaults();
 
 		foreach ($value as $index => $val) {
-			// Hosts and items fields are stored as arrays to bypass length limit.
-			foreach ($val['hosts'] as $num => $pattern_item) {
+			// Hosts, items and itemids fields are stored as arrays to bypass length limit.
+			foreach ($val['hosts'] as $num => $pattern_host) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 					'name' => $this->name.'.hosts.'.$index.'.'.$num,
-					'value' => $pattern_item
+					'value' => $pattern_host
 				];
 			}
 			foreach ($val['items'] as $num => $pattern_item) {
@@ -169,6 +227,30 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 					'name' => $this->name.'.items.'.$index.'.'.$num,
 					'value' => $pattern_item
+				];
+			}
+			foreach ($val['itemids'] as $num => $itemid) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.itemids.'.$index.'.'.$num,
+					'value' => $itemid
+				];
+			}
+			// Field "color" stored as array for dataset type CWidgetHelper::DATASET_TYPE_SINGLE_ITEM (0)
+			if ($val['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+				foreach ($val['color'] as $num => $color) {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'.color.'.$index.'.'.$num,
+						'value' => $color
+					];
+				}
+			}
+			else {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.color.'.$index,
+					'value' => $val['color']
 				];
 			}
 

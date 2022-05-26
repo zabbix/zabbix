@@ -1,90 +1,118 @@
 // Widget configuration.
 
-.overlay-dialogue.modal-popup {
-	.dashboard-grid-widget-svggraph {
-		.table-forms-container {
-			border: 1px solid $ui-border-color;
-		}
+form.dashboard-grid-widget-svggraph {
+	.table-forms-container {
+		border: 1px solid $ui-border-color;
+	}
 
-		table {
-			width: initial;
-		}
+	// table {
+	// 	width: initial;
+	// }
 
-		.dataset-head {
-			display: grid;
-			grid-template-columns: 24px 24px 1fr 1fr 24px;
-			grid-gap: 10px;
-		}
+	.dataset-head {
+		display: grid;
+		grid-template-columns: 24px 24px 1fr 1fr 24px;
+		grid-gap: 10px;
+	}
 
-		.dataset-body {
-			display: grid;
-			grid-template-columns: 24px 1fr 1fr 24px;
-			grid-gap: 10px;
-			align-items: start;
-			position: relative;
-			margin-top: 10px;
+	.dataset-body.list-accordion-item-body	 {
+		display: grid;
+		grid-template-columns: 24px 1fr 1fr 24px;
+		grid-gap: 10px;
+		align-items: start;
+		position: relative;
+		margin-top: 10px;
 
-			.form-grid {
-				padding-top: 0;
+		.form-grid {
+			padding-top: 0;
 
-				&:first-child {
-					grid-column-start: 2;
-				}
+			&:first-child {
+				grid-column-start: 2;
 			}
 		}
+	}
 
+	.drag-icon {
+		position: absolute;
+		left: -14px;
+	}
+
+	.td-drag-icon {
 		.drag-icon {
-			position: absolute;
-			left: -14px;
+			position: relative;
+			top: 8px;
+			left: 9px;
+			margin-right: 5px;
 		}
+	}
 
-		.dataset-actions {
-			text-align: right;
+	.dataset-actions {
+		text-align: right;
 
-			.btn-remove {
-				top: 0;
-				right: 0;
-				vertical-align: baseline;
+		.btn-remove {
+			top: 0;
+			right: 0;
+			vertical-align: baseline;
+		}
+	}
+
+	.items-list {
+		grid-column: 2 / span 3;
+	}
+
+	.list-vertical-accordion {
+		position: relative;
+		margin-left: 15px;
+		padding-left: 0;
+	}
+
+	.list-accordion-item {
+		position: relative;
+		margin-bottom: 10px;
+
+		&.list-accordion-item-opened {
+			&::before {
+				content: ' ';
+				position: absolute;
+				top: 24px;
+				bottom: 0;
+				left: 11px;
+				width: 2px;
+				background: $ui-border-color;
 			}
 		}
 
-		.items-list {
-			grid-column: 2 / span 3;
-		}
-
-		.list-vertical-accordion {
-			position: relative;
-			margin-left: 15px;
-			padding-left: 0;
-		}
-
-		.list-accordion-item {
-			position: relative;
-			margin-bottom: 10px;
-
-			&.list-accordion-item-opened {
-				&::before {
-					content: ' ';
-					position: absolute;
-					top: 24px;
-					bottom: 0;
-					left: 11px;
-					width: 2px;
-					background: $ui-border-color;
-				}
+		&.list-accordion-item-closed {
+			.multiselect {
+				height: 24px;
+				overflow: hidden;
 			}
 
-			&.list-accordion-item-closed {
-				.multiselect {
-					height: 24px;
-					overflow: hidden;
+			.dataset-body {
+				display: none;
+			}
+
+			.dataset-head {
+				.table-forms-separator {
+					border: none;
 				}
 
-				.dataset-body {
-					display: none;
+				.single-item-table {
+					thead,
+					tfoot,
+					.table-col-handle,
+					.table-col-action {
+						display: none;
+					}
 				}
 			}
 		}
 	}
-}
 
+	.single-item-table {
+		.table-col-handle { width: 26px; }
+		.table-col-no { width: 20px; }
+		.table-col-color { width: 24px; }
+		.table-col-action { width: 55px; }
+	}
+}

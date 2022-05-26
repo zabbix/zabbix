@@ -21,6 +21,9 @@
 
 class CWidgetHelper {
 
+	public const DATASET_TYPE_SINGLE_ITEM = 0;
+	public const DATASET_TYPE_PATTERN_ITEM = 1;
+
 	/**
 	 * Create CForm for widget configuration form.
 	 *
@@ -1141,14 +1144,14 @@ class CWidgetHelper {
 	 *
 	 * @return CListItem
 	 */
-	private static function getGraphDataSetLayout($field_name, array $value, $form_name, $row_num, $is_opened) {
-		$dataset = 1;
-
+	private static function getGraphDataSetLayout($field_name, array $value, $form_name, $row_num, $is_opened,
+			int $dataset_type = CWidgetHelper::DATASET_TYPE_PATTERN_ITEM) {
 		$dataset_head = [
-			new CDiv((new CSimpleButton('&nbsp;'))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE))
+			new CDiv((new CSimpleButton('&nbsp;'))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)),
+			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
 		];
 
-		if ($dataset == 1) {
+		if ($dataset_type == self::DATASET_TYPE_PATTERN_ITEM) {
 			$dataset_head = array_merge($dataset_head, [
 				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))->appendColorPickerJs(false),
 				(new CPatternSelect([
@@ -1187,16 +1190,56 @@ class CWidgetHelper {
 			]);
 		}
 		else {
+			$item_rows = [];
+			foreach($value['itemids'] as $i => $itemid) {
+				$item_name = array_key_exists($itemid, $value['item_names'])
+					? $value['item_names'][$itemid]
+					: '';
+
+				$item_rows[] = (new CRow([
+					(new CCol(
+						(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+					))
+						->addClass('table-col-handle')
+						->addClass(ZBX_STYLE_TD_DRAG_ICON),
+					(new CCol(
+						(new CColor($field_name.'['.$row_num.'][color][]', $value['color'][$i],
+							'items_'.$row_num.'_'.($i + 1).'_color'
+						))
+							->appendColorPickerJs(false)
+					))->addClass('table-col-color'),
+					(new CCol(new CSpan(($i + 1).':')))->addClass('table-col-no'),
+					(new CCol(
+						(new CLink($item_name))
+							->setId('items_'.$row_num.'_'.($i + 1).'_name')
+							->addClass('js-click-expend')
+					))->addClass('table-col-name'),
+					(new CCol([
+						(new CButton('button', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove'),
+						(new CVar($field_name.'['.$row_num.'][itemids][]', $itemid, 'items_'.$row_num.'_'.($i + 1).'_input'))
+					]))
+						->addClass('table-col-action')
+						->addClass(ZBX_STYLE_NOWRAP)
+				]))
+					->addClass('sortable')
+					->addClass('single-item-table-row')
+					->setAttribute('data-number', $i + 1);
+			}
+
 			$items_list = (new CTable())
-				->setId('itemsTable')
+				->addClass('single-item-table')
+				->setAttribute('data-set', $row_num)
 				->setColumns([
 					(new CTableColumn())->addClass('table-col-handle'),
+					(new CTableColumn())->addClass('table-col-color'),
 					(new CTableColumn())->addClass('table-col-no'),
-					(new CTableColumn(_('Color')))->addClass('table-col-colour'),
 					(new CTableColumn(_('Name')))->addClass('table-col-name'),
 					(new CTableColumn(_('Action')))->addClass('table-col-action')
 				])
-				->addItem(
+				->addItem([
+					$item_rows,
 					(new CTag('tfoot', true))
 						->addItem(
 							(new CCol(
@@ -1209,7 +1252,7 @@ class CWidgetHelper {
 									)
 							))->setColSpan(5)
 						)
-				);
+				]);
 
 			$dataset_head = array_merge($dataset_head, [
 				(new CDiv($items_list))->addClass('items-list table-forms-separator')
@@ -1224,7 +1267,9 @@ class CWidgetHelper {
 		))->addClass('dataset-actions');
 
 		return (new CListItem([
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+			(new CDiv())
+				->addClass(ZBX_STYLE_DRAG_ICON)
+				->addClass('js-main-drag-icon'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
 				->addClass('dataset-head')
@@ -1403,21 +1448,23 @@ class CWidgetHelper {
 				])
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
-			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED);
+			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
+			->setAttribute('data-set', $row_num);
 	}
 
 	/**
 	 * Return template used by dynamic rows in CWidgetFieldGraphDataSet field.
 	 *
 	 * @param CWidgetFieldGraphDataSet $field
-	 * @param string                   $form_name   Form name in which data set field resides.
+	 * @param string                   $form_name     Form name in which data set field resides.
+	 * @param int                      $dataset_type
 	 *
 	 * @return string
 	 */
-	public static function getGraphDataSetTemplate($field, $form_name) {
-		$value = ['color' => '#{color}'] + CWidgetFieldGraphDataSet::getDefaults();
+	public static function getGraphDataSetTemplate($field, $form_name, int $dataset_type) {
+		$value = ['color' => '#{color}'] +  CWidgetFieldGraphDataSet::getDefaults();
 
-		return self::getGraphDataSetLayout($field->getName(), $value, $form_name, '#{rowNum}', true)->toString();
+		return self::getGraphDataSetLayout($field->getName(), $value, $form_name, '#{rowNum}', true, $dataset_type)->toString();
 	}
 
 	/**
@@ -1436,20 +1483,23 @@ class CWidgetHelper {
 			$values[] = CWidgetFieldGraphDataSet::getDefaults();
 		}
 
+		// Get item names for single item datasets.
+		$itemids = array_merge(...array_column($values, 'itemids'));
+		if ($itemids) {
+			$names = self::getItemNames($itemids);
+		}
+
 		foreach ($values as $i => $value) {
-			$list->addItem(self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i == 0));
+			if ($value['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
+				$value['item_names'] = $names;
+			}
+
+			$list->addItem(
+				self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i == 0, $value['dataset_type'])
+			);
 		}
 
 		// Add 'Add' button under accordion.
-//		$list->addItem(
-//			(new CDiv(
-//				(new CButton('data_sets_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new data set')]))
-//					->addClass(ZBX_STYLE_BTN_ALT)
-//					->setId('dataset-add')
-//			)),
-//			ZBX_STYLE_LIST_ACCORDION_FOOT
-//		);
-
 		$list->addItem(
 			(new CList())
 				->addClass(ZBX_STYLE_BTN_SPLIT)
@@ -1471,186 +1521,26 @@ class CWidgetHelper {
 		return $list;
 	}
 
-	/**
-	 * Return javascript necessary to initialize CWidgetFieldGraphDataSet field.
-	 *
-	 * @return string
-	 */
-	public static function getGraphDataSetJavascript() {
-		return '
-			function changeDataSetDrawType(obj) {
-				const row_num = obj.id.replace("ds_", "").replace("_type", "");
+	private static function getItemNames(array $itemids): array {
+		$names = [];
 
-				switch (jQuery(":checked", jQuery(obj)).val()) {
-					case "'.SVG_GRAPH_TYPE_POINTS.'":
-						jQuery("#ds_" + row_num + "_width").rangeControl("disable");
-						jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");
-						jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");
-						jQuery("#ds_" + row_num + "_fill").rangeControl("disable");
-						jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);
-						jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
-						jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
-						jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
-						break;
-					case "'.SVG_GRAPH_TYPE_BAR.'":
-						jQuery("#ds_" + row_num + "_width").rangeControl("disable");
-						jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");
-						jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");
-						jQuery("#ds_" + row_num + "_fill").rangeControl("disable");
-						jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);
-						jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
-						jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
-						jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
-						break;
-					default:
-						jQuery("#ds_" + row_num + "_width").rangeControl("enable");
-						jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");
-						jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");
-						jQuery("#ds_" + row_num + "_fill").rangeControl("enable");
-						jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);
-						jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);
-						jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);
-						jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", false);
-						break;
-				}
-			};
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name'],
+			'selectHosts' => ['hostid', 'name'],
+			'itemids' => $itemids,
+			'preservekeys' => true
+		]);
 
-			function changeDataSetAggregateFunction(obj) {
-				const row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");
-				const no_aggregation = (jQuery(obj).val() == '.AGGREGATE_NONE.');
+		if (!$items) {
+			return $names;
+		}
 
-				jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);
-				jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);
-				jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);
-			};
+		foreach ($items as $item) {
+			$hosts = array_column($item['hosts'], 'name', 'hostid');
+			$names[$item['itemid']] = $hosts[$item['hostid']].NAME_DELIMITER.$item['name'];
+		}
 
-			// Initialize dynamic rows.
-			jQuery("#data_sets")
-				.dynamicRows({
-					template: "#dataset-row",
-					beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",
-					remove: ".'.ZBX_STYLE_BTN_REMOVE.'",
-					add: "#dataset-add",
-					row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",
-					dataCallback: function(data) {
-						data.color = function(num) {
-							var palette = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE.';
-							return palette[num % palette.length];
-						} (data.rowNum);
-						return data;
-					}
-				})
-				.bind("beforeadd.dynamicRows", function(event, options) {
-					jQuery("#data_sets").zbx_vertical_accordion("collapseAll");
-				})
-				.bind("afteradd.dynamicRows", function(event, options) {
-					const container = jQuery(".overlay-dialogue-body");
-
-					container.scrollTop(Math.max(container.scrollTop(),
-						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
-					));
-
-					jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color) {
-						jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'",
-							jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'")
-						).css("background-color", "#"+color);
-					}, appendTo: ".overlay-dialogue-body"});
-
-					jQuery(".multiselect", jQuery("#data_sets")).each(function() {
-						jQuery(this).multiSelect(jQuery(this).data("params"));
-					});
-
-					widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");
-					widget_svggraph_form.onGraphConfigChange();
-				})
-				.bind("afterremove.dynamicRows", function(event, options) {
-					widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");
-					widget_svggraph_form.onGraphConfigChange();
-				})
-				.bind("tableupdate.dynamicRows", function(event, options) {
-					widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");
-					jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'[data-options]").rangeControl();
-
-					if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {
-						jQuery("#data_sets .drag-icon").removeClass("disabled");
-						jQuery("#data_sets").sortable("enable");
-					}
-					else {
-						jQuery("#data_sets .drag-icon").addClass("disabled");
-						jQuery("#data_sets").sortable("disable");
-					}
-				});
-
-			// Initialize vertical accordion.
-			jQuery("#data_sets")
-				.on("focus", ".'.CMultiSelect::ZBX_STYLE_CLASS.' input.input", function() {
-					jQuery("#data_sets").zbx_vertical_accordion("expandNth",
-						jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());
-					})
-				.on("collapse", function(event, data) {
-					jQuery("textarea, .multiselect", data.section).scrollTop(0);
-					jQuery(window).trigger("resize");
-				})
-				.on("expand", function() {
-					jQuery(window).trigger("resize");
-				})
-				.zbx_vertical_accordion({handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"});
-
-			// Initialize rangeControl UI elements.
-			jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'", jQuery("#data_sets")).rangeControl();
-
-			// Expand dataset when click in pattern fields.
-			jQuery("#data_sets").on("click", "'.implode(', ', [
-				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CMultiSelect::ZBX_STYLE_CLASS,
-				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
-			]).'", function(event) {
-				jQuery("#data_sets").zbx_vertical_accordion("expandNth",
-					jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());
-
-				jQuery(event.currentTarget).find("input.input").focus();
-			});
-
-			// Initialize pattern fields.
-			jQuery(".multiselect", jQuery("#data_sets")).each(function() {
-				jQuery(this).multiSelect(jQuery(this).data("params"));
-			});
-
-			// Initialize color-picker UI elements.
-			jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color){
-				jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'"))
-					.css("background-color", "#"+color);
-			}, appendTo: ".overlay-dialogue-body"});
-
-			// Initialize sorting.
-			if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2) {
-				jQuery("#data_sets .drag-icon").addClass("disabled");
-			}
-
-			jQuery("#data_sets").sortable({
-				items: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",
-				containment: "parent",
-				handle: ".drag-icon",
-				tolerance: "pointer",
-				scroll: false,
-				cursor: "grabbing",
-				opacity: 0.6,
-				axis: "y",
-				disabled: function() {
-					return jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2;
-				}(),
-				start: function() { // Workaround to fix wrong scrolling at initial sort.
-					jQuery(this).sortable("refreshPositions");
-				},
-				stop: () => widget_svggraph_form.onGraphConfigChange(),
-				update: function() {
-					widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");
-				}
-			});
-
-			$(".overlay-dialogue-body").on("change", "z-select[id$=\"aggregate_function\"]", (e) => {
-				changeDataSetAggregateFunction(e.target);
-			});
-		';
+		return $names;
 	}
 
 	/**

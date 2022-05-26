@@ -23,73 +23,128 @@
 window.widget_svggraph_form = new class {
 
 	init({form_id, form_tabs_id}) {
+		colorPalette.setThemeColors(<?= json_encode(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
+
 		this.form_id = form_id;
 		this.form_tabs = form_tabs_id;
 
-		//jQuery(".overlay-dialogue-body").on("scroll", function() {
-		//	if (jQuery("#svg-graph-preview").length) {
-		//		const $dialogue_body = jQuery(this);
-		//		const $preview_container = jQuery(".<?//= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>//");
-		//
-		//		if ($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 400) {
-		//			jQuery("#svg-graph-preview").css("top", $dialogue_body.offset().top - $preview_container.offset().top);
-		//			jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
-		//		}
-		//		else {
-		//			jQuery("#svg-graph-preview").css("top", 0);
-		//			jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", 0);
-		//		}
-		//	}
-		//	else {
-		//		jQuery(".overlay-dialogue-body").off("scroll");
-		//	}
-		//});
+		// jQuery(".overlay-dialogue-body").on("scroll", function() {
+		// 	if (jQuery("#svg-graph-preview").length) {
+		// 		const $dialogue_body = jQuery(this);
+		// 		const $preview_container = jQuery(".<?//= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>//");
 
-		//jQuery(`#${this.form_tabs}`).on("change", "input, z-select, .multiselect", () => this.onGraphConfigChange());
-		//
-		//
-		//this.onGraphConfigChange();
-		//
-		//$(".overlay-dialogue").on("overlay-dialogue-resize", (event, size_new, size_old) => {
-		//	if (jQuery("#svg-graph-preview").length) {
-		//		if (size_new.width != size_old.width) {
-		//			this.onGraphConfigChange();
-		//		}
-		//	} else {
-		//		$(".overlay-dialogue").off("overlay-dialogue-resize");
-		//	}
-		//});
+		// 		if ($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 400) {
+		// 			jQuery("#svg-graph-preview").css("top", $dialogue_body.offset().top - $preview_container.offset().top);
+		// 			jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
+		// 		}
+		// 		else {
+		// 			jQuery("#svg-graph-preview").css("top", 0);
+		// 			jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", 0);
+		// 		}
+		// 	}
+		// 	else {
+		// 		jQuery(".overlay-dialogue-body").off("scroll");
+		// 	}
+		// });
 
-		document.querySelector('.js-add-item').addEventListener('click', () => this._selectItems());
+		jQuery(`#${this.form_tabs}`).on("change", "input, z-select, .multiselect", () => this.onGraphConfigChange());
+
+		this.onGraphConfigChange();
+
+		$(".overlay-dialogue").on("overlay-dialogue-resize", (event, size_new, size_old) => {
+			if (jQuery("#svg-graph-preview").length) {
+				if (size_new.width != size_old.width) {
+					this.onGraphConfigChange();
+				}
+			} else {
+				$(".overlay-dialogue").off("overlay-dialogue-resize");
+			}
+		});
+
+
+		// Initialize vertical accordion.
+		jQuery("#data_sets")
+			.on("focus", ".<?= CMultiSelect::ZBX_STYLE_CLASS ?> input.input, .js-click-expend, .color-picker-preview", function() {
+				jQuery("#data_sets").zbx_vertical_accordion("expandNth",
+					jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index()
+				);
+			})
+			.on("collapse", function(event, data) {
+				jQuery("textarea, .multiselect", data.section).scrollTop(0);
+				jQuery(window).trigger("resize");
+			})
+			.on("expand", function() {
+				jQuery(window).trigger("resize");
+			})
+			.zbx_vertical_accordion({handler: ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>"});
+
+		// Initialize rangeControl UI elements.
+		jQuery(".<?= CRangeControl::ZBX_STYLE_CLASS ?>", jQuery("#data_sets")).rangeControl();
+
+		// Expand dataset when click in pattern fields.
+		jQuery("#data_sets").on("click", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= CMultiSelect::ZBX_STYLE_CLASS ?>, .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= ZBX_STYLE_BTN_GREY ?>", function(event) {
+			jQuery("#data_sets").zbx_vertical_accordion("expandNth",
+				jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index());
+
+			jQuery(event.currentTarget).find("input.input").focus();
+		});
+
+		// Initialize pattern fields.
+		jQuery(".multiselect", jQuery("#data_sets")).each(function() {
+			jQuery(this).multiSelect(jQuery(this).data("params"));
+		});
+
+		// Initialize color-picker UI elements.
+		jQuery(".<?= ZBX_STYLE_COLOR_PICKER ?> input").colorpicker({onUpdate: function(color){
+			jQuery(".<?= ZBX_STYLE_COLOR_PREVIEW_BOX ?>", jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>"))
+				.css("background-color", "#"+color);
+		}, appendTo: ".overlay-dialogue-body"});
+
+		this.initDataSetSortable();
+
+		jQuery(".overlay-dialogue-body").on("change", "z-select[id$=\"aggregate_function\"]", (e) => {
+			changeDataSetAggregateFunction(e.target);
+		});
+
+		document.getElementById('data_sets').addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-add-item')) {
+				this._selectItems();
+			}
+
+			if (e.target.classList.contains('element-table-remove')) {
+				this.removeSingleItem(e.target);
+			}
+
+			if (e.target.classList.contains('btn-remove')) {
+				this.removeDataSet(e.target);
+			}
+		});
+
+		document
+			.getElementById('dataset-add')
+			.addEventListener('click', () => this._addDataset(1));
 
 		document
 			.getElementById('dataset-menu')
-			.addEventListener('click', this._addDataset);
+			.addEventListener('click', this._addDatasetMenu);
 	}
-
-
 
 	_selectItems() {
 		const overlay = PopUp("popup.generic", {
 			srctbl: 'items',
 			srcfld1: 'itemid',
 			srcfld2: 'name',
-			dstfrm: 'graphForm',
+			dstfrm: this.form_id,
 			numeric: 1,
 			writeonly: 1,
 			multiselect: 1,
 			with_webitems: 1,
 			real_hosts: 1
 		});
-
 		overlay.$dialogue[0].addEventListener('overlay.submit', (e) => {
 			console.log(e.detail);
 		});
 	}
-
-
-
-
 
 	_timePeriodTabInit() { // TODO: Time period tab - update controls enable status on 'Set custom time period' checkbox change
 		jQuery("#time_from, #time_to, #time_from_calendar, #time_to_calendar")
@@ -119,19 +174,21 @@ window.widget_svggraph_form = new class {
 		jQuery("input, button, z-select", jQuery("#tags_table_tags", widget)).prop("disabled", !on);
 	}
 
-	_addDataset(e) {
+	_addDatasetMenu(e) {
 		const menu = [
 			{
 				items: [
 					{
 						label: <?= json_encode(_('Item pattern')) ?>,
-						clickCallback: (event) => {
-							//debugger;
+						clickCallback: () => {
+							widget_svggraph_form._addDataset(1)
 						}
 					},
 					{
 						label: <?= json_encode(_('Item list')) ?>,
-						clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
+						clickCallback: () => {
+							widget_svggraph_form._addDataset(0)
+						}
 					}
 				]
 			},
@@ -139,7 +196,9 @@ window.widget_svggraph_form = new class {
 				items: [
 					{
 						label: <?= json_encode(_('Clone')) ?>,
-						clickCallback: () => ZABBIX.Dashboard.addNewDashboardPage()
+						clickCallback: () => {
+							// TODO: clone function
+						}
 					}
 				]
 			}
@@ -153,6 +212,69 @@ window.widget_svggraph_form = new class {
 				within: '.wrapper'
 			}
 		});
+	}
+
+	_addDataset(type) {
+		const row_numb = jQuery('#data_sets .list-accordion-item').length;
+		const container = jQuery(".overlay-dialogue-body");
+
+		let template = new Template(jQuery('#dataset-single-item-tmpl').html());
+
+		if (type == 1) {
+			template = new Template(jQuery('#dataset-pattern-item-tmpl').html());
+		}
+
+		jQuery("#data_sets").zbx_vertical_accordion("collapseAll");
+
+		jQuery('#data_sets .list-accordion-foot').before(template.evaluate({rowNum: row_numb, color: colorPalette.getNextColor()}));
+
+		container.scrollTop(Math.max(container.scrollTop(),
+			jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
+		));
+
+		jQuery(".<?= ZBX_STYLE_COLOR_PICKER ?> input").colorpicker({onUpdate: function(color) {
+			jQuery(".<?= ZBX_STYLE_COLOR_PREVIEW_BOX ?>",
+					jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>")
+			).css("background-color", "#"+color);
+		}, appendTo: ".overlay-dialogue-body"});
+
+		jQuery(".multiselect", jQuery("#data_sets")).each(function() {
+			jQuery(this).multiSelect(jQuery(this).data("params"));
+		});
+
+		jQuery(".<?= CRangeControl::ZBX_STYLE_CLASS ?>", jQuery("#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>")).rangeControl();
+
+		widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
+		widget_svggraph_form.onGraphConfigChange();
+
+		widget_svggraph_form.initDataSetSortable();
+
+		colorPalette.incrementNextColor();
+	}
+
+	removeDataSet(obj) {
+		let i = 0;
+
+		obj
+			.closest('.list-accordion-item')
+			.remove();
+
+		[...document.querySelectorAll('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')].map((elem) => {
+			elem.dataset.set = i;
+
+			if (elem.querySelector('.single-item-table')) {
+				elem.querySelector('.single-item-table').dataset.set = i;
+			}
+
+			i++;
+		});
+
+		this.updateVariableOrder(jQuery("#data_sets"), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
+		this.recalculateSortOrder();
+	}
+
+	getDataSetNumber() {
+		return jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]').data('set');
 	}
 
 	onLeftYChange() {
@@ -294,4 +416,210 @@ window.widget_svggraph_form = new class {
 			});
 		});
 	}
+
+	initDataSetSortable() {
+		// Initialize sorting.
+		if (jQuery("#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").length == 1) {
+			jQuery("#data_sets .js-main-drag-icon").addClass("disabled");
+		}
+		else {
+			jQuery("#data_sets .js-main-drag-icon").removeClass("disabled");
+		}
+
+		jQuery("#data_sets").sortable({
+			disabled: jQuery("#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").length < 2,
+			items: ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>",
+			containment: "parent",
+			handle: ".js-main-drag-icon",
+			tolerance: "pointer",
+			scroll: false,
+			cursor: "grabbing",
+			opacity: 0.6,
+			axis: "y",
+			start: function() { // Workaround to fix wrong scrolling at initial sort.
+				jQuery(this).sortable("refreshPositions");
+			},
+			stop: () => widget_svggraph_form.onGraphConfigChange(),
+			update: function() {
+				widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
+			}
+		});
+	}
+
+	initSingleItemSortable() {
+		const dataset_number = widget_svggraph_form.getDataSetNumber();
+
+		if (jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row').length == 1) {
+			jQuery('.single-item-table[data-set='+dataset_number+'] .<?= ZBX_STYLE_DRAG_ICON ?>').addClass("disabled");
+		}
+		else {
+			jQuery('.single-item-table[data-set=' + dataset_number + '] .<?= ZBX_STYLE_DRAG_ICON ?>')
+				.removeClass("disabled");
+		}
+
+
+		jQuery('.single-item-table[data-set='+dataset_number+']').sortable({
+			disabled: jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row').length < 2,
+			items: 'tbody .single-item-table-row',
+			axis: 'y',
+			containment: 'parent',
+			cursor: 'grabbing',
+			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			tolerance: 'pointer',
+			opacity: 0.6,
+			update: this.recalculateSortOrder,
+			helper: (e, ui) => {
+				for (const td of ui.find('>td')) {
+					const $td = $(td);
+					$td.attr('width', $td.width())
+				}
+
+				// When dragging element on safari, it jumps out of the table.
+				if (SF) {
+					// Move back draggable element to proper position.
+					ui.css('left', (ui.offset().left - 2) + 'px');
+				}
+
+				return ui;
+			},
+			stop: (e, ui) => {
+				ui.item.find('>td').removeAttr('width');
+			},
+			start: (e, ui) => {
+				$(ui.placeholder).height($(ui.helper).height());
+			}
+		});
+	}
+
+	rewriteNameLinks() {
+		const dataset_number = widget_svggraph_form.getDataSetNumber();
+		const size = jQuery('.single-item-table[data-set='+dataset_number+'] .single-item-table-row').length + 1;
+
+		for (let i = 0; i < size; i++) {
+			const parameters = {
+				srctbl: "items",
+				srcfld1: 'itemid',
+				srcfld2: 'name',
+				dstfrm: widget_svggraph_form.form_id,
+				dstfld1: `items_${dataset_number}_${i}_input`,
+				dstfld2: `items_${dataset_number}_${i}_name`,
+				numeric: 1,
+				writeonly: 1,
+				multiselect: 1,
+				with_webitems: 1,
+				real_hosts: 1
+			};
+
+			$('#items_' + dataset_number + '_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
+				JSON.stringify(parameters) + ',' +
+				'{dialogue_class: "modal-popup-generic"});'
+			);
+		}
+	}
+
+	removeSingleItem(obj) {
+		const table_row = obj.closest('.single-item-table-row');
+
+		table_row.remove();
+
+		this.recalculateSortOrder();
+	}
+
+	recalculateSortOrder() {
+		const dataset_number = widget_svggraph_form.getDataSetNumber();
+		let i = 1;
+
+		jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row').each(function () {
+			const $obj = jQuery(this);
+
+			$obj.data('number', i);
+
+			jQuery('.color-picker input', $obj).attr('id', `items_${dataset_number}_${i}_color`);
+			jQuery('.color-picker button', $obj).attr('id', `lbl_items_${dataset_number}_${i}_color`);
+
+			jQuery('.table-col-name a', $obj).attr('id', `items_${dataset_number}_${i}_name`);
+
+			jQuery('.table-col-action input', $obj).attr('id', `items_${dataset_number}_${i}_input`);
+
+			jQuery('.table-col-no span', $obj).text(i + ':');
+
+			i++;
+		});
+
+		widget_svggraph_form.rewriteNameLinks();
+	}
+};
+
+window.addPopupValues = (list) => {
+	if (!isset('object', list) || list.object != 'itemid') {
+		return false;
+	}
+
+	const dataset_number = widget_svggraph_form.getDataSetNumber();
+	const tmpl = new Template(jQuery('#dataset-item-row-tmpl').html());
+
+	for (let i = 0; i < list.values.length; i++) {
+		const size = jQuery('.single-item-table[data-set='+dataset_number+'] .single-item-table-row').length + 1;
+		const value = list.values[i];
+		const name = value.name;
+		const itemid = value.itemid;
+
+		jQuery('.single-item-table[data-set='+dataset_number+'] tbody').append(tmpl.evaluate({
+			dsNum: dataset_number,
+			rowNum: size,
+			name: name,
+			itemid: itemid
+		}));
+		jQuery(`#items_${dataset_number}_${size}_color`).val(colorPalette.getNextColor());
+		jQuery(`#items_${dataset_number}_${size}_color`).colorpicker();
+
+		widget_svggraph_form.rewriteNameLinks();
+		widget_svggraph_form.initSingleItemSortable();
+	}
+}
+
+function changeDataSetDrawType(obj) {
+	const row_num = obj.id.replace("ds_", "").replace("_type", "");
+
+	switch (jQuery(":checked", jQuery(obj)).val()) {
+		case "<?= SVG_GRAPH_TYPE_POINTS ?>":
+			jQuery("#ds_" + row_num + "_width").rangeControl("disable");
+			jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");
+			jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");
+			jQuery("#ds_" + row_num + "_fill").rangeControl("disable");
+			jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);
+			jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
+			jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
+			jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
+			break;
+		case "<?= SVG_GRAPH_TYPE_BAR ?>":
+			jQuery("#ds_" + row_num + "_width").rangeControl("disable");
+			jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");
+			jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");
+			jQuery("#ds_" + row_num + "_fill").rangeControl("disable");
+			jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);
+			jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
+			jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
+			jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
+			break;
+		default:
+			jQuery("#ds_" + row_num + "_width").rangeControl("enable");
+			jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");
+			jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");
+			jQuery("#ds_" + row_num + "_fill").rangeControl("enable");
+			jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);
+			jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);
+			jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);
+			jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", false);
+			break;
+	}
+};
+
+function changeDataSetAggregateFunction(obj) {
+	const row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");
+	const no_aggregation = (jQuery(obj).val() == <?= AGGREGATE_NONE ?>);
+
+	jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);
+	jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);
+	jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);
 };

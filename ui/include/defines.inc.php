@@ -1427,6 +1427,7 @@ define('API_UNEXPECTED',			51);
 define('API_INT32_RANGES',			53);
 define('API_LAT_LNG_ZOOM',			54);
 define('API_TIMESTAMP',				55);
+define('API_COLORS',				56);
 
 // flags
 define('API_REQUIRED',					0x00001);
