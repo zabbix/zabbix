@@ -2376,7 +2376,7 @@ class CHost extends CHostGeneral {
 		unset($host);
 
 		$this->addAffectedTags($hosts, $db_hosts);
-		self::checkTags($hosts, $db_hosts);
+		self::checkTags($hosts);
 
 		if (array_key_exists('host', $host_names) || array_key_exists('name', $host_names)) {
 			$filter = [];
@@ -2446,12 +2446,11 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
+	 * @param array $hosts
 	 *
 	 * @throws APIException
 	 */
-	private static function checkTags(array $hosts, array $db_hosts = null): void {
+	private static function checkTags(array &$hosts): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'tags' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
 				'tag' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
