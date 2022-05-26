@@ -235,6 +235,7 @@ class CControllerHostEdit extends CController {
 				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC;
 
 				$macro['original'] = [
+					'macro' => $macro['macro'],
 					'value' => getMacroConfigValue($macro),
 					'description' => $macro['description'],
 					'type' => $macro['type']
