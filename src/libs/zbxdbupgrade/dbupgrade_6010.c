@@ -574,36 +574,36 @@ static void	DBpatch_6010033_hstgrp_free(hstgrp_t *hstgrp)
 
 static int	DBpatch_6010033_update_group_type(hstgrp_t *hstgrp)
 {
-	int	ret = SUCCEED;
-
 	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where groupid=" ZBX_FS_UI64,
 			hstgrp->type, hstgrp->groupid))
 	{
-		ret = FAIL;
+		return FAIL;
 	}
 
-	return ret;
+	return SUCCEED;
 }
 
 static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps, int *type)
 {
 	int	i;
+	size_t	g_sz;
+
+	g_sz = strlen(name);
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
-		size_t	t_sz, g_sz;
-		char	tmp[256 * ZBX_MAX_BYTES_IN_UTF8_CHAR];
+		size_t	t_sz;
+		char	tmp[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 		t_sz = strlen(hstgrps->values[i]->name);
-		g_sz = strlen(name);
 
 		if (g_sz == t_sz)
 			continue;
 
-		if (t_sz < g_sz)
+		if (g_sz > t_sz)
 		{
-			zbx_strlcpy(tmp, hstgrps->values[i]->name, sizeof(tmp));
-			zbx_strlcat(tmp, "/", sizeof(tmp));
+			strscpy(tmp, hstgrps->values[i]->name);
+			strscat(tmp, "/");
 
 			if (0 == strncmp(tmp, name, strlen(tmp)))
 			{
@@ -613,8 +613,8 @@ static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps,
 		}
 		else
 		{
-			zbx_strlcpy(tmp, name, sizeof(tmp));
-			zbx_strlcat(tmp, "/", sizeof(tmp));
+			strscpy(tmp, name);
+			strscat(tmp, "/");
 
 			if (0 == strncmp(tmp, hstgrps->values[i]->name, strlen(tmp)))
 			{
@@ -760,7 +760,6 @@ static int	DBpatch_6010033_split_groups(void)
 		hstgrp_t	*hstgrp;
 
 		hstgrp = (hstgrp_t *)zbx_malloc(NULL, sizeof(hstgrp_t));
-		memset(hstgrp, 0, sizeof(hstgrp_t));
 
 		ZBX_STR2UINT64(hstgrp->groupid, row[0]);
 		hstgrp->name = zbx_strdup(NULL, row[1]);
@@ -806,9 +805,9 @@ static int	DBpatch_6010033_split_groups(void)
 
 	for (i = 0; i < hstgrps.values_num; i++)
 	{
-		has_hosts = zbx_vector_uint64_search(&host_groupids, hstgrps.values[i]->groupid,
+		has_hosts = zbx_vector_uint64_bsearch(&host_groupids, hstgrps.values[i]->groupid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		has_templates = zbx_vector_uint64_search(&template_groupids, hstgrps.values[i]->groupid,
+		has_templates = zbx_vector_uint64_bsearch(&template_groupids, hstgrps.values[i]->groupid,
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		if (FAIL == has_hosts && FAIL == has_templates)
