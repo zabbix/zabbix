@@ -126,8 +126,8 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				$host = array_intersect_key($host,
 					array_flip(['hostid', 'status', 'inventory', 'description', 'templates', 'templates_clear',
 						'macros'
-					]
-				));
+					])
+				);
 			}
 
 			$hostids = API::Host()->update($host);

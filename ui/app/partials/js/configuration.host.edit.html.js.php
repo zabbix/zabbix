@@ -32,7 +32,9 @@
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}'),
 				new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN),
-				new CInput('hidden', 'macros[#{rowNum}][discovery_state]', CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
+				new CInput('hidden', 'macros[#{rowNum}][discovery_state]',
+					CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
+				)
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
@@ -80,7 +82,9 @@
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}'),
-				new CInput('hidden', 'macros[#{rowNum}][discovery_state]', CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
+				new CInput('hidden', 'macros[#{rowNum}][discovery_state]',
+					CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
+				)
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
