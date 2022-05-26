@@ -485,22 +485,6 @@ static int	DBpatch_6010026(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6010027(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update profiles"
-			" set idx='web.auditlog.filter.actions'"
-			" where idx='web.auditlog.filter.action'"))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static int	DBpatch_6010028(void)
 {
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
@@ -873,29 +857,27 @@ static int	DBpatch_6010033(void)
 	return DBpatch_6010033_split_groups();
 }
 
-#define RENAME_PROFILE(old, new)								\
-												\
-do {												\
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='" #new "' where idx='" #old "'"))	\
-	{											\
-		ret = FAIL;									\
-		goto out;									\
-	}											\
-} while (0)
-
 static int	DBpatch_6010034(void)
 {
-	int ret = SUCCEED;
+	int		i;
+	const char	*values[] = {
+			"web.auditlog.filter.actions", "web.auditlog.filter.action",
+			"web.hostgroups.php.sort", "web.hostgroups.sort",
+			"web.hostgroups.php.sortorder", "web.hostgroups.sortorder",
+			"web.groups.filter_name", "web.hostgroups.filter_name",
+			"web.groups.filter.active", "web.hostgroups.filter.active",
+		};
 
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return ret;
+		return SUCCEED;
 
-	RENAME_PROFILE(web.hostgroups.php.sort, web.hostgroups.sort);
-	RENAME_PROFILE(web.hostgroups.php.sortorder, web.hostgroups.sortorder);
-	RENAME_PROFILE(web.groups.filter_name, web.hostgroups.filter_name);
-	RENAME_PROFILE(web.groups.filter.active, web.hostgroups.filter.active);
-out:
-	return ret;
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 #undef RENAME_PROFILE
@@ -939,7 +921,6 @@ DBPATCH_ADD(6010023, 0, 1)
 DBPATCH_ADD(6010024, 0, 1)
 DBPATCH_ADD(6010025, 0, 1)
 DBPATCH_ADD(6010026, 0, 1)
-DBPATCH_ADD(6010027, 0, 1)
 DBPATCH_ADD(6010028, 0, 1)
 DBPATCH_ADD(6010029, 0, 1)
 DBPATCH_ADD(6010030, 0, 1)
