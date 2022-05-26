@@ -563,7 +563,7 @@ static int	DBpatch_6010033_update_group_type(hstgrp_t *hstgrp)
 
 static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps, int *type)
 {
-	int	i, last_type, found = 0;
+	int	i, last_type = FAIL;
 	size_t	g_sz;
 
 	g_sz = strlen(name);
@@ -586,41 +586,32 @@ static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps,
 			strscpy(tmp, hstgrps->values[i]->name);
 			strscat(tmp, "/");
 
-			if (0 == strncmp(tmp, name, strlen(tmp)))
-			{
-				if (0 != i && last_type != hstgrps->values[i]->type)
-				{
-					*type = DBPATCH_HOSTGROUP_TYPE_MIXED;
-					return SUCCEED;
-				}
-
-				last_type = hstgrps->values[i]->type;
-				found = 1;
-			}
+			if (0 != strncmp(tmp, name, strlen(tmp)))
+				continue;
 		}
 		else
 		{
 			strscpy(tmp, name);
 			strscat(tmp, "/");
 
-			if (0 == strncmp(tmp, hstgrps->values[i]->name, strlen(tmp)))
-			{
-				if (0 != i && last_type != hstgrps->values[i]->type)
-				{
-					*type = DBPATCH_HOSTGROUP_TYPE_MIXED;
-					return SUCCEED;
-				}
-
-				last_type = hstgrps->values[i]->type;
-				found = 1;
-			}
+			if (0 != strncmp(tmp, hstgrps->values[i]->name, strlen(tmp)))
+				continue;
 		}
+
+		if (FAIL != last_type && last_type != hstgrps->values[i]->type)
+		{
+			*type = DBPATCH_HOSTGROUP_TYPE_MIXED;
+			return SUCCEED;
+		}
+
+		last_type = hstgrps->values[i]->type;
 	}
 
-	if (0 == found)
+	if (FAIL == last_type)
 		return FAIL;
 
 	*type = last_type;
+
 	return SUCCEED;
 }
 
@@ -649,15 +640,13 @@ static int	DBpatch_6010033_update_empty(zbx_vector_hstgrp_t *hstgrps)
 
 static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 {
-	int			i, new_count = 0, permission, ret = SUCCEED;
+	int			i, permission, new_count = 0, ret = SUCCEED;
 	zbx_uint64_t		nextid, groupid;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_db_insert_t		db_insert;
-
-	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
@@ -666,8 +655,9 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 	}
 
 	if (0 == new_count)
-		goto out;
+		return SUCCEED;
 
+	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
 	nextid = DBget_maxid_num("hstgrp", new_count);
 
 	for (i = 0; i < hstgrps->values_num; i++)
