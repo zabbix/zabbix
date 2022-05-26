@@ -837,7 +837,6 @@ class testSID extends CWebTest {
 				'link' => 'zabbix.php?action=hostgroup.create&name=aaaaaaa',
 				'json_output' => true
 			]],
-
 			// Host group update.
 			[[
 				'link' => 'zabbix.php?action=hostgroup.update&name=aaabbb&groupid=6',
@@ -863,7 +862,6 @@ class testSID extends CWebTest {
 				'link' => 'zabbix.php?action=templategroup.create&name=aaa',
 				'json_output' => true
 			]],
-
 			// Template group update.
 			[[
 				'link' => 'zabbix.php?action=templategroup.update&name=aaabbb&groupid=14',
