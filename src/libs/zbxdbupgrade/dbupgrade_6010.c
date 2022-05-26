@@ -526,7 +526,7 @@ static int	DBpatch_6010028(void)
 #define DBPATCH_TPLGRP_GROUPIDS	DBPATCH_GROUPIDS("=")
 #define DBPATCH_HSTGRP_GROUPIDS	DBPATCH_GROUPIDS("<>")
 #define DBPATCH_HSTPROTO_GROUPIDS								\
-		"select groupid from group_prototype where groupid is not null"
+		"select distinct groupid from group_prototype where groupid is not null"
 
 #define	HOSTGROUP_TYPE_EMPTY	2
 #define HOSTGROUP_TYPE_MIXED	3
