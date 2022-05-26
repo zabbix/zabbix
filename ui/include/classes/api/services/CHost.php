@@ -1717,26 +1717,30 @@ class CHost extends CHostGeneral {
 		}
 
 		if ($options['selectTags'] !== null) {
+			foreach ($result as &$row) {
+				$row['tags'] = [];
+			}
+			unset($row);
+
 			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$options['selectTags'] = ['tag', 'value', 'automatic'];
+				$output = ['hosttagid', 'hostid', 'tag', 'value', 'automatic'];
+			}
+			else {
+				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
 			}
 
-			$tags_options = [
-				'output' => $this->outputExtend($options['selectTags'], ['hostid']),
-				'filter' => ['hostid' => $hostids]
+			$sql_options = [
+				'output' => $output,
+				'filter' => ['hostid' => array_keys($result)]
 			];
+			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
 
-			foreach ($result as &$host) {
-				$host['tags'] = [];
-			}
-			unset($host);
+			while ($db_tag = DBfetch($db_tags)) {
+				$hostid = $db_tag['hostid'];
 
-			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
+				unset($db_tag['hosttagid'], $db_tag['hostid']);
 
-			while ($tag = DBfetch($tags)) {
-				$hostid = $tag['hostid'];
-				unset($tag['hosttagid'], $tag['hostid']);
-				$result[$hostid]['tags'][] = $tag;
+				$result[$hostid]['tags'][] = $db_tag;
 			}
 		}
 

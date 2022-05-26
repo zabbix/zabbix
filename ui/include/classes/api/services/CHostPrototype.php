@@ -312,15 +312,31 @@ class CHostPrototype extends CHostBase {
 
 		// adding tags
 		if ($options['selectTags'] !== null) {
-			$tags = API::getApiService()->select('host_tag', [
-				'output' => $this->outputExtend($options['selectTags'], ['hostid', 'hosttagid']),
-				'filter' => ['hostid' => $hostids],
-				'preservekeys' => true
-			]);
+			foreach ($result as &$row) {
+				$row['tags'] = [];
+			}
+			unset($row);
 
-			$relation_map = $this->createRelationMap($tags, 'hostid', 'hosttagid');
-			$tags = $this->unsetExtraFields($tags, ['hostid', 'hosttagid'], []);
-			$result = $relation_map->mapMany($result, $tags, 'tags');
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$output = ['hosttagid', 'hostid', 'tag', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
+			}
+
+			$sql_options = [
+				'output' => $output,
+				'filter' => ['hostid' => array_keys($result)]
+			];
+			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$hostid = $db_tag['hostid'];
+
+				unset($db_tag['hosttagid'], $db_tag['hostid']);
+
+				$result[$hostid]['tags'][] = $db_tag;
+			}
 		}
 
 		if ($options['selectInterfaces'] !== null) {
