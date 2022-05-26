@@ -724,13 +724,6 @@ int	zbx_db_mock_field_append(zbx_db_mock_field_t *field, const char *text);
 int	zbx_db_check_instanceid(void);
 
 /* tags */
-typedef enum
-{
-	ZBX_TAG_MANUAL = 0,
-	ZBX_TAG_AUTOMATIC = 1
-}
-zbx_tag_type_t;
-
 typedef struct
 {
 	zbx_uint64_t	tagid;
@@ -741,24 +734,45 @@ typedef struct
 #define ZBX_FLAG_DB_TAG_UNSET			__UINT64_C(0x00000000)
 #define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000001)
 #define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000002)
-#define ZBX_FLAG_DB_TAG_UPDATE_TYPE		__UINT64_C(0x00000004)
+#define ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC	__UINT64_C(0x00000004)
 #define ZBX_FLAG_DB_TAG_REMOVE			__UINT64_C(0x80000000)
 #define ZBX_FLAG_DB_TAG_UPDATE	(ZBX_FLAG_DB_TAG_UPDATE_TAG |	\
 		ZBX_FLAG_DB_TAG_UPDATE_VALUE |			\
-		ZBX_FLAG_DB_TAG_UPDATE_TYPE)
+		ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC)
 	zbx_uint64_t	flags;
-	zbx_tag_type_t	tag_type_orig;
-	zbx_tag_type_t	tag_type;
 }
 zbx_db_tag_t;
 
+#define ZBX_TAG_MANUAL		0
+#define ZBX_TAG_AUTOMATIC	1
+
+typedef struct
+{
+	zbx_uint64_t	tagid;
+	char		*tag_orig;
+	char		*tag;
+	char		*value_orig;
+	char		*value;
+	unsigned char	automatic_orig;
+	unsigned char	automatic;
+	/* the same as flags in zbx_db_tag_t */
+	zbx_uint64_t	flags;
+}
+zbx_db_host_tag_t;
+
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
-zbx_db_tag_t	*zbx_db_host_tag_create(const char *tag_tag, const char *tag_value, zbx_tag_type_t tag_type);
 void		zbx_db_tag_free(zbx_db_tag_t *tag);
 int		zbx_db_tag_compare_func(const void *d1, const void *d2);
 int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
 ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
+
+zbx_db_host_tag_t	*zbx_db_host_tag_create(const char *tag_tag, const char *tag_value,
+		unsigned char tag_automatic);
+void	zbx_db_host_tag_free(zbx_db_host_tag_t *tag);
+int	zbx_db_host_tag_compare_func(const void *d1, const void *d2);
+
+ZBX_PTR_VECTOR_DECL(db_host_tag_ptr, zbx_db_host_tag_t *)
 
 typedef enum
 {

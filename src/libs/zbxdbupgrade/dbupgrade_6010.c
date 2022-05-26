@@ -484,9 +484,14 @@ static int	DBpatch_6010026(void)
 
 static int	DBpatch_6010027(void)
 {
-	/* set ZBX_TAG_AUTOMATIC as automatic */
-	if (ZBX_DB_OK > DBexecute("update host_tag set automatic=1"
-			" where hostid in (select hostid from host_discovery where parent_hostid is not null)"))
+	if (ZBX_DB_OK > DBexecute(
+			"update host_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where hostid in ("
+				" select hostid"
+				" from host_discovery"
+				" where parent_hostid is not null"
+			")"))
 	{
 		return FAIL;
 	}

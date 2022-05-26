@@ -2012,7 +2012,7 @@ typedef struct
 	zbx_vector_uint64_t	lnk_templateids;	/* list of templates which should be linked */
 	zbx_vector_ptr_t	group_prototypes;	/* list of group prototypes */
 	zbx_vector_macros_t	hostmacros;		/* list of user macros */
-	zbx_vector_db_tag_ptr_t	tags;			/* list of host prototype tags */
+	zbx_vector_db_host_tag_ptr_t	tags;		/* list of host prototype tags */
 	zbx_vector_interfaces_t	interfaces;		/* list of interfaces */
 	char			*host;
 	char			*name_orig;
@@ -2102,8 +2102,8 @@ static void	DBhost_prototype_clean(zbx_host_prototype_t *host_prototype)
 	zbx_free(host_prototype->host);
 	zbx_vector_macros_clear_ext(&host_prototype->hostmacros, DBhost_macro_free);
 	zbx_vector_macros_destroy(&host_prototype->hostmacros);
-	zbx_vector_db_tag_ptr_clear_ext(&host_prototype->tags, zbx_db_tag_free);
-	zbx_vector_db_tag_ptr_destroy(&host_prototype->tags);
+	zbx_vector_db_host_tag_ptr_clear_ext(&host_prototype->tags, zbx_db_host_tag_free);
+	zbx_vector_db_host_tag_ptr_destroy(&host_prototype->tags);
 	zbx_vector_interfaces_clear_ext(&host_prototype->interfaces, DBhost_interface_free);
 	zbx_vector_interfaces_destroy(&host_prototype->interfaces);
 	DBgroup_prototypes_clean(&host_prototype->group_prototypes);
@@ -2189,7 +2189,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		zbx_vector_uint64_create(&host_prototype->lnk_templateids);
 		zbx_vector_ptr_create(&host_prototype->group_prototypes);
 		zbx_vector_macros_create(&host_prototype->hostmacros);
-		zbx_vector_db_tag_ptr_create(&host_prototype->tags);
+		zbx_vector_db_host_tag_ptr_create(&host_prototype->tags);
 		zbx_vector_interfaces_create(&host_prototype->interfaces);
 		host_prototype->host = zbx_strdup(NULL, row[2]);
 		host_prototype->name = zbx_strdup(NULL, row[3]);
@@ -2970,7 +2970,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		hostid, tagid;
 	zbx_host_prototype_t	*host_prototype = NULL;
-	zbx_db_tag_t		*tag;
+	zbx_db_host_tag_t	*tag;
 	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2983,7 +2983,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 		zbx_vector_uint64_append(&hostids, ((zbx_host_prototype_t *)host_prototypes->values[i])->templateid);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hostid,tag,value"
+			"select hostid,tag,value,automatic"
 			" from host_tag"
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
@@ -3007,9 +3007,9 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 			host_prototype = (zbx_host_prototype_t *)host_prototypes->values[i];
 		}
 
-		tag = zbx_db_tag_create(row[1], row[2]);
+		tag = zbx_db_host_tag_create(row[1], row[2], (unsigned char)atoi(row[3]));
 		tag->tagid = 0;
-		zbx_vector_db_tag_ptr_append(&host_prototype->tags, tag);
+		zbx_vector_db_host_tag_ptr_append(&host_prototype->tags, tag);
 	}
 	DBfree_result(result);
 
@@ -3492,7 +3492,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 					sql2_alloc = ZBX_KIBIBYTE, sql2_offset = 0;
 	const zbx_group_prototype_t	*group_prototype;
 	const zbx_macros_prototype_t	*hostmacro;
-	zbx_db_tag_t			*tag;
+	zbx_db_host_tag_t		*tag;
 	zbx_interfaces_prototype_t	*interface;
 	zbx_uint64_t			hostid = 0, hosttemplateid = 0, group_prototypeid = 0, new_hostmacroid = 0,
 					hosttagid = 0, interfaceid = 0;
@@ -3503,12 +3503,12 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	zbx_db_insert_t			db_insert, db_insert_hdiscovery, db_insert_gproto,
 					db_insert_hmacro, db_insert_tag, db_insert_iface, db_insert_snmp,
 					db_insert_inventory_mode;
-	zbx_vector_db_tag_ptr_t		upd_tags;
+	zbx_vector_db_host_tag_ptr_t	upd_tags;
 	zbx_vector_uint64_t		del_inventory_modes_hostids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_db_tag_ptr_create(&upd_tags);
+	zbx_vector_db_host_tag_ptr_create(&upd_tags);
 	zbx_vector_uint64_create(&del_inventory_modes_hostids);
 
 	for (i = 0; i < host_prototypes->values_num; i++)
@@ -3572,7 +3572,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			}
 			else if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 			{
-				zbx_vector_db_tag_ptr_append(&upd_tags, tag);
+				zbx_vector_db_host_tag_ptr_append(&upd_tags, tag);
 
 				zbx_audit_host_prototype_update_json_update_tag_create_entry(host_prototype->hostid,
 						tag->tagid);
@@ -3709,7 +3709,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	{
 		hosttagid = DBget_maxid_num("host_tag", new_tags);
 
-		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", NULL);
+		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", "automatic",
+				NULL);
 	}
 
 	if (0 != new_interfaces)
@@ -3962,10 +3963,10 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			if (0 == tag->tagid)
 			{
 				zbx_db_insert_add_values(&db_insert_tag, hosttagid, host_prototype->hostid,
-						tag->tag, tag->value);
+						tag->tag, tag->value, tag->automatic);
 
 				zbx_audit_host_prototype_update_json_add_tag(host_prototype->hostid, hosttagid,
-						tag->tag, tag->value);
+						tag->tag, tag->value, tag->automatic);
 
 				hosttagid++;
 			}
@@ -4105,7 +4106,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 
 	if (0 != upd_tags.values_num)
 	{
-		zbx_vector_db_tag_ptr_sort(&upd_tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+		zbx_vector_db_host_tag_ptr_sort(&upd_tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		for (i = 0; i < upd_tags.values_num; i++)
 		{
@@ -4210,7 +4211,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	zbx_free(sql1);
 	zbx_free(sql2);
 
-	zbx_vector_db_tag_ptr_destroy(&upd_tags);
+	zbx_vector_db_host_tag_ptr_destroy(&upd_tags);
 	zbx_vector_uint64_destroy(&del_inventory_modes_hostids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
