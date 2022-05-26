@@ -576,8 +576,11 @@ static int	DBpatch_6010033_update_group_type(hstgrp_t *hstgrp)
 {
 	int	ret = SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where groupid=" ZBX_FS_UI64, hstgrp->type, hstgrp->groupid))
+	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where groupid=" ZBX_FS_UI64,
+			hstgrp->type, hstgrp->groupid))
+	{
 		ret = FAIL;
+	}
 
 	return ret;
 }
@@ -640,13 +643,10 @@ static int	DBpatch_6010033_update_empty(zbx_vector_hstgrp_t *hstgrps)
 		else
 			hstgrps->values[i]->type = group_type;
 
-		if (SUCCEED != DBpatch_6010033_update_group_type(hstgrps->values[i]))
-		{
-			ret = FAIL;
-			goto out;
-		}
+		if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps->values[i])))
+			break;
 	}
-out:
+
 	return ret;
 }
 
@@ -742,15 +742,12 @@ out:
 
 static int	DBpatch_6010033_split_groups(void)
 {
-	int			i, permission, has_hosts, has_templates, ret = SUCCEED;
-	zbx_uint64_t		nextid, groupid;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	int			i, has_hosts, has_templates, ret = SUCCEED;
+	zbx_uint64_t		groupid;
 	DB_RESULT		result;
 	DB_ROW			row;
 	zbx_vector_hstgrp_t	hstgrps;
 	zbx_vector_uint64_t	host_groupids, template_groupids;
-	zbx_db_insert_t		db_insert;
 
 	zbx_vector_hstgrp_create(&hstgrps);
 	zbx_vector_uint64_create(&host_groupids);
@@ -786,14 +783,14 @@ static int	DBpatch_6010033_split_groups(void)
 	DBfree_result(result);
 
 	result = DBselect(DBPATCH_HSTPROTO_GROUPIDS);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
-
-		if (FAIL == zbx_vector_uint64_search(&host_groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			zbx_vector_uint64_append(&host_groupids, groupid);
+		zbx_vector_uint64_append(&host_groupids, groupid);
 	}
 	DBfree_result(result);
+
 	result = DBselect(DBPATCH_TPLGRP_GROUPIDS);
 
 	while (NULL != (row = DBfetch(result)))
@@ -803,8 +800,9 @@ static int	DBpatch_6010033_split_groups(void)
 	}
 	DBfree_result(result);
 
-	zbx_vector_uint64_sort(&host_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_sort(&template_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&host_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&host_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (i = 0; i < hstgrps.values_num; i++)
 	{
@@ -820,12 +818,14 @@ static int	DBpatch_6010033_split_groups(void)
 		else if (FAIL == has_templates)
 		{
 			hstgrps.values[i]->type = HOSTGROUP_TYPE_HOST;
+
 			if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps.values[i])))
 				goto out;
 		}
 		else if (FAIL == has_hosts)
 		{
 			hstgrps.values[i]->type = HOSTGROUP_TYPE_TEMPLATE;
+
 			if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps.values[i])))
 				goto out;
 		}
@@ -833,9 +833,8 @@ static int	DBpatch_6010033_split_groups(void)
 			hstgrps.values[i]->type = HOSTGROUP_TYPE_MIXED;
 	}
 
-	if (SUCCEED != DBpatch_6010033_update_empty(&hstgrps) ||
-			SUCCEED != DBpatch_6010033_create_template_groups(&hstgrps))
-		goto out;
+	if (SUCCEED == (ret = DBpatch_6010033_update_empty(&hstgrps)))
+		ret = DBpatch_6010033_create_template_groups(&hstgrps);
 out:
 	zbx_vector_uint64_destroy(&host_groupids);
 	zbx_vector_uint64_destroy(&template_groupids);
