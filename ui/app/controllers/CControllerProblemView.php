@@ -58,7 +58,6 @@ class CControllerProblemView extends CControllerProblem {
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
-			'filter_selected' =>		'int32',
 			'filter_reset' =>			'in 1',
 			'counter_index' =>			'ge 0'
 		];
@@ -100,10 +99,9 @@ class CControllerProblemView extends CControllerProblem {
 	}
 
 	protected function doAction() {
-		$inputs = $this->cleanInput($this->getInputAll());
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
 			->read()
-			->setInput($inputs);
+			->setInput($this->cleanInput($this->getInputAll()));
 
 		$filter_tabs = [];
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {

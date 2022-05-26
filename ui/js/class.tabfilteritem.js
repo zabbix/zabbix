@@ -42,6 +42,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._parent = options.parent || null;
 		this._idx_namespace = options.idx_namespace;
 		this._index = options.index;
+		this._unsaved_indicator = null;
 		this._content_container = options.container;
 		this._data = options.data || {};
 		this._template = options.template;
@@ -65,6 +66,20 @@ class CTabFilterItem extends CBaseComponent {
 		if (this._data.filter_show_counter) {
 			this.setCounter('');
 		}
+	}
+
+	/**
+	 * Initialize indicator DOM node for tab unsaved state.
+	 */
+	initUnsavedIndicator() {
+		let green_dot = document.createElement('span');
+
+		green_dot.setAttribute('data-indicator-value', '1');
+		green_dot.setAttribute('data-indicator', 'mark');
+		green_dot.classList.add('display-none');
+		this._target.appendChild(green_dot);
+
+		this._unsaved_indicator = green_dot;
 	}
 
 	/**
@@ -166,6 +181,7 @@ class CTabFilterItem extends CBaseComponent {
 		}
 
 		let edit = document.createElement('a');
+
 		edit.classList.add(TABFILTERITEM_STYLE_EDIT_BTN);
 		edit.addEventListener('click', () => this.openPropertiesDialog({}, this._target));
 		this._target.parentNode.appendChild(edit);
@@ -421,21 +437,6 @@ class CTabFilterItem extends CBaseComponent {
 		this.setBrowserLocation(new URLSearchParams(this._apply_url));
 	}
 
-	showIndicator() {
-		if (!this._target.querySelector("span[data-indicator='mark']")) {
-			let green_dot = document.createElement('span');
-			green_dot.setAttribute('data-indicator-value', '1');
-			green_dot.setAttribute('data-indicator', 'mark');
-			this._target.appendChild(green_dot);
-		}
-	}
-
-	hideIndicator(tab_target) {
-		if (tab_target.querySelector("span[data-indicator='mark']")) {
-			tab_target.querySelector("span[data-indicator='mark']").remove();
-		}
-	}
-
 	/**
 	 * Checks difference between original form values and to be posted values.
 	 * Updates this._unsaved according to check results
@@ -450,9 +451,7 @@ class CTabFilterItem extends CBaseComponent {
 		src_query = new URLSearchParams(src_query);
 		search_params = new URLSearchParams(search_params);
 
-		let ignore_fields = ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action', 'page',
-			'tags[0][operator]', 'inventory[0][field]', 'filter_sortable', 'expanded', 'filter_configurable',
-			'filter_src', 'tab_view', 'uniqid', 'object Object', 'evaltype', 'filter_view_data'];
+		let ignore_fields = ['filter_name', 'filter_custom_time', 'filter_show_counter', 'from', 'to', 'action', 'page'];
 
 		for (const field of ignore_fields) {
 			src_query.delete(field);
@@ -461,14 +460,10 @@ class CTabFilterItem extends CBaseComponent {
 
 		src_query.sort();
 		search_params.sort();
+		this._unsaved = (src_query.toString() !== search_params.toString());
 
-		if (src_query.toString() !== search_params.toString()) {
-			this._unsaved = true;
-			this.showIndicator()
-		}
-		else {
-			this._unsaved = false;
-			this.resetUnsavedState();
+		if (this._unsaved_indicator) {
+			this._unsaved_indicator.classList.toggle('display-none', !this._unsaved);
 		}
 	}
 
@@ -492,7 +487,9 @@ class CTabFilterItem extends CBaseComponent {
 
 		this._src_url = src_query.toString();
 
-		this.hideIndicator(this._target);
+		if (this._unsaved_indicator) {
+			this._unsaved_indicator.classList.add('display-none');
+		}
 	}
 
 	/**
