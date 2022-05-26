@@ -868,7 +868,7 @@ static int	DBpatch_6010034(void)
 {
 	int		i;
 	const char	*values[] = {
-			"web.auditlog.filter.actions", "web.auditlog.filter.action",
+			"web.auditlog.filter.action", "web.auditlog.filter.actions",
 			"web.hostgroups.php.sort", "web.hostgroups.sort",
 			"web.hostgroups.php.sortorder", "web.hostgroups.sortorder",
 			"web.groups.filter_name", "web.hostgroups.filter_name",
