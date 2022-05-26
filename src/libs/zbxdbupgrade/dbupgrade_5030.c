@@ -27,7 +27,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "sysinfo.h"
-#include "zbxhash.h"
+#include "zbxcrypto.h"
 
 /*
  * 5.4 development database patches
