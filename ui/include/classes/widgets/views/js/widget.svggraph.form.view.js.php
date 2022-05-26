@@ -106,6 +106,8 @@ window.widget_svggraph_form = new class {
 			changeDataSetAggregateFunction(e.target);
 		});
 
+		this.rewriteNameLinks();
+
 		document.getElementById('data_sets').addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-add-item')) {
 				this._selectItems();
@@ -492,29 +494,31 @@ window.widget_svggraph_form = new class {
 	}
 
 	rewriteNameLinks() {
-		const dataset_number = widget_svggraph_form.getDataSetNumber();
-		const size = jQuery('.single-item-table[data-set='+dataset_number+'] .single-item-table-row').length + 1;
+		[...document.querySelectorAll('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>[data-set]')].map((elem) => {
+			const dataset_number = elem.dataset.set;
+			const size = jQuery('.single-item-table-row', jQuery(elem)).length + 1;
 
-		for (let i = 0; i < size; i++) {
-			const parameters = {
-				srctbl: "items",
-				srcfld1: 'itemid',
-				srcfld2: 'name',
-				dstfrm: widget_svggraph_form.form_id,
-				dstfld1: `items_${dataset_number}_${i}_input`,
-				dstfld2: `items_${dataset_number}_${i}_name`,
-				numeric: 1,
-				writeonly: 1,
-				multiselect: 1,
-				with_webitems: 1,
-				real_hosts: 1
-			};
+			for (let i = 0; i < size; i++) {
+				const parameters = {
+					srctbl: "items",
+					srcfld1: 'itemid',
+					srcfld2: 'name',
+					dstfrm: widget_svggraph_form.form_id,
+					dstfld1: `items_${dataset_number}_${i}_input`,
+					dstfld2: `items_${dataset_number}_${i}_name`,
+					numeric: 1,
+					writeonly: 1,
+					multiselect: 1,
+					with_webitems: 1,
+					real_hosts: 1
+				};
 
-			$('#items_' + dataset_number + '_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
-				JSON.stringify(parameters) + ',' +
-				'{dialogue_class: "modal-popup-generic"});'
-			);
-		}
+				$('#items_' + dataset_number + '_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
+					JSON.stringify(parameters) + ',' +
+					'{dialogue_class: "modal-popup-generic"});'
+				);
+			}
+		});
 	}
 
 	removeSingleItem(obj) {

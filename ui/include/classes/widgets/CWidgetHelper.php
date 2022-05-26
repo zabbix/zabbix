@@ -1205,8 +1205,7 @@ class CWidgetHelper {
 					(new CCol(
 						(new CColor($field_name.'['.$row_num.'][color][]', $value['color'][$i],
 							'items_'.$row_num.'_'.($i + 1).'_color'
-						))
-							->appendColorPickerJs(false)
+						))->appendColorPickerJs(false)
 					))->addClass('table-col-color'),
 					(new CCol(new CSpan(($i + 1).':')))->addClass('table-col-no'),
 					(new CCol(
@@ -1527,6 +1526,7 @@ class CWidgetHelper {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'name'],
 			'selectHosts' => ['hostid', 'name'],
+			'webitems' => true,
 			'itemids' => $itemids,
 			'preservekeys' => true
 		]);
