@@ -23,7 +23,6 @@
 #include "embed.h"
 #include "duktape.h"
 #include "base64.h"
-#include "sha256crypt.h"
 #include "zbxhash.h"
 #include "zbxcrypto.h"
 
@@ -130,7 +129,7 @@ static char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 			memcpy(buf, ptr, *len);
 			break;
 		default:
-			ptr = duk_require_lstring(ctx, 0, len);
+			ptr = duk_require_lstring(ctx, index, len);
 			buf = zbx_malloc(NULL, *len);
 			memcpy(buf, ptr, *len);
 			break;
@@ -154,19 +153,19 @@ static duk_ret_t	es_md5(duk_context *ctx)
 {
 	char		*str;
 	md5_state_t	state;
-	md5_byte_t	hash[MD5_DIGEST_SIZE];
+	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
 	char		*md5sum;
 	duk_size_t	len;
 
 	str = es_get_buffer_dyn(ctx, 0, &len);
 
-	md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
+	md5sum = (char *)zbx_malloc(NULL, ZBX_MD5_DIGEST_SIZE * 2 + 1);
 
 	zbx_md5_init(&state);
 	zbx_md5_append(&state, (const md5_byte_t *)str, (int)len);
 	zbx_md5_finish(&state, hash);
 
-	es_bin_to_hex(hash, MD5_DIGEST_SIZE, md5sum);
+	es_bin_to_hex(hash, ZBX_MD5_DIGEST_SIZE, md5sum);
 
 	duk_push_string(ctx, md5sum);
 	zbx_free(md5sum);

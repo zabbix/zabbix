@@ -67,7 +67,6 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
