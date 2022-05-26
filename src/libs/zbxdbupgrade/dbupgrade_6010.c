@@ -574,6 +574,9 @@ static void	DBpatch_6010033_hstgrp_free(hstgrp_t *hstgrp)
 
 static int	DBpatch_6010033_update_group_type(hstgrp_t *hstgrp)
 {
+	if (HOSTGROUP_TYPE_MIXED == hstgrp->type)
+		return SUCCEED;
+
 	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where groupid=" ZBX_FS_UI64,
 			hstgrp->type, hstgrp->groupid))
 	{
@@ -585,7 +588,7 @@ static int	DBpatch_6010033_update_group_type(hstgrp_t *hstgrp)
 
 static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps, int *type)
 {
-	int	i;
+	int	i, last_type, found = 0;
 	size_t	g_sz;
 
 	g_sz = strlen(name);
@@ -594,6 +597,9 @@ static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps,
 	{
 		size_t	t_sz;
 		char	tmp[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+		if (HOSTGROUP_TYPE_MIXED == hstgrps->values[i]->type)
+			continue;
 
 		t_sz = strlen(hstgrps->values[i]->name);
 
@@ -607,8 +613,14 @@ static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps,
 
 			if (0 == strncmp(tmp, name, strlen(tmp)))
 			{
-				*type = hstgrps->values[i]->type;
-				return SUCCEED;
+				if (0 != i && last_type != hstgrps->values[i]->type)
+				{
+					*type = HOSTGROUP_TYPE_MIXED;
+					return SUCCEED;
+				}
+
+				last_type = hstgrps->values[i]->type;
+				found = 1;
 			}
 		}
 		else
@@ -618,13 +630,23 @@ static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps,
 
 			if (0 == strncmp(tmp, hstgrps->values[i]->name, strlen(tmp)))
 			{
-				*type = hstgrps->values[i]->type;
-				return SUCCEED;
+				if (0 != i && last_type != hstgrps->values[i]->type)
+				{
+					*type = HOSTGROUP_TYPE_MIXED;
+					return SUCCEED;
+				}
+
+				last_type = hstgrps->values[i]->type;
+				found = 1;
 			}
 		}
 	}
 
-	return FAIL;
+	if (0 == found)
+		return FAIL;
+
+	*type = last_type;
+	return SUCCEED;
 }
 
 static int	DBpatch_6010033_update_empty(zbx_vector_hstgrp_t *hstgrps)
