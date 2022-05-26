@@ -59,16 +59,7 @@ database/postgresql/data.sql
 database/postgresql/schema.sql
 database/postgresql/timescaledb.sql
 database/postgresql/history_pk_prepare.sql
-database/postgresql/tsdb_history_pk_upgrade_with_compression/history_pk.sql
-database/postgresql/tsdb_history_pk_upgrade_with_compression/history_pk_str.sql
-database/postgresql/tsdb_history_pk_upgrade_with_compression/history_pk_text.sql
-database/postgresql/tsdb_history_pk_upgrade_with_compression/history_pk_log.sql
-database/postgresql/tsdb_history_pk_upgrade_with_compression/history_pk_uint.sql
-database/postgresql/tsdb_history_pk_upgrade_no_compression/history_pk.sql
-database/postgresql/tsdb_history_pk_upgrade_no_compression/history_pk_str.sql
-database/postgresql/tsdb_history_pk_upgrade_no_compression/history_pk_text.sql
-database/postgresql/tsdb_history_pk_upgrade_no_compression/history_pk_log.sql
-database/postgresql/tsdb_history_pk_upgrade_no_compression/history_pk_uint.sql
+database/postgresql/tsdb_history_pk_upgrade_*
 database/sqlite3/data.sql
 database/sqlite3/schema.sql
 etc/agent.conf
