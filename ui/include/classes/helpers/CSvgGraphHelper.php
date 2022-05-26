@@ -47,7 +47,8 @@ class CSvgGraphHelper {
 		$errors = [];
 
 		// Find which metrics will be shown in graph and calculate time periods and display options.
-		self::getMetrics($metrics, $options['data_sets']);
+		self::getMetricsPattern($metrics, $options['data_sets']);
+		self::getMetricsItems($metrics, $options['data_sets']);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['overrides']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
@@ -97,13 +98,14 @@ class CSvgGraphHelper {
 		];
 	}
 
-	/**
-	 * Select metrics from given data set options. Apply data set options to each selected metric.
-	 */
-	private static function getMetrics(array &$metrics, array $data_sets): void {
+	private static function getMetricsPattern(array &$metrics, array $data_sets): void {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
+			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+				continue;
+			}
+
 			if (!$data_set['hosts'] || !$data_set['items']) {
 				continue;
 			}
@@ -125,8 +127,7 @@ class CSvgGraphHelper {
 
 			if ($hosts) {
 				$items = API::Item()->get([
-					'output' => [
-						'itemid', 'name', 'history', 'trends', 'units', 'value_type'],
+					'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type'],
 					'selectHosts' => ['name'],
 					'hostids' => array_keys($hosts),
 					'webitems' => true,
@@ -147,7 +148,7 @@ class CSvgGraphHelper {
 					continue;
 				}
 
-				unset($data_set['hosts'], $data_set['items']);
+				unset($data_set['itemids'], $data_set['items']);
 
 				// The bigger transparency level, the less visible the metric is.
 				$data_set['transparency'] = 10 - (int) $data_set['transparency'];
@@ -163,6 +164,59 @@ class CSvgGraphHelper {
 					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
 					$max_metrics--;
 				}
+			}
+		}
+	}
+
+
+	private static function getMetricsItems(array &$metrics, array $data_sets): void {
+		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
+
+		foreach ($data_sets as $index => $data_set) {
+			if ($data_set['dataset_type'] == CWidgetHelper::DATASET_TYPE_PATTERN_ITEM) {
+				continue;
+			}
+
+			if (!$data_set['itemids']) {
+				continue;
+			}
+
+			if ($max_metrics == 0) {
+				break;
+			}
+
+			$items = API::Item()->get([
+				'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type'],
+				'selectHosts' => ['name'],
+				'webitems' => true,
+				'filter' => [
+					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
+				],
+				'itemids' => $data_set['itemids'],
+				'sortfield' => 'name',
+				'sortorder' => ZBX_SORT_UP,
+				'limit' => $max_metrics
+			]);
+
+			if (!$items) {
+				continue;
+			}
+
+			unset($data_set['itemids']);
+
+			// The bigger transparency level, the less visible the metric is.
+			$data_set['transparency'] = 10 - (int) $data_set['transparency'];
+
+			$data_set['timeshift'] = ($data_set['timeshift'] !== '')
+				? (int) timeUnitToSeconds($data_set['timeshift'])
+				: 0;
+
+			$colors = $data_set['color'];
+
+			foreach ($items as $item) {
+				$data_set['color'] = '#'.array_shift($colors);
+				$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+				$max_metrics--;
 			}
 		}
 	}

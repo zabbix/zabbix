@@ -1000,6 +1000,7 @@ class CSvgGraph extends CSvg {
 		$threshold = $points_distance ? $average_distance * 3 : 0;
 
 		// Add missing values.
+		$prev_point = null;
 		$prev_clock = null;
 		$missing_points = [];
 		foreach ($points as $clock => $point) {
@@ -1013,9 +1014,13 @@ class CSvgGraph extends CSvg {
 					$missing_points[$prev_clock + $gap_interval] = 0;
 					$missing_points[$clock - $gap_interval] = 0;
 				}
+				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_LAST_KNOWN) {
+					$missing_points[$clock - $gap_interval] = $prev_point;
+				}
 			}
 
 			$prev_clock = $clock;
+			$prev_point = $point;
 		}
 
 		return $missing_points;
