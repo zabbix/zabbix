@@ -43,7 +43,7 @@ class testFormServicesSla extends CWebTest {
 	private static $sla_sql = 'SELECT * FROM sla ORDER BY slaid';
 	private static $update_sla = 'Update SLA';
 	private static $sla_with_downtimes = 'SLA with schedule and downtime';
-	private static $delete_sla = 'SLA for delete';
+	private static $delete_sla = 'SLA для удаления - 頑張って';
 
 	/**
 	 * Check SLA create form layout.

@@ -29,7 +29,7 @@ class Sla {
 		CDataHelper::call('sla.create', [
 			[
 				'name' => 'Update SLA',
-				'period' => 1,
+				'period' => 2,
 				'slo' => '99.99',
 				'effective_date' => 1619827200,
 				'timezone' => 'Europe/Riga',
@@ -71,7 +71,7 @@ class Sla {
 				]
 			],
 			[
-				'name' => 'SLA for delete',
+				'name' => 'SLA для удаления - 頑張って',
 				'period' => 3,
 				'slo' => '66.6',
 				'effective_date' => 1651352400,
@@ -95,7 +95,88 @@ class Sla {
 						'period_to' => 20000
 					]
 				]
+			],
+			[
+				'name' => 'Disabled SLA',
+				'period' => 0,
+				'slo' => '9.99',
+				'effective_date' => 1577836800,
+				'timezone' => 'America/Nuuk',
+				'status' => 0,
+				'service_tags' => [
+					[
+						'tag' => 'tag',
+						'value' => 'value'
+					],
+					[
+						'tag' => 'old_tag_1',
+						'value' => 'new_old_value_1'
+					],
+					[
+						'tag' => 'Unique TAG',
+						'value' => 'Unique VALUE'
+					]
+				],
+				'schedule' => [
+					[
+						'period_from' => 0,
+						'period_to' => 61200
+					],
+					[
+						'period_from' => 86400,
+						'period_to' => 104400
+					],
+					[
+						'period_from' => 190800,
+						'period_to' => 194400
+					],
+					[
+						'period_from' => 280800,
+						'period_to' => 284400
+					],
+					[
+						'period_from' => 370800,
+						'period_to' => 374400
+					],
+					[
+						'period_from' => 446400,
+						'period_to' => 504000
+					],
+					[
+						'period_from' => 601200,
+						'period_to' => 604800
+					]
+				]
+			],
+			[
+				'name' => 'Disabled SLA Annual',
+				'period' => 4,
+				'slo' => '13.01',
+				'effective_date' => 1924991999,
+				'timezone' => 'Pacific/Fiji',
+				'status' => 0,
+				'service_tags' => [
+					[
+						'tag' => 'sla',
+						'value' => 'service level agreement'
+					],
+					[
+						'tag' => 'old_tag_1',
+						'value' => 'old_value_1'
+					]
+				],
+				'schedule' => [
+					[
+						'period_from' => 0,
+						'period_to' => 61200
+					],
+					[
+						'period_from' => 601200,
+						'period_to' => 604800
+					]
+				]
 			]
+
 		]);
 
 		return ['sla_ids' => CDataHelper::getIds('name')];
