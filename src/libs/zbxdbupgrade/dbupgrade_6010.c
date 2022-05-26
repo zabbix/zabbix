@@ -500,20 +500,11 @@ static int	DBpatch_6010028(void)
 	return SUCCEED;
 }
 
-#define DBPATCH_HOST_STATUS_TEMPLATE	"3"
-#define DBPATCH_GROUPIDS(cmp)									\
-		"select distinct g.groupid"							\
-		" from hosts h,hosts_groups hg,hstgrp g"					\
-		" where g.groupid=hg.groupid and"						\
-			" hg.hostid=h.hostid and"						\
-			" h.status" cmp DBPATCH_HOST_STATUS_TEMPLATE
-#define DBPATCH_TPLGRP_GROUPIDS	DBPATCH_GROUPIDS("=")
-#define DBPATCH_HSTGRP_GROUPIDS	DBPATCH_GROUPIDS("<>")
-#define DBPATCH_HSTPROTO_GROUPIDS								\
-		"select distinct groupid from group_prototype where groupid is not null"
-
-#define	HOSTGROUP_TYPE_EMPTY	2
-#define HOSTGROUP_TYPE_MIXED	3
+#define DBPATCH_HOST_STATUS_TEMPLATE		"3"
+#define DBPATCH_HOSTGROUP_TYPE_HOST		0
+#define DBPATCH_HOSTGROUP_TYPE_TEMPLATE		1
+#define	DBPATCH_HOSTGROUP_TYPE_EMPTY		2
+#define DBPATCH_HOSTGROUP_TYPE_MIXED		3
 typedef struct
 {
 	zbx_uint64_t	groupid;
@@ -558,7 +549,7 @@ static void	DBpatch_6010033_hstgrp_free(hstgrp_t *hstgrp)
 
 static int	DBpatch_6010033_update_group_type(hstgrp_t *hstgrp)
 {
-	if (HOSTGROUP_TYPE_MIXED == hstgrp->type)
+	if (DBPATCH_HOSTGROUP_TYPE_MIXED == hstgrp->type)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where groupid=" ZBX_FS_UI64,
@@ -582,7 +573,7 @@ static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps,
 		size_t	t_sz;
 		char	tmp[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-		if (HOSTGROUP_TYPE_MIXED == hstgrps->values[i]->type)
+		if (DBPATCH_HOSTGROUP_TYPE_MIXED == hstgrps->values[i]->type)
 			continue;
 
 		t_sz = strlen(hstgrps->values[i]->name);
@@ -599,7 +590,7 @@ static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps,
 			{
 				if (0 != i && last_type != hstgrps->values[i]->type)
 				{
-					*type = HOSTGROUP_TYPE_MIXED;
+					*type = DBPATCH_HOSTGROUP_TYPE_MIXED;
 					return SUCCEED;
 				}
 
@@ -616,7 +607,7 @@ static int	DBpatch_6010033_starts_with(char *name, zbx_vector_hstgrp_t *hstgrps,
 			{
 				if (0 != i && last_type != hstgrps->values[i]->type)
 				{
-					*type = HOSTGROUP_TYPE_MIXED;
+					*type = DBPATCH_HOSTGROUP_TYPE_MIXED;
 					return SUCCEED;
 				}
 
@@ -641,11 +632,11 @@ static int	DBpatch_6010033_update_empty(zbx_vector_hstgrp_t *hstgrps)
 	{
 		int	group_type;
 
-		if (HOSTGROUP_TYPE_EMPTY != hstgrps->values[i]->type)
+		if (DBPATCH_HOSTGROUP_TYPE_EMPTY != hstgrps->values[i]->type)
 			continue;
 
 		if (SUCCEED != DBpatch_6010033_starts_with(hstgrps->values[i]->name, hstgrps, &group_type))
-			hstgrps->values[i]->type = HOSTGROUP_TYPE_HOST;
+			hstgrps->values[i]->type = DBPATCH_HOSTGROUP_TYPE_HOST;
 		else
 			hstgrps->values[i]->type = group_type;
 
@@ -670,7 +661,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
-		if (HOSTGROUP_TYPE_MIXED == hstgrps->values[i]->type)
+		if (DBPATCH_HOSTGROUP_TYPE_MIXED == hstgrps->values[i]->type)
 			new_count++;
 	}
 
@@ -681,12 +672,12 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
-		if (HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
+		if (DBPATCH_HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
 			continue;
 
 		hstgrps->values[i]->newgroupid = nextid++;
 		zbx_db_insert_add_values(&db_insert, hstgrps->values[i]->newgroupid, hstgrps->values[i]->name,
-				HOSTGROUP_TYPE_TEMPLATE, hstgrps->values[i]->uuid);
+				DBPATCH_HOSTGROUP_TYPE_TEMPLATE, hstgrps->values[i]->uuid);
 	}
 
 	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
@@ -698,7 +689,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
-		if (HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
+		if (DBPATCH_HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
 			continue;
 
 		result = DBselect(
@@ -778,7 +769,13 @@ static int	DBpatch_6010033_split_groups(void)
 	if (0 == hstgrps.values_num)
 		goto out;
 
-	result = DBselect(DBPATCH_HSTGRP_GROUPIDS);
+	result = DBselect(
+			"select distinct g.groupid"
+			" from hosts h,hosts_groups hg,hstgrp g"
+			" where g.groupid=hg.groupid and"
+				" hg.hostid=h.hostid and"
+				" h.status<>" DBPATCH_HOST_STATUS_TEMPLATE
+			);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -787,7 +784,11 @@ static int	DBpatch_6010033_split_groups(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect(DBPATCH_HSTPROTO_GROUPIDS);
+	result = DBselect(
+			"select distinct groupid"
+			" from group_prototype"
+			" where groupid is not null"
+			);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -796,7 +797,13 @@ static int	DBpatch_6010033_split_groups(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect(DBPATCH_TPLGRP_GROUPIDS);
+	result = DBselect(
+			"select distinct g.groupid"
+			" from hosts h,hosts_groups hg,hstgrp g"
+			" where g.groupid=hg.groupid and"
+				" hg.hostid=h.hostid and"
+				" h.status=" DBPATCH_HOST_STATUS_TEMPLATE
+			);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -818,24 +825,24 @@ static int	DBpatch_6010033_split_groups(void)
 
 		if (FAIL == has_hosts && FAIL == has_templates)
 		{
-			hstgrps.values[i]->type = HOSTGROUP_TYPE_EMPTY;
+			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_EMPTY;
 		}
 		else if (FAIL == has_templates)
 		{
-			hstgrps.values[i]->type = HOSTGROUP_TYPE_HOST;
+			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_HOST;
 
 			if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps.values[i])))
 				goto out;
 		}
 		else if (FAIL == has_hosts)
 		{
-			hstgrps.values[i]->type = HOSTGROUP_TYPE_TEMPLATE;
+			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_TEMPLATE;
 
 			if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps.values[i])))
 				goto out;
 		}
 		else
-			hstgrps.values[i]->type = HOSTGROUP_TYPE_MIXED;
+			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_MIXED;
 	}
 
 	if (SUCCEED == (ret = DBpatch_6010033_update_empty(&hstgrps)))
@@ -880,13 +887,11 @@ static int	DBpatch_6010034(void)
 	return SUCCEED;
 }
 
-#undef RENAME_PROFILE
-#undef DBPATCH_HOST_STATUS_TEMPLATE
-#undef DBPATCH_GROUPIDS
 #undef DBPATCH_TPLGRP_GROUPIDS
-#undef DBPATCH_HSTGRP_GROUPIDS
-#undef HOSTGROUP_TYPE_EMPTY
-#undef HOSTGROUP_TYPE_MIXED
+#undef DBPATCH_HOSTGROUP_TYPE_HOST
+#undef DBPATCH_HOSTGROUP_TYPE_TEMPLATE
+#undef DBPATCH_HOSTGROUP_TYPE_EMPTY
+#undef DBPATCH_HOSTGROUP_TYPE_MIXED
 
 #endif
 
