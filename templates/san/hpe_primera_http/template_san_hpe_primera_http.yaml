@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-24T01:22:35Z'
+  date: '2022-05-27T08:14:14Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -31,27 +31,6 @@ zabbix_export:
           name: Templates/SAN
       items:
         -
-          uuid: fff2354ba48b4deb861e47e980e9ed35
-          name: 'HPE Primera: Get common provisioning groups'
-          type: DEPENDENT
-          key: hpe.primera.cpgs
-          delay: '0'
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          description: 'A list of common provisioning groups.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.cpgs.members
-          master_item:
-            key: hpe.primera.data
-          tags:
-            -
-              tag: component
-              value: raw
-        -
           uuid: 530e20083da8423e9d30c8342f1b7da3
           name: 'HPE Primera: Get data'
           type: SCRIPT
@@ -63,9 +42,14 @@ zabbix_export:
             var params = JSON.parse(value),
                 fields = ['username', 'password', 'base_url'],
                 methods = ['disks', 'cpgs', 'hosts', 'ports', 'system', 'tasks', 'volumes'],
-                result = {},
-                errors = {},
                 data = {};
+            
+            class Key {
+                constructor(key) {
+                    this.key = key;
+                }
+                getKey() {return this.key;}
+            }
             
             fields.forEach(function (field) {
                 if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
@@ -76,6 +60,8 @@ zabbix_export:
             if (!params.base_url.endsWith('/')) {
                 params.base_url += '/';
             }
+            
+            data['errors'] = {};
             
             function getSessionKey() {
                 var response, request = new HttpRequest();
@@ -97,19 +83,27 @@ zabbix_export:
                         throw 'Failed to parse auth response received from device API. Check debug log for more information.';
                     }
                 }
-                return auth_data;
+                else {
+                    throw 'No data received by auth request'
+                }
+            
+                if ('key' in auth_data) {
+                    return auth_data;
+                } else {
+                    throw 'Auth response does not contain session key'
+                }
             }
             
             try {
-                sessionKey = getSessionKey()['key'];
+                session_key = new Key(getSessionKey()['key']);
             }
             catch (error) {
-                errors.auth = error.toString();
+                data.errors.auth = error.toString();
             }
             
             function getHttpData(method) {
                 request = new HttpRequest();
-                request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + sessionKey);
+                request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + session_key.getKey());
             
                 raw_data = request.get(params.base_url + 'api/v1/' + method);
             
@@ -118,22 +112,24 @@ zabbix_export:
                 }
             
                 if (raw_data !== null) {
-                    try {
-                        result = JSON.stringify(raw_data);
+                    if (typeof raw_data === 'object') {
+                        return raw_data;
                     }
-                    catch (error) {
-                        throw 'Failed to parse response received from device API. Check debug log for more information.';
+                    else {
+                        throw 'Received data is not an object';
                     }
                 }
-                return raw_data;
+                else {
+                    throw 'No data received by ' + method + ' request.';
+                }
             }
             
             for (var i in methods) {
                 try {
-                    data[methods[i]] = getHttpData(methods[i]);
+                    data[methods[i]] = JSON.parse(getHttpData(methods[i]));
                 }
                 catch (error) {
-                    errors[methods[i]] = error.toString();
+                    data.errors[methods[i]] = error.toString();
                 }
             }
             
@@ -146,12 +142,14 @@ zabbix_export:
                 }
             }
             catch (error) {
-                errors.logout = error.toString();
+                data.errors.logout = error.toString();
             }
             
-            data.errors = errors;
+            if (Object.keys(data.errors).length == 0) {
+                data.errors = '';
+            }
             
-            return data;
+            return JSON.stringify(data);
           description: 'The JSON with result of WSAPI requests.'
           timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
           parameters:
@@ -164,27 +162,6 @@ zabbix_export:
             -
               name: username
               value: '{$HPE.PRIMERA.API.USERNAME}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 2b1fef9aacde40f2bc66cc918adad7ac
-          name: 'HPE Primera: Get disks'
-          type: DEPENDENT
-          key: hpe.primera.disks
-          delay: '0'
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          description: 'A list of physical disks.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.disks.members
-          master_item:
-            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -230,6 +207,10 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.errors
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: hpe.primera.data
           tags:
@@ -253,48 +234,6 @@ zabbix_export:
                   tag: scope
                   value: availability
         -
-          uuid: fcd8380a5313449eb6cdbb06b0180a7c
-          name: 'HPE Primera: Get hosts'
-          type: DEPENDENT
-          key: hpe.primera.hosts
-          delay: '0'
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          description: 'A list of hosts.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.hosts.members
-          master_item:
-            key: hpe.primera.data
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: 2aaa287a0d3849439ea16d7da4d822fe
-          name: 'HPE Primera: Get ports'
-          type: DEPENDENT
-          key: hpe.primera.ports
-          delay: '0'
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          description: 'A list of ports.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.ports.members
-          master_item:
-            key: hpe.primera.data
-          tags:
-            -
-              tag: component
-              value: raw
-        -
           uuid: efc450d0682c4c5d93df41d05c10eceb
           name: 'HPE Primera: Capacity allocated'
           type: DEPENDENT
@@ -307,7 +246,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.allocatedCapacityMiB
+                - $.system.allocatedCapacityMiB
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -317,7 +256,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -338,7 +277,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.failedCapacityMiB
+                - $.system.failedCapacityMiB
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -348,7 +287,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -369,7 +308,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.freeCapacityMiB
+                - $.system.freeCapacityMiB
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -379,7 +318,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -400,7 +339,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.totalCapacityMiB
+                - $.system.totalCapacityMiB
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -410,7 +349,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -431,7 +370,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.chunkletSizeMiB
+                - $.system.chunkletSizeMiB
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -441,7 +380,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -464,39 +403,18 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.contact
+                - $.system.contact
               error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.system.info
-          tags:
-            -
-              tag: component
-              value: system
-        -
-          uuid: 0e0e4c5c08dd420ab26862bfa140d729
-          name: 'HPE Primera: Get system information'
-          type: DEPENDENT
-          key: hpe.primera.system.info
-          delay: '0'
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          description: 'General system information.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.system
-          master_item:
             key: hpe.primera.data
           tags:
             -
               tag: component
-              value: raw
+              value: system
         -
           uuid: dd61f3a680284893801c96bdbd445645
           name: 'HPE Primera: System location'
@@ -512,14 +430,14 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.location
+                - $.system.location
               error_handler: DISCARD_VALUE
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -539,13 +457,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.model
+                - $.system.model
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -565,13 +483,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.name
+                - $.system.name
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -588,13 +506,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.onlineNodes.length()
+                - $.system.onlineNodes.length()
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -611,13 +529,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.totalNodes
+                - $.system.totalNodes
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -637,13 +555,13 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.serialNumber
+                - $.system.serialNumber
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
@@ -662,78 +580,17 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.systemVersion
+                - $.system.systemVersion
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.system.info
+            key: hpe.primera.data
           tags:
             -
               tag: component
               value: system
-        -
-          uuid: 05fd350143374c73a5502011dd05b119
-          name: 'HPE Primera: Get tasks'
-          type: DEPENDENT
-          key: hpe.primera.tasks
-          delay: '0'
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          description: 'A list of latest executed, in progress or failed tasks.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.tasks.members
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  result = [];
-                  tasks = JSON.parse(value);
-                  
-                  tmp_tasks = {};
-                  
-                  tasks.forEach(function (task) {
-                    task_name = task.name;
-                    tmp_tasks[task_name] = task;
-                  });
-                  
-                  for (var task in tmp_tasks) {
-                    result.push(tmp_tasks[task])
-                  };
-                  
-                  return JSON.stringify(result);
-          master_item:
-            key: hpe.primera.data
-          tags:
-            -
-              tag: component
-              value: raw
-        -
-          uuid: d1744dbb6e21418cb314e77041890f67
-          name: 'HPE Primera: Get volumes'
-          type: DEPENDENT
-          key: hpe.primera.volumes
-          delay: '0'
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          description: 'A list of storage volumes.'
-          preprocessing:
-            -
-              type: JSONPATH
-              parameters:
-                - $.volumes.members
-          master_item:
-            key: hpe.primera.data
-          tags:
-            -
-              tag: component
-              value: raw
         -
           uuid: a0b4fdee38a64c5f82fd051ea74a7b2d
           name: 'HPE Primera: Service ping'
@@ -799,13 +656,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].numFPVVs.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].numFPVVs.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -829,7 +686,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].rawFreeSpaceMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].rawFreeSpaceMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -839,7 +696,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -863,7 +720,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].rawSharedSpaceMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].rawSharedSpaceMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -873,7 +730,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -894,7 +751,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].rawTotalSpaceMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].rawTotalSpaceMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -904,7 +761,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -928,7 +785,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].SAUsage.rawTotalMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].SAUsage.rawTotalMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -938,7 +795,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -962,7 +819,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].SAUsage.rawUsedMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].SAUsage.rawUsedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -972,7 +829,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -996,7 +853,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].SAUsage.totalMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].SAUsage.totalMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1006,7 +863,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1030,7 +887,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].SAUsage.usedMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].SAUsage.usedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1040,7 +897,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1064,7 +921,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].SDUsage.rawTotalMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].SDUsage.rawTotalMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1074,7 +931,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1098,7 +955,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].SDUsage.rawUsedMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].SDUsage.rawUsedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1108,7 +965,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1132,7 +989,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].SDUsage.totalMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].SDUsage.totalMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1142,7 +999,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1166,7 +1023,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].SDUsage.usedMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].SDUsage.usedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1176,7 +1033,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1200,7 +1057,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].UsrUsage.rawTotalMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].UsrUsage.rawTotalMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1210,7 +1067,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1234,7 +1091,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].UsrUsage.rawUsedMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].UsrUsage.rawUsedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1244,7 +1101,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1268,7 +1125,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].UsrUsage.totalMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].UsrUsage.totalMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1278,7 +1135,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1302,7 +1159,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].UsrUsage.usedMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].UsrUsage.usedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1312,7 +1169,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1336,7 +1193,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].freeSpaceMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].freeSpaceMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1346,7 +1203,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1370,7 +1227,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].sharedSpaceMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].sharedSpaceMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1380,7 +1237,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1404,7 +1261,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].totalSpaceMiB.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].totalSpaceMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1414,7 +1271,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1474,13 +1331,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].degradedStates.first()'
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return JSON.stringify(JSON.parse(value));'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].degradedStates.first()'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1540,13 +1393,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].failedStates.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].failedStates.first()'
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return JSON.stringify(JSON.parse(value));'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1577,9 +1430,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].state.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].state.first()'
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1631,13 +1484,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].numTDVVs.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].numTDVVs.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1660,13 +1513,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].numTPVVs.first()'
+                    - '$.cpgs.members[?(@.id == "{#ID}")].numTPVVs.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.cpgs
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1823,7 +1676,7 @@ zabbix_export:
                     host: 'HPE Primera by HTTP'
                     key: 'hpe.primera.cpg.space.usr["{#ID}",raw_used]'
           master_item:
-            key: hpe.primera.cpgs
+            key: hpe.primera.data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -1832,6 +1685,10 @@ zabbix_export:
               lld_macro: '{#NAME}'
               path: $.name
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.cpgs.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1857,7 +1714,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].freeSizeMiB.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].freeSizeMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1867,7 +1724,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1892,13 +1749,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].fwVersion.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].fwVersion.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1923,7 +1780,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].loopA0.degraded.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].loopA0.degraded.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1934,7 +1791,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -1970,7 +1827,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].loopA1.degraded.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].loopA1.degraded.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1981,7 +1838,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2017,7 +1874,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].loopB0.degraded.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].loopB0.degraded.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2028,7 +1885,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2064,7 +1921,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].loopB1.degraded.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].loopB1.degraded.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2075,7 +1932,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2111,13 +1968,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].manufacturer.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].manufacturer.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2142,13 +1999,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].model.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].model.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2172,14 +2029,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].RPM.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].RPM.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2204,13 +2061,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].serialNumber.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].serialNumber.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2242,7 +2099,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].state.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].state.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '99'
                 -
@@ -2250,7 +2107,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2314,7 +2171,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].totalSizeMiB.first()'
+                    - '$.disks.members[?(@.id == "{#ID}")].totalSizeMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2324,7 +2181,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.disks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2336,7 +2193,7 @@ zabbix_export:
                   tag: disk
                   value: '{#POSITION}'
           master_item:
-            key: hpe.primera.disks
+            key: hpe.primera.data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -2345,6 +2202,10 @@ zabbix_export:
               lld_macro: '{#POSITION}'
               path: $.position
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.disks.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2378,14 +2239,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].descriptors.comment.first()'
+                    - '$.hosts.members[?(@.id == "{#ID}")].descriptors.comment.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.hosts
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2407,14 +2268,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].descriptors.contact.first()'
+                    - '$.hosts.members[?(@.id == "{#ID}")].descriptors.contact.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.hosts
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2436,14 +2297,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].descriptors.IPAddr.first()'
+                    - '$.hosts.members[?(@.id == "{#ID}")].descriptors.IPAddr.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.hosts
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2465,14 +2326,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].descriptors.location.first()'
+                    - '$.hosts.members[?(@.id == "{#ID}")].descriptors.location.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.hosts
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2494,14 +2355,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].descriptors.model.first()'
+                    - '$.hosts.members[?(@.id == "{#ID}")].descriptors.model.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.hosts
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2523,14 +2384,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].descriptors.os.first()'
+                    - '$.hosts.members[?(@.id == "{#ID}")].descriptors.os.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.hosts
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2539,7 +2400,7 @@ zabbix_export:
                   tag: host
                   value: '{#NAME}'
           master_item:
-            key: hpe.primera.hosts
+            key: hpe.primera.data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -2548,6 +2409,10 @@ zabbix_export:
               lld_macro: '{#NAME}'
               path: $.name
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.hosts.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2591,14 +2456,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].failoverState.first()'
+                    - '$.ports.members[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].failoverState.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.ports
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2644,13 +2509,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].hardwareType.first()'
+                    - '$.ports.members[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].hardwareType.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.ports
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2693,13 +2558,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].linkState.first()'
+                    - '$.ports.members[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].linkState.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.ports
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2760,13 +2625,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].type.first()'
+                    - '$.ports.members[?(@.portPos.node == "{#NODE}" && @.portPos.slot == "{#SLOT}" && @.portPos.cardPort == "{#CARD.PORT}")].type.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.ports
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2775,7 +2640,7 @@ zabbix_export:
                   tag: port
                   value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
           master_item:
-            key: hpe.primera.ports
+            key: hpe.primera.data
           lld_macro_paths:
             -
               lld_macro: '{#CARD.PORT}'
@@ -2790,6 +2655,10 @@ zabbix_export:
               lld_macro: '{#TYPE}'
               path: $.type
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.ports.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2837,7 +2706,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].finishTime.first()'
+                    - '$.tasks.members[?(@.id == "{#ID}")].finishTime.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2855,7 +2724,7 @@ zabbix_export:
                       
                       return Date.parse(raw_date[0] + 'T' + raw_date[1] + raw_date[2] + ':00')/1000;
               master_item:
-                key: hpe.primera.tasks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2876,7 +2745,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].startTime.first()'
+                    - '$.tasks.members[?(@.id == "{#ID}")].startTime.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2889,7 +2758,7 @@ zabbix_export:
                       
                       return Date.parse(raw_date[0] + 'T' + raw_date[1] + raw_date[2] + ':00')/1000;
               master_item:
-                key: hpe.primera.tasks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -2917,13 +2786,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].status.first()'
+                    - '$.tasks.members[?(@.id == "{#ID}")].status.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
               master_item:
-                key: hpe.primera.tasks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3011,13 +2880,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].type.first()'
+                    - '$.tasks.members[?(@.id == "{#ID}")].type.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: hpe.primera.tasks
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3026,7 +2895,7 @@ zabbix_export:
                   tag: task
                   value: '{#NAME}'
           master_item:
-            key: hpe.primera.tasks
+            key: hpe.primera.data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -3038,6 +2907,28 @@ zabbix_export:
               lld_macro: '{#TYPE}'
               path: $.type
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.tasks.members
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [],
+                      tmp_tasks = {};
+                  
+                  tasks = JSON.parse(value);
+                  
+                  tasks.forEach(function (task) {
+                      tmp_tasks[task.name] = task;
+                  });
+                  
+                  for (var task in tmp_tasks) {
+                      result.push(tmp_tasks[task])
+                  };
+                  
+                  return JSON.stringify(result);
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -3075,14 +2966,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].capacityEfficiency.compaction.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].capacityEfficiency.compaction.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3106,14 +2997,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].capacityEfficiency.compression.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].capacityEfficiency.compression.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3137,14 +3028,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].capacityEfficiency.deduplication.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].capacityEfficiency.deduplication.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3168,14 +3059,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].capacityEfficiency.overProvisioning.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].capacityEfficiency.overProvisioning.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3199,14 +3090,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].capacityEfficiency.dataReduction.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].capacityEfficiency.dataReduction.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3230,7 +3121,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].adminSpace.freeMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].adminSpace.freeMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3240,7 +3131,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3264,7 +3155,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].adminSpace.rawReservedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].adminSpace.rawReservedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3274,7 +3165,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3298,7 +3189,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].adminSpace.reservedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].adminSpace.reservedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3308,7 +3199,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3332,7 +3223,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].adminSpace.usedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].adminSpace.usedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3342,7 +3233,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3366,7 +3257,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].snapshotSpace.freeMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].snapshotSpace.freeMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3376,7 +3267,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3400,7 +3291,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].snapshotSpace.rawReservedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].snapshotSpace.rawReservedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3410,7 +3301,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3434,7 +3325,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].snapshotSpace.reservedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].snapshotSpace.reservedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3444,7 +3335,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3468,7 +3359,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].snapshotSpace.usedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].snapshotSpace.usedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3478,7 +3369,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3502,7 +3393,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].totalReservedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].totalReservedMiB.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3513,7 +3404,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3537,7 +3428,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].sizeMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].sizeMiB.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
@@ -3548,7 +3439,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3572,14 +3463,14 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].totalUsedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].totalUsedMiB.first()'
                   error_handler: DISCARD_VALUE
                 -
                   type: MULTIPLIER
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3603,7 +3494,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].userSpace.freeMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].userSpace.freeMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3613,7 +3504,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3637,7 +3528,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].userSpace.rawReservedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].userSpace.rawReservedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3647,7 +3538,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3671,7 +3562,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].userSpace.reservedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].userSpace.reservedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3681,7 +3572,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3705,7 +3596,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].userSpace.usedMiB.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].userSpace.usedMiB.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -3715,7 +3606,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3746,13 +3637,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].compressionState.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].compressionState.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3783,13 +3674,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].deduplicationState.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].deduplicationState.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3849,13 +3740,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].degradedStates.first()'
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return JSON.stringify(JSON.parse(value));'
+                    - '$.volumes.members[?(@.id == "{#ID}")].degradedStates.first()'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3915,13 +3802,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].failedStates.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].failedStates.first()'
                 -
                   type: JAVASCRIPT
                   parameters:
                     - 'return JSON.stringify(JSON.parse(value));'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -3952,9 +3839,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].state.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].state.first()'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -4019,9 +3906,9 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.id == "{#ID}")].rcopyStatus.first()'
+                    - '$.volumes.members[?(@.id == "{#ID}")].rcopyStatus.first()'
               master_item:
-                key: hpe.primera.volumes
+                key: hpe.primera.data
               tags:
                 -
                   tag: component
@@ -4151,7 +4038,7 @@ zabbix_export:
                     host: 'HPE Primera by HTTP'
                     key: 'hpe.primera.volume.space.user["{#ID}",used]'
           master_item:
-            key: hpe.primera.volumes
+            key: hpe.primera.data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -4160,6 +4047,10 @@ zabbix_export:
               lld_macro: '{#NAME}'
               path: $.name
           preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.volumes.members
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
