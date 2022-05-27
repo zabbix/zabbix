@@ -1363,8 +1363,8 @@ static void	process_triggers(zbx_trigger_copy_t *trigger_copy_template, zbx_hash
 		trigger_copy_insert->event_name = zbx_strdup(NULL, trigger_copy_template->event_name);
 
 		trigger_copy_insert->priority = trigger_copy_template->priority;
-		trigger_copy_insert->comments =  DBdyn_escape_string(trigger_copy_template->comments);
-		trigger_copy_insert->url = DBdyn_escape_string(trigger_copy_template->url);
+		trigger_copy_insert->comments =  zbx_strdup(NULL, trigger_copy_template->comments);
+		trigger_copy_insert->url = zbx_strdup(NULL, trigger_copy_template->url);
 		trigger_copy_insert->correlation_tag = zbx_strdup(NULL, trigger_copy_template->correlation_tag);
 		trigger_copy_insert->status = trigger_copy_template->status;
 		trigger_copy_insert->type = trigger_copy_template->type;
