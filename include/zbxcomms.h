@@ -67,6 +67,35 @@ zbx_buf_type_t;
 #	include <openssl/rand.h>
 #endif
 
+
+
+typedef struct
+{
+	unsigned int	configured_tls_connect_mode;
+	unsigned int	configured_tls_accept_modes;
+
+	char	*CONFIG_TLS_CONNECT;
+	char	*CONFIG_TLS_ACCEPT;
+	char	*CONFIG_TLS_CA_FILE;
+	char	*CONFIG_TLS_CRL_FILE;
+	char	*CONFIG_TLS_SERVER_CERT_ISSUER;
+	char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
+	char	*CONFIG_TLS_CERT_FILE;
+	char	*CONFIG_TLS_KEY_FILE;
+	char	*CONFIG_TLS_PSK_IDENTITY;
+	char	*CONFIG_TLS_PSK_FILE;
+	char	*CONFIG_TLS_CIPHER_CERT13;
+	char	*CONFIG_TLS_CIPHER_CERT;
+	char	*CONFIG_TLS_CIPHER_PSK13;
+	char	*CONFIG_TLS_CIPHER_PSK;
+	char	*CONFIG_TLS_CIPHER_ALL13;
+	char	*CONFIG_TLS_CIPHER_ALL;
+	char	*CONFIG_TLS_CIPHER_CMD13;/* not used in agent, defined for linking with tls.c */
+	char	*CONFIG_TLS_CIPHER_CMD;	/* not used in agent, defined for linking with tls.c */
+} zbx_config_tls_t;
+
+void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls_);
+
 typedef struct
 {
 #if defined(HAVE_GNUTLS)
@@ -263,7 +292,7 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 
 #endif	/* #if defined(_WINDOWS) */
 
-void	zbx_tls_validate_config(void);
+void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char program_type);
 void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(void);
 void	zbx_tls_init_child(void);
