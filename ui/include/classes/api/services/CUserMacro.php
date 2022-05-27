@@ -696,6 +696,8 @@ class CUserMacro extends CApiService {
 			$upd_hostmacro = DB::getUpdatedValues('hostmacro', $hostmacro, $db_hostmacro);
 
 			if ($upd_hostmacro) {
+				$upd_hostmacro['automatic'] = ZBX_USERMACRO_MANUAL;
+
 				$upd_hostmacros[] = [
 					'values' => $upd_hostmacro,
 					'where' => ['hostmacroid' => $hostmacro['hostmacroid']]
