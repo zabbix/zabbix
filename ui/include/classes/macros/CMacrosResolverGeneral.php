@@ -310,14 +310,14 @@ class CMacrosResolverGeneral {
 	 * @param bool   $types['functionids']                        Extract numeric macros. For example, "{12345}".
 	 * @param bool   $types['expr_macros']                        Extract expression macros.
 	 *                                                              For example, "{?func(/host/key, param)}".
-	 * @param bool   $types['expr_macros_host']                   Extract expression macros with with the ability to
+	 * @param bool   $types['expr_macros_host']                   Extract expression macros with the ability to
 	 *                                                              specify a {HOST.HOST} macro or an empty host name
 	 *                                                              instead of a hostname.
 	 *                                                              For example,
 	 *                                                                "{?func(/host/key, param)}",
 	 *                                                                "{?func(/{HOST.HOST}/key, param)}",
 	 *                                                                "{?func(//key, param)}".
-	 * @param bool   $types['expr_macros_host_n']                 Extract expression macros with with the ability to
+	 * @param bool   $types['expr_macros_host_n']                 Extract expression macros with the ability to
 	 *                                                              specify a {HOST.HOST<1-9>} macro or an empty host
 	 *                                                              name instead of a hostname.
 	 *                                                              For example,
