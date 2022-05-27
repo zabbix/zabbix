@@ -281,7 +281,7 @@ class CTabFilterProfile {
 		$this->tabfilters = CProfile::getArray($this->namespace.'.properties', []);
 
 		foreach ($this->tabfilters as &$tabfilter) {
-			$tabfilter = json_decode($tabfilter, true);
+			$tabfilter = json_decode($tabfilter, true) + ['filter_name' => ''];
 		}
 		unset($tabfilter);
 
@@ -317,7 +317,9 @@ class CTabFilterProfile {
 
 		if ($this->filter_defaults) {
 			foreach ($tabfilters as &$tabfilter) {
-				$tabfilter = CArrayHelper::unsetEqualValues($tabfilter, $this->filter_defaults);
+				$tabfilter = CArrayHelper::unsetEqualValues($tabfilter, $this->filter_defaults) + [
+						'filter_name' => $tabfilter['filter_name']
+					];
 
 				if (array_key_exists('filter_show_counter', $tabfilter)) {
 					$tabfilter['filter_show_counter'] = (int) $tabfilter['filter_show_counter'];

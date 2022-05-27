@@ -779,7 +779,7 @@ class CTabFilter extends CBaseComponent {
 				if (this._active_item._index == 0) {
 					this.profileUpdate('properties', {
 						idx2: 0,
-						value_str: ''
+						value_str: 'filter_name='
 					})
 					.then(() => {
 						this._events.buttonResetAction();
