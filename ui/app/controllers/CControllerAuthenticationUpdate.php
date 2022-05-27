@@ -223,6 +223,7 @@ class CControllerAuthenticationUpdate extends CController {
 
 		if (!$auth_valid) {
 			$this->response->setFormData($this->getInputAll());
+			CMessageHelper::setErrorTitle(_('Cannot add server'));
 			$this->setResponse($this->response);
 
 			return;
