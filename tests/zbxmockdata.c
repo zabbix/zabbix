@@ -140,7 +140,7 @@ static int	zbx_yaml_add_node(yaml_document_t *dst_doc, yaml_document_t *src_doc,
 	return new_node;
 }
 
-static int	zbx_yaml_include(yaml_document_t *dst_doc, const char *filename)
+static int	zbx_yaml_include_file(yaml_document_t *dst_doc, const char *filename)
 {
 	yaml_parser_t		parser;
 	yaml_document_t		doc;
@@ -238,41 +238,86 @@ static void	zbx_yaml_replace_node(yaml_document_t *doc, int old_index, int new_i
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: include file and add to include map                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_yaml_add_include(yaml_document_t *doc, zbx_vector_uint64_pair_t *include_map, int index)
+{
+	const yaml_node_t	*node;
+	char			filename[MAX_STRING_LEN];
+	int			new_index;
+	zbx_uint64_pair_t	pair;
+
+	node = yaml_document_get_node(doc, index);
+
+	if (YAML_SCALAR_NODE != node->type)
+		return -1;
+
+	memcpy(filename, node->data.scalar.value, node->data.scalar.length);
+	filename[node->data.scalar.length] = '\0';
+
+	if (-1 == (new_index = zbx_yaml_include_file(doc, filename)))
+		return -1;
+
+	pair.first = (zbx_uint64_t)index;
+	pair.second = (zbx_uint64_t)new_index;
+	zbx_vector_uint64_pair_append(include_map, pair);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: recursively include yaml documents from first level 'include'     *
  *          mapping scalar value or sequence                                  *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_yaml_include_rec(yaml_document_t *doc, int *index)
+static int	zbx_yaml_include(yaml_document_t *doc, int *index)
 {
-	char			filename[MAX_STRING_LEN];
-	const yaml_node_t	*node;
-	int			new_index;
+	const yaml_node_t		*node;
+	int				i, ret = -1;
+	zbx_vector_uint64_pair_t	include_map;
+
+	zbx_vector_uint64_pair_create(&include_map);
 
 	node = yaml_document_get_node(doc, *index);
 
 	if (YAML_SEQUENCE_NODE == node->type)
 	{
 		yaml_node_item_t	*item;
+		zbx_vector_uint64_t	indexes;
+
+		zbx_vector_uint64_create(&indexes);
 
 		for (item = node->data.sequence.items.start; item < node->data.sequence.items.top; item++)
-			zbx_yaml_include_rec(doc, item);
-		return;
+			zbx_vector_uint64_append(&indexes, (zbx_uint64_t)*item);
+
+		for (i = 0; i < indexes.values_num; i++)
+		{
+			if (-1 == zbx_yaml_add_include(doc, &include_map, (int)indexes.values[i]))
+				goto out;
+		}
+
+		zbx_vector_uint64_destroy(&indexes);
 	}
-
-	if (YAML_SCALAR_NODE != node->type)
-		return;
-
-	memcpy(filename, node->data.scalar.value, node->data.scalar.length);
-	filename[node->data.scalar.length] = '\0';
-
-	if (-1 != (new_index = zbx_yaml_include(doc, filename)))
+	else
 	{
-		zbx_yaml_replace_node(doc, *index, new_index);
-
-		/* re-acquire root node - after changes to the document */
-		/* the previously acquired node pointers are not valid  */
-		root = yaml_document_get_root_node(&test_case);
+		if (-1 == zbx_yaml_add_include(doc, &include_map, *index))
+			goto out;
 	}
+
+	for (i = 0; i < include_map.values_num; i++)
+		zbx_yaml_replace_node(doc, (int)include_map.values[i].first, (int)include_map.values[i].second);
+
+	/* re-acquire root node - after changes to the document */
+	/* the previously acquired node pointers are not valid  */
+	root = yaml_document_get_root_node(&test_case);
+
+	ret = 0;
+out:
+	zbx_vector_uint64_pair_destroy(&include_map);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -299,10 +344,7 @@ static int	zbx_yaml_check_include(yaml_document_t *doc)
 	for (pair = root->data.mapping.pairs.start; pair < root->data.mapping.pairs.top; pair++)
 	{
 		if (0 == zbx_yaml_scalar_cmp("include", yaml_document_get_node(doc, pair->key)))
-		{
-			zbx_yaml_include_rec(doc, &pair->value);
-			break;
-		}
+			return zbx_yaml_include(doc, &pair->value);
 	}
 
 	return 0;

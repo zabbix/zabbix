@@ -21,7 +21,7 @@
 #define ZABBIX_REPORT_PROTOCOL_H
 
 #include "zbxalgo.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 #define ZBX_REPORT_PARAM_SUBJECT	"subject"
 #define ZBX_REPORT_PARAM_BODY		"body"
@@ -59,8 +59,8 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 void	report_deserialize_begin_report(const unsigned char *data, char **name, char **url, char **cookie,
 		int *width, int *height, zbx_vector_ptr_pair_t *params);
 
-zbx_uint32_t	report_serialize_send_report(unsigned char **data, const DB_MEDIATYPE *mt,
+zbx_uint32_t	report_serialize_send_report(unsigned char **data, const ZBX_DB_MEDIATYPE *mt,
 		const zbx_vector_str_t *emails);
-void	report_deserialize_send_report(const unsigned char *data, DB_MEDIATYPE *mt, zbx_vector_str_t *sendtos);
+void	report_deserialize_send_report(const unsigned char *data, ZBX_DB_MEDIATYPE *mt, zbx_vector_str_t *sendtos);
 
 #endif

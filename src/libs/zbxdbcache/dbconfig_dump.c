@@ -267,37 +267,6 @@ static void	DCdump_host_inventories(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  End of %s()", __func__);
 }
 
-static void	DCdump_htmpls(void)
-{
-	ZBX_DC_HTMPL		*htmpl = NULL;
-	zbx_hashset_iter_t	iter;
-	zbx_vector_ptr_t	index;
-	int			i, j;
-
-	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
-
-	zbx_vector_ptr_create(&index);
-	zbx_hashset_iter_reset(&config->htmpls, &iter);
-
-	while (NULL != (htmpl = (ZBX_DC_HTMPL *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_ptr_append(&index, htmpl);
-
-	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < index.values_num; i++)
-	{
-		htmpl = (ZBX_DC_HTMPL *)index.values[i];
-
-		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64, htmpl->hostid);
-
-		for (j = 0; j < htmpl->templateids.values_num; j++)
-			zabbix_log(LOG_LEVEL_TRACE, "  templateid:" ZBX_FS_UI64, htmpl->templateids.values[j]);
-	}
-
-	zbx_vector_ptr_destroy(&index);
-
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
-}
 
 static void	DCdump_kvs_paths(void)
 {
@@ -315,68 +284,18 @@ static void	DCdump_kvs_paths(void)
 
 		zbx_hashset_iter_reset(&kvs_path->kvs, &iter);
 		while (NULL != (kvs = (zbx_dc_kv_t *)zbx_hashset_iter_next(&iter)))
-			zabbix_log(LOG_LEVEL_TRACE, "  key:'%s' refcount:%d", kvs->key, kvs->refcount);
+		{
+			int	j;
+
+			zabbix_log(LOG_LEVEL_TRACE, "  key:'%s'", kvs->key);
+
+			for (j = 0; j < kvs->macros.values_num; j++)
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "    hostid:" ZBX_FS_UI64 " macroid:" ZBX_FS_UI64,
+						kvs->macros.values[j].first, kvs->macros.values[j].second);
+			}
+		}
 	}
-
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
-}
-
-static void	DCdump_gmacros(void)
-{
-	ZBX_DC_GMACRO		*gmacro;
-	zbx_hashset_iter_t	iter;
-	zbx_vector_ptr_t	index;
-	int			i;
-
-	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
-
-	zbx_vector_ptr_create(&index);
-	zbx_hashset_iter_reset(&config->gmacros, &iter);
-
-	while (NULL != (gmacro = (ZBX_DC_GMACRO *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_ptr_append(&index, gmacro);
-
-	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < index.values_num; i++)
-	{
-		gmacro = (ZBX_DC_GMACRO *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "globalmacroid:" ZBX_FS_UI64 " macro:'%s' value:'%s' context:'%s' op:%d"
-				" type:%d", gmacro->globalmacroid, gmacro->macro,
-				gmacro->value, ZBX_NULL2EMPTY_STR(gmacro->context), gmacro->context_op, gmacro->type);
-	}
-
-	zbx_vector_ptr_destroy(&index);
-
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
-}
-
-static void	DCdump_hmacros(void)
-{
-	ZBX_DC_HMACRO		*hmacro;
-	zbx_hashset_iter_t	iter;
-	zbx_vector_ptr_t	index;
-	int			i;
-
-	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
-
-	zbx_vector_ptr_create(&index);
-	zbx_hashset_iter_reset(&config->hmacros, &iter);
-
-	while (NULL != (hmacro = (ZBX_DC_HMACRO *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_ptr_append(&index, hmacro);
-
-	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < index.values_num; i++)
-	{
-		hmacro = (ZBX_DC_HMACRO *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "hostmacroid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " macro:'%s' value:'%s'"
-				" context '%s' op:%d type:%d", hmacro->hostmacroid, hmacro->hostid, hmacro->macro,
-				hmacro->value, ZBX_NULL2EMPTY_STR(hmacro->context), hmacro->context_op, hmacro->type);
-	}
-
-	zbx_vector_ptr_destroy(&index);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
@@ -442,7 +361,7 @@ static void	DCdump_interfaces(void)
 
 static void	DCdump_numitem(const ZBX_DC_NUMITEM *numitem)
 {
-	zabbix_log(LOG_LEVEL_TRACE, "  units:'%s' trends:%d", numitem->units, numitem->trends);
+	zabbix_log(LOG_LEVEL_TRACE, "  units:'%s' trends:%s", numitem->units, numitem->trends_period);
 }
 
 static void	DCdump_snmpitem(const ZBX_DC_SNMPITEM *snmpitem)
@@ -648,10 +567,10 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  lastlogsize:" ZBX_FS_UI64 " mtime:%d", item->lastlogsize, item->mtime);
 		zabbix_log(LOG_LEVEL_TRACE, "  delay:'%s' nextcheck:%d", item->delay, item->nextcheck);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", item->data_expected_from);
-		zabbix_log(LOG_LEVEL_TRACE, "  history:%d history_sec:%d", item->history, item->history_sec);
+		zabbix_log(LOG_LEVEL_TRACE, "  history:%s", item->history_period);
 		zabbix_log(LOG_LEVEL_TRACE, "  poller_type:%u location:%u", item->poller_type, item->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
-		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u schedulable:%u", item->queue_priority, item->schedulable);
+		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u", item->queue_priority);
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{
@@ -1373,10 +1292,8 @@ void	DCdump_configuration(void)
 	DCdump_proxies();
 	DCdump_ipmihosts();
 	DCdump_host_inventories();
-	DCdump_htmpls();
 	DCdump_kvs_paths();
-	DCdump_gmacros();
-	DCdump_hmacros();
+	um_cache_dump(config->um_cache);
 	DCdump_interfaces();
 	DCdump_items();
 	DCdump_item_discovery();

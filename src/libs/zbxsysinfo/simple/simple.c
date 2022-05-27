@@ -296,7 +296,7 @@ static int	validate_imap(const char *line)
 int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
 {
 	unsigned short	port = 0;
-	char		*service, *ip_str, ip[MAX_ZBX_DNSNAME_LEN + 1], *port_str;
+	char		*service, *ip_str, ip[ZBX_MAX_DNSNAME_LEN + 1], *port_str;
 	int		value_int, ret = SYSINFO_RET_FAIL;
 	double		check_time;
 

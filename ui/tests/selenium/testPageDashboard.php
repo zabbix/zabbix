@@ -100,6 +100,7 @@ class testPageDashboard extends CLegacyWebTest {
 
 		$properties_form->fill(['Name' => 'Dashboard creation']);
 		$properties_form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 

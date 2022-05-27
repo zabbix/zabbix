@@ -117,8 +117,8 @@ ZBX_PTR_VECTOR_DECL(vmware_diskextent, zbx_vmware_diskextent_t *)
 
 typedef struct
 {
-	char				*name;
 	char				*uuid;
+	char				*name;
 	char				*id;
 	zbx_uint64_t			capacity;
 	zbx_uint64_t			free_space;
@@ -128,6 +128,7 @@ typedef struct
 }
 zbx_vmware_datastore_t;
 
+int	vmware_ds_uuid_compare(const void *d1, const void *d2);
 int	vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
 
@@ -144,6 +145,7 @@ ZBX_VECTOR_DECL(vmware_hvdisk, zbx_vmware_hvdisk_t)
 typedef struct
 {
 	char				*name;
+	char				*uuid;
 	zbx_vector_vmware_hvdisk_t	hvdisks;
 }
 zbx_vmware_dsname_t;
@@ -279,6 +281,7 @@ typedef struct
 	char			*id;
 	char			*parentid;
 	char			*path;
+	zbx_uint64_t		vm_num;
 }
 zbx_vmware_resourcepool_t;
 
@@ -466,7 +469,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 
 int	zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *type, const char *id,
 		const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
-		zbx_vector_custquery_param_t *query_instance);
+		zbx_vector_custquery_param_t *query_params);
 zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t *service, const char *type,
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode);
 
