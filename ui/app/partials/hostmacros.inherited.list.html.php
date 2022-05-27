@@ -53,11 +53,13 @@ $table->setColumns([
 ]);
 
 foreach ($data['macros'] as $i => $macro) {
+	$macro_readonly = !($macro['inherited_type'] & ZBX_PROPERTY_INHERITED)
+		? $macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC
+		: true;
+
 	$macro_cell = [
 		(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
-			->setReadonly($macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC
-				|| !($macro['inherited_type'] & ZBX_PROPERTY_OWN)
-			)
+			->setReadonly($macro_readonly)
 			->addClass('macro')
 			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 			->setAttribute('placeholder', '{$MACRO}'),
