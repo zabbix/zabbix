@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2021-03-19 17:58+0300\n"
-"Last-Translator: Anonymous Pootle User\n"
+"PO-Revision-Date: 2022-05-25 14:15+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1616169505.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
@@ -134,12 +135,12 @@ msgstr[2] "%1$s akcí"
 #: jsLoader.php:239
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s znaků"
 
 #: jsLoader.php:240
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "Zbývá %1$s znaků"
 
 #: app/views/popup.acknowledge.edit.php:59
 #: app/views/popup.acknowledge.edit.php:64
