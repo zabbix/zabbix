@@ -64,17 +64,16 @@ zbx_dbsync_obj_changelog_t;
 ZBX_VECTOR_DECL(dbsync_obj_changelog, zbx_dbsync_obj_changelog_t)
 ZBX_VECTOR_IMPL(dbsync_obj_changelog, zbx_dbsync_obj_changelog_t)
 
+ZBX_PTR_VECTOR_DECL(dbsync, zbx_dbsync_t *)
+ZBX_PTR_VECTOR_IMPL(dbsync, zbx_dbsync_t *)
+
 typedef struct
 {
 	zbx_vector_uint64_t			inserts;
 	zbx_vector_uint64_t			updates;
 	zbx_vector_uint64_t			deletes;
 
-	/* objects that are stored in the corresponding table,                */
-	/* but not cached and shouldn't be attempted to re-read it on failure */
-	zbx_vector_uint64_t			ignore_objectids;
-
-	const zbx_dbsync_t			*sync;
+	zbx_vector_dbsync_t 			syncs;
 	zbx_vector_dbsync_obj_changelog_t	changelog;
 }
 zbx_dbsync_journal_t;
@@ -295,7 +294,7 @@ void	zbx_dbsync_journal_init(zbx_dbsync_journal_t *journal)
 	zbx_vector_uint64_create(&journal->updates);
 	zbx_vector_uint64_create(&journal->deletes);
 
-	zbx_vector_uint64_create(&journal->ignore_objectids);
+	zbx_vector_dbsync_create(&journal->syncs);
 
 	zbx_vector_dbsync_obj_changelog_create(&journal->changelog);
 }
@@ -306,7 +305,7 @@ void	zbx_dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
 	zbx_vector_uint64_destroy(&journal->updates);
 	zbx_vector_uint64_destroy(&journal->deletes);
 
-	zbx_vector_uint64_destroy(&journal->ignore_objectids);
+	zbx_vector_dbsync_destroy(&journal->syncs);
 
 	zbx_vector_dbsync_obj_changelog_destroy(&journal->changelog);
 }
@@ -385,37 +384,36 @@ static void	dbsync_prune_changelog()
  ******************************************************************************/
 static void	dbsync_remove_duplicate_ids(zbx_vector_uint64_t *dst, const zbx_vector_uint64_t *src)
 {
-	int	i, j;
+	int	i, j, k;
 
-	if (0 == dst->values_num || 0 == src->values_num)
-		return;
-
-	for (i = 0, j = 0;;)
+	for (i = 0, j = 0, k = 0; j < src->values_num && i < dst->values_num;)
 	{
 		if (dst->values[i] == src->values[j])
 		{
-			if (i == --dst->values_num)
-				break;
-
-			memmove(dst->values + i, dst->values + i + 1, (dst->values_num - i) * sizeof(zbx_uint64_t));
-
-			if (++j == src->values_num)
-				break;
-
+			i++;
+			j++;
 			continue;
 		}
 
 		if (dst->values[i] < src->values[j])
 		{
-			if (++i == dst->values_num)
-				break;
+			while (dst->values[i] < src->values[j] && i < dst->values_num)
+				dst->values[k++] = dst->values[i++];
 		}
 		else
 		{
-			if (++j == src->values_num)
-				break;
+			while (dst->values[i] > src->values[j] && j < src->values_num)
+				j++;
 		}
 	}
+
+	if (j == src->values_num && i < dst->values_num)
+	{
+		memmove(dst->values + k, dst->values + i, (dst->values_num - i) * sizeof(zbx_uint64_t));
+		k += dst->values_num - i;
+	}
+
+	dst->values_num = k;
 }
 
 /******************************************************************************
@@ -507,29 +505,38 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	return changelog_num;
 }
 
-void	zbx_dbsync_env_set_sync(int object, const zbx_dbsync_t *sync)
-{
-	dbsync_env.journals[ZBX_DBSYNC_JOURNAL(object)].sync = sync;
-}
-
 static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 {
 	zbx_vector_uint64_t	objectids;
-	int			i;
+	int			i, j, objects_num;
+
+	if (0 == journal->changelog.values_num)
+		return;
+
+	objects_num = journal->inserts.values_num + journal->updates.values_num;
+
+	for (i = 0; i < journal->syncs.values_num; i++)
+		objects_num += journal->syncs.values[i]->rows.values_num;
 
 	zbx_vector_uint64_create(&objectids);
-	zbx_vector_uint64_reserve(&objectids, journal->sync->rows.values_num);
+	zbx_vector_uint64_reserve(&objectids, objects_num);
 
-	for (i = 0; i < journal->sync->rows.values_num; i++)
+	for (j = 0; j < journal->syncs.values_num; j++)
 	{
-		zbx_dbsync_row_t	*row = (zbx_dbsync_row_t *)journal->sync->rows.values[i];
+		for (i = 0; i < journal->syncs.values[j]->rows.values_num; i++)
+		{
+			zbx_dbsync_row_t	*row = (zbx_dbsync_row_t *)journal->syncs.values[j]->rows.values[i];
 
-		if (0 != row->rowid)
-			zbx_vector_uint64_append(&objectids, row->rowid);
+			if (0 != row->rowid)
+				zbx_vector_uint64_append(&objectids, row->rowid);
+		}
 	}
 
-	zbx_vector_uint64_append_array(&objectids, journal->ignore_objectids.values,
-			journal->ignore_objectids.values_num);
+	if (0 != journal->inserts.values_num)
+		zbx_vector_uint64_append_array(&objectids, journal->inserts.values, journal->inserts.values_num);
+
+	if (0 != journal->updates.values_num)
+		zbx_vector_uint64_append_array(&objectids, journal->updates.values, journal->updates.values_num);
 
 	zbx_vector_uint64_sort(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -582,17 +589,18 @@ int	zbx_dbsync_env_changelog_num(void)
  *                                                                            *
  ******************************************************************************/
 static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *field, const zbx_vector_uint64_t *ids, unsigned char tag, zbx_vector_uint64_t *ignore_ids)
+		const char *field, zbx_vector_uint64_t *ids, unsigned char tag)
 {
 	DB_ROW			dbrow;
 	DB_RESULT		result;
 	char			**row;
 	size_t			sql_offset_reset = *sql_offset;
 	zbx_uint64_t		rowid, *batch;
-	int			batch_size, i, j;
+	int			batch_size;
 	zbx_vector_uint64_t	read_ids;
 
 	zbx_vector_uint64_create(&read_ids);
+	zbx_vector_uint64_reserve(&read_ids, ids->values_num);
 
 	for (batch = ids->values; batch < ids->values + ids->values_num; batch += ZBX_DBSYNC_BATCH_SIZE)
 	{
@@ -616,15 +624,7 @@ static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, si
 	}
 
 	zbx_vector_uint64_sort(&read_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	for (i = 0, j = 0; i < ids->values_num && j < read_ids.values_num; i++, j++)
-	{
-		while (ids->values[i] < read_ids.values[j])
-			zbx_vector_uint64_append(ignore_ids, ids->values[i]);
-	}
-
-	for (; i < ids->values_num; i++)
-		zbx_vector_uint64_append(ignore_ids, ids->values[i]);
+	dbsync_remove_duplicate_ids(ids, &read_ids);
 
 	zbx_vector_uint64_destroy(&read_ids);
 
@@ -641,7 +641,7 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
 {
 	int	i;
 
-	journal->sync = sync;
+	zbx_vector_dbsync_append(&journal->syncs, sync);
 
 	if (0 != journal->inserts.values_num || 0 != journal->updates.values_num)
 	{
@@ -651,7 +651,7 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
 		if (0 != journal->inserts.values_num)
 		{
 			if (FAIL == dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, &journal->inserts,
-					ZBX_DBSYNC_ROW_ADD, &journal->ignore_objectids))
+					ZBX_DBSYNC_ROW_ADD))
 			{
 				return FAIL;
 			}
@@ -660,7 +660,7 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
 		if (0 != journal->updates.values_num)
 		{
 			if (FAIL == dbsync_get_rows(sync, sql, sql_alloc, sql_offset, field, &journal->updates,
-					ZBX_DBSYNC_ROW_UPDATE, &journal->ignore_objectids))
+					ZBX_DBSYNC_ROW_UPDATE))
 			{
 				return FAIL;
 			}
