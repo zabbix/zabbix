@@ -1731,7 +1731,7 @@ class CHost extends CHostGeneral {
 
 			$sql_options = [
 				'output' => $output,
-				'filter' => ['hostid' => array_keys($result)]
+				'filter' => ['hostid' => $hostids]
 			];
 			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
 

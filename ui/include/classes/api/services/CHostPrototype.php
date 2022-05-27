@@ -234,7 +234,6 @@ class CHostPrototype extends CHostBase {
 
 		$hostids = array_keys($result);
 
-		// adding discovery rule
 		if ($options['selectDiscoveryRule'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'parent_itemid', 'host_discovery');
 			$discoveryRules = API::DiscoveryRule()->get([
@@ -249,7 +248,6 @@ class CHostPrototype extends CHostBase {
 		self::addRelatedGroupLinks($options, $result);
 		self::addRelatedGroupPrototypes($options, $result);
 
-		// adding host
 		if ($options['selectParentHost'] !== null) {
 			$hosts = [];
 			$relationMap = new CRelationMap();
@@ -278,7 +276,6 @@ class CHostPrototype extends CHostBase {
 			$result = $relationMap->mapOne($result, $hosts, 'parentHost');
 		}
 
-		// adding templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
 				$templates = [];
@@ -310,7 +307,6 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		// adding tags
 		if ($options['selectTags'] !== null) {
 			foreach ($result as &$row) {
 				$row['tags'] = [];
@@ -326,7 +322,7 @@ class CHostPrototype extends CHostBase {
 
 			$sql_options = [
 				'output' => $output,
-				'filter' => ['hostid' => array_keys($result)]
+				'filter' => ['hostid' => $hostids]
 			];
 			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
 
