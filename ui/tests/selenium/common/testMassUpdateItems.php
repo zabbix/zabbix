@@ -745,6 +745,34 @@ class testMassUpdateItems extends CWebTest{
 			],
 			[
 				[
+					'expected' => TEST_BAD,
+					'names' => [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Calculated'],
+						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)']
+					],
+					'details' => 'Invalid parameter "/1": the parameter "params" is missing.'
+				]
+			],
+			[
+				[
+					'names' => [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
+						'User name' => ['id' => 'username', 'value' => 'telnet_name'],
+						'Password' => ['id' => 'password', 'value' => 'telnet_password']
+					],
+					'details' => 'Invalid parameter "/1": the parameter "params" is missing.'
+				]
+			],
+			[
+				[
 					'names' => [
 						'17_Script',
 						'18_Script'
@@ -1161,31 +1189,6 @@ class testMassUpdateItems extends CWebTest{
 			[
 				[
 					'names' => [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
-						'User name' => ['id' => 'username', 'value' => 'telnet_name'],
-						'Password' => ['id' => 'password', 'value' => 'telnet_password']
-					]
-				]
-			],
-			[
-				[
-					'names' => [
-						'1_Item',
-						'2_Item'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'Calculated'],
-						'Type of information' => ['id' => 'value_type', 'value' => 'Numeric (float)']
-					]
-				]
-			],
-			[
-				[
-					'names' => [
 						'15_Calculated',
 						'16_Calculated'
 					],
@@ -1552,7 +1555,7 @@ class testMassUpdateItems extends CWebTest{
 						['type' => 'Simple change'],
 						['type' => 'Simple change']
 					],
-					'details' => 'Only one change step is allowed.'
+					'details' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within the combinations of (type)=((9, 10)).'
 				]
 			],
 			[
@@ -1565,7 +1568,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => [
 						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
 					],
-					'details' => 'Incorrect value for field "params": "min" value must be less than or equal to "max" value.'
+					'details' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be less than or equal to the value of parameter "/1/preprocessing/1/params/1".'
 				]
 			],
 			[
@@ -1578,7 +1581,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => [
 						['type' => 'Check for error using regular expression', 'parameter_1' => 'test']
 					],
-					'details' => 'Incorrect value for field "params": second parameter is expected.'
+					'details' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
 				]
 			],
 			[
@@ -1592,7 +1595,7 @@ class testMassUpdateItems extends CWebTest{
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
-					'details' => 'Only one throttling step is allowed.'
+					'details' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within the combinations of (type)=((19, 20)).'
 				]
 			],
 			[
@@ -1605,7 +1608,7 @@ class testMassUpdateItems extends CWebTest{
 					'Preprocessing steps' => [
 						['type' => 'Regular expression']
 					],
-					'details' => 'Incorrect value for field "params": first parameter is expected.'
+					'details' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
 				]
 			],
 			[
@@ -1623,7 +1626,7 @@ class testMassUpdateItems extends CWebTest{
 							'error_handler' => 'Set error to'
 						]
 					],
-					'details' => 'Incorrect value for field "error_handler_params": cannot be empty.'
+					'details' => 'Invalid parameter "/1/preprocessing/1/error_handler_params": cannot be empty.'
 				]
 			],
 			[
@@ -1762,7 +1765,7 @@ class testMassUpdateItems extends CWebTest{
 							]
 						]
 					],
-					'details' => 'Invalid parameter "/1/tags/2/tag": cannot be empty.'
+					'details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
 			// TODO: Uncomment this case when ZBX-19263 is fixed.

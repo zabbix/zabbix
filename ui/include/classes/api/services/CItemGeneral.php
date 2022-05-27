@@ -225,7 +225,7 @@ abstract class CItemGeneral extends CApiService {
 			'type' => API_OBJECTS,
 			'uniq_by_values' => [
 				['type' => [ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED]],
-				['type' => [ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
+				['type' => [ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
 				['type' => [ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON]]
 			],
 			'fields' => [

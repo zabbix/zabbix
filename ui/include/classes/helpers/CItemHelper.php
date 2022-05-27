@@ -30,7 +30,7 @@ class CItemHelper {
 	 * @param array $field_rules  API input rule fields.
 	 *
 	 * @return array  Resulting index of input fields to be fed into validation for if-conditions to work.
-	 *                Note: fields used in if-closures may need to be added manually.
+	 *                Note: fields used in if-closures and affected objects may need to be added manually.
 	 */
 	public static function extractConditionFields(array $field_rules): array {
 		$result = [];

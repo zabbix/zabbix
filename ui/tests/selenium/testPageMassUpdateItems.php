@@ -239,6 +239,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
+						'Update interval' => ['Delay' => '1m'],
 						'Status' => ['id' => 'status', 'value' => 'Disabled']
 					]
 				]
@@ -252,6 +253,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
+						'Update interval' => ['Delay' => '1m'],
 						'Status' => ['id' => 'status', 'value' => 'Enabled']
 					]
 				]
