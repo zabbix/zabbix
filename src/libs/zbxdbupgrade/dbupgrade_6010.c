@@ -21,7 +21,6 @@
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxalgo.h"
-#include "log.h"
 
 extern unsigned char	program_type;
 
