@@ -21,6 +21,7 @@
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "zbxalgo.h"
+#include "log.h"
 
 extern unsigned char	program_type;
 
@@ -751,9 +752,6 @@ static int	DBpatch_6010033_split_groups(void)
 		zbx_vector_hstgrp_append(&hstgrps, hstgrp);
 	}
 	DBfree_result(result);
-
-	if (0 == hstgrps.values_num)
-		goto out;
 
 	result = DBselect(
 			"select distinct g.groupid"
