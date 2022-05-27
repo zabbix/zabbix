@@ -466,7 +466,7 @@ if ($data['interfaces']) {
 }
 
 $form_list
-	// Append SNMP common fields fields.
+	// Append SNMP common fields.
 	->addRow(
 		(new CLabel(_('SNMP OID'), 'snmp_oid'))->setAsteriskMark(),
 		(new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))
