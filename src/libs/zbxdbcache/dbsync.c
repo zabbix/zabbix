@@ -397,12 +397,12 @@ static void	dbsync_remove_duplicate_ids(zbx_vector_uint64_t *dst, const zbx_vect
 
 		if (dst->values[i] < src->values[j])
 		{
-			while (dst->values[i] < src->values[j] && i < dst->values_num)
+			while (i < dst->values_num && dst->values[i] < src->values[j])
 				dst->values[k++] = dst->values[i++];
 		}
 		else
 		{
-			while (dst->values[i] > src->values[j] && j < src->values_num)
+			while (j < src->values_num && dst->values[i] > src->values[j])
 				j++;
 		}
 	}
