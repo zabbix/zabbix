@@ -407,7 +407,7 @@ static void	dbsync_remove_duplicate_ids(zbx_vector_uint64_t *dst, const zbx_vect
 		}
 	}
 
-	if (j == src->values_num && i < dst->values_num)
+	if (j == src->values_num && i < dst->values_num && k != i)
 	{
 		memmove(dst->values + k, dst->values + i, (dst->values_num - i) * sizeof(zbx_uint64_t));
 		k += dst->values_num - i;
