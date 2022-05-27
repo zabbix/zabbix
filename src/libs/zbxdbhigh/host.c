@@ -1424,7 +1424,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	/* delete from items */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update items set master_itemid=null where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "and master_itemid is not null;\n");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and master_itemid is not null;\n");
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
