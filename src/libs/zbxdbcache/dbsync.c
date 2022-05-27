@@ -1093,9 +1093,6 @@ static int	dbsync_compare_host_macro(const zbx_um_macro_t *hmacro, const DB_ROW 
 	if (FAIL == dbsync_compare_uchar(dbrow[4], hmacro->type))
 		return FAIL;
 
-	if (FAIL == dbsync_compare_uchar(dbrow[5], hmacro->automatic))
-		return FAIL;
-
 	if (ZBX_MACRO_VALUE_VAULT == atoi(dbrow[4]))
 	{
 		if (FAIL == um_macro_check_vault_location(hmacro, dbrow[3]))
@@ -1157,7 +1154,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	zbx_um_macro_t		**pmacro;
 
 	if (NULL == (result = DBselect(
-			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type,m.automatic"
+			"select m.hostmacroid,m.hostid,m.macro,m.value,m.type"
 			" from hostmacro m"
 			" inner join hosts h on m.hostid=h.hostid"
 			" where h.flags<>%d", ZBX_FLAG_DISCOVERY_PROTOTYPE)))
@@ -1165,7 +1162,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 6, NULL);
+	dbsync_prepare(sync, 5, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

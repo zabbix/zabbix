@@ -28,7 +28,6 @@ typedef struct
 	zbx_uint64_t	macroid;
 	zbx_uint64_t	hostid;
 	unsigned char	type;
-	unsigned char	automatic;
 	char		*macro;
 	char		*value;
 }

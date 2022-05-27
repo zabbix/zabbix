@@ -100,7 +100,6 @@ void	mock_config_load_user_macros(const char *path)
 		macro->value = zbx_strdup(NULL, macro_value);
 		macro->context_op = 0;
 		macro->type = 0;
-		macro->automatic = 0;
 		macro->context = context;
 		macro->refcount = 0;
 
