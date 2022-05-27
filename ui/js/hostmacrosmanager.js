@@ -204,6 +204,7 @@ class HostMacrosManager {
 						.val(original_macro)
 						.prop('readonly', true)
 						.trigger('input');
+					$('#macros_' + num + '_value_btn', $row).prop('disabled', true);
 					$('#macros_' + num + '_type_button', $row)
 						.removeClass()
 						.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[original_type]].join(' '))
@@ -233,6 +234,7 @@ class HostMacrosManager {
 					$('#macros_' + num + '_value', $row)
 						.prop('readonly', false)
 						.focus();
+					$('#macros_' + num + '_value_btn', $row).prop('disabled', false);
 					$('#macros_' + num + '_type_button', $row)
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
