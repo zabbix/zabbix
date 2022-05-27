@@ -987,8 +987,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		for (i = 0; i < override_tags.values_num; i++)
 		{
 			tmp_tag = (zbx_db_tag_t *)override_tags.values[i];
-			tmp_host_tag = zbx_db_host_tag_create(tmp_host_tag->tag, tmp_host_tag->value,
-					ZBX_TAG_AUTOMATIC);
+			tmp_host_tag = zbx_db_host_tag_create(tmp_tag->tag, tmp_tag->value, ZBX_TAG_AUTOMATIC);
 			zbx_vector_db_host_tag_ptr_append(&tmp_host_tags, tmp_host_tag);
 		}
 
