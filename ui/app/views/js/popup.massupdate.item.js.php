@@ -64,7 +64,7 @@
 (() => {
 	const history_toggle = document.getElementById('history_mode');
 
-	if (!history_elem) {
+	if (!history_toggle) {
 		return false;
 	}
 
