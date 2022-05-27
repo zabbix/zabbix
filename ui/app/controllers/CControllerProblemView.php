@@ -99,11 +99,10 @@ class CControllerProblemView extends CControllerProblem {
 	}
 
 	protected function doAction() {
+		$filter_tabs = [];
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
 			->read()
 			->setInput($this->cleanInput($this->getInputAll()));
-
-		$filter_tabs = [];
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($filter_tab['filter_custom_time']) {
 				$filter_tab['show'] = TRIGGERS_OPTION_ALL;

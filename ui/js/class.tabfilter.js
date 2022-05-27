@@ -450,7 +450,7 @@ class CTabFilter extends CBaseComponent {
 			collapse: (ev) => {
 				let item = ev.detail.target;
 
-				if (item !== this._timeselector && item._index != 0) {
+				if (item !== this._timeselector) {
 					item.updateUnsavedState();
 				}
 
@@ -664,7 +664,6 @@ class CTabFilter extends CBaseComponent {
 					url = new Curl('zabbix.php', false);
 
 				url.setArgument('action', current_url.getArgument('action'));
-				url.setArgument('filter_selected', this._options.selected);
 				url.setArgument('filter_reset', 1);
 				window.location.href = url.getUrl();
 			},

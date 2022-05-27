@@ -110,7 +110,6 @@ class CControllerPopupTabFilterUpdate extends CController {
 		}
 
 		$filter->tabfilters[$idx2] = $properties;
-
 		$filter->update();
 
 		$this->setResponse(new CControllerResponseData([
