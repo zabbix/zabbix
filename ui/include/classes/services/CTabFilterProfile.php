@@ -317,9 +317,7 @@ class CTabFilterProfile {
 
 		if ($this->filter_defaults) {
 			foreach ($tabfilters as &$tabfilter) {
-				$tabfilter = CArrayHelper::unsetEqualValues($tabfilter, $this->filter_defaults) + [
-					'filter_name' => $tabfilter['filter_name']
-				];
+				$tabfilter = CArrayHelper::unsetEqualValues($tabfilter, $this->filter_defaults);
 
 				if (array_key_exists('filter_show_counter', $tabfilter)) {
 					$tabfilter['filter_show_counter'] = (int) $tabfilter['filter_show_counter'];

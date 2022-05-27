@@ -42,6 +42,7 @@ class CTabFilterItem extends CBaseComponent {
 		this._parent = options.parent || null;
 		this._idx_namespace = options.idx_namespace;
 		this._index = options.index;
+		this._unsaved = false;
 		this._unsaved_indicator = null;
 		this._content_container = options.container;
 		this._data = options.data || {};
@@ -76,7 +77,7 @@ class CTabFilterItem extends CBaseComponent {
 
 		green_dot.setAttribute('data-indicator-value', '1');
 		green_dot.setAttribute('data-indicator', 'mark');
-		green_dot.classList.add('display-none');
+		green_dot.classList.toggle('display-none', !this._unsaved);
 		this._target.appendChild(green_dot);
 
 		this._unsaved_indicator = green_dot;
@@ -338,6 +339,7 @@ class CTabFilterItem extends CBaseComponent {
 		}
 
 		this._target.text = data.filter_name;
+		this.initUnsavedIndicator();
 		this.setBrowserLocationToApplyUrl();
 	}
 
