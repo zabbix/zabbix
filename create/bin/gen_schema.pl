@@ -17,13 +17,17 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 use strict;
+use warnings;
+
 use File::Basename;
 
-my $file = dirname($0)."/../src/schema.tmpl";	# name the file
+my $file = dirname($0) . "/../src/schema.tmpl";	# name the file
 
 my ($state, %output, $eol, $fk_bol, $fk_eol, $ltab, $pkey, $table_name, $pkey_name);
 my ($szcol1, $szcol2, $szcol3, $szcol4, $sequences, $sql_suffix, $triggers);
 my ($fkeys, $fkeys_prefix, $fkeys_suffix, $uniq, $delete_cascade);
+
+my %table_types;	# for making sure that table types aren't duplicated
 
 my %c = (
 	"type"		=>	"code",
@@ -41,7 +45,7 @@ my %c = (
 	"t_shorttext"	=>	"ZBX_TYPE_SHORTTEXT",
 	"t_time"	=>	"ZBX_TYPE_INT",
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
-	"t_cuid"	=>	"ZBX_TYPE_CUID"
+	"t_cuid"	=>	"ZBX_TYPE_CUID",
 );
 
 $c{"before"} = "/*
@@ -97,7 +101,7 @@ my %mysql = (
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
-	"t_cuid"	=>	"varchar(25)"
+	"t_cuid"	=>	"varchar(25)",
 );
 
 my %oracle = (
@@ -118,7 +122,7 @@ my %oracle = (
 	"t_shorttext"	=>	"nvarchar2(2048)",
 	"t_time"	=>	"number(10)",
 	"t_varchar"	=>	"nvarchar2",
-	"t_cuid"	=>	"nvarchar2(25)"
+	"t_cuid"	=>	"nvarchar2(25)",
 );
 
 my %postgresql = (
@@ -139,7 +143,7 @@ my %postgresql = (
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
-	"t_cuid"	=>	"varchar(25)"
+	"t_cuid"	=>	"varchar(25)",
 );
 
 my %sqlite3 = (
@@ -160,7 +164,7 @@ my %sqlite3 = (
 	"t_shorttext"	=>	"text",
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
-	"t_cuid"	=>	"varchar(25)"
+	"t_cuid"	=>	"varchar(25)",
 );
 
 sub rtrim($)
@@ -170,9 +174,9 @@ sub rtrim($)
 	return $string;
 }
 
-sub newstate
+sub newstate($)
 {
-	my $new = $_[0];
+	my $new = shift;
 
 	if ($state eq "field")
 	{
@@ -180,7 +184,10 @@ sub newstate
 		{
 			print "${pkey}${eol}\n)$output{'table_options'};${eol}\n";
 		}
-		if ($new eq "field") { print ",${eol}\n"; }
+		if ($new eq "field")
+		{
+			print ",${eol}\n";
+		}
 	}
 
 	if ($state ne "bof")
@@ -202,13 +209,13 @@ sub newstate
 	$state = $new;
 }
 
-sub process_table
+sub process_table($)
 {
-	my $line = $_[0];
+	my $line = shift;
 	my $flags;
 
 	newstate("table");
-	
+
 	$delete_cascade = 0;
 
 	($table_name, $pkey_name, $flags) = split(/\|/, $line, 3);
@@ -242,7 +249,7 @@ sub process_table
 		}
 		else
 		{
-			$pkey = ""
+			$pkey = "";
 		}
 
 		if ($output{"database"} eq "mysql")
@@ -256,34 +263,21 @@ sub process_table
 	}
 }
 
-sub process_field
+sub process_field($)
 {
-	my $line = $_[0];
-	my $type_2;
+	my $line = shift;
+
 	newstate("field");
 
-	my $name = "";
-	my $type = "";
-	my $default = "";
-	my $null = "";
-	my $flags = "";
-	my $relN = "";
-	my $fk_table = "";
-	my $fk_field = "";
-	my $fk_flags = "";
-
-	($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
-	my ($type_short, $length) = split(/\(/, $type, 2);
+	my ($name, $type, $default, $null, $flags, $relN, $fk_table, $fk_field, $fk_flags) = split(/\|/, $line, 9);
+	my ($type_short, $length) = $type =~ /^(\w+)(?:\((\d+)\))?$/;
 
 	if ($output{"type"} eq "code")
 	{
 		$type = $output{$type_short};
 		if ($type eq "ZBX_TYPE_CHAR")
 		{
-			for ($length)
-			{
-				s/\)//;
-			}
+			# use specified $length, don't override it
 		}
 		elsif ($type eq "ZBX_TYPE_TEXT")
 		{
@@ -328,10 +322,7 @@ sub process_field
 			}
 		}
 
-		for ($flags)
-		{
-			s/,/ \| /g;
-		}
+		$flags =~ s/,/ \| /g;
 
 		if ($fk_table)
 		{
@@ -366,8 +357,8 @@ sub process_field
 		}
 		else
 		{
-			s/'//g for ($default);
-			$default = "\"$default\""
+			$default =~ s/'//g;
+			$default = "\"$default\"";
 		}
 
 		print "\t\t{\"${name}\",\t${default},\t${fk_table},\t${fk_field},\t${length},\t$type,\t${flags},\t${fk_flags}}";
@@ -375,19 +366,17 @@ sub process_field
 	else
 	{
 		my @text_fields;
-		$a = $output{$type_short};
-		$_ = $type;
-		s/$type_short/$a/g;
-		$type_2 = $_;
 
-		if (($output{"database"} eq "oracle") && (0 == index($type_2, "nvarchar2") || 0 == index($type_2, "nclob")))
+		$type =~ s/$type_short/$output{$type_short}/g;
+
+		if (($output{"database"} eq "oracle") && (index($type, "nvarchar2") == 0 || index($type, "nclob") == 0))
 		{
 			$null = "";
 		}
 
 		my $row = $null;
 
-		if ($type eq "t_serial")
+		if ($type_short eq "t_serial")
 		{
 			if ($output{"database"} eq "sqlite3")
 			{
@@ -400,16 +389,16 @@ sub process_field
 			}
 			elsif ($output{"database"} eq "oracle")
 			{
-				$sequences = "${sequences}CREATE SEQUENCE ${table_name}_seq${eol}\n";
-				$sequences = "${sequences}START WITH 1${eol}\n";
-				$sequences = "${sequences}INCREMENT BY 1${eol}\n";
-				$sequences = "${sequences}NOMAXVALUE${eol}\n/${eol}\n";
-				$sequences = "${sequences}CREATE TRIGGER ${table_name}_tr${eol}\n";
-				$sequences = "${sequences}BEFORE INSERT ON ${table_name}${eol}\n";
-				$sequences = "${sequences}FOR EACH ROW${eol}\n";
-				$sequences = "${sequences}BEGIN${eol}\n";
-				$sequences = "${sequences}SELECT ${table_name}_seq.nextval INTO :new.${name} FROM dual;${eol}\n";
-				$sequences = "${sequences}END;${eol}\n/${eol}\n";
+				$sequences .= "CREATE SEQUENCE ${table_name}_seq${eol}\n";
+				$sequences .= "START WITH 1${eol}\n";
+				$sequences .= "INCREMENT BY 1${eol}\n";
+				$sequences .= "NOMAXVALUE${eol}\n/${eol}\n";
+				$sequences .= "CREATE TRIGGER ${table_name}_tr${eol}\n";
+				$sequences .= "BEFORE INSERT ON ${table_name}${eol}\n";
+				$sequences .= "FOR EACH ROW${eol}\n";
+				$sequences .= "BEGIN${eol}\n";
+				$sequences .= "SELECT ${table_name}_seq.nextval INTO :new.${name} FROM dual;${eol}\n";
+				$sequences .= "END;${eol}\n/${eol}\n";
 			}
 		}
 
@@ -454,11 +443,11 @@ sub process_field
 
 				if ($output{"database"} eq "mysql")
 				{
-					$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} `${table_name}` ADD CONSTRAINT `${cname}` FOREIGN KEY (`${name}`) REFERENCES `${fk_table}` (`${fk_field}`)${fk_flags}${fk_eol}\n";
+					$fkeys .= "${fk_bol}ALTER TABLE${only} `${table_name}` ADD CONSTRAINT `${cname}` FOREIGN KEY (`${name}`) REFERENCES `${fk_table}` (`${fk_field}`)${fk_flags}${fk_eol}\n";
 				}
 				else
 				{
-					$fkeys = "${fkeys}${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
+					$fkeys .= "${fk_bol}ALTER TABLE${only} ${table_name} ADD CONSTRAINT ${cname} FOREIGN KEY (${name}) REFERENCES ${fk_table} (${fk_field})${fk_flags}${fk_eol}\n";
 				}
 			}
 		}
@@ -476,14 +465,14 @@ sub process_field
 			$default = "DEFAULT $default";
 		}
 
-		printf "${ltab}%-*s %-*s %-*s ${row}${references}", $szcol1, $name, $szcol2, $type_2, $szcol3, $default;
+		printf("${ltab}%-*s %-*s %-*s ${row}${references}", $szcol1, $name, $szcol2, $type, $szcol3, $default);
 	}
 }
 
-sub process_index
+sub process_index($$)
 {
-	my $line = $_[0];
-	my $unique = $_[1];
+	my $line   = shift;
+	my $unique = shift;
 
 	newstate("index");
 
@@ -509,34 +498,26 @@ sub process_index
 
 		if ($output{"database"} eq "mysql")
 		{
-			for ($fields)
-			{
-				s/,/`,`/g;
-			}
+			$fields =~ s/,/`,`/g;
 
 			my $quote_index = "`$fields`";
+			$quote_index =~ s/\)`/\)/g;
+			$quote_index =~ s/\(/`\(/g;
 
-			for ($quote_index)
-			{
-				s/\)`/\)/g;
-				s/\(/`\(/g;
-			}
 			print "CREATE${unique} INDEX `${table_name}_$name` ON `$table_name` ($quote_index);${eol}\n";
 		}
 		else
 		{
-			for ($fields)
-			{
-				s/\(\d+\)//g;
-			}
+			$fields =~ s/\(\d+\)//g;
+
 			print "CREATE${unique} INDEX ${table_name}_$name ON $table_name ($fields);${eol}\n";
 		}
 	}
 }
 
-sub process_row
+sub process_row($)
 {
-	my $line = $_[0];
+	my $line = shift;
 
 	newstate("row");
 
@@ -547,7 +528,7 @@ sub process_row
 
 	foreach (@array)
 	{
-		$values = "$values," if ($first == 0);
+		$values .= "," if ($first == 0);
 		$first = 0;
 
 		# remove leading and trailing spaces
@@ -556,7 +537,7 @@ sub process_row
 
 		if ($_ eq 'NULL')
 		{
-			$values = "$values$_";
+			$values .= $_;
 		}
 		else
 		{
@@ -600,16 +581,16 @@ sub process_row
 				$_ =~ s/&eol;/\x0D\x0A/g;
 			}
 
-			$values = "$values$modifier'$_'";
+			$values .= "${modifier}'${_}'";
 		}
 	}
 
-	$values = "$values)";
+	$values .= ")";
 
 	print "INSERT INTO $table_name VALUES $values;${eol}\n";
 }
 
-sub timescaledb
+sub timescaledb()
 {
 	print<<EOF
 DO \$\$
@@ -698,14 +679,14 @@ EOF
 	exit;
 }
 
-sub usage
+sub usage()
 {
 	print "Usage: $0 [c|mysql|oracle|postgresql|sqlite3|timescaledb]\n";
 	print "The script generates Zabbix SQL schemas and C code for different database engines.\n";
 	exit;
 }
 
-sub unix_timestamp
+sub unix_timestamp()
 {
 	if ($output{"database"} eq "mysql")
 	{
@@ -725,78 +706,42 @@ sub unix_timestamp
 	}
 }
 
-sub table_type
+sub open_trigger($)
 {
-	if (${table_name} eq "hosts")
-	{
-		return 1;
-	}
-	if (${table_name} eq "host_tag")
-	{
-		return 2;
-	}
-	if (${table_name} eq "items")
-	{
-		return 3;
-	}
-	if (${table_name} eq "item_tag")
-	{
-		return 4;
-	}
-	if (${table_name} eq "triggers")
-	{
-		return 5;
-	}
-	if (${table_name} eq "trigger_tag")
-	{
-		return 6;
-	}
-	if (${table_name} eq "functions")
-	{
-		return 7;
-	}
-	if (${table_name} eq "item_preproc")
-	{
-		return 8;
-	}
-}
+	my $type = shift;
+	my $out;
 
-sub open_trigger
-{
-	my ($type) = @_;
-	my ($out);
-	
 	$out = "CREATE TRIGGER ${table_name}_${type}${eol}\n";
 	if ($type eq "insert")
 	{
-		$out = "${out}BEFORE INSERT";
+		$out .= "BEFORE INSERT";
 	}
 	elsif ($type eq "update")
 	{
-		$out = "${out}AFTER UPDATE";
+		$out .= "AFTER UPDATE";
 	}
 	elsif ($type eq "delete")
 	{
-		$out = "${out}AFTER DELETE";
+		$out .= "AFTER DELETE";
 	}
-	
-	$out = "${out} ON ${table_name}${eol}\n";
-	$out = "${out}FOR EACH ROW${eol}\n";
-	
+
+	$out .= " ON ${table_name}${eol}\n";
+	$out .= "FOR EACH ROW${eol}\n";
+
 	if ($output{"database"} eq "mysql" || $output{"database"} eq "oracle"  || $output{"database"} eq "sqlite3")
 	{
-		$out = "${out}BEGIN${eol}\n";
-		$out = "${out}INSERT INTO changelog (object,objectid,operation,clock)${eol}\n";
+		$out .= "BEGIN${eol}\n";
+		$out .= "INSERT INTO changelog (object,objectid,operation,clock)${eol}\n";
 	}
 	elsif ($output{"database"} eq "postgresql")
 	{
-		$out = "${out}execute procedure changelog_${table_name}_${type}();${eol}\n";
+		$out .= "execute procedure changelog_${table_name}_${type}();${eol}\n";
 	}
-	
+
 	return $out;
 }
 
-sub close_trigger
+sub close_trigger()
 {
 	if ($output{"database"} eq "mysql")
 	{
@@ -816,92 +761,101 @@ sub close_trigger
 	}
 }
 
-sub open_function
+sub open_function($)
 {
-	my ($type) = @_;
-	my ($out);
-	
+	my $type = shift;
+	my $out;
+
 	$out = "create or replace function changelog_${table_name}_${type}() returns trigger as \$\$${eol}\n";
-	$out = "${out}begin${eol}\n";
-	$out = "${out}insert into changelog (object,objectid,operation,clock)";
-	
+	$out .= "begin${eol}\n";
+	$out .= "insert into changelog (object,objectid,operation,clock)";
+
 	return $out;
 }
 
-sub close_function
+sub close_function()
 {
-	my ($out);
-	
+	my $out;
+
 	$out = "return new;${eol}\n";
-	$out = "${out}end;${eol}\n";
-	$out = "${out}\$\$ language plpgsql;${eol}\n";
-	
+	$out .= "end;${eol}\n";
+	$out .= "\$\$ language plpgsql;${eol}\n";
+
 	return $out;
 }
 
-sub process_changelog
+sub process_changelog($)
 {
+	my $table_type = shift;
+
 	if ($delete_cascade)
 	{
-		close 
-		die "foreign keys without RESTRICT flag are not compatible with table CHANGELOG token";
+		die("foreign keys without RESTRICT flag are not compatible with table CHANGELOG token");
 	}
-	
+
+	if (exists($table_types{$table_type}) && $table_types{$table_type} ne $table_name)
+	{
+		die("cannot use table type '$table_type' for table '$table_name', it was already used for table '$table_types{$table_type}'");
+	}
+	$table_types{$table_type} = $table_name;
+
+	my $unix_timestamp = unix_timestamp();
+
 	if ($output{"database"} eq "c")
 	{
-		return
+		return;
 	}
 	elsif ($output{"database"} eq "mysql" || $output{"database"} eq "sqlite3")
 	{
-		$triggers = "${triggers}@{[open_trigger('insert')]}";
-		$triggers = "${triggers}VALUES (@{[table_type()]},new.${pkey_name},1,@{[unix_timestamp()]});${eol}\n";
-		$triggers = "${triggers}@{[close_trigger()]}";
-		
-		$triggers = "${triggers}@{[open_trigger('update')]}";
-		$triggers = "${triggers}VALUES (@{[table_type()]},old.${pkey_name},2,@{[unix_timestamp()]});${eol}\n";
-		$triggers = "${triggers}@{[close_trigger()]}";
-		
-		$triggers = "${triggers}@{[open_trigger('delete')]}";
-		$triggers = "${triggers}VALUES (@{[table_type()]},old.${pkey_name},3,@{[unix_timestamp()]});${eol}\n";
-		$triggers = "${triggers}@{[close_trigger()]}";
+		$triggers .= open_trigger('insert');
+		$triggers .= "VALUES (${table_type},new.${pkey_name},1,${unix_timestamp});${eol}\n";
+		$triggers .= close_trigger();
+
+		$triggers .= open_trigger('update');
+		$triggers .= "VALUES (${table_type},old.${pkey_name},2,${unix_timestamp});${eol}\n";
+		$triggers .= close_trigger();
+
+		$triggers .= open_trigger('delete');
+		$triggers .= "VALUES (${table_type},old.${pkey_name},3,${unix_timestamp});${eol}\n";
+		$triggers .= close_trigger();
 	}
 	elsif ($output{"database"} eq "postgresql")
 	{
-		$triggers = "${triggers}@{[open_function('insert')]}";
-		$triggers = "${triggers} values (@{[table_type()]},new.${pkey_name},1,@{[unix_timestamp()]});${eol}\n";
-		$triggers = "${triggers}@{[close_function()]}";
-		$triggers = "${triggers}@{[open_trigger('insert')]}";
-		$triggers = "${triggers}@{[close_trigger()]}";
-		
-		$triggers = "${triggers}@{[open_function('update')]}";
-		$triggers = "${triggers} values (@{[table_type()]},old.${pkey_name},2,@{[unix_timestamp()]});${eol}\n";
-		$triggers = "${triggers}@{[close_function()]}";
-		$triggers = "${triggers}@{[open_trigger('update')]}";
-		$triggers = "${triggers}@{[close_trigger()]}";
-		
-		$triggers = "${triggers}@{[open_function('delete')]}";
-		$triggers = "${triggers} values (@{[table_type()]},old.${pkey_name},3,@{[unix_timestamp()]});${eol}\n";
-		$triggers = "${triggers}@{[close_function()]}";
-		$triggers = "${triggers}@{[open_trigger('delete')]}";
-		$triggers = "${triggers}@{[close_trigger()]}";
+		$triggers .= open_function('insert');
+		$triggers .= " values (${table_type},new.${pkey_name},1,${unix_timestamp});${eol}\n";
+		$triggers .= close_function();
+		$triggers .= open_trigger('insert');
+		$triggers .= close_trigger();
+
+		$triggers .= open_function('update');
+		$triggers .= " values (${table_type},old.${pkey_name},2,${unix_timestamp});${eol}\n";
+		$triggers .= close_function();
+		$triggers .= open_trigger('update');
+		$triggers .= close_trigger();
+
+		$triggers .= open_function('delete');
+		$triggers .= " values (${table_type},old.${pkey_name},3,${unix_timestamp});${eol}\n";
+		$triggers .= close_function();
+		$triggers .= open_trigger('delete');
+		$triggers .= close_trigger();
 	}
 	elsif ($output{"database"} eq "oracle")
 	{
-		$triggers = "${triggers}@{[open_trigger('insert')]}";
-		$triggers = "${triggers}VALUES (@{[table_type()]},:new.${pkey_name},1,@{[unix_timestamp()]});${eol}\n";
-		$triggers = "${triggers}@{[close_trigger()]}";
+		$triggers .= open_trigger('insert');
+		$triggers .= "VALUES (${table_type},:new.${pkey_name},1,${unix_timestamp});${eol}\n";
+		$triggers .= close_trigger();
 
-		$triggers = "${triggers}@{[open_trigger('update')]}";
-		$triggers = "${triggers}VALUES (@{[table_type()]},:old.${pkey_name},2,@{[unix_timestamp()]});${eol}\n";
-		$triggers = "${triggers}@{[close_trigger()]}";
+		$triggers .= open_trigger('update');
+		$triggers .= "VALUES (${table_type},:old.${pkey_name},2,${unix_timestamp});${eol}\n";
+		$triggers .= close_trigger();
 
-		$triggers = "${triggers}@{[open_trigger('delete')]}";
-		$triggers = "${triggers}VALUES (@{[table_type()]},:old.${pkey_name},3,@{[unix_timestamp()]});${eol}\n";
-		$triggers = "${triggers}@{[close_trigger()]}";
+		$triggers .= open_trigger('delete');
+		$triggers .= "VALUES (${table_type},:old.${pkey_name},3,${unix_timestamp});${eol}\n";
+		$triggers .= close_trigger();
 	}
 }
 
-sub process
+sub process()
 {
 	print $output{"before"};
 
@@ -910,27 +864,26 @@ sub process
 	$sequences = "";
 	$triggers = "";
 	$uniq = "";
-	my ($type, $line);
 
 	open(INFO, $file);	# open the file
 	my @lines = <INFO>;	# read it into an array
 	close(INFO);		# close the file
 
-	foreach $line (@lines)
+	foreach my $line (@lines)
 	{
 		$line =~ tr/\t//d;
 		chop($line);
 
-		($type, $line) = split(/\|/, $line, 2);
+		my ($type, $opts) = split(/\|/, $line, 2);
 
 		if ($type)
 		{
-			if ($type eq 'FIELD')		{ process_field($line); }
-			elsif ($type eq 'INDEX')	{ process_index($line, 0); }
-			elsif ($type eq 'TABLE')	{ process_table($line); }
-			elsif ($type eq 'UNIQUE')	{ process_index($line, 1); }
-			elsif ($type eq 'CHANGELOG')	{ process_changelog(); }
-			elsif ($type eq 'ROW' && $output{"type"} ne "code")		{ process_row($line); }
+			if ($type eq 'FIELD')					{ process_field($opts); }
+			elsif ($type eq 'INDEX')				{ process_index($opts, 0); }
+			elsif ($type eq 'TABLE')				{ process_table($opts); }
+			elsif ($type eq 'UNIQUE')				{ process_index($opts, 1); }
+			elsif ($type eq 'CHANGELOG')				{ process_changelog($opts); }
+			elsif ($type eq 'ROW' && $output{"type"} ne "code")	{ process_row($opts); }
 		}
 	}
 
@@ -942,24 +895,23 @@ sub process
 	}
 
 	print $sequences . $triggers . $sql_suffix;
-	
+
 	if ($output{"database"} eq "mysql")
 	{
 		print "DELIMITER ;${eol}\n";
 	}
 
-	print $fkeys_prefix.$fkeys.$fkeys_suffix;
+	print $fkeys_prefix . $fkeys . $fkeys_suffix;
 	print $output{"after"};
 }
 
-sub main
+sub main()
 {
 	if ($#ARGV != 0)
 	{
 		usage();
 	}
 
-	my $format = $ARGV[0];
 	$eol = "";
 	$fk_bol = "";
 	$fk_eol = ";";
@@ -968,9 +920,11 @@ sub main
 	$szcol2 = 15;
 	$szcol3 = 25;
 	$szcol4 = 7;
-	$sql_suffix="";
+	$sql_suffix = "";
 	$fkeys_prefix = "";
 	$fkeys_suffix = "";
+
+	my $format = $ARGV[0];
 
 	if ($format eq 'c')			{ %output = %c; }
 	elsif ($format eq 'mysql')		{ %output = %mysql; }
