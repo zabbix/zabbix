@@ -1523,7 +1523,7 @@ td.inactive-bg {
 
 .filter-container.tabfilter-container {
 	.icon-filter::before {
-		background-position: -87px -547px;
+		background: url($sprite-path) no-repeat -87px -547px;
 	}
 
 	.tabfilter-item-label {

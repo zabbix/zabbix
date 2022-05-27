@@ -7212,4 +7212,4 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   content: ""; }
 
 .icon-filter::before {
-  background-position: -87px -547px; }
+  background: url("../img/icon-sprite.svg?20211222") no-repeat -87px -547px; }

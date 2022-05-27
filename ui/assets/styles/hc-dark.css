@@ -7854,7 +7854,7 @@ td.inactive-bg {
   box-shadow: 0 1px 0px #ffffff, 0 -1px 0px #ffffff; }
 
 .filter-container.tabfilter-container .icon-filter::before {
-  background-position: -87px -547px; }
+  background: url("../img/icon-sprite.svg?20211222") no-repeat -87px -547px; }
 .filter-container.tabfilter-container .tabfilter-item-label.focused {
   box-shadow: 0 0 0 2px #ffffff; }
 
