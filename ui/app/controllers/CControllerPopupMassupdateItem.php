@@ -302,7 +302,7 @@ class CControllerPopupMassupdateItem extends CController {
 				CArrayHelper::sort($req_data['tags'], ['tag', 'value']);
 				$item_draft['tags'] = $req_data['tags'];
 
-				$draft_fields = array_fill_keys(['tags', 'preprocessing'], true)
+				$draft_fields = array_fill_keys(['tags', 'preprocessing', 'key_'], true)
 					+ CItemHelper::extractConditionFields($api_input_rules['fields']);
 				$item_draft += CItemHelper::combineFromFieldIndex($draft_fields, $req_data, $item_defaults);
 				$input_index = CItemHelper::extractExpectedFieldIndex($api_input_rules, $item_draft, $db_item);

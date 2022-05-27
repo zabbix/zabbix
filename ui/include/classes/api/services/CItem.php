@@ -603,7 +603,11 @@ class CItem extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends'), 'default' => '365d'],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {

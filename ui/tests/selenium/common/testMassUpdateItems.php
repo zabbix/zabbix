@@ -100,7 +100,7 @@ class testMassUpdateItems extends CWebTest{
 	 */
 	public function getCommonChangeData() {
 		return [
-				[
+			[
 				[
 					'expected' => TEST_BAD,
 					'names' => [
@@ -110,7 +110,20 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent']
 					],
-					'details' => 'Item uses incorrect interface type.'
+					'details' => 'Invalid parameter "/1": the parameter "snmp_oid" is missing.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names' => [
+						'7_IPMI',
+						'8_IPMI'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'SNMP trap']
+					],
+					'details' => 'Invalid parameter "/1/interfaceid": the host interface ID of type "SNMP" is expected.'
 				]
 			],
 			[
@@ -121,9 +134,10 @@ class testMassUpdateItems extends CWebTest{
 						'14_DB_Monitor'
 					],
 					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'TELNET agent']
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
+						'User name' => ['id' => 'username', 'value' => 'username1']
 					],
-					'details' => 'No interface found.'
+					'details' => 'Invalid parameter "/1": the parameter "params" is missing.'
 				]
 			],
 			[
@@ -137,7 +151,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051']
 					],
-					'details' => 'No authentication user name specified.'
+					'details' => 'Invalid parameter "/1/username": cannot be empty.'
 				]
 			],
 			[
@@ -152,7 +166,7 @@ class testMassUpdateItems extends CWebTest{
 						'Authentication method' => ['id' => 'authtype', 'value' => 'Password'],
 						'User name' => ['id' => 'username', 'value' => '']
 					],
-					'details' => 'No authentication user name specified.'
+					'details' => 'Invalid parameter "/1/username": cannot be empty.'
 				]
 			],
 			[
@@ -169,7 +183,7 @@ class testMassUpdateItems extends CWebTest{
 						'Public key file' => ['id' => 'publickey', 'value' => '/path/file1'],
 						'Private key file' => ['id' => 'privatekey', 'value' => '/path/file2']
 					],
-					'details' => 'No authentication user name specified.'
+					'details' => 'Invalid parameter "/1/username": cannot be empty.'
 				]
 			],
 			[
@@ -186,7 +200,7 @@ class testMassUpdateItems extends CWebTest{
 						'Public key file' => ['id' => 'publickey', 'value' => ''],
 						'Private key file' => ['id' => 'privatekey', 'value' => '/path/file2']
 					],
-					'details' => 'No public key file specified.'
+					'details' => 'Invalid parameter "/1/publickey": cannot be empty.'
 				]
 			],
 			[
@@ -203,7 +217,7 @@ class testMassUpdateItems extends CWebTest{
 						'Public key file' => ['id' => 'publickey', 'value' => '/path/file1'],
 						'Private key file' => ['id' => 'privatekey', 'value' => '']
 					],
-					'details' => 'No private key file specified.'
+					'details' => 'Invalid parameter "/1/privatekey": cannot be empty.'
 				]
 			],
 			[
@@ -221,7 +235,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'history', 'value' => '3599']
 						]
 					],
-					'details' => 'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
+					'details' => 'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
 				]
 			],
 			[
@@ -239,7 +253,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'history', 'value' => '1']
 						]
 					],
-					'details' => 'Incorrect value for field "history": value must be one of 0, 3600-788400000.'
+					'details' => 'Invalid parameter "/1/history": value must be one of 0, 3600-788400000.'
 				]
 			],
 			[
@@ -257,7 +271,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'history', 'value' => '']
 						]
 					],
-					'details' => 'Incorrect value for field "history": a time unit is expected.'
+					'details' => 'Invalid parameter "/1/history": cannot be empty.'
 				]
 			],
 			[
@@ -275,7 +289,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'history', 'value' => '25y']
 						]
 					],
-					'details' => 'Incorrect value for field "history": a time unit is expected.'
+					'details' => 'Invalid parameter "/1/history": a time unit is expected.'
 				]
 			],
 			[
@@ -293,7 +307,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'trends', 'value' => '']
 						]
 					],
-					'details' => 'Incorrect value for field "trends": a time unit is expected.'
+					'details' => 'Invalid parameter "/1/trends": cannot be empty.'
 				]
 			],
 			[
@@ -308,10 +322,10 @@ class testMassUpdateItems extends CWebTest{
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'Trend storage period' => [
 							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'trends', 'value' => '86399']
+							'input' => ['id' => 'trends', 'value' => '3599']
 						]
 					],
-					'details' => 'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
+					'details' => 'Invalid parameter "/1/trends": value must be one of 0, 3600-788400000.'
 				]
 			],
 			[
@@ -326,10 +340,29 @@ class testMassUpdateItems extends CWebTest{
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'Trend storage period' => [
 							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
-							'input' => ['id' => 'trends', 'value' => '1']
+							'input' => ['id' => 'trends', 'value' => '788400001']
 						]
 					],
-					'details' => 'Incorrect value for field "trends": value must be one of 0, 86400-788400000.'
+					'details' => 'Invalid parameter "/1/trends": value must be one of 0, 3600-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'names' => [
+						'1_Item',
+						'2_Item'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
+						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
+						'Type of information' =>  ['id' => 'value_type', 'value' => 'Text'],
+						'Trend storage period' => [
+							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
+							'input' => ['id' => 'trends', 'value' => '788400000']
+						]
+					],
+					'details' => 'Invalid parameter "/1": unexpected parameter "trends".'
 				]
 			],
 			[
@@ -347,7 +380,7 @@ class testMassUpdateItems extends CWebTest{
 							'input' => ['id' => 'trends', 'value' => '25y']
 						]
 					],
-					'details' => 'Incorrect value for field "trends": a time unit is expected.'
+					'details' => 'Invalid parameter "/1/trends": a time unit is expected.'
 				]
 			],
 			[
@@ -361,7 +394,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix trapper'],
 						'Allowed hosts' => ['id' => 'trapper_hosts', 'value' => 'Zabbix server']
 					],
-					'details' => 'Incorrect value for field "trapper_hosts": invalid address range "Zabbix server".'
+					'details' => 'Invalid parameter "/1/trapper_hosts": invalid address range "Zabbix server".'
 				]
 			],
 			[
@@ -375,7 +408,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Update interval' => ['Delay' => '']
 					],
-					'details' => 'Incorrect value for field "delay": invalid delay.'
+					'details' => 'Invalid parameter "/1/delay": cannot be empty.'
 				]
 			],
 			[
@@ -496,7 +529,7 @@ class testMassUpdateItems extends CWebTest{
 							]
 						]
 					],
-					'details' => 'Invalid parameter "headers": nonempty key and value pair expected.'
+					'details' => 'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 				]
 			],
 			[
@@ -519,7 +552,7 @@ class testMassUpdateItems extends CWebTest{
 							]
 						]
 					],
-					'details' => 'Invalid parameter "headers": nonempty key and value pair expected.'
+					'details' => 'Invalid parameter "/1/headers": nonempty key and value pair expected.'
 				]
 			],
 			[
@@ -536,7 +569,7 @@ class testMassUpdateItems extends CWebTest{
 						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
 						'Request body' => ['id' => 'posts', 'value' => '"request": "active checks", "host": "host"']
 					],
-					'details' => 'Invalid parameter "posts": JSON is expected.'
+					'details' => 'Invalid parameter "/1/posts": JSON is expected.'
 				]
 			],
 			[
@@ -553,7 +586,7 @@ class testMassUpdateItems extends CWebTest{
 						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => 'xml version="1.0" encoding="UTF-8"?<zabbix_export></zabbix_export>']
 					],
-					'details' => 'Invalid parameter "posts": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
+					'details' => 'Invalid parameter "/1/posts": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
 				]
 			],
 			[
@@ -570,7 +603,7 @@ class testMassUpdateItems extends CWebTest{
 						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => '']
 					],
-					'details' => 'Invalid parameter "posts": XML is expected.'
+					'details' => 'Invalid parameter "/1/posts": cannot be empty.'
 				]
 			],
 			[
@@ -585,7 +618,7 @@ class testMassUpdateItems extends CWebTest{
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => '']
 					],
-					'details' => 'Invalid parameter "/url": cannot be empty.'
+					'details' => 'Invalid parameter "/1/url": cannot be empty.'
 				]
 			],
 			[
@@ -600,7 +633,7 @@ class testMassUpdateItems extends CWebTest{
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.4:10054'],
 						'JMX endpoint' => ['id' => 'jmx_endpoint', 'value' => '']
 					],
-					'details' => 'Incorrect value for field "jmx_endpoint": cannot be empty.'
+					'details' => 'Invalid parameter "/1/jmx_endpoint": cannot be empty.'
 				]
 			],
 			[
@@ -620,7 +653,7 @@ class testMassUpdateItems extends CWebTest{
 						'User name' => ['id' => 'username', 'value' => 'new_test_name'],
 						'Password' => ['id' => 'password', 'value' => '']
 					],
-					'details' => 'Incorrect value for field "username": both username and password should be either present or empty.'
+					'details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
 				]
 			],
 			[
@@ -640,7 +673,7 @@ class testMassUpdateItems extends CWebTest{
 						'User name' => ['id' => 'username', 'value' => ''],
 						'Password' => ['id' => 'password', 'value' => 'new_test_password']
 					],
-					'details' => 'Incorrect value for field "username": both username and password should be either present or empty.'
+					'details' => 'Invalid parameter "/1": both username and password should be either present or empty.'
 				]
 			],
 			[
@@ -654,7 +687,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055']
 					],
-					'details' => 'No SNMP OID specified.',
+					'details' => 'Invalid parameter "/1": the parameter "snmp_oid" is missing.',
 					'interface_text_part' => 'SNMPv3, Context name: zabbix'
 				]
 			],
@@ -668,7 +701,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Dependent item']
 					],
-					'details' => 'Incorrect value for field "master_itemid": cannot be empty.'
+					'details' => 'Invalid parameter "/1/master_itemid": cannot be empty.'
 				]
 			],
 			[
