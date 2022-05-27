@@ -55,16 +55,14 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	public function testFormAdministrationGeneralAuditLog_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=audit.settings.edit');
 		$form = $this->query('id:audit-settings')->asForm()->one();
-		$form->checkValue(['Enable audit logging' => true, 'Enable internal housekeeping' => true,
-				'Data storage period' => '365d']);
+		$form->checkValue($this->default_values);
 
 		// Check if field "Data storage period" is disabled when options are false
 		$form->fill(['Enable audit logging' => true, 'Enable internal housekeeping' => false]);
 		$form->query('class:form-field')->one()->isEnabled(false);
 
 		// Check if buttons in view are clickable
-		$this->assertTrue($form->query('button:Update')->one()->isClickable());
-		$this->assertTrue($form->query('button:Reset defaults')->one()->isClickable());
+		$this->assertTrue($form->query('button', ['Update', 'Reset defaults'])->one()->isClickable());
 
 		// Check if Header and Title are as expected
 		$this->page->assertHeader('Audit log');
