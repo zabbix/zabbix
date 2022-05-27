@@ -30,7 +30,7 @@ import (
 	"sync"
 	"time"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 const (
@@ -42,7 +42,8 @@ const (
 	ssdType     = "ssd"
 	hddType     = "hdd"
 
-	spinUpAttrName = "Spin_Up_Time"
+	spinUpAttrName  = "Spin_Up_Time"
+	unknownAttrName = "Unknown_Attribute"
 
 	ataSmartAttrFieldName      = "ata_smart_attributes"
 	ataSmartAttrTableFieldName = "table"
@@ -68,10 +69,77 @@ type device struct {
 	DeviceType   string `json:"{#DISKTYPE}"`
 	Model        string `json:"{#MODEL}"`
 	SerialNumber string `json:"{#SN}"`
+	Path         string `json:"{#PATH}"`
+	RaidType     string `json:"{#RAIDTYPE}"`
+	Attributes   string `json:"{#ATTRIBUTES}"`
 }
 type jsonDevice struct {
 	serialNumber string
 	jsonData     string
+}
+
+type singleDevice struct {
+	DiskType        string              `json:"disk_type"`
+	Firmware        string              `json:"firmware_version"`
+	ModelName       string              `json:"model_name"`
+	SerialNumber    string              `json:"serial_number"`
+	Smartctl        smartctlField       `json:"smartctl"`
+	HealthLog       healthLog           `json:"nvme_smart_health_information_log"`
+	SmartAttributes singelRequestTables `json:"ata_smart_attributes"`
+	Data            ataData             `json:"ata_smart_data"`
+	Temperature     temperature         `json:"temperature"`
+	PowerOnTime     power               `json:"power_on_time"`
+	Err             string              `json:"-"`
+	SelfTest        bool                `json:"-"`
+}
+
+type healthLog struct {
+	Temperature     int `json:"temperature"`
+	PowerOnTime     int `json:"power_on_hours"`
+	CriticalWarning int `json:"critical_warning"`
+	MediaErrors     int `json:"media_errors"`
+	Percentage_used int `json:"percentage_used"`
+}
+
+type temperature struct {
+	Current int `json:"current"`
+}
+
+type power struct {
+	Hours int `json:"hours"`
+}
+
+type singelRequestTables struct {
+	Table []singelRequestRaw `json:"table"`
+}
+
+type singelRequestRaw struct {
+	Name string   `json:"name"`
+	Raw  rawField `json:"raw"`
+}
+
+type singleRequestAttribute struct {
+	Value int    `json:"value"`
+	Raw   string `json:"raw"`
+}
+
+type rawField struct {
+	Value int    `json:"value"`
+	Str   string `json:"string"`
+}
+
+type ataData struct {
+	SelfTest     selfTest     `json:"self_test"`
+	Capabilities capabilities `json:"capabilities"`
+}
+type capabilities struct {
+	SelfTestsSupported bool `json:"self_tests_supported"`
+}
+type selfTest struct {
+	Status status `json:"status"`
+}
+type status struct {
+	Passed bool `json:"passed"`
 }
 
 type attribute struct {
@@ -96,6 +164,8 @@ type deviceInfo struct {
 	Name     string `json:"name"`
 	InfoName string `json:"info_name"`
 	DevType  string `json:"type"`
+	name     string `json:"-"`
+	raidType string `json:"-"`
 }
 
 type smartctl struct {
@@ -184,7 +254,17 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 	return r, err
 }
 
-//executeBase executed runners for basic devices retrived from smartctl
+// executeSingle returns device data for single device from smartctl based on provided path.
+func (p *Plugin) executeSingle(path string) (device []byte, err error) {
+	device, err = p.executeSmartctl(fmt.Sprintf("-a %s -j", path), false)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to execute smartctl: %w.", err)
+	}
+
+	return
+}
+
+//executeBase executed runners for basic devices retrieved from smartctl.
 func (r *runner) executeBase(basicDev []deviceInfo, jsonRunner bool) error {
 	r.startBasicRunners(jsonRunner)
 
@@ -197,7 +277,7 @@ func (r *runner) executeBase(basicDev []deviceInfo, jsonRunner bool) error {
 	return r.waitForExecution()
 }
 
-//executeRaids executes runners for raid devices (except megaraid) retrived from smartctl
+//executeRaids executes runners for raid devices (except megaraid) retrieved from smartctl
 func (r *runner) executeRaids(raids []deviceInfo, jsonRunner bool) {
 	raidTypes := []string{"3ware", "areca", "cciss", "sat"}
 
@@ -216,7 +296,7 @@ func (r *runner) executeRaids(raids []deviceInfo, jsonRunner bool) {
 	r.waitForRaidExecution(r.raidDone)
 }
 
-//executeMegaRaids executes runners for megaraid devices retrived from smartctl
+//executeMegaRaids executes runners for megaraid devices retrieved from smartctl
 func (r *runner) executeMegaRaids(megaraids []deviceInfo, jsonRunner bool) {
 	r.megaraids = make(chan raidParameters, len(megaraids))
 
@@ -381,6 +461,8 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 			return
 		}
 
+		dp.Info.name = name
+
 		r.mux.Lock()
 
 		if jsonRunner {
@@ -454,10 +536,14 @@ runner:
 			}
 
 			if dp.SmartStatus != nil {
+				dp.Info.name = raid.name
+
 				if raid.rType == satType {
 					dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
+					dp.Info.raidType = raid.rType
 				} else {
 					dp.Info.Name = fmt.Sprintf("%s %s,%d", raid.name, raid.rType, i)
+					dp.Info.raidType = fmt.Sprintf("%s,%d", raid.rType, i)
 				}
 
 				if r.setRaidDevices(dp, device, raid.rType, jsonRunner) {
@@ -523,6 +609,8 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 		}
 
 		dp.Info.Name = fmt.Sprintf("%s %s", raid.name, raid.rType)
+		dp.Info.name = raid.name
+		dp.Info.raidType = raid.rType
 
 		r.setRaidDevices(dp, device, raid.rType, jsonRunner)
 	}
@@ -619,32 +707,41 @@ func (dp *deviceParser) checkErr() (err error) {
 func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
 	basicTmp, err := p.scanDevices("--scan -j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %s.", err)
+		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %w.", err)
 	}
 
 	raidTmp, err := p.scanDevices("--scan -d sat -j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %s.", err)
+		return nil, nil, nil, fmt.Errorf("Failed to scan for sat devices: %w.", err)
 	}
 
-raid:
-	for _, tmp := range basicTmp {
-		for _, r := range raidTmp {
+	basic, raid, megaraid = formatDeviceOutput(basicTmp, raidTmp)
+
+	return
+}
+
+// formatDeviceOutput removes raid devices from basic device list and separates megaraid devices from the rest of raid
+// devices.
+func formatDeviceOutput(basic, raid []deviceInfo) (basicDev, raidDev, megaraidDev []deviceInfo) {
+loop:
+	for _, tmp := range basic {
+		for _, r := range raid {
 			if tmp.Name == r.Name {
-				continue raid
+				continue loop
 			}
 		}
 
-		basic = append(basic, tmp)
+		basicDev = append(basicDev, tmp)
 	}
 
-	for _, r := range raidTmp {
+	for _, r := range raid {
 		if strings.Contains(r.DevType, "megaraid") {
-			megaraid = append(megaraid, r)
+			megaraidDev = append(megaraidDev, r)
+
 			continue
 		}
 
-		raid = append(raid, r)
+		raidDev = append(raidDev, r)
 	}
 
 	return

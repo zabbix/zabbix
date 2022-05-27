@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-01-26T10:48:12Z'
+  date: '2022-04-06T19:36:03Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -82,7 +82,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.alerter.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.alerter.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of alerter processes over 75%'
+              name: 'Remote Zabbix server: Utilization of alerter processes is high'
+              event_name: 'Remote Zabbix server: Utilization of alerter processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -117,7 +118,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.alert_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.alert_manager.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of alert manager processes over 75%'
+              name: 'Remote Zabbix server: Utilization of alert manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of alert manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -152,7 +154,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.alert_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.alert_syncer.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of alert syncer processes over 75%'
+              name: 'Remote Zabbix server: Utilization of alert syncer processes is high'
+              event_name: 'Remote Zabbix server: Utilization of alert syncer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -187,7 +190,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.availability_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.availability_manager.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of availability manager processes over 75%'
+              name: 'Remote Zabbix server: Utilization of availability manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of availability manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -222,7 +226,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.configuration_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.configuration_syncer.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of configuration syncer processes over 75%'
+              name: 'Remote Zabbix server: Utilization of configuration syncer processes is high'
+              event_name: 'Remote Zabbix server: Utilization of configuration syncer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -257,7 +262,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.discoverer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.discoverer.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of discoverer processes over 75%'
+              name: 'Remote Zabbix server: Utilization of discoverer processes is high'
+              event_name: 'Remote Zabbix server: Utilization of discoverer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -292,7 +298,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.escalator.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.escalator.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of escalator processes over 75%'
+              name: 'Remote Zabbix server: Utilization of escalator processes is high'
+              event_name: 'Remote Zabbix server: Utilization of escalator processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -327,7 +334,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.history_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.history_poller.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of history poller processes over 75%'
+              name: 'Remote Zabbix server: Utilization of history poller processes is high'
+              event_name: 'Remote Zabbix server: Utilization of history poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -362,7 +370,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.history_syncer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.history_syncer.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of history syncer processes over 75%'
+              name: 'Remote Zabbix server: Utilization of history syncer processes is high'
+              event_name: 'Remote Zabbix server: Utilization of history syncer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -397,7 +406,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.housekeeper.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.housekeeper.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of housekeeper processes over 75%'
+              name: 'Remote Zabbix server: Utilization of housekeeper processes is high'
+              event_name: 'Remote Zabbix server: Utilization of housekeeper processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -432,7 +442,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.http_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.http_poller.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of http poller processes over 75%'
+              name: 'Remote Zabbix server: Utilization of http poller processes is high'
+              event_name: 'Remote Zabbix server: Utilization of http poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -467,7 +478,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.icmp_pinger.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.icmp_pinger.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of icmp pinger processes over 75%'
+              name: 'Remote Zabbix server: Utilization of icmp pinger processes is high'
+              event_name: 'Remote Zabbix server: Utilization of icmp pinger processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -502,7 +514,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.ipmi_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.ipmi_manager.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of ipmi manager processes over 75%'
+              name: 'Remote Zabbix server: Utilization of ipmi manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of ipmi manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -537,7 +550,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.ipmi_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.ipmi_poller.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of ipmi poller processes over 75%'
+              name: 'Remote Zabbix server: Utilization of ipmi poller processes is high'
+              event_name: 'Remote Zabbix server: Utilization of ipmi poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -572,7 +586,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.java_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.java_poller.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of java poller processes over 75%'
+              name: 'Remote Zabbix server: Utilization of java poller processes is high'
+              event_name: 'Remote Zabbix server: Utilization of java poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -607,7 +622,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.lld_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.lld_manager.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of lld manager processes over 75%'
+              name: 'Remote Zabbix server: Utilization of lld manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of lld manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -642,7 +658,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.lld_worker.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.lld_worker.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of lld worker processes over 75%'
+              name: 'Remote Zabbix server: Utilization of lld worker processes is high'
+              event_name: 'Remote Zabbix server: Utilization of lld worker processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -675,7 +692,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.odbc_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.odbc_poller.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of ODBC poller processes over 75%'
+              name: 'Remote Zabbix server: Utilization of ODBC poller processes is high'
+              event_name: 'Remote Zabbix server: Utilization of ODBC poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -710,7 +728,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.poller.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of poller processes over 75%'
+              name: 'Remote Zabbix server: Utilization of poller processes is high'
+              event_name: 'Remote Zabbix server: Utilization of poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -745,7 +764,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.preprocessing_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.preprocessing_manager.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of preprocessing manager processes over 75%'
+              name: 'Remote Zabbix server: Utilization of preprocessing manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of preprocessing manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -780,7 +800,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.preprocessing_worker.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.preprocessing_worker.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of preprocessing worker processes over 75%'
+              name: 'Remote Zabbix server: Utilization of preprocessing worker processes is high'
+              event_name: 'Remote Zabbix server: Utilization of preprocessing worker processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -815,7 +836,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.proxy_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.proxy_poller.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of proxy poller processes over 75%'
+              name: 'Remote Zabbix server: Utilization of proxy poller processes is high'
+              event_name: 'Remote Zabbix server: Utilization of proxy poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -850,7 +872,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.report_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.report_manager.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of report manager processes over 75%'
+              name: 'Remote Zabbix server: Utilization of report manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of report manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -885,7 +908,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.report_writer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.report_writer.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of report writer processes over 75%'
+              name: 'Remote Zabbix server: Utilization of report writer processes is high'
+              event_name: 'Remote Zabbix server: Utilization of report writer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -920,7 +944,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.self-monitoring.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.self-monitoring.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of self-monitoring processes over 75%'
+              name: 'Remote Zabbix server: Utilization of self-monitoring processes is high'
+              event_name: 'Remote Zabbix server: Utilization of self-monitoring processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -955,7 +980,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.service_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.service_manager.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of service manager processes over 75%'
+              name: 'Remote Zabbix server: Utilization of service manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of service manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -990,7 +1016,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.snmp_trapper.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.snmp_trapper.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of snmp trapper processes over 75%'
+              name: 'Remote Zabbix server: Utilization of snmp trapper processes is high'
+              event_name: 'Remote Zabbix server: Utilization of snmp trapper processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -1025,7 +1052,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.task_manager.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.task_manager.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of task manager processes over 75%'
+              name: 'Remote Zabbix server: Utilization of task manager processes is high'
+              event_name: 'Remote Zabbix server: Utilization of task manager processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -1060,7 +1088,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.timer.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.timer.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of timer processes over 75%'
+              name: 'Remote Zabbix server: Utilization of timer processes is high'
+              event_name: 'Remote Zabbix server: Utilization of timer processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -1095,7 +1124,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.trapper.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.trapper.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of trapper processes over 75%'
+              name: 'Remote Zabbix server: Utilization of trapper processes is high'
+              event_name: 'Remote Zabbix server: Utilization of trapper processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -1130,7 +1160,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.trigger_housekeeper.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.trigger_housekeeper.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of trigger housekeeper processes over 75%'
+              name: 'Remote Zabbix server: Utilization of trigger housekeeper processes is high'
+              event_name: 'Remote Zabbix server: Utilization of trigger housekeeper processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -1165,7 +1196,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.unreachable_poller.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.unreachable_poller.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of unreachable poller processes over 75%'
+              name: 'Remote Zabbix server: Utilization of unreachable poller processes is high'
+              event_name: 'Remote Zabbix server: Utilization of unreachable poller processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -1200,7 +1232,8 @@ zabbix_export:
               expression: 'avg(/Remote Zabbix server health/process.vmware_collector.avg.busy,10m)>75'
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: 'avg(/Remote Zabbix server health/process.vmware_collector.avg.busy,10m)<65'
-              name: 'Remote Zabbix server: Utilization of vmware collector processes over 75%'
+              name: 'Remote Zabbix server: Utilization of vmware collector processes is high'
+              event_name: 'Remote Zabbix server: Utilization of vmware collector processes over 75%'
               priority: AVERAGE
               tags:
                 -
@@ -1443,7 +1476,8 @@ zabbix_export:
             -
               uuid: 93a52f22c79b40539fcd3a26183daad9
               expression: 'last(/Remote Zabbix server health/version,#1)<>last(/Remote Zabbix server health/version,#2) and length(last(/Remote Zabbix server health/version))>0'
-              name: 'Remote Zabbix server: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Remote Zabbix server: Version has changed'
+              event_name: 'Remote Zabbix server: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Remote Zabbix server version has changed. Ack to close.'
               manual_close: 'YES'

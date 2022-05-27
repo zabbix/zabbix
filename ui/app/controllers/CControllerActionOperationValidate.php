@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -200,6 +200,6 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function doAction() {
-		return $this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode([])]));
 	}
 }

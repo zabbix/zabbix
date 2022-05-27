@@ -198,20 +198,33 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 								break;
 
 							case CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION:
-								foreach ($token['data']['parameters'][0]['data']['filter']['tokens'] as $filter_token) {
-									switch ($filter_token['type']) {
-										case CFilterParser::TOKEN_TYPE_USER_MACRO:
-											$texts_support_user_macros[] = $filter_token['match'];
+								foreach ($token['data']['parameters'] as $parameter) {
+									switch ($parameter['type']) {
+										case CHistFunctionParser::PARAM_TYPE_QUERY:
+											foreach ($parameter['data']['filter']['tokens'] as $filter_token) {
+												switch ($filter_token['type']) {
+													case CFilterParser::TOKEN_TYPE_USER_MACRO:
+														$texts_support_user_macros[] = $filter_token['match'];
+														break;
+
+													case CFilterParser::TOKEN_TYPE_LLD_MACRO:
+														$texts_support_lld_macros[] = $filter_token['match'];
+														break;
+
+													case CFilterParser::TOKEN_TYPE_STRING:
+														$text = CFilterParser::unquoteString($filter_token['match']);
+														$texts_support_user_macros[] = $text;
+														$texts_support_lld_macros[] = $text;
+														break;
+												}
+											}
 											break;
 
-										case CFilterParser::TOKEN_TYPE_LLD_MACRO:
-											$texts_support_lld_macros[] = $filter_token['match'];
-											break;
-
-										case CFilterParser::TOKEN_TYPE_STRING:
-											$text = CFilterParser::unquoteString($filter_token['match']);
-											$texts_support_user_macros[] = $text;
-											$texts_support_lld_macros[] = $text;
+										case CHistFunctionParser::PARAM_TYPE_PERIOD:
+										case CHistFunctionParser::PARAM_TYPE_QUOTED:
+										case CHistFunctionParser::PARAM_TYPE_UNQUOTED:
+											$texts_support_user_macros[] = $parameter['match'];
+											$texts_support_lld_macros[] = $parameter['match'] ;
 											break;
 									}
 								}
@@ -247,20 +260,31 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				}
 			}
 			elseif (strstr($inputs[$field], '{') !== false) {
+				if ($field === 'key') {
+					$item_key_parser = new CItemKey();
+
+					$texts_having_macros = $item_key_parser->parse($key) == CParser::PARSE_SUCCESS
+						? CMacrosResolverGeneral::getItemKeyParameters($item_key_parser->getParamsRaw())
+						: [];
+				}
+				else {
+					$texts_having_macros = [$inputs[$field]];
+				}
+
 				// Field support macros like {HOST.*}, {ITEM.*} etc.
 				if ($macros) {
 					$supported_macros = array_merge_recursive($supported_macros, $macros);
-					$texts_support_macros[] = $inputs[$field];
+					$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
 				}
 
 				// Check if LLD macros are supported in field.
 				if ($support_lldmacros && $this->macros_by_item_props[$field]['support_lld_macros']) {
-					$texts_support_lld_macros[] = $inputs[$field];
+					$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
 				}
 
 				// Check if user macros are supported in field.
 				if ($this->macros_by_item_props[$field]['support_user_macros']) {
-					$texts_support_user_macros[] = $inputs[$field];
+					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
 				}
 			}
 		}

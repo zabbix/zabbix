@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-03-18T09:49:27Z'
+  date: '2022-04-13T22:09:00Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -114,7 +114,7 @@ zabbix_export:
                     else if (/^.*,[\w]+$/g.test(locations[i])) {
                         result = getHttpData('zip=' + locations[i]);
                     }
-                    else if (/^[0-9]{1,2}(\.[0-9]+)?,[0-9]{1,2}(\.[0-9]+)?/g.test(locations[i])) {
+                    else if (/^(\-)?[0-9]{1,2}(\.[0-9]+)?,(\-)?[0-9]{1,2}(\.[0-9]+)?/g.test(locations[i])) {
                         coordinates = locations[i].split(',');
                         result = getHttpData('lat=' + coordinates[0] + '&lon=' + coordinates[1]);
                     }
@@ -497,7 +497,8 @@ zabbix_export:
                 -
                   uuid: 3b7e55f13c6a4ba2930709d5c51c8a09
                   expression: 'min(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)>{$TEMP.CRIT.HIGH}'
-                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m)'
+                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too high'
+                  event_name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too high (over {$TEMP.CRIT.HIGH} for 30m)'
                   opdata: 'Current temp: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Temperature value is too high.'
@@ -509,7 +510,8 @@ zabbix_export:
                 -
                   uuid: 7c98d2784a2e42faa76e67348a0df7ff
                   expression: 'max(/OpenWeatherMap by HTTP/openweathermap.temp[{#ID}],#3)<{$TEMP.CRIT.LOW}'
-                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m)'
+                  name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too low'
+                  event_name: '[{#LOCATION}, {#COUNTRY}]: Temperature is too low (below {$TEMP.CRIT.LOW} for 30m)'
                   opdata: 'Current temp: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Temperature value is too low.'
@@ -703,8 +705,8 @@ zabbix_export:
             2. by location name (for example: Riga)
             3. by location ID. Link to the list of city ID: http://bulk.openweathermap.org/sample/city.list.json.gz
             4. by zip/post code with a country code (for example: 94040,us)
-            A few locations can be added to the macro at the same time by "|" delimiter. 
-            For example: 43.81821,7.76115|Riga|2643743|94040,us.
+            A few locations can be added to the macro at the same time by `|` delimiter. 
+            For example: `43.81821,7.76115|Riga|2643743|94040,us`.
             Please note that API requests by city name, zip-codes and city id will be deprecated soon.
         -
           macro: '{$OPENWEATHERMAP.API.ENDPOINT}'

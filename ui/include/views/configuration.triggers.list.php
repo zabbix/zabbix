@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
@@ -139,7 +140,7 @@ $filter = (new CFilter())
 	->setResetUrl((new CUrl('triggers.php'))->setArgument('context', $data['context']))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addvar('context', $data['context'])
+	->addvar('context', $data['context'], 'filter_context')
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $widget = (new CWidget())
@@ -174,7 +175,7 @@ $url = (new CUrl('triggers.php'))
 $triggers_form = (new CForm('post', $url))
 	->setName('triggersForm')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], 'form_context');
 
 // create table
 $triggers_table = (new CTableInfo())->setHeader([

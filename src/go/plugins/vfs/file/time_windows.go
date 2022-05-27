@@ -29,8 +29,8 @@ import (
 	"syscall"
 	"unsafe"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const (

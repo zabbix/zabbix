@@ -1146,7 +1146,6 @@ ZABBIX.apps.map = (function($) {
 
 						default:
 							throw 'Unsupported element type found in copy buffer!';
-							break;
 					}
 
 					if (element) {
@@ -1700,8 +1699,7 @@ ZABBIX.apps.map = (function($) {
 
 			// create dom
 			this.domNode = $('<div>', {
-					style: 'position: absolute; z-index: 1;\
-						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
+					style: 'position: absolute; z-index: 1; background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
 				.appendTo(this.sysmap.container)
 				.addClass('cursor-pointer sysmap_shape')
@@ -3337,8 +3335,7 @@ ZABBIX.apps.map = (function($) {
 					element,
 					elementTypeText,
 					i,
-					ln,
-					name;
+					ln;
 
 				$('#massList tbody').empty();
 

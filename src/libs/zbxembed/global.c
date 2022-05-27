@@ -80,6 +80,29 @@ static duk_ret_t	es_atob(duk_context *ctx)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: convert binary data to hex string                                 *
+ *                                                                            *
+ * Parameters: bin - [IN] the data to convert                                 *
+ *             len - [IN] the number of bytes to convert                      *
+ *             out - [OUT] the output buffer (must be 2x + 1 of input len)    *
+ *                                                                            *
+ ******************************************************************************/
+static void	es_bin_to_hex(const unsigned char *bin, size_t len, char *out)
+{
+	const char	*hex = "0123456789abcdef";
+	size_t		i;
+
+	for (i = 0; i < len; i++)
+	{
+		*out++ = hex[bin[i] >> 4];
+		*out++ = hex[bin[i] & 15];
+	}
+
+	*out = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: compute a md5 checksum                                            *
  *                                                                            *
  * Parameters: ctx - [IN] pointer to duk_context                              *
@@ -91,31 +114,23 @@ static duk_ret_t	es_atob(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_md5(duk_context *ctx)
 {
-	const char	*hex = "0123456789abcdef";
+	const char	*str;
 	md5_state_t	state;
 	md5_byte_t	hash[MD5_DIGEST_SIZE];
-	int		i;
-	char		*str = NULL, *md5sum, *ptr;
+	char		*md5sum;
+	duk_size_t	len;
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+	str = duk_require_lstring(ctx, 0, &len);
 
-	ptr = md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
+	md5sum = (char *)zbx_malloc(NULL, MD5_DIGEST_SIZE * 2 + 1);
 
 	zbx_md5_init(&state);
-	zbx_md5_append(&state, (const md5_byte_t *)str, strlen(str));
+	zbx_md5_append(&state, (const md5_byte_t *)str, (int)len);
 	zbx_md5_finish(&state, hash);
 
-	for (i = 0; i < MD5_DIGEST_SIZE; i++)
-	{
-		*ptr++ = hex[hash[i] >> 4];
-		*ptr++ = hex[hash[i] & 15];
-	}
-
-	*ptr = '\0';
+	es_bin_to_hex(hash, MD5_DIGEST_SIZE, md5sum);
 
 	duk_push_string(ctx, md5sum);
-	zbx_free(str);
 	zbx_free(md5sum);
 	return 1;
 }
@@ -133,27 +148,16 @@ static duk_ret_t	es_md5(duk_context *ctx)
  ******************************************************************************/
 static duk_ret_t	es_sha256(duk_context *ctx)
 {
-	char	*str = NULL, hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
-	int	i;
+	const char	*str;
+	char		hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	duk_size_t	len;
 
-	if (SUCCEED != zbx_cesu8_to_utf8(duk_require_string(ctx, 0), &str))
-		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot convert value to utf8");
+	str = duk_require_lstring(ctx, 0, &len);
 
-	zbx_sha256_hash(str, hash_res);
-
-	for (i = 0 ; i < ZBX_SHA256_DIGEST_SIZE; i++)
-	{
-		char z[3];
-
-		zbx_snprintf(z, 3, "%02x", (unsigned char)hash_res[i]);
-		hash_res_stringhexes[i * 2] = z[0];
-		hash_res_stringhexes[i * 2 + 1] = z[1];
-	}
-
-	hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2] = '\0';
+	zbx_sha256_hash_len(str, len, hash_res);
+	es_bin_to_hex((const unsigned char *)hash_res, ZBX_SHA256_DIGEST_SIZE, hash_res_stringhexes);
 
 	duk_push_string(ctx, hash_res_stringhexes);
-	zbx_free(str);
 	return 1;
 }
 

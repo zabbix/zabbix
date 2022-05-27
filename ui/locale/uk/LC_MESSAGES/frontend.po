@@ -1,32 +1,33 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2016-02-09 16:27+0300\n"
-"Last-Translator: Oleksii <oleksii.zagorskyi@zabbix.com>\n"
+"PO-Revision-Date: 2022-03-17 14:26+0000\n"
+"Last-Translator: AndriiZaiets <andrii.zaiets@hotmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1455028074.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "Дата \"%1$s\" має бути меншою за дату \"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" замість \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 #: include/classes/import/validators/C10XmlValidator.php:338
@@ -49,7 +50,7 @@ msgstr "\"%1$s\" очікувалось"
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" має бути порожнім рядком або більше ніж \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
@@ -2139,6 +2140,11 @@ msgstr[0] "Не вдалося скопіювати тригер"
 msgstr[1] "Не вдалося скопіювати тригери"
 msgstr[2] "Не вдалося скопіювати тригери"
 
+#: include/triggers.inc.php:246
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+msgstr ""
+
 #: include/triggers.inc.php:226
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
@@ -2864,6 +2870,11 @@ msgstr ""
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostBase.php:644
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
@@ -2878,6 +2889,11 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:802
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:641
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:381
@@ -2899,6 +2915,16 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:799
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:502
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:638
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:705
@@ -3081,6 +3107,26 @@ msgstr "Не вдалося від'єднати і очистити веб сц�
 #: include/classes/api/services/CHost.php:1095
 msgid "Cannot unlink template"
 msgstr "Не вдалося від'єднати шаблон"
+
+#: include/classes/api/services/CHostBase.php:331
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:415
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:414
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:330
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
@@ -6484,6 +6530,10 @@ msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
+msgstr ""
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
 msgstr ""
 
 #: include/locales.inc.php:33
@@ -17566,6 +17616,21 @@ msgstr ""
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
+#: include/classes/api/services/CTriggerGeneral.php:2245
+#, c-format
+msgid "The dependency of trigger \"%1$s\" on trigger \"%2$s\" already exists."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2249
+#, c-format
+msgid "The dependency of trigger prototype \"%1$s\" on trigger \"%2$s\" already exists."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2250
+#, c-format
+msgid "The dependency of trigger prototype \"%1$s\" on trigger prototype \"%2$s\" already exists."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr ""
@@ -17682,6 +17747,10 @@ msgstr "Цей місяць"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "Цей місяць по нині"
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:123
 #: include/views/configuration.item.prototype.edit.php:109
@@ -17994,6 +18063,61 @@ msgstr "Тригер \"%1$s\" вже існує у \"%2$s\"."
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "Тригер \"%1$s\" належить шаблонам з різними зв'язками."
 
+#: include/triggers.inc.php:372 include/triggers.inc.php:433
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/triggers.inc.php:373 include/triggers.inc.php:434
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2728
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2727
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2621
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2354
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2349
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2365
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2472
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2857
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2856
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
@@ -18098,6 +18222,66 @@ msgstr "Прототип тригера \"%1$s\" вже існує в \"%2$s\"."
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr "Прототип тригера \"%1$s\" належить шаблонам з різними зв'язками."
+
+#: include/classes/api/services/CDiscoveryRule.php:916
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:915
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2733
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2732
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2622
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2473
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2862
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2861
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2355
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2350
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2366
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:1325
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
+msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1716
 #, c-format
@@ -19876,6 +20060,10 @@ msgstr ""
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "З проблемами"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"

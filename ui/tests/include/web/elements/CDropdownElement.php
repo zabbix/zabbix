@@ -23,7 +23,7 @@ require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 /**
- * Dropdown (select) element.
+ * Custom dropdown element.
  */
 class CDropdownElement extends CElement {
 
@@ -33,43 +33,58 @@ class CDropdownElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getOptions() {
-		return $this->query('tag:option')->all();
+		return $this->query('xpath:.//li[not(@optgroup)]')->all();
 	}
 
 	/**
-	 * Get text of selected option.
+	 * Get text of selected element.
 	 *
 	 * @return string
 	 */
 	public function getText() {
-		foreach ($this->getOptions() as $option) {
-			if ($option->isSelected()) {
-				return $option->getText();
-			}
-		}
-
-		return null;
+		return $this->query('xpath:./button')->one()->getText();
 	}
 
 	/**
 	 * Select option by text.
 	 *
-	 * @param string $text    option text to be selected
+	 * @param string $text		option text to be selected
 	 *
 	 * @return $this
 	 */
 	public function select($text) {
-		$option = $this->query('xpath:.//option[text()='.CXPathHelper::escapeQuotes($text).']')->one();
-		if (!$option->isSelected()) {
-			if ($option->isClickable()) {
-				$option->click();
+		if ($text === $this->getText()) {
+			return $this;
+		}
+
+		$option = null;
+		if ($this->query("xpath:.//li[not(@optgroup)]/*")->count() > 0) {
+			foreach ($this->getOptions() as $element) {
+				if ($text === $element->getText()) {
+					$option = $element;
+
+					break;
+				}
 			}
-			else {
-				throw new Exception('Cannot select disabled dropdown element.');
+		}
+		else {
+			$option = $this->query('xpath:.//li[not(@optgroup) and text()='.CXPathHelper::escapeQuotes($text).']')->one();
+		}
+		if ($option !== null) {
+			for ($i = 0; $i < 5; $i++) {
+				try {
+					$this->waitUntilClickable()->click();
+					$option->click();
+
+					return $this;
+				}
+				catch (Exception $exception) {
+					// Code is not missing here.
+				}
 			}
 		}
 
-		return $this;
+		throw new Exception('Failed to select dropdown option "'.$text.'".');
 	}
 
 	/**

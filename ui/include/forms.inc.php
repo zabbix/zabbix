@@ -150,7 +150,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 			new CTag('h4', true, [
 				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 			])
-		]);
+		], ZBX_STYLE_HOVER_NOBG);
 
 	// array contains subfilters and number of items in each
 	$item_params = [
@@ -514,9 +514,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 
 	// output
 	if (count($item_params['tags']) > 1) {
-		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags'],
-			'subfilter_tags'
-		);
+		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags']);
 		$table_subfilter->addRow([$tags_output]);
 	}
 
@@ -921,7 +919,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 
 		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 	}
 
@@ -1575,8 +1573,15 @@ function getCopyElementsFormData($elements_field, $title = null) {
 		'elements' => getRequest($elements_field, []),
 		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_HOST_GROUP),
 		'copy_targetids' => getRequest('copy_targetids', []),
-		'hostid' => getRequest('hostid', 0)
+		'hostid' => 0
 	];
+
+	$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
+	$filter_hostids = getRequest('filter_hostids', CProfile::getArray($prefix.'triggers.filter_hostids', []));
+
+	if (count($filter_hostids) == 1) {
+		$data['hostid'] = reset($filter_hostids);
+	}
 
 	if (!$data['elements'] || !is_array($data['elements'])) {
 		show_error_message(_('Incorrect list of items.'));
@@ -1744,7 +1749,7 @@ function getTriggerFormData(array $data) {
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
 			getTriggerParentTemplates([$trigger], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		if ($data['show_inherited_tags']) {

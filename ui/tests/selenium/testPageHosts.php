@@ -172,7 +172,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
-		$this->zbxTestCheckboxSelect('ids_'.$hostid);
+		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
 		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
 
@@ -195,7 +195,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
-		$this->zbxTestCheckboxSelect('ids_'.$hostid);
+		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
 		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
 
@@ -236,8 +236,6 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByTemplates() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();

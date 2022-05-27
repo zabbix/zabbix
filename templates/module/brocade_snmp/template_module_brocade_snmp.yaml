@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-02-04T07:23:55Z'
+  date: '2022-04-06T19:33:48Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -41,7 +41,8 @@ zabbix_export:
             -
               uuid: 7b068eb5d43846d987148f38f66b1f1a
               expression: 'min(/Brocade_Foundry Performance SNMP/system.cpu.util[snAgGblCpuUtil1MinAvg.0],5m)>{$CPU.UTIL.CRIT}'
-              name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'High CPU utilization'
+              event_name: 'High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
@@ -71,7 +72,8 @@ zabbix_export:
             -
               uuid: 929046c4439741a9aa3ab00933322a86
               expression: 'min(/Brocade_Foundry Performance SNMP/vm.memory.util[snAgGblDynMemUtil.0],5m)>{$MEMORY.UTIL.MAX}'
-              name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'High memory utilization'
+              event_name: 'High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
               tags:

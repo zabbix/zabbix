@@ -30,6 +30,11 @@ class CPageHeader {
 	protected $title;
 
 	/**
+	 * @var string  Language attribute.
+	 */
+	protected $lang;
+
+	/**
 	 * @var array of css file paths
 	 */
 	protected $cssFiles = [];
@@ -61,9 +66,11 @@ class CPageHeader {
 
 	/**
 	 * @param string $title
+	 * @param string $lang
 	 */
-	public function __construct($title = '') {
+	public function __construct(string $title, string $lang) {
 		$this->title = CHtml::encode($title);
+		$this->lang = $lang;
 		$this->sid = substr(CSessionHelper::getId(), 16, 16);
 	}
 
@@ -121,9 +128,9 @@ class CPageHeader {
 	 * Display page head html.
 	 */
 	public function display() {
+		echo '<!DOCTYPE html>'."\n";
+		echo '<html lang="'.$this->lang.'">'."\n";
 		echo <<<HTML
-<!DOCTYPE html>
-<html>
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 		<meta charset="utf-8" />

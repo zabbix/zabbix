@@ -312,7 +312,7 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ^udp | wc -l'
+			'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l'
 		],
 		[
 			'key' => 'net.tcp.socket.count[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.',,,listen]',
@@ -333,7 +333,7 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result_exec' => 'netstat -au --numeric-hosts -4 | grep ^udp | wc -l'
+			'result_exec' => 'netstat -au --numeric-hosts | grep ^udp | wc -l'
 		],
 		[
 			'key' => 'vfs.dir.get['.self::TEST_DIR_NAME.']',

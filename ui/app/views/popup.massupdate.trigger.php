@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,10 +21,8 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
-
-// Visibility box javascript is already added. It should not be added in popup response.
-define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())

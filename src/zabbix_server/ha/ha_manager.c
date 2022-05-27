@@ -716,6 +716,63 @@ finish:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check for active and standby node availability and update         *
+ *          unavailable nodes accordingly                                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	ha_db_check_unavailable_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
+{
+	int	i, ret = SUCCEED;
+
+	zbx_vector_str_t	unavailable_nodes;
+
+	zbx_vector_str_create(&unavailable_nodes);
+
+	for (i = 0; i < nodes->values_num; i++)
+	{
+		if (SUCCEED == zbx_cuid_compare(nodes->values[i]->ha_nodeid, info->ha_nodeid))
+			continue;
+
+		if (ZBX_NODE_STATUS_STANDBY != nodes->values[i]->status &&
+				ZBX_NODE_STATUS_ACTIVE != nodes->values[i]->status)
+		{
+			continue;
+		}
+
+
+		if (db_time >= nodes->values[i]->lastaccess + info->failover_delay)
+		{
+			zbx_vector_str_append(&unavailable_nodes, nodes->values[i]->ha_nodeid.str);
+
+			zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, nodes->values[i]->ha_nodeid.str,
+					nodes->values[i]->name);
+			zbx_audit_ha_update_field_int(nodes->values[i]->ha_nodeid.str, ZBX_AUDIT_HA_STATUS,
+					nodes->values[i]->status, ZBX_NODE_STATUS_UNAVAILABLE);
+		}
+	}
+
+	if (0 != unavailable_nodes.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set status=%d where",
+				ZBX_NODE_STATUS_UNAVAILABLE);
+
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "ha_nodeid",
+				(const char **)unavailable_nodes.values, unavailable_nodes.values_num);
+
+		ret = ha_db_execute(info, "%s", sql);
+		zbx_free(sql);
+	}
+
+	zbx_vector_str_destroy(&unavailable_nodes);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: register server node                                              *
  *                                                                            *
  * Return value: SUCCEED - node was registered or database was offline        *
@@ -811,6 +868,9 @@ static void	ha_db_register_node(zbx_ha_info_t *info)
 			ha_db_execute(info, "delete from ha_node where name<>''");
 	}
 
+	if (ZBX_HA_IS_CLUSTER() && ZBX_NODE_STATUS_ERROR != info->ha_status && ZBX_NODE_STATUS_ACTIVE == ha_status)
+		ha_db_check_unavailable_nodes(info, &nodes, db_time);
+
 	ha_flush_audit(info);
 
 	zbx_free(sql);
@@ -842,49 +902,11 @@ finish:
  ******************************************************************************/
 static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int db_time)
 {
-	int			i, ret = SUCCEED;
-	zbx_vector_str_t	unavailable_nodes;
+	int	ret;
 
 	zbx_audit_init(info->auditlog);
 
-	zbx_vector_str_create(&unavailable_nodes);
-
-	for (i = 0; i < nodes->values_num; i++)
-	{
-		if (nodes->values[i]->status != ZBX_NODE_STATUS_STANDBY)
-			continue;
-
-		if (db_time >= nodes->values[i]->lastaccess + info->failover_delay)
-		{
-			zbx_vector_str_append(&unavailable_nodes, nodes->values[i]->ha_nodeid.str);
-
-			zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, nodes->values[i]->ha_nodeid.str,
-					nodes->values[i]->name);
-			zbx_audit_ha_update_field_int(nodes->values[i]->ha_nodeid.str, ZBX_AUDIT_HA_STATUS,
-					nodes->values[i]->status, ZBX_NODE_STATUS_UNAVAILABLE);
-		}
-	}
-
-	if (0 != unavailable_nodes.values_num)
-	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set status=%d where",
-				ZBX_NODE_STATUS_UNAVAILABLE);
-
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "ha_nodeid",
-				(const char **)unavailable_nodes.values, unavailable_nodes.values_num);
-
-		if (SUCCEED != ha_db_execute(info, "%s", sql))
-			ret = FAIL;
-
-		zbx_free(sql);
-	}
-
-	zbx_vector_str_destroy(&unavailable_nodes);
-
-	if (SUCCEED == ret)
+	if (SUCCEED == (ret = ha_db_check_unavailable_nodes(info, nodes, db_time)))
 		ha_flush_audit(info);
 	else
 		zbx_audit_clean();
