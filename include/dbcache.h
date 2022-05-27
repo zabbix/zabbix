@@ -21,7 +21,7 @@
 #define ZABBIX_DBCACHE_H
 
 #include "sysinfo.h" //included for convenience
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxcomms.h"
 #include "zbxshmem.h"
 #include "zbxeval.h"
@@ -85,9 +85,9 @@ extern int	CONFIG_ODBCPOLLER_FORKS;
 typedef struct
 {
 	zbx_uint64_t	interfaceid;
-	char		ip_orig[INTERFACE_IP_LEN_MAX];
-	char		dns_orig[INTERFACE_DNS_LEN_MAX];
-	char		port_orig[INTERFACE_PORT_LEN_MAX];
+	char		ip_orig[ZBX_INTERFACE_IP_LEN_MAX];
+	char		dns_orig[ZBX_INTERFACE_DNS_LEN_MAX];
+	char		port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
 	unsigned char	useip;
@@ -95,7 +95,7 @@ typedef struct
 	unsigned char	main;
 	unsigned char	available;
 	int		disable_until;
-	char		error[INTERFACE_ERROR_LEN_MAX];
+	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
 }
 DC_INTERFACE;
@@ -109,18 +109,25 @@ typedef struct
 	unsigned char	bulk;
 	unsigned char	snmp_version;
 	unsigned char	useip;
-	char		ip_orig[INTERFACE_IP_LEN_MAX];
-	char		dns_orig[INTERFACE_DNS_LEN_MAX];
-	char		port_orig[INTERFACE_PORT_LEN_MAX];
+	char		ip_orig[ZBX_INTERFACE_IP_LEN_MAX];
+	char		dns_orig[ZBX_INTERFACE_DNS_LEN_MAX];
+	char		port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
 }
 DC_INTERFACE2;
+
+#define HOST_IPMI_USERNAME_LEN		16
+#define HOST_IPMI_USERNAME_LEN_MAX	(HOST_IPMI_USERNAME_LEN + 1)
+#define HOST_IPMI_PASSWORD_LEN		20
+#define HOST_IPMI_PASSWORD_LEN_MAX	(HOST_IPMI_PASSWORD_LEN + 1)
+#define HOST_PROXY_ADDRESS_LEN		255
+#define HOST_PROXY_ADDRESS_LEN_MAX	(HOST_PROXY_ADDRESS_LEN + 1)
 
 typedef struct
 {
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	proxy_hostid;
-	char		host[HOST_HOST_LEN_MAX];
-	char		name[HOST_NAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		host[ZBX_HOSTNAME_BUF_LEN];
+	char		name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	int		maintenance_from;
@@ -169,37 +176,39 @@ typedef struct
 	unsigned char		verify_peer;
 	unsigned char		verify_host;
 	unsigned char		allow_traps;
-	char			key_orig[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
+	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1], *key;
 	char			*units;
 	char			*delay;
 	int			history_sec;
 	int			trends_sec;
 	int			mtime;
-	char			trapper_hosts[ITEM_TRAPPER_HOSTS_LEN_MAX];
-	char			logtimefmt[ITEM_LOGTIMEFMT_LEN_MAX];
-	char			snmp_community_orig[ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
-	char			snmp_oid_orig[ITEM_SNMP_OID_LEN_MAX], *snmp_oid;
-	char			snmpv3_securityname_orig[ITEM_SNMPV3_SECURITYNAME_LEN_MAX], *snmpv3_securityname;
-	char			snmpv3_authpassphrase_orig[ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX], *snmpv3_authpassphrase;
-	char			snmpv3_privpassphrase_orig[ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX], *snmpv3_privpassphrase;
-	char			ipmi_sensor[ITEM_IPMI_SENSOR_LEN_MAX];
+	char			trapper_hosts[ZBX_ITEM_TRAPPER_HOSTS_LEN_MAX];
+	char			logtimefmt[ZBX_ITEM_LOGTIMEFMT_LEN_MAX];
+	char			snmp_community_orig[ZBX_ITEM_SNMP_COMMUNITY_LEN_MAX], *snmp_community;
+	char			snmp_oid_orig[ZBX_ITEM_SNMP_OID_LEN_MAX], *snmp_oid;
+	char			snmpv3_securityname_orig[ZBX_ITEM_SNMPV3_SECURITYNAME_LEN_MAX], *snmpv3_securityname;
+	char			snmpv3_authpassphrase_orig[ZBX_ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX],
+				*snmpv3_authpassphrase;
+	char			snmpv3_privpassphrase_orig[ZBX_ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX],
+				*snmpv3_privpassphrase;
+	char			ipmi_sensor[ZBX_ITEM_IPMI_SENSOR_LEN_MAX];
 	char			*params;
-	char			username_orig[ITEM_USERNAME_LEN_MAX], *username;
-	char			publickey_orig[ITEM_PUBLICKEY_LEN_MAX], *publickey;
-	char			privatekey_orig[ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
-	char			password_orig[ITEM_PASSWORD_LEN_MAX], *password;
-	char			snmpv3_contextname_orig[ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
-	char			jmx_endpoint_orig[ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
-	char			timeout_orig[ITEM_TIMEOUT_LEN_MAX], *timeout;
-	char			url_orig[ITEM_URL_LEN_MAX], *url;
-	char			query_fields_orig[ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
+	char			username_orig[ZBX_ITEM_USERNAME_LEN_MAX], *username;
+	char			publickey_orig[ZBX_ITEM_PUBLICKEY_LEN_MAX], *publickey;
+	char			privatekey_orig[ZBX_ITEM_PRIVATEKEY_LEN_MAX], *privatekey;
+	char			password_orig[ZBX_ITEM_PASSWORD_LEN_MAX], *password;
+	char			snmpv3_contextname_orig[ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN_MAX], *snmpv3_contextname;
+	char			jmx_endpoint_orig[ZBX_ITEM_JMX_ENDPOINT_LEN_MAX], *jmx_endpoint;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX], *timeout;
+	char			url_orig[ZBX_ITEM_URL_LEN_MAX], *url;
+	char			query_fields_orig[ZBX_ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
 	char			*posts;
-	char			status_codes_orig[ITEM_STATUS_CODES_LEN_MAX], *status_codes;
-	char			http_proxy_orig[ITEM_HTTP_PROXY_LEN_MAX], *http_proxy;
+	char			status_codes_orig[ZBX_ITEM_STATUS_CODES_LEN_MAX], *status_codes;
+	char			http_proxy_orig[ZBX_ITEM_HTTP_PROXY_LEN_MAX], *http_proxy;
 	char			*headers;
-	char			ssl_cert_file_orig[ITEM_SSL_CERT_FILE_LEN_MAX], *ssl_cert_file;
-	char			ssl_key_file_orig[ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
-	char			ssl_key_password_orig[ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
+	char			ssl_cert_file_orig[ZBX_ITEM_SSL_CERT_FILE_LEN_MAX], *ssl_cert_file;
+	char			ssl_key_file_orig[ZBX_ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
+	char			ssl_key_password_orig[ZBX_ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	char			*script_params;
 	char			*error;
 	unsigned char		*formula_bin;
@@ -277,7 +286,7 @@ zbx_trigger_items_t;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	char		host[HOST_HOST_LEN_MAX];
+	char		host[ZBX_HOSTNAME_BUF_LEN];
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
 	int		proxy_tasks_nextcheck;
@@ -285,8 +294,8 @@ typedef struct
 						/* or 0 if no error */
 	int		version;
 	int		lastaccess;
-	char		addr_orig[INTERFACE_ADDR_LEN_MAX];
-	char		port_orig[INTERFACE_PORT_LEN_MAX];
+	char		addr_orig[ZBX_INTERFACE_ADDR_LEN_MAX];
+	char		port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
 
@@ -1063,9 +1072,9 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid);
 typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const DC_ITEM *, const char *, const char *,
 		const zbx_timespec_t *, char **);
 
-void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression, zbx_trigger_func_t eval_func_cb,
-		int recovery);
-void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
+void	zbx_db_trigger_explain_expression(const ZBX_DB_TRIGGER *trigger, char **expression,
+		zbx_trigger_func_t eval_func_cb, int recovery);
+void	zbx_db_trigger_get_function_value(const ZBX_DB_TRIGGER *trigger, int index, char **value,
 		zbx_trigger_func_t eval_func_cb, int recovery);
 
 /* external user macro cache API */

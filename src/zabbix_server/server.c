@@ -23,7 +23,7 @@
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
 
-#include "export.h"
+#include "zbxexport.h"
 #include "zbxself.h"
 
 #include "cfg.h"
@@ -33,6 +33,7 @@
 #include "zbxmutexs.h"
 #include "zbxmodules.h"
 #include "zbxnix.h"
+#include "zbxcomms.h"
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"
@@ -67,7 +68,6 @@
 #include "zbxcrypto.h"
 #include "zbxhistory.h"
 #include "postinit.h"
-#include "export.h"
 #include "../libs/zbxvault/vault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
@@ -1114,18 +1114,22 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}

@@ -21,7 +21,7 @@
 #define ZABBIX_DBUPGRADE_H
 
 #include "common.h"
-#include "dbschema.h"
+#include "zbxdbschema.h"
 
 typedef struct
 {
@@ -31,6 +31,8 @@ typedef struct
 	unsigned char	mandatory;
 }
 zbx_dbpatch_t;
+
+#define ZBX_DBPATCH_FUNCTION_PARAM_LEN			255
 
 #define DBPATCH_VERSION(zabbix_version)			zbx_dbpatches_##zabbix_version
 

@@ -9,7 +9,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -17,23 +17,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DISCOVERY_H
-#define ZABBIX_DISCOVERY_H
+#ifndef ZABBIX_DB_LENGTHS_H
+#define ZABBIX_DB_LENGTHS_H
 
-#include "db.h"
-
-typedef struct
-{
-	zbx_uint64_t	dcheckid;
-	unsigned short	port;
-	char		dns[INTERFACE_DNS_LEN_MAX];
-	char		value[MAX_DISCOVERED_VALUE_SIZE];
-	int		status;
-	time_t		itemtime;
-}
-zbx_service_t;
-
-void	discovery_update_host(DB_DHOST *dhost, int status, int now);
-void	discovery_update_service(const DB_DRULE *drule, zbx_uint64_t dcheckid, DB_DHOST *dhost,
-		const char *ip, const char *dns, int port, int status, const char *value, int now);
+#define TRIGGER_OPDATA_LEN		255
+#define TRIGGER_URL_LEN			255
+#define TRIGGER_DESCRIPTION_LEN		255
+#if defined(HAVE_ORACLE)
+#	define TRIGGER_COMMENTS_LEN	2048
+#else
+#	define TRIGGER_COMMENTS_LEN	65535
 #endif
+#define TRIGGER_EVENT_NAME_LEN		2048
+
+#define TAG_NAME_LEN			255
+#define TAG_VALUE_LEN			255
+
+#define GROUP_NAME_LEN			255
+
+#define ALERT_ERROR_LEN			2048
+#define ALERT_ERROR_LEN_MAX		(ALERT_ERROR_LEN + 1)
+
+#define ITEM_PREPROC_PARAMS_LEN		65535
+
+#define EVENT_NAME_LEN			2048
+
+#define REPORT_ERROR_LEN		2048
+#endif /* ZABBIX_DB_LENGTHS_H */

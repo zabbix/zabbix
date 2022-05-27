@@ -1875,14 +1875,16 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose: resolve calculated item formula empty and macro host references   *
- *          (// , {HOST.HOST}) to host names                                  *
- *                                                                            *
- * Parameters: eval - [IN] the evaluation data                                *
- *             item - [IN] the calculated item                                *
- *                                                                            *
- ******************************************************************************/
+*                                                                             *
+* Purpose: resolve calculated item formula with an empty(default host) and    *
+*          macro host references, like:                                       *
+*          ( two forward slashes , {HOST.HOST}) to host names                 *
+*                                                                             *
+* Parameters: eval - [IN] the evaluation expression                           *
+*             item - [IN] the calculated item which defines the evaluation    *
+*                         expression                                          *
+*                                                                             *
+*******************************************************************************/
 void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const DC_ITEM *item)
 {
 	int	i;
@@ -1948,15 +1950,16 @@ static void	host_index_free(zbx_host_index_t *index)
 }
 
 /******************************************************************************
- *                                                                            *
- * Purpose: resolve expression macro empty and macro host references          *
- *          (// , {HOST.HOST}, {HOST.HOST<N>}) to  host names                 *
- *                                                                            *
- * Parameters: eval    - [IN] the evaluation data                             *
- *             trigger - [IN] the calculated item                             *
- *                                                                            *
- ******************************************************************************/
-void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger)
+*                                                                             *
+* Purpose: resolve expression with an empty host macro(default host)          *
+*          and macro host references, like:                                   *
+*          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>}) to host names   *
+*                                                                             *
+* Parameters: eval    - [IN/OUT] the evaluation expression                    *
+*             trigger - [IN] trigger which defines the evaluation expression  *
+*                                                                             *
+*******************************************************************************/
+void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const ZBX_DB_TRIGGER *trigger)
 {
 	int			i, func_num, index;
 	zbx_vector_ptr_t	hosts;

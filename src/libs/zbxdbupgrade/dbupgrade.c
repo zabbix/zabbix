@@ -21,7 +21,7 @@
 #include "dbupgrade.h"
 #include "dbschema.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 
 typedef struct

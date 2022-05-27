@@ -25,7 +25,7 @@
 #include "common.h"
 #include "zbxtrends.h"
 #include "log.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 int	__wrap_DBis_null(const char *field);
 DB_ROW	__wrap_DBfetch(DB_RESULT result);

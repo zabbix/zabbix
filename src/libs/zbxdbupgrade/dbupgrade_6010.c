@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "log.h"
 #include "sysinfo.h"
@@ -64,7 +64,7 @@ static int	DBpatch_6010002(void)
 		" from triggers"
 		" where " ZBX_DB_CHAR_LENGTH(description) ">%d", 255);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -79,7 +79,7 @@ static int	DBpatch_6010002(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -118,11 +118,11 @@ static int	DBpatch_6010005(void)
 		" from hosts_templates ht, hosts h"
 		" where ht.hostid=h.hostid and h.flags=4"); /* ZBX_FLAG_DISCOVERY_CREATED */
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		/* set TEMPLATE_LINK_LLD as link_type */
+		/* set ZBX_TEMPLATE_LINK_LLD as link_type */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_templates set link_type=1 where hosttemplateid=%s;\n", row[0]);
 
@@ -130,7 +130,7 @@ static int	DBpatch_6010005(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -352,7 +352,7 @@ static int	DBpatch_6010024(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select hi.itemid,hi.type,ht.name"
@@ -393,7 +393,7 @@ static int	DBpatch_6010024(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -419,7 +419,7 @@ static int	DBpatch_6010025(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select hi.itemid,hi.type,hs.name,ht.name"
@@ -461,7 +461,7 @@ static int	DBpatch_6010025(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -476,6 +476,48 @@ static int	DBpatch_6010025(void)
 }
 
 static int	DBpatch_6010026(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.auditlog.filter.action' and value_int=-1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010027(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set idx='web.auditlog.filter.actions'"
+			" where idx='web.auditlog.filter.action'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010028(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"delete from role_rule where value_str='trigger.adddependencies' or "
+			"value_str='trigger.deletedependencies'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010029(void)
 {
 	const ZBX_TABLE	table =
 			{"changelog", "changelogid", 0,
@@ -493,7 +535,7 @@ static int	DBpatch_6010026(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6010027(void)
+static int	DBpatch_6010030(void)
 {
 #ifdef HAVE_ORACLE
 	return DBcreate_serial_sequence("changelog");
@@ -502,7 +544,7 @@ static int	DBpatch_6010027(void)
 #endif
 }
 
-static int	DBpatch_6010028(void)
+static int	DBpatch_6010031(void)
 {
 #ifdef HAVE_ORACLE
 	return DBcreate_serial_trigger("changelog", "changelogid");
@@ -511,127 +553,127 @@ static int	DBpatch_6010028(void)
 #endif
 }
 
-static int	DBpatch_6010029(void)
+static int	DBpatch_6010032(void)
 {
 	return DBcreate_index("changelog", "changelog_1", "clock", 0);
 }
 
-static int	DBpatch_6010030(void)
+static int	DBpatch_6010033(void)
 {
 	return DBcreate_changelog_insert_trigger("hosts", "hostid");
 }
 
-static int	DBpatch_6010031(void)
+static int	DBpatch_6010034(void)
 {
 	return DBcreate_changelog_update_trigger("hosts", "hostid");
 }
 
-static int	DBpatch_6010032(void)
+static int	DBpatch_6010035(void)
 {
 	return DBcreate_changelog_delete_trigger("hosts", "hostid");
 }
 
-static int	DBpatch_6010033(void)
+static int	DBpatch_6010036(void)
 {
 	return DBcreate_changelog_insert_trigger("host_tag", "hosttagid");
 }
 
-static int	DBpatch_6010034(void)
+static int	DBpatch_6010037(void)
 {
 	return DBcreate_changelog_update_trigger("host_tag", "hosttagid");
 }
 
-static int	DBpatch_6010035(void)
+static int	DBpatch_6010038(void)
 {
 	return DBcreate_changelog_delete_trigger("host_tag", "hosttagid");
 }
 
-static int	DBpatch_6010036(void)
+static int	DBpatch_6010039(void)
 {
 	return DBcreate_changelog_insert_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010037(void)
+static int	DBpatch_6010040(void)
 {
 	return DBcreate_changelog_update_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010038(void)
+static int	DBpatch_6010041(void)
 {
 	return DBcreate_changelog_delete_trigger("items", "itemid");
 }
 
-static int	DBpatch_6010039(void)
+static int	DBpatch_6010042(void)
 {
 	return DBcreate_changelog_insert_trigger("item_tag", "itemtagid");
 }
 
-static int	DBpatch_6010040(void)
+static int	DBpatch_6010043(void)
 {
 	return DBcreate_changelog_update_trigger("item_tag", "itemtagid");
 }
 
-static int	DBpatch_6010041(void)
+static int	DBpatch_6010044(void)
 {
 	return DBcreate_changelog_delete_trigger("item_tag", "itemtagid");
 }
 
-static int	DBpatch_6010042(void)
+static int	DBpatch_6010045(void)
 {
 	return DBcreate_changelog_insert_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_6010043(void)
+static int	DBpatch_6010046(void)
 {
 	return DBcreate_changelog_update_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_6010044(void)
+static int	DBpatch_6010047(void)
 {
 	return DBcreate_changelog_delete_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_6010045(void)
+static int	DBpatch_6010048(void)
 {
 	return DBcreate_changelog_insert_trigger("trigger_tag", "triggertagid");
 }
 
-static int	DBpatch_6010046(void)
+static int	DBpatch_6010049(void)
 {
 	return DBcreate_changelog_update_trigger("trigger_tag", "triggertagid");
 }
 
-static int	DBpatch_6010047(void)
+static int	DBpatch_6010050(void)
 {
 	return DBcreate_changelog_delete_trigger("trigger_tag", "triggertagid");
 }
 
-static int	DBpatch_6010048(void)
+static int	DBpatch_6010051(void)
 {
 	return DBcreate_changelog_insert_trigger("functions", "functionid");
 }
 
-static int	DBpatch_6010049(void)
+static int	DBpatch_6010052(void)
 {
 	return DBcreate_changelog_update_trigger("functions", "functionid");
 }
 
-static int	DBpatch_6010050(void)
+static int	DBpatch_6010053(void)
 {
 	return DBcreate_changelog_delete_trigger("functions", "functionid");
 }
 
-static int	DBpatch_6010051(void)
+static int	DBpatch_6010054(void)
 {
 	return DBcreate_changelog_insert_trigger("item_preproc", "item_preprocid");
 }
 
-static int	DBpatch_6010052(void)
+static int	DBpatch_6010055(void)
 {
 	return DBcreate_changelog_update_trigger("item_preproc", "item_preprocid");
 }
 
-static int	DBpatch_6010053(void)
+static int	DBpatch_6010056(void)
 {
 	return DBcreate_changelog_delete_trigger("item_preproc", "item_preprocid");
 }
@@ -696,5 +738,8 @@ DBPATCH_ADD(6010050, 0,	1)
 DBPATCH_ADD(6010051, 0,	1)
 DBPATCH_ADD(6010052, 0,	1)
 DBPATCH_ADD(6010053, 0,	1)
+DBPATCH_ADD(6010054, 0,	1)
+DBPATCH_ADD(6010055, 0,	1)
+DBPATCH_ADD(6010056, 0,	1)
 
 DBPATCH_END()

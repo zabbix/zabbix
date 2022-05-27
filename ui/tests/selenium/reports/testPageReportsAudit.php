@@ -143,20 +143,21 @@ class testPageReportsAudit extends CLegacyWebTest {
 		$this->page->assertTitle('Audit log');
 		$this->page->assertHeader('Audit log');
 
-		if (self::$action_list === null) {
-			self::$action_list = $this->query('id:filter-actions')->one()->asCheckboxList();
-		}
-
-		return $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-	}
-
-	public function testPageReportsAudit_CheckLayout() {
-		$form = $this->getFormAndActionList();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 
 		if (!($form->getField('Users')->isVisible())) {
 			$this->query('id:ui-id-2')->waitUntilClickable()->one()->click();
 		}
 
+		if (self::$action_list === null) {
+			self::$action_list = $this->query('id:filter-actions')->one()->asCheckboxList();
+		}
+
+		return $form;
+	}
+
+	public function testPageReportsAudit_CheckLayout() {
+		$form = $this->getFormAndActionList();
 
 		$this->assertEquals(['Users', 'Resource', 'Resource ID', 'Recordset ID', 'Actions'],$form->getLabels()->asText());
 		$this->assertTrue(!array_diff($this->actions, self::$action_list->getLabels()->asText()));
@@ -185,11 +186,6 @@ class testPageReportsAudit extends CLegacyWebTest {
 	 */
 	public function testPageReportsAudit_Filter($action, $resourcetype) {
 		$form = $this->getFormAndActionList();
-
-		if (!($form->getField('Users')->isVisible())) {
-			$this->query('id:ui-id-2')->waitUntilClickable()->one()->click();
-		}
-
 		$form->getField('Users')->asMultiselect()->clear();
 		$form->getField('Resource')->asDropdown()->select($this->resourcetypes[$resourcetype]);
 
