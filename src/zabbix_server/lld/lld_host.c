@@ -828,7 +828,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	char			*buffer = NULL;
 	int			i, host_found = 0;
 	zbx_lld_host_t		*host = NULL;
-	zbx_vector_db_host_tag_ptr_t	tmp_tags;
+	zbx_vector_db_tag_ptr_t	override_tags;
 	zbx_vector_uint64_t	lnk_templateids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -853,7 +853,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		}
 	}
 
-	zbx_vector_db_host_tag_ptr_create(&tmp_tags);
+	zbx_vector_db_tag_ptr_create(&override_tags);
 
 	if (0 == host_found)
 	{
@@ -883,7 +883,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		zbx_vector_uint64_create(&host->lnk_templateids);
 
 		lld_override_host(&lld_row->overrides, host->host, &lnk_templateids, &host->inventory_mode,
-				&tmp_tags, &host->status, &discover_proto);
+				&override_tags, &host->status, &discover_proto);
 
 		if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
 		{
@@ -926,7 +926,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		}
 
 		lld_override_host(&lld_row->overrides, NULL != buffer ? buffer : host->host, &lnk_templateids,
-				&inventory_mode_proto, &tmp_tags, NULL, &discover_proto);
+				&inventory_mode_proto, &override_tags, NULL, &discover_proto);
 
 		if (ZBX_PROTOTYPE_NO_DISCOVER == discover_proto)
 		{
@@ -970,17 +970,41 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 	if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 	{
-		zbx_vector_db_host_tag_ptr_append_array(&tmp_tags, tags->values, tags->values_num);
-		lld_host_update_tags(host, &tmp_tags, lld_macros, info);
+		zbx_db_tag_t			*tmp_tag;
+		zbx_db_host_tag_t		*tmp_host_tag;
+		zbx_vector_db_host_tag_ptr_t	tmp_host_tags;
+
+		zbx_vector_db_host_tag_ptr_create(&tmp_host_tags);
+
+		for (i = 0; i < tags->values_num; i++)
+		{
+			tmp_host_tag = (zbx_db_host_tag_t *)tags->values[i];
+			tmp_host_tag = zbx_db_host_tag_create(tmp_host_tag->tag, tmp_host_tag->value,
+					tmp_host_tag->automatic);
+			zbx_vector_db_host_tag_ptr_append(&tmp_host_tags, tmp_host_tag);
+		}
+
+		for (i = 0; i < override_tags.values_num; i++)
+		{
+			tmp_tag = (zbx_db_tag_t *)override_tags.values[i];
+			tmp_host_tag = zbx_db_host_tag_create(tmp_host_tag->tag, tmp_host_tag->value,
+					ZBX_TAG_AUTOMATIC);
+			zbx_vector_db_host_tag_ptr_append(&tmp_host_tags, tmp_host_tag);
+		}
+
+		lld_host_update_tags(host, &tmp_host_tags, lld_macros, info);
 
 		if (0 != lnk_templateids.values_num)
 		{
 			zbx_vector_uint64_append_array(&host->lnk_templateids, lnk_templateids.values,
 					lnk_templateids.values_num);
 		}
+
+		zbx_vector_db_host_tag_ptr_clear_ext(&tmp_host_tags, zbx_db_host_tag_free);
+		zbx_vector_db_host_tag_ptr_destroy(&tmp_host_tags);
 	}
 out:
-	zbx_vector_db_host_tag_ptr_destroy(&tmp_tags);
+	zbx_vector_db_tag_ptr_destroy(&override_tags);
 	zbx_vector_uint64_destroy(&lnk_templateids);
 
 	zbx_free(buffer);
