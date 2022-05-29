@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-26T12:34:40Z'
+  date: '2022-05-29T09:32:40Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -94,9 +94,9 @@ zabbix_export:
                     'volumes',
                     'volume-statistics'
                 ],
-                data_temp = {},
+                data_tmp = {},
                 result_tmp = {},
-                sessionKey,
+                session_key,
                 data = {};
             
             fields.forEach(function (field) {
@@ -121,37 +121,33 @@ zabbix_export:
             
             if (response !== null) {
                 try {
-                    auth_data = XML.toJson(response);
-                    auth_data = JSON.parse(auth_data)['RESPONSE']['OBJECT']['PROPERTY'];
+                    session_key = XML.query(value, '/RESPONSE/OBJECT/PROPERTY[@name="response"]/text()');
+                    return_code = XML.query(value, '/RESPONSE/OBJECT/PROPERTY[@name="return-code"]/text()');
                 }
                 catch (error) {
                     throw 'Failed to parse auth response received from device API. Check debug log for more information.';
                 }
             }
             
-            for (var i=0; i < auth_data.length; i++) {
-                if (auth_data[i]['@name'] == 'response') {
-                    sessionKey = auth_data[i]['#text'];
-                }
+            if (return_code != '1') {
+                throw 'Authentication failed.'
             }
-            
-            if (sessionKey === null) {
-                throw 'Failed to parse auth response received from device API. Check debug log for more information.';
+            else if (session_key === '') {
+                throw 'Failed to retrieve session key from auth response.';
             }
             
             request = new HttpRequest();
-            request.addHeader('sessionKey: ' + sessionKey);
+            request.addHeader('sessionKey: ' + session_key);
             request.addHeader('datatype: api-embed');
             
             data['errors'] = [];
             
             methods.forEach(function (method) {
                 response = request.get(params.base_url + 'api/show/' + method);
-                methodError = {};
+                method_error = {};
             
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    methodError['method-name'] = method;
-                    methodError['return-code-error'] = 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    method_error[method] = 'Request failed with status code ' + request.getStatus() + ': ' + response;
                 }
             
                 if (response !== null) {
@@ -160,33 +156,30 @@ zabbix_export:
                         data[method] = [];
             
                         result_tmp.RESPONSE.OBJECT.forEach(function (object) {
-                            var data_temp = {};
-                            var basetype = object['@basetype'];
-                            var properties = object.PROPERTY;
+                            var data_tmp = {};
             
-                            properties.forEach(function (property) {
+                            object.PROPERTY.forEach(function (property) {
                                 name = property['@name'];
                                 value = property['#text'] || '';
-                                data_temp[name] = value;
+                                data_tmp[name] = value;
                             });
             
                             if (method == 'controller-statistics') {
-                                data_temp['durable-id'] = data_temp['durable-id'].toLowerCase();
+                                data_tmp['durable-id'] = data_tmp['durable-id'].toLowerCase();
                             }
             
-                            if (basetype != 'status') {
-                                data[method].push(data_temp);
+                            if (object['@basetype'] != 'status') {
+                                data[method].push(data_tmp);
                             }
                         });
                     }
                     catch (error) {
-                        methodError['method-name'] = method;
-                        methodError['parse-error'] = 'Failed to parse response received from device API. Check debug log for more information.';
+                        method_error[method] = 'Failed to parse response received from device API. Check debug log for more information.';
                     }
                 }
             
-                if (Object.keys(methodError).length > 0) {
-                    data['errors'].push(methodError);
+                if (Object.keys(method_error).length > 0) {
+                    data['errors'].push(method_error);
                 }
             });
             
@@ -1506,7 +1499,7 @@ zabbix_export:
               key: 'hpe.msa.disks["{#DURABLE.ID}",temperature]'
               delay: '0'
               history: 7d
-              units: '!C'
+              units: '!°C'
               description: 'Temperature of the disk.'
               preprocessing:
                 -
@@ -3658,6 +3651,7 @@ zabbix_export:
               key: 'hpe.msa.power_supplies["{#DURABLE.ID}",temperature]'
               delay: '0'
               history: 7d
+              units: '!°C'
               description: 'Power supply temperature.'
               preprocessing:
                 -
