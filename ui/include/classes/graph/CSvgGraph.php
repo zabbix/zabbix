@@ -197,7 +197,7 @@ class CSvgGraph extends CSvg {
 			GRAPH_YAXIS_SIDE_RIGHT => 0
 		];
 
-		foreach ($metrics as $i => $metric) {
+		foreach ($metrics as $index => $metric) {
 			$min_value = null;
 			$max_value = null;
 
@@ -205,14 +205,30 @@ class CSvgGraph extends CSvg {
 				$metrics_for_each_axes[$metric['options']['axisy']]++;
 
 				foreach ($metric['points'] as $point) {
-					if ($min_value === null || $min_value > $point['value']) {
-						$min_value = (float) $point['value'];
+					switch ($metric['options']['approximation']) {
+						case APPROXIMATION_MIN:
+							$point_min = $point['min'];
+							$point_max = $point['min'];
+							break;
+						case APPROXIMATION_MAX:
+							$point_min = $point['max'];
+							$point_max = $point['max'];
+							break;
+						case APPROXIMATION_ALL:
+							$point_min = $point['min'];
+							$point_max = $point['max'];
+							break;
+						default:
+							$point_min = $point['avg'];
+							$point_max = $point['avg'];
+							break;
 					}
-					if ($max_value === null || $max_value < $point['value']) {
-						$max_value = (float) $point['value'];
+					if ($min_value === null || $min_value > $point_min) {
+						$min_value = (float) $point_min;
 					}
-
-					$this->points[$i][$point['clock']] = $point['value'];
+					if ($max_value === null || $max_value < $point_max) {
+						$max_value = (float) $point_max;
+					}
 				}
 
 				if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
@@ -233,13 +249,15 @@ class CSvgGraph extends CSvg {
 				}
 			}
 
-			$this->metrics[$i] = [
+			$this->metrics[$index] = [
 				'name' => $metric['name'],
 				'itemid' => $metric['itemid'],
 				'units' => $metric['units'],
 				'host' => $metric['hosts'][0],
-				'options' => ['order' => $i] + $metric['options']
+				'options' => ['order' => $index] + $metric['options']
 			];
+
+			$this->points[$index] = $metric['points'];
 		}
 
 		$this->left_y_empty = ($metrics_for_each_axes[GRAPH_YAXIS_SIDE_LEFT] == 0);
@@ -532,31 +550,40 @@ class CSvgGraph extends CSvg {
 				 * Avoid invisible data point drawing. Data sets of type != SVG_GRAPH_TYPE_POINTS cannot be skipped to
 				 * keep shape unchanged.
 				 */
-				$in_range = ($max_value >= $point && $min_value <= $point);
-				if ($in_range || $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
-					$x = $this->canvas_x + $this->canvas_width
-						- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
+				$path_point = [];
+				foreach ($point as $type => $value) {
+					$in_range = ($max_value >= $value && $min_value <= $value);
+					if ($in_range || $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
+						$x = $this->canvas_x + $this->canvas_width
+							- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 
-					if ($max_value - $min_value == INF) {
-						$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
-							$max_value / 10 - $point / 10, 1 / ($max_value / 10 - $min_value / 10)
-						]);
-					}
-					else {
-						$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
-							$max_value - $point, 1 / ($max_value - $min_value)
-						]);
-					}
+						if ($max_value - $min_value == INF) {
+							$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+									$max_value / 10 - $value / 10, 1 / ($max_value / 10 - $min_value / 10)
+								]);
+						}
+						else {
+							$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+									$max_value - $value, 1 / ($max_value - $min_value)
+								]);
+						}
 
-					if (!$in_range) {
-						$y = ($point > $max_value) ? max($y_min, $y) : min($y_max, $y);
-					}
+						if (!$in_range) {
+							$y = ($value > $max_value) ? max($y_min, $y) : min($y_max, $y);
+						}
 
-					$paths[$path_num][] = [$x, ceil($y), convertUnits([
-						'value' => $point,
-						'units' => $metric['units']
-					])];
+						$path_point[$type] = [
+							(int) ceil($x),
+							(int) ceil($y),
+							convertUnits([
+								'value' => $value,
+								'units' => $metric['units']
+							])
+						];
+					}
 				}
+
+				$paths[$path_num][] = $path_point;
 			}
 
 			if ($paths) {
@@ -683,6 +710,17 @@ class CSvgGraph extends CSvg {
 
 	private function drawMetricsLine(): void {
 		foreach ($this->metrics as $index => $metric) {
+			switch ($metric['options']['approximation']) {
+				case APPROXIMATION_MIN:
+					$approximation = 'min';
+					break;
+				case APPROXIMATION_MAX:
+					$approximation = 'max';
+					break;
+				default:
+					$approximation = 'avg';
+			}
+
 			if (array_key_exists($index, $this->paths)
 					&& in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])) {
 
@@ -693,7 +731,21 @@ class CSvgGraph extends CSvg {
 
 					foreach ($this->paths[$index] as $path) {
 						if (count($path) > 1) {
-							$this->addItem(new CSvgGraphArea($path, $metric, $y_zero));
+							if ($metric['options']['approximation'] == APPROXIMATION_ALL) {
+								$this->addItem(
+									new CSvgGraphArea(
+										array_merge(
+											array_column($path, 'max'),
+											array_reverse(array_column($path, 'min'))
+										),
+										$metric,
+										null
+									)
+								);
+							}
+							else {
+								$this->addItem(new CSvgGraphArea(array_column($path, $approximation), $metric, $y_zero));
+							}
 						}
 					}
 				}
@@ -706,7 +758,18 @@ class CSvgGraph extends CSvg {
 	private function drawMetricsPoint(): void {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS && array_key_exists($index, $this->paths)) {
-				$this->addItem(new CSvgGraphPoints(reset($this->paths[$index]), $metric));
+				switch ($metric['options']['approximation']) {
+					case APPROXIMATION_MIN:
+						$approximation = 'min';
+						break;
+					case APPROXIMATION_MAX:
+						$approximation = 'max';
+						break;
+					default:
+						$approximation = 'avg';
+				}
+
+				$this->addItem(new CSvgGraphPoints(array_column(reset($this->paths[$index]), $approximation), $metric));
 			}
 		}
 	}
@@ -721,6 +784,17 @@ class CSvgGraph extends CSvg {
 
 		foreach ($this->paths as $index => $path) {
 			if ($this->metrics[$index]['options']['type'] == SVG_GRAPH_TYPE_BAR) {
+				switch ($this->metrics[$index]['options']['approximation']) {
+					case APPROXIMATION_MIN:
+						$approximation = 'min';
+						break;
+					case APPROXIMATION_MAX:
+						$approximation = 'max';
+						break;
+					default:
+						$approximation = 'avg';
+				}
+
 				// If one second in displayed over multiple pixels, this shows number of px in second.
 				$sec_per_px = ceil(($this->time_till - $this->time_from) / $this->canvas_width);
 				$px_per_sec = ceil($this->canvas_width / ($this->time_till - $this->time_from));
@@ -735,12 +809,12 @@ class CSvgGraph extends CSvg {
 						? floor($time_points[$point_index] / $sec_per_px) * $sec_per_px
 						: $time_points[$point_index];
 					$bar_groups_indexes[$y_axis_side][$time_point][$index] = $point_index;
-					$bar_groups_position[$y_axis_side][$time_point][$point_index] = $point[0];
+					$bar_groups_position[$y_axis_side][$time_point][$point_index] = $point[$approximation][0];
 
 					if ($last_point > 0) {
-						$bar_min_width[$y_axis_side] = min($point[0] - $last_point, $bar_min_width[$y_axis_side]);
+						$bar_min_width[$y_axis_side] = min($point[$approximation][0] - $last_point, $bar_min_width[$y_axis_side]);
 					}
-					$last_point = $point[0];
+					$last_point = $point[$approximation][0];
 				}
 			}
 		}
@@ -752,18 +826,33 @@ class CSvgGraph extends CSvg {
 				$bar_width = ceil($group_width / $group_count * .75);
 				$group_index = 0;
 				foreach ($paths as $path_index => $point_index) {
+					switch ($this->metrics[$path_index]['options']['approximation']) {
+						case APPROXIMATION_MIN:
+							$point = $this->paths[$path_index][0][$point_index]['min'];
+							break;
+						case APPROXIMATION_MAX:
+							$point = $this->paths[$path_index][0][$point_index]['max'];
+							break;
+						default:
+							$point = $this->paths[$path_index][0][$point_index]['avg'];
+					}
+
 					$group_x = $bar_groups_position[$y_axis][$time_point][$point_index];
+
 					if ($group_count > 1) {
-						$this->paths[$path_index][0][$point_index][0] = $group_x
+						$point[0] = $group_x
 							// Calculate the leftmost X-coordinate including gap size.
 							- $group_width * .375
 							// Calculate the X-offset for each bar in the group.
 							+ ceil($bar_width * ($group_index + .5));
 						$group_index++;
 					}
-					$this->paths[$path_index][0][$point_index][3] = max(1, $bar_width);
+
+					$point[3] = max(1, $bar_width);
 					// X position for bars group.
-					$this->paths[$path_index][0][$point_index][4] = $group_x - $group_width * .375;
+					$point[4] = $group_x - $group_width * .375;
+
+					$this->paths[$path_index][0][$point_index] = $point;
 				}
 			}
 		}
@@ -796,9 +885,20 @@ class CSvgGraph extends CSvg {
 				continue;
 			}
 
+			switch ($metric['options']['approximation']) {
+				case APPROXIMATION_MIN:
+					$approximation = 'min';
+					break;
+				case APPROXIMATION_MAX:
+					$approximation = 'max';
+					break;
+				default:
+					$approximation = 'avg';
+			}
+
 			$values[$metric['options']['axisy']] = array_merge(
 				$values[$metric['options']['axisy']],
-				array_values($this->points[$index])
+				array_column($this->points[$index], $approximation)
 			);
 		}
 

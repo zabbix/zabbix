@@ -105,8 +105,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	}
 
 	private function initDataSetFields(): void {
-		$field_ds = (new CWidgetFieldGraphDataSet('ds', _('Data set')))
-			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
+		$field_ds = (new CWidgetFieldGraphDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 
 		if (array_key_exists('ds', $this->data)) {
 			$field_ds->setValue($this->data['ds']);

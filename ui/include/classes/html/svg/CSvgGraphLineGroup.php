@@ -59,12 +59,16 @@ class CSvgGraphLineGroup extends CSvgGroup {
 			'.'.CSvgGraphLine::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order'] => [
 				'stroke-opacity' => $this->options['transparency'] * 0.1,
 				'stroke' => $this->options['color'],
-				'stroke-width' => $this->options['width']
+				'stroke-width' => $this->options['width'] * $this->options['approximation'] == APPROXIMATION_ALL ? 2 : 1
 			] + ($this->options['type'] == SVG_GRAPH_TYPE_LINE ? ['stroke-linejoin' => 'round'] : []),
 			'.'.CSvgGraphLine::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order'].' circle' => [
 				'fill-opacity' => $this->options['transparency'] * 0.1,
 				'fill' => $this->options['color'],
 				'stroke-width' => 0
+			],
+			'.'.CSvgGraphLine::ZBX_STYLE_CLASS.' .'.CSvgGraphLine::ZBX_STYLE_LINE_AUXILIARY => [
+				'stroke-width' => $this->options['width'],
+				'opacity' => $this->options['transparency'] * 0.1
 			]
 		];
 	}
@@ -75,13 +79,34 @@ class CSvgGraphLineGroup extends CSvgGroup {
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 		);
 
+		switch ($this->options['approximation']) {
+			case APPROXIMATION_MIN:
+				$approximation = 'min';
+				break;
+			case APPROXIMATION_MAX:
+				$approximation = 'max';
+				break;
+			default:
+				$approximation = 'avg';
+		}
+
 		foreach ($this->paths as $path) {
 			// Draw single data point paths as circles instead of lines.
-			$this->addItem((count($path) > 1)
-				? new CSvgGraphLine($path, $this->metric)
-				: (new CSvgCircle($path[0][0], $path[0][1], $this->options['pointsize']))
-					->setAttribute('label', $path[0][2])
-			);
+			if (count($path) > 1) {
+				$this->addItem(new CSvgGraphLine(array_column($path, $approximation), $this->metric));
+
+				if ($this->options['approximation'] == APPROXIMATION_ALL) {
+					$this->addItem(new CSvgGraphLine(array_column($path, 'min'), $this->metric, true));
+					$this->addItem(new CSvgGraphLine(array_column($path, 'max'), $this->metric, true));
+				}
+			}
+			else {
+				$this->addItem(
+					(new CSvgCircle($path[0][$approximation][0], $path[0][$approximation][1],
+						$this->options['pointsize'])
+					)->setAttribute('label', $path[0][$approximation][2])
+				);
+			}
 		}
 	}
 

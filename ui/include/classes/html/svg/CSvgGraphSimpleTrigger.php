@@ -84,17 +84,17 @@ class CSvgGraphSimpleTrigger extends CSvgGroup {
 
 		if ($range == INF) {
 			$y = $this->height + $this->y - CMathHelper::safeMul([
-					$this->height,
-					($this->value - $this->min) / 10,
-					1 / $range / 10
-				]);
+				$this->height,
+				($this->value - $this->min) / 10,
+				1 / $range / 10
+			]);
 		}
 		else {
 			$y = $this->height + $this->y - CMathHelper::safeMul([
-					$this->height,
-					$this->value - $this->min,
-					1 / $range
-				]);
+				$this->height,
+				$this->value - $this->min,
+				1 / $range
+			]);
 		}
 
 		$label_x = $this->side == GRAPH_YAXIS_SIDE_RIGHT

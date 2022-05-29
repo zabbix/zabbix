@@ -22,6 +22,7 @@
 class CSvgGraphLine extends CSvgPath {
 
 	public const ZBX_STYLE_CLASS = 'svg-graph-line';
+	public const ZBX_STYLE_LINE_AUXILIARY = 'svg-graph-line-auxiliary';
 
 	protected $path;
 
@@ -30,14 +31,14 @@ class CSvgGraphLine extends CSvgPath {
 	protected $units;
 	protected $host;
 
-	protected $add_label;
+	protected $is_auxiliary;
 
 	protected $options;
 
-	public function __construct(array $path, array $metric) {
+	public function __construct(array $path, array $metric, bool $is_auxiliary = false) {
 		parent::__construct();
 
-		$this->add_label = true;
+		$this->is_auxiliary = $is_auxiliary;
 		$this->path = $path;
 
 		$this->itemid = $metric['itemid'];
@@ -55,28 +56,19 @@ class CSvgGraphLine extends CSvgPath {
 	}
 
 	public function makeStyles(): array {
-		$this
-			->addClass(self::ZBX_STYLE_CLASS)
-			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order']);
+		if ($this->is_auxiliary) {
+			$this->addClass(self::ZBX_STYLE_LINE_AUXILIARY);
+		}
 
-		return [
-			'.'.self::ZBX_STYLE_CLASS => [
-				'fill' => 'none'
-			],
-			'.'.self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order'] => [
-				'opacity' => $this->options['transparency'] * 0.1,
-				'stroke' => $this->options['color'],
-				'stroke-width' => $this->options['width']
-			] + ($this->options['type'] == SVG_GRAPH_TYPE_LINE ? ['stroke-linejoin' => 'round'] : [])
-		];
+		return [];
 	}
 
 	protected function draw(): void {
 		if (count($this->path) > 1) {
 			$last_point = [0, 0];
 
-			foreach ($this->path as $i => $point) {
-				if ($i == 0) {
+			foreach ($this->path as $index => $point) {
+				if ($index == 0) {
 					$this->moveTo($point[0], $point[1]);
 				}
 				else {
@@ -91,7 +83,7 @@ class CSvgGraphLine extends CSvgPath {
 	}
 
 	public function toString($destroy = true): string {
-		if ($this->add_label && $this->path) {
+		if (!$this->is_auxiliary && $this->path) {
 			$line_values = '';
 
 			foreach ($this->path as $point) {

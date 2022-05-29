@@ -3074,7 +3074,7 @@ $form-icon-btn: (
 			overflow: auto;
 			overflow-x: hidden;
 			width: 100%;
-			max-height: 100vh; // max-height: calc(100vh - 220px); TODO: 6940
+			max-height: calc(100vh - 220px);
 			max-width: inherit;
 			margin: 0 -10px 10px;
 			padding: 0 10px;
@@ -3127,7 +3127,7 @@ $form-icon-btn: (
 	}
 
 	&.modal-popup {
-		top: 0; //top: 50px; TODO: 6940
+		top: 50px;
 		max-width: 1120px;
 
 		&.modal-popup-small {

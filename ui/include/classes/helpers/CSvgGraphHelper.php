@@ -450,7 +450,7 @@ class CSvgGraphHelper {
 		// To reduce number of requests, group metrics by time range.
 		$tr_groups = [];
 
-		foreach ($metrics as $metric_num => &$metric) {
+		foreach ($metrics as $index => &$metric) {
 			if ($metric['options']['aggregate_function'] != AGGREGATE_NONE) {
 				continue;
 			}
@@ -468,7 +468,7 @@ class CSvgGraphHelper {
 				];
 			}
 
-			$tr_groups[$key]['items'][$metric_num] = [
+			$tr_groups[$key]['items'][$index] = [
 				'itemid' => $metric['itemid'],
 				'value_type' => $metric['value_type'],
 				'source' => ($metric['source'] == SVG_GRAPH_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
@@ -483,17 +483,19 @@ class CSvgGraphHelper {
 			);
 
 			if ($results) {
-				foreach ($tr_group['items'] as $metric_num => $item) {
-					$metric = &$metrics[$metric_num];
+				foreach ($tr_group['items'] as $index => $item) {
+					$metric = &$metrics[$index];
 
 					// Collect and sort data points.
 					if (array_key_exists($item['itemid'], $results)) {
-						$points = [];
 						foreach ($results[$item['itemid']]['data'] as $point) {
-							$points[] = ['clock' => $point['clock'], 'value' => $point['avg']];
+							$metric['points'][$point['clock']] = [
+								'min' => $point['min'],
+								'avg' => $point['avg'],
+								'max' => $point['max']
+							];
 						}
-						usort($points, [__CLASS__, 'sortByClock']);
-						$metric['points'] = $points;
+						ksort($metric['points'], SORT_NUMERIC);
 
 						unset($metric['source'], $metric['history'], $metric['trends']);
 					}
@@ -562,80 +564,28 @@ class CSvgGraphHelper {
 				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
 			);
 
-			$metric_points = [];
-
 			if ($result) {
+				$metric_points = [];
 				foreach ($result as $points) {
 					foreach ($points['data'] as $point) {
-						$metric_points[$point['tick']]['itemid'][] = $point['itemid'];
-						$metric_points[$point['tick']]['clock'][] = $point['clock'];
-
 						if (array_key_exists('count', $point)) {
-							$metric_points[$point['tick']]['count'][] = $point['count'];
+							$metric_points[$point['tick']]['value'][] = $point['count'];
 						}
 						if (array_key_exists('value', $point)) {
 							$metric_points[$point['tick']]['value'][] = $point['value'];
 						}
 					}
 				}
-				ksort($metric_points, SORT_NUMERIC);
 
-				switch ($metric['options']['aggregate_function']) {
-					case AGGREGATE_MIN:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = ['clock' => $tick, 'value' => min($point['value'])];
-						}
-						break;
-
-					case AGGREGATE_MAX:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = ['clock' => $tick, 'value' => max($point['value'])];
-						}
-						break;
-
-					case AGGREGATE_AVG:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = [
-								'clock' => $tick,
-								'value' => CMathHelper::safeAvg($point['value'])
-							];
-						}
-						break;
-
-					case AGGREGATE_COUNT:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['count'])];
-						}
-						break;
-
-					case AGGREGATE_SUM:
-						foreach ($metric_points as $tick => $point) {
-							$metric['points'][] = ['clock' => $tick, 'value' => array_sum($point['value'])];
-						}
-						break;
-
-					case AGGREGATE_FIRST:
-						foreach ($metric_points as $tick => $point) {
-							if ($point['clock']) {
-								$metric['points'][] = [
-									'clock' => $tick,
-									'value' => $point['value'][array_search(min($point['clock']), $point['clock'])]
-								];
-							}
-						}
-						break;
-
-					case AGGREGATE_LAST:
-						foreach ($metric_points as $tick => $point) {
-							if ($point['clock']) {
-								$metric['points'][] = [
-									'clock' => $tick,
-									'value' => $point['value'][array_search(max($point['clock']), $point['clock'])]
-								];
-							}
-						}
-						break;
+				foreach ($metric_points as $tick => $point) {
+					$metric['points'][$tick] = [
+						'min' => min($point['value']),
+						'avg' => CMathHelper::safeAvg($point['value']),
+						'max' => max($point['value'])
+					];
 				}
+
+				ksort($metric['points'], SORT_NUMERIC);
 			}
 		}
 	}
@@ -654,7 +604,16 @@ class CSvgGraphHelper {
 			];
 
 			if ($metric['points']) {
-				$values = array_column($metric['points'], 'value');
+				switch ($metric['options']['approximation']) {
+					case APPROXIMATION_MIN:
+						$values = array_column($metric['points'], 'min');
+						break;
+					case APPROXIMATION_MAX:
+						$values = array_column($metric['points'], 'max');
+						break;
+					default:
+						$values = array_column($metric['points'], 'avg');
+				}
 
 				$item += [
 					'units' => $metric['units'],

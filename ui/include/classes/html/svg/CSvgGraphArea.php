@@ -25,11 +25,10 @@ class CSvgGraphArea extends CSvgGraphLine {
 
 	private $y_zero;
 
-	public function __construct(array $path, array $metric, int $y_zero = 0) {
-		parent::__construct($path, $metric);
+	public function __construct(array $path, array $metric, ?int $y_zero) {
+		parent::__construct($path, $metric, true);
 
 		$this->y_zero = $y_zero;
-		$this->add_label = false;
 		$this->options = $metric['options'] + [
 			'fill' => 5
 		];
