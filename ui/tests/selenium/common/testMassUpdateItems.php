@@ -130,20 +130,6 @@ class testMassUpdateItems extends CWebTest{
 				[
 					'expected' => TEST_BAD,
 					'names' => [
-						'13_DB_Monitor',
-						'14_DB_Monitor'
-					],
-					'change' => [
-						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
-						'User name' => ['id' => 'username', 'value' => 'username1']
-					],
-					'details' => 'Invalid parameter "/1": the parameter "params" is missing.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'names' => [
 						'1_Item',
 						'2_Item'
 					],
@@ -758,6 +744,7 @@ class testMassUpdateItems extends CWebTest{
 				]
 			],
 			[
+				'expected' => TEST_BAD,
 				[
 					'names' => [
 						'1_Item',
@@ -769,6 +756,19 @@ class testMassUpdateItems extends CWebTest{
 						'Password' => ['id' => 'password', 'value' => 'telnet_password']
 					],
 					'details' => 'Invalid parameter "/1": the parameter "params" is missing.'
+				]
+			],
+
+			[
+				[
+					'names' => [
+						'13_DB_Monitor',
+						'14_DB_Monitor'
+					],
+					'change' => [
+						'Type' => ['id' => 'type', 'value' => 'TELNET agent'],
+						'User name' => ['id' => 'username', 'value' => 'username1']
+					]
 				]
 			],
 			[

@@ -209,6 +209,10 @@ class CControllerPopupMassupdateItem extends CController {
 			DBstart();
 
 			foreach ($ids as $id) {
+				if (!array_key_exists($id, $db_items)) {
+					continue;
+				}
+
 				$db_item = $db_items[$id];
 				$item_type = array_key_exists('type', $input) ? $input['type'] : $db_item['type'];
 				$item_host = $db_item['hosts'][0];
