@@ -78,8 +78,6 @@ static void	um_mock_macro_init(zbx_um_mock_macro_t *macro, zbx_uint64_t hostid, 
 	}
 	else
 		macro->type = ZBX_MACRO_VALUE_TEXT;
-
-	macro->automatic = 0;
 }
 
 /*********************************************************************************
@@ -275,7 +273,6 @@ void	um_mock_cache_init_from_config(zbx_um_mock_cache_t *cache, zbx_um_cache_t *
 					(*phost)->macros.values[i]->context);
 			macro->value = zbx_strdup(NULL, (*phost)->macros.values[i]->value);
 			macro->type = (*phost)->macros.values[i]->type;
-			macro->automatic = (*phost)->macros.values[i]->automatic;
 
 			zbx_vector_um_mock_macro_append(&host_local.macros, macro);
 		}
@@ -364,9 +361,6 @@ static int	um_mock_compare_macros_by_content(const zbx_um_mock_macro_t *m1, cons
 	if (0 != (ret = (int)m1->type - (int)m2->type))
 		goto out;
 
-	if (0 != (ret = (int)m1->automatic - (int)m2->automatic))
-		goto out;
-
 	ret = strcmp(m1->value, m2->value);
 out:
 	zbx_free(name1);
@@ -406,7 +400,7 @@ static void	um_mock_dbsync_add_macro(zbx_dbsync_t *sync, unsigned char tag, cons
 	char			**prow;
 
 	if (0 == sync->columns_num)
-		sync->columns_num = (0 == macro->hostid ? 4 : 6);
+		sync->columns_num = (0 == macro->hostid ? 4 : 5);
 
 	row = (zbx_dbsync_row_t *)zbx_malloc(NULL, sizeof(zbx_dbsync_row_t));
 	row->rowid = macro->macroid;
@@ -419,9 +413,6 @@ static void	um_mock_dbsync_add_macro(zbx_dbsync_t *sync, unsigned char tag, cons
 	*prow++ = zbx_strdup(NULL, macro->macro);
 	*prow++ = zbx_strdup(NULL, macro->value);
 	*prow++ = zbx_dsprintf(NULL, "%u", macro->type);
-
-	if (0 != macro->hostid)
-		*prow++ = zbx_dsprintf(NULL, "%u", macro->automatic);
 
 	zbx_vector_ptr_append(&sync->rows, row);
 

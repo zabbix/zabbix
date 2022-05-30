@@ -213,7 +213,6 @@ static zbx_um_macro_t	*um_macro_dup(zbx_um_macro_t *macro)
 	dup->context = dc_strpool_acquire(macro->context);
 	dup->value = dc_strpool_acquire(macro->value);
 	dup->type = macro->type;
-	dup->automatic = macro->automatic;
 	dup->context_op = macro->context_op;
 	dup->refcount = 1;
 
@@ -606,7 +605,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	{
 		char		*name = NULL, *context = NULL;
 		const char	*dc_name, *dc_context, *dc_value;
-		unsigned char	context_op, type, automatic;
+		unsigned char	context_op, type;
 		zbx_um_macro_t	*macro;
 
 		/* removed rows will be always at the end of sync list */
@@ -630,12 +629,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		zbx_free(context);
 
 		if (2 == offset)
-		{
 			ZBX_STR2UINT64(hostid, row[1]);
-			ZBX_STR2UCHAR(automatic, row[5]);
-		}
-		else
-			automatic = 0;
 
 		ZBX_STR2UCHAR(type, row[offset + 2]);
 
@@ -705,7 +699,6 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		(*pmacro)->name = dc_name;
 		(*pmacro)->context = dc_context;
 		(*pmacro)->type = type;
-		(*pmacro)->automatic = automatic;
 		(*pmacro)->context_op = context_op;
 
 		if (ZBX_MACRO_VALUE_VAULT == type)
@@ -1211,9 +1204,9 @@ void	um_cache_dump(zbx_um_cache_t *cache)
 			}
 
 			zabbix_log(LOG_LEVEL_TRACE, "    macroid:" ZBX_FS_UI64 " name:'%s' context:'%s' op:'%d'"
-					" value:'%s' type:%d automatic:%d refcount:%u", macro->macroid, macro->name,
+					" value:'%s' type:%d refcount:%u", macro->macroid, macro->name,
 					ZBX_NULL2EMPTY_STR(macro->context), macro->context_op,
-					ZBX_NULL2EMPTY_STR(value), macro->type, macro->automatic, macro->refcount);
+					ZBX_NULL2EMPTY_STR(value), macro->type, macro->refcount);
 		}
 
 		if (0 != (*phost)->templateids.values_num)
