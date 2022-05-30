@@ -2533,7 +2533,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     vertical-align: middle;
     padding: 0 8px 7px 8px;
     margin-bottom: -7px; }
-  .filter-container.tabfilter-container .tabfilter-item-label:not(.selected) .tabfilter-item-link:not(.icon-filter, .btn-time)::before {
+  .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label.ui-sortable-helper + .tabfilter-item-label.ui-sortable-handle:not(.selected, .ui-sortable-helper) .tabfilter-item-link::before,
+  .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label:not(.selected) + .tabfilter-item-label.ui-sortable-handle:not(.selected, .ui-sortable-helper) .tabfilter-item-link::before {
     content: ' ';
     position: absolute;
     top: 1px;
@@ -2541,9 +2542,6 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     display: inline-block;
     height: 20px;
     border-left: 1px solid #768d99; }
-  .filter-container.tabfilter-container .tabfilter-item-label.selected + .tabfilter-item-label .tabfilter-item-link::before,
-  .filter-container.tabfilter-container .tabfilter-item-label:not(.selected).ui-sortable-helper .tabfilter-item-link::before {
-    display: none; }
   .filter-container.tabfilter-container .icon-edit {
     width: 24px;
     height: 22px;
