@@ -2006,33 +2006,33 @@ ZBX_PTR_VECTOR_IMPL(interfaces, zbx_interfaces_prototype_t *)
 
 typedef struct
 {
-	zbx_uint64_t		templateid;		/* link to parent template */
-	zbx_uint64_t		hostid;
-	zbx_uint64_t		itemid;			/* discovery rule id */
-	zbx_vector_uint64_t	lnk_templateids;	/* list of templates which should be linked */
-	zbx_vector_ptr_t	group_prototypes;	/* list of group prototypes */
-	zbx_vector_macros_t	hostmacros;		/* list of user macros */
-	zbx_vector_db_host_tag_ptr_t	tags;		/* list of host prototype tags */
-	zbx_vector_interfaces_t	interfaces;		/* list of interfaces */
-	char			*host;
-	char			*name_orig;
-	char			*name;
-	unsigned char		status_orig;
-	unsigned char		status;
+	zbx_uint64_t			templateid;		/* link to parent template */
+	zbx_uint64_t			hostid;
+	zbx_uint64_t			itemid;			/* discovery rule id */
+	zbx_vector_uint64_t		lnk_templateids;	/* list of templates which should be linked */
+	zbx_vector_ptr_t		group_prototypes;	/* list of group prototypes */
+	zbx_vector_macros_t		hostmacros;		/* list of user macros */
+	zbx_vector_db_host_tag_ptr_t	tags;			/* list of host prototype tags */
+	zbx_vector_interfaces_t		interfaces;		/* list of interfaces */
+	char				*host;
+	char				*name_orig;
+	char				*name;
+	unsigned char			status_orig;
+	unsigned char			status;
 #define ZBX_FLAG_HPLINK_RESET_FLAG			0x00
 #define ZBX_FLAG_HPLINK_UPDATE_NAME			0x01
 #define ZBX_FLAG_HPLINK_UPDATE_STATUS			0x02
 #define ZBX_FLAG_HPLINK_UPDATE_DISCOVER			0x04
 #define ZBX_FLAG_HPLINK_UPDATE_CUSTOM_INTERFACES	0x08
 #define ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE		0x10
-	unsigned char		flags;
-	unsigned char		discover_orig;
-	unsigned char		discover;
-	unsigned char		custom_interfaces_orig;
-	unsigned char		custom_interfaces;
-	signed char		inventory_mode_orig;
-	signed char		inventory_mode;
-	zbx_uint64_t		templateid_host;
+	unsigned char			flags;
+	unsigned char			discover_orig;
+	unsigned char			discover;
+	unsigned char			custom_interfaces_orig;
+	unsigned char			custom_interfaces;
+	signed char			inventory_mode_orig;
+	signed char			inventory_mode;
+	zbx_uint64_t			templateid_host;
 }
 zbx_host_prototype_t;
 
@@ -3082,8 +3082,8 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 			{
 				zbx_vector_uint64_append(del_tagids, tagid);
 
-				zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE, host_prototype_local->hostid,
-						host_prototype_local->host);
+				zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE,
+						host_prototype_local->hostid, host_prototype_local->host);
 				zbx_audit_host_prototype_update_json_delete_tag(host_prototype_local->hostid, tagid);
 			}
 

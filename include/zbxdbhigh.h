@@ -769,8 +769,8 @@ ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
 
 zbx_db_host_tag_t	*zbx_db_host_tag_create(const char *tag_tag, const char *tag_value,
 		unsigned char tag_automatic);
-void	zbx_db_host_tag_free(zbx_db_host_tag_t *tag);
-int	zbx_db_host_tag_compare_func(const void *d1, const void *d2);
+void			zbx_db_host_tag_free(zbx_db_host_tag_t *tag);
+int			zbx_db_host_tag_compare_func(const void *d1, const void *d2);
 
 ZBX_PTR_VECTOR_DECL(db_host_tag_ptr, zbx_db_host_tag_t *)
 

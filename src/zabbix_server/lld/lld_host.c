@@ -2368,9 +2368,8 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_host_
 		if (FAIL == zbx_vector_db_host_tag_ptr_bsearch(&proto_tags, host_tag, zbx_db_host_tag_compare_func))
 		{
 			if (ZBX_TAG_AUTOMATIC == host_tag->automatic)
-			{
 				host_tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
-			}
+
 			continue;
 		}
 
@@ -3374,7 +3373,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 				zbx_audit_host_update_json_update_tag_create_entry(host->hostid, tag->tagid);
 
-				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "automatic='%d'", tag->automatic);
+				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "automatic=%d", tag->automatic);
 
 				zbx_audit_host_update_json_update_tag_type(host->hostid, tag->tagid,
 						tag->automatic_orig, tag->automatic);

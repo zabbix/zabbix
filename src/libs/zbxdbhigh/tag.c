@@ -84,7 +84,7 @@ zbx_db_host_tag_t	*zbx_db_host_tag_create(const char *tag_tag, const char *tag_v
 	tag->automatic = tag_automatic;
 	tag->tag_orig = NULL;
 	tag->value_orig = NULL;
-	tag->automatic_orig = tag_automatic;
+	tag->automatic_orig = 0;
 
 	return tag;
 }

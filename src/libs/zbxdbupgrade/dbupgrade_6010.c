@@ -530,7 +530,7 @@ static int	DBpatch_6010030(void)
 			"update host_tag"
 			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
 			" where hostid in ("
-				" select hostid"
+				"select hostid"
 				" from host_discovery"
 				" where parent_hostid is not null"
 			")"))
