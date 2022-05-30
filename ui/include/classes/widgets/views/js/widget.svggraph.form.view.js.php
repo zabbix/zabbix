@@ -28,6 +28,8 @@ window.widget_svggraph_form = new class {
 		this.form_id = form_id;
 		this.form_tabs = form_tabs_id;
 
+		this.dataset_wrapper = document.getElementById('data_sets');
+
 		// jQuery(".overlay-dialogue-body").on("scroll", function() {
 		// 	if (jQuery("#svg-graph-preview").length) {
 		// 		const $dialogue_body = jQuery(this);
@@ -63,7 +65,7 @@ window.widget_svggraph_form = new class {
 
 
 		// Initialize vertical accordion.
-		jQuery("#data_sets")
+		jQuery(this.dataset_wrapper)
 			.on("focus", ".<?= CMultiSelect::ZBX_STYLE_CLASS ?> input.input, .js-click-expend, .color-picker-preview", function() {
 				jQuery("#data_sets").zbx_vertical_accordion("expandNth",
 					jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index()
@@ -79,18 +81,18 @@ window.widget_svggraph_form = new class {
 			.zbx_vertical_accordion({handler: ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>"});
 
 		// Initialize rangeControl UI elements.
-		jQuery(".<?= CRangeControl::ZBX_STYLE_CLASS ?>", jQuery("#data_sets")).rangeControl();
+		jQuery(".<?= CRangeControl::ZBX_STYLE_CLASS ?>", jQuery(this.dataset_wrapper)).rangeControl();
 
 		// Expand dataset when click in pattern fields.
-		jQuery("#data_sets").on("click", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= CMultiSelect::ZBX_STYLE_CLASS ?>, .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= ZBX_STYLE_BTN_GREY ?>", function(event) {
-			jQuery("#data_sets").zbx_vertical_accordion("expandNth",
+		jQuery(this.dataset_wrapper).on("click", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= CMultiSelect::ZBX_STYLE_CLASS ?>, .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= ZBX_STYLE_BTN_GREY ?>", function(event) {
+			jQuery(this.dataset_wrapper).zbx_vertical_accordion("expandNth",
 				jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index());
 
 			jQuery(event.currentTarget).find("input.input").focus();
 		});
 
 		// Initialize pattern fields.
-		jQuery(".multiselect", jQuery("#data_sets")).each(function() {
+		jQuery(".multiselect", jQuery(this.dataset_wrapper)).each(function() {
 			jQuery(this).multiSelect(jQuery(this).data("params"));
 		});
 
@@ -129,6 +131,11 @@ window.widget_svggraph_form = new class {
 		document
 			.getElementById('dataset-menu')
 			.addEventListener('click', this._addDatasetMenu);
+
+		this._timePeriodTabInit();
+		this._axesTabInit();
+		this._legendTabInit();
+		this._problemsTabInit();
 	}
 
 	_selectItems() {
@@ -154,9 +161,9 @@ window.widget_svggraph_form = new class {
 	}
 
 	_axesTabInit() {
-		widget_svggraph_form.onLeftYChange(); // TODO: on Left Y checkbox
+		this.onLeftYChange(); // TODO: on Left Y checkbox
 
-		widget_svggraph_form.onRightYChange(); // TODO: on Right Y checkbox
+		this.onRightYChange(); // TODO: on Right Y checkbox
 	}
 
 	_legendTabInit() { // TODO: on Show legend checkbox
@@ -199,7 +206,7 @@ window.widget_svggraph_form = new class {
 					{
 						label: <?= json_encode(_('Clone')) ?>,
 						clickCallback: () => {
-							// TODO: clone function
+							widget_svggraph_form.clone();
 						}
 					}
 				]
@@ -226,7 +233,7 @@ window.widget_svggraph_form = new class {
 			template = new Template(jQuery('#dataset-pattern-item-tmpl').html());
 		}
 
-		jQuery("#data_sets").zbx_vertical_accordion("collapseAll");
+		jQuery(this.dataset_wrapper).zbx_vertical_accordion("collapseAll");
 
 		jQuery('#data_sets .list-accordion-foot').before(template.evaluate({rowNum: row_numb, color: colorPalette.getNextColor()}));
 
@@ -240,28 +247,35 @@ window.widget_svggraph_form = new class {
 			).css("background-color", "#"+color);
 		}, appendTo: ".overlay-dialogue-body"});
 
-		jQuery(".multiselect", jQuery("#data_sets")).each(function() {
+		jQuery(".multiselect", jQuery(this.dataset_wrapper)).each(function() {
 			jQuery(this).multiSelect(jQuery(this).data("params"));
 		});
 
 		jQuery(".<?= CRangeControl::ZBX_STYLE_CLASS ?>", jQuery("#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>")).rangeControl();
 
-		widget_svggraph_form.updateVariableOrder(jQuery("#data_sets"), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
-		widget_svggraph_form.onGraphConfigChange();
+		this.updateVariableOrder(jQuery(this.dataset_wrapper), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
+		this.onGraphConfigChange();
 
-		widget_svggraph_form.initDataSetSortable();
+		this.initDataSetSortable();
 
 		colorPalette.incrementNextColor();
 	}
 
 	removeDataSet(obj) {
-		let i = 0;
-
 		obj
 			.closest('.list-accordion-item')
 			.remove();
 
-		[...document.querySelectorAll('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')].map((elem) => {
+		this.recalculateDataSetAttribute();
+
+		this.updateVariableOrder(jQuery(this.dataset_wrapper), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
+		this.recalculateSortOrder();
+	}
+
+	recalculateDataSetAttribute() {
+		let i = 0;
+
+		[...this.dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')].map((elem) => {
 			elem.dataset.set = i;
 
 			if (elem.querySelector('.single-item-table')) {
@@ -270,13 +284,14 @@ window.widget_svggraph_form = new class {
 
 			i++;
 		});
-
-		this.updateVariableOrder(jQuery("#data_sets"), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
-		this.recalculateSortOrder();
 	}
 
 	getDataSetNumber() {
-		return jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]').data('set');
+		if (jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]').length) {
+			return jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]').data('set');
+		}
+
+		return jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>[data-set]:last').data('set');
 	}
 
 	onLeftYChange() {
@@ -396,7 +411,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	updateVariableOrder(obj, row_selector, var_prefix) {
-		jQuery.each([10000, 0], function(index, value) {
+		jQuery.each([10000, 0], function(_, value) {
 			jQuery(row_selector, obj).each(function(i) {
 				jQuery(".multiselect[data-params]", this).each(function() {
 					const name = jQuery(this).multiSelect("getOption", "name");
@@ -408,13 +423,15 @@ window.widget_svggraph_form = new class {
 					}
 				});
 
-				jQuery('[name^="' + var_prefix + '["]', this).filter(function() {
-					return jQuery(this).attr("name").match(/[a-z]+\[\d+]\[[a-z_]+]/);
-				}).each(function() {
-					jQuery(this).attr("name",
-						jQuery(this).attr("name").replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, "$1" + (value + i) + "$2")
-					);
-				});
+				jQuery('[name^="' + var_prefix + '["]', this)
+					.filter(function () {
+						return jQuery(this).attr("name").match(/[a-z]+\[\d+]\[[a-z_]+]/);
+					})
+					.each(function () {
+						jQuery(this).attr("name",
+							jQuery(this).attr("name").replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, "$1" + (value + i) + "$2")
+						);
+					});
 			});
 		});
 	}
@@ -449,7 +466,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	initSingleItemSortable() {
-		const dataset_number = widget_svggraph_form.getDataSetNumber();
+		const dataset_number = this.getDataSetNumber();
 
 		if (jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row').length == 1) {
 			jQuery('.single-item-table[data-set='+dataset_number+'] .<?= ZBX_STYLE_DRAG_ICON ?>').addClass("disabled");
@@ -530,7 +547,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	recalculateSortOrder() {
-		const dataset_number = widget_svggraph_form.getDataSetNumber();
+		const dataset_number = widget_svggraph_form.getDataSetNumber(); // When function added as eventlistener `this` scope not working.
 		let i = 1;
 
 		jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row').each(function () {
@@ -552,6 +569,76 @@ window.widget_svggraph_form = new class {
 
 		widget_svggraph_form.rewriteNameLinks();
 	}
+
+clone() {
+	let dataset_elem = this.dataset_wrapper.querySelector('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]');
+	if (!dataset_elem) {
+		dataset_elem = Array.from(this.dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> ')).pop();
+	}
+
+	const dataset_number = this.getDataSetNumber();
+	const dataset_type = dataset_elem.dataset.type;
+	const inputs = dataset_elem.querySelectorAll('input[name^=ds]');
+
+	this._addDataset(dataset_type);
+
+	const cloned_dataset = this.dataset_wrapper.querySelector('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]');
+	const cloned_number = cloned_dataset.dataset.set;
+
+	if (dataset_type == 0) {
+		const list = {
+			object: 'itemid',
+			values: []
+		};
+
+		[...dataset_elem.querySelectorAll('.single-item-table-row')].map((elem) => {
+			const itemid = elem.querySelector("[name^='ds[" + dataset_number + "][itemids]").value;
+			const name = elem.querySelector('.table-col-name a').textContent;
+
+			list.values.push({
+				itemid: itemid,
+				name: name
+			});
+		});
+
+		window.addPopupValues(list);
+	}
+	else {
+		const host_pattern_data = jQuery(dataset_elem.querySelector('.js-hosts-multiselect')).multiSelect('getData')
+		const items_pattern_data = jQuery(dataset_elem.querySelector('.js-items-multiselect')).multiSelect('getData')
+
+		jQuery(cloned_dataset.querySelector('.js-hosts-multiselect')).multiSelect('addData', host_pattern_data);
+		jQuery(cloned_dataset.querySelector('.js-items-multiselect')).multiSelect('addData', items_pattern_data);
+	}
+
+	[...inputs].map((elem) => {
+		const name = elem.name;
+		const type = elem.type;
+		const value = elem.value;
+
+		const cloned_name = name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, "$1" + (cloned_number) + "$2");
+
+		if (type === 'text') {
+			cloned_dataset.querySelector("[name='" + cloned_name + "']").value = value;
+
+			if (elem.classList.contains('<?= CRangeControl::ZBX_STYLE_CLASS ?>')) {
+				// Fire change event to redraw range input.
+				cloned_dataset.querySelector("[name='" + cloned_name + "']").dispatchEvent(new Event('change'));
+			}
+		}
+		else if (type === 'checkbox' || type === 'radio') {
+			if (elem.checked) {
+				// Click to fire events.
+				cloned_dataset.querySelector("[name='" + cloned_name + "'][value='" + value + "']").click();
+			}
+		}
+		else if (cloned_dataset.querySelector("z-select[name='" + cloned_name + "']")) {
+			cloned_dataset.querySelector("[name='" + cloned_name + "']").value = value;
+		}
+	});
+
+	this.onGraphConfigChange();
+}
 };
 
 window.addPopupValues = (list) => {
@@ -567,6 +654,10 @@ window.addPopupValues = (list) => {
 		const value = list.values[i];
 		const name = value.name;
 		const itemid = value.itemid;
+
+		if (jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row input[value=' + itemid + ']').length) {
+			continue;
+		}
 
 		jQuery('.single-item-table[data-set='+dataset_number+'] tbody').append(tmpl.evaluate({
 			dsNum: dataset_number,

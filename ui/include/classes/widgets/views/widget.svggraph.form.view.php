@@ -41,8 +41,8 @@ $jq_templates = [];
 
 $graph_preview = (new CDiv())
 	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
-	->addItem((new CDiv())->setId('svg-graph-preview'));
-	// ->addStyle('height: 10px !important; overflow: hidden;'); // FIXME: debug
+	->addItem((new CDiv())->setId('svg-graph-preview'))
+	->addStyle('height: 10px !important; overflow: hidden;'); // FIXME: debug
 
 $form_tabs = (new CTabView())
 	->addTab('data_set',  _('Data set'), getDatasetTab($fields, $scripts, $jq_templates, $form->getName()),

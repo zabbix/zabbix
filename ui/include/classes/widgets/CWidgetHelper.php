@@ -1168,7 +1168,9 @@ class CWidgetHelper {
 						]
 					],
 					'add_post_js' => false
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				]))
+					->addClass('js-hosts-multiselect')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 				(new CPatternSelect([
 					'name' => $field_name.'['.$row_num.'][items][]',
 					'object_name' => 'items',
@@ -1186,7 +1188,9 @@ class CWidgetHelper {
 						]
 					],
 					'add_post_js' => false
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				]))
+					->addClass('js-items-multiselect')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			]);
 		}
 		else {
@@ -1448,7 +1452,8 @@ class CWidgetHelper {
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
 			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
-			->setAttribute('data-set', $row_num);
+			->setAttribute('data-set', $row_num)
+			->setAttribute('data-type', $dataset_type);
 	}
 
 	/**
