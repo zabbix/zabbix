@@ -5182,7 +5182,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .svg-graph-preview {
   margin-top: 10px;
-  min-width: 960px;
+  width: 1080px;
   height: 300px;
   position: relative; }
   .svg-graph-preview > div {

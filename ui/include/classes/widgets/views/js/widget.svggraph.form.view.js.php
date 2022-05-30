@@ -132,6 +132,7 @@ window.widget_svggraph_form = new class {
 			.getElementById('dataset-menu')
 			.addEventListener('click', this._addDatasetMenu);
 
+		this._displayingOptionsTabInit();
 		this._timePeriodTabInit();
 		this._axesTabInit();
 		this._legendTabInit();
@@ -155,21 +156,50 @@ window.widget_svggraph_form = new class {
 		});
 	}
 
-	_timePeriodTabInit() { // TODO: Time period tab - update controls enable status on 'Set custom time period' checkbox change
-		jQuery("#time_from, #time_to, #time_from_calendar, #time_to_calendar")
-			.prop("disabled", !jQuery(this).is(":checked"));
+	_displayingOptionsTabInit() {
+		document.getElementById('percentile_left')
+			.addEventListener('click', (e) => {
+				document.getElementById('percentile_left_value').disabled = !e.target.checked;
+			});
+		document.getElementById('percentile_right')
+			.addEventListener('click', (e) => {
+				document.getElementById('percentile_right_value').disabled = !e.target.checked;
+			});
+	}
+
+	_timePeriodTabInit() {
+		document.getElementById('graph_time')
+			.addEventListener('click', (e) => {
+				document.getElementById('time_from').disabled = !e.target.checked;
+				document.getElementById('time_to').disabled = !e.target.checked;
+				document.getElementById('time_from_calendar').disabled = !e.target.checked;
+				document.getElementById('time_to_calendar').disabled = !e.target.checked;
+			});
 	}
 
 	_axesTabInit() {
-		this.onLeftYChange(); // TODO: on Left Y checkbox
+		this.onLeftYChange();
 
-		this.onRightYChange(); // TODO: on Right Y checkbox
+		this.onRightYChange();
 	}
 
-	_legendTabInit() { // TODO: on Show legend checkbox
-		jQuery("[name=legend_lines]").rangeControl(
-			jQuery(this).is(":checked") ? "enable" : "disable"
-		);
+	_legendTabInit() {
+		document.getElementById('legend')
+			.addEventListener('click', (e) => {
+				jQuery("#legend_lines").rangeControl(
+					e.target.checked ? "enable" : "disable"
+				);
+				jQuery("#legend_columns").rangeControl(
+					e.target.checked ? "enable" : "disable"
+				);
+				document.getElementById('legend_statistic').disabled = !e.target.checked;
+			});
+		document.getElementById('legend_statistic')
+			.addEventListener('click', (e) => {
+				jQuery("#legend_columns").rangeControl(
+					e.target.checked ? "enable" : "disable"
+				);
+			});
 	}
 
 	_problemsTabInit() { // TODO: Problems tab - update controls enable status on 'Show problems' checkbox change
@@ -569,6 +599,27 @@ window.widget_svggraph_form = new class {
 
 		widget_svggraph_form.rewriteNameLinks();
 	}
+
+// clone() {
+// 	const dataset_elem = this.dataset_wrapper.querySelector('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]');
+// 	const dataset_number = this.getDataSetNumber();
+// 	const dataset_type = dataset_elem.dataset.type;
+
+// 	const cloned_dataset = dataset_elem.cloneNode(true);
+
+// 	dataset_elem
+// 		.classList
+// 		.replace('<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>', '<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?>');
+
+// 	dataset_elem.after(cloned_dataset);
+
+// 	this.recalculateDataSetAttribute();
+// 	this.updateVariableOrder(jQuery(this.dataset_wrapper), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
+
+// 	if (dataset_type == 0) {
+
+// 	}
+// }
 
 clone() {
 	let dataset_elem = this.dataset_wrapper.querySelector('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]');

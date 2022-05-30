@@ -41,8 +41,8 @@ $jq_templates = [];
 
 $graph_preview = (new CDiv())
 	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
-	->addItem((new CDiv())->setId('svg-graph-preview'))
-	->addStyle('height: 10px !important; overflow: hidden;'); // FIXME: debug
+	->addItem((new CDiv())->setId('svg-graph-preview'));
+	// ->addStyle('height: 10px !important; overflow: hidden;'); // FIXME: debug
 
 $form_tabs = (new CTabView())
 	->addTab('data_set',  _('Data set'), getDatasetTab($fields, $scripts, $jq_templates, $form->getName()),
@@ -51,7 +51,7 @@ $form_tabs = (new CTabView())
 	->addTab('displaying_options',  _('Displaying options'), getDisplayOptionsTab($fields), TAB_INDICATOR_GRAPH_OPTIONS)
 	->addTab('time_period',  _('Time period'), getTimePeriodTab($fields), TAB_INDICATOR_GRAPH_TIME)
 	->addTab('axes',  _('Axes'), getAxesTab($fields))
-	->addTab('legend',  _('Legend'), getLegendTab($fields, $scripts), TAB_INDICATOR_GRAPH_LEGEND)
+	->addTab('legend_tab',  _('Legend'), getLegendTab($fields, $scripts), TAB_INDICATOR_GRAPH_LEGEND)
 	->addTab('problems',  _('Problems'), getProblemsTab($fields, $scripts, $jq_templates, $form->getName()),
 		TAB_INDICATOR_GRAPH_PROBLEMS
 	)

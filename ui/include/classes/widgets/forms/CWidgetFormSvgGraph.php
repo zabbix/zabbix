@@ -442,8 +442,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			SVG_GRAPH_LEGEND_COLUMNS_MIN, SVG_GRAPH_LEGEND_COLUMNS_MAX
 		))->setDefault(SVG_GRAPH_LEGEND_COLUMNS_MAX);
 
-		if ($field_legend->getValue() == SVG_GRAPH_LEGEND_OFF
-				&& $field_legend_statistic->getValue() == SVG_GRAPH_LEGEND_STATISTIC_ON) {
+		if ($field_legend_statistic->getValue() == SVG_GRAPH_LEGEND_STATISTIC_OFF) {
 			$field_legend_columns->setFlags(CWidgetField::FLAG_DISABLED);
 		}
 		if (array_key_exists('legend_columns', $this->data)) {
