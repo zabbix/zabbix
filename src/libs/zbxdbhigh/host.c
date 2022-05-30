@@ -1282,7 +1282,7 @@ out:
  * Purpose: get linked (discovered, dependent, etc) items                     *
  *                                                                            *
  ******************************************************************************/
-static int	db_get_liked_items(zbx_vector_uint64_t *itemids, const char *filter, const char *field)
+static int	db_get_linked_items(zbx_vector_uint64_t *itemids, const char *filter, const char *field)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0, sql_mark = 0;
@@ -1348,13 +1348,13 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	if (0 == itemids->values_num)
 		goto out;
 
-	if (SUCCEED != db_get_liked_items(itemids, "item_discovery id,items i where id.itemid=i.itemid and",
+	if (SUCCEED != db_get_linked_items(itemids, "item_discovery id,items i where id.itemid=i.itemid and",
 			"id.parent_itemid"))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != db_get_liked_items(itemids, "items i where", "i.master_itemid"))
+	if (SUCCEED != db_get_linked_items(itemids, "items i where", "i.master_itemid"))
 		goto out;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
