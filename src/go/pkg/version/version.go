@@ -23,8 +23,6 @@ package version
 import (
 	"fmt"
 	"strings"
-
-	"git.zabbix.com/ap/plugin-support/plugin/comms"
 )
 
 const (
@@ -142,12 +140,12 @@ func TitleMessage() string {
 	return title
 }
 
-func Display(pluginVersion bool) {
+func Display(additionalMessages []string) {
 	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
 	fmt.Printf("Revision %s %s, compilation time: %s %s\n", Revision(), RevDate(), CompileDate(), CompileTime())
 
-	if pluginVersion {
-		fmt.Printf("Plugin support version %d.%d\n", comms.MajorVersion, comms.MinorVersion)
+	for _, msg := range additionalMessages {
+		fmt.Println(msg)
 	}
 
 	fmt.Println()

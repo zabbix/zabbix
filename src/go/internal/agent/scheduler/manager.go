@@ -539,7 +539,7 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
-	logPluginVersion()
+	log.Infof("%s",comms.GetPluginVersionMessage())
 
 	monitor.Register(monitor.Scheduler)
 	go m.run()
@@ -728,8 +728,4 @@ func getPluginOpts(optsRaw interface{}, name string) (pluginCap, pluginSystemCap
 	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
 
 	return
-}
-
-func logPluginVersion() {
-	log.Infof("Plugin support version %d.%d", comms.MajorVersion, comms.MinorVersion)
 }

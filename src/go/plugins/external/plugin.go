@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"net"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"sync"
 	"time"
@@ -60,8 +59,6 @@ func (p *Plugin) Register() (response *comms.RegisterResponse, err error) {
 func (p *Plugin) ExecutePlugin() {
 	startLock.Lock()
 	defer startLock.Unlock()
-
-	p.checkPath()
 
 	p.cmd = exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial))
 
@@ -150,12 +147,6 @@ func (p *Plugin) CheckPid(pid int) bool {
 func (p *Plugin) Cleanup() {
 	p.broker.stop()
 	p.cmd = nil
-}
-
-func (p *Plugin) checkPath() {
-	if !filepath.IsAbs(p.Path) {
-		panic(fmt.Sprintf("failed to start plugin %s, path must be absolute", p.Path))
-	}
 }
 
 func getConnection(listener net.Listener, timeout time.Duration) (conn net.Conn, err error) {

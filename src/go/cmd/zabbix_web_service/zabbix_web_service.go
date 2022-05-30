@@ -76,7 +76,7 @@ func main() {
 	}
 
 	if versionFlag {
-		version.Display(false)
+		version.Display(nil)
 		os.Exit(0)
 	}
 
