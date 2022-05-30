@@ -131,7 +131,7 @@ abstract class CControllerHostUpdateGeneral extends CController {
 
 				if (array_key_exists('discovery_state', $macro)
 						&& $macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING) {
-					$macro_diff += array_intersect_key($db_macro, $macro_fields);
+					$macro_diff['automatic'] = ZBX_USERMACRO_MANUAL;
 				}
 
 				$macro = ['hostmacroid' => $macro['hostmacroid']] + $macro_diff;

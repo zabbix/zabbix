@@ -1554,11 +1554,17 @@ abstract class CHostBase extends CApiService {
 
 					$db_hostmacro = $db_host['macros'][$hostmacro['hostmacroid']];
 
-					// If at least one editable property is changed, convert automatic macro to manual.
-					if (array_key_exists('automatic', $db_hostmacro)
-							&& $db_hostmacro['automatic'] == ZBX_USERMACRO_AUTOMATIC
-							&& array_diff_key($hostmacro, array_flip(['hostmacroid']))) {
-						$hostmacro['automatic'] = ZBX_USERMACRO_MANUAL;
+					// Check if this is not an attempt to modify automatic host macro.
+					if ($this instanceof CHost) {
+						$macro_fields = array_flip(['macro', 'value', 'type', 'description']);
+						$hostmacro += array_intersect_key($db_hostmacro, array_flip(['automatic']));
+
+						if ($hostmacro['automatic'] == ZBX_USERMACRO_AUTOMATIC
+								&& array_diff_assoc(array_intersect_key($hostmacro, $macro_fields), $db_hostmacro)) {
+							self::exception(ZBX_API_ERROR_PERMISSIONS,
+								_s('Not allowed to modify automatic user macro "%1$s".', $hostmacro['macro'])
+							);
+						}
 					}
 
 					$hostmacro += array_intersect_key($db_hostmacro, array_flip(['macro', 'type']));

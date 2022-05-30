@@ -51,7 +51,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
 				'tls_subject', 'flags', 'inventory_mode'
 			],
-			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
+			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'],
 			'hostids' => $this->getInput('hostid'),
 			'editable' => true
 		]);

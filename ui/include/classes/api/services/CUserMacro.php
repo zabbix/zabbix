@@ -520,7 +520,8 @@ class CUserMacro extends CApiService {
 			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
 			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
-			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
+			'automatic' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostmacros, '/', $error)) {
@@ -528,7 +529,7 @@ class CUserMacro extends CApiService {
 		}
 
 		$db_hostmacros = $this->get([
-			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'description'],
+			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'description', 'automatic'],
 			'hostmacroids' => array_column($hostmacros, 'hostmacroid'),
 			'editable' => true,
 			'inherited' => false,
@@ -554,6 +555,12 @@ class CUserMacro extends CApiService {
 
 		foreach ($hostmacros as $index => &$hostmacro) {
 			$db_hostmacro = $db_hostmacros[$hostmacro['hostmacroid']];
+
+			if ($db_hostmacro['automatic'] == ZBX_USERMACRO_AUTOMATIC && !array_key_exists('automatic', $hostmacro)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Not allowed to modify automatic user macro "%1$s".', $db_hostmacro['macro'])
+				);
+			}
 
 			if ($hostmacro['type'] != $db_hostmacro['type']) {
 				if ($db_hostmacro['type'] == ZBX_MACRO_TYPE_SECRET) {
@@ -696,8 +703,6 @@ class CUserMacro extends CApiService {
 			$upd_hostmacro = DB::getUpdatedValues('hostmacro', $hostmacro, $db_hostmacro);
 
 			if ($upd_hostmacro) {
-				$upd_hostmacro['automatic'] = ZBX_USERMACRO_MANUAL;
-
 				$upd_hostmacros[] = [
 					'values' => $upd_hostmacro,
 					'where' => ['hostmacroid' => $hostmacro['hostmacroid']]
