@@ -640,9 +640,12 @@ static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, si
 static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, size_t *sql_offset,
 		const char *field, const char *keyword, zbx_dbsync_journal_t *journal)
 {
-	int	i;
+	int	i, inserts_num, updates_num;
 
 	zbx_vector_dbsync_append(&journal->syncs, sync);
+
+	inserts_num = journal->inserts.values_num;
+	updates_num = journal->updates.values_num;
 
 	if (0 != journal->inserts.values_num || 0 != journal->updates.values_num)
 	{
@@ -671,8 +674,10 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
 	for (i = 0; i < journal->deletes.values_num; i++)
 		dbsync_add_row(sync, journal->deletes.values[i], ZBX_DBSYNC_ROW_REMOVE, NULL);
 
-	sync->add_num = journal->inserts.values_num;
-	sync->update_num = journal->updates.values_num;
+	/* the obtained object identifiers are removed from journal */
+	sync->add_num = inserts_num - journal->inserts.values_num;
+	sync->update_num = updates_num - journal->updates.values_num;
+
 	sync->remove_num = journal->deletes.values_num;
 
 	return SUCCEED;
