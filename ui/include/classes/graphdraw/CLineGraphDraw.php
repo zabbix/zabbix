@@ -722,15 +722,17 @@ class CLineGraphDraw extends CGraphDraw {
 				$gbColor
 			);
 
-			imagefilledpolygon(
-				$this->im,
-				[
-					$this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
-				],
-				$this->getColor('White')
-			);
+			$points = [
+				$this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
+				$this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
+				$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
+			];
+			if (PHP_VERSION_ID >= 80100) {
+				imagefilledpolygon($this->im, $points, $this->getColor('White'));
+			}
+			else {
+				imagefilledpolygon($this->im, $points, 3, $this->getColor('White'));
+			}
 
 			/* draw left axis triangle */
 			zbx_imageline($this->im, $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
@@ -764,15 +766,17 @@ class CLineGraphDraw extends CGraphDraw {
 				$gbColor
 			);
 
-			imagefilledpolygon(
-				$this->im,
-				[
-					$this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
-					$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
-					$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
-				],
-				$this->getColor('White')
-			);
+			$points = [
+				$this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
+				$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
+				$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10
+			];
+			if (PHP_VERSION_ID >= 80100) {
+				imagefilledpolygon($this->im, $points, $this->getColor('White'));
+			}
+			else {
+				imagefilledpolygon($this->im, $points, 3, $this->getColor('White'));
+			}
 
 			/* draw right axis triangle */
 			zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
@@ -805,15 +809,17 @@ class CLineGraphDraw extends CGraphDraw {
 			$gbColor
 		);
 
-		imagefilledpolygon(
-			$this->im,
-			[
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
-				$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 10, $this->sizeY + $this->shiftY + 1
-			],
-			$this->getColor('White')
-		);
+		$points = [
+			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
+			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY + 4,
+			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 10, $this->sizeY + $this->shiftY + 1
+		];
+		if (PHP_VERSION_ID >= 80100) {
+			imagefilledpolygon($this->im, $points, $this->getColor('White'));
+		}
+		else {
+			imagefilledpolygon($this->im, $points, 3, $this->getColor('White'));
+		}
 
 		/* draw X axis triangle */
 		zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5, $this->sizeY + $this->shiftY - 2,
@@ -1509,26 +1515,30 @@ class CLineGraphDraw extends CGraphDraw {
 						? $this->graphtheme['leftpercentilecolor']
 						: $this->graphtheme['rightpercentilecolor'];
 
-					imagefilledpolygon(
-						$this->im,
-						[
-							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
-							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
-							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
-						],
-						$this->getColor($color)
-					);
+					$points = [
+						$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
+						$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
+						$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
+					];
+					if (PHP_VERSION_ID >= 80100) {
+						imagefilledpolygon($this->im, $points, $this->getColor($color));
+					}
+					else {
+						imagefilledpolygon($this->im, $points, 3, $this->getColor($color));
+					}
 
-					imagepolygon(
-						$this->im,
-						[
-							$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
-							$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
-							$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
-						],
-						3,
-						$this->getColor('Black No Alpha')
-					);
+					$points = [
+						$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
+						$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
+						$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
+					];
+					if (PHP_VERSION_ID >= 80100) {
+						imagepolygon($this->im, $points, $this->getColor('Black No Alpha'));
+					}
+					else {
+						imagepolygon($this->im, $points, 3, $this->getColor('Black No Alpha'));
+					}
+
 					$rowNum++;
 				}
 			}
@@ -1730,7 +1740,13 @@ class CLineGraphDraw extends CGraphDraw {
 				$style = $drawtype == GRAPH_ITEM_DRAWTYPE_BOLD_LINE ? LINE_TYPE_BOLD : LINE_TYPE_NORMAL;
 
 				if ($calc_fnc == CALC_FNC_ALL) {
-					imagefilledpolygon($this->im, $a, $minmax_color);
+					if (PHP_VERSION_ID >= 80100) {
+						imagefilledpolygon($this->im, $a, $avg_color);
+					}
+					else {
+						imagefilledpolygon($this->im, $a, 4, $minmax_color);
+					}
+
 					if (!$y1x || !$y2x) {
 						zbx_imagealine($this->im, $x1, $y1max, $x2, $y2max, $max_color, $style);
 					}
@@ -1780,7 +1796,12 @@ class CLineGraphDraw extends CGraphDraw {
 					$a[6] = $x2;
 					$a[7] = $y2;
 
-					imagefilledpolygon($this->im, $a, $avg_color);
+					if (PHP_VERSION_ID >= 80100) {
+						imagefilledpolygon($this->im, $a, $avg_color);
+					}
+					else {
+						imagefilledpolygon($this->im, $a, 4, $avg_color);
+					}
 				}
 				else {
 					imageLine($this->im, $x1, $y1, $x2, $y2, $avg_color); // draw the initial line
