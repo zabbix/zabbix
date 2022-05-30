@@ -107,7 +107,7 @@ class testTriggerValidation extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot create circular dependencies.'
+				'expected_error' => 'Trigger "test-trigger-1" cannot depend on the trigger "test-trigger-2", because a circular linkage ("test-trigger-2" -> "test-trigger-1" -> "test-trigger-2") would occur.'
 			],
 			'delete trigger name' => [
 				'triggers' => [
@@ -129,7 +129,7 @@ class testTriggerValidation extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot create dependency on trigger itself.'
+				'expected_error' => 'Trigger "test-trigger-1" cannot depend on the trigger "test-trigger-1", because a circular linkage ("test-trigger-1" -> "test-trigger-1") would occur.'
 			],
 			'update read-only properties' => [
 				'triggers' => [
@@ -392,7 +392,7 @@ class testTriggerValidation extends CAPITest {
 						]]
 					]
 				],
-				'expected_error' => 'Cannot add dependency from a host to a template.'
+				'expected_error' => 'Trigger "Trigger with invalid dependencies" cannot depend on the trigger "template-trigger", because dependencies of host triggers on template triggers are not allowed.'
 			],
 			'Trigger with invalid dependencies #3' => [
 				'triggers' => [
