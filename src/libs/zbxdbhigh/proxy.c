@@ -2038,6 +2038,13 @@ int	process_proxyconfig(struct zbx_json_parse *jp_data, struct zbx_json_parse *j
 				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, table_ids->table->recid,
 						table_ids->ids.values, table_ids->ids.values_num);
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+				/* reset master_itemid to avoid recursive removal of dependent items */
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+						"update items set master_itemid=null where");
+				DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", table_ids->ids.values,
+						table_ids->ids.values_num);
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and master_itemid is not null;\n");
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from %s where",
