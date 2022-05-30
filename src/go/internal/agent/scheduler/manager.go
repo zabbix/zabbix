@@ -539,7 +539,7 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
-	log.Infof("%s",comms.GetPluginVersionMessage())
+	log.Infof("%s", comms.GetPluginVersionMessage())
 
 	monitor.Register(monitor.Scheduler)
 	go m.run()
