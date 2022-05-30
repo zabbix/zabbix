@@ -361,6 +361,25 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Checks absence of pid file after kill.
+	 *
+	 * @param string $component    component name
+	 * 
+	 */
+	 private static function checkPidKilled($component) {
+
+		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+			if (!file_exists(self::getPidPath($component))) {
+				return true;
+			}
+
+			sleep(self::WAIT_ITERATION_DELAY);
+		}
+		
+		return false;
+	}
+
+	/**
 	 * Wait for component to stop.
 	 *
 	 * @param string $component    component name
@@ -370,12 +389,8 @@ class CIntegrationTest extends CAPITest {
 	protected static function waitForShutdown($component) {
 		self::validateComponent($component);
 
-		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
-			if (!file_exists(self::getPidPath($component))) {
-				return;
-			}
-
-			sleep(self::WAIT_ITERATION_DELAY);
+		if (self::checkPidKilled($component)) {
+			return;
 		}
 
 		$pid = @file_get_contents(self::getPidPath($component));
@@ -387,29 +402,29 @@ class CIntegrationTest extends CAPITest {
 		do {
 			for ($i = count($pids) -1; $i >= 1; $i--) {
 				$child_pid = $pids[$i];
+				
 				if  (is_numeric($child_pid) && posix_kill($child_pid, 0)) {
-					system('kill -9 '.$child_pid );
+					posix_kill($child_pid, SIGKILL);
 					sleep(10 * self::WAIT_ITERATION_DELAY);
+					
 					if (!posix_kill($child_pid, 0)) {
 						break;
 					}
 				}
 			}
 
-			for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
-				if (!file_exists(self::getPidPath($component))) {
-					return;
-				}
-
-				sleep(self::WAIT_ITERATION_DELAY);
+			if (self::checkPidKilled($component)) {
+				return;
 			}
+
 			$pids = explode("\n", shell_exec('pgrep -P '.$pid));
 			$iterations++;
 		} while (count($pids) > 0 && $iterations < $pids_count );
 
 		if  (is_numeric($pid) && posix_kill($pid, 0)) {
-			$killed = system('kill -9 '.$pid );
-			if ($killed) {
+			posix_kill($pid, SIGKILL);
+			
+			if (self::checkPidKilled($component)) {
 				return;
 			}
 		}

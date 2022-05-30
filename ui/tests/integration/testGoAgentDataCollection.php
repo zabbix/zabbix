@@ -580,14 +580,14 @@ class testGoAgentDataCollection extends CIntegrationTest {
 					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
 						$a = $value[self::COMPONENT_AGENT][$i];
 						$b = $value[self::COMPONENT_AGENT2][$i];
-						$diff_values[$i] = abs(abs($a) - abs($b));
+						$diff_values[$i] = abs($a - $b);
 					}
 					$offset = array_search(min($diff_values), $diff_values);
 
 					$a = $value[self::COMPONENT_AGENT][$offset];
 					$b = $value[self::COMPONENT_AGENT2][$offset];
 
-					$diff = abs(abs($a) - abs($b));
+					$diff = abs($a - $b);
 				}
 				else {
 					$records = count($values[self::COMPONENT_AGENT]);
@@ -595,7 +595,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 						$slice = array_slice($values[self::COMPONENT_AGENT], 0, $records - $i);
 						$a = end($slice);
 						$b = end($values[self::COMPONENT_AGENT2]);
-						$diff_values[$i] = abs(abs($a) - abs($b));
+						$diff_values[$i] = abs($a - $b);
 					}
 
 					$diff = min($diff_values);
