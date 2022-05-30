@@ -43,7 +43,7 @@ class CSvgGraphArea extends CSvgGraphLine {
 			'.'.self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order'] => [
 				'fill-opacity' => $this->options['fill'] * 0.1,
 				'fill' => $this->options['color'],
-				'stroke-opacity' => 0.1,
+				'stroke-opacity' => 0.05,
 				'stroke' => $this->options['color'],
 				'stroke-width' => 2
 			]
@@ -54,12 +54,16 @@ class CSvgGraphArea extends CSvgGraphLine {
 		parent::draw();
 
 		if ($this->path) {
-			$first_point = reset($this->path);
-			$last_point = end($this->path);
-			$this
-				->lineTo($last_point[0], $this->y_zero)
-				->lineTo($first_point[0], $this->y_zero)
-				->closePath();
+			if ($this->y_zero !== null) {
+				$first_point = reset($this->path);
+				$last_point = end($this->path);
+
+				$this
+					->lineTo($last_point[0], $this->y_zero)
+					->lineTo($first_point[0], $this->y_zero);
+			}
+
+			$this->closePath();
 		}
 	}
 }
