@@ -905,6 +905,17 @@ sub process()
 	print $output{"after"};
 }
 
+sub c_append_changelog_tables()
+{
+	print "\nconst zbx_db_table_changelog_t\tchangelog_tables[] = {\n";
+	
+	while (my ($object, $table) = each(%table_types)) {
+		print "\t{\"$table\", $object},\n"
+	}
+	
+	print	"\t{0}\n};\n";
+}
+
 sub main()
 {
 	if ($#ARGV != 0)
@@ -938,6 +949,8 @@ sub main()
 
 	if ($format eq "c")
 	{
+		c_append_changelog_tables();
+		
 		$eol = "\\n\\";
 		$fk_bol = "\t\"";
 		$fk_eol = "\",";

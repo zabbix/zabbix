@@ -1123,40 +1123,15 @@ out:
 #define ZBX_CHANGELOG_OP_UPDATE	2
 #define ZBX_CHANGELOG_OP_DELETE	3
 
-#define ZBX_CHANGELOG_TABLE_HOSTS		1
-#define ZBX_CHANGELOG_TABLE_HOST_TAG		2
-#define ZBX_CHANGELOG_TABLE_ITEMS		3
-#define ZBX_CHANGELOG_TABLE_ITEM_TAG		4
-#define ZBX_CHANGELOG_TABLE_TRIGGERS		5
-#define ZBX_CHANGELOG_TABLE_TRIGGER_TAG		6
-#define ZBX_CHANGELOG_TABLE_FUNCTIONS		7
-#define ZBX_CHANGELOG_TABLE_ITEM_PREPROC	8
-
 static int	DBget_changelog_table_by_name(const char *table_name)
 {
-	if (0 == strcmp(table_name, "hosts"))
-		return ZBX_CHANGELOG_TABLE_HOSTS;
+	const zbx_db_table_changelog_t	*table;
 
-	if (0 == strcmp(table_name, "host_tag"))
-		return ZBX_CHANGELOG_TABLE_HOST_TAG;
-
-	if (0 == strcmp(table_name, "items"))
-		return ZBX_CHANGELOG_TABLE_ITEMS;
-
-	if (0 == strcmp(table_name, "item_tag"))
-		return ZBX_CHANGELOG_TABLE_ITEM_TAG;
-
-	if (0 == strcmp(table_name, "triggers"))
-		return ZBX_CHANGELOG_TABLE_TRIGGERS;
-
-	if (0 == strcmp(table_name, "trigger_tag"))
-		return ZBX_CHANGELOG_TABLE_TRIGGER_TAG;
-
-	if (0 == strcmp(table_name, "functions"))
-		return ZBX_CHANGELOG_TABLE_FUNCTIONS;
-
-	if (0 == strcmp(table_name, "item_preproc"))
-		return ZBX_CHANGELOG_TABLE_ITEM_PREPROC;
+	for (table = changelog_tables; NULL != table->table; table++)
+	{
+		if (0 == strcmp(table_name, table->table))
+			return table->object;
+	}
 
 	return FAIL;
 }
