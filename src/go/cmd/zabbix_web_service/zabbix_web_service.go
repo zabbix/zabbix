@@ -31,8 +31,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxnet"
 )

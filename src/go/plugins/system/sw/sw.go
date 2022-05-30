@@ -30,9 +30,9 @@ import (
 	"strings"
 	"time"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/zbxcmd"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -

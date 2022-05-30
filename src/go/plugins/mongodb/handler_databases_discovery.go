@@ -23,7 +23,7 @@ import (
 	"encoding/json"
 	"sort"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type dbEntity struct {

@@ -28,6 +28,7 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
@@ -35,7 +36,6 @@ import (
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/log"
 )
 
 var (

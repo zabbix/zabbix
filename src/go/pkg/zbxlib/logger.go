@@ -22,7 +22,7 @@ package zbxlib
 import (
 	"C"
 )
-import "zabbix.com/pkg/log"
+import "git.zabbix.com/ap/plugin-support/log"
 
 const c_info = 127
 

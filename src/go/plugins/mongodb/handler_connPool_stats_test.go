@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"gopkg.in/mgo.v2/bson"
-	"zabbix.com/pkg/zbxerr"
 )
 
 func Test_connPoolStatsHandler(t *testing.T) {
