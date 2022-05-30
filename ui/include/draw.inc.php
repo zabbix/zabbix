@@ -27,7 +27,7 @@
  * @param   array     $fgColor    foreground color, array of RGB
  * @param   float     $alpha      transparency index in range of 0-1, 1 returns unchanged fgColor color
  *
- * @return int|false  A color index or false on failure.
+ * @return int  A color index.
  */
 function zbx_colormix($image, $bgColor, $fgColor, $alpha) {
 	$r = $bgColor[0] + ($fgColor[0] - $bgColor[0]) * $alpha;
