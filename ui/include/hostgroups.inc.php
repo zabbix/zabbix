@@ -252,7 +252,8 @@ function enrichParentGroups(array $groups) {
 	foreach ($groups as $group) {
 		$parent = explode('/', $group['name']);
 		while (array_pop($parent) && $parent) {
-			$parents[implode('/', $parent)] = true;
+			$parent_name = implode('/', $parent);
+			$parents[$parent_name] = $parent_name;
 		}
 	}
 
@@ -268,7 +269,7 @@ function enrichParentGroups(array $groups) {
 		$groups += API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'filter' => [
-				'name' => array_keys($parents)
+				'name' => $parents
 			],
 			'preservekeys' => true
 		]);
@@ -291,7 +292,8 @@ function enrichParentTemplateGroups(array $groups) {
 	foreach ($groups as $group) {
 		$parent = explode('/', $group['name']);
 		while (array_pop($parent) && $parent) {
-			$parents[implode('/', $parent)] = true;
+			$parent_name = implode('/', $parent);
+			$parents[$parent_name] = $parent_name;
 		}
 	}
 
@@ -307,7 +309,7 @@ function enrichParentTemplateGroups(array $groups) {
 		$groups += API::TemplateGroup()->get([
 			'output' => ['groupid', 'name'],
 			'filter' => [
-				'name' => array_keys($parents)
+				'name' => $parents
 			],
 			'preservekeys' => true
 		]);
