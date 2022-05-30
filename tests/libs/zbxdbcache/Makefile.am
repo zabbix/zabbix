@@ -8,7 +8,10 @@ SERVER_tests = \
 	is_item_processed_by_server \
 	dc_item_poller_type_update \
 	dc_expand_user_macros_in_func_params \
-	dc_function_calculate_nextcheck
+	dc_function_calculate_nextcheck \
+	um_cache_sync \
+	um_cache_resolve \
+	um_cache_resolve_cont
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -38,6 +41,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a
 
 CACHE_LIBS = \
@@ -51,15 +55,18 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_srcdir)/src/zabbix_server/service/libservice.a \
-	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
+	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
+	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
@@ -80,6 +87,7 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_builddir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
@@ -200,5 +208,48 @@ dc_function_calculate_nextcheck_SOURCES = \
 dc_function_calculate_nextcheck_LDADD = \
 	$(CACHE_LIBS) @SERVER_LIBS@
 dc_function_calculate_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
+
+um_cache_sync_CFLAGS = \
+	-I@top_srcdir@/tests \
+	-I@top_srcdir@/src/libs
+um_cache_sync_SOURCES = \
+	um_cache_sync.c \
+	um_cache_mock.c \
+	um_cache_mock.h
+um_cache_sync_LDADD = \
+	$(CACHE_LIBS) @SERVER_LIBS@
+um_cache_sync_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=__zbx_shmem_malloc \
+	-Wl,--wrap=__zbx_shmem_realloc \
+	-Wl,--wrap=__zbx_shmem_free
+
+um_cache_resolve_CFLAGS = \
+	-I@top_srcdir@/tests \
+	-I@top_srcdir@/src/libs
+um_cache_resolve_SOURCES = \
+	um_cache_resolve.c \
+	um_cache_mock.c \
+	um_cache_mock.h
+um_cache_resolve_LDADD = \
+	$(CACHE_LIBS) @SERVER_LIBS@
+um_cache_resolve_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=__zbx_shmem_malloc \
+	-Wl,--wrap=__zbx_shmem_realloc \
+	-Wl,--wrap=__zbx_shmem_free
+
+um_cache_resolve_cont_CFLAGS = \
+	-I@top_srcdir@/tests \
+	-I@top_srcdir@/src/libs
+um_cache_resolve_cont_SOURCES = \
+	um_cache_resolve_cont.c \
+	um_cache_mock.c \
+	um_cache_mock.h 
+um_cache_resolve_cont_LDADD = \
+	$(CACHE_LIBS) @SERVER_LIBS@
+um_cache_resolve_cont_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=__zbx_shmem_malloc \
+	-Wl,--wrap=__zbx_shmem_realloc \
+	-Wl,--wrap=__zbx_shmem_free
+
 
 endif

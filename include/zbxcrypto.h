@@ -22,26 +22,20 @@
 
 #include "zbxtypes.h"
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-
-#if defined(_WINDOWS)
-
-typedef struct zbx_thread_sendval_tls_args ZBX_THREAD_SENDVAL_TLS_ARGS;
-
-void	zbx_tls_pass_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
-void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
-
-#endif	/* #if defined(_WINDOWS) */
-
-void	zbx_tls_validate_config(void);
-void	zbx_tls_library_deinit(void);
-void	zbx_tls_init_parent(void);
-void	zbx_tls_init_child(void);
-void	zbx_tls_free(void);
-void	zbx_tls_free_on_signal(void);
-void	zbx_tls_version(void);
-
-#endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
-
 int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
-#endif /* ZABBIX_CRYPTO_H */
+int	zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t out_len);
+
+char	*zbx_create_token(zbx_uint64_t seed);
+size_t	zbx_get_token_len(void);
+char	*zbx_gen_uuid4(const char *seed);
+
+typedef enum
+{
+	ZBX_HASH_MD5,
+	ZBX_HASH_SHA256
+}
+zbx_crypto_hash_t;
+
+int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
+		char **out);
+#endif /* ZABBIX_ZBXCRYPTO_H */

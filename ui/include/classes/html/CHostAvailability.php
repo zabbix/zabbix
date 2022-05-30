@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -20,6 +20,10 @@
 
 
 class CHostAvailability extends CTag {
+
+	public const TYPES = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_IPMI, INTERFACE_TYPE_JMX,
+		INTERFACE_TYPE_AGENT_ACTIVE
+	];
 
 	public const LABELS = [
 		INTERFACE_TYPE_AGENT => 'ZBX',
@@ -45,17 +49,13 @@ class CHostAvailability extends CTag {
 	/**
 	 * Set host interfaces.
 	 *
-	 * @param array  $interfaces                 Array of arrays with all host interfaces.
-	 * @param int    $interfaces[]['type']       Type of interface, INTERFACE_TYPE_* constant.
-	 * @param string $interfaces[]['interface']  Hint table 'Interface' column value.
-	 * @param string $interfaces[]['detail']     Hint table 'Interface' column additional details string.
-	 * @param int    $interfaces[]['available']  Hint table 'Status' column value, INTERFACE_AVAILABLE_* constant.
-	 * @param string $interfaces[]['error']      Hint table 'Error' column value.
+	 * @param array  $interfaces
+	 * @param string $availability_status
 	 *
 	 * @return CHostAvailability
 	 */
 	public function setInterfaces(array $interfaces): CHostAvailability {
-		$this->type_interfaces = array_fill_keys(array_keys(static::LABELS), []);
+		$this->type_interfaces = array_fill_keys(static::TYPES, []);
 
 		foreach ($interfaces as $interface) {
 			$this->type_interfaces[$interface['type']][] = $interface;
@@ -102,6 +102,11 @@ class CHostAvailability extends CTag {
 
 	public function toString($destroy = true) {
 		foreach ($this->type_interfaces as $type => $interfaces) {
+			// Add active checks to agent interfaces.
+			if ($type == INTERFACE_TYPE_AGENT) {
+				$interfaces = array_merge($interfaces, $this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]);
+			}
+
 			if (!$interfaces || !array_key_exists($type, static::LABELS)) {
 				continue;
 			}

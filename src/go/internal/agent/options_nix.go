@@ -66,6 +66,7 @@ type AgentOptions struct {
 	ExternalPluginTimeout    int      `conf:"optional,name=PluginTimeout,range=1:30"`
 	ExternalPluginsSocket    string   `conf:"optional,name=PluginSocket,default=/tmp/agent.plugin.sock"`
 	ForceActiveChecksOnStart int      `conf:"optional,range=0:1,default=0"`
+	HeartbeatFrequency       int      `conf:"optional,range=0:3600,default=60"`
 
 	AllowKey interface{} `conf:"optional"`
 	DenyKey  interface{} `conf:"optional"`

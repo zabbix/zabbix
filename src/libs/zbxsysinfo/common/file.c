@@ -25,7 +25,7 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "dir.h"
-#include "sha256crypt.h"
+#include "zbxhash.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
@@ -700,7 +700,7 @@ static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	char		*hash_text = NULL;
 	size_t		sz;
-	md5_byte_t	hash[MD5_DIGEST_SIZE];
+	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
 	double		ts;
 
 	ts = zbx_time();
@@ -740,10 +740,10 @@ static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 
 	/* convert MD5 hash to text form */
 
-	sz = MD5_DIGEST_SIZE * 2 + 1;
+	sz = ZBX_MD5_DIGEST_SIZE * 2 + 1;
 	hash_text = (char *)zbx_malloc(hash_text, sz);
 
-	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
 		zbx_snprintf(&hash_text[i << 1], sz - (i << 1), "%02x", hash[i]);
 
 	SET_STR_RESULT(result, hash_text);

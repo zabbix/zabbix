@@ -312,7 +312,7 @@ ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 		return;
 	}
 
-	var value, key;
+	var value;
 
 	try {
 		value = this.unwrap(event.newValue);

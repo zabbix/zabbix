@@ -24,7 +24,7 @@
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
+#include "zbxcomms.h"
 
 extern unsigned char	program_type;
 
@@ -47,8 +47,8 @@ extern unsigned char	program_type;
 static void	db_register_host(const char *host, const char *ip, unsigned short port, unsigned int connection_type,
 		const char *host_metadata, zbx_conn_flags_t flag, const char *interface)
 {
-	char		dns[INTERFACE_DNS_LEN_MAX];
-	char		ip_addr[INTERFACE_IP_LEN_MAX];
+	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
+	char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
 	const char	*p;
 	const char	*p_ip, *p_dns;
 
@@ -378,8 +378,11 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 	if (0 != itemids.values_num)
 	{
-		DC_ITEM		*dc_items;
-		int		*errcodes;
+		DC_ITEM			*dc_items;
+		int			*errcodes;
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
 
 		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
@@ -403,6 +406,9 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
+					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
+
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
@@ -414,6 +420,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	zbx_vector_uint64_destroy(&itemids);
@@ -518,7 +526,7 @@ out:
  ******************************************************************************/
 int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	char			host[HOST_HOST_LEN_MAX], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
+	char			host[ZBX_HOSTNAME_BUF_LEN], tmp[MAX_STRING_LEN], ip[ZBX_INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL, *interface = NULL, *buffer = NULL;
 	struct zbx_json		json;
 	int			ret = FAIL, i, version;
@@ -610,8 +618,11 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	if (0 != itemids.values_num)
 	{
-		DC_ITEM		*dc_items;
-		int		*errcodes, delay;
+		DC_ITEM			*dc_items;
+		int			*errcodes, delay;
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
 
 		dc_items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * itemids.values_num);
@@ -633,11 +644,14 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
+					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
+
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
-			substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL,
+			zbx_substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL,
 					MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 			zbx_json_addobject(&json, NULL);
@@ -679,6 +693,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		zbx_free(errcodes);
 		zbx_free(dc_items);
+
+		zbx_dc_close_user_macros(um_handle);
 	}
 
 	zbx_json_close(&json);

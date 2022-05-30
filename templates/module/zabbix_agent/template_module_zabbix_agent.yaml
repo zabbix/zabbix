@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:01:47Z'
+  date: '2022-05-18T22:41:50Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -197,6 +197,39 @@ zabbix_export:
             -
               tag: component
               value: application
+        -
+          uuid: 0fd83c56dce244738607cd6585a6acb3
+          name: 'Active agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,active_agent,available]'
+          history: 7d
+          description: |
+            Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - unknown
+            1 - available
+            2 - not available
+          valuemap:
+            name: zabbix.host.active_agent.available
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: e91c556b0ff64292b9b9b5709a5d74b3
+              expression: 'min(/Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
+              name: 'Zabbix agent: active checks are not available'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       tags:
         -
           tag: class
@@ -209,7 +242,24 @@ zabbix_export:
           macro: '{$AGENT.NODATA_TIMEOUT}'
           value: 30m
           description: 'No data timeout for active agents. Consider to keep it relatively high.'
+        -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 5m
+          description: 'Timeout after which agent is considered unavailable.'
       valuemaps:
+        -
+          uuid: 9f93aabb08794395b1c62cf784fc58c3
+          name: zabbix.host.active_agent.available
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: 'not available'
         -
           uuid: 9bf3eef7e8d8402ca6f826b377ea2db6
           name: 'Zabbix agent ping status'

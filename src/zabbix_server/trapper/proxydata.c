@@ -18,7 +18,7 @@
 **/
 
 #include "proxydata.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "proxy.h"
 
@@ -27,6 +27,7 @@
 #include "zbxnix.h"
 #include "zbxcompress.h"
 #include "zbxcommshigh.h"
+#include "zbxavailability.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -247,6 +248,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	proxy_get_hist_data(&j, &history_lastid, &more_history);
 	proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
 	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+	proxy_get_host_active_availability(&j);
 
 	zbx_vector_ptr_create(&tasks);
 	zbx_tm_get_remote_tasks(&tasks, 0);

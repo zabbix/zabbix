@@ -493,8 +493,8 @@ class CMultifieldTableElement extends CTableElement {
 
 			foreach ($values as $key => $value) {
 				// Elements with predefined values are always ignored.
-				if (in_array(CTestArrayHelper::get($fields, $key), [CDropdownElement::class, CCheckboxElement::class,
-						CRadioButtonList::class, CSegmentedRadioElement::class])) {
+				if (in_array(CTestArrayHelper::get($fields, $key), [CCheckboxElement::class, CRadioButtonList::class,
+						CSegmentedRadioElement::class])) {
 					continue;
 				}
 

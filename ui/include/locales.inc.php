@@ -28,8 +28,9 @@
  *
  * @return array    an array of locales with locale codes as keys and arrays as values
  */
-function getLocales() {
+function getLocales(): array {
 	return [
+		'en_GB' => ['name' => _('English (en_GB)'),	'display' => true],
 		'en_US' => ['name' => _('English (en_US)'),	'display' => true],
 		'bg_BG' => ['name' => _('Bulgarian (bg_BG)'),	'display' => false],
 		'ca_ES' => ['name' => _('Catalan (ca_ES)'),	'display' => false],
@@ -40,7 +41,7 @@ function getLocales() {
 		'fi_FI' => ['name' => _('Finnish (fi_FI)'),	'display' => false],
 		'fr_FR' => ['name' => _('French (fr_FR)'),	'display' => true],
 		'ka_GE' => ['name' => _('Georgian (ka_GE)'),	'display' => false],
-		'de_DE' => ['name' => _('German (de_DE)'),	'display' => false],
+		'de_DE' => ['name' => _('German (de_DE)'),	'display' => true],
 		'el_GR' => ['name' => _('Greek (el_GR)'),	'display' => false],
 		'he_IL' => ['name' => _('Hebrew (he_IL)'),	'display' => true],
 		'hu_HU' => ['name' => _('Hungarian (hu_HU)'),	'display' => false],
@@ -62,7 +63,7 @@ function getLocales() {
 		'sv_SE' => ['name' => _('Swedish (sv_SE)'),	'display' => false],
 		'tr_TR' => ['name' => _('Turkish (tr_TR)'),	'display' => true],
 		'uk_UA' => ['name' => _('Ukrainian (uk_UA)'),	'display' => true],
-		'vi_VN' => ['name' => _('Vietnamese (vi_VN)'),	'display' => false]
+		'vi_VN' => ['name' => _('Vietnamese (vi_VN)'),	'display' => true]
 	];
 }
 
@@ -174,6 +175,7 @@ function zbx_locale_variants_win($language) {
 	// http://docs.moodle.org/dev/Table_of_locales#Table
 	// This array should contain all array keys from getLocales() function, but in lowercase.
 	$win_language_names = [
+		'en_gb' => ['English_United Kingdom.1252', 'english-uk'],
 		'en_us' => ['English_United States.1252', 'english-usa'],
 		'bg_bg' => ['Bulgarian_Bulgaria.1251'],
 		'ca_es' => ['Catalan_Spain.1252'],

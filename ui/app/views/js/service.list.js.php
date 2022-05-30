@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -99,7 +99,7 @@
 					});
 				}
 				else if (e.target.classList.contains('js-massdelete-service')) {
-					this._delete(e.target, Object.values(chkbxRange.getSelectedIds()));
+					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		}

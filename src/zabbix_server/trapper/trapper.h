@@ -26,6 +26,8 @@ extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern char	*CONFIG_STATS_ALLOWED_IP;
 
+#define ZBX_IPC_SERVICE_TRAPPER	"trapper"
+
 ZBX_THREAD_ENTRY(trapper_thread, args);
 
 #endif

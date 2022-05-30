@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 /*
@@ -27,8 +28,8 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/pdh"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
 
@@ -261,6 +262,8 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) Stop() {
+	p.counters = make(map[perfCounterIndex]*perfCounter)
+
 	_ = win32.PdhCloseQuery(p.query)
 	p.query = 0
 }

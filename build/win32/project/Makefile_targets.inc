@@ -37,6 +37,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcrypto}.c{..\..\..\src\libs\zbxcrypto}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxgetopt}.c{..\..\..\src\libs\zbxgetopt}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxhash}.c{..\..\..\src\libs\zbxhash}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
@@ -84,6 +87,12 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 {..\..\..\src\libs\zbxsysinfo\win32}.cpp{..\..\..\src\libs\zbxsysinfo\win32}.o:
 	$(CC) $? /Fo"$@" $(CPPFLAGS)
+
+{..\..\..\src\libs\zbxsysinfo\alias}.c{..\..\..\src\libs\zbxsysinfo\alias}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxvariant}.c{..\..\..\src\libs\zbxvariant}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\libs\zbxwin32}.c{..\..\..\src\libs\zbxwin32}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)

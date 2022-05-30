@@ -216,11 +216,6 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
-void	zbx_on_exit(int ret)
-{
-	ZBX_UNUSED(ret);
-}
-
 /* test itself */
 
 int	main (void)

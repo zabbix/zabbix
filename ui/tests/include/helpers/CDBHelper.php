@@ -260,16 +260,25 @@ class CDBHelper {
 		$suffix = '_tmp'.count(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			$cmd = '';
+
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
-			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
+			$server = ($DB['SERVER'] !== '') ? ' -h'.$DB['SERVER'] : '';
+
+			$cmd .= ' pg_dump'.$server;
+
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' -p'.$DB['PORT'];
+			}
+
 			$db_name = $DB['DATABASE'];
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 
-			exec('pg_dump'.$server.' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$db_name.' -f'.$file,
-				$output, $result_code
-			);
+			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' -d'.$db_name.' -f'.$file;
+
+			exec($cmd, $output, $result_code);
 
 			if ($result_code != 0) {
 				throw new Exception('Failed to backup "'.implode('", "', $top_tables).'".');
@@ -298,22 +307,36 @@ class CDBHelper {
 		$tables = array_pop(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			$cmd = '';
+
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
-			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
+			$server = ($DB['SERVER'] !== '') ? ' -h'.$DB['SERVER'] : '';
+
+			$cmd .= ' pg_restore'.$server;
+
+			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
+				$cmd .= ' -p'.$DB['PORT'];
+			}
+
 			$db_name = $DB['DATABASE'];
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 
-			exec('pg_restore'.$server.' -U'.$DB['USER'].' -Fd -j5 --clean -d '.$db_name.' '.$file, $output,
-				$result_code
-			);
+			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 --clean -d'.$db_name.' '.$file;
+			exec($cmd, $output, $result_code);
 
 			if ($result_code != 0) {
 				throw new Exception('Failed to restore "'.$file.'".');
 			}
 
-			exec('rm -rf '.$file);
+			if (strstr(strtolower(PHP_OS), 'win') !== false) {
+				$file = str_replace('/', '\\', $file);
+				exec('rd '.$file.' /q /s');
+			}
+			else {
+				exec('rm -rf '.$file);
+			}
 
 			if ($result_code != 0) {
 				throw new Exception('Failed to remove "'.$file.'".');

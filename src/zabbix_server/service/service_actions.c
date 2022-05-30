@@ -20,6 +20,7 @@
 #include "service_actions.h"
 
 #include "log.h"
+#include "zbxserver.h"
 
 /******************************************************************************
  *                                                                            *

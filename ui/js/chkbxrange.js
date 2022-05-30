@@ -172,9 +172,9 @@ var chkbxRange = {
 	 *
 	 * Checks all of the checkboxes that belong to these objects and highlights the table row.
 	 *
-	 * @param {string}  object
-	 * @param {Array}   objectIds     array of objects IDs as integers
-	 * @param {bool}    checked
+	 * @param {string}   object
+	 * @param {Array}    objectIds     array of objects IDs as integers
+	 * @param {boolean}  checked
 	 */
 	checkObjects: function(object, objectIds, checked) {
 		const selected_ids = this.getSelectedIds();
@@ -186,11 +186,12 @@ var chkbxRange = {
 				checkbox.checked = checked;
 
 				jQuery(checkbox).closest('tr').toggleClass('row-selected', checked);
-				// Remove class attribute if it's empty
+				// Remove class attribute if it's empty.
 				jQuery(checkbox).closest('tr').filter('*[class=""]').removeAttr('class');
 
 				if (checked) {
-					selected_ids[objectId] = objectId;
+					const actions = document.getElementById(object + '_' + objectId).getAttribute('data-actions');
+					selected_ids[objectId] = (actions === null) ? '' : actions;
 				}
 				else {
 					delete selected_ids[objectId];
@@ -258,19 +259,51 @@ var chkbxRange = {
 	 * Update the state of the "Go" controls.
 	 */
 	updateGoButton: function() {
-		var count = 0;
-		jQuery.each(this.getSelectedIds(), function() {
-			count++;
-		});
+		const object = this.pageGoName;
+		let selected_count = 0;
+		let actions = [];
 
-		var selectedCountSpan = jQuery('#selected_count');
-		selectedCountSpan.text(count + ' ' + selectedCountSpan.text().split(' ')[1]);
+		Object
+			.values(this.getSelectedIds())
+			.forEach(value => {
+				selected_count++;
 
-		jQuery('#action_buttons button').each((_, val) => {
-			const $val = jQuery(val);
+				// Count the special attributes for checkboxes.
+				if (value !== null) {
+					const action_list = value.split(' ');
 
-			if (!$val.data('disabled')) {
-				$val.prop('disabled', count == 0);
+					for (const action of action_list) {
+						if (!actions.hasOwnProperty(action)) {
+							actions[action] = 0;
+						}
+						actions[action]++;
+					}
+				}
+			});
+
+		// Replace the selected count text.
+		const selected_count_span = document.getElementById('selected_count');
+		selected_count_span.innerHTML = selected_count + ' ' + selected_count_span.innerHTML.split(' ')[1];
+
+		document.querySelectorAll('#action_buttons button').forEach((button) => {
+			// In case button is not permanently disabled by view, enable it depending on attributes and count.
+			if (!button.dataset.disabled) {
+				// First disabled the button and then check if it can be enabled.
+				button.disabled = true;
+
+				// Check if a special attribute is required to enable the button.
+				if (button.dataset.required) {
+					for (const [action, count] of Object.entries(actions)) {
+						// Checkbox data-actions attribute must match the button attribute.
+						if (button.dataset.required === action) {
+							button.disabled = (count == 0);
+						}
+					}
+				}
+				else {
+					// No special attributes required, enable the button depending only on selected count.
+					button.disabled = (selected_count == 0);
+				}
 			}
 		});
 	},

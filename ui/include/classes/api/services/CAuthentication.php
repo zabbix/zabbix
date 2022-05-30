@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -36,12 +36,11 @@ class CAuthentication extends CApiService {
 	 * @var array
 	 */
 	private $output_fields = ['authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
-		'http_case_sensitive', 'ldap_configured', 'ldap_host', 'ldap_port', 'ldap_base_dn', 'ldap_search_attribute',
-		'ldap_bind_dn', 'ldap_case_sensitive', 'ldap_bind_password', 'saml_auth_enabled', 'saml_idp_entityid',
-		'saml_sso_url', 'saml_slo_url', 'saml_username_attribute', 'saml_sp_entityid', 'saml_nameid_format',
-		'saml_sign_messages', 'saml_sign_assertions', 'saml_sign_authn_requests', 'saml_sign_logout_requests',
-		'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive',
-		'passwd_min_length', 'passwd_check_rules'
+		'http_case_sensitive', 'ldap_configured', 'ldap_case_sensitive', 'ldap_userdirectoryid', 'saml_auth_enabled',
+		'saml_idp_entityid', 'saml_sso_url', 'saml_slo_url', 'saml_username_attribute', 'saml_sp_entityid',
+		'saml_nameid_format', 'saml_sign_messages', 'saml_sign_assertions', 'saml_sign_authn_requests',
+		'saml_sign_logout_requests', 'saml_sign_logout_responses', 'saml_encrypt_nameid', 'saml_encrypt_assertions',
+		'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules'
 	];
 
 	/**
@@ -122,13 +121,8 @@ class CAuthentication extends CApiService {
 			'http_strip_domains' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'http_strip_domains')],
 			'http_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
 			'ldap_configured' =>			['type' => API_INT32, 'in' => ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED],
-			'ldap_host' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'ldap_host')],
-			'ldap_port' =>					['type' => API_INT32, 'in' => '0:65535'],
-			'ldap_base_dn' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'ldap_base_dn')],
-			'ldap_search_attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'ldap_search_attribute')],
-			'ldap_bind_dn' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_bind_dn')],
 			'ldap_case_sensitive' =>		['type' => API_INT32, 'in' => ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE],
-			'ldap_bind_password' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'ldap_bind_password')],
+			'ldap_userdirectoryid' =>		['type' => API_ID, 'flags' => API_ALLOW_NULL],
 			'saml_auth_enabled' =>			['type' => API_INT32, 'in' => ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED],
 			'saml_idp_entityid' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'saml_idp_entityid')],
 			'saml_sso_url' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'saml_sso_url')],
@@ -152,9 +146,42 @@ class CAuthentication extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		if (array_key_exists('ldap_userdirectoryid', $auth) && $auth['ldap_userdirectoryid']) {
+			$exists = API::UserDirectory()->get(['userdirectoryids' => $auth['ldap_userdirectoryid']]);
+
+			if (!$exists) {
+				static::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', '/ldap_userdirectoryid', _('referred object does not exist'))
+				);
+			}
+		}
+
 		$output_fields = $this->output_fields;
 		$output_fields[] = 'configid';
 
-		return DB::select('config', ['output' => $output_fields])[0];
+		$db_auth = DB::select('config', ['output' => $output_fields]);
+		$db_auth = reset($db_auth);
+
+		if (array_key_exists('authentication_type', $auth)) {
+			$auth += $db_auth;
+
+			if ($auth['authentication_type'] == ZBX_AUTH_LDAP
+					&& $auth['ldap_configured'] == ZBX_AUTH_LDAP_DISABLED) {
+				static::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', '/authentication_type', _('LDAP must be enabled'))
+				);
+			}
+
+			$have_userdirectories = $auth['ldap_userdirectoryid'] != 0
+				|| API::UserDirectory()->get(['output' => ['userdirectoryid'], 'limit' => 1]);
+
+			if (!$have_userdirectories) {
+				static::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', '/authentication_type', _('no LDAP servers'))
+				);
+			}
+		}
+
+		return $db_auth;
 	}
 }

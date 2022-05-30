@@ -25,8 +25,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/version"
 )
 

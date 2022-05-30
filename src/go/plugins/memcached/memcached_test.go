@@ -26,9 +26,9 @@ import (
 	"testing"
 	"time"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/plugins/memcached/mockserver"
 )
 

@@ -369,7 +369,7 @@ class CDataHelper extends CAPIHelper {
 	 *  Add data to item.
 	 *
 	 * @param string $itemid		item id
-	 * @param array $values		value that should be sent to item
+	 * @param array $values			value that should be sent to item
 	 * @param mixed $time			time when value was received
 	 */
 	public static function addItemData($itemid, $values, $time = null) {

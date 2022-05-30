@@ -46,7 +46,14 @@ int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, 
 int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
+int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+
 int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_connectionstate(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -84,6 +91,8 @@ int	check_vcenter_hv_hw_memory(AGENT_REQUEST *request, const char *username, con
 		AGENT_RESULT *result);
 int	check_vcenter_hv_hw_model(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_hw_serialnumber(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_hw_uuid(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, const char *password,
@@ -92,9 +101,13 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 		AGENT_RESULT *result);
 int	check_vcenter_hv_memory_used(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT * result);
 int	check_vcenter_hv_network_in(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -112,12 +125,18 @@ int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const
 		AGENT_RESULT *result);
 int	check_vcenter_hv_sensors_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_hw_sensors_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
+int	check_vcenter_vm_attribute(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_num(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_vm_consolidationneeded(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -165,6 +184,8 @@ int	check_vcenter_vm_net_if_usage(AGENT_REQUEST *request, const char *username, 
 		AGENT_RESULT *result);
 int	check_vcenter_vm_powerstate(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_vm_snapshot_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, const char *password,
@@ -172,6 +193,8 @@ int	check_vcenter_vm_net_if_in(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_vm_net_if_out(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_vm_state(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_storage_committed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -186,6 +209,8 @@ int	check_vcenter_vm_storage_writeoio(AGENT_REQUEST *request, const char *userna
 int	check_vcenter_vm_storage_totalwritelatency(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_storage_totalreadlatency(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -207,6 +232,11 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 		zbx_vector_ptr_t *add_results);
 
 int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+
+int	check_vcenter_rp_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_rp_memory(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
