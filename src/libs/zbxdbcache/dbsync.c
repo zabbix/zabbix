@@ -529,8 +529,7 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 		{
 			zbx_dbsync_row_t	*row = (zbx_dbsync_row_t *)journal->syncs.values[j]->rows.values[i];
 
-			if (0 != row->rowid)
-				zbx_vector_uint64_append(&objectids, row->rowid);
+			zbx_vector_uint64_append(&objectids, row->rowid);
 		}
 	}
 
@@ -796,19 +795,6 @@ int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsign
 	}
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: skip current row - it will not be synced to configuration cache   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dbsync_skip(zbx_dbsync_t *sync)
-{
-	if (ZBX_DBSYNC_UPDATE != sync->mode)
-		return;
-
-	((zbx_dbsync_row_t *)sync->rows.values[sync->row_index])->rowid = 0;
 }
 
 /******************************************************************************

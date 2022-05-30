@@ -2161,10 +2161,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_synced_new_config_t 
 		ZBX_STR2UCHAR(type, row[3]);
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
-		{
-			zbx_dbsync_skip(sync);
 			continue;
-		}
 
 		item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
@@ -3677,16 +3674,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(triggerid, row[4]);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-		{
-			/* Item could have been created after we have selected them in the             */
-			/* previous queries. However, we shall avoid the check for functions being the */
-			/* same as in the trigger expression, because that is somewhat expensive, not  */
-			/* 100% (think functions keeping their functionid, but changing their function */
-			/* or parameters), and even if there is an inconsistency, we can live with it. */
-
-			zbx_dbsync_skip(sync);
 			continue;
-		}
 
 		/* process function information */
 
@@ -4554,10 +4542,7 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(triggerid, row[1]);
 
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &triggerid)))
-		{
-			zbx_dbsync_skip(sync);
 			continue;
-		}
 
 		ZBX_STR2UINT64(triggertagid, row[0]);
 
@@ -4644,10 +4629,7 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 		ZBX_STR2UINT64(itemid, row[1]);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-		{
-			zbx_dbsync_skip(sync);
 			continue;
-		}
 
 		ZBX_STR2UINT64(itemtagid, row[0]);
 
