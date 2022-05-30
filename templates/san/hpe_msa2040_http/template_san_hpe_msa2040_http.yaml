@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-29T09:32:40Z'
+  date: '2022-05-30T08:10:32Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -121,8 +121,8 @@ zabbix_export:
             
             if (response !== null) {
                 try {
-                    session_key = XML.query(value, '/RESPONSE/OBJECT/PROPERTY[@name="response"]/text()');
-                    return_code = XML.query(value, '/RESPONSE/OBJECT/PROPERTY[@name="return-code"]/text()');
+                    session_key = XML.query(response, '/RESPONSE/OBJECT/PROPERTY[@name="response"]/text()');
+                    return_code = XML.query(response, '/RESPONSE/OBJECT/PROPERTY[@name="return-code"]/text()');
                 }
                 catch (error) {
                     throw 'Failed to parse auth response received from device API. Check debug log for more information.';
@@ -158,17 +158,17 @@ zabbix_export:
                         result_tmp.RESPONSE.OBJECT.forEach(function (object) {
                             var data_tmp = {};
             
-                            object.PROPERTY.forEach(function (property) {
-                                name = property['@name'];
-                                value = property['#text'] || '';
-                                data_tmp[name] = value;
-                            });
-            
-                            if (method == 'controller-statistics') {
-                                data_tmp['durable-id'] = data_tmp['durable-id'].toLowerCase();
-                            }
-            
                             if (object['@basetype'] != 'status') {
+                                object.PROPERTY.forEach(function (property) {
+                                    name = property['@name'];
+                                    value = property['#text'] || '';
+                                    data_tmp[name] = value;
+                                });
+                
+                                if (method == 'controller-statistics') {
+                                    data_tmp['durable-id'] = data_tmp['durable-id'].toLowerCase();
+                                }
+            
                                 data[method].push(data_tmp);
                             }
                         });
@@ -4151,7 +4151,7 @@ zabbix_export:
           description: 'The critical threshold of the CPU utilization in %.'
         -
           macro: '{$HPE.MSA.DATA.TIMEOUT}'
-          value: 5s
+          value: 30s
           description: 'Response timeout for API.'
         -
           macro: '{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT}'
