@@ -55,14 +55,6 @@ class CSvgGraphLine extends CSvgPath {
 		];
 	}
 
-	public function makeStyles(): array {
-		if ($this->is_auxiliary) {
-			$this->addClass(self::ZBX_STYLE_LINE_AUXILIARY);
-		}
-
-		return [];
-	}
-
 	protected function draw(): void {
 		if (count($this->path) > 1) {
 			$last_point = [0, 0];
@@ -83,17 +75,22 @@ class CSvgGraphLine extends CSvgPath {
 	}
 
 	public function toString($destroy = true): string {
-		if (!$this->is_auxiliary && $this->path) {
-			$line_values = '';
+		if ($this->path) {
+			if ($this->is_auxiliary) {
+				$this->addClass(self::ZBX_STYLE_LINE_AUXILIARY);
+			}
+			else {
+				$line_values = '';
 
-			foreach ($this->path as $point) {
-				$line_values .= ($line_values === '') ? $point[2] : ','.$point[2];
+				foreach ($this->path as $point) {
+					$line_values .= ($line_values === '') ? $point[2] : ','.$point[2];
+				}
+
+				$this->setAttribute('label', $line_values);
 			}
 
-			$this->setAttribute('label', $line_values);
+			$this->draw();
 		}
-
-		$this->draw();
 
 		return parent::toString($destroy);
 	}

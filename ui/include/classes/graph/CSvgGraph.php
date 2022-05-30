@@ -724,6 +724,8 @@ class CSvgGraph extends CSvg {
 			if (array_key_exists($index, $this->paths)
 					&& in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])) {
 
+				$line_group = new CSvgGraphLineGroup($this->paths[$index], $metric);
+
 				if ($metric['options']['fill'] > 0) {
 					$y_zero = $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT
 						? $this->right_y_zero
@@ -732,7 +734,7 @@ class CSvgGraph extends CSvg {
 					foreach ($this->paths[$index] as $path) {
 						if (count($path) > 1) {
 							if ($metric['options']['approximation'] == APPROXIMATION_ALL) {
-								$this->addItem(
+								$line_group->addItem(
 									new CSvgGraphArea(
 										array_merge(
 											array_column($path, 'max'),
@@ -744,13 +746,13 @@ class CSvgGraph extends CSvg {
 								);
 							}
 							else {
-								$this->addItem(new CSvgGraphArea(array_column($path, $approximation), $metric, $y_zero));
+								$line_group->addItem(new CSvgGraphArea(array_column($path, $approximation), $metric, $y_zero));
 							}
 						}
 					}
 				}
 
-				$this->addItem(new CSvgGraphLineGroup($this->paths[$index], $metric));
+				$this->addItem($line_group);
 			}
 		}
 	}

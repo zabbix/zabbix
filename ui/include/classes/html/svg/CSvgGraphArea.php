@@ -34,24 +34,10 @@ class CSvgGraphArea extends CSvgGraphLine {
 		];
 	}
 
-	public function makeStyles(): array {
-		$this
-			->addClass(self::ZBX_STYLE_CLASS)
-			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order']);
-
-		return [
-			'.'.self::ZBX_STYLE_CLASS.'-'.$this->itemid.'-'.$this->options['order'] => [
-				'fill-opacity' => $this->options['fill'] * 0.1,
-				'fill' => $this->options['color'],
-				'stroke-opacity' => 0.05,
-				'stroke' => $this->options['color'],
-				'stroke-width' => 2
-			]
-		];
-	}
-
 	protected function draw(): void {
 		parent::draw();
+
+		$this->addClass(self::ZBX_STYLE_CLASS);
 
 		if ($this->path) {
 			if ($this->y_zero !== null) {

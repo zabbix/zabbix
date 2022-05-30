@@ -51,7 +51,7 @@ class CSvgTag extends CTag {
 	 */
 	public function addItem($value): self {
 		if ($value instanceof self) {
-			$this->styles = $value->makeStyles() + $this->styles;
+			$this->styles = array_merge($this->styles, $value->makeStyles());
 		}
 
 		return parent::addItem($value);

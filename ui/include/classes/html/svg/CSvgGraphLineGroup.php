@@ -48,25 +48,32 @@ class CSvgGraphLineGroup extends CSvgGroup {
 	}
 
 	public function makeStyles(): array {
+		$item_css_class = CSvgGraphLine::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order'];
+
 		$this
 			->addClass(CSvgGraphLine::ZBX_STYLE_CLASS)
-			->addClass(CSvgGraphLine::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order']);
+			->addClass($item_css_class);
 
 		return [
 			'.'.CSvgGraphLine::ZBX_STYLE_CLASS => [
 				'fill' => 'none'
 			],
-			'.'.CSvgGraphLine::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order'] => [
+			'.'.$item_css_class => [
 				'stroke-opacity' => $this->options['transparency'] * 0.1,
 				'stroke' => $this->options['color'],
 				'stroke-width' => $this->options['width'] * $this->options['approximation'] == APPROXIMATION_ALL ? 2 : 1
 			] + ($this->options['type'] == SVG_GRAPH_TYPE_LINE ? ['stroke-linejoin' => 'round'] : []),
-			'.'.CSvgGraphLine::ZBX_STYLE_CLASS.'-'.$this->metric['itemid'].'-'.$this->options['order'].' circle' => [
+			'.'.$item_css_class.' circle' => [
 				'fill-opacity' => $this->options['transparency'] * 0.1,
 				'fill' => $this->options['color'],
 				'stroke-width' => 0
 			],
-			'.'.CSvgGraphLine::ZBX_STYLE_CLASS.' .'.CSvgGraphLine::ZBX_STYLE_LINE_AUXILIARY => [
+			'.'.$item_css_class.' .'.CSvgGraphArea::ZBX_STYLE_CLASS => [
+				'fill-opacity' => $this->options['fill'] * 0.1,
+				'fill' => $this->options['color'],
+				'stroke-opacity' => 0.05
+			],
+			'.'.$item_css_class.' .'.CSvgGraphLine::ZBX_STYLE_LINE_AUXILIARY => [
 				'stroke-width' => $this->options['width'],
 				'opacity' => $this->options['transparency'] * 0.1
 			]
