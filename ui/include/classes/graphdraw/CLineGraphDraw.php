@@ -1395,13 +1395,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			// draw color square
-			if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
-				$colorSquare = imagecreatetruecolor(11, 11);
-			}
-			else {
-				$colorSquare = imagecreate(11, 11);
-			}
-
+			$colorSquare = imagecreatetruecolor(11, 11);
 			imagefill($colorSquare, 0, 0, $this->getColor($this->graphtheme['backgroundcolor'], 0));
 			imagefilledrectangle($colorSquare, 0, 0, 10, 10, $color);
 			imagerectangle($colorSquare, 0, 0, 10, 10, $this->getColor('Black'));
@@ -2057,14 +2051,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->selectTriggers();
 		$this->calcDimensions();
 
-		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-				&& @imagecreatetruecolor(1, 1)
-		) {
-			$this->im = imagecreatetruecolor(1, 1);
-		}
-		else {
-			$this->im = imagecreate(1, 1);
-		}
+		$this->im = imagecreatetruecolor(1, 1);
 
 		$this->initColors();
 
@@ -2094,13 +2081,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->calcPercentile();
 		$this->calcZero();
 
-		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-				&& @imagecreatetruecolor(1, 1)) {
-			$this->im = imagecreatetruecolor($this->fullSizeX, $this->fullSizeY);
-		}
-		else {
-			$this->im = imagecreate($this->fullSizeX, $this->fullSizeY);
-		}
+		$this->im = imagecreatetruecolor($this->fullSizeX, $this->fullSizeY);
 
 		$this->initColors();
 		$this->drawRectangle();
