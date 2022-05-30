@@ -1123,13 +1123,14 @@ out:
 #define ZBX_CHANGELOG_OP_UPDATE	2
 #define ZBX_CHANGELOG_OP_DELETE	3
 
-#define ZBX_CHANGELOG_TABLE_HOSTS	1
-#define ZBX_CHANGELOG_TABLE_HOST_TAG	2
-#define ZBX_CHANGELOG_TABLE_ITEMS	3
-#define ZBX_CHANGELOG_TABLE_ITEM_TAG	4
-#define ZBX_CHANGELOG_TABLE_TRIGGERS	5
-#define ZBX_CHANGELOG_TABLE_TRIGGER_TAG	6
-#define ZBX_CHANGELOG_TABLE_FUNCTIONS	7
+#define ZBX_CHANGELOG_TABLE_HOSTS		1
+#define ZBX_CHANGELOG_TABLE_HOST_TAG		2
+#define ZBX_CHANGELOG_TABLE_ITEMS		3
+#define ZBX_CHANGELOG_TABLE_ITEM_TAG		4
+#define ZBX_CHANGELOG_TABLE_TRIGGERS		5
+#define ZBX_CHANGELOG_TABLE_TRIGGER_TAG		6
+#define ZBX_CHANGELOG_TABLE_FUNCTIONS		7
+#define ZBX_CHANGELOG_TABLE_ITEM_PREPROC	8
 
 static int	DBget_changelog_table_by_name(const char *table_name)
 {
@@ -1153,6 +1154,9 @@ static int	DBget_changelog_table_by_name(const char *table_name)
 
 	if (0 == strcmp(table_name, "functions"))
 		return ZBX_CHANGELOG_TABLE_FUNCTIONS;
+
+	if (0 == strcmp(table_name, "item_preproc"))
+		return ZBX_CHANGELOG_TABLE_ITEM_PREPROC;
 
 	return FAIL;
 }
