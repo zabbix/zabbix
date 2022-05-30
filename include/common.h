@@ -961,9 +961,9 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	help(void);
-void	usage(void);
-void	version(void);
+void	zbx_help(void);
+void	zbx_usage(void);
+void	zbx_version(void);
 
 const char	*get_program_name(const char *path);
 

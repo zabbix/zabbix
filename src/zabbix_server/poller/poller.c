@@ -42,6 +42,7 @@
 #include "zbxhttp.h"
 #include "log.h"
 #include "zbxavailability.h"
+#include "zbxcomms.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
