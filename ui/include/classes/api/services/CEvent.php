@@ -938,7 +938,7 @@ class CEvent extends CApiService {
 				if ($this->isEventClosed($event)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', 'action',
-							_s('cannot %1$s resolved problem', $action)
+							_s('unexpected value "%1$s"', $action)
 						)
 					);
 				}
