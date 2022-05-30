@@ -737,6 +737,18 @@ out:
 	return ret;
 }
 
+#define ADD_GROUPIDS_FROM_FIELD(table,field)								\
+													\
+	result = DBselect("select distinct " field " from " table " where " field " is not null");	\
+													\
+	while (NULL != (row = DBfetch(result)))								\
+	{												\
+		BX_STR2UINT64(groupid, row[0]);							\
+		zbx_vector_uint64_append(&host_groupids, groupid);					\
+	}												\
+	DBfree_result(result);
+#define ADD_GROUPIDS_FROM(table) ADD_GROUPIDS_FROM_FIELD(table, "groupid")
+
 static int	DBpatch_6010033_split_groups(void)
 {
 	int			i, has_hosts, has_templates, ret = SUCCEED;
@@ -780,14 +792,14 @@ static int	DBpatch_6010033_split_groups(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect("select distinct groupid from group_prototype where groupid is not null");
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(groupid, row[0]);
-		zbx_vector_uint64_append(&host_groupids, groupid);
-	}
-	DBfree_result(result);
+	ADD_GROUPIDS_FROM("group_prototype");
+	ADD_GROUPIDS_FROM_FIELD("config", "discovery_groupid");
+	ADD_GROUPIDS_FROM("corr_condition_group");
+	ADD_GROUPIDS_FROM("group_discovery");
+	ADD_GROUPIDS_FROM("maintenance_groups");
+	ADD_GROUPIDS_FROM("opcommand_grp");
+	ADD_GROUPIDS_FROM("opgroup");
+	ADD_GROUPIDS_FROM("scripts");
 
 	result = DBselect(
 			"select distinct g.groupid"
