@@ -364,9 +364,9 @@ class CIntegrationTest extends CAPITest {
 	 * Checks absence of pid file after kill.
 	 *
 	 * @param string $component    component name
-	 * 
+	 *
 	 */
-	 private static function checkPidKilled($component) {
+	private static function checkPidKilled($component) {
 
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			if (!file_exists(self::getPidPath($component))) {
@@ -375,7 +375,7 @@ class CIntegrationTest extends CAPITest {
 
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
-		
+
 		return false;
 	}
 
@@ -402,11 +402,11 @@ class CIntegrationTest extends CAPITest {
 		do {
 			for ($i = count($pids) -1; $i >= 1; $i--) {
 				$child_pid = $pids[$i];
-				
+
 				if  (is_numeric($child_pid) && posix_kill($child_pid, 0)) {
 					posix_kill($child_pid, SIGKILL);
 					sleep(10 * self::WAIT_ITERATION_DELAY);
-					
+
 					if (!posix_kill($child_pid, 0)) {
 						break;
 					}
@@ -423,7 +423,7 @@ class CIntegrationTest extends CAPITest {
 
 		if  (is_numeric($pid) && posix_kill($pid, 0)) {
 			posix_kill($pid, SIGKILL);
-			
+
 			if (self::checkPidKilled($component)) {
 				return;
 			}
