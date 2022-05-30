@@ -1159,10 +1159,10 @@ int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_
 				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT);
 #elif HAVE_MYSQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_insert after insert"
-				" on %s for each row"
-					" insert into changelog (object,objectid,operation,clock)"
-						" values (%d,new.%s,%d,unix_timestamp())",
+			"create trigger %s_insert after insert on %s\n"
+				"for each row\n"
+					"insert into changelog (object,objectid,operation,clock)\n"
+						"values (%d,new.%s,%d,unix_timestamp())",
 				table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT);
 #elif HAVE_POSTGRESQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1211,10 +1211,10 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE);
 #elif HAVE_MYSQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_update after update"
-				" on %s for each row"
-					" insert into changelog (object,objectid,operation,clock)"
-						" values (%d,old.%s,%d,unix_timestamp())",
+			"create trigger %s_update after update on %s\n"
+				"for each row\n"
+					"insert into changelog (object,objectid,operation,clock)\n"
+						"values (%d,old.%s,%d,unix_timestamp())",
 				table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE);
 #elif HAVE_POSTGRESQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1263,10 +1263,10 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE);
 #elif HAVE_MYSQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_delete before delete"
-				" on %s for each row"
-					" insert into changelog (object,objectid,operation,clock)"
-						" values (%d,old.%s,%d,unix_timestamp())",
+			"create trigger %s_delete before delete on %s\n"
+				"for each row\n"
+					"insert into changelog (object,objectid,operation,clock)\n"
+						"values (%d,old.%s,%d,unix_timestamp())",
 				table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE);
 #elif HAVE_POSTGRESQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -1277,7 +1277,7 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 				"return new;"
 			"end;"
 			"$$ language plpgsql;"
-			"create trigger %s_delete after delete"
+			"create trigger %s_delete before delete"
 				" on %s for each row"
 					"  execute procedure changelog_%s_delete();",
 				table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE, table_name, table_name,

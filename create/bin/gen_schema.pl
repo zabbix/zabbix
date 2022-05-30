@@ -690,19 +690,19 @@ sub unix_timestamp()
 {
 	if ($output{"database"} eq "mysql")
 	{
-		return "UNIX_TIMESTAMP()";
+		return "unix_timestamp()";
 	}
 	if ($output{"database"} eq "oracle")
 	{
-		return "(CAST(SYS_EXTRACT_UTC(SYSTIMESTAMP) AS DATE)-DATE'1970-01-01')*86400";
+		return "(cast(sys_extract_utc(systimestamp) as date)-date'1970-01-01')*86400";
 	}
 	if ($output{"database"} eq "postgresql")
 	{
-		return "CAST(EXTRACT(EPOCH FROM NOW()) AS INT)";
+		return "cast(extract(epoch from now()) as int)";
 	}
 	if ($output{"database"} eq "sqlite3")
 	{
-		return "CAST(STRFTIME('%s', 'NOW') AS INTEGER)";
+		return "cast(strftime('%s', 'now') as integer)";
 	}
 }
 
@@ -711,27 +711,31 @@ sub open_trigger($)
 	my $type = shift;
 	my $out;
 
-	$out = "CREATE TRIGGER ${table_name}_${type}${eol}\n";
+	$out = "create trigger ${table_name}_${type}${eol} ";
 	if ($type eq "insert")
 	{
-		$out .= "BEFORE INSERT";
+		$out .= "after insert";
 	}
 	elsif ($type eq "update")
 	{
-		$out .= "AFTER UPDATE";
+		$out .= "after update";
 	}
 	elsif ($type eq "delete")
 	{
-		$out .= "AFTER DELETE";
+		$out .= "before delete";
 	}
 
-	$out .= " ON ${table_name}${eol}\n";
-	$out .= "FOR EACH ROW${eol}\n";
+	$out .= " on ${table_name}${eol}\n";
+	$out .= "for each row${eol}\n";
 
-	if ($output{"database"} eq "mysql" || $output{"database"} eq "oracle"  || $output{"database"} eq "sqlite3")
+	if ($output{"database"} eq "mysql")
 	{
-		$out .= "BEGIN${eol}\n";
-		$out .= "INSERT INTO changelog (object,objectid,operation,clock)${eol}\n";
+		$out .= "insert into changelog (object,objectid,operation,clock)${eol}\n";
+	}
+	elsif ($output{"database"} eq "oracle"  || $output{"database"} eq "sqlite3")
+	{
+		$out .= "begin${eol}\n";
+		$out .= "insert into changelog (object,objectid,operation,clock)${eol}\n";
 	}
 	elsif ($output{"database"} eq "postgresql")
 	{
@@ -745,7 +749,7 @@ sub close_trigger()
 {
 	if ($output{"database"} eq "mysql")
 	{
-		return "END\$\$${eol}\n";
+		return "\$\$${eol}\n";
 	}
 	elsif ($output{"database"} eq "postgresql")
 	{
@@ -753,11 +757,11 @@ sub close_trigger()
 	}
 	elsif ($output{"database"} eq "oracle")
 	{
-		return "END;${eol}\n/${eol}\n";
+		return "end;${eol}\n/${eol}\n";
 	}
 	elsif ($output{"database"} eq "sqlite3")
 	{
-		return "END;${eol}\n";
+		return "end;${eol}\n";
 	}
 }
 
@@ -808,15 +812,15 @@ sub process_changelog($)
 	elsif ($output{"database"} eq "mysql" || $output{"database"} eq "sqlite3")
 	{
 		$triggers .= open_trigger('insert');
-		$triggers .= "VALUES (${table_type},new.${pkey_name},1,${unix_timestamp});${eol}\n";
+		$triggers .= "values (${table_type},new.${pkey_name},1,${unix_timestamp});${eol}\n";
 		$triggers .= close_trigger();
 
 		$triggers .= open_trigger('update');
-		$triggers .= "VALUES (${table_type},old.${pkey_name},2,${unix_timestamp});${eol}\n";
+		$triggers .= "values (${table_type},old.${pkey_name},2,${unix_timestamp});${eol}\n";
 		$triggers .= close_trigger();
 
 		$triggers .= open_trigger('delete');
-		$triggers .= "VALUES (${table_type},old.${pkey_name},3,${unix_timestamp});${eol}\n";
+		$triggers .= "values (${table_type},old.${pkey_name},3,${unix_timestamp});${eol}\n";
 		$triggers .= close_trigger();
 	}
 	elsif ($output{"database"} eq "postgresql")
@@ -842,15 +846,15 @@ sub process_changelog($)
 	elsif ($output{"database"} eq "oracle")
 	{
 		$triggers .= open_trigger('insert');
-		$triggers .= "VALUES (${table_type},:new.${pkey_name},1,${unix_timestamp});${eol}\n";
+		$triggers .= "values (${table_type},:new.${pkey_name},1,${unix_timestamp});${eol}\n";
 		$triggers .= close_trigger();
 
 		$triggers .= open_trigger('update');
-		$triggers .= "VALUES (${table_type},:old.${pkey_name},2,${unix_timestamp});${eol}\n";
+		$triggers .= "values (${table_type},:old.${pkey_name},2,${unix_timestamp});${eol}\n";
 		$triggers .= close_trigger();
 
 		$triggers .= open_trigger('delete');
-		$triggers .= "VALUES (${table_type},:old.${pkey_name},3,${unix_timestamp});${eol}\n";
+		$triggers .= "values (${table_type},:old.${pkey_name},3,${unix_timestamp});${eol}\n";
 		$triggers .= close_trigger();
 	}
 }
