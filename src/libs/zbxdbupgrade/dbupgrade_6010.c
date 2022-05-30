@@ -639,10 +639,10 @@ static int	DBpatch_6010033_update_types(zbx_vector_hstgrp_t *hstgrps)
 				break;
 		}
 
-		else
+		else if (DBPATCH_HOSTGROUP_TYPE_HOST == hstgrps->values[i]->type)
 		{
 			if (SUCCEED == DBpatch_6010033_check_types(hstgrps->values[i], hstgrps, &group_type) &&
-				DBPATCH_HOSTGROUP_TYPE_MIXED == group_type)
+					DBPATCH_HOSTGROUP_TYPE_MIXED == group_type)
 				hstgrps->values[i]->type = DBPATCH_HOSTGROUP_TYPE_MIXED;
 		}
 	}
