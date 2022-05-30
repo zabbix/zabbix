@@ -532,19 +532,22 @@ function get_next_color($palettetype = 0) {
  * @param resource 	$image
  * @param int		$fontsize
  * @param int 		$angle
- * @param int		$x
- * @param int 		$y
+ * @param int|float $x
+ * @param int|float $y
  * @param int		$color		a numeric color identifier from imagecolorallocate() or imagecolorallocatealpha()
  * @param string	$string
  */
 function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
+	$x = (int) $x;
+	$y = (int) $y;
+
 	if ((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) || ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
-		imagettftext($image, $fontsize, $angle, (int) $x, (int) $y, $color, $ttf, $string);
+		imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
 	}
 	elseif ($angle == 0) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
-		imagettftext($image, $fontsize, $angle, (int) $x, (int) $y, $color, $ttf, $string);
+		imagettftext($image, $fontsize, $angle, $x, $y, $color, $ttf, $string);
 	}
 	else {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_GRAPH_FONT_NAME.'.ttf';
@@ -553,7 +556,7 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
 		$imgg = imagecreatetruecolor($size['width'] + 1, $size['height']);
 		$transparentColor = imagecolorallocatealpha($imgg, 200, 200, 200, 127);
 		imagefill($imgg, 0, 0, $transparentColor);
-		imagettftext($imgg, $fontsize, 0, 0, (int) $size['height'], $color, $ttf, $string);
+		imagettftext($imgg, $fontsize, 0, 0, $size['height'], $color, $ttf, $string);
 
 		$imgg = imagerotate($imgg, $angle, $transparentColor);
 		imagealphablending($imgg, false);
