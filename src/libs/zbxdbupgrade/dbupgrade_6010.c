@@ -595,12 +595,6 @@ static int	DBpatch_6010033_check_types(hstgrp_t *hstgrp, zbx_vector_hstgrp_t *hs
 
 			if (0 != strncmp(tmp, hstgrps->values[i]->name, strlen(tmp)))
 				continue;
-
-			if (hstgrp->type != hstgrps->values[i]->type)
-			{
-				*type = DBPATCH_HOSTGROUP_TYPE_MIXED;
-				return SUCCEED;
-			}
 		}
 
 		if (FAIL != last_type && last_type != hstgrps->values[i]->type)
@@ -620,7 +614,7 @@ static int	DBpatch_6010033_check_types(hstgrp_t *hstgrp, zbx_vector_hstgrp_t *hs
 	return SUCCEED;
 }
 
-static int	DBpatch_6010033_update_types(zbx_vector_hstgrp_t *hstgrps)
+static int	DBpatch_6010033_update_empty_groups(zbx_vector_hstgrp_t *hstgrps)
 {
 	int	i, ret = SUCCEED;
 
@@ -628,26 +622,33 @@ static int	DBpatch_6010033_update_types(zbx_vector_hstgrp_t *hstgrps)
 	{
 		int	group_type;
 
-		if (DBPATCH_HOSTGROUP_TYPE_EMPTY == hstgrps->values[i]->type)
-		{
-			if (SUCCEED != DBpatch_6010033_check_types(hstgrps->values[i], hstgrps, &group_type))
-				hstgrps->values[i]->type = DBPATCH_HOSTGROUP_TYPE_HOST;
-			else
-				hstgrps->values[i]->type = group_type;
+		if (DBPATCH_HOSTGROUP_TYPE_EMPTY != hstgrps->values[i]->type)
+			continue;
 
-			if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps->values[i])))
-				break;
-		}
+		if (SUCCEED != DBpatch_6010033_check_types(hstgrps->values[i], hstgrps, &group_type))
+			hstgrps->values[i]->type = DBPATCH_HOSTGROUP_TYPE_HOST;
+		else
+			hstgrps->values[i]->type = group_type;
 
-		else if (DBPATCH_HOSTGROUP_TYPE_HOST == hstgrps->values[i]->type)
-		{
-			if (SUCCEED == DBpatch_6010033_check_types(hstgrps->values[i], hstgrps, &group_type) &&
-					DBPATCH_HOSTGROUP_TYPE_MIXED == group_type)
-				hstgrps->values[i]->type = DBPATCH_HOSTGROUP_TYPE_MIXED;
-		}
+		if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps->values[i])))
+			break;
 	}
+}
+static void	DBpatch_6010033_update_mixed_parents(zbx_vector_hstgrp_t *hstgrps)
+{
+	int	i, ret;
 
-	return ret;
+	for (i = 0; i < hstgrps->values_num; i++)
+	{
+		int	group_type;
+
+		if (DBPATCH_HOSTGROUP_TYPE_HOST != hstgrps->values[i]->type)
+			continue;
+
+		if (SUCCEED == DBpatch_6010033_check_types(hstgrps->values[i], hstgrps, &group_type) &&
+				DBPATCH_HOSTGROUP_TYPE_HOST != group_type)
+			hstgrps->values[i]->type = DBPATCH_HOSTGROUP_TYPE_MIXED;
+	}
 }
 
 static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
@@ -835,8 +836,11 @@ static int	DBpatch_6010033_split_groups(void)
 			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_MIXED;
 	}
 
-	if (SUCCEED == (ret = DBpatch_6010033_update_types(&hstgrps)))
+	if (SUCCEED == (ret = DBpatch_6010033_update_empty_groups(&hstgrps)))
+	{
+		DBpatch_6010033_update_mixed_parents(&hstgrps);
 		ret = DBpatch_6010033_create_template_groups(&hstgrps);
+	}
 out:
 	zbx_vector_uint64_destroy(&host_groupids);
 	zbx_vector_uint64_destroy(&template_groupids);
