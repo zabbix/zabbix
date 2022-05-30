@@ -1562,7 +1562,7 @@ abstract class CHostBase extends CApiService {
 						if ($hostmacro['automatic'] == ZBX_USERMACRO_AUTOMATIC
 								&& array_diff_assoc(array_intersect_key($hostmacro, $macro_fields), $db_hostmacro)) {
 							self::exception(ZBX_API_ERROR_PERMISSIONS,
-								_s('Not allowed to modify automatic user macro "%1$s".', $macro_fields['macro'])
+								_s('Not allowed to modify automatic user macro "%1$s".', $db_hostmacro['macro'])
 							);
 						}
 					}
