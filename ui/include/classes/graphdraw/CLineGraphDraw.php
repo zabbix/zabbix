@@ -1838,7 +1838,7 @@ class CLineGraphDraw extends CGraphDraw {
 								$alpha = 0;
 							}
 							else {
-								$alpha = 127 - abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
+								$alpha = 127 - (int) abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
 							}
 
 							$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
