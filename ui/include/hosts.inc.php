@@ -910,7 +910,6 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 		if (array_key_exists($macro, $parent_host_macros)) {
 			$inherited_macro['parent_host'] = [
-				'macro' => $macro,
 				'value' => getMacroConfigValue($parent_host_macros[$macro]),
 				'description' => $parent_host_macros[$macro]['description'],
 				'type' => $parent_host_macros[$macro]['type']
@@ -918,7 +917,6 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 		}
 		elseif (array_key_exists($macro, $global_macros)) {
 			$inherited_macro['global'] = [
-				'macro' => $macro,
 				'value' => $global_macros[$macro]['value'],
 				'description' => $global_macros[$macro]['description'],
 				'type' => $global_macros[$macro]['type']
@@ -933,7 +931,6 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 			foreach ($templateids as $templateid) {
 				if (array_key_exists($templateid, $hosts) && array_key_exists($macro, $hosts[$templateid]['macros'])) {
 					$inherited_macro['template'] = [
-						'macro' => $macro,
 						'value' => $hosts[$templateid]['macros'][$macro]['value'],
 						'description' => $hosts[$templateid]['macros'][$macro]['description'],
 						'templateid' => $hosts[$templateid]['templateid'],

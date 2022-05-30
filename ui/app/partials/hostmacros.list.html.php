@@ -37,7 +37,7 @@ $table = (new CTable())
 foreach ($data['macros'] as $i => $macro) {
 	$macro_cell = [
 		(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
-			->setReadonly($macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC)
+			->setReadonly($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL)
 			->addClass('macro')
 			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 			->setAttribute('placeholder', '{$MACRO}'),
@@ -48,7 +48,6 @@ foreach ($data['macros'] as $i => $macro) {
 	}
 
 	if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
-		$macro_cell[] = new CVar('macros['.$i.'][original_macro]', $macro['original']['macro']);
 		$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
 		$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
 		$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);

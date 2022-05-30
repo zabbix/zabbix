@@ -53,13 +53,11 @@ $table->setColumns([
 ]);
 
 foreach ($data['macros'] as $i => $macro) {
-	$macro_readonly = !($macro['inherited_type'] & ZBX_PROPERTY_INHERITED)
-		? $macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC
-		: true;
-
 	$macro_cell = [
 		(new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
-			->setReadonly($macro_readonly)
+			->setReadonly($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
+				|| $macro['inherited_type'] & ZBX_PROPERTY_INHERITED
+			)
 			->addClass('macro')
 			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 			->setAttribute('placeholder', '{$MACRO}'),
@@ -73,14 +71,12 @@ foreach ($data['macros'] as $i => $macro) {
 
 	if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
 		$inherited_macro = $macro[$macro['inherited_level']];
-		$macro_cell[] = new CVar('macros['.$i.'][inherited][macro]', $inherited_macro['macro']);
 		$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
 		$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
 		$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
 	}
 
 	if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
-		$macro_cell[] = new CVar('macros['.$i.'][original_macro]', $macro['original']['macro']);
 		$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
 		$macro_cell[] = new CVar('macros['.$i.'][original_description]', $macro['original']['description']);
 		$macro_cell[] = new CVar('macros['.$i.'][original_macro_type]', $macro['original']['type']);

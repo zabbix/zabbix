@@ -137,8 +137,8 @@ abstract class CControllerHostUpdateGeneral extends CController {
 				$macro = ['hostmacroid' => $macro['hostmacroid']] + $macro_diff;
 			}
 			else {
-				unset($macro['discovery_state'], $macro['original_macro'], $macro['original_value'],
-					$macro['original_description'], $macro['original_macro_type']
+				unset($macro['discovery_state'], $macro['original_value'], $macro['original_description'],
+					$macro['original_macro_type']
 				);
 			}
 		}

@@ -138,7 +138,6 @@ class CControllerHostMacrosList extends CController {
 	 * Create array of original macro values from input fields.
 	 *
 	 * @param array  $macro
-	 * @param string $macro['original_macro']
 	 * @param string $macro['original_value']
 	 * @param string $macro['original_description']
 	 * @param string $macro['original_macro_type']
@@ -150,7 +149,6 @@ class CControllerHostMacrosList extends CController {
 
 		$field_keys_map = [
 			'original_value' => 'value',
-			'original_macro' => 'macro',
 			'original_description' => 'description',
 			'original_macro_type' => 'type'
 		];

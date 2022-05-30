@@ -139,10 +139,6 @@ class HostMacrosManager {
 
 				if (inherited_type & HostMacrosManager.ZBX_PROPERTY_OWN) {
 					// Switching from ZBX_PROPERTY_BOTH to ZBX_PROPERTY_INHERITED.
-					$('#macros_' + macro_num + '_macro')
-						.val($('#macros_' + macro_num + '_inherited_macro').val())
-						.prop('readonly', true)
-						.trigger('input');
 					$('#macros_' + macro_num + '_inherited_type')
 						.val(inherited_type & ~HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_' + macro_num + '_description')
@@ -193,17 +189,12 @@ class HostMacrosManager {
 
 				if ($discovery.val() == HostMacrosManager.DISCOVERY_STATE_CONVERTING) {
 					const original_type = $('#macros_' + num + '_original_macro_type').val();
-					const original_macro = $('#macros_' + num + '_original_macro').val();
 					const original_value = $('#macros_' + num + '_original_value', $row).val();
 					const original_descr = $('#macros_' + num + '_original_description', $row).val();
 					const original_value_field_state = (original_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET)
 						? {'disabled': true}
 						: {'readonly': true};
 
-					$('#macros_' + num + '_macro')
-						.val(original_macro)
-						.prop('readonly', true)
-						.trigger('input');
 					$('#macros_' + num + '_value_btn', $row).prop('disabled', true);
 					$('#macros_' + num + '_type_button', $row)
 						.removeClass()
@@ -230,7 +221,6 @@ class HostMacrosManager {
 					$('#macros_' + num + '_change_state').text(t('Change'));
 				}
 				else {
-					$('#macros_' + num + '_macro').prop('readonly', false);
 					$('#macros_' + num + '_value', $row)
 						.prop('readonly', false)
 						.focus();
