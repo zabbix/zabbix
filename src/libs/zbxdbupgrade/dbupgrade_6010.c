@@ -743,7 +743,7 @@ out:
 													\
 	while (NULL != (row = DBfetch(result)))								\
 	{												\
-		BX_STR2UINT64(groupid, row[0]);							\
+		ZBX_STR2UINT64(groupid, row[0]);							\
 		zbx_vector_uint64_append(&host_groupids, groupid);					\
 	}												\
 	DBfree_result(result);
