@@ -610,7 +610,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 	$tags = makeTags($problems);
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
-		CScreenProblem::addSuppressedByNames($problems);
+		CScreenProblem::addSuppressionNames($problems);
 	}
 
 	foreach ($problems as $problem) {
