@@ -1025,15 +1025,21 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 	if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 	{
+		zbx_lld_hosttag_t		*host_tag;
 		zbx_vector_lld_hosttag_ptr_t	tmp_host_tags;
 
 		zbx_vector_lld_hosttag_ptr_create(&tmp_host_tags);
-		zbx_vector_lld_hosttag_ptr_append_array(&tmp_host_tags, tags->values, tags->values_num);
+
+		for (i = 0; i < tags->values_num; i++)
+		{
+			host_tag = lld_hosttag_create(tags->values[i]->tag, tags->values[i]->value,
+					tags->values[i]->automatic);
+			zbx_vector_lld_hosttag_ptr_append(&tmp_host_tags, host_tag);
+		}
 
 		for (i = 0; i < override_tags.values_num; i++)
 		{
 			zbx_db_tag_t		*override_tag;
-			zbx_lld_hosttag_t	*host_tag;
 
 			override_tag = (zbx_db_tag_t *)override_tags.values[i];
 			host_tag = lld_hosttag_create(override_tag->tag, override_tag->value, ZBX_TAG_AUTOMATIC);
@@ -1042,6 +1048,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 
 		lld_host_update_tags(host, &tmp_host_tags, lld_macros, info);
 
+		zbx_vector_lld_hosttag_ptr_clear_ext(&tmp_host_tags, lld_hosttag_free);
 		zbx_vector_lld_hosttag_ptr_destroy(&tmp_host_tags);
 
 		if (0 != lnk_templateids.values_num)
@@ -1051,7 +1058,6 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		}
 	}
 out:
-	zbx_vector_db_tag_ptr_clear_ext(&override_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&override_tags);
 	zbx_vector_uint64_destroy(&lnk_templateids);
 
