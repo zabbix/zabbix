@@ -59,11 +59,11 @@ class CSvgGraphLegend extends CDiv {
 	}
 
 	public function getLinesCount(): int {
-		return $this->lines_count;
+		return $this->lines_count + ($this->show_statistic ? 1 : 0);
 	}
 
 	public function setLinesCount(int $lines_count): self {
-		$this->lines_count = $lines_count + ($this->show_statistic ? 1 : 0);
+		$this->lines_count = $lines_count;
 
 		return $this;
 	}
@@ -124,7 +124,7 @@ class CSvgGraphLegend extends CDiv {
 		$this
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addClass($this->show_statistic ? self::ZBX_STYLE_GRAPH_LEGEND_STATISTIC : null)
-			->addStyle('--lines: '.$this->lines_count.';');
+			->addStyle('--lines: '.$this->getLinesCount().';');
 
 		if (!$this->show_statistic) {
 			$this->addStyle('--columns: '. min($this->columns_count, count($this->legend_items)).';');
