@@ -52,12 +52,12 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	private $message;
 
 	/**
-	 * @var string
+	 * @var int
 	 */
 	private $suppress;
 
 	/**
-	 * @var string
+	 * @var int
 	 */
 	private $unsuppress;
 
@@ -90,15 +90,13 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret && $this->getInput('suppress_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_SUPPRESS
-				&& $this->getInput('suppress_time_option', 0) == ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE) {
+				&& $this->getInput('suppress_time_option', '') == ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE) {
 			$this->suppress_until_time_parser = new CRangeTimeParser();
-			$this->suppress_until_time_parser->parse($this->getInput('suppress_until_problem', 0));
+			$this->suppress_until_time_parser->parse($this->getInput('suppress_until_problem', ''));
+			$suppress_until = $this->suppress_until_time_parser->getDateTime(false)->getTimestamp();
 
-			if ($this->suppress_until_time_parser->getDateTime(false)->getTimestamp() < time()) {
-				info(_s('Incorrect value for field "%1$s": %2$s.', _('time until suppress problem'),
-					_('Insert future time')
-				));
-
+			if (!validateUnixTime($suppress_until) || $suppress_until < time()) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Suppress until problem'), _('invalid time')));
 				$ret = false;
 			}
 		}
