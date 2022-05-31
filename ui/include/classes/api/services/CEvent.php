@@ -538,10 +538,15 @@ class CEvent extends CApiService {
 		$data['eventids'] = array_keys(array_flip($data['eventids']));
 
 		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
+		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
+		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
 
 		$events = $this->get([
 			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid'],
-			'select_acknowledges' => $has_close_action ? ['action'] : null,
+			'select_acknowledges' => $has_close_action || $has_suppress_action || $has_unsuppress_action
+				? ['action']
+				: null,
+			'selectSuppressionData' => $has_unsuppress_action ? ['maintenanceid'] : null,
 			'eventids' => $data['eventids'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -598,14 +603,14 @@ class CEvent extends CApiService {
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_SUPPRESS action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
+			if ($has_suppress_action && !$this->isEventClosed($event)) {
 				$action |= ZBX_PROBLEM_UPDATE_SUPPRESS;
 				$suppress_until = $data['suppress_until'];
 				$suppress_eventids[] = $eventid;
 			}
 
 			// Perform ZBX_PROBLEM_UPDATE_UNSUPPRESS action flag.
-			if (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+			if ($has_unsuppress_action && $this->isEventSuppressed($event) && !$this->isEventClosed($event)) {
 				$action |= ZBX_PROBLEM_UPDATE_UNSUPPRESS;
 				$unsuppress_eventids[] = $eventid;
 			}
@@ -889,9 +894,7 @@ class CEvent extends CApiService {
 
 		$events = $this->get([
 			'output' => ['r_eventid'],
-			'select_acknowledges' => $has_suppress_action || $has_unsuppress_action ? ['action'] : null,
 			'selectRelatedObject' => $has_close_action ? ['manual_close'] : null,
-			'selectSuppressionData' => $has_unsuppress_action ? ['userid'] : null,
 			'eventids' => $data['eventids'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -931,26 +934,8 @@ class CEvent extends CApiService {
 			$this->checkCanChangeSeverity($data['eventids'], $editable_events_count, $data['severity']);
 		}
 
-		// Checks if events are not resolved to execute suppress or unsuppress action.
-		if ($has_suppress_action || $has_unsuppress_action) {
-			$action = $has_suppress_action ? ZBX_PROBLEM_UPDATE_SUPPRESS : ZBX_PROBLEM_UPDATE_UNSUPPRESS;
-			foreach ($events as $event) {
-				if ($this->isEventClosed($event)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'action',
-							_s('unexpected value "%1$s"', $action)
-						)
-					);
-				}
-			}
-		}
-
-		if ($has_unsuppress_action) {
-			$this->checkCanUnsuppress($events);
-		}
-
 		if($has_suppress_action) {
-			$this->isFutureTime($data, $time);
+			$this->CheckIfValidTime($data, $time);
 		}
 	}
 
@@ -1009,30 +994,43 @@ class CEvent extends CApiService {
 	}
 
 	/**
-	 * Checks if unsuppress action can be executed for all given events.
+	 * Checks if time is valid future time.
 	 *
-	 * @param array $events  Array of event objects.
-	 *
-	 * @throws APIException  Throws an exception:
-	 *                        - If event is not manually suppressed;
+	 * @param array $data                    Input data.
+	 * @param array $data['suppress_until']  Suppress until unix time. O for Indefinite time.
+	 * @param int   $time                    Current unix time.
 	 */
-	protected function checkCanUnsuppress(array $events) {
-		foreach ($events as $event) {
-			foreach ($event['suppression_data'] as $suppression) {
-				if($suppression['userid'] != 0) {
-					break;
-				}
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'action',
-						_s('Cannot %1$s manually unsuppressed problem', ZBX_PROBLEM_UPDATE_UNSUPPRESS)
-					)
-				);
-			}
+	protected function CheckIfValidTime(array $data, $time) {
+		if ($data['suppress_until'] <= $time && $data['suppress_until'] != 0) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'suppress_until',
+					_s('unexpected value "%1$s"', $data['suppress_until'])
+				)
+			);
 		}
 	}
 
 	/**
-	 * Checks if events are closed.
+	 * Checks if unsuppress action can be executed for given event.
+	 *
+	 * @param array $event                                         Event object.
+	 * @param array $event['suppression_data']                     List of problem suppression data.
+	 * @param array $event['suppression_data'][]['maintenanceid']  Problem maintenanceid.
+	 *
+	 * @return bool
+	 */
+	protected function isEventSuppressed(array $event) {
+		foreach ($event['suppression_data'] as $suppression) {
+			if($suppression['maintenanceid'] == 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if event are closed.
 	 *
 	 * @param array $event                              Event object.
 	 * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
@@ -1053,23 +1051,8 @@ class CEvent extends CApiService {
 				}
 			}
 		}
-	}
 
-	/**
-	 * Checks if time is valid future time.
-	 *
-	 * @param array $data                    Input data.
-	 * @param array $data['suppress_until']  Suppress until unix time. O for Indefinite time.
-	 * @param int   $time                    Current unix time.
-	 */
-	protected function isFutureTime(array $data, $time) {
-		if ($data['suppress_until'] <= $time && $data['suppress_until'] != 0) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'suppress_until',
-					_s('unexpected value "%1$s"', $data['suppress_until'])
-				)
-			);
-		}
+		return false;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
