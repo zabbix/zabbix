@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-30T08:10:32Z'
+  date: '2022-05-31T09:41:36Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -33,7 +33,7 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.msa.data.errors
           delay: '0'
-          history: 1h
+          history: 7d
           trends: '0'
           value_type: TEXT
           description: 'A list of method errors from API requests.'
@@ -47,7 +47,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           tags:
             -
               tag: component
@@ -71,7 +71,7 @@ zabbix_export:
           uuid: e07e09dbcdd44f509a06343c9a53a455
           name: 'HPE MSA: Get data'
           type: SCRIPT
-          key: hpe.msa.raw.data
+          key: hpe.msa.data.get
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -227,7 +227,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           tags:
             -
               tag: component
@@ -250,7 +250,7 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '4'
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           tags:
             -
               tag: component
@@ -310,7 +310,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           tags:
             -
               tag: component
@@ -336,7 +336,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           tags:
             -
               tag: component
@@ -362,7 +362,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           tags:
             -
               tag: component
@@ -388,7 +388,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           tags:
             -
               tag: component
@@ -414,7 +414,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           tags:
             -
               tag: component
@@ -476,7 +476,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -502,7 +502,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -528,7 +528,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -554,7 +554,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -577,7 +577,7 @@ zabbix_export:
                   parameters:
                     - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''write-cache-used''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -608,7 +608,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -631,7 +631,7 @@ zabbix_export:
                   parameters:
                     - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''cpu-load''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -671,7 +671,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -694,7 +694,7 @@ zabbix_export:
                   parameters:
                     - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''bytes-per-second-numeric''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -722,7 +722,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -750,7 +750,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -773,7 +773,7 @@ zabbix_export:
                   parameters:
                     - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''iops''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -801,7 +801,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -827,7 +827,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -853,7 +853,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -881,7 +881,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -911,7 +911,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -985,7 +985,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1013,7 +1013,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1039,7 +1039,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1067,7 +1067,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1095,7 +1095,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1132,7 +1132,7 @@ zabbix_export:
                   parameters:
                     - '$.[''controller-statistics''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''power-on-time''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1229,7 +1229,7 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.controllers.iops.write["{#CONTROLLER.ID}",rate]'
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#CONTROLLER.ID}'
@@ -1278,7 +1278,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1306,7 +1306,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1335,7 +1335,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1365,7 +1365,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1427,7 +1427,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1456,7 +1456,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1484,7 +1484,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1512,7 +1512,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1548,7 +1548,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1614,7 +1614,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1642,7 +1642,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1651,7 +1651,7 @@ zabbix_export:
                   tag: disk
                   value: '{#DURABLE.ID}'
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
@@ -1714,7 +1714,7 @@ zabbix_export:
                   parameters:
                     - '0.000001'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1742,7 +1742,7 @@ zabbix_export:
                   parameters:
                     - '0.000001'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1770,7 +1770,7 @@ zabbix_export:
                   parameters:
                     - '0.000001'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1798,7 +1798,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1821,7 +1821,7 @@ zabbix_export:
                   parameters:
                     - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1849,7 +1849,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1877,7 +1877,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1900,7 +1900,7 @@ zabbix_export:
                   parameters:
                     - '$.[''disk-group-statistics''][?(@[''name''] == "{#NAME}")].[''iops''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1928,7 +1928,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1956,7 +1956,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -1987,7 +1987,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2014,7 +2014,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2045,7 +2045,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2121,7 +2121,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2151,7 +2151,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2228,7 +2228,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2402,7 +2402,7 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.disks.groups.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -2447,7 +2447,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2509,7 +2509,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2537,7 +2537,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2565,7 +2565,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2589,7 +2589,7 @@ zabbix_export:
                   parameters:
                     - '$.[''enclosures''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''enclosure-power''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2619,7 +2619,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2682,7 +2682,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
@@ -2727,7 +2727,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2784,7 +2784,7 @@ zabbix_export:
                   parameters:
                     - '$.[''fans''][?(@[''durable-id''] == "{#DURABLE.ID}")].[''speed''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2812,7 +2812,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2865,7 +2865,7 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.fans["{#DURABLE.ID}",speed]'
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
@@ -2890,12 +2890,17 @@ zabbix_export:
           key: hpe.msa.frus.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               -
                 macro: '{#TYPE}'
                 value: ^(POWER_SUPPLY|RAID_IOM|CHASSIS_MIDPLANE)$
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
+              -
+                macro: '{#TYPE}'
+                operator: EXISTS
+                formulaid: B
           description: 'Discover FRU.'
           item_prototypes:
             -
@@ -2918,7 +2923,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -2946,7 +2951,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3001,7 +3006,7 @@ zabbix_export:
                       }
                       return 6;
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3034,7 +3039,7 @@ zabbix_export:
                       tag: scope
                       value: availability
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#DESCRIPTION}'
@@ -3088,7 +3093,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3119,7 +3124,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3198,7 +3203,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3257,7 +3262,7 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.pools.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -3302,7 +3307,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3366,7 +3371,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3428,7 +3433,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3437,7 +3442,7 @@ zabbix_export:
                   tag: port
                   value: '{#NAME}'
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'
@@ -3482,7 +3487,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3544,7 +3549,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3572,7 +3577,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3602,7 +3607,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3663,7 +3668,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3682,7 +3687,7 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.power_supplies["{#DURABLE.ID}",temperature]'
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#DURABLE.ID}'
@@ -3723,7 +3728,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3749,7 +3754,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3775,7 +3780,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3801,7 +3806,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3829,7 +3834,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3852,7 +3857,7 @@ zabbix_export:
                   parameters:
                     - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''bytes-per-second-numeric''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3880,7 +3885,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3908,7 +3913,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3931,7 +3936,7 @@ zabbix_export:
                   parameters:
                     - '$.[''volume-statistics''][?(@[''volume-name''] == "{#NAME}")].[''iops''].first()'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3959,7 +3964,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -3990,7 +3995,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -4021,7 +4026,7 @@ zabbix_export:
                   parameters:
                     - '512'
               master_item:
-                key: hpe.msa.raw.data
+                key: hpe.msa.data.get
               tags:
                 -
                   tag: component
@@ -4103,7 +4108,7 @@ zabbix_export:
                     host: 'HPE MSA 2040 Storage by HTTP'
                     key: 'hpe.msa.volumes.space["{#NAME}",total]'
           master_item:
-            key: hpe.msa.raw.data
+            key: hpe.msa.data.get
           lld_macro_paths:
             -
               lld_macro: '{#NAME}'

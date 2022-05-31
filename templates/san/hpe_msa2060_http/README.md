@@ -170,7 +170,7 @@ There are no template links in this template.
 |HPE |FRU [{#ENCLOSURE.ID}: {#LOCATION}]: Status |<p>{#DESCRIPTION}. FRU status:</p><p>Absent: The FRU is not present.</p><p>Fault: The FRU's health is Degraded or Fault.</p><p>Invalid data: The FRU ID data is invalid. The FRU's EEPROM is improperly programmed.</p><p>OK: The FRU is operating normally.</p><p>Power off: The FRU is powered off.</p> |DEPENDENT |hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",status]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['frus'][?(@['name'] == "{#TYPE}" && @['fru-location'] == "{#LOCATION}")].['fru-status-numeric'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |HPE |FRU [{#ENCLOSURE.ID}: {#LOCATION}]: Part number |<p>{#DESCRIPTION}. Part number of the FRU.</p> |DEPENDENT |hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",part_number]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['frus'][?(@['name'] == "{#TYPE}" && @['fru-location'] == "{#LOCATION}")].['part-number'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |HPE |FRU [{#ENCLOSURE.ID}: {#LOCATION}]: Serial number |<p>{#DESCRIPTION}. FRU serial number.</p> |DEPENDENT |hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",serial_number]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['frus'][?(@['name'] == "{#TYPE}" && @['fru-location'] == "{#LOCATION}")].['serial-number'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Zabbix raw items |HPE MSA: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |hpe.msa.raw.data<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|Zabbix raw items |HPE MSA: Get data |<p>The JSON with result of API requests.</p> |SCRIPT |hpe.msa.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
 
 ## Triggers
 
