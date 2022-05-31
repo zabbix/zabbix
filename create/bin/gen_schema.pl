@@ -772,7 +772,7 @@ sub open_function($)
 
 	$out = "create or replace function changelog_${table_name}_${type}() returns trigger as \$\$${eol}\n";
 	$out .= "begin${eol}\n";
-	$out .= "insert into changelog (object,objectid,operation,clock)";
+	$out .= "insert into changelog (object,objectid,operation,clock)\n";
 
 	return $out;
 }
@@ -826,19 +826,19 @@ sub process_changelog($)
 	elsif ($output{"database"} eq "postgresql")
 	{
 		$triggers .= open_function('insert');
-		$triggers .= " values (${table_type},new.${pkey_name},1,${unix_timestamp});${eol}\n";
+		$triggers .= "values (${table_type},new.${pkey_name},1,${unix_timestamp});${eol}\n";
 		$triggers .= close_function();
 		$triggers .= open_trigger('insert');
 		$triggers .= close_trigger();
 
 		$triggers .= open_function('update');
-		$triggers .= " values (${table_type},old.${pkey_name},2,${unix_timestamp});${eol}\n";
+		$triggers .= "values (${table_type},old.${pkey_name},2,${unix_timestamp});${eol}\n";
 		$triggers .= close_function();
 		$triggers .= open_trigger('update');
 		$triggers .= close_trigger();
 
 		$triggers .= open_function('delete');
-		$triggers .= " values (${table_type},old.${pkey_name},3,${unix_timestamp});${eol}\n";
+		$triggers .= "values (${table_type},old.${pkey_name},3,${unix_timestamp});${eol}\n";
 		$triggers .= close_function();
 		$triggers .= open_trigger('delete');
 		$triggers .= close_trigger();

@@ -1150,11 +1150,11 @@ int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_insert after insert"
-				" on %s for each row"
-				" begin\n"
-					"insert into changelog (object,objectid,operation,clock)"
-						" values (%d,:new.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
+			"create trigger %s_insert after insert on %s\n"
+				"for each row\n"
+				"begin\n"
+					"insert into changelog (object,objectid,operation,clock)\n"
+						"values (%d,:new.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
 						"-date'1970-01-01')*86400);\n"
 				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT);
 #elif HAVE_MYSQL
@@ -1166,16 +1166,16 @@ int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_
 				table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT);
 #elif HAVE_POSTGRESQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create or replace function changelog_%s_insert() returns trigger as $$"
-			" begin"
-				" insert into changelog (object,objectid,operation,clock)"
-					" values (%d,new.%s,%d,cast(extract(epoch from now()) as int));"
-				"return new;"
-			"end;"
-			"$$ language plpgsql;"
-			"create trigger %s_insert after insert"
-				" on %s for each row"
-					"  execute procedure changelog_%s_insert();",
+			"create or replace function changelog_%s_insert() returns trigger as $$\n"
+			"begin\n"
+				"insert into changelog (object,objectid,operation,clock)\n"
+					"values (%d,new.%s,%d,cast(extract(epoch from now()) as int));\n"
+				"return new;\n"
+			"end;\n"
+			"$$ language plpgsql;\n"
+			"create trigger %s_insert after insert on %s\n"
+				"for each row\n"
+					"execute procedure changelog_%s_insert();",
 				table_name, table_type, field_name, ZBX_CHANGELOG_OP_INSERT, table_name, table_name,
 				table_name);
 #endif
@@ -1202,11 +1202,11 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_update after update"
-				" on %s for each row"
-				" begin\n"
-					"insert into changelog (object,objectid,operation,clock)"
-						" values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
+			"create trigger %s_update after update on %s\n"
+				"for each row\n"
+				"begin\n"
+					"insert into changelog (object,objectid,operation,clock)\n"
+						"values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
 						"-date'1970-01-01')*86400);\n"
 				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE);
 #elif HAVE_MYSQL
@@ -1218,16 +1218,16 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 				table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE);
 #elif HAVE_POSTGRESQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create or replace function changelog_%s_update() returns trigger as $$"
-			" begin"
-				" insert into changelog (object,objectid,operation,clock)"
-					" values (%d,old.%s,%d,cast(extract(epoch from now()) as int));"
-				"return new;"
-			"end;"
-			"$$ language plpgsql;"
-			"create trigger %s_update after update"
-				" on %s for each row"
-					"  execute procedure changelog_%s_update();",
+			"create or replace function changelog_%s_update() returns trigger as $$\n"
+			"begin\n"
+				"insert into changelog (object,objectid,operation,clock)\n"
+					"values (%d,old.%s,%d,cast(extract(epoch from now()) as int));\n"
+				"return new;\n"
+			"end;\n"
+			"$$ language plpgsql;\n"
+			"create trigger %s_update after update on %s\n"
+				"for each row\n"
+					"execute procedure changelog_%s_update();",
 				table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE, table_name, table_name,
 				table_name);
 #endif
@@ -1254,11 +1254,10 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_delete before delete"
-				" on %s for each row"
-				" begin\n"
-					"insert into changelog (object,objectid,operation,clock)"
-						" values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
+			"create trigger %s_delete before delete on %s for each row\n"
+				"begin\n"
+					"insert into changelog (object,objectid,operation,clock)\n"
+						"values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
 						"-date'1970-01-01')*86400);\n"
 				"end;", table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE);
 #elif HAVE_MYSQL
@@ -1270,16 +1269,16 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 				table_name, table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE);
 #elif HAVE_POSTGRESQL
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create or replace function changelog_%s_delete() returns trigger as $$"
-			" begin"
-				" insert into changelog (object,objectid,operation,clock)"
-					" values (%d,old.%s,%d,cast(extract(epoch from now()) as int));"
-				"return new;"
-			"end;"
-			"$$ language plpgsql;"
-			"create trigger %s_delete before delete"
-				" on %s for each row"
-					"  execute procedure changelog_%s_delete();",
+			"create or replace function changelog_%s_delete() returns trigger as $$\n"
+			"begin\n"
+				"insert into changelog (object,objectid,operation,clock)\n"
+					"values (%d,old.%s,%d,cast(extract(epoch from now()) as int));\n"
+				"return new;\n"
+			"end;\n"
+			"$$ language plpgsql;\n"
+			"create trigger %s_delete before delete on %s\n"
+				"for each row\n"
+					"execute procedure changelog_%s_delete();",
 				table_name, table_type, field_name, ZBX_CHANGELOG_OP_DELETE, table_name, table_name,
 				table_name);
 #endif
