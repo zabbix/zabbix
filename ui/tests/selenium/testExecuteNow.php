@@ -193,6 +193,7 @@ class testExecuteNow extends CWebTest {
 		$filter_form->submit();
 		$this->page->waitUntilReady();
 		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
+		$table->waitUntilReloaded();
 		$this->selectItemsAndExecuteNow($data, $table);
 	}
 

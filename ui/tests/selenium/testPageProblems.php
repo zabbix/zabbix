@@ -71,8 +71,9 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Check the default tag filter option AND and tag value option Contains
 		$this->zbxTestClickButtonText('Reset');
+		$this->query('id:filter-tags_0')->one()->waitUntilReloaded();
 		$this->assertTrue($this->zbxTestCheckboxSelected('evaltype_00'));
-		$form = $this->query('id:tabfilter_0')->asForm()->one();
+		$form = $this->query('id:tabfilter_0')->asForm()->waitUntilPresent()->one();
 		$this->zbxTestDropdownAssertSelected('tags_00_operator', 'Contains');
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
 
@@ -100,9 +101,10 @@ class testPageProblems extends CLegacyWebTest {
 	public function testPageProblems_FilterByTagsOptionContainsEquals() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
-		$this->zbxTestClickButtonText('Reset');
-		$form = $this->query('id:tabfilter_0')->asForm()->one();
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
+		$this->zbxTestClickButtonText('Reset');
+		$result_form->waitUntilReloaded();
+		$form = $this->query('id:tabfilter_0')->asForm()->one();
 
 		// Search by partial "Contains" tag value match
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('service');
@@ -126,9 +128,10 @@ class testPageProblems extends CLegacyWebTest {
 	public function testPageProblems_FilterByTagsOptionContainsEqualsAndRemoveOne() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
-		$this->zbxTestClickButtonText('Reset');
-		$form = $this->query('id:tabfilter_0')->asForm()->one();
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
+		$this->zbxTestClickButtonText('Reset');
+		$result_form->waitUntilReloaded();
+		$form = $this->query('id:tabfilter_0')->asForm()->one();
 
 		// Select tag option "OR" and exact "Equals" tag value match
 		$this->zbxTestClickXpath('//label[@for="evaltype_20"]');
@@ -405,8 +408,9 @@ class testPageProblems extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
-		$this->zbxTestClickButtonText('Reset');
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
+		$this->zbxTestClickButtonText('Reset');
+		$form->waitUntilReloaded();
 
 		// Select host group
 		$this->zbxTestClickButtonMultiselect('groupids_0');
@@ -451,9 +455,10 @@ class testPageProblems extends CLegacyWebTest {
 	public function testPageProblems_ShowTags() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
-		$this->zbxTestClickButtonText('Reset');
 		$form = $this->query('id:tabfilter_0')->asForm()->one()->waitUntilVisible();
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
+		$this->zbxTestClickButtonText('Reset');
+		$result_form->waitUntilReloaded();
 
 		// Check Show tags NONE
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('service');
@@ -609,7 +614,9 @@ class testPageProblems extends CLegacyWebTest {
 	 */
 	public function testPageProblems_TagPriority($data) {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
+		$table = $this->query('xpath://form[@name="problem"]')->one();
 		$this->zbxTestClickButtonText('Reset');
+		$table->waitUntilReloaded();
 		$this->zbxTestInputType('name_0', 'trigger with tag priority');
 
 		if (array_key_exists('show_tags', $data)) {
@@ -625,7 +632,7 @@ class testPageProblems extends CLegacyWebTest {
 		}
 
 		$this->query('name:filter_apply')->one()->click();
-		$this->query('xpath://form[@name="problem"]')->one()->waitUntilReloaded();
+		$table->waitUntilReloaded();
 
 		// Check tag priority sorting.
 		if (array_key_exists('sorting', $data)) {
@@ -651,9 +658,9 @@ class testPageProblems extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
-		$this->zbxTestClickButtonText('Reset');
-		$this->page->waitUntilReady();
 		$result_form = $this->query('xpath://form[@name="problem"]')->one();
+		$this->zbxTestClickButtonText('Reset');
+		$result_form->waitUntilReloaded();
 
 		$this->zbxTestClickButtonMultiselect('hostids_0');
 		$this->zbxTestLaunchOverlayDialog('Hosts');
