@@ -348,7 +348,7 @@ out:
 	zbx_free(fullkey);
 	zbx_free(wfullkey);
 
-	return SUCCEED;
+	return ret;
 }
 
 static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result)

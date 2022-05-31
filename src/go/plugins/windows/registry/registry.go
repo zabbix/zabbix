@@ -29,9 +29,9 @@ import (
 	"regexp"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows/registry"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/zbxerr"
 )
 
 // Plugin -
@@ -73,7 +73,7 @@ func getHive(key string) (hive registry.Key, e error) {
 		return registry.PERFORMANCE_DATA, nil
 	}
 
-	return 0, errors.New("Failed to parse key.")
+	return 0, errors.New("Failed to parse registry key.")
 }
 
 func convertValue(k registry.Key, value string) (result interface{}, stype string, err error) {
@@ -200,7 +200,7 @@ func getValue(params []string) (result interface{}, err error) {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
-	if len(params) < 1 {
+	if len(params) < 1 || params[0] == "" {
 		return nil, errors.New("Registry key is not supplied.")
 	}
 
@@ -245,7 +245,7 @@ func discover(params []string) (result string, err error) {
 		return "", zbxerr.ErrorTooManyParameters
 	}
 
-	if len(params) < 1 {
+	if len(params) < 1 || params[0] == "" {
 		return "", errors.New("Registry key is not supplied.")
 	}
 
