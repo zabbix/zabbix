@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-27T08:14:14Z'
+  date: '2022-05-31T14:22:46Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -31,142 +31,6 @@ zabbix_export:
           name: Templates/SAN
       items:
         -
-          uuid: 530e20083da8423e9d30c8342f1b7da3
-          name: 'HPE Primera: Get data'
-          type: SCRIPT
-          key: hpe.primera.data
-          history: 0d
-          trends: '0'
-          value_type: TEXT
-          params: |
-            var params = JSON.parse(value),
-                fields = ['username', 'password', 'base_url'],
-                methods = ['disks', 'cpgs', 'hosts', 'ports', 'system', 'tasks', 'volumes'],
-                data = {};
-            
-            class Key {
-                constructor(key) {
-                    this.key = key;
-                }
-                getKey() {return this.key;}
-            }
-            
-            fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
-            });
-            
-            if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
-            }
-            
-            data['errors'] = {};
-            
-            function getSessionKey() {
-                var response, request = new HttpRequest();
-                request.addHeader('Content-Type: application/json');
-            
-                credentials = {'user' : params.username, 'password' : params.password};
-            
-                response = request.post(params.base_url + 'api/v1/credentials', JSON.stringify(credentials));
-            
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-                }
-            
-                if (response !== null) {
-                    try {
-                        auth_data = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse auth response received from device API. Check debug log for more information.';
-                    }
-                }
-                else {
-                    throw 'No data received by auth request'
-                }
-            
-                if ('key' in auth_data) {
-                    return auth_data;
-                } else {
-                    throw 'Auth response does not contain session key'
-                }
-            }
-            
-            try {
-                session_key = new Key(getSessionKey()['key']);
-            }
-            catch (error) {
-                data.errors.auth = error.toString();
-            }
-            
-            function getHttpData(method) {
-                request = new HttpRequest();
-                request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + session_key.getKey());
-            
-                raw_data = request.get(params.base_url + 'api/v1/' + method);
-            
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                }
-            
-                if (raw_data !== null) {
-                    if (typeof raw_data === 'object') {
-                        return raw_data;
-                    }
-                    else {
-                        throw 'Received data is not an object';
-                    }
-                }
-                else {
-                    throw 'No data received by ' + method + ' request.';
-                }
-            }
-            
-            for (var i in methods) {
-                try {
-                    data[methods[i]] = JSON.parse(getHttpData(methods[i]));
-                }
-                catch (error) {
-                    data.errors[methods[i]] = error.toString();
-                }
-            }
-            
-            try {
-                request = new HttpRequest();
-                response = request.delete(params.base_url + 'api/v1/credentials/' + sessionKey)
-            
-                if (request.getStatus() !== 200) {
-                    throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
-                }
-            }
-            catch (error) {
-                data.errors.logout = error.toString();
-            }
-            
-            if (Object.keys(data.errors).length == 0) {
-                data.errors = '';
-            }
-            
-            return JSON.stringify(data);
-          description: 'The JSON with result of WSAPI requests.'
-          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
-          parameters:
-            -
-              name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
-            -
-              name: password
-              value: '{$HPE.PRIMERA.API.PASSWORD}'
-            -
-              name: username
-              value: '{$HPE.PRIMERA.API.USERNAME}'
-          tags:
-            -
-              tag: component
-              value: raw
-        -
           uuid: d5b8a74991d34652973a78d58203d5fd
           name: 'HPE Primera: Disks total'
           type: DEPENDENT
@@ -184,7 +48,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -212,7 +76,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -228,11 +92,185 @@ zabbix_export:
               dependencies:
                 -
                   name: 'HPE Primera: Service is unavailable'
-                  expression: 'last(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"])=0'
+                  expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
               tags:
                 -
                   tag: scope
                   value: availability
+        -
+          uuid: 530e20083da8423e9d30c8342f1b7da3
+          name: 'HPE Primera: Get data'
+          type: SCRIPT
+          key: hpe.primera.get_data
+          history: 0d
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var Primera = {
+                params: {},
+                session_key: null,
+            
+                setParams: function (params) {
+                    ['username', 'password', 'base_url'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                            throw 'Required param is not set: ' + field + '.';
+                        }
+                    });
+            
+                    Primera.params = params;
+                    if (typeof Primera.params.base_url === 'string' && !Primera.params.base_url.endsWith('/')) {
+                        Primera.params.base_url += '/';
+                    }
+                },
+            
+                login: function () {
+                    if (Primera.session_key !== null) {
+                        return;
+                    }
+            
+                    var response, request = new HttpRequest();
+                    request.addHeader('Content-Type: application/json');
+            
+                    response = request.post(Primera.params.base_url + 'api/v1/credentials', JSON.stringify({
+                        'user': Primera.params.username,
+                        'password': Primera.params.password
+                    }));
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                            throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+                        }
+            
+                    if (response !== null) {
+                        try {
+                            auth_data = JSON.parse(response);
+                        }
+                        catch (error) {
+                            throw 'Failed to parse auth response received from device API.';
+                        }
+                    }
+                    else {
+                        throw 'No data received by auth request.'
+                    }
+            
+                    if ('key' in auth_data) {
+                        Primera.session_key = auth_data['key'];
+                    } else {
+                        throw 'Auth response does not contain session key.'
+                    }
+                },
+            
+                logout: function () {
+                    if (Primera.session_key !== null) {
+                        (new HttpRequest()).delete(Primera.params.base_url + 'api/v1/credentials/' + Primera.session_key);
+                    }
+                },
+            
+                requestData: function (method) {
+                    if (Primera.session_key === null) {
+                        return;
+                    }
+            
+                    request = new HttpRequest();
+                    request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + Primera.session_key);
+            
+                    raw_data = request.get(Primera.params.base_url + 'api/v1/' + method);
+            
+                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    }
+            
+                    if (raw_data !== null) {
+                        if (typeof raw_data === 'object') {
+                            return JSON.parse(raw_data);
+                        }
+                        else {
+                            throw 'Received data is not an object.';
+                        }
+                    }
+                    else {
+                        throw 'No data received by ' + method + ' request.';
+                    }
+                }
+            };
+            
+            var methods = ['disks', 'cpgs', 'hosts', 'ports', 'system', 'tasks', 'volumes'],
+                data = {};
+            
+            data['errors'] = {};
+            
+            try {
+                Primera.setParams(JSON.parse(value));
+            
+                try {
+                    Primera.login();
+                }
+                catch (error) {
+                    data.errors.auth = error.toString();
+                }
+            
+                if (!('auth' in data.errors)) {
+                    for (var i in methods) {
+                        try {
+                            if (methods[i] === 'tasks') {
+                                var result = [],
+                                    tmp_tasks = {};
+            
+                                tasks = Primera.requestData(methods[i]);
+            
+                                tasks.members.forEach(function (task) {
+                                    tmp_tasks[task.name] = task;
+                                });
+            
+                                for (var task in tmp_tasks) {
+                                    result.push(tmp_tasks[task]);
+                                }
+            
+                                data[methods[i]] = result;
+                            }
+                            else {
+                                data[methods[i]] = Primera.requestData(methods[i]);
+                            }
+                        }
+                        catch (error) {
+                            data.errors[methods[i]] = error.toString();
+                        }
+                    }
+                }
+            }
+            catch (error) {
+                data.errors.params = error.toString();
+            }
+            
+            Primera.logout();
+            
+            if (Object.keys(data.errors).length !== 0) {
+                errors = 'Failed to receive data for the following methods:';
+                for (var error in data.errors) {
+                    errors += '\n' + error + ' : ' + data.errors[error];
+                }
+                data.errors = errors;
+            }
+            else {
+                data.errors = '';
+            }
+            
+            return JSON.stringify(data);
+          description: 'The JSON with result of WSAPI requests.'
+          timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
+          parameters:
+            -
+              name: base_url
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
+            -
+              name: password
+              value: '{$HPE.PRIMERA.API.PASSWORD}'
+            -
+              name: username
+              value: '{$HPE.PRIMERA.API.USERNAME}'
+          tags:
+            -
+              tag: component
+              value: raw
         -
           uuid: efc450d0682c4c5d93df41d05c10eceb
           name: 'HPE Primera: Capacity allocated'
@@ -256,7 +294,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -287,7 +325,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -318,7 +356,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -349,7 +387,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -380,7 +418,7 @@ zabbix_export:
               parameters:
                 - '1048576'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -410,7 +448,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -437,7 +475,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -463,7 +501,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -489,7 +527,7 @@ zabbix_export:
               parameters:
                 - 6h
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -512,7 +550,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -535,7 +573,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -561,7 +599,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -586,7 +624,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           tags:
             -
               tag: component
@@ -615,7 +653,7 @@ zabbix_export:
           triggers:
             -
               uuid: 8e7aa46322c643878e509461dbb9169d
-              expression: 'last(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"])=0'
+              expression: 'max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"],5m)=0'
               name: 'HPE Primera: Service is unavailable'
               priority: HIGH
               manual_close: 'YES'
@@ -662,7 +700,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -696,7 +734,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -730,7 +768,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -761,7 +799,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -795,7 +833,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -829,7 +867,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -863,7 +901,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -897,7 +935,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -931,7 +969,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -965,7 +1003,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -999,7 +1037,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1033,7 +1071,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1067,7 +1105,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1101,7 +1139,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1135,7 +1173,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1169,7 +1207,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1203,7 +1241,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1237,7 +1275,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1271,7 +1309,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1333,7 +1371,7 @@ zabbix_export:
                   parameters:
                     - '$.cpgs.members[?(@.id == "{#ID}")].degradedStates.first()'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1399,7 +1437,7 @@ zabbix_export:
                   parameters:
                     - 'return JSON.stringify(JSON.parse(value));'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1432,7 +1470,7 @@ zabbix_export:
                   parameters:
                     - '$.cpgs.members[?(@.id == "{#ID}")].state.first()'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1490,7 +1528,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1519,7 +1557,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1676,7 +1714,7 @@ zabbix_export:
                     host: 'HPE Primera by HTTP'
                     key: 'hpe.primera.cpg.space.usr["{#ID}",raw_used]'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -1724,7 +1762,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1755,7 +1793,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1791,7 +1829,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1838,7 +1876,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1885,7 +1923,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1932,7 +1970,7 @@ zabbix_export:
                   parameters:
                     - ''
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -1974,7 +2012,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2005,7 +2043,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2036,7 +2074,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2067,7 +2105,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2107,7 +2145,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2181,7 +2219,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2193,7 +2231,7 @@ zabbix_export:
                   tag: disk
                   value: '{#POSITION}'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -2246,7 +2284,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2275,7 +2313,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2304,7 +2342,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2333,7 +2371,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2362,7 +2400,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2391,7 +2429,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2400,7 +2438,7 @@ zabbix_export:
                   tag: host
                   value: '{#NAME}'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -2463,7 +2501,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2515,7 +2553,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2564,7 +2602,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2631,7 +2669,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2640,7 +2678,7 @@ zabbix_export:
                   tag: port
                   value: '{#NODE}:{#SLOT}:{#CARD.PORT}'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           lld_macro_paths:
             -
               lld_macro: '{#CARD.PORT}'
@@ -2706,7 +2744,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.tasks.members[?(@.id == "{#ID}")].finishTime.first()'
+                    - '$.tasks[?(@.id == "{#ID}")].finishTime.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2724,7 +2762,7 @@ zabbix_export:
                       
                       return Date.parse(raw_date[0] + 'T' + raw_date[1] + raw_date[2] + ':00')/1000;
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2745,7 +2783,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.tasks.members[?(@.id == "{#ID}")].startTime.first()'
+                    - '$.tasks[?(@.id == "{#ID}")].startTime.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -2758,7 +2796,7 @@ zabbix_export:
                       
                       return Date.parse(raw_date[0] + 'T' + raw_date[1] + raw_date[2] + ':00')/1000;
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2786,13 +2824,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.tasks.members[?(@.id == "{#ID}")].status.first()'
+                    - '$.tasks[?(@.id == "{#ID}")].status.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 10m
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2880,13 +2918,13 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.tasks.members[?(@.id == "{#ID}")].type.first()'
+                    - '$.tasks[?(@.id == "{#ID}")].type.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -2895,7 +2933,7 @@ zabbix_export:
                   tag: task
                   value: '{#NAME}'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
@@ -2910,25 +2948,7 @@ zabbix_export:
             -
               type: JSONPATH
               parameters:
-                - $.tasks.members
-            -
-              type: JAVASCRIPT
-              parameters:
-                - |
-                  var result = [],
-                      tmp_tasks = {};
-                  
-                  tasks = JSON.parse(value);
-                  
-                  tasks.forEach(function (task) {
-                      tmp_tasks[task.name] = task;
-                  });
-                  
-                  for (var task in tmp_tasks) {
-                      result.push(tmp_tasks[task])
-                  };
-                  
-                  return JSON.stringify(result);
+                - $.tasks
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2973,7 +2993,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3004,7 +3024,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3035,7 +3055,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3066,7 +3086,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3097,7 +3117,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3131,7 +3151,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3165,7 +3185,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3199,7 +3219,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3233,7 +3253,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3267,7 +3287,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3301,7 +3321,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3335,7 +3355,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3369,7 +3389,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3404,7 +3424,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3439,7 +3459,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3470,7 +3490,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3504,7 +3524,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3538,7 +3558,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3572,7 +3592,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3606,7 +3626,7 @@ zabbix_export:
                   parameters:
                     - '1048576'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3643,7 +3663,7 @@ zabbix_export:
                   parameters:
                     - 6h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3680,7 +3700,7 @@ zabbix_export:
                   parameters:
                     - 6h
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3742,7 +3762,7 @@ zabbix_export:
                   parameters:
                     - '$.volumes.members[?(@.id == "{#ID}")].degradedStates.first()'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3808,7 +3828,7 @@ zabbix_export:
                   parameters:
                     - 'return JSON.stringify(JSON.parse(value));'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3841,7 +3861,7 @@ zabbix_export:
                   parameters:
                     - '$.volumes.members[?(@.id == "{#ID}")].state.first()'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -3908,7 +3928,7 @@ zabbix_export:
                   parameters:
                     - '$.volumes.members[?(@.id == "{#ID}")].rcopyStatus.first()'
               master_item:
-                key: hpe.primera.data
+                key: hpe.primera.get_data
               tags:
                 -
                   tag: component
@@ -4038,7 +4058,7 @@ zabbix_export:
                     host: 'HPE Primera by HTTP'
                     key: 'hpe.primera.volume.space.user["{#ID}",used]'
           master_item:
-            key: hpe.primera.data
+            key: hpe.primera.get_data
           lld_macro_paths:
             -
               lld_macro: '{#ID}'
