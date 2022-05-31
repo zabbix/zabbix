@@ -1668,7 +1668,7 @@ int	zbx_ha_stop(char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_THREAD_ERROR == ha_pid)
+	if (ZBX_THREAD_ERROR == ha_pid || 0 != kill(ha_pid, 0))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -1688,7 +1688,8 @@ int	zbx_ha_stop(char **error)
 		ret = SUCCEED;
 	}
 out:
-	ha_pid = ZBX_THREAD_ERROR;
+	if (SUCCEED == ret)
+		ha_pid = ZBX_THREAD_ERROR;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1702,9 +1703,11 @@ out:
  ******************************************************************************/
 void	zbx_ha_kill(void)
 {
-	kill(ha_pid, SIGKILL);
-	zbx_thread_wait(ha_pid);
-	ha_pid = ZBX_THREAD_ERROR;
+	if (ZBX_THREAD_ERROR != ha_pid) {
+		kill(ha_pid, SIGKILL);
+		zbx_thread_wait(ha_pid);
+		ha_pid = ZBX_THREAD_ERROR;
+	}
 }
 
 /******************************************************************************
