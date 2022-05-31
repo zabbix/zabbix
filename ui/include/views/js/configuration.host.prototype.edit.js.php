@@ -48,6 +48,14 @@
 			return;
 		}
 	}
+
+	jQuery(function($) {
+		$('#host')
+			.on('input keydown paste', function () {
+				$('#name').attr('placeholder', $(this).val());
+			})
+			.trigger('input');
+	});
 </script>
 
 <script type="text/javascript">
