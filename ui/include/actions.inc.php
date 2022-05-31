@@ -1792,7 +1792,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 
 	return $total
 		? makeActionIcon([
-			'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
+			'icon' => array_key_exists('suppress_until', $data['suppress_until'][$total-1])
 				? ZBX_STYLE_ICON_INVISIBLE
 				: ZBX_STYLE_ICON_VISIBLE,
 			'button' => true,
@@ -2208,21 +2208,25 @@ function makeActionTableIcon(array $action) {
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
-				$suppress_until = $action['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE
-					? _s('Indefinitely')
-					: ($action['suppress_until'] < strtotime('tomorrow') && $action['suppress_until'] > time()
+				if ($action['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
+					$suppress_until = _s('Indefinitely');
+				}
+				else {
+					$suppress_until = $action['suppress_until'] < strtotime('tomorrow')
+					&& $action['suppress_until'] > time()
 						? zbx_date2str(TIME_FORMAT, $action['suppress_until'])
-						: zbx_date2str(DATE_TIME_FORMAT, $action['suppress_until']));
+						: zbx_date2str(DATE_TIME_FORMAT, $action['suppress_until']);
+				}
 
 				$action_icons[] = makeActionIcon([
 					'icon' => ZBX_STYLE_ICON_INVISIBLE,
 					'button' => true,
-					'hint' => 'Suppressed till: '.$suppress_until
+					'hint' => _s('Suppressed till: %1$s', $suppress_until)
 				]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ICON_VISIBLE, 'title' => 'Unsuppressed']);
+				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ICON_VISIBLE, 'title' => _('Unsuppressed')]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
