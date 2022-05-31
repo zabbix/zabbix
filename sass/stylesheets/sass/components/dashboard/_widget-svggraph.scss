@@ -104,7 +104,15 @@ form.dashboard-grid-widget-svggraph {
 					.table-col-action {
 						display: none;
 					}
+
+					.single-item-table-row td {
+						padding: 0px 5px 5px 0;
+					}
 				}
+			}
+
+			.items-list {
+				padding-left: 0;
 			}
 		}
 	}
@@ -114,5 +122,9 @@ form.dashboard-grid-widget-svggraph {
 		.table-col-no { width: 20px; }
 		.table-col-color { width: 24px; }
 		.table-col-action { width: 55px; }
+
+		.single-item-table-row td {
+			padding: 0px 5px 0 0;
+		}
 	}
 }

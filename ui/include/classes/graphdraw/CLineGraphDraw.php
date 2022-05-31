@@ -1266,8 +1266,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->shiftY,
 				$x2 - 1, // -1 border
 				$this->sizeY + $this->shiftY,
-				0
-//				$this->getColor($this->graphtheme['graphcolor'], 0)
+				$this->getColor($this->graphtheme['graphcolor'], 0)
 			);
 
 			$start = find_period_start($periods, $end);
