@@ -777,11 +777,21 @@ sub open_function($)
 	return $out;
 }
 
-sub close_function()
+sub close_function($)
 {
-	my $out;
+	my $type = shift;
+	my ($out, $ret_row);
+	
+	if ($type eq "delete")
+	{
+		$ret_row = "old";
+	}
+	else
+	{
+		$ret_row = "new";
+	}
 
-	$out = "return new;${eol}\n";
+	$out = "return ${ret_row};${eol}\n";
 	$out .= "end;${eol}\n";
 	$out .= "\$\$ language plpgsql;${eol}\n";
 
@@ -827,19 +837,19 @@ sub process_changelog($)
 	{
 		$triggers .= open_function('insert');
 		$triggers .= "values (${table_type},new.${pkey_name},1,${unix_timestamp});${eol}\n";
-		$triggers .= close_function();
+		$triggers .= close_function('insert');
 		$triggers .= open_trigger('insert');
 		$triggers .= close_trigger();
 
 		$triggers .= open_function('update');
 		$triggers .= "values (${table_type},old.${pkey_name},2,${unix_timestamp});${eol}\n";
-		$triggers .= close_function();
+		$triggers .= close_function('update');
 		$triggers .= open_trigger('update');
 		$triggers .= close_trigger();
 
 		$triggers .= open_function('delete');
 		$triggers .= "values (${table_type},old.${pkey_name},3,${unix_timestamp});${eol}\n";
-		$triggers .= close_function();
+		$triggers .= close_function('delete');
 		$triggers .= open_trigger('delete');
 		$triggers .= close_trigger();
 	}
