@@ -59,7 +59,6 @@ class CSvgGraph extends CSvg {
 	 */
 	private $paths = [];
 
-	private $show_simple_triggers;
 	private $show_working_time;
 	private $show_percentile_left;
 	private $percentile_left_value;
@@ -146,7 +145,6 @@ class CSvgGraph extends CSvg {
 
 		$this->graph_theme = getUserGraphTheme();
 
-		$this->show_simple_triggers = $options['displaying']['show_simple_triggers'];
 		$this->show_working_time = $options['displaying']['show_working_time'];
 		$this->show_percentile_left = $options['displaying']['show_percentile_left'];
 		$this->percentile_left_value = $options['displaying']['percentile_left_value'];
