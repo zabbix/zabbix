@@ -272,7 +272,7 @@ class CScreenProblem extends CScreenBase {
 				$triggerids = [];
 
 				if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
-					self::addSuppressedByNames($problems);
+					self::addSuppressionNames($problems);
 				}
 
 				foreach ($problems as $problem) {
@@ -361,7 +361,7 @@ class CScreenProblem extends CScreenBase {
 	 *
 	 * @static
 	 */
-	public static function addSuppressedByNames(array &$problems) {
+	public static function addSuppressionNames(array &$problems) {
 		$maintenanceids = [];
 		$userids = [];
 
@@ -385,7 +385,7 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($userids) {
-			$user = API::User()->get([
+			$users = API::User()->get([
 				'output' => ['username', 'name', 'surname'],
 				'userids' => $userids,
 				'preservekeys' => true
@@ -396,18 +396,15 @@ class CScreenProblem extends CScreenBase {
 			foreach ($problem['suppression_data'] as &$data) {
 				if ($data['maintenanceid'] != 0) {
 					$data['maintenance_name'] = $maintenances[$data['maintenanceid']]['name'];
-
 				}
-				elseif ($data['userid'] != 0) {
-					$data['username'] = getUserFullname($user[$data['userid']]);
-
+				elseif ($data['userid'] != 0 && array_key_exists($data['userid'], $users)) {
+					$data['username'] = getUserFullname($users[$data['userid']]);
 				}
 				else {
-					$data['username'] = 'Inaccessible user';
-
+					$data['username'] = _('Inaccessible user');
 				}
-				unset($data);
 			}
+			unset($data);
 		}
 		unset($problem);
 	}
