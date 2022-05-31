@@ -124,7 +124,7 @@
 		var $show_inherited_macros = $('input[name="show_inherited_macros"]'),
 			linked_templateids = <?= json_encode($data['macros_tab']['linked_templates']) ?>;
 
-		$('#host')
+		$('#template_name')
 			.on('input keydown paste', function() {
 				$('#visiblename').attr('placeholder', $(this).val());
 			})
