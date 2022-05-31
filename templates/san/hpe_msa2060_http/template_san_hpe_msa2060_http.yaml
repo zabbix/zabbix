@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-31T09:41:39Z'
+  date: '2022-05-31T14:53:27Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -62,7 +62,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'Service is down or unavailable'
-                  expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}"],5m)=0'
+                  expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0'
               tags:
                 -
                   tag: scope
@@ -414,7 +414,7 @@ zabbix_export:
           uuid: 3831060089ff497993088472e922df38
           name: 'HPE MSA: Service ping'
           type: SIMPLE
-          key: 'net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}"]'
+          key: 'net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"]'
           history: 7d
           description: 'Check if HTTP/HTTPS service accepts TCP connections.'
           preprocessing:
@@ -432,7 +432,7 @@ zabbix_export:
           triggers:
             -
               uuid: 9c1bf26f95d946f386bbf613d3d55779
-              expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}"],5m)=0'
+              expression: 'max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{HOST.CONN}","{$HPE.MSA.API.PORT}"],5m)=0'
               name: 'Service is down or unavailable'
               priority: HIGH
               description: 'HTTP/HTTPS service is down or unable to establish TCP connection.'
