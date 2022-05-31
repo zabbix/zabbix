@@ -143,6 +143,8 @@ window.widget_svggraph_form = new class {
 			}
 		});
 
+		this.initSingleItemSortable();
+
 		document
 			.getElementById('dataset-add')
 			.addEventListener('click', () => this._addDataset(1));
@@ -538,7 +540,6 @@ window.widget_svggraph_form = new class {
 			jQuery('.single-item-table[data-set=' + dataset_number + '] .<?= ZBX_STYLE_DRAG_ICON ?>')
 				.removeClass("disabled");
 		}
-
 
 		jQuery('.single-item-table[data-set='+dataset_number+']').sortable({
 			disabled: jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row').length < 2,
