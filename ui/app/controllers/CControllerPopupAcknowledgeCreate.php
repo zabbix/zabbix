@@ -282,7 +282,8 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		// Select details for all affected events.
 		$events = API::Event()->get([
 			'output' => ['eventid', 'objectid', 'acknowledged', 'r_eventid'],
-			'select_acknowledges' => $this->close_problems ? ['action'] : null,
+			'select_acknowledges' => $this->close_problems || $this->suppress || $this->unsuppress ? ['action'] : null,
+			'selectSuppressionData' => $this->unsuppress ? ['maintenanceid'] : null,
 			'eventids' => $eventids,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -348,10 +349,10 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			if ($this->unacknowledge && $event['acknowledged'] == EVENT_ACKNOWLEDGED) {
 				$eventid_groups['unacknowledgeable'][] = $event['eventid'];
 			}
-			if ($this->suppress) {
+			if ($this->suppress && !$this->isEventClosed($event)) {
 				$eventid_groups['suppressible'][] = $event['eventid'];
 			}
-			if ($this->unsuppress) {
+			if ($this->unsuppress && !$this->isEventClosed($event) && $this->isEventSuppressed($event)) {
 				$eventid_groups['unsuppressible'][] = $event['eventid'];
 			}
 
@@ -387,6 +388,51 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Checks if event are closed.
+	 *
+	 * @param array $event                              Event object.
+	 * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
+	 * @param array $event['acknowledges']              List of problem updates.
+	 * @param array $event['acknowledges'][]['action']  Action performed in update.
+	 *
+	 * @return bool
+	 */
+	protected function isEventClosed(array $event) {
+		if (bccomp($event['r_eventid'], '0') == 1) {
+			return true;
+		}
+		else {
+			foreach ($event['acknowledges'] as $acknowledge) {
+				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+					// If at least one manual close update was found, event is closing.
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if event is manually suppressed.
+	 *
+	 * @param array $event                                         Event object.
+	 * @param array $event['suppression_data']                     List of problem suppression data.
+	 * @param array $event['suppression_data'][]['maintenanceid']  Problem maintenanceid.
+	 *
+	 * @return bool
+	 */
+	protected function isEventSuppressed(array $event) {
+		foreach ($event['suppression_data'] as $suppression) {
+			if($suppression['maintenanceid'] == 0) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
