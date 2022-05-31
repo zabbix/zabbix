@@ -20,17 +20,16 @@
 #include "proxy.h"
 
 #include "cfg.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 #include "sysinfo.h"
 #include "zbxmodules.h"
 
 #include "zbxnix.h"
-#include "daemon.h"
 #include "zbxself.h"
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
@@ -50,12 +49,17 @@
 #include "../zabbix_server/vmware/vmware.h"
 #include "setproctitle.h"
 #include "zbxcrypto.h"
+#include "zbxcomms.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
-#include "../zabbix_server/availability/avail_manager.h"
-#include "zbxvault.h"
-#include "sighandler.h"
+#include "zbxavailability.h"
+#include "../libs/zbxvault/vault.h"
+#include "zbxdiag.h"
+#include "diag/diag_proxy.h"
 #include "zbxrtc.h"
+#include "../zabbix_server/availability/avail_manager.h"
+#include "zbxserver.h"
+#include "stats/zabbix_stats.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -141,6 +145,7 @@ static char	shortopts[] = "c:hVR:f";
 int		threads_num = 0;
 pid_t		*threads = NULL;
 static int	*threads_flags;
+static char	*CONFIG_PID_FILE = NULL;
 
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_PROXY_ACTIVE;
 
@@ -194,7 +199,8 @@ int	CONFIG_PROXY_OFFLINE_BUFFER	= 1;
 
 int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 
-int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_HOUR;
+/* how often active Zabbix proxy requests configuration data from server, in seconds */
+int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;
 
 int	CONFIG_HISTSYNCER_FORKS		= 4;
@@ -210,7 +216,6 @@ zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 0;
-zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE;
@@ -229,8 +234,11 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
-char	*CONFIG_VAULTTOKEN		= NULL;
+char	*CONFIG_VAULT			= NULL;
 char	*CONFIG_VAULTURL		= NULL;
+char	*CONFIG_VAULTTOKEN		= NULL;
+char	*CONFIG_VAULTTLSCERTFILE	= NULL;
+char	*CONFIG_VAULTTLSKEYFILE		= NULL;
 char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
@@ -464,9 +472,9 @@ static void	zbx_set_defaults(void)
 		{
 			assert(*value);
 
-			if (MAX_ZBX_HOSTNAME_LEN < strlen(*value))
+			if (ZBX_MAX_HOSTNAME_LEN < strlen(*value))
 			{
-				(*value)[MAX_ZBX_HOSTNAME_LEN] = '\0';
+				(*value)[ZBX_MAX_HOSTNAME_LEN] = '\0';
 				zabbix_log(LOG_LEVEL_WARNING, "proxy name truncated to [%s])", *value);
 			}
 
@@ -614,6 +622,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("SSLCALocation", CONFIG_SSL_CA_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", CONFIG_SSL_CERT_LOCATION, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", CONFIG_SSL_KEY_LOCATION, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("Vault", CONFIG_VAULT, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("VaultToken", CONFIG_VAULTTOKEN, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("VaultDBPath", CONFIG_VAULTDBPATH, "cURL library"));
 #endif
@@ -783,6 +792,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"Vault",			&CONFIG_VAULT,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultTLSCertFile",		&CONFIG_VAULTTLSCERTFILE,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultTLSKeyFile",		&CONFIG_VAULTTLSKEYFILE,		TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{"VaultURL",			&CONFIG_VAULTURL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
@@ -927,6 +942,60 @@ static void	zbx_free_config(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: callback function for providing PID file path to libraries        *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*get_pid_file_path(void)
+{
+	return CONFIG_PID_FILE;
+}
+
+static void	zbx_on_exit(int ret)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+
+	if (NULL != threads)
+	{
+		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */
+		zbx_free(threads);
+		zbx_free(threads_flags);
+	}
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+	zbx_locks_disable();
+#endif
+	free_metrics();
+	zbx_ipc_service_free_env();
+
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+	free_database_cache(ZBX_SYNC_ALL);
+	free_configuration_cache();
+	DBclose();
+
+	DBdeinit();
+
+	/* free vmware support */
+	zbx_vmware_destroy();
+
+	free_selfmon_collector();
+	free_proxy_history_lock();
+
+	zbx_unload_modules();
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_close_log();
+
+	zbx_locks_destroy();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
+	exit(EXIT_SUCCESS);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: executes proxy processes                                          *
  *                                                                            *
  ******************************************************************************/
@@ -936,13 +1005,19 @@ int	main(int argc, char **argv)
 	char		ch;
 	int		opt_c = 0, opt_r = 0;
 
+	/* see description of 'optarg' in 'man 3 getopt' */
+	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
+	int		zbx_optind = 0;
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		switch (ch)
 		{
@@ -957,18 +1032,22 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -1026,7 +1105,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 }
 
 static void	zbx_check_db(void)
@@ -1217,14 +1296,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init_token_from_env(&error))
+	if (SUCCEED != zbx_vault_token_from_env_get(&CONFIG_VAULTTOKEN, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init_db_credentials(&error))
+	if (SUCCEED != zbx_vault_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_vault_db_credentials_get(&CONFIG_DBUSER, &CONFIG_DBPASSWORD, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);
@@ -1286,6 +1372,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_tls_init_parent();
 #endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
+
+	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
+	zbx_diag_init(diag_add_section_info);
 
 	for (i = 0; i < threads_num; i++)
 	{
@@ -1408,14 +1497,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
-			sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_set_exiting_with_fail();
 			break;
 		}
 
 		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_set_exiting_with_fail();
 			break;
 		}
 	}
@@ -1426,49 +1515,4 @@ out:
 	zbx_on_exit(ZBX_EXIT_STATUS());
 
 	return SUCCEED;
-}
-
-void	zbx_on_exit(int ret)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
-
-	if (NULL != threads)
-	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
-		zbx_free(threads);
-		zbx_free(threads_flags);
-	}
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-	zbx_locks_disable();
-#endif
-	free_metrics();
-	zbx_ipc_service_free_env();
-
-	DBconnect(ZBX_DB_CONNECT_EXIT);
-	free_database_cache(ZBX_SYNC_ALL);
-	free_configuration_cache();
-	DBclose();
-
-	DBdeinit();
-
-	/* free vmware support */
-	zbx_vmware_destroy();
-
-	free_selfmon_collector();
-	free_proxy_history_lock();
-
-	zbx_unload_modules();
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
-
-	zabbix_close_log();
-
-	zbx_locks_destroy();
-
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
-
-	exit(EXIT_SUCCESS);
 }

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
@@ -139,7 +140,7 @@ $filter = (new CFilter())
 	->setResetUrl((new CUrl('triggers.php'))->setArgument('context', $data['context']))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addvar('context', $data['context'])
+	->addvar('context', $data['context'], 'filter_context')
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $widget = (new CWidget())
@@ -148,21 +149,25 @@ $widget = (new CWidget())
 		? CDocHelper::CONFIGURATION_HOST_TRIGGERS_LIST
 		: CDocHelper::CONFIGURATION_TEMPLATE_TRIGGERS_LIST
 	))
-	->setControls(new CList([
-		(new CTag('nav', true, ($data['single_selected_hostid'] != 0)
-			? new CRedirectButton(_('Create trigger'), (new CUrl('triggers.php'))
-				->setArgument('hostid', $data['single_selected_hostid'])
-				->setArgument('form', 'create')
-				->setArgument('context', $data['context'])
-				->getUrl()
-			)
-			: (new CButton('form',
-				($data['context'] === 'host')
-					? _('Create trigger (select host first)')
-					: _('Create trigger (select template first)')
-			))->setEnabled(false)
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					$data['single_selected_hostid'] != 0
+						? new CRedirectButton(_('Create trigger'),
+							(new CUrl('triggers.php'))
+								->setArgument('hostid', $data['single_selected_hostid'])
+								->setArgument('form', 'create')
+								->setArgument('context', $data['context'])
+						)
+						: (new CButton('form',
+							$data['context'] === 'host'
+								? _('Create trigger (select host first)')
+								: _('Create trigger (select template first)')
+						))->setEnabled(false)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
-	]));
+	);
 
 if ($data['single_selected_hostid'] != 0) {
 	$widget->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
@@ -178,7 +183,7 @@ $url = (new CUrl('triggers.php'))
 $triggers_form = (new CForm('post', $url))
 	->setName('triggersForm')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], 'form_context');
 
 // create table
 $triggers_table = (new CTableInfo())->setHeader([

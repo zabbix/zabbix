@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -126,6 +126,7 @@ class CMacroValue extends CInput {
 		if ($value_type == ZBX_MACRO_TYPE_TEXT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_TEXT;
 			$dropdown_btn_class = ZBX_STYLE_ICON_TEXT;
+
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
@@ -134,14 +135,16 @@ class CMacroValue extends CInput {
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
 			$dropdown_btn_class = ZBX_STYLE_ICON_SECRET_TEXT;
+
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
-				->setAttribute('placeholder', _('path/to/secret:key'))
+				->setAttribute('placeholder', _('value'))
 				->setReadonly($readonly);
 		}
 		else {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
 			$dropdown_btn_class = ZBX_STYLE_ICON_INVISIBLE;
+
 			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
 				->setAttribute('maxlength', $this->maxlength)
 				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)

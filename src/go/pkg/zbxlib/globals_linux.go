@@ -27,7 +27,8 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcomms/libzbxcomms.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcommon/libzbxcommon.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxcrypto/libzbxcrypto.a
-#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxsys/libzbxsys.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxthreads/libzbxthreads.a
+#cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxmutexs/libzbxmutexs.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxnix/libzbxnix.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxconf/libzbxconf.a
 #cgo LDFLAGS: ${SRCDIR}/../../../libs/zbxhttp/libzbxhttp.a
@@ -98,10 +99,6 @@ const char	*help_message[] = {};
 
 ZBX_METRIC	parameters_agent[] = {NULL};
 ZBX_METRIC	parameters_specific[] = {NULL};
-
-void zbx_on_exit(int ret)
-{
-}
 
 int	zbx_procstat_collector_started(void)
 {

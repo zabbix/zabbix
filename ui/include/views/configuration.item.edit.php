@@ -609,6 +609,15 @@ if ($data['display_interfaces']) {
 					->setId('js-item-interface-field')
 			]);
 		}
+		else {
+			$item_tab->addItem([
+				(new CLabel(_('Host interface'), 'interface'))->setId('js-item-interface-label'),
+				(new CFormField(
+					(new CTextBox('interface', interfaceType2str(INTERFACE_TYPE_OPT), true))
+						->setAttribute('disabled', 'disabled')
+				))->setId('js-item-interface-field')
+			]);
+		}
 	}
 	else {
 		$select_interface = getInterfaceSelect($data['interfaces'])
@@ -617,6 +626,10 @@ if ($data['display_interfaces']) {
 			->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
+
+		if ($readonly) {
+			$select_interface->setAttribute('readonly', 'readonly');
+		}
 
 		$item_tab->addItem([
 			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
@@ -1056,11 +1069,12 @@ if ($data['itemid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Execute now')))
+		$buttons[] = (new CSimpleButton(_('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
-			);
+			)
+			->onClick('view.checkNow(this);');
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');

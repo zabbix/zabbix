@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,44 +17,35 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.dashboard_share_edit_popup = {
-	user_group_row_template: null,
-	user_row_template: null,
+
+window.dashboard_share_edit_popup = new class {
 
 	init({dashboard, user_group_row_template, user_row_template}) {
 		this.user_group_row_template = new Template(user_group_row_template);
 		this.user_row_template = new Template(user_row_template);
 
-		this.addPopupValues({'object': 'private', 'values': [dashboard.private]});
-		this.addPopupValues({'object': 'userid', 'values': dashboard.users});
-		this.addPopupValues({'object': 'usrgrpid', 'values': dashboard.userGroups});
+		this._addPopupValues({'object': 'private', 'values': [dashboard.private]});
+		this._addPopupValues({'object': 'userid', 'values': dashboard.users});
+		this._addPopupValues({'object': 'usrgrpid', 'values': dashboard.userGroups});
 
 		/**
 		* @see init.js add.popup event
 		*/
 		window.addPopupValues = (list) => {
-			this.addPopupValues(list);
+			this._addPopupValues(list);
 		};
-	},
+	}
 
 	submit() {
-		clearMessages();
-
 		const overlay = overlays_stack.getById('dashboard_share_edit');
 		const form = overlay.$dialogue.$body[0].querySelector('form');
 
-		const curl = new Curl('zabbix.php', false);
-
-		curl.setArgument('action', 'dashboard.share.update');
-
 		overlay.setLoading();
+
+		const curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', 'dashboard.share.update');
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
@@ -63,31 +54,43 @@ window.dashboard_share_edit_popup = {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				clearMessages();
+
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
-				overlay.unsetLoading();
-
-				addMessage(response.messages);
 				overlayDialogueDestroy(overlay.dialogueid);
-			})
-			.catch((error) => {
-				overlay.unsetLoading();
 
-				for (const el of form.parentNode.children) {
-					if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-						el.parentNode.removeChild(el);
+				const message_box = makeMessageBox('good', response.success.messages, response.success.title);
+
+				addMessage(message_box);
+			})
+			.catch((exception) => {
+				for (const element of form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
 					}
 				}
 
-				const message_box = (typeof error === 'object' && 'html_string' in error)
-					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Failed to update dashboard sharing.'), true, false)[0];
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Failed to update dashboard sharing.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				form.parentNode.insertBefore(message_box, form);
+			})
+			.finally(() => {
+				overlay.unsetLoading();
 			});
-	},
+	}
 
 	removeUserGroupShares(usrgrpid) {
 		const element = document.getElementById(`user-group-shares-${usrgrpid}`);
@@ -95,7 +98,7 @@ window.dashboard_share_edit_popup = {
 		if (element !== null) {
 			element.remove();
 		}
-	},
+	}
 
 	removeUserShares(userid) {
 		const element = document.getElementById(`user-shares-${userid}`);
@@ -103,9 +106,9 @@ window.dashboard_share_edit_popup = {
 		if (element !== null) {
 			element.remove();
 		}
-	},
+	}
 
-	addPopupValues(list) {
+	_addPopupValues(list) {
 		for (let i = 0; i < list.values.length; i++) {
 			const value = list.values[i];
 

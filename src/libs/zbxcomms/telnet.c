@@ -17,10 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "telnet.h"
+#include "zbxcomms.h"
+#include "comms.h"
 
 #include "common.h"
 #include "log.h"
+
+#define WAIT_READ	0
+#define WAIT_WRITE	1
+
+#define CMD_IAC		255
+#define CMD_WILL	251
+#define CMD_WONT	252
+#define CMD_DO		253
+#define CMD_DONT	254
+#define OPT_SGA		3
 
 static char	prompt_char = '\0';
 
@@ -125,6 +136,9 @@ static ssize_t	telnet_socket_write(ZBX_SOCKET socket_fd, const void *buf, size_t
 	return rc;
 }
 
+#undef WAIT_READ
+#undef WAIT_WRITE
+
 static ssize_t	telnet_read(ZBX_SOCKET socket_fd, char *buf, size_t *buf_left, size_t *buf_offset)
 {
 	unsigned char	c, c1, c2, c3;
@@ -207,6 +221,13 @@ end:
 
 	return rc;
 }
+
+#undef CMD_IAC
+#undef CMD_WILL
+#undef CMD_WONT
+#undef CMD_DO
+#undef CMD_DONT
+#undef OPT_SGA
 
 /******************************************************************************
  *                                                                            *
@@ -305,7 +326,7 @@ static void	telnet_rm_prompt(const char *buf, size_t *offset)
 	}
 }
 
-int	telnet_test_login(ZBX_SOCKET socket_fd)
+int	zbx_telnet_test_login(ZBX_SOCKET socket_fd)
 {
 	char	buf[MAX_BUFFER_LEN];
 	size_t	sz, offset;
@@ -332,7 +353,7 @@ int	telnet_test_login(ZBX_SOCKET socket_fd)
 	return ret;
 }
 
-int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result)
+int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result)
 {
 	char	buf[MAX_BUFFER_LEN], c;
 	size_t	sz, offset;
@@ -407,7 +428,7 @@ fail:
 	return ret;
 }
 
-int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding)
+int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding)
 {
 	char	buf[MAX_BUFFER_LEN];
 	size_t	sz, offset;
@@ -433,6 +454,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 
 	sz = sizeof(buf);
 	offset = 0;
+
 	while (ZBX_PROTO_ERROR != (rc = telnet_read(socket_fd, buf, &sz, &offset)))
 	{
 		if (prompt_char == telnet_lastchar(buf, offset))

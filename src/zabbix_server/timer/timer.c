@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "dbcache.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
@@ -97,7 +97,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < updates->values_num; i++)
 	{
@@ -151,7 +151,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 			log_host_maintenance_update(diff);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 		DBexecute("%s", sql);
@@ -383,7 +383,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 
 		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
 				"suppress_until", NULL);
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < event_queries.values_num; i++)
 		{
@@ -480,7 +480,7 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 				goto cleanup;
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)
 		{

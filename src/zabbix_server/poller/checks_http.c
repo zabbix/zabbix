@@ -185,7 +185,8 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
-	char			url[ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *error = NULL, *headers, *line, *buffer;
+	char			url[ZBX_ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *headers, *line, *buffer,
+				*error = NULL;
 	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;

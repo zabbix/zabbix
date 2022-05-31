@@ -2793,12 +2793,25 @@ class CApiInputValidator {
 			return false;
 		}
 
+		$options = [];
+		$providers = [ZBX_VAULT_TYPE_HASHICORP, ZBX_VAULT_TYPE_CYBERARK];
+
+		if (array_key_exists('provider', $rule)) {
+			if (!in_array($rule['provider'], $providers)) {
+				$error = _s('value must be one of %1$s', implode(', ', $providers));
+				return false;
+			}
+			else {
+				$options['provider'] = $rule['provider'];
+			}
+		}
+
 		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
 			return false;
 		}
 
-		$vault_secret_parser = new CVaultSecretParser();
+		$vault_secret_parser = new CVaultSecretParser($options);
 
 		if ($vault_secret_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $vault_secret_parser->getError());

@@ -24,7 +24,8 @@
  */
 
 $output = [
-	'header' => $data['title']
+	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_HTTP_STEP_EDIT)
 ];
 
 $options = $data['options'];

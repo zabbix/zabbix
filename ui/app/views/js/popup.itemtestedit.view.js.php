@@ -191,24 +191,27 @@ function itemGetValueTest(overlay) {
 		success: function(ret) {
 			overlay.$dialogue.find('.msg-bad, .msg-good, .msg-warning').remove();
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery($body).prepend(ret.messages);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				jQuery($body).prepend(message_box);
+
+				return;
 			}
-			else {
-				<?php if ($data['show_prev']): ?>
-					if (typeof ret.prev_value !== 'undefined') {
-						jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
-						jQuery('#prev_time', $form).val(ret.prev_time);
-						jQuery('#upd_prev', $form).val(form_data['upd_last']);
-						jQuery('#upd_last', $form).val(Math.ceil(+new Date() / 1000));
-					}
-				<?php endif ?>
 
-				jQuery('#value', $form).multilineInput('value', ret.value);
-
-				if (typeof ret.eol !== 'undefined') {
-					jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
+			<?php if ($data['show_prev']): ?>
+				if (typeof ret.prev_value !== 'undefined') {
+					jQuery('#prev_value', $form).multilineInput('value', ret.prev_value);
+					jQuery('#prev_time', $form).val(ret.prev_time);
+					jQuery('#upd_prev', $form).val(form_data['upd_last']);
+					jQuery('#upd_last', $form).val(Math.ceil(+new Date() / 1000));
 				}
+			<?php endif ?>
+
+			jQuery('#value', $form).multilineInput('value', ret.value);
+
+			if (typeof ret.eol !== 'undefined') {
+				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 			}
 		},
 		dataType: 'json',
@@ -279,11 +282,13 @@ function itemCompleteTest(overlay) {
 		success: function(ret) {
 			overlay.$dialogue.find('.msg-bad, .msg-good, .msg-warning').remove();
 
-			if (typeof ret.messages !== 'undefined') {
-				jQuery($body).prepend(ret.messages);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				jQuery($body).prepend(message_box);
 			}
 
-			processItemPreprocessingTestResults(ret.steps);
+			processItemPreprocessingTestResults(ret.steps ?? []);
 
 			<?php if ($data['show_prev']): ?>
 				if (typeof ret.prev_value !== 'undefined') {

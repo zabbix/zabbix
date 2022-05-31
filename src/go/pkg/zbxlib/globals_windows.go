@@ -30,12 +30,12 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/misc.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/str.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
-#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/alias.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/time.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/fatal.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/disk.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/threads.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/iprange.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/zbxhash.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/md5.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/vector.o
@@ -52,6 +52,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dns.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_alias.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/eventlog.o
 #cgo openssl LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/tls_version.o
 #cgo LDFLAGS: -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi

@@ -21,22 +21,21 @@
 
 #include "common.h"
 #include "log.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxserver.h"
 #include "events.h"
 #include "valuecache.h"
 #include "zbxmodules.h"
 #include "module.h"
-#include "export.h"
+#include "zbxexport.h"
 #include "zbxhistory.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxavailability.h"
 #include "zbxtrends.h"
-#include "../zbxalgo/vectorimpl.h"
 
-static zbx_mem_info_t	*hc_index_mem = NULL;
-static zbx_mem_info_t	*hc_mem = NULL;
-static zbx_mem_info_t	*trend_mem = NULL;
+static zbx_shmem_info_t	*hc_index_mem = NULL;
+static zbx_shmem_info_t	*hc_mem = NULL;
+static zbx_shmem_info_t	*trend_mem = NULL;
 
 #define	LOCK_CACHE	zbx_mutex_lock(cache_lock)
 #define	UNLOCK_CACHE	zbx_mutex_unlock(cache_lock)
@@ -409,7 +408,7 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 			zbx_uint128_t	avg;
 
 			/* calculate the trend average value */
-			udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
+			zbx_udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
 
 			zbx_db_insert_add_values(&db_insert, trend->itemid, trend->clock, trend->num,
 					trend->value_min.ui64, avg.lo, trend->value_max.ui64);
@@ -544,9 +543,9 @@ static void	dc_trends_update_uint(ZBX_DC_TREND *trend, DB_ROW row, int num, size
 		trend->value_max.ui64 = value_max.ui64;
 
 	/* calculate the trend average value */
-	umul64_64(&avg, num, value_avg.ui64);
-	uinc128_128(&trend->value_avg.ui64, &avg);
-	udiv128_64(&avg, &trend->value_avg.ui64, trend->num + num);
+	zbx_umul64_64(&avg, num, value_avg.ui64);
+	zbx_uinc128_128(&trend->value_avg.ui64, &avg);
+	zbx_udiv128_64(&avg, &trend->value_avg.ui64, trend->num + num);
 
 	trend->num += num;
 
@@ -591,7 +590,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 	result = DBselect("%s order by itemid,clock", sql);
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -632,7 +631,7 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -819,7 +818,7 @@ static void	DCadd_trend(const ZBX_DC_HISTORY *history, ZBX_DC_TREND **trends, in
 				trend->value_min.ui64 = history->value.ui64;
 			if (trend->num == 0 || history->value.ui64 > trend->value_max.ui64)
 				trend->value_max.ui64 = history->value.ui64;
-			uinc128_64(&trend->value_avg.ui64, history->value.ui64);
+			zbx_uinc128_64(&trend->value_avg.ui64, history->value.ui64);
 			break;
 	}
 	trend->num++;
@@ -1189,7 +1188,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_MIN, trend->value_min.ui64);
-				udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
+				zbx_udiv128_64(&avg, &trend->value_avg.ui64, trend->num);
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_AVG, avg.lo);
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_MAX, trend->value_max.ui64);
 				break;
@@ -1600,7 +1599,7 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 	if (0 != item_num)
 	{
 		DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, item_num);
-		prepare_triggers((DC_TRIGGER **)trigger_order.values, trigger_order.values_num);
+		zbx_prepare_triggers((DC_TRIGGER **)trigger_order.values, trigger_order.values_num);
 		zbx_determine_items_in_expressions(&trigger_order, itemids, item_num);
 	}
 
@@ -1612,13 +1611,13 @@ static void	recalculate_triggers(const ZBX_DC_HISTORY *history, int history_num,
 
 		if (offset != trigger_order.values_num)
 		{
-			prepare_triggers((DC_TRIGGER **)trigger_order.values + offset,
+			zbx_prepare_triggers((DC_TRIGGER **)trigger_order.values + offset,
 					trigger_order.values_num - offset);
 		}
 	}
 
 	zbx_vector_ptr_sort(&trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	evaluate_expressions(&trigger_order, history_itemids, history_items, history_errcodes);
+	zbx_evaluate_expressions(&trigger_order, history_itemids, history_items, history_errcodes);
 	zbx_process_triggers(&trigger_order, trigger_diff);
 
 	DCfree_triggers(&trigger_order);
@@ -1807,12 +1806,12 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 		case ITEM_VALUE_TYPE_STR:
 			dc_history_clean_value(hdata);
 			hdata->value.str = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_STR_VALUE_LEN)] = '\0';
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_STR_VALUE_LEN)] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			dc_history_clean_value(hdata);
 			hdata->value.str = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_TEXT_VALUE_LEN)] = '\0';
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
@@ -1822,7 +1821,7 @@ static void	dc_history_set_value(ZBX_DC_HISTORY *hdata, unsigned char value_type
 				memset(hdata->value.log, 0, sizeof(zbx_log_value_t));
 			}
 			hdata->value.log->value = value->data.str;
-			hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_LOG_VALUE_LEN)] = '\0';
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 	}
 
 	hdata->value_type = value_type;
@@ -1858,14 +1857,14 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 		switch (hdata->value_type)
 		{
 			case ITEM_VALUE_TYPE_STR:
-				hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_STR_VALUE_LEN)] = '\0';
+				hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_STR_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_TEXT:
-				hdata->value.str[zbx_db_strlen_n(hdata->value.str, HISTORY_TEXT_VALUE_LEN)] = '\0';
+				hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_TEXT_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				logvalue = hdata->value.log->value;
-				logvalue[zbx_db_strlen_n(logvalue, HISTORY_LOG_VALUE_LEN)] = '\0';
+				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 				if (FAIL == zbx_validate_value_dbl(hdata->value.dbl, CONFIG_DOUBLE_PRECISION))
@@ -1898,6 +1897,9 @@ static void	normalize_item_value(const DC_ITEM *item, ZBX_DC_HISTORY *hdata)
 			zbx_variant_set_str(&value_var, hdata->value.log->value);
 			hdata->value.log->value = NULL;
 			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return;
 	}
 
 	dc_history_set_value(hdata, item->value_type, &value_var);
@@ -2021,7 +2023,7 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 
 	if (i != item_diff->values_num || 0 != inventory_values->values_num)
 	{
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (i != item_diff->values_num)
 		{
@@ -2032,7 +2034,7 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 		if (0 != inventory_values->values_num)
 			DCadd_update_inventory_sql(&sql_offset, inventory_values);
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
@@ -2098,12 +2100,12 @@ static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
 
 		zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
 				ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
 			DBexecute("%s", sql);
@@ -2939,7 +2941,8 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 	items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
 	errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)history_num);
 
-	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
+	DCconfig_get_items_by_itemids_partial(items, itemids.values, errcodes, itemids.values_num,
+			ZBX_ITEM_GET_HOUSEKEEPING | ZBX_ITEM_GET_MISC);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -3178,6 +3181,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 		if (0 != history_num)
 		{
+			zbx_dc_um_handle_t	*um_handle;
+
 			hc_get_item_values(history, &history_items);	/* copy item data from history cache */
 
 			items = (DC_ITEM *)zbx_malloc(NULL, sizeof(DC_ITEM) * (size_t)history_num);
@@ -3192,6 +3197,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 			DCconfig_get_items_by_itemids_partial(items, itemids.values, errcodes, history_num,
 					item_retrieve_mode);
+
+			um_handle = zbx_dc_open_user_macros();
 
 			DCmass_prepare_history(history, &itemids, items, errcodes, history_num, &item_diff,
 					&inventory_values, compression_age, &proxy_subscribtions);
@@ -3223,6 +3230,8 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 				}
 				while (ZBX_DB_DOWN == txn_error);
 			}
+
+			zbx_dc_close_user_macros(um_handle);
 
 			zbx_clean_events();
 
@@ -3686,7 +3695,7 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_val
 		item_value->value.value_str.len = zbx_db_strlen_n(log->value, ZBX_HISTORY_VALUE_LEN) + 1;
 
 		if (NULL != log->source && '\0' != *log->source)
-			item_value->source.len = zbx_db_strlen_n(log->source, HISTORY_LOG_SOURCE_LEN) + 1;
+			item_value->source.len = zbx_db_strlen_n(log->source, ZBX_HISTORY_LOG_SOURCE_LEN) + 1;
 		else
 			item_value->source.len = 0;
 	}
@@ -3734,7 +3743,7 @@ static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, const zbx_tim
 		item_value->mtime = mtime;
 	}
 
-	item_value->value.value_str.len = zbx_db_strlen_n(error, ITEM_ERROR_LEN) + 1;
+	item_value->value.value_str.len = zbx_db_strlen_n(error, ZBX_ITEM_ERROR_LEN) + 1;
 	dc_string_buffer_realloc(item_value->value.value_str.len);
 	item_value->value.value_str.pvalue = string_values_offset;
 	memcpy(&string_values[string_values_offset], error, item_value->value.value_str.len);
@@ -3912,8 +3921,8 @@ void	dc_flush_history(void)
  * history cache storage                                                      *
  *                                                                            *
  ******************************************************************************/
-ZBX_MEM_FUNC_IMPL(__hc_index, hc_index_mem)
-ZBX_MEM_FUNC_IMPL(__hc, hc_mem)
+ZBX_SHMEM_FUNC_IMPL(__hc_index, hc_index_mem)
+ZBX_SHMEM_FUNC_IMPL(__hc, hc_mem)
 
 /******************************************************************************
  *                                                                            *
@@ -3943,7 +3952,7 @@ static void	hc_free_data(zbx_hc_data_t *data)
 {
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
-		__hc_mem_free_func(data->value.str);
+		__hc_shmem_free_func(data->value.str);
 	}
 	else
 	{
@@ -3953,21 +3962,21 @@ static void	hc_free_data(zbx_hc_data_t *data)
 			{
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
-					__hc_mem_free_func(data->value.str);
+					__hc_shmem_free_func(data->value.str);
 					break;
 				case ITEM_VALUE_TYPE_LOG:
-					__hc_mem_free_func(data->value.log->value);
+					__hc_shmem_free_func(data->value.log->value);
 
 					if (NULL != data->value.log->source)
-						__hc_mem_free_func(data->value.log->source);
+						__hc_shmem_free_func(data->value.log->source);
 
-					__hc_mem_free_func(data->value.log);
+					__hc_shmem_free_func(data->value.log);
 					break;
 			}
 		}
 	}
 
-	__hc_mem_free_func(data);
+	__hc_shmem_free_func(data);
 }
 
 /******************************************************************************
@@ -4029,7 +4038,7 @@ static char	*hc_mem_value_str_dup(const dc_value_str_t *str)
 {
 	char	*ptr;
 
-	if (NULL == (ptr = (char *)__hc_mem_malloc_func(NULL, str->len)))
+	if (NULL == (ptr = (char *)__hc_shmem_malloc_func(NULL, str->len)))
 		return NULL;
 
 	memcpy(ptr, &string_values[str->pvalue], str->len - 1);
@@ -4087,7 +4096,7 @@ static int	hc_clone_history_log_data(zbx_log_value_t **dst, const dc_item_value_
 	if (NULL == *dst)
 	{
 		/* using realloc instead of malloc just to suppress 'not used' warning for realloc */
-		if (NULL == (*dst = (zbx_log_value_t *)__hc_mem_realloc_func(NULL, sizeof(zbx_log_value_t))))
+		if (NULL == (*dst = (zbx_log_value_t *)__hc_shmem_realloc_func(NULL, sizeof(zbx_log_value_t))))
 			return FAIL;
 
 		memset(*dst, 0, sizeof(zbx_log_value_t));
@@ -4124,7 +4133,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 {
 	if (NULL == *data)
 	{
-		if (NULL == (*data = (zbx_hc_data_t *)__hc_mem_malloc_func(NULL, sizeof(zbx_hc_data_t))))
+		if (NULL == (*data = (zbx_hc_data_t *)__hc_shmem_malloc_func(NULL, sizeof(zbx_hc_data_t))))
 			return FAIL;
 
 		memset(*data, 0, sizeof(zbx_hc_data_t));
@@ -4487,7 +4496,7 @@ int	hc_get_history_compression_age(void)
  *                                                                            *
  ******************************************************************************/
 
-ZBX_MEM_FUNC_IMPL(__trend, trend_mem)
+ZBX_SHMEM_FUNC_IMPL(__trend, trend_mem)
 
 static int	init_trend_cache(char **error)
 {
@@ -4499,8 +4508,8 @@ static int	init_trend_cache(char **error)
 	if (SUCCEED != (ret = zbx_mutex_create(&trends_lock, ZBX_MUTEX_TRENDS, error)))
 		goto out;
 
-	sz = zbx_mem_required_size(1, "trend cache", "TrendCacheSize");
-	if (SUCCEED != (ret = zbx_mem_create(&trend_mem, CONFIG_TRENDS_CACHE_SIZE, "trend cache", "TrendCacheSize", 0,
+	sz = zbx_shmem_required_size(1, "trend cache", "TrendCacheSize");
+	if (SUCCEED != (ret = zbx_shmem_create(&trend_mem, CONFIG_TRENDS_CACHE_SIZE, "trend cache", "TrendCacheSize", 0,
 			error)))
 	{
 		goto out;
@@ -4517,7 +4526,7 @@ static int	init_trend_cache(char **error)
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
-			__trend_mem_malloc_func, __trend_mem_realloc_func, __trend_mem_free_func);
+			__trend_shmem_malloc_func, __trend_shmem_realloc_func, __trend_shmem_free_func);
 
 #undef INIT_HASHSET_SIZE
 out:
@@ -4549,38 +4558,39 @@ int	init_database_cache(char **error)
 	if (SUCCEED != (ret = zbx_mutex_create(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_mem_create(&hc_mem, CONFIG_HISTORY_CACHE_SIZE, "history cache",
+	if (SUCCEED != (ret = zbx_shmem_create(&hc_mem, CONFIG_HISTORY_CACHE_SIZE, "history cache",
 			"HistoryCacheSize", 1, error)))
 	{
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_mem_create(&hc_index_mem, CONFIG_HISTORY_INDEX_CACHE_SIZE, "history index cache",
+	if (SUCCEED != (ret = zbx_shmem_create(&hc_index_mem, CONFIG_HISTORY_INDEX_CACHE_SIZE, "history index cache",
 			"HistoryIndexCacheSize", 0, error)))
 	{
 		goto out;
 	}
 
-	cache = (ZBX_DC_CACHE *)__hc_index_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
+	cache = (ZBX_DC_CACHE *)__hc_index_shmem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 	memset(cache, 0, sizeof(ZBX_DC_CACHE));
 
-	ids = (ZBX_DC_IDS *)__hc_index_mem_malloc_func(NULL, sizeof(ZBX_DC_IDS));
+	ids = (ZBX_DC_IDS *)__hc_index_shmem_malloc_func(NULL, sizeof(ZBX_DC_IDS));
 	memset(ids, 0, sizeof(ZBX_DC_IDS));
 
 	zbx_hashset_create_ext(&cache->history_items, ZBX_HC_ITEMS_INIT_SIZE,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
-			__hc_index_mem_malloc_func, __hc_index_mem_realloc_func, __hc_index_mem_free_func);
+			__hc_index_shmem_malloc_func, __hc_index_shmem_realloc_func, __hc_index_shmem_free_func);
 
 	zbx_binary_heap_create_ext(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY,
-			__hc_index_mem_malloc_func, __hc_index_mem_realloc_func, __hc_index_mem_free_func);
+			__hc_index_shmem_malloc_func, __hc_index_shmem_realloc_func, __hc_index_shmem_free_func);
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_hashset_create_ext(&(cache->proxyqueue.index), ZBX_HC_SYNC_MAX,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
-			__hc_index_mem_malloc_func, __hc_index_mem_realloc_func, __hc_index_mem_free_func);
+			__hc_index_shmem_malloc_func, __hc_index_shmem_realloc_func, __hc_index_shmem_free_func);
 
-		zbx_list_create_ext(&(cache->proxyqueue.list), __hc_index_mem_malloc_func, __hc_index_mem_free_func);
+		zbx_list_create_ext(&(cache->proxyqueue.list), __hc_index_shmem_malloc_func,
+				__hc_index_shmem_free_func);
 
 		cache->proxyqueue.state = ZBX_HC_PROXYQUEUE_STATE_NORMAL;
 
@@ -4676,9 +4686,9 @@ void	free_database_cache(int sync)
 
 	cache = NULL;
 
-	zbx_mem_destroy(hc_mem);
+	zbx_shmem_destroy(hc_mem);
 	hc_mem = NULL;
-	zbx_mem_destroy(hc_index_mem);
+	zbx_shmem_destroy(hc_index_mem);
 	hc_index_mem = NULL;
 
 	zbx_mutex_destroy(&cache_lock);
@@ -4686,7 +4696,7 @@ void	free_database_cache(int sync)
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
-		zbx_mem_destroy(trend_mem);
+		zbx_shmem_destroy(trend_mem);
 		trend_mem = NULL;
 		zbx_mutex_destroy(&trends_lock);
 	}
@@ -4815,15 +4825,15 @@ void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num)
  * Purpose: get shared memory allocator statistics                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hc_get_mem_stats(zbx_mem_stats_t *data, zbx_mem_stats_t *index)
+void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
 {
 	LOCK_CACHE;
 
 	if (NULL != data)
-		zbx_mem_get_stats(hc_mem, data);
+		zbx_shmem_get_stats(hc_mem, data);
 
 	if (NULL != index)
-		zbx_mem_get_stats(hc_index_mem, index);
+		zbx_shmem_get_stats(hc_index_mem, index);
 
 	UNLOCK_CACHE;
 }

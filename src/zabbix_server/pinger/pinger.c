@@ -22,7 +22,7 @@
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxicmpping.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "preproc.h"
 
@@ -384,8 +384,11 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	char			error[MAX_STRING_LEN], *addr = NULL;
 	icmpping_t		icmpping;
 	icmppingsec_type_t	type;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	items = &item;
 	num = DCconfig_get_poller_items(ZBX_POLLER_TYPE_PINGER, &items);
@@ -393,7 +396,7 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	for (i = 0; i < num; i++)
 	{
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		rc = substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL, MACRO_TYPE_ITEM_KEY, error,
+		rc = zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL, MACRO_TYPE_ITEM_KEY, error,
 				sizeof(error));
 
 		if (SUCCEED == rc)
@@ -429,6 +432,8 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 		zbx_free(items);
 
 	zbx_preprocessor_flush();
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, *icmp_items_count);
 }
@@ -476,7 +481,7 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 static void	process_pinger_hosts(icmpitem_t *items, int items_count)
 {
 	int			i, first_index = 0, ping_result;
-	char			error[ITEM_ERROR_LEN_MAX];
+	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	static ZBX_FPING_HOST	*hosts = NULL;
 	static int		hosts_alloc = 4;
 	int			hosts_count = 0;

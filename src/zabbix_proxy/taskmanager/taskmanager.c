@@ -19,13 +19,15 @@
 
 #include "taskmanager.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "log.h"
-#include "zbxcrypto.h"
 #include "zbxdiag.h"
 #include "zbxrtc.h"
+#include "proxy.h"
+#include "zbxcomms.h"
+#include "dbcache.h"
 
 #include "../../zabbix_server/scripts/scripts.h"
 #include "../../zabbix_server/trapper/trapper_item_test.h"
@@ -37,6 +39,8 @@
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
+extern int				CONFIG_PROXYMODE;
+extern char 				*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
@@ -248,7 +252,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
+static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, int now)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -279,6 +283,10 @@ static int	tm_execute_data(zbx_uint64_t taskid, int clock, int ttl, int now)
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			ret = tm_execute_data_json(data_type, row[1], &info);
+			break;
+		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
+				ret = zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
 			break;
 		default:
 			task->data = zbx_tm_data_result_create(parent_taskid, FAIL, "Unknown task.");
@@ -313,7 +321,7 @@ finish:
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(int now)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -348,7 +356,7 @@ static int	tm_process_tasks(int now)
 				zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-				if (SUCCEED == tm_execute_data(taskid, clock, ttl, now))
+				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now))
 					processed_num++;
 				break;
 			default:
@@ -377,6 +385,38 @@ static void	tm_remove_old_tasks(int now)
 	DBexecute("delete from task where status in (%d,%d) and clock<=%d",
 			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, now - ZBX_TM_CLEANUP_TASK_AGE);
 	DBcommit();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create config cache reload request to be sent to the server       *
+ *          (only from passive proxy)                                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	force_config_sync(void)
+{
+	zbx_tm_task_t	*task;
+	zbx_uint64_t	taskid;
+	struct zbx_json	j;
+
+	taskid = DBget_maxid("task");
+
+	DBbegin();
+
+	task = zbx_tm_task_create(taskid, ZBX_TM_PROXYDATA, ZBX_TM_STATUS_NEW, (int)time(NULL), 0, 0);
+
+	zbx_json_init(&j, 1024);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY_NAME, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&j);
+
+	task->data = zbx_tm_data_create(taskid, j.buffer, j.buffer_size, ZBX_TM_DATA_TYPE_PROXY_HOSTNAME);
+
+	zbx_tm_save_task(task);
+
+	DBcommit();
+
+	zbx_tm_task_free(task);
+	zbx_json_free(&j);
 }
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
@@ -413,7 +453,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
-		unsigned char	*rtc_data;
+		unsigned char	*rtc_data = NULL;
 
 		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
@@ -421,6 +461,11 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
 				zbx_clear_cache_snmp(process_type, process_num);
 #endif
+			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd && ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
+				force_config_sync();
+
+			zbx_free(rtc_data);
+
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}
@@ -430,7 +475,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
-		tasks_num = tm_process_tasks((int)sec1);
+		tasks_num = tm_process_tasks(&rtc, (int)sec1);
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((int)sec1);

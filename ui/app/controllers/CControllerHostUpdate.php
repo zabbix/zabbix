@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -122,7 +122,9 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 			}
 
 			if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				$host = array_intersect_key($host, array_flip(['hostid', 'status', 'inventory', 'description']));
+				$host = array_intersect_key($host,
+					array_flip(['hostid', 'status', 'inventory', 'description', 'templates', 'templates_clear']
+				));
 			}
 
 			$hostids = API::Host()->update($host);

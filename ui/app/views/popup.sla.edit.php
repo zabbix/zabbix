@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -222,16 +222,7 @@ $form
 			sla_edit_popup.init('.json_encode([
 				'slaid' => $data['slaid'],
 				'service_tags' => $data['form']['service_tags'],
-				'excluded_downtimes' => $data['form']['excluded_downtimes'],
-				'create_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'sla.create')
-					->getUrl(),
-				'update_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'sla.update')
-					->getUrl(),
-				'delete_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'sla.delete')
-					->getUrl()
+				'excluded_downtimes' => $data['form']['excluded_downtimes']
 			]).');
 		'))->setOnDocumentReady()
 	);
@@ -264,7 +255,8 @@ if ($data['slaid'] !== null) {
 					[
 						'title' => _('Cancel'),
 						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true
+						'cancel' => true,
+						'action' => ''
 					]
 				]
 			]).');'

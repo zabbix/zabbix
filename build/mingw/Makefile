@@ -20,6 +20,7 @@ OBJS = \
 	$(OUTPUTDIR)\fatal.o \
 	$(OUTPUTDIR)\disk.o \
 	$(OUTPUTDIR)\iprange.o \
+	$(OUTPUTDIR)\zbxhash.o \
 	$(OUTPUTDIR)\md5.o \
 	$(OUTPUTDIR)\sysinfo.o \
 	$(OUTPUTDIR)\vector.o \
@@ -27,7 +28,6 @@ OBJS = \
 	$(OUTPUTDIR)\persistent_state.o \
 	$(OUTPUTDIR)\logfiles.o \
 	$(OUTPUTDIR)\file.o \
-	$(OUTPUTDIR)\alias.o \
 	$(OUTPUTDIR)\algodefs.o \
 	$(OUTPUTDIR)\json.o \
 	$(OUTPUTDIR)\json_parser.o \
@@ -38,11 +38,12 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo_dns.o \
 	$(OUTPUTDIR)\sysinfo_file.o \
 	$(OUTPUTDIR)\sysinfo_dir.o \
+	$(OUTPUTDIR)\sysinfo_alias.o \
 	$(OUTPUTDIR)\eventlog.o \
 	$(TARGETDIR)\resource.syso
 
 CFLAGS := $(CFLAGS) -O2 -g -DHAVE_STDINT_H=1 -DZBX_BUILD_AGENT2=1  -DHAVE_THREAD_LOCAL=1 \
-	-I$(TOPDIR)\build\win32\include -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include
+	-I$(TOPDIR)\build\win32\include\common -I$(TOPDIR)\build\mingw -I$(TOPDIR)\include -I$(TOPDIR)\include\common
 
 RFLAGS := $(RFLAGS) --input-format=rc -O coff
 GOPATH := $(GOPATH);$(TOPDIR)\go
@@ -111,13 +112,10 @@ $(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxcommon\str.c
 $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxcommon\file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\alias.o: $(TOPDIR)\src\libs\zbxcommon\alias.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
 $(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxcommon\time.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\tls_version.o: $(TOPDIR)\src\libs\zbxcrypto\tls_version.c
+$(OUTPUTDIR)\tls_version.o: $(TOPDIR)\src\libs\zbxcomms\tls_version.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\fatal.o: $(TOPDIR)\src\libs\zbxwin32\fatal.c
@@ -126,10 +124,13 @@ $(OUTPUTDIR)\fatal.o: $(TOPDIR)\src\libs\zbxwin32\fatal.c
 $(OUTPUTDIR)\disk.o: $(TOPDIR)\src\libs\zbxwin32\disk.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\threads.o: $(TOPDIR)\src\libs\zbxsys\threads.c
+$(OUTPUTDIR)\threads.o: $(TOPDIR)\src\libs\zbxthreads\threads.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\md5.o: $(TOPDIR)\src\libs\zbxcrypto\md5.c
+$(OUTPUTDIR)\zbxhash.o: $(TOPDIR)\src\libs\zbxhash\zbxhash.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\md5.o: $(TOPDIR)\src\libs\zbxhash\md5.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\json_parser.o: $(TOPDIR)\src\libs\zbxjson\json_parser.c
@@ -138,10 +139,10 @@ $(OUTPUTDIR)\json_parser.o: $(TOPDIR)\src\libs\zbxjson\json_parser.c
 $(OUTPUTDIR)\jsonpath.o: $(TOPDIR)\src\libs\zbxjson\jsonpath.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
-$(OUTPUTDIR)\sha256crypt.o: $(TOPDIR)\src\libs\zbxcrypto\sha256crypt.c
+$(OUTPUTDIR)\sha256crypt.o: $(TOPDIR)\src\libs\zbxhash\sha256crypt.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
-$(OUTPUTDIR)\variant.o: $(TOPDIR)\src\libs\zbxcommon\variant.c
+$(OUTPUTDIR)\variant.o: $(TOPDIR)\src\libs\zbxvariant\variant.c
 	$(CC) $(CFLAGS) -DUNICODE -DWITH_COMMON_METRICS -c $^ -o $@
 
 $(OUTPUTDIR)\json.o: $(TOPDIR)\src\libs\zbxjson\json.c
@@ -160,6 +161,9 @@ $(OUTPUTDIR)\sysinfo_file.o: $(TOPDIR)\src\libs\zbxsysinfo\common\file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\sysinfo_dir.o: $(TOPDIR)\src\libs\zbxsysinfo\common\dir.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\sysinfo_alias.o: $(TOPDIR)\src\libs\zbxsysinfo\alias\alias.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\vector.o: $(TOPDIR)\src\libs\zbxalgo\vector.c
@@ -202,4 +206,4 @@ $(TARGETBIN): $(OBJS) .FORCE
 
 clean:
 	go clean -cache
-	del $(TOPDIR)\include\config.h "$(TARGETBIN)" $(OUTPUTDIR)\*.o $(TARGETDIR)\*.syso 2>NUL
+	del $(TOPDIR)\include\common\config.h "$(TARGETBIN)" $(OUTPUTDIR)\*.o $(TARGETDIR)\*.syso 2>NUL

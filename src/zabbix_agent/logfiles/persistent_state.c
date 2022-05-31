@@ -22,7 +22,7 @@
 #include "log.h"
 #include "logfiles.h"
 #include "zbxjson.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
+#include "zbxcrypto.h"
 
 /* tags for agent persistent storage files */
 #define ZBX_PERSIST_TAG_FILENAME		"filename"
@@ -74,7 +74,7 @@ static int	zbx_persistent_inactive_compare_func(const void *d1, const void *d2)
 static char	*str2file_name_part(const char *str)
 {
 	md5_state_t	state;
-	md5_byte_t	md5[MD5_DIGEST_SIZE];
+	md5_byte_t	md5[ZBX_MD5_DIGEST_SIZE];
 	char		size_buf[21];		/* 20 - max size of printed 'size_t' value, 1 - '\0' */
 	char		*md5_text = NULL;
 	size_t		str_sz, md5_text_sz, size_buf_len;
@@ -87,11 +87,11 @@ static char	*str2file_name_part(const char *str)
 
 	size_buf_len = zbx_snprintf(size_buf, sizeof(size_buf), ZBX_FS_SIZE_T, (zbx_fs_size_t)str_sz);
 
-	md5_text_sz = MD5_DIGEST_SIZE * 2 + size_buf_len + 1;
+	md5_text_sz = ZBX_MD5_DIGEST_SIZE * 2 + size_buf_len + 1;
 	md5_text = (char *)zbx_malloc(NULL, md5_text_sz);
 
 	zbx_md5buf2str(md5, md5_text);
-	memcpy(md5_text + MD5_DIGEST_SIZE * 2, size_buf, size_buf_len + 1);
+	memcpy(md5_text + ZBX_MD5_DIGEST_SIZE * 2, size_buf, size_buf_len + 1);
 
 	return md5_text;
 }
@@ -752,9 +752,9 @@ int	zbx_restore_file_details(const char *str, struct st_logfile **logfiles, int 
 	zbx_uint64_t	size;
 	zbx_uint64_t	processed_size_tmp = 0;
 	int		md5_block_size = 0;
-	md5_byte_t	first_block_md5[MD5_DIGEST_SIZE];
+	md5_byte_t	first_block_md5[ZBX_MD5_DIGEST_SIZE];
 	zbx_uint64_t	last_block_offset = 0;
-	md5_byte_t	last_block_md5[MD5_DIGEST_SIZE];
+	md5_byte_t	last_block_md5[ZBX_MD5_DIGEST_SIZE];
 	/* flags to check missing attributes */
 	int		got_filename = 0, got_mtime = 0, got_seq = 0, got_incomplete = 0, got_copy_of = 0, got_dev = 0,
 			got_ino_lo = 0, got_ino_hi = 0, got_size = 0, got_processed_size = 0, got_md5_block_size = 0,

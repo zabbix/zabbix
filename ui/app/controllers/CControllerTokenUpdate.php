@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -104,16 +104,13 @@ class CControllerTokenUpdate extends CController {
 		$output = [];
 
 		if ($result) {
-			$success = ['title' => _('API token updated')];
+			$output['success']['title'] = _('API token updated');
 
 			if ($messages = get_and_clear_messages()) {
-				$success['messages'] = array_column($messages, 'message');
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
 
-			$output['success'] = $success;
-
 			if ($this->hasInput('regenerate')) {
-
 				['tokenids' => $tokenids] = $result;
 				[['userid' => $userid]] = API::Token()->get([
 					'output' => ['userid'],
@@ -128,7 +125,7 @@ class CControllerTokenUpdate extends CController {
 					])
 					: [CWebUser::$data];
 
-				$data = [
+				$output['data'] = [
 					'name' => $token['name'],
 					'user_name' => getUserFullname($user),
 					'auth_token' => $auth_token,
@@ -138,8 +135,6 @@ class CControllerTokenUpdate extends CController {
 					'message' => _('API token updated'),
 					'admin_mode' => $this->getInput('admin_mode')
 				];
-
-				$output['data'] = $data;
 			}
 		}
 		else {

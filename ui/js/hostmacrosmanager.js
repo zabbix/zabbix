@@ -61,8 +61,10 @@ class HostMacrosManager {
 			}
 		})
 			.done((response) => {
-				if (typeof response === 'object' && 'errors' in response) {
-					this.$container.append(response.errors);
+				if (typeof response === 'object' && 'error' in response) {
+					const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+
+					this.$container.append(message_box);
 				}
 				else {
 					if (typeof response.messages !== 'undefined') {
@@ -241,4 +243,4 @@ class HostMacrosManager {
 			$element.val(macro_part.toUpperCase() + context_part);
 		}
 	}
-};
+}

@@ -31,23 +31,25 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
-	..\..\..\src\libs\zbxcommon\variant.o \
 	..\..\..\src\libs\zbxcommon\str.o \
 	..\..\..\src\libs\zbxcommon\time.o \
-	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
 	..\..\..\src\libs\zbxconf\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
-	..\..\..\src\libs\zbxcrypto\md5.o \
+	..\..\..\src\libs\zbxcrypto\crypto.o \
+	..\..\..\src\libs\zbxgetopt\getopt.o \
+	..\..\..\src\libs\zbxhash\md5.o \
+	..\..\..\src\libs\zbxhash\zbxhash.o \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
 	..\..\..\src\libs\zbxjson\jsonpath.o \
 	..\..\..\src\libs\zbxlog\log.o \
-	..\..\..\src\libs\zbxsys\mutexs.o \
-	..\..\..\src\libs\zbxsys\symbols.o \
-	..\..\..\src\libs\zbxsys\threads.o \
+	..\..\..\src\libs\zbxmutexs\mutexs.o \
+	..\..\..\src\libs\zbxsymbols\symbols.o \
+	..\..\..\src\libs\zbxthreads\threads.o \
+	..\..\..\src\libs\zbxvariant\variant.o \
 	..\..\..\src\libs\zbxwin32\fatal.o \
 	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \

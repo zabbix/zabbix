@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -37,17 +37,22 @@
 		timeout: null,
 		_refresh_message_box: null,
 		_popup_message_box: null,
+		active_filter: null,
 
-		init({refresh_url, refresh_data, refresh_interval, filter_options}) {
+		checkbox_object: null,
+
+		init({refresh_url, refresh_data, refresh_interval, filter_options, checkbox_object}) {
 			this.refresh_url = new Curl(refresh_url, false);
 			this.refresh_data = refresh_data;
 			this.refresh_interval = refresh_interval;
+			this.checkbox_object = checkbox_object;
 
 			const url = new Curl('zabbix.php', false);
 			url.setArgument('action', 'latest.view.refresh');
 			this.refresh_simple_url = url.getUrl();
 
 			this.initTabFilter(filter_options);
+			this.initExpandableSubfilter();
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -62,10 +67,51 @@
 
 			this.refresh_counters = this.createCountersRefresh(1);
 			this.filter = new CTabFilter(document.getElementById('monitoring_latest_filter'), filter_options);
+			this.active_filter = this.filter._active_item;
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				this.reloadPartialAndTabCounters();
+
+				if (this.active_filter !== this.filter._active_item) {
+					this.active_filter = this.filter._active_item;
+					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+					chkbxRange.clearSelectedOnFilterChange();
+				}
 			});
+
+			document.addEventListener('click', (event) => {
+				if (event.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
+					view.setSubfilter(JSON.parse(event.target.dataset.subfilterTag));
+				}
+			});
+
+			// Tags must be activated also using the enter button on keyboard.
+			document.addEventListener('keydown', (event) => {
+				if (event.which == 13 && event.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
+					view.setSubfilter(JSON.parse(event.target.dataset.subfilterTag));
+				}
+			});
+		},
+
+		initExpandableSubfilter() {
+			document.querySelectorAll('.expandable-subfilter').forEach((element) => {
+				const subfilter = new CExpandableSubfilter(element);
+				subfilter.on(EXPANDABLE_SUBFILTER_EVENT_EXPAND, (e) => {
+					this.filter.setExpandedSubfilters(e.detail.name);
+				});
+			});
+
+			const expand_tags = document.getElementById('expand_tag_values');
+			if (expand_tags !== null) {
+				expand_tags.addEventListener('click', () => {
+					document.querySelectorAll('.subfilter-option-grid.display-none').forEach((element) => {
+						element.classList.remove('display-none');
+					});
+
+					this.filter.setExpandedSubfilters(expand_tags.dataset['name']);
+					expand_tags.remove();
+				});
+			}
 		},
 
 		createCountersRefresh(timeout) {
@@ -172,6 +218,8 @@
 					return post_data;
 				}, {});
 
+			post_data['subfilters_expanded'] = this.filter.getExpandedSubfilters();
+
 			var deferred = $.ajax({
 				url: this.refresh_simple_url,
 				data: post_data,
@@ -219,6 +267,8 @@
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);
 			}
+
+			this.initExpandableSubfilter();
 		},
 
 		onDataFail(jqXHR) {
@@ -267,6 +317,83 @@
 			}
 		},
 
+		massCheckNow(button) {
+			button.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'item.masscheck_now');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({itemids: Object.keys(chkbxRange.getSelectedIds())})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					clearMessages();
+
+					if ('error' in response) {
+						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
+					}
+					else if('success' in response) {
+						addMessage(makeMessageBox('good', [], response.success.title, true, false));
+
+						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+						uncheckTableRows('latest', []);
+						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
+						chkbxRange.update(this.checkbox_object);
+					}
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				})
+				.finally(() => {
+					button.classList.remove('is-loading');
+
+					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
+					button.blur();
+				});
+		},
+
+		checkNow(itemid) {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'item.masscheck_now');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({itemids: [itemid]})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					clearMessages();
+
+					/*
+					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
+					 * messages and that would mean to reload the page and show them. Also postMessageError would be
+					 * displayed right after header is loaded. Meaning message is not inside the page form like that is
+					 * in postMessageOk case. Instead show message directly that comes from controller.
+					 */
+					if ('error' in response) {
+						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
+					}
+					else if('success' in response) {
+						addMessage(makeMessageBox('good', [], response.success.title, true, false));
+					}
+				})
+				.catch(() => {
+					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const message_box = makeMessageBox('bad', [], title)[0];
+
+					clearMessages();
+					addMessage(message_box);
+				});
+		},
+
 		editHost(hostid) {
 			const host_data = {hostid};
 
@@ -279,7 +406,8 @@
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large'
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
 			});
 
 			this.unscheduleRefresh();
@@ -333,7 +461,7 @@
 					view._addPopupMessage(makeMessageBox('good', messages, title));
 				}
 
-				uncheckTableRows('');
+				uncheckTableRows('latest');
 				view.refresh();
 			}
 		}

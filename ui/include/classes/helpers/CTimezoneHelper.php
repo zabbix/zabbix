@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -76,8 +76,10 @@ class CTimezoneHelper {
 	 *
 	 * @return bool
 	 */
-	public static function isSupported(string $timezone): bool {
-		return array_key_exists($timezone, self::getList());
+	public static function isSupported(?string $timezone): bool {
+		return $timezone === null
+			? array_key_exists(ZBX_DEFAULT_TIMEZONE, self::getList())
+			: array_key_exists($timezone, self::getList());
 	}
 
 	/**

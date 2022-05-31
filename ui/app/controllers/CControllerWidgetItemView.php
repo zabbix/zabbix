@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -174,14 +174,12 @@ class CControllerWidgetItemView extends CControllerWidget {
 						/*
 						 * In case there is a numeric value, for example 0.001234 and decimal places are set to 2,
 						 * convertUnitsRaw would return 0.0012, however in this widget we need to show the exact
-						 * number. So we convert the value again which results in 0.
+						 * number. So we convert the value again which results in 0.00. In case decimal places are set
+						 * to 10 (maximum), the value will be converted to 0.0012340000.
 						 */
 						if ($raw_units['is_numeric']) {
-							$value = self::convertNumeric($value, $fields['decimal_places']);
+							$value = self::convertNumeric($value, $fields['decimal_places'], $value_type);
 						}
-
-						// In order to split the number into value and fraction, we need to convert it to string.
-						$value = (string) $value;
 
 						/*
 						 * Regardless of unit conversion, separate the decimals from value. In case of scientific
@@ -338,18 +336,26 @@ class CControllerWidgetItemView extends CControllerWidget {
 	/**
 	 * Convert numeric value using precise decimal points.
 	 *
-	 * @param string $value     Value to convert.
-	 * @param int    $decimals  Number of decimal places.
+	 * @param string $value       Value to convert.
+	 * @param int    $decimals    Number of decimal places.
+	 * @param string $value_type  Item value type.
 	 *
-	 * @return double|string  Return string if number is very large. Otherwise returns double (float).
+	 * @return string
 	 */
-	private static function convertNumeric(string $value, int $decimals) {
+	private static function convertNumeric(string $value, int $decimals, string $value_type): string {
 		if ($value >= pow(10, ZBX_FLOAT_DIG)) {
 			return sprintf('%.'.ZBX_FLOAT_DIG.'E', $value);
 		}
-		else {
-			return round((float) $value, $decimals);
+
+		if ($value_type == ITEM_VALUE_TYPE_FLOAT) {
+			$numeric_formatting = localeconv();
+
+			return number_format((float) $value, $decimals, $numeric_formatting['decimal_point'],
+				$numeric_formatting['thousands_sep']
+			);
 		}
+
+		return $value;
 	}
 
 	/**

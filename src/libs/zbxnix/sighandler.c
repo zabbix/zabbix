@@ -17,18 +17,42 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "sighandler.h"
+#include "zbxnix.h"
+#include "sigcommon.h"
 
 #include "common.h"
 #include "log.h"
 #include "fatal.h"
-#include "sigcommon.h"
-#include "zbxcrypto.h"
-#include "daemon.h"
+#include "zbxcomms.h"
 
-int			sig_parent_pid = -1;
-volatile sig_atomic_t	sig_exiting;
+#define ZBX_EXIT_NONE		0
+#define ZBX_EXIT_SUCCESS	1
+#define ZBX_EXIT_FAILURE	2
+
+int				sig_parent_pid = -1;
+static volatile sig_atomic_t	sig_exiting;
 static volatile sig_atomic_t	sig_exit_on_terminate = 1;
+static zbx_on_exit_t		zbx_on_exit_cb = NULL;
+
+void	zbx_set_exiting_with_fail(void)
+{
+	sig_exiting = ZBX_EXIT_FAILURE;
+}
+
+void	zbx_set_exiting_with_succeed(void)
+{
+	sig_exiting = ZBX_EXIT_SUCCESS;
+}
+
+int	ZBX_IS_RUNNING(void)
+{
+	return ZBX_EXIT_NONE == sig_exiting;
+}
+
+int	ZBX_EXIT_STATUS(void)
+{
+	return ZBX_EXIT_SUCCESS == sig_exiting ? SUCCEED : FAIL;
+}
 
 static void	log_fatal_signal(int sig, siginfo_t *siginfo, void *context)
 {
@@ -104,7 +128,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			exit_with_failure();
 
 		if (SIGUSR2 == sig)
-			sig_exiting = 1;
+			sig_exiting = ZBX_EXIT_SUCCESS;
 	}
 	else
 	{
@@ -129,7 +153,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			zbx_tls_free_on_signal();
 #endif
 			if (0 != sig_exit_on_terminate)
-				zbx_on_exit(SUCCEED);
+				zbx_on_exit_cb(SUCCEED);
 		}
 	}
 }
@@ -158,15 +182,21 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	}
 }
 
+#undef ZBX_EXIT_NONE
+#undef ZBX_EXIT_SUCCESS
+#undef ZBX_EXIT_FAILURE
+
 /******************************************************************************
  *                                                                            *
- * Purpose: set the commonly used signal handlers                             *
+ * Purpose: set the commonly used signal handlers and the callback function   *
+ *          which would run when terminating signal handler                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_set_common_signal_handlers(void)
+void	zbx_set_common_signal_handlers(zbx_on_exit_t zbx_on_exit_cb_arg)
 {
 	struct sigaction	phan;
 
+	zbx_on_exit_cb = zbx_on_exit_cb_arg;
 	sig_parent_pid = (int)getpid();
 
 	sigemptyset(&phan.sa_mask);

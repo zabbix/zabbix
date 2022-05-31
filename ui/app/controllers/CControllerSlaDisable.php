@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -54,8 +54,6 @@ class CControllerSlaDisable extends CController {
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
-		$output = [];
-
 		$slaids = $this->getInput('slaids');
 
 		$update = [];
@@ -69,6 +67,8 @@ class CControllerSlaDisable extends CController {
 
 		$result = API::Sla()->update($update);
 
+		$output = [];
+
 		if ($result) {
 			$output['success']['title'] = _n('SLA disabled', 'SLAs disabled', count($slaids));
 
@@ -77,6 +77,11 @@ class CControllerSlaDisable extends CController {
 			}
 		}
 		else {
+			$output['error'] = [
+				'title' => _n('Cannot disable SLA', 'Cannot disable SLAs', count($slaids)),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+
 			$slas = API::Sla()->get([
 				'output' => [],
 				'slaids' => $slaids,
@@ -84,11 +89,7 @@ class CControllerSlaDisable extends CController {
 				'preservekeys' => true
 			]);
 
-			$output['error'] = [
-				'title' => _n('Cannot disable SLA', 'Cannot disable SLAs', count($slaids)),
-				'messages' => array_column(get_and_clear_messages(), 'message'),
-				'keepids' => array_keys($slas)
-			];
+			$output['keepids'] = array_keys($slas);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

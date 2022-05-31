@@ -19,10 +19,11 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxmemory/libzbxmemory.a \
+	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
-	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 
@@ -49,7 +50,7 @@ zbx_baseline_get_data_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_baseline_get_data_LDADD = \
-	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends_baseline.a \
+	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(COMMON_LIB_FILES)
 
 zbx_baseline_get_data_LDADD += @SERVER_LIBS@

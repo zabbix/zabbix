@@ -26,16 +26,16 @@
 #include "nodecommand.h"
 #include "proxyconfig.h"
 #include "proxydata.h"
-#include "daemon.h"
-#include "zbxcrypto.h"
+#include "zbxnix.h"
 #include "zbxcommshigh.h"
-#include "../../libs/zbxserver/zabbix_stats.h"
+#include "zbxserver.h"
 #include "../poller/checks_snmp.h"
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
 #include "trapper_item_test.h"
 #include "trapper_request.h"
+#include "zbxavailability.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -950,6 +950,39 @@ static void	active_passive_misconfig(zbx_socket_t *sock)
 	zbx_free(msg);
 }
 
+static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
+{
+	char		host[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
+			hbfreq[ZBX_MAX_UINT64_LEN];
+	zbx_uint64_t	hostid;
+	DC_HOST		dc_host;
+	unsigned char	*data = NULL;
+	zbx_uint32_t	data_len;
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
+		return FAIL;
+
+	if (FAIL == DCconfig_get_hostid_by_name(host, &hostid))
+		return FAIL;
+
+	if (FAIL == DCget_host_by_hostid(&dc_host, hostid))
+		return FAIL;
+
+	if (0 != dc_host.proxy_hostid || HOST_STATUS_NOT_MONITORED == dc_host.status)
+		return SUCCEED;
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
+		return FAIL;
+
+	data_len = zbx_availability_serialize_active_heartbeat(&data, hostid, atoi(hbfreq));
+	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HB, data, data_len, NULL);
+
+	zbx_free(data);
+
+	return SUCCEED;
+}
+
+
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts)
 {
 	int	ret = SUCCEED;
@@ -1070,6 +1103,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					zbx_trapper_item_test(sock, &jp);
 			}
+			else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
+			{
+				ret = process_active_check_heartbeat(&jp);
+			}
 			else if (SUCCEED != trapper_process_request(value, sock, &jp))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
@@ -1084,9 +1121,9 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	else
 	{
 		char			value_dec[MAX_BUFFER_LEN], lastlogsize[ZBX_MAX_UINT64_LEN], timestamp[11],
-					source[HISTORY_LOG_SOURCE_LEN_MAX], severity[11],
-					host[HOST_HOST_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
-					key[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+					source[ZBX_HISTORY_LOG_SOURCE_LEN_MAX], severity[11],
+					host[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1],
+					key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 		zbx_agent_value_t	av;
 		zbx_host_key_t		hk = {host, key};
 		DC_ITEM			item;

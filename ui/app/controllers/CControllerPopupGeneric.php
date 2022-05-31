@@ -380,7 +380,7 @@ class CControllerPopupGeneric extends CController {
 			],
 			'sla' => [
 				'title' => _('SLA'),
-				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
 				'allowed_src_fields' => 'slaid,name',
 				'form' => [
 					'name' => 'slaform',
@@ -445,8 +445,6 @@ class CControllerPopupGeneric extends CController {
 			'numeric' =>							'in 1',
 			'reference' =>							'string',
 			'writeonly' =>							'in 1',
-			'noempty' =>							'in 1',
-			'submit_parent' =>						'in 1',
 			'enrich_parent_groups' =>				'in 1',
 			'filter_groupid_rst' =>					'in 1',
 			'filter_hostid_rst' =>					'in 1',
@@ -482,13 +480,12 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -723,7 +720,7 @@ class CControllerPopupGeneric extends CController {
 	 * @return array
 	 */
 	protected function getPageOptions(): array {
-		$option_fields_binary = ['noempty', 'real_hosts', 'submit_parent', 'with_items', 'writeonly'];
+		$option_fields_binary = ['real_hosts', 'with_items', 'writeonly'];
 		$option_fields_value = ['host_templates'];
 
 		$page_options = [
@@ -740,9 +737,7 @@ class CControllerPopupGeneric extends CController {
 			'reference' => $this->getInput('reference', $this->getInput('srcfld1', 'unknown'))
 		];
 
-		$page_options['parentid'] = ($page_options['dstfld1'] !== '')
-			? zbx_jsvalue($page_options['dstfld1'])
-			: 'null';
+		$page_options['parentid'] = $page_options['dstfld1'] !== '' ? $page_options['dstfld1'] : null;
 
 		foreach ($option_fields_binary as $field) {
 			if ($this->hasInput($field)) {
@@ -1183,11 +1178,13 @@ class CControllerPopupGeneric extends CController {
 			case 'graph_prototypes':
 				$options += [
 					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => ['name'],
+					'selectHosts' => ['hostid', 'name'],
 					'hostids' => $this->hostids ? $this->hostids : null
 				];
 
 				if ($this->source_table === 'graph_prototypes') {
+					$options['selectDiscoveryRule'] = ['hostid'];
+
 					$records = (!$this->host_preselect_required || $this->hostids)
 						? API::GraphPrototype()->get($options)
 						: [];

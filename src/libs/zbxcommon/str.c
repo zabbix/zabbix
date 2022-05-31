@@ -18,10 +18,9 @@
 **/
 
 #include "common.h"
-#include "threads.h"
-#include "module.h"
 
-#include "zbxcrypto.h"
+#include "zbxthreads.h"
+#include "module.h"
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>
@@ -47,15 +46,11 @@ static const char	help_message_footer[] =
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	version(void)
+void	zbx_version(void)
 {
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	printf("\n");
-	zbx_tls_version();
-#endif
 }
 
 /******************************************************************************
@@ -67,7 +62,7 @@ void	version(void)
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	usage(void)
+void	zbx_usage(void)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
@@ -121,11 +116,11 @@ void	usage(void)
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	help(void)
+void	zbx_help(void)
 {
 	const char	**p = help_message;
 
-	usage();
+	zbx_usage();
 	printf("\n");
 
 	while (NULL != *p)
@@ -829,7 +824,7 @@ char	*zbx_strdcatf(char *dest, const char *f, ...)
  *                                                                            *
  * Return value: return SUCCEED if hostname is valid                          *
  *               or FAIL if hostname contains invalid chars, is empty         *
- *               or is longer than MAX_ZBX_HOSTNAME_LEN                       *
+ *               or is longer than ZBX_MAX_HOSTNAME_LEN                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_check_hostname(const char *hostname, char **error)
@@ -855,10 +850,10 @@ int	zbx_check_hostname(const char *hostname, char **error)
 		return FAIL;
 	}
 
-	if (MAX_ZBX_HOSTNAME_LEN < len)
+	if (ZBX_MAX_HOSTNAME_LEN < len)
 	{
 		if (NULL != error)
-			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", MAX_ZBX_HOSTNAME_LEN);
+			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", ZBX_MAX_HOSTNAME_LEN);
 		return FAIL;
 	}
 
@@ -1427,6 +1422,8 @@ const char	*zbx_interface_type_string(zbx_interface_type_t type)
 			return "IPMI";
 		case INTERFACE_TYPE_JMX:
 			return "JMX";
+		case INTERFACE_TYPE_OPT:
+			return "optional";
 		case INTERFACE_TYPE_ANY:
 			return "any";
 		case INTERFACE_TYPE_UNKNOWN:
@@ -1468,6 +1465,8 @@ const char	*zbx_result_string(int result)
 			return "AGENT_ERROR";
 		case GATEWAY_ERROR:
 			return "GATEWAY_ERROR";
+		case SIG_ERROR:
+			return "SIG_ERROR";
 		case SYSINFO_RET_FAIL:
 			return "SYSINFO_RET_FAIL";
 		default:
@@ -5418,16 +5417,17 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
  *                                                                            *
  * Parameters: src       - [IN] source string                                 *
  *             delimiter - [IN] delimiter                                     *
+ *             last      - [IN] split after last delimiter                    *
  *             left      - [IN/OUT] first part of the string                  *
  *             right     - [IN/OUT] second part of the string or NULL, if     *
  *                                  delimiter was not found                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_strsplit(const char *src, char delimiter, char **left, char **right)
+static void	zbx_string_split(const char *src, char delimiter, unsigned char last, char **left, char **right)
 {
 	char	*delimiter_ptr;
 
-	if (NULL == (delimiter_ptr = strchr(src, delimiter)))
+	if (NULL == (delimiter_ptr = (0 == last ? strchr(src, delimiter) : strrchr(src, delimiter))))
 	{
 		*left = zbx_strdup(NULL, src);
 		*right = NULL;
@@ -5447,6 +5447,16 @@ void	zbx_strsplit(const char *src, char delimiter, char **left, char **right)
 		(*left)[left_size - 1] = '\0';
 		memcpy(*right, delimiter_ptr + 1, right_size);
 	}
+}
+
+void	zbx_strsplit_first(const char *src, char delimiter, char **left, char **right)
+{
+	zbx_string_split(src, delimiter, 0, left, right);
+}
+
+void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **right)
+{
+	zbx_string_split(src, delimiter, 1, left, right);
 }
 
 /******************************************************************************

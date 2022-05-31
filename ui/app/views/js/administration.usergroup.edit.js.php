@@ -34,14 +34,33 @@
 			$tag_filter_table_container  = $form.find('table#tag-filter-table').parent(),
 			$ms_tag_filter_groups        = $new_tag_filter_table.find('.multiselect'),
 			$ms_group_right_groups       = $new_group_right_table.find('.multiselect'),
+			$userdirectory               = $form.find('[name="userdirectoryid"]'),
+			$gui_access                  = $form.find('[name="gui_access"]'),
 			timeoutid_new_group_right,
 			timeoutid_new_tag_filter,
 			xhr_new_group_right,
 			xhr_new_tag_filter;
 
+		$gui_access.on('change', onFrontendAccessChange);
+		onFrontendAccessChange.apply($gui_access);
+
 		$form.submit(function() {
 			$form.trimValues(['#name']);
 		});
+
+		/**
+		 * Handle "Frontend access" selector change.
+		 */
+		function onFrontendAccessChange() {
+			let gui_access = $(this).val();
+
+			if (gui_access == <?= GROUP_GUI_ACCESS_INTERNAL ?> || gui_access == <?= GROUP_GUI_ACCESS_DISABLED ?>) {
+				$userdirectory.attr('disabled', 'disabled');
+			}
+			else {
+				$userdirectory.removeAttr('disabled');
+			}
+		}
 
 		/**
 		 * Collects data.
@@ -190,7 +209,12 @@
 			return function(resp) {
 				clearMessages();
 
-				if (resp.messages) {
+				if ('error' in resp) {
+					const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title);
+
+					addMessage(message_box);
+				}
+				else if ('messages' in resp) {
 					addMessage(resp.messages);
 				}
 

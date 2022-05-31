@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -339,15 +339,6 @@ $form
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
-				'create_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'service.create')
-					->getUrl(),
-				'update_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'service.update')
-					->getUrl(),
-				'delete_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'service.delete')
-					->getUrl(),
 				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 			]).');
 		'))->setOnDocumentReady()
@@ -381,7 +372,8 @@ if ($data['serviceid'] !== null) {
 					[
 						'title' => _('Cancel'),
 						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true
+						'cancel' => true,
+						'action' => ''
 					]
 				]
 			]).');'

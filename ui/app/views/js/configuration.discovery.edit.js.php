@@ -226,9 +226,9 @@
 	jQuery(function() {
 		addDCheck(<?= json_encode(array_values($data['drule']['dchecks'])) ?>);
 
-		jQuery('input:radio[name="uniqueness_criteria"][value=<?= json_encode($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="host_source"][value=<?= json_encode($data['drule']['host_source']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="name_source"][value=<?= json_encode($data['drule']['name_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="uniqueness_criteria"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['uniqueness_criteria']) ?>)+']').attr('checked', 'checked');
+		jQuery('input:radio[name="host_source"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['host_source']) ?>)+']').attr('checked', 'checked');
+		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['name_source']) ?>)+']').attr('checked', 'checked');
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
@@ -367,8 +367,10 @@
 				.find('.<?= ZBX_STYLE_MSG_BAD ?>')
 				.remove();
 
-			if (typeof response.errors !== 'undefined') {
-				return jQuery(response.errors).insertBefore($form);
+			if ('error' in response) {
+				const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+
+				message_box.insertBefore($form);
 			}
 			else {
 				var dcheck = response.params;
@@ -385,7 +387,7 @@
 					|| '<?= ZBX_DISCOVERY_UNSPEC ?>';
 
 				if (hasDCheckDuplicates()) {
-					jQuery(makeMessageBox('bad', <?= json_encode(_('Check already exists.')) ?>, null, true, false))
+					jQuery(makeMessageBox('bad', [<?= json_encode(_('Check already exists.')) ?>]))
 						.insertBefore($form);
 
 					return false;

@@ -40,14 +40,12 @@ class CControllerPopupAcknowledgeEdit extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -164,7 +162,7 @@ class CControllerPopupAcknowledgeEdit extends CController {
 		$data['has_unack_events'] = ($ack_count != count($events));
 
 		// Severity can be changed only for editable triggers.
-		$data['problem_severity_can_be_changed'] = !!$editable_triggers;
+		$data['problem_severity_can_be_changed'] = (bool) $editable_triggers;
 
 		// Add number of selected and related problem events to count of selected resolved events.
 		$data['related_problems_count'] += API::Problem()->get([

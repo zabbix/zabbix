@@ -21,6 +21,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Modules'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MODULE_EDIT))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu());
 
 // create form

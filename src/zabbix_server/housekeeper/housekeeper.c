@@ -19,7 +19,7 @@
 
 #include "housekeeper.h"
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxserver.h"
 #include "zbxrtc.h"
@@ -362,9 +362,10 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rules, zbx_hk_history_
  ******************************************************************************/
 static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*tmp = NULL;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*tmp = NULL;
+	zbx_dc_um_handle_t	*um_handle;
 
 	result = DBselect(
 			"select i.itemid,i.value_type,i.history,i.trends,h.hostid"
@@ -374,6 +375,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				" and h.status in (%d,%d)",
 			ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED,
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -389,7 +392,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
 		{
 			tmp = zbx_strdup(tmp, row[2]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
@@ -420,7 +423,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				continue;
 
 			tmp = zbx_strdup(tmp, row[3]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
@@ -443,6 +446,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		}
 	}
 	DBfree_result(result);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zbx_free(tmp);
 }

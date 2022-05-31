@@ -623,7 +623,7 @@ class CMediatype extends CApiService {
 			'exec_params' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'exec_params')],
 			'content_type' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'content_type')],
 			'script' =>					['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'script')],
-			'timeout' =>				['type' => API_TIME_UNIT, 'in' => DB::getDefault('media_type', 'timeout')],
+			'timeout' =>				['type' => API_TIME_UNIT, 'in' => timeUnitToSeconds(DB::getDefault('media_type', 'timeout'))],
 			'process_tags' =>			['type' => API_INT32, 'in' => DB::getDefault('media_type', 'process_tags')],
 			'show_event_menu' =>		['type' => API_INT32, 'in' => DB::getDefault('media_type', 'show_event_menu')],
 			'event_menu_url' =>			['type' => API_STRING_UTF8, 'in' => DB::getDefault('media_type', 'event_menu_url')],

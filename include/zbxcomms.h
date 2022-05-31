@@ -17,34 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_COMMS_H
-#define ZABBIX_COMMS_H
+#ifndef ZABBIX_ZBXCOMMS_H
+#define ZABBIX_ZBXCOMMS_H
 
 #include "zbxalgo.h"
 
 #ifdef _WINDOWS
-#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
-#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)recv((s), (b), (int)(bl), 0))
-#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
 #	define zbx_socket_last_error()		WSAGetLastError()
-#	define zbx_bind(s, a, l)		(bind((s), (a), (int)(l)))
-#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (int)(n), (f), (a), (l)))
 
-#	define ZBX_PROTO_AGAIN			WSAEINTR
 #	define ZBX_PROTO_ERROR			SOCKET_ERROR
-#	define ZBX_SOCKET_ERROR			INVALID_SOCKET
 #	define ZBX_SOCKET_TO_INT(s)		((int)(s))
 #else
-#	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)write((s), (b), (bl)))
-#	define ZBX_TCP_READ(s, b, bl)		((ssize_t)read((s), (b), (bl)))
-#	define zbx_socket_close(s)		if (ZBX_SOCKET_ERROR != (s)) close(s)
 #	define zbx_socket_last_error()		errno
-#	define zbx_bind(s, a, l)		(bind((s), (a), (l)))
-#	define zbx_sendto(fd, b, n, f, a, l)	(sendto((fd), (b), (n), (f), (a), (l)))
 
-#	define ZBX_PROTO_AGAIN		EINTR
 #	define ZBX_PROTO_ERROR		-1
-#	define ZBX_SOCKET_ERROR		-1
 #	define ZBX_SOCKET_TO_INT(s)	(s)
 #endif
 
@@ -71,7 +57,26 @@ zbx_buf_type_t;
 #define ZBX_STAT_BUF_LEN	2048
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-typedef struct zbx_tls_context	zbx_tls_context_t;
+
+#if defined(HAVE_GNUTLS)
+#	include <gnutls/gnutls.h>
+#	include <gnutls/x509.h>
+#elif defined(HAVE_OPENSSL)
+#	include <openssl/ssl.h>
+#	include <openssl/err.h>
+#	include <openssl/rand.h>
+#endif
+
+typedef struct
+{
+#if defined(HAVE_GNUTLS)
+	gnutls_session_t		ctx;
+	gnutls_psk_client_credentials_t	psk_client_creds;
+	gnutls_psk_server_credentials_t	psk_server_creds;
+#elif defined(HAVE_OPENSSL)
+	SSL				*ctx;
+#endif
+} zbx_tls_context_t;
 #endif
 
 typedef struct
@@ -84,7 +89,7 @@ typedef struct
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_context_t		*tls_ctx;
 #endif
-	unsigned int 			connection_type;	/* type of connection actually established: */
+	unsigned int			connection_type;	/* type of connection actually established: */
 								/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
 								/* ZBX_TCP_SEC_TLS_CERT */
 	int				timeout;
@@ -96,7 +101,7 @@ typedef struct
 	ZBX_SOCKADDR			peer_info;		/* getpeername() result */
 	/* Peer host DNS name or IP address for diagnostics (after TCP connection is established). */
 	/* TLS connection may be shut down at any time and it will not be possible to get peer IP address anymore. */
-	char				peer[MAX_ZBX_DNSNAME_LEN + 1];
+	char				peer[ZBX_MAX_DNSNAME_LEN + 1];
 	int				protocol;
 }
 zbx_socket_t;
@@ -126,7 +131,8 @@ void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_connection_type_name(unsigned int type);
 
 #define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, 0)
-#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, timeout)
+#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), 0,	\
+									ZBX_TCP_PROTOCOL, timeout)
 #define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, 0, ZBX_TCP_PROTOCOL, timeout)
 #define zbx_tcp_send_raw(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, 0, 0)
 
@@ -185,7 +191,6 @@ void	zbx_udp_close(zbx_socket_t *s);
 #define ZBX_DEFAULT_AGENT_PORT_STR	"10050"
 #define ZBX_DEFAULT_SERVER_PORT_STR	"10051"
 
-
 #ifdef HAVE_IPV6
 #	define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)		\
 			getnameinfo(sa, AF_INET == (sa)->sa_family ?		\
@@ -202,4 +207,85 @@ int	zbx_comms_parse_response(char *xml, char *host, size_t host_len, char *key, 
 		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
 		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
 		char *severity, size_t severity_len);
-#endif // ZABBIX_COMMS_H
+
+int	zbx_telnet_test_login(ZBX_SOCKET socket_fd);
+int	zbx_telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
+int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
+
+/* TLS BLOCK */
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+
+#if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER)
+#	if !defined(LIBRESSL_VERSION_NUMBER)
+#		define OPENSSL_INIT_LOAD_SSL_STRINGS			0
+#		define OPENSSL_INIT_LOAD_CRYPTO_STRINGS		0
+#		define OPENSSL_VERSION					SSLEAY_VERSION
+#	endif
+#	define OpenSSL_version					SSLeay_version
+#	define TLS_method					TLSv1_2_method
+#	define TLS_client_method				TLSv1_2_client_method
+#	define SSL_CTX_get_ciphers(ciphers)			((ciphers)->cipher_list)
+#	if !defined(LIBRESSL_VERSION_NUMBER)
+#		define SSL_CTX_set_min_proto_version(ctx, TLSv)	1
+#	endif
+#endif
+
+#if defined(_WINDOWS)
+
+/* Typical thread is long-running, if necessary, it initializes TLS for itself. Zabbix sender is an exception. If */
+/* data is sent from a file or in real time then sender's 'main' thread starts the 'send_value' thread for each   */
+/* 250 values to be sent. To avoid TLS initialization on every start of 'send_value' thread we initialize TLS in  */
+/* 'main' thread and use this structure for passing minimum TLS variables into 'send_value' thread. */
+
+struct zbx_thread_sendval_tls_args
+{
+#if defined(HAVE_GNUTLS)
+	gnutls_certificate_credentials_t	my_cert_creds;
+	gnutls_psk_client_credentials_t		my_psk_client_creds;
+	gnutls_priority_t			ciphersuites_cert;
+	gnutls_priority_t			ciphersuites_psk;
+#elif defined(HAVE_OPENSSL)
+	SSL_CTX			*ctx_cert;
+#ifdef HAVE_OPENSSL_WITH_PSK
+	SSL_CTX			*ctx_psk;
+	const char		*psk_identity_for_cb;
+	size_t			psk_identity_len_for_cb;
+	char			*psk_for_cb;
+	size_t			psk_len_for_cb;
+#endif
+#endif
+};
+
+typedef struct zbx_thread_sendval_tls_args ZBX_THREAD_SENDVAL_TLS_ARGS;
+
+void	zbx_tls_pass_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
+void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
+
+#endif	/* #if defined(_WINDOWS) */
+
+void	zbx_tls_validate_config(void);
+void	zbx_tls_library_deinit(void);
+void	zbx_tls_init_parent(void);
+void	zbx_tls_init_child(void);
+void	zbx_tls_free(void);
+void	zbx_tls_free_on_signal(void);
+void	zbx_tls_version(void);
+
+#endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
+typedef struct
+{
+	const char	*psk_identity;
+	size_t		psk_identity_len;
+	char		issuer[HOST_TLS_ISSUER_LEN_MAX];
+	char		subject[HOST_TLS_SUBJECT_LEN_MAX];
+}
+zbx_tls_conn_attr_t;
+
+int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
+int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
+int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
+unsigned int	zbx_tls_get_psk_usage(void);
+
+/* TLS BLOCK END */
+
+#endif /* ZABBIX_ZBXCOMMS_H */

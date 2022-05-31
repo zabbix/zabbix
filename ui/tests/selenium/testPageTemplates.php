@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
@@ -29,7 +29,7 @@ class testPageTemplates extends CLegacyWebTest {
 
 	public $templateName = 'Huawei OceanStor 5300 V5 SNMP';
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	public static function allTemplates() {
@@ -119,8 +119,6 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('templates.php');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();

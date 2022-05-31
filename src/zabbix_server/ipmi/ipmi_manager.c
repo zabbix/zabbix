@@ -23,7 +23,7 @@
 
 #include "ipmi_manager.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
@@ -588,13 +588,14 @@ static zbx_ipmi_manager_host_t	*ipmi_manager_cache_host(zbx_ipmi_manager_t *mana
 		zbx_ipmi_manager_host_t	host_local;
 
 		host_local.hostid = hostid;
+		host_local.disable_until = 0;
+		host_local.poller = ipmi_manager_get_host_poller(manager);
+		host_local.lastcheck = now;
+
 		host = (zbx_ipmi_manager_host_t *)zbx_hashset_insert(&manager->hosts, &host_local, sizeof(host_local));
-
-		host->disable_until = 0;
-		host->poller = ipmi_manager_get_host_poller(manager);
 	}
-
-	host->lastcheck = now;
+	else
+		host->lastcheck = now;
 
 	return host;
 }
@@ -647,7 +648,7 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
 
 	if (NULL != data)
 	{
-		zbx_availability_flush(data, data_offset);
+		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, data_offset, NULL);
 		zbx_free(data);
 	}
 }
@@ -680,7 +681,7 @@ static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_u
 
 	if (NULL != data)
 	{
-		zbx_availability_flush(data, data_offset);
+		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, data_offset, NULL);
 		zbx_free(data);
 	}
 }

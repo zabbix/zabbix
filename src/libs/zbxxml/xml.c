@@ -28,8 +28,6 @@
 #	include <libxml/xpath.h>
 #endif
 
-#include "../zbxalgo/vectorimpl.h"
-
 typedef struct _zbx_xml_node_t zbx_xml_node_t;
 
 ZBX_PTR_VECTOR_DECL(xml_node_ptr, zbx_xml_node_t *)
@@ -1281,7 +1279,7 @@ out:
  *                                                                            *
  * Purpose: retrieve a value from xml data relative to the specified node     *
  *                                                                            *
- * Parameters: doc    - [IN] the XML document                                 *
+ * Parameters: xdoc   - [IN] the XML document                                 *
  *             node   - [IN] the XML node                                     *
  *             xpath  - [IN] the XML XPath                                    *
  *                                                                            *
@@ -1289,7 +1287,7 @@ out:
  *         contain the value specified by xpath.                              *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath)
+char	*zbx_xml_node_read_value(xmlDoc *xdoc, xmlNode *node, const char *xpath)
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -1297,7 +1295,7 @@ char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath)
 	xmlChar		*val;
 	char		*value = NULL;
 
-	xpathCtx = xmlXPathNewContext(doc);
+	xpathCtx = xmlXPathNewContext(xdoc);
 
 	xpathCtx->node = node;
 
@@ -1315,7 +1313,7 @@ char	*zbx_xml_node_read_value(xmlDoc *doc, xmlNode *node, const char *xpath)
 
 	nodeset = xpathObj->nodesetval;
 
-	if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+	if (NULL != (val = xmlNodeListGetString(xdoc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
 	{
 		value = zbx_strdup(NULL, (const char *)val);
 		xmlFree(val);
@@ -1347,4 +1345,109 @@ char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath)
 	return zbx_xml_node_read_value(xdoc, root_element, xpath);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve an xmlNode from xml data relative to the specified node  *
+ *                                                                            *
+ * Parameters: xdoc    - [IN] the XML document                                *
+ *             node   - [IN] the XML node                                     *
+ *             xpath  - [IN] the XML XPath                                    *
+ *                                                                            *
+ * Return: The pointer to xmlNode or NULL if the xml data does not            *
+ *         contain the value specified by xpath.                              *
+ *                                                                            *
+ ******************************************************************************/
+xmlNode	*zbx_xml_node_get(xmlDoc *xdoc, xmlNode *node, const char *xpath)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNode		*value = NULL;
+
+	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL != node)
+		xpathCtx->node = node;
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+		goto clean;
+
+	if (XPATH_NODESET != xpathObj->type)
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	value = xpathObj->nodesetval->nodeTab[0];
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+
+	return value;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve an xmlNode from xml document                             *
+ *                                                                            *
+ * Parameters: xdoc  - [IN] the XML document                                  *
+ *             xpath - [IN] the XML XPath                                     *
+ *                                                                            *
+ * Return: The pointer to xmlNode or NULL if the xml data does not            *
+ *         contain the value specified by xpath.                              *
+ *                                                                            *
+ ******************************************************************************/
+xmlNode	*zbx_xml_doc_get(xmlDoc *xdoc, const char *xpath)
+{
+	return zbx_xml_node_get(xdoc, NULL, xpath);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove a xmlNode from xml data relative to the specified node     *
+ *                                                                            *
+ * Parameters: xdoc   - [IN] the XML document                                 *
+ *             node   - [IN] the XML node                                     *
+ *             xpath  - [IN] the XML XPath                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the operation has completed successfully           *
+ *               FAIL    - the operation has failed                           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_xml_node_remove(xmlDoc *xdoc, xmlNode *node, const char *xpath)
+{
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	int		i, ret = FAIL;
+
+	if (NULL == xdoc)
+		goto out;
+
+	xpathCtx = xmlXPathNewContext(xdoc);
+
+	if (NULL != node)
+		xpathCtx->node = node;
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)xpath, xpathCtx)))
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		xmlUnlinkNode(nodeset->nodeTab[i]);
+		xmlFreeNode(nodeset->nodeTab[i]);
+		nodeset->nodeTab[i] = NULL;
+	}
+
+	ret = SUCCEED;
+clean:
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+out:
+	return ret;
+}
 #endif // HAVE_LIBXML2 && HAVE_LIBCURL

@@ -16,16 +16,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#include "zbxtrends.h"
+#include "trends.h"
 
 #include "common.h"
 #include "zbxalgo.h"
 #include "log.h"
-#include "zbxtrends.h"
-#include "mutexs.h"
-#include "memalloc.h"
-#include "trends.h"
-
-extern zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE;
+#include "zbxmutexs.h"
+#include "zbxshmem.h"
 
 typedef struct
 {
@@ -73,11 +71,11 @@ static int		alloc_num = 0;
  *   2) indexing hashset slots pointer array, allocated during cache initialization
  *   3) slots array, allocated during cache initialization and used for hashset entry allocations
  */
-static zbx_mem_info_t	*tfc_mem = NULL;
+static zbx_shmem_info_t	*tfc_mem = NULL;
 
 static zbx_mutex_t	tfc_lock = ZBX_MUTEX_NULL;
 
-ZBX_MEM_FUNC_IMPL(__tfc, tfc_mem)
+ZBX_SHMEM_FUNC_IMPL(__tfc, tfc_mem)
 
 #define LOCK_CACHE	zbx_mutex_lock(tfc_lock)
 #define UNLOCK_CACHE	zbx_mutex_unlock(tfc_lock)
@@ -157,7 +155,7 @@ static void	*tfc_malloc_func(void *old, size_t size)
 		return tfc_alloc_slot();
 
 	if (0 == alloc_num++)
-		return __tfc_mem_malloc_func(old, size);
+		return __tfc_shmem_malloc_func(old, size);
 
 	return NULL;
 }
@@ -178,7 +176,7 @@ static void	tfc_free_func(void *ptr)
 		return;
 	}
 
-	__tfc_mem_free_func(ptr);
+	__tfc_shmem_free_func(ptr);
 }
 
 /******************************************************************************
@@ -366,18 +364,19 @@ static const char	*tfc_state_str(zbx_trend_state_t state)
  *                                                                            *
  * Purpose: initialize trend function cache                                   *
  *                                                                            *
- * Parameters: error - [OUT] the error message                                *
+ * Parameters: cache_size - [IN] trend function cache size, can be 0          *
+ *             error      - [OUT] the error message                           *
  *                                                                            *
  * Return value: SUCCEED - the cache was initialized successfully             *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tfc_init(char **error)
+int	zbx_tfc_init(zbx_uint64_t cache_size, char **error)
 {
 	zbx_uint64_t	size_reserved, size_actual;
 	int		ret = FAIL;
 
-	if (0 == CONFIG_TREND_FUNC_CACHE_SIZE)
+	if (0 == cache_size)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): trends function cache disabled", __func__);
 		return SUCCEED;
@@ -388,17 +387,17 @@ int	zbx_tfc_init(char **error)
 	if (SUCCEED != zbx_mutex_create(&tfc_lock, ZBX_MUTEX_TREND_FUNC, error))
 		goto out;
 
-	size_reserved = zbx_mem_required_size(1, "trend function cache size", "TrendFunctionCacheSize");
+	size_reserved = zbx_shmem_required_size(1, "trend function cache size", "TrendFunctionCacheSize");
 
-	if (SUCCEED != zbx_mem_create(&tfc_mem, CONFIG_TREND_FUNC_CACHE_SIZE, "trend function cache size",
+	if (SUCCEED != zbx_shmem_create(&tfc_mem, cache_size, "trend function cache size",
 			"TrendFunctionCacheSize", 1, error))
 	{
 		goto out;
 	}
 
-	cache =  (zbx_tfc_t *)__tfc_mem_realloc_func(NULL, sizeof(zbx_tfc_t));
+	cache =  (zbx_tfc_t *)__tfc_shmem_realloc_func(NULL, sizeof(zbx_tfc_t));
 
-	size_actual = CONFIG_TREND_FUNC_CACHE_SIZE;
+	size_actual = cache_size;
 	/* (8 + 8) * 3 - overhead for 3 allocations */
 	size_actual -= size_reserved + sizeof(zbx_tfc_t) + (8 + 8) * 3;
 
@@ -414,7 +413,7 @@ int	zbx_tfc_init(char **error)
 	cache->lru_head = UINT32_MAX;
 	cache->lru_tail = UINT32_MAX;
 
-	cache->slots = (zbx_tfc_slot_t *)__tfc_mem_malloc_func(NULL, sizeof(zbx_tfc_slot_t) * cache->slots_num);
+	cache->slots = (zbx_tfc_slot_t *)__tfc_shmem_malloc_func(NULL, sizeof(zbx_tfc_slot_t) * cache->slots_num);
 
 	cache->free_head = UINT32_MAX;
 	cache->free_slot = 0;
@@ -437,9 +436,9 @@ out:
  ******************************************************************************/
 void	zbx_tfc_destroy(void)
 {
-	if (0 != CONFIG_TREND_FUNC_CACHE_SIZE)
+	if (NULL != tfc_mem)
 	{
-		zbx_mem_destroy(tfc_mem);
+		zbx_shmem_destroy(tfc_mem);
 		tfc_mem = NULL;
 		zbx_mutex_destroy(&tfc_lock);
 		alloc_num = 0;
@@ -513,8 +512,13 @@ int	zbx_tfc_get_value(zbx_uint64_t itemid, int start, int end, zbx_trend_functio
 		{
 			char	buf[ZBX_MAX_DOUBLE_LEN + 1];
 
+			if (data->state == ZBX_TREND_STATE_NODATA)
+				zbx_strlcpy(buf, "none", sizeof(buf));
+			else
+				zbx_print_double(buf, sizeof(buf), data->value);
+
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%s value:%s", __func__,
-					tfc_state_str(data->state), zbx_print_double(buf, sizeof(buf), data->value));
+					tfc_state_str(data->state), buf);
 		}
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():not cached", __func__);

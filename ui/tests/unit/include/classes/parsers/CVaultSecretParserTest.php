@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -28,97 +28,134 @@ class CVaultSecretParserTest extends TestCase {
 	 */
 	public function dataProvider() {
 		return [
+			// HashiCorp
 			// PARSE_SUCCESS
-			['path/to/secret:key', 0, [], [
+			['path/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['path/to/secret', 0, ['with_key' => false], [
+			['path/to/secret', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['mount%2Fpoint/to/secret:key', 0, [], [
+			['mount%2Fpoint/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['mount%2Fpoint/secret:key', 0, [], [
+			['mount%2Fpoint/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['mount%2Fpoint/secret', 0, ['with_key' => false], [
+			['mount%2Fpoint/secret', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
 			// Double slash in key is allowed.
-			['namespace/secret:key/'.'/key', 0, [], [
+			['namespace/secret:key/'.'/key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
 			// Multibyte support.
-			['bā/āb:ā', 0, [], [
+			['bā/āb:ā', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
-			['zabbix/secret%3A/path:key', 0, [], [
+			['zabbix/secret%3A/path:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'error' => ''
 			]],
 			// PARSE_FAIL
-			['pathtosecret/:key', 0, [], [
+			['pathtosecret/:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near ":key"'
 			]],
-			['/mount%2Fpoint/pathtosecret:key', 0, [], [
+			['/mount%2Fpoint/pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "/mount%2Fpoint/pathtosecret:key"'
 			]],
-			['/pathtosecret:key', 0, [], [
+			['/pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "/pathtosecret:key"'
 			]],
-			['pathtosecret:key', 0, [], [
+			['pathtosecret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "pathtosecret:key"'
 			]],
-			[':key', 0, [], [
+			[':key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near ":key"'
 			]],
-			['/path/to/secret:key', 0, [], [
+			['/path/to/secret:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "/path/to/secret:key"'
 			]],
 			// Path is empty.
-			['namespace/', 0, ['with_key' => false], [
+			['namespace/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "namespace/"'
 			]],
 			// Path has trailing slash.
-			['namespace/path/', 0, ['with_key' => false], [
+			['namespace/path/', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "path/"'
 			]],
-			['namespace/path/:key', 0, [], [
+			['namespace/path/:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "path/:key"'
 			]],
 			// Path begins with slash.
-			['namespace/'.'/path', 0, ['with_key' => false], [
+			['namespace/'.'/path', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "/path"'
 			]],
 			// Path has empty segment.
-			['namespace/path/'.'/to', 0, ['with_key' => false], [
+			['namespace/path/'.'/to', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP, 'with_key' => false], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "path//to"'
 			]],
-			['namespace/path/'.'/to:key', 0, [], [
+			['namespace/path/'.'/to:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "path//to:key"'
 			]],
-			['zabbix/secret/:path:key', 0, [], [
+			['zabbix/secret/:path:key', 0, ['provider' => ZBX_VAULT_TYPE_HASHICORP], [
 				'rc' => CParser::PARSE_FAIL,
 				'error' => 'incorrect syntax near "secret/:path:key"'
+			]],
+
+			// CyberArk
+			// PARSE_SUCCESS
+			['AppID=&Query=Safe=Object=buzz:key', 0, ['provider' => ZBX_VAULT_TYPE_CYBERARK], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'error' => ''
+			]],
+			['AppID=&Query=Safe=Object=buzz', 0, ['with_key' => false, 'provider' => ZBX_VAULT_TYPE_CYBERARK], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'error' => ''
+			]],
+			// PARSE_FAIL
+			['', 0, ['provider' => ZBX_VAULT_TYPE_CYBERARK], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'string is empty'
+			]],
+			['@AppID=&Query=Safe=Object=buzz', 0, ['with_key' => false, 'provider' => ZBX_VAULT_TYPE_CYBERARK], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near "@AppID=&Query=Safe=Object=buzz"'
+			]],
+			['AppID=&Qu#ery=Safe=Object=buzz', 0, ['with_key' => false, 'provider' => ZBX_VAULT_TYPE_CYBERARK], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near "Qu#ery=Safe=Object=buzz"'
+			]],
+			['AppID=&Query=Safe=Object=buzz', 0, ['provider' => ZBX_VAULT_TYPE_CYBERARK], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'mandatory key is missing'
+			]],
+			['AppId=&Query=Safe=Object=buzz:key', 0, ['provider' => ZBX_VAULT_TYPE_CYBERARK], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'mandatory parameter "AppID" is missing'
+			]],
+			['AppID=&Query=Safe=Object=buzz:key', 0, ['with_key' => false, 'provider' => ZBX_VAULT_TYPE_CYBERARK], [
+				'rc' => CParser::PARSE_FAIL,
+				'error' => 'incorrect syntax near ":key"'
 			]]
 		];
 	}

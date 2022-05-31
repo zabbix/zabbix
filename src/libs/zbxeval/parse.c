@@ -20,8 +20,6 @@
 #include "zbxeval.h"
 #include "eval.h"
 
-#include "../zbxalgo/vectorimpl.h"
-
 ZBX_VECTOR_IMPL(eval_token, zbx_eval_token_t)
 
 static int	is_whitespace(char c)

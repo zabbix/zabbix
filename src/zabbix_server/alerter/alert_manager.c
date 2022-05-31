@@ -19,7 +19,7 @@
 
 #include "alert_manager.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxserver.h"
@@ -34,8 +34,8 @@
 
 #define ZBX_UPDATE_STR(dst, src)			\
 	if (NULL == src)				\
-		zbx_free(dst); 				\
-	else if (NULL == dst || 0 != strcmp(dst, src)) 	\
+		zbx_free(dst);				\
+	else if (NULL == dst || 0 != strcmp(dst, src))	\
 		dst = zbx_strdup(dst, src);
 
 #define ZBX_AM_DB_POLL_DELAY	1
@@ -1376,7 +1376,10 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 	if (0 == access(*cmd, X_OK))
 	{
-		char	*pstart, *pend;
+		char			*pstart, *pend;
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
 
 		db_alert.sendto = (NULL != alert->sendto ? alert->sendto : zbx_strdup(NULL, ""));
 		db_alert.subject = (NULL != alert->subject ? alert->subject : zbx_strdup(NULL, ""));
@@ -1389,7 +1392,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 
 			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, pstart, pend - pstart);
 
-			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, &db_alert, NULL,
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, &db_alert, NULL,
 					NULL, NULL, NULL, &param, MACRO_TYPE_ALERT, NULL, 0);
 
 			param_esc = zbx_dyn_escape_shell_single_quote(param);
@@ -1405,6 +1408,8 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 			zbx_free(db_alert.subject);
 		if (db_alert.message != alert->message)
 			zbx_free(db_alert.message);
+
+		zbx_dc_close_user_macros(um_handle);
 
 		ret = SUCCEED;
 	}
@@ -1927,8 +1932,8 @@ static void	am_process_begin_dispatch(zbx_ipc_client_t *client, const unsigned c
  *             content_type - [OUT] the message content type                  *
  *                                                                            *
  ******************************************************************************/
-static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, DB_MEDIATYPE *mt, zbx_shared_str_t *message,
-		unsigned char *content_type)
+static void	am_prepare_dispatch_message(zbx_am_dispatch_t *dispatch, ZBX_DB_MEDIATYPE *mt,
+		zbx_shared_str_t *message, unsigned char *content_type)
 {
 	char	*body = NULL;
 
@@ -1964,7 +1969,7 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 	int			i;
 	zbx_vector_str_t	recipients;
 	zbx_am_alert_t		*alert;
-	DB_MEDIATYPE		mt;
+	ZBX_DB_MEDIATYPE		mt;
 	zbx_shared_str_t	message;
 	unsigned char		content_type;
 	zbx_uint64_t		id;
@@ -2199,8 +2204,8 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 
 			if (NULL == (source = zbx_hashset_search(&sources, &source_local)))
 			{
+				source_local.alerts_num = 0;
 				source = zbx_hashset_insert(&sources, &source_local, sizeof(source_local));
-				source->alerts_num = 0;
 				zbx_vector_ptr_append(&view, source);
 			}
 			source->alerts_num++;

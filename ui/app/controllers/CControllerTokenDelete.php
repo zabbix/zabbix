@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -33,7 +33,13 @@ class CControllerTokenDelete extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -52,32 +58,28 @@ class CControllerTokenDelete extends CController {
 
 		$result = API::Token()->delete($tokenids);
 
-		$deleted = count($tokenids);
-
 		$output = [];
 
 		if ($result) {
-			$tokenids = API::Token()->get([
-				'output' => [],
-				'tokenids' => $tokenids
-			]);
-
-			$output['keepids'] = array_column($tokenids, 'tokenid');
-
-			$success = ['title' => _n('API token deleted', 'API tokens deleted', $deleted)];
+			$output['success']['title'] = _n('API token deleted', 'API tokens deleted', count($tokenids));
 
 			if ($messages = get_and_clear_messages()) {
-				$success['messages'] = array_column($messages, 'message');
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
-
-			$output['success'] = $success;
 		}
 		else {
-			CMessageHelper::setErrorTitle(_n('Cannot delete API token', 'Cannot delete API tokens', $deleted));
 			$output['error'] = [
-				'title' => CMessageHelper::getTitle(),
+				'title' => _n('Cannot delete API token', 'Cannot delete API tokens', count($tokenids)),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
+
+			$tokens = API::Token()->get([
+				'output' => [],
+				'tokenids' => $tokenids,
+				'preservekeys' => true
+			]);
+
+			$output['keepids'] = array_keys($tokens);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

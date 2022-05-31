@@ -27,7 +27,7 @@
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 #elif defined(HAVE_ORACLE)
-#	include "dbschema.h"
+#	include "zbxdbschema.h"
 #	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
 #	include <libpq-fe.h>
@@ -36,7 +36,7 @@
 #endif
 
 #if defined(HAVE_SQLITE3)
-#	include "mutexs.h"
+#	include "zbxmutexs.h"
 #endif
 
 struct zbx_db_result

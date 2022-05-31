@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -199,20 +199,7 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 	->show();
 
 (new CScriptTag('
-	view.init('.json_encode([
-		'enable_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'sla.enable')
-			->setArgumentSID()
-			->getUrl(),
-		'disable_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'sla.disable')
-			->setArgumentSID()
-			->getUrl(),
-		'delete_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'sla.delete')
-			->setArgumentSID()
-			->getUrl()
-	]).');
+	view.init();
 '))
 	->setOnDocumentReady()
 	->show();

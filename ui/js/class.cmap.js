@@ -91,6 +91,7 @@ ZABBIX.namespace('apps.map');
 ZABBIX.apps.map = (function($) {
 	// dependencies
 	var Observer = ZABBIX.classes.Observer;
+	const ZBX_STYLE_DEFAULT_OPTION = 'default-option';
 
 	function createMap(containerId, mapData) {
 		var CMap = function(containerId, mapData) {
@@ -1146,7 +1147,6 @@ ZABBIX.apps.map = (function($) {
 
 						default:
 							throw 'Unsupported element type found in copy buffer!';
-							break;
 					}
 
 					if (element) {
@@ -1700,8 +1700,7 @@ ZABBIX.apps.map = (function($) {
 
 			// create dom
 			this.domNode = $('<div>', {
-					style: 'position: absolute; z-index: 1;\
-						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
+					style: 'position: absolute; z-index: 1; background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
 				.appendTo(this.sysmap.container)
 				.addClass('cursor-pointer sysmap_shape')
@@ -2673,9 +2672,9 @@ ZABBIX.apps.map = (function($) {
 			const select_icon_maintenance = document.getElementById('iconid_maintenance');
 			const select_icon_disabled = document.getElementById('iconid_disabled');
 
-			select_icon_on.addOption({label: t('S_DEFAULT'), value: '0'});
-			select_icon_maintenance.addOption({label: t('S_DEFAULT'), value: '0'});
-			select_icon_disabled.addOption({label: t('S_DEFAULT'), value: '0'});
+			select_icon_on.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
+			select_icon_maintenance.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
+			select_icon_disabled.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
 
 			for (i in this.sysmap.iconList) {
 				icon = this.sysmap.iconList[i];
@@ -2717,8 +2716,7 @@ ZABBIX.apps.map = (function($) {
 						dstfld1: 'elementNameTriggers',
 						with_triggers: '1',
 						real_hosts: '1',
-						multiselect: '1',
-						noempty: '1'
+						multiselect: '1'
 					}
 				}
 			});
@@ -3253,9 +3251,9 @@ ZABBIX.apps.map = (function($) {
 			const select_icon_maintenance = document.getElementById('massIconidMaintenance');
 			const select_icon_disabled = document.getElementById('massIconidDisabled');
 
-			select_icon_on.addOption({label: t('S_DEFAULT'), value: '0'});
-			select_icon_maintenance.addOption({label: t('S_DEFAULT'), value: '0'});
-			select_icon_disabled.addOption({label: t('S_DEFAULT'), value: '0'});
+			select_icon_on.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
+			select_icon_maintenance.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
+			select_icon_disabled.addOption({label: t('S_DEFAULT'), value: '0', class_name: ZBX_STYLE_DEFAULT_OPTION});
 
 			for (i in this.sysmap.iconList) {
 				icon = this.sysmap.iconList[i];
@@ -3337,8 +3335,7 @@ ZABBIX.apps.map = (function($) {
 					element,
 					elementTypeText,
 					i,
-					ln,
-					name;
+					ln;
 
 				$('#massList tbody').empty();
 

@@ -17,12 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "service.h"
+#include "zbxwinservice.h"
 
 #include "common.h"
 #include "cfg.h"
 #include "log.h"
-#include "alias.h"
 #include "zbxconf.h"
 #include "perfmon.h"
 
@@ -31,7 +30,24 @@
 static	SERVICE_STATUS		serviceStatus;
 static	SERVICE_STATUS_HANDLE	serviceHandle;
 
-int	application_status = ZBX_APP_RUNNING;
+#define ZBX_APP_STOPPED	0
+#define ZBX_APP_RUNNING	1
+/* required for closing application from service */
+static int	application_status = ZBX_APP_RUNNING;
+
+static zbx_on_exit_t	zbx_on_exit_cb;
+
+int	ZBX_IS_RUNNING(void)
+{
+	return application_status;
+}
+
+void	ZBX_DO_EXIT(void)
+{
+	application_status = ZBX_APP_STOPPED;
+}
+#undef ZBX_APP_STOPPED
+#undef ZBX_APP_RUNNING
 
 /* free resources allocated by MAIN_ZABBIX_ENTRY() */
 void	zbx_free_service_resources(int ret);
@@ -44,7 +60,7 @@ static void	parent_signal_handler(int sig)
 		case SIGTERM:
 			ZBX_DO_EXIT();
 			zabbix_log(LOG_LEVEL_INFORMATION, "Got signal. Exiting ...");
-			zbx_on_exit(SUCCEED);
+			zbx_on_exit_cb(SUCCEED);
 			break;
 	}
 }
@@ -395,8 +411,9 @@ int	ZabbixStopService(void)
 	return ret;
 }
 
-void	set_parent_signal_handler(void)
+void	set_parent_signal_handler(zbx_on_exit_t zbx_on_exit_cb_arg)
 {
+	zbx_on_exit_cb = zbx_on_exit_cb_arg;
 	signal(SIGINT, parent_signal_handler);
 	signal(SIGTERM, parent_signal_handler);
 }

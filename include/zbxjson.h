@@ -188,6 +188,12 @@
 #define ZBX_PROTO_TAG_PID			"pid"
 #define ZBX_PROTO_TAG_PROCESS_NAME		"process_name"
 #define ZBX_PROTO_TAG_PROCESS_NUM		"process_num"
+#define ZBX_PROTO_TAG_HEARTBEAT_FREQ		"heartbeat_freq"
+#define ZBX_PROTO_TAG_ACTIVE_STATUS		"active_status"
+#define ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA	"host data"
+#define ZBX_PROTO_TAG_PROXY_NAME		"proxy_name"
+#define ZBX_PROTO_TAG_PROXY_NAMES		"proxy_names"
+#define ZBX_PROTO_TAG_PROXY_HOSTIDS		"proxy_hostids"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -204,6 +210,7 @@
 #define ZBX_PROTO_VALUE_GET_STATUS		"status.get"
 #define ZBX_PROTO_VALUE_PROXY_DATA		"proxy data"
 #define ZBX_PROTO_VALUE_PROXY_TASKS		"proxy tasks"
+#define ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT	"active check heartbeat"
 
 #define ZBX_PROTO_VALUE_GET_QUEUE_OVERVIEW	"overview"
 #define ZBX_PROTO_VALUE_GET_QUEUE_PROXY		"overview by proxy"

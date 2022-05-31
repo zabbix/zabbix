@@ -20,6 +20,7 @@
 #include "service_actions.h"
 
 #include "log.h"
+#include "zbxserver.h"
 
 /******************************************************************************
  *                                                                            *
@@ -209,7 +210,7 @@ static int	service_update_match_action(const zbx_service_update_t *update, const
 
 	zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, action->formula + last_pos);
 
-	if (FAIL == evaluate(&res, expr, error, sizeof(error), NULL))
+	if (FAIL == zbx_evaluate(&res, expr, error, sizeof(error), NULL))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot evaluate action \"" ZBX_FS_UI64 "\" formula \"%s\": %s",
 			action->actionid, action->formula, error);

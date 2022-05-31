@@ -20,7 +20,7 @@
 #ifndef ZABBIX_PREPROCESSING_MANAGER_H
 #define ZABBIX_PREPROCESSING_MANAGER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(preprocessing_manager_thread, args);
 

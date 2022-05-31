@@ -33,20 +33,21 @@ $widget = (new CWidget())
 	))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(
-				($data['hostid'] != 0)
-					? new CRedirectButton(_('Create item'), (new CUrl('items.php'))
-						->setArgument('form', 'create')
-						->setArgument('hostid', $data['hostid'])
-						->setArgument('context', $data['context'])
-						->getUrl()
-					)
-					: (new CButton('form',
-						($data['context'] === 'host')
-							? _('Create item (select host first)')
-							: _('Create item (select template first)')
-					))->setEnabled(false)
-			)
+			(new CList())
+				->addItem(
+					$data['hostid'] != 0
+						? new CRedirectButton(_('Create item'),
+							(new CUrl('items.php'))
+								->setArgument('form', 'create')
+								->setArgument('hostid', $data['hostid'])
+								->setArgument('context', $data['context'])
+						)
+						: (new CButton('form',
+							$data['context'] === 'host'
+								? _('Create item (select host first)')
+								: _('Create item (select template first)')
+						))->setEnabled(false)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
@@ -68,7 +69,7 @@ $url = (new CUrl('items.php'))
 $itemForm = (new CForm('post', $url))
 	->setName('items')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], 'form_context');
 
 if (!empty($data['hostid'])) {
 	$itemForm->addVar('hostid', $data['hostid']);
@@ -164,11 +165,12 @@ foreach ($data['items'] as $item) {
 					: 'item.massdisable'
 				)
 				->setArgument('context', $data['context'])
+				->setArgument('checkbox_hash', $data['checkbox_hash'])
+				->setArgumentSID()
 				->getUrl()
 		))
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($item['status'], $item['state']))
-		->addSID()
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(itemIndicatorStyle($item['status'], $item['state']))
 	);
 
 	// triggers info
@@ -188,20 +190,15 @@ foreach ($data['items'] as $item) {
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-			$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
-		}
-		else {
-			$trigger_description[] = new CLink(
-				CHtml::encode($trigger['description']),
-				(new CUrl('triggers.php'))
-					->setArgument('form', 'update')
-					->setArgument('hostid', key($trigger['hosts']))
-					->setArgument('triggerid', $trigger['triggerid'])
-					->setArgument('context', $data['context'])
-					->setArgument('backurl', $backurl)
-			);
-		}
+		$trigger_description[] = new CLink(
+			CHtml::encode($trigger['description']),
+			(new CUrl('triggers.php'))
+				->setArgument('form', 'update')
+				->setArgument('hostid', key($trigger['hosts']))
+				->setArgument('triggerid', $trigger['triggerid'])
+				->setArgument('context', $data['context'])
+				->setArgument('backurl', $backurl)
+		);
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
@@ -239,7 +236,7 @@ foreach ($data['items'] as $item) {
 	}
 
 	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
 		->setMenuPopup(CMenuPopupHelper::getItemConfiguration([
 			'itemid' => $item['itemid'],
 			'context' => $data['context'],
@@ -274,8 +271,15 @@ foreach ($data['items'] as $item) {
 		}
 	}
 
+	$checkbox = new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']);
+
+	if (in_array($item['type'], checkNowAllowedTypes())
+			&& $item['status'] == ITEM_STATUS_ACTIVE && $item['hosts'][0]['status'] == HOST_STATUS_MONITORED) {
+		$checkbox->setAttribute('data-actions', 'execute');
+	}
+
 	$itemTable->addRow([
-		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
+		$checkbox,
 		$wizard,
 		($data['hostid'] == 0) ? $item['host'] : null,
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
@@ -299,8 +303,7 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$massclearhistory = [
 		'name' => _('Clear history'),
-		'confirm' => _('Delete history of selected items?'),
-		'disabled' => $data['is_template']
+		'confirm' => _('Delete history of selected items?')
 	];
 
 	if ($data['config']['compression_status']) {
@@ -308,7 +311,13 @@ if ($data['context'] === 'host') {
 	}
 
 	$button_list += [
-		'item.masscheck_now' => ['name' => _('Execute now'), 'disabled' => $data['is_template']],
+		'item.masscheck_now' => [
+			'content' => (new CSimpleButton(_('Execute now')))
+				->onClick('view.massCheckNow(this);')
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('no-chkbxrange')
+				->setAttribute('data-required', 'execute')
+		],
 		'item.massclearhistory' => $massclearhistory
 	];
 }
@@ -339,6 +348,11 @@ $widget->addItem($itemForm);
 
 $widget->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['checkbox_hash'],
+		'checkbox_object' => 'group_itemid'
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

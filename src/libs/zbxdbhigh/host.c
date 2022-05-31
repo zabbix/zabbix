@@ -21,17 +21,16 @@
 #include "log.h"
 #include "dbcache.h"
 #include "zbxserver.h"
-#include "../../libs/zbxaudit/audit_host.h"
-#include "../../libs/zbxaudit/audit_item.h"
-#include "../../libs/zbxaudit/audit_trigger.h"
-#include "../../libs/zbxaudit/audit_httptest.h"
-#include "../../libs/zbxaudit/audit_graph.h"
-#include "../../libs/zbxaudit/audit.h"
+#include "audit/zbxaudit_host.h"
+#include "audit/zbxaudit_item.h"
+#include "audit/zbxaudit_trigger.h"
+#include "audit/zbxaudit_httptest.h"
+#include "audit/zbxaudit_graph.h"
+#include "audit/zbxaudit.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
-#include "../zbxalgo/vectorimpl.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {
@@ -828,10 +827,11 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d)"
+				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d)"
 					" and",
 				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT);
+				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
+				ITEM_TYPE_HTTPAGENT);
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -909,7 +909,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 
 	DBfree_result(result);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != actionids.values_num)
 	{
@@ -933,7 +933,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* in ORACLE always present begin..end; */
 	if (16 < sql_offset)
@@ -1008,7 +1008,7 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	zbx_vector_uint64_create(&selementids);
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
 	if (0 != selementids.values_num)
@@ -1028,7 +1028,7 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -1138,7 +1138,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 
 	zbx_vector_uint64_create(&profileids);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "graphid", &profile_idx, 1, graphids);
@@ -1155,7 +1155,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid", graphids->values, graphids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -1340,7 +1340,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBadd_to_housekeeper(itemids, "lldruleid", event_tables, ARRSIZE(event_tables));
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "itemid", &profile_idx, 1, itemids);
@@ -1357,7 +1357,7 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 clean:
@@ -1821,7 +1821,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, const char *hostname, zbx_ve
 		goto clean;
 	}
 
-	zbx_audit_host_create_entry(AUDIT_ACTION_UPDATE, hostid, hostname);
+	zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
 	DBdelete_template_httptests(hostid, del_templateids);
 	DBdelete_template_graphs(hostid, del_templateids);
@@ -2030,8 +2030,8 @@ typedef struct
 	unsigned char		discover;
 	unsigned char		custom_interfaces_orig;
 	unsigned char		custom_interfaces;
-	char			inventory_mode_orig;
-	char			inventory_mode;
+	signed char		inventory_mode_orig;
+	signed char		inventory_mode;
 	zbx_uint64_t		templateid_host;
 }
 zbx_host_prototype_t;
@@ -2206,7 +2206,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 		if (SUCCEED == DBis_null(row[7]))
 			host_prototype->inventory_mode = HOST_INVENTORY_DISABLED;
 		else
-			host_prototype->inventory_mode = (char)atoi(row[7]);
+			host_prototype->inventory_mode = (signed char)atoi(row[7]);
 
 		host_prototype->inventory_mode_orig = HOST_INVENTORY_DISABLED;
 
@@ -2251,7 +2251,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 
 				if (host_prototype->itemid == itemid && 0 == strcmp(host_prototype->host, row[2]))
 				{
-					char	inventory_mode_null_processed;
+					signed char	inventory_mode_null_processed;
 
 					ZBX_STR2UINT64(host_prototype->hostid, row[1]);
 
@@ -2282,7 +2282,7 @@ static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *tem
 					if (SUCCEED == DBis_null(row[8]))
 						inventory_mode_null_processed = HOST_INVENTORY_DISABLED;
 					else
-						inventory_mode_null_processed = (char)atoi(row[8]);
+						inventory_mode_null_processed = (signed char)atoi(row[8]);
 
 					if (host_prototype->inventory_mode != inventory_mode_null_processed)
 					{
@@ -2415,7 +2415,7 @@ static void	DBhost_prototypes_templates_make(zbx_vector_ptr_t *host_prototypes,
 						ZBX_STR2UINT64(hosttemplateid, row[2]);
 						zbx_vector_uint64_append(del_hosttemplateids, hosttemplateid);
 
-						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+						zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 								host_prototype->hostid, host_prototype->host);
 
 						zbx_audit_host_prototype_update_json_delete_parent_template(
@@ -2926,7 +2926,7 @@ static void	DBhost_prototypes_macros_make(zbx_vector_ptr_t *host_prototypes, zbx
 					{
 						zbx_vector_uint64_append(del_macroids, hostmacroid);
 
-						zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+						zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 								host_prototype->hostid, host_prototype->host);
 
 						zbx_audit_host_prototype_update_json_delete_hostmacro(
@@ -3082,7 +3082,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes, zbx_v
 			{
 				zbx_vector_uint64_append(del_tagids, tagid);
 
-				zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype_local->hostid,
+				zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE, host_prototype_local->hostid,
 						host_prototype_local->host);
 				zbx_audit_host_prototype_update_json_delete_tag(host_prototype_local->hostid, tagid);
 			}
@@ -3295,7 +3295,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 						{
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 
-							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+							zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 									host_prototype->hostid, host_prototype->host);
 
 							zbx_audit_host_prototype_update_json_delete_interface(
@@ -3317,7 +3317,7 @@ static void	DBhost_prototypes_interfaces_make(zbx_vector_ptr_t *host_prototypes,
 						{
 							zbx_vector_uint64_append(del_interfaceids, interfaceid);
 
-							zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE,
+							zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE,
 									host_prototype->hostid, host_prototype->host);
 
 							zbx_audit_host_prototype_update_json_delete_interface(
@@ -3526,7 +3526,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		}
 		else
 		{
-			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_UPDATE, host_prototype->hostid,
+			zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_UPDATE, host_prototype->hostid,
 					host_prototype->host);
 
 			if (0 != (host_prototype->flags & ZBX_FLAG_HPLINK_UPDATE_INVENTORY_MODE))
@@ -3627,7 +3627,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != upd_tags.values_num)
 	{
 		sql1 = (char *)zbx_malloc(sql1, sql1_alloc);
-		DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		zbx_DBbegin_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 	}
 
 	if (0 != new_hosts_templates)
@@ -3638,7 +3638,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != del_inventory_modes_hostids.values_num)
 	{
 		sql2 = (char *)zbx_malloc(sql2, sql2_alloc);
-		DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+		zbx_DBbegin_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 	}
 
 	if (0 != del_hosttemplateids->values_num)
@@ -3745,7 +3745,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 					(int)ZBX_FLAG_DISCOVERY_PROTOTYPE, host_prototype->templateid,
 					(int)host_prototype->discover, (int)host_prototype->custom_interfaces);
 
-			zbx_audit_host_prototype_create_entry(AUDIT_ACTION_ADD, host_prototype->hostid,
+			zbx_audit_host_prototype_create_entry(ZBX_AUDIT_ACTION_ADD, host_prototype->hostid,
 					host_prototype->host);
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
@@ -3832,7 +3832,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 				}
 
 				zbx_audit_host_prototype_update_json_update_inventory_mode(host_prototype->hostid,
-						host_prototype->inventory_mode_orig, host_prototype->inventory_mode);
+						(int)host_prototype->inventory_mode_orig,
+						(int)host_prototype->inventory_mode);
 			}
 		}
 
@@ -3841,8 +3842,8 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, host_prototype->hostid,
 					host_prototype->lnk_templateids.values[j]);
 
-			zbx_audit_host_prototype_update_json_add_parent_template(host_prototype->hostid,
-					hosttemplateid, host_prototype->lnk_templateids.values[j]);
+			zbx_audit_host_prototype_update_json_add_parent_template(host_prototype->hostid, hosttemplateid,
+					host_prototype->lnk_templateids.values[j], ZBX_TEMPLATE_LINK_MANUAL);
 
 			hosttemplateid++;
 		}
@@ -4187,7 +4188,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 	if (SUCCEED == res && (NULL != sql1 || new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes ||
 			0 != upd_hostmacros || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_inventory_modes))
 	{
-		DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
+		zbx_DBend_multiple_update(&sql1, &sql1_alloc, &sql1_offset);
 
 		/* in ORACLE always present begin..end; */
 		if (16 < sql1_offset)
@@ -4199,7 +4200,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			0 != del_interfaceids->values_num || 0 != del_snmpids->values_num ||
 			0 != del_inventory_modes_hostids.values_num))
 	{
-		DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
+		zbx_DBend_multiple_update(&sql2, &sql2_alloc, &sql2_offset);
 
 		/* in ORACLE always present begin..end; */
 		if (16 < sql2_offset)
@@ -5019,7 +5020,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 				zbx_vector_uint64_append(&httpupdstepids, httpstep->hoststepid);
 			}
 
-			zbx_audit_httptest_create_entry(AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
+			zbx_audit_httptest_create_entry(ZBX_AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
 		}
 	}
 
@@ -5188,7 +5189,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 				NULL);
 	}
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < httptests->values_num; i++)
 	{
@@ -5198,7 +5199,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		{
 			httptest->httptestid = httptestid++;
 
-			zbx_audit_httptest_create_entry(AUDIT_ACTION_ADD, httptest->httptestid, httptest->name);
+			zbx_audit_httptest_create_entry(ZBX_AUDIT_ACTION_ADD, httptest->httptestid, httptest->name);
 
 			zbx_db_insert_add_values(&db_insert_htest, httptest->httptestid, httptest->name,
 					httptest->delay, (int)httptest->status, httptest->agent,
@@ -5263,7 +5264,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		{
 			const char	*d = ",";
 
-			zbx_audit_httptest_create_entry(AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
+			zbx_audit_httptest_create_entry(ZBX_AUDIT_ACTION_UPDATE, httptest->httptestid, httptest->name);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update httptest"
 					" set templateid=" ZBX_FS_UI64, httptest->templateid);
@@ -5484,7 +5485,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		zbx_db_insert_clean(&db_insert_httag);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 		DBexecute("%s", sql);
@@ -5630,11 +5631,14 @@ static void	DBcopy_template_httptests(zbx_uint64_t hostid, const zbx_vector_uint
  *                                                                            *
  * Parameters: hostid          - [IN] host identifier from database           *
  *             lnk_templateids - [IN] array of template IDs                   *
+ *             link_type       - [IN] link type 0 - manual, 1 - LLD automatic *
+ *             error           - [OUT] error message                          *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
  ******************************************************************************/
-int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids, char **error)
+int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
+		zbx_host_template_link_type link_type, char **error)
 {
 	zbx_vector_uint64_t	templateids;
 	zbx_uint64_t		hosttemplateid;
@@ -5690,12 +5694,15 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	db_insert_htemplates = zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
-	zbx_db_insert_prepare(db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid", "templateid", NULL);
+	zbx_db_insert_prepare(db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid", "templateid",
+			"link_type", NULL);
 
 	for (i = 0; i < lnk_templateids->values_num; i++)
 	{
-		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, hostid, lnk_templateids->values[i]);
-		zbx_audit_host_update_json_add_parent_template(hostid, hosttemplateid, lnk_templateids->values[i]);
+		zbx_db_insert_add_values(db_insert_htemplates, hosttemplateid, hostid, lnk_templateids->values[i],
+				link_type);
+		zbx_audit_host_update_json_add_parent_template(hostid, hosttemplateid, lnk_templateids->values[i],
+				link_type);
 
 		hosttemplateid++;
 	}
@@ -5775,7 +5782,7 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	zbx_vector_uint64_destroy(&itemids);
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete host from maps */
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST, hostids);
@@ -5796,7 +5803,7 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -5870,15 +5877,18 @@ clean:
 zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*ip_esc, *dns_esc, *tmp = NULL;
-	zbx_uint64_t	interfaceid = 0;
-	unsigned char	main_ = 1, db_main, db_useip;
-	unsigned short	db_port;
-	const char	*db_ip, *db_dns;
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*ip_esc, *dns_esc, *tmp = NULL;
+	zbx_uint64_t		interfaceid = 0;
+	unsigned char		main_ = 1, db_main, db_useip;
+	unsigned short		db_port;
+	const char		*db_ip, *db_dns;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	result = DBselect(
 			"select interfaceid,useip,ip,dns,port,main"
@@ -5908,7 +5918,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 
 			zbx_free(tmp);
 			tmp = strdup(row[4]);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 				continue;
@@ -5988,6 +5998,8 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type, unsigned c
 	zbx_free(dns_esc);
 	zbx_free(ip_esc);
 out:
+	zbx_dc_close_user_macros(um_handle);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64, __func__, interfaceid);
 
 	return interfaceid;
@@ -6289,7 +6301,7 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 
 	zbx_vector_uint64_create(&selementids);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete sysmaps_elements */
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_HOST_GROUP, groupids);
@@ -6306,7 +6318,7 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 

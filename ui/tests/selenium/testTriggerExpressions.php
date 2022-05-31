@@ -50,17 +50,13 @@ class testTriggerExpressions extends CWebTest {
 		$this->assertTrue($message->isBad());
 		$this->assertEquals('Cannot evaluate expression', $message->getTitle());
 
-		$message_details = [
-			'Connection to Zabbix server "localhost" refused. Possible reasons:',
-			'1. Incorrect server IP/DNS in the "zabbix.conf.php";',
-			'2. Security environment (for example, SELinux) is blocking the connection;',
-			'3. Zabbix server daemon not running;',
-			'4. Firewall is blocking TCP connection.',
-			'Connection refused'
-		];
+		$message_details = "Connection to Zabbix server \"localhost\" refused. Possible reasons:\n".
+				"1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n".
+				"2. Security environment (for example, SELinux) is blocking the connection;\n".
+				"3. Zabbix server daemon not running;\n".
+				"4. Firewall is blocking TCP connection.\n".
+				"Connection refused";
 
-		foreach ($message_details as $line) {
-			$this->assertTrue($message->hasLine($line));
-		}
+		$this->assertTrue($message->hasLine($message_details));
 	}
 }

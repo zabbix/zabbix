@@ -298,7 +298,8 @@ class CTemplate extends CHostGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings,uuid']
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings,uuid'],
+			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => 'templateid,host,name,description,uuid']
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -368,7 +369,7 @@ class CTemplate extends CHostGeneral {
 				'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')],
+										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
@@ -718,17 +719,35 @@ class CTemplate extends CHostGeneral {
 			' FROM hosts_templates ht,hosts_templates htt'.
 			' WHERE ht.hostid=htt.hostid'.
 				' AND ht.templateid!=htt.templateid'.
-				' AND '.dbConditionInt('ht.templateid', $templateids).
-				' AND '.dbConditionInt('htt.templateid', $templateids, true)
+				' AND '.dbConditionId('ht.templateid', $templateids).
+				' AND '.dbConditionId('htt.templateid', $templateids, true)
 		);
 
 		while ($row = DBfetch($result)) {
 			$del_templates[$row['del_templateid']][$row['hostid']][] = $row['templateid'];
 		}
 
+		$del_links_clear = [];
+		$options = [
+			'output' => ['templateid', 'hostid'],
+			'filter' => [
+				'templateid' => $templateids
+			]
+		];
+		$result = DBselect(DB::makeSql('hosts_templates', $options));
+
+		while ($row = DBfetch($result)) {
+			if (!in_array($row['hostid'], $templateids)) {
+				$del_links_clear[$row['templateid']][$row['hostid']] = true;
+			}
+		}
+
 		if ($del_templates) {
-			$this->checkTriggerDependenciesOfUpdTemplates($del_templates);
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
+		}
+
+		if ($del_links_clear) {
+			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
 		}
 	}
 
@@ -813,7 +832,7 @@ class CTemplate extends CHostGeneral {
 				'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')],
+										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
@@ -925,7 +944,7 @@ class CTemplate extends CHostGeneral {
 				'macro' =>			['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 				'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 				'value' =>			['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')],
+										['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
 										['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
@@ -1057,10 +1076,10 @@ class CTemplate extends CHostGeneral {
 				}
 
 				if (array_key_exists('templates_link', $data)) {
-					$this->massCheckTemplatesLinks('massupdate', $templateids_link, $db_templates);
+					$this->massCheckTemplatesLinks('massupdate', $templateids_link, $db_templates, $templateids_clear);
 				}
 				else {
-					$this->massCheckTemplatesLinks('massremove', $templateids_clear, $db_templates);
+					$this->massCheckTemplatesLinks('massremove', $templateids_clear, $db_templates, $templateids_clear);
 				}
 			}
 		}
@@ -1144,7 +1163,9 @@ class CTemplate extends CHostGeneral {
 
 			$this->massAddAffectedObjects('templates', $templateids, $db_templates);
 
-			$this->massCheckTemplatesLinks('massremove', $templateids, $db_templates);
+			$this->massCheckTemplatesLinks('massremove', $templateids, $db_templates,
+				array_key_exists('templateids_clear', $data) ? $data['templateids_clear'] : []
+			);
 		}
 	}
 

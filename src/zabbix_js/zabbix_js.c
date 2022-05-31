@@ -21,7 +21,7 @@
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxembed.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 
 const char	*progname;
 const char	title_message[] = "zabbix_js";
@@ -73,34 +73,9 @@ static char	shortopts[] = "s:i:p:hVl:t";
 
 /* end of COMMAND LINE OPTIONS */
 
-unsigned int	configured_tls_connect_mode;
-unsigned int	configured_tls_accept_modes;	/* not used in zabbix_get, just for linking */
-									/* with tls.c */
-char	*CONFIG_TLS_CONNECT		= NULL;
-char	*CONFIG_TLS_ACCEPT		= NULL;	/* not used in zabbix_js, just for linking with tls.c */
-char	*CONFIG_TLS_CA_FILE		= NULL;
-char	*CONFIG_TLS_CRL_FILE		= NULL;
-char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
-char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
-char	*CONFIG_TLS_CERT_FILE		= NULL;
-char	*CONFIG_TLS_KEY_FILE		= NULL;
-char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
-char	*CONFIG_TLS_PSK_FILE		= NULL;
-
-/* CONFIG_TLS_CIPHER_* are not used in zabbix_js, defined for linking with tls.c */
-char	*CONFIG_TLS_CIPHER_CERT13	= NULL;
-char	*CONFIG_TLS_CIPHER_CERT		= NULL;
-char	*CONFIG_TLS_CIPHER_PSK13	= NULL;
-char	*CONFIG_TLS_CIPHER_PSK		= NULL;
-char	*CONFIG_TLS_CIPHER_ALL13	= NULL;
-char	*CONFIG_TLS_CIPHER_ALL		= NULL;
-char	*CONFIG_TLS_CIPHER_CMD13	= NULL;
-char	*CONFIG_TLS_CIPHER_CMD		= NULL;
-
-int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
-int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_js, just for linking with tls.c */
-
 char	*CONFIG_SOURCE_IP 		= NULL;
+
+/* not related with tls from libzbxcomms.a */
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
@@ -148,10 +123,17 @@ int	main(int argc, char **argv)
 	char	*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL, *error = NULL,
 		*result = NULL, script_error[MAX_STRING_LEN];
 
+	/* see description of 'optarg' in 'man 3 getopt' */
+	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
+	int		zbx_optind = 0;
+
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		switch (ch)
 		{
@@ -174,15 +156,15 @@ int	main(int argc, char **argv)
 				timeout = atoi(zbx_optarg);
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				ret = SUCCEED;
 				goto clean;
 			case 'V':
-				version();
+				zbx_version();
 				ret = SUCCEED;
 				goto clean;
 			default:
-				usage();
+				zbx_usage();
 				goto clean;
 		}
 	}
@@ -201,7 +183,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{
-		usage();
+		zbx_usage();
 		goto close;
 	}
 
@@ -249,6 +231,9 @@ int	main(int argc, char **argv)
 	printf("\n%s\n", result);
 close:
 	zabbix_close_log();
+#ifndef _WINDOWS
+	zbx_locks_destroy();
+#endif
 clean:
 	zbx_free(result);
 	zbx_free(error);

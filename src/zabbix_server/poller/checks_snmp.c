@@ -294,7 +294,8 @@ static void	cache_put_snmp_index(const DC_ITEM *item, const char *snmp_oid, cons
 				__snmpidx_mapping_hash, __snmpidx_mapping_compare, __snmpidx_mapping_clean,
 				ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-		main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_insert(&snmpidx, &main_key_local, sizeof(main_key_local));
+		main_key = (zbx_snmpidx_main_key_t *)zbx_hashset_insert(&snmpidx, &main_key_local,
+				sizeof(main_key_local));
 	}
 
 	if (NULL == (mapping = (zbx_snmpidx_mapping_t *)zbx_hashset_search(main_key->mappings, &value)))
@@ -1283,9 +1284,10 @@ out:
 	return ret;
 }
 
-static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
-		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
-		char *error, size_t max_error_len, int *max_succeed, int *min_fail, unsigned char poller_type)
+static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items,
+		char oids[][ZBX_ITEM_SNMP_OID_LEN_MAX], AGENT_RESULT *results, int *errcodes,
+		unsigned char *query_and_ignore_type, int num, int level, char *error, size_t max_error_len,
+		int *max_succeed, int *min_fail, unsigned char poller_type)
 {
 	int			i, j, status, ret = SUCCEED;
 	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;
@@ -1390,7 +1392,7 @@ retry:
 			if (parsed_oid_lens[j] != var->name_length ||
 					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid)))
 			{
-				char	sent_oid[ITEM_SNMP_OID_LEN_MAX], received_oid[ITEM_SNMP_OID_LEN_MAX];
+				char	sent_oid[ZBX_ITEM_SNMP_OID_LEN_MAX], received_oid[ZBX_ITEM_SNMP_OID_LEN_MAX];
 
 				zbx_snmp_dump_oid(sent_oid, sizeof(sent_oid), parsed_oids[j], parsed_oid_lens[j]);
 				zbx_snmp_dump_oid(received_oid, sizeof(received_oid), var->name, var->name_length);
@@ -1786,7 +1788,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 		int bulk)
 {
 	int			i, j, ret;
-	char			oid_translated[ITEM_SNMP_OID_LEN_MAX];
+	char			oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX];
 	struct zbx_json		js;
 	zbx_snmp_ddata_t	data;
 	zbx_snmp_dobject_t	*obj;
@@ -1854,11 +1856,11 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 	int		i, j, k, ret;
 	int		to_walk[MAX_SNMP_ITEMS], to_walk_num = 0;
 	int		to_verify[MAX_SNMP_ITEMS], to_verify_num = 0;
-	char		to_verify_oids[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
+	char		to_verify_oids[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
 	unsigned char	query_and_ignore_type[MAX_SNMP_ITEMS];
-	char		index_oids[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
-	char		index_values[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
-	char		oids_translated[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
+	char		index_oids[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
+	char		index_values[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
+	char		oids_translated[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
 	char		*idx = NULL, *pl;
 	size_t		idx_alloc = 32;
 
@@ -2054,7 +2056,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 		unsigned char poller_type)
 {
 	int	i, ret;
-	char	oids_translated[MAX_SNMP_ITEMS][ITEM_SNMP_OID_LEN_MAX];
+	char	oids_translated[MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

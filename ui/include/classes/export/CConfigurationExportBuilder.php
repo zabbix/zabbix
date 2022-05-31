@@ -44,6 +44,77 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Build row structure.
+	 *
+	 * @param array  $rule      Validation rule for selected tag in 3rd parameter.
+	 * @param array  $row       Export row.
+	 * @param string $tag       Tag name.
+	 * @param string $main_tag  Main element (for error reporting).
+	 *
+	 * @throws Exception  if row is invalid.
+	 *
+	 * @return mixed
+	 */
+	private static function buildArrayRow(array $rule, array $row, string $tag, string $main_tag) {
+		if (array_key_exists('ex_rules', $rule)) {
+			$parent_rule = array_intersect_key($rule, array_flip(['ex_default', 'default', 'rule']));
+			$rule = call_user_func($rule['ex_rules'], $row);
+			$rule = $parent_rule + $rule;
+		}
+
+		$is_required = (bool) ($rule['type'] & XML_REQUIRED);
+		$is_string = (bool) ($rule['type'] & XML_STRING);
+		$is_array = (bool) ($rule['type'] & XML_ARRAY);
+		$is_indexed_array = (bool) ($rule['type'] & XML_INDEXED_ARRAY);
+		$has_data = array_key_exists($tag, $row);
+
+		if (array_key_exists('ex_default', $rule)) {
+			$default_value = (string) call_user_func($rule['ex_default'], $row);
+		}
+		elseif (array_key_exists('default', $rule)) {
+			$default_value = (string) $rule['default'];
+		}
+		else {
+			$default_value = null;
+		}
+
+		if (!$default_value && !$has_data) {
+			if ($is_required) {
+				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $main_tag, _s('the tag "%1$s" is missing', $tag)));
+			}
+			return null;
+		}
+
+		$value = $has_data ? $row[$tag] : $default_value;
+
+		if (!$is_required && $has_data && $default_value == $value) {
+			return null;
+		}
+
+		if (($is_indexed_array || $is_array) && $has_data) {
+			$temp_store = self::build($rule, $is_array ? [$value] : $value, $tag);
+
+			return ($is_required || $temp_store) ? $temp_store : null;
+		}
+
+		if ($is_string && $value !== null) {
+			$value = str_replace("\r\n", "\n", $value);
+		}
+
+		if (array_key_exists('in', $rule)) {
+			if (!array_key_exists($value, $rule['in'])) {
+				throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
+					_s('unexpected constant value "%1$s"', $value)
+				));
+			}
+
+			return $rule['in'][$value];
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Build data structure.
 	 *
 	 * @param array  $schema    Tag schema from validation class.
@@ -52,79 +123,35 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function build(array $schema, array $data, $main_tag = null) {
+	private static function build(array $schema, array $data, string $main_tag) {
 		$n = 0;
 		$result = [];
 
-		$rules = $schema['rules'];
-
 		if ($schema['type'] & XML_INDEXED_ARRAY) {
-			$rules = $schema['rules'][$schema['prefix']]['rules'];
+			$type = $schema['rules'][$schema['prefix']]['type'] & (XML_ARRAY | XML_STRING);
+			$rules = $type == XML_ARRAY
+				? $schema['rules'][$schema['prefix']]['rules']
+				: $schema['rules'][$schema['prefix']];
+		}
+		else {
+			$type = XML_ARRAY;
+			$rules = $schema['rules'];
 		}
 
 		foreach ($data as $row) {
 			$store = [];
-			foreach ($rules as $tag => $val) {
-				$is_required = $val['type'] & XML_REQUIRED;
-				$is_string = $val['type'] & XML_STRING;
-				$is_array = $val['type'] & XML_ARRAY;
-				$is_indexed_array = $val['type'] & XML_INDEXED_ARRAY;
-				$has_data = array_key_exists($tag, $row);
 
-				if (array_key_exists('ex_default', $val)) {
-					$default_value = (string) call_user_func($val['ex_default'], $row);
-				}
-				elseif (array_key_exists('default', $val)) {
-					$default_value = (string) $val['default'];
-				}
-				else {
-					$default_value = null;
-				}
+			if ($type == XML_ARRAY) {
+				foreach ($rules as $tag => $rule) {
+					$value = self::buildArrayRow($rule, $row, $tag, $main_tag);
 
-				if (!$default_value && !$has_data) {
-					if ($is_required) {
-						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $main_tag,
-							_s('the tag "%1$s" is missing', $tag)
-						));
+					if ($value !== null) {
+						$store[$tag] = $value;
 					}
-					continue;
 				}
-
-				$value = $has_data ? $row[$tag] : $default_value;
-
-				if (!$is_required && $has_data && $default_value == $value) {
-					continue;
-				}
-
-				if (array_key_exists('export', $val)) {
-					$store[$tag] = call_user_func($val['export'], $row);
-					continue;
-				}
-
-				if (($is_indexed_array || $is_array) && $has_data) {
-					$temp_store = $this->build($val, $is_array ? [$value] : $value, $tag);
-					if ($is_required || $temp_store) {
-						$store[$tag] = $temp_store;
-					}
-					continue;
-				}
-
-				if ($is_string && $value !== null) {
-					$value = str_replace("\r\n", "\n", $value);
-				}
-
-				if (array_key_exists('in', $val)) {
-					if (!array_key_exists($value, $val['in'])) {
-						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $tag,
-							_s('unexpected constant value "%1$s"', $value)
-						));
-					}
-
-					$store[$tag] = $val['in'][$value];
-				}
-				else {
-					$store[$tag] = $value;
-				}
+			}
+			else {
+				$store = str_replace("\r\n", "\n", $row);
 			}
 
 			if ($schema['type'] & XML_INDEXED_ARRAY) {
@@ -147,7 +174,7 @@ class CConfigurationExportBuilder {
 	public function buildGroups(array $schema, array $groups) {
 		$groups = $this->formatGroups($groups);
 
-		$this->data['groups'] = $this->build($schema, $groups, 'groups');
+		$this->data['groups'] = self::build($schema, $groups, 'groups');
 	}
 
 	/**
@@ -160,7 +187,7 @@ class CConfigurationExportBuilder {
 	public function buildTemplates(array $schema, array $templates, array $simple_triggers) {
 		$templates = $this->formatTemplates($templates, $simple_triggers);
 
-		$this->data['templates'] = $this->build($schema, $templates, 'templates');
+		$this->data['templates'] = self::build($schema, $templates, 'templates');
 	}
 
 	/**
@@ -173,7 +200,7 @@ class CConfigurationExportBuilder {
 	public function buildHosts(array $schema, array $hosts, array $simple_triggers) {
 		$hosts = $this->formatHosts($hosts, $simple_triggers);
 
-		$this->data['hosts'] = $this->build($schema, $hosts, 'hosts');
+		$this->data['hosts'] = self::build($schema, $hosts, 'hosts');
 	}
 
 	/**
@@ -185,7 +212,7 @@ class CConfigurationExportBuilder {
 	public function buildTriggers(array $schema, array $triggers) {
 		$triggers = $this->formatTriggers($triggers);
 
-		$this->data['triggers'] = $this->build($schema, $triggers, 'triggers');
+		$this->data['triggers'] = self::build($schema, $triggers, 'triggers');
 	}
 
 	/**
@@ -197,7 +224,7 @@ class CConfigurationExportBuilder {
 	public function buildGraphs(array $schema, array $graphs) {
 		$graphs = $this->formatGraphs($graphs);
 
-		$this->data['graphs'] = $this->build($schema, $graphs, 'graphs');
+		$this->data['graphs'] = self::build($schema, $graphs, 'graphs');
 	}
 
 	/**
@@ -209,7 +236,7 @@ class CConfigurationExportBuilder {
 	public function buildMediaTypes(array $schema, array $media_types) {
 		$media_types = $this->formatMediaTypes($media_types);
 
-		$this->data['media_types'] = $this->build($schema, $media_types, 'media_types');
+		$this->data['media_types'] = self::build($schema, $media_types, 'media_types');
 	}
 
 	/**
@@ -373,7 +400,7 @@ class CConfigurationExportBuilder {
 			];
 		}
 
-		$this->data['maps'] = $this->build($schema, $this->data['maps'], 'maps');
+		$this->data['maps'] = self::build($schema, $this->data['maps'], 'maps');
 	}
 
 	/**
@@ -432,14 +459,14 @@ class CConfigurationExportBuilder {
 	 * @return array|string
 	 */
 	private static function formatMediaTypeParameters(array $media_type) {
-		if ($media_type['type'] == MEDIA_TYPE_EXEC) {
-			return $media_type['exec_params'];
-		}
+		switch ($media_type['type']) {
+			case MEDIA_TYPE_EXEC:
+				return explode("\n", substr($media_type['exec_params'], 0, -1));
 
-		if ($media_type['type'] == MEDIA_TYPE_WEBHOOK) {
-			CArrayHelper::sort($media_type['parameters'], ['name']);
+			case MEDIA_TYPE_WEBHOOK:
+				CArrayHelper::sort($media_type['parameters'], ['name']);
 
-			return array_values($media_type['parameters']);
+				return array_values($media_type['parameters']);
 		}
 
 		return [];

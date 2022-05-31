@@ -83,8 +83,9 @@ echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
-		(new CButton('login', _('Login')))->onClick('document.location = '.
-			json_encode($redirect_to->getUrl()).';')
+		(new CButton('login', _('Login')))
+			->setAttribute('data-url', $redirect_to->getUrl())
+			->onClick('document.location = this.dataset.url;')
 	],
 	'theme' => getUserTheme(CWebUser::$data)
 ]))->getOutput();

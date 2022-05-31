@@ -241,6 +241,7 @@ class CWidgetHelper {
 			'object_name' => 'hosts',
 			'data' => $field->getValue(),
 			'placeholder' => $field->getPlaceholder(),
+			'wildcard_allowed' => 1,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
@@ -801,6 +802,7 @@ class CWidgetHelper {
 							'object_name' => 'hosts',
 							'data' => $value['hosts'],
 							'placeholder' => _('host pattern'),
+							'wildcard_allowed' => 1,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
@@ -822,6 +824,7 @@ class CWidgetHelper {
 							'data' => $value['items'],
 							'placeholder' => _('item pattern'),
 							'multiple' => true,
+							'wildcard_allowed' => 1,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'items',
@@ -1159,6 +1162,7 @@ class CWidgetHelper {
 					'object_name' => 'hosts',
 					'data' => $value['hosts'],
 					'placeholder' => _('host pattern'),
+					'wildcard_allowed' => 1,
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'hosts',
@@ -1176,6 +1180,7 @@ class CWidgetHelper {
 					'object_name' => 'items',
 					'data' => $value['items'],
 					'placeholder' => _('item pattern'),
+					'wildcard_allowed' => 1,
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'items',

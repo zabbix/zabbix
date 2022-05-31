@@ -21,6 +21,7 @@
 #include "zbxmockdata.h"
 
 #include "zbxalgo.h"
+#include "zbxserver.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -81,7 +82,7 @@ void	zbx_mock_test_entry(void **state)
 				zbx_mock_error_string(error));
 	}
 
-	if (expected_result != (actual_result = evaluate(&actual_value, expression, actual_error,
+	if (expected_result != (actual_result = zbx_evaluate(&actual_value, expression, actual_error,
 			sizeof(actual_error), NULL)))
 	{
 		fail_msg("Got %s instead of %s as a result. Error: %s", zbx_sysinfo_ret_string(actual_result),

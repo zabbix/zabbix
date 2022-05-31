@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-02-25 13:35+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"PO-Revision-Date: 2022-05-27 12:36+0000\n"
+"Last-Translator: Atsushi <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1645788938.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -281,6 +282,10 @@ msgstr "(0 - アクションのデフォルトを使用)"
 msgid "(Only super admins can create groups)"
 msgstr "(特権管理者のみがグループを作成できます)"
 
+#: app/partials/configuration.host.edit.html.php:131
+msgid "(linked by host discovery)"
+msgstr "(ホストディスカバリによってリンク)"
+
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
 #: app/views/popup.massupdate.host.php:121
@@ -309,6 +314,14 @@ msgstr "10秒"
 #: include/views/reports.toptriggers.php:118 toptriggers.php:25
 msgid "100 busiest triggers"
 msgstr "障害発生数上位100項目"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:184
+msgid "12-hour"
+msgstr "12時間表示"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:183
+msgid "24-hour"
+msgstr "24時間表示"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -649,6 +662,10 @@ msgstr "アクティブ"
 msgctxt "maintenance status"
 msgid "Active"
 msgstr "有効"
+
+#: include/hosts.inc.php:497
+msgid "Active checks"
+msgstr "アクティブチェック"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -1139,6 +1156,10 @@ msgstr "スワップ領域にスワップアウトされるゲストの物理メ
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "ゲストの物理メモリページをバックアップするために消費されたホストの物理メモリ量、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:73
+msgid "Analog"
+msgstr "アナログ"
+
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
 #: app/views/popup.lldoverride.php:68 include/triggers.inc.php:1060
@@ -1308,6 +1329,10 @@ msgstr "毎%4$s %3$s日 %1$s:%2$s"
 #: app/views/popup.maintenance.period.php:154
 msgid "At (hour:minute)"
 msgstr "開始時刻 (時:分)"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:125
+msgid "At least one LDAP server must exist."
+msgstr "少なくとも1台のLDAPサーバーを設定してください。"
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
@@ -1770,6 +1795,10 @@ msgstr "インターバル中のCPU使用率、<url> - VMwareサービスURL、<
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "インターバル中のCPU使用率、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
+#: include/classes/data/CItemData.php:1429
+msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
 msgstr "CPU使用率。浮動小数点値を返す"
@@ -2076,10 +2105,20 @@ msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
 msgstr[0] "トリガーをコピーできません"
 
+#: include/triggers.inc.php:246
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+msgstr "条件式内に複数のホストがあるため、トリガー\"%1$s\"をコピーできません。"
+
 #: include/triggers.inc.php:226
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
 msgstr "条件式に複数のホストが使用されているため、トリガー\"%1$s:%2$s\"をコピーできません。"
+
+#: app/controllers/CControllerSlaCreate.php:69
+#: app/controllers/CControllerSlaCreate.php:127
+msgid "Cannot create SLA"
+msgstr "SLAを作成できません"
 
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
@@ -2112,9 +2151,18 @@ msgstr "ディスカバリルールを作成できません"
 msgid "Cannot create icon map"
 msgstr "アイコンのマッピングを作成できません"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:79
+msgid "Cannot create request"
+msgstr "リクエストを作成できません"
+
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
 msgstr "定期レポートを作成できません"
+
+#: app/controllers/CControllerServiceCreate.php:96
+#: app/controllers/CControllerServiceCreate.php:184
+msgid "Cannot create service"
+msgstr "サービスを作成できません"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
@@ -2165,6 +2213,10 @@ msgstr[0] "相関関係を削除できません"
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] "ダッシュボードを削除できません"
+
+#: include/classes/api/services/CUserDirectory.php:383
+msgid "Cannot delete default user directory."
+msgstr "デフォルトのユーザーディレクトリを削除できません。"
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2273,6 +2325,10 @@ msgstr[0] "モジュールを削除できません: %1$s。"
 msgid "Cannot delete network map"
 msgstr "ネットワークマップを削除できません"
 
+#: app/controllers/CControllerProxyDelete.php:39
+msgid "Cannot delete proxies"
+msgstr "プロキシを削除できません"
+
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
@@ -2377,6 +2433,11 @@ msgstr "トリガーを削除できません"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "ユーザーを削除できません"
+
+#: include/classes/api/services/CUserDirectory.php:398
+#, c-format
+msgid "Cannot delete user directory \"%1$s\"."
+msgstr "ユーザーディレクトリ\"%1$s\"を削除できません。"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
@@ -2530,6 +2591,11 @@ msgstr[0] "Webシナリオを有効にできません"
 msgid "Cannot evaluate expression"
 msgstr "条件式を評価できません"
 
+#: app/controllers/CControllerItemMassCheckNow.php:243
+#: app/controllers/CControllerItemMassCheckNow.php:251
+msgid "Cannot execute operation"
+msgstr "処理を実行できません"
+
 #: app/controllers/CControllerPopupScriptExec.php:123
 msgid "Cannot execute script."
 msgstr "スクリプトを実行できません。"
@@ -2657,6 +2723,10 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"の\"%2$s\"を上書き
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "マップ\"%2$s\"で使用されているトリガー\"%1$s\"が見つかりません。"
 
+#: include/classes/api/services/CUser.php:1510
+msgid "Cannot find user directory for LDAP."
+msgstr "LDAP用のユーザーディレクトリが見つかりません。"
+
 #: include/classes/import/CConfigurationImport.php:732
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
@@ -2712,6 +2782,11 @@ msgstr "トリガー\"%3$s\"の依存関係によってテンプレート\"%1$s\
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "トリガー\"%3$s\"の条件式によってテンプレート\"%1$s\"をホスト\"%2$s\"にリンクできません。"
 
+#: include/classes/api/services/CHostBase.php:644
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr "親テンプレート\"%3$s\"を二重リンクすることになるので、テンプレート\"%1$s\"をホスト\"%2$s\"にリンクできません。"
+
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
@@ -2727,6 +2802,11 @@ msgstr "トリガー\"%3$s\"の依存関係によってテンプレート\"%1$s\
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "トリガー\"%3$s\"の条件式によってテンプレート\"%1$s\"をホストプロトタイプ\"%2$s\"にリンクできません。"
+
+#: include/classes/api/services/CHostBase.php:641
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr "親テンプレート\"%3$s\"を二重リンクすることになるので、テンプレート\"%1$s\"をホストプロトタイプ\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
@@ -2748,6 +2828,16 @@ msgstr "トリガー\"%3$s\"の依存関係によってテンプレート\"%1$s\
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "トリガー\"%3$s\"の条件式によってテンプレート\"%1$s\"をテンプレート\"%2$s\"にリンクできません。"
+
+#: include/classes/api/services/CHostBase.php:502
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr "循環参照(%3$s)になってしまうので、テンプレート\"%1$s\"をテンプレート\"%2$s\"にリンクできません。"
+
+#: include/classes/api/services/CHostBase.php:638
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr "親テンプレート\"%3$s\"を二重リンクすることになるので、テンプレート\"%1$s\"をテンプレート\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
@@ -2926,6 +3016,26 @@ msgstr "Webシナリオのリンク削除と削除が行えません。"
 msgid "Cannot unlink template"
 msgstr "テンプレートのリンクを削除できません"
 
+#: include/classes/api/services/CHostBase.php:331
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr "トリガー\"%3$s\"の依存関係によって、ホスト\"%2$s\"からテンプレート\"%1$s\"へのリンクを削除できません。"
+
+#: include/classes/api/services/CHostBase.php:415
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
+msgstr "ホスト\"%4$s\"上のトリガー\"%3$s\"の依存関係によって、テンプレート\"%2$s\"からテンプレート\"%1$s\"へのリンクを削除できません。"
+
+#: include/classes/api/services/CHostBase.php:414
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:330
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to dependency of trigger \"%4$s\"."
@@ -3002,6 +3112,11 @@ msgstr "ディスカバリされたトリガー\"%1$s\"の\"%2$s\"を更新で�
 #: app/controllers/CControllerTokenUpdate.php:147
 msgid "Cannot update API token"
 msgstr "APIトークンを更新できません"
+
+#: app/controllers/CControllerSlaUpdate.php:70
+#: app/controllers/CControllerSlaUpdate.php:138
+msgid "Cannot update SLA"
+msgstr "SLAを更新できません"
 
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
@@ -3189,6 +3304,11 @@ msgstr "スクリプトを更新できません"
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
 msgstr "スクリプトの範囲を更新できません。\"%1$s\"はアクション\"%2$s\"で使用されています。"
+
+#: app/controllers/CControllerServiceUpdate.php:97
+#: app/controllers/CControllerServiceUpdate.php:200
+msgid "Cannot update service"
+msgstr "サービスを更新できません"
 
 #: include/classes/api/services/CService.php:2310
 #: include/classes/api/services/CService.php:2372
@@ -3524,6 +3644,10 @@ msgstr "クリックして表示または変更"
 #: include/classes/widgets/CWidgetConfig.php:53
 msgid "Clock"
 msgstr "時刻"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:72
+msgid "Clock type"
+msgstr "時計のタイプ"
 
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:139
@@ -3865,6 +3989,10 @@ msgstr "ユーザーの設定"
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
 msgstr "Web監視の設定"
+
+#: app/controllers/CControllerAuditLogList.php:199
+msgid "Configuration refresh"
+msgstr "設定リフレッシュ"
 
 #: app/controllers/CControllerAuditSettingsUpdate.php:78
 #: app/controllers/CControllerAutoregUpdate.php:69
@@ -4505,6 +4633,11 @@ msgstr "カスタム深刻度の名前はすべての言語に影響するため
 msgid "Custom size"
 msgstr "カスタムサイズ"
 
+#: app/views/administration.miscconfig.edit.php:104
+#: include/classes/setup/CSetupWizard.php:563
+msgid "CyberArk Vault"
+msgstr "CyberArk Vault"
+
 #: app/partials/scheduledreport.formgrid.html.php:95
 msgid "Cycle"
 msgstr "周期"
@@ -4848,6 +4981,10 @@ msgstr "標準"
 msgid "Default (%1$s)"
 msgstr "デフォルト (%1$s)"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:134
+msgid "Default LDAP server must be specified."
+msgstr "デフォルトのLDAPサーバーを指定してください。"
+
 #: app/views/administration.userrole.edit.php:123
 msgid "Default access to new UI elements"
 msgstr "デフォルトで新しいUI要素に対してアクセス"
@@ -5160,6 +5297,10 @@ msgstr "選択したメディアタイプを削除しますか？"
 msgid "Delete selected proxies?"
 msgstr "選択したプロキシを削除しますか？"
 
+#: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
+msgid "Delete selected proxy?"
+msgstr "選択したプロキシを削除しますか？"
+
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
 msgstr "選択した正規表現を削除しますか？"
@@ -5371,6 +5512,10 @@ msgstr "デバイスの固有性を特定する基準"
 msgid "Digest"
 msgstr "Digest"
 
+#: include/classes/widgets/forms/CWidgetFormClock.php:74
+msgid "Digital"
+msgstr "デジタル"
+
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
 msgstr "ディレクトリ"
@@ -5423,6 +5568,10 @@ msgstr "選択したホストグループのホストを無効にしますか？
 
 #: app/views/administration.proxy.list.php:188
 msgid "Disable hosts monitored by selected proxies?"
+msgstr "選択したプロキシによるホストの監視を無効にしますか？"
+
+#: app/views/js/proxy.list.js.php:137
+msgid "Disable hosts monitored by selected proxy?"
 msgstr "選択したプロキシによるホストの監視を無効にしますか？"
 
 #: app/views/administration.token.list.php:199
@@ -5627,6 +5776,10 @@ msgstr "VMwareデータストアのディスカバリ、<url> - VMwareサービ�
 #: include/classes/data/CItemData.php:1282
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "VMwareハイパーバイザーのデータストアのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
+
+#: include/classes/data/CItemData.php:1379
+msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
+msgstr "VMwareハイパーバイザーのネットワークインターフェースのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザー。JSONで返す"
 
 #: include/classes/data/CItemData.php:1306
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
@@ -6153,6 +6306,10 @@ msgstr "ホストを有効"
 msgid "Enable hosts monitored by selected proxies?"
 msgstr "選択したプロキシによるホストの監視を有効にしますか？"
 
+#: app/views/js/proxy.list.js.php:122
+msgid "Enable hosts monitored by selected proxy?"
+msgstr "選択したプロキシによるホストの監視を有効にしますか？"
+
 #: app/views/administration.audit.settings.edit.php:48
 #: app/views/administration.housekeeping.edit.php:44
 #: app/views/administration.housekeeping.edit.php:98
@@ -6307,6 +6464,10 @@ msgstr "終了日付"
 #: app/views/popup.itemtestedit.view.php:296
 msgid "End of line sequence"
 msgstr "改行コード"
+
+#: include/locales.inc.php:33
+msgid "English (en_GB)"
+msgstr "英語 (en_GB)"
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -6724,6 +6885,10 @@ msgstr "ダッシュボードページの貼り付けに失敗しました。"
 msgid "Failed to paste widget."
 msgstr "ウィジェットの貼り付けに失敗しました。"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:390
+msgid "Failed to select default LDAP server."
+msgstr "デフォルトのLDAPサーバーを選択できませんでした。"
+
 #: app/controllers/CControllerDashboardUpdate.php:141
 #: app/controllers/CControllerTemplateDashboardUpdate.php:135
 #: app/views/js/configuration.dashboard.edit.js.php:156
@@ -6738,6 +6903,11 @@ msgstr "ダッシュボードページのプロパティの変更に失敗しま
 #: jsLoader.php:140
 msgid "Failed to update dashboard properties."
 msgstr "ダッシュボードのプロパティの変更に失敗しました。"
+
+#: app/controllers/CControllerDashboardShareUpdate.php:110
+#: app/views/js/popup.dashboard.share.edit.js.php:83
+msgid "Failed to update dashboard sharing."
+msgstr "ダッシュボードの共有の更新に失敗しました。"
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -6998,6 +7168,11 @@ msgstr "フォントサイズ"
 #: app/views/popup.httpstep.php:85
 msgid "Form data"
 msgstr "フォームデータ"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:182
+#: include/classes/widgets/forms/CWidgetFormClock.php:242
+msgid "Format"
+msgstr "表示形式"
 
 #: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
 #: include/views/configuration.item.prototype.edit.php:707
@@ -9586,6 +9761,13 @@ msgstr "IPアドレス\"%1$s\"が正しくありません。"
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
 msgstr "JSONデータが正しくありません。JSONテキストのパース中にサーバーでエラーが発生しました。"
 
+#: app/controllers/CControllerPopupLdapCheck.php:52
+#: app/controllers/CControllerPopupLdapEdit.php:49
+#: app/controllers/CControllerPopupLdapTestEdit.php:44
+#: app/controllers/CControllerPopupLdapTestSend.php:50
+msgid "Invalid LDAP configuration"
+msgstr "LDAPの設定が正しくありません"
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "YAMLファイルの内容が正しくありません"
@@ -9975,6 +10157,10 @@ msgstr "インベントリフィールド"
 #: app/views/popup.massupdate.host.php:179
 msgid "Inventory mode"
 msgstr "インベントリモード"
+
+#: include/classes/helpers/CRoleHelper.php:480
+msgid "Invoke \"Execute now\" on read-only hosts"
+msgstr "読み込み専用ホスト上の\"監視データ取得\"の呼び出し"
 
 #: app/views/administration.user.list.php:112
 msgid "Is online?"
@@ -10390,9 +10576,18 @@ msgstr "韓国語 (ko_KR)"
 msgid "LDAP"
 msgstr "LDAP"
 
+#: app/views/administration.usergroup.edit.php:88
+#: app/views/popup.ldap.edit.php:157
+msgid "LDAP Server"
+msgstr "LDAPサーバー"
+
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
 msgstr "LDAP認証"
+
+#: include/classes/api/services/CUser.php:1491
+msgid "LDAP authentication is disabled."
+msgstr "LDAP認証が無効です。"
 
 #: app/views/administration.authentication.edit.php:163
 msgid "LDAP host"
@@ -10405,6 +10600,10 @@ msgstr "LDAPは設定されていません"
 #: app/controllers/CControllerAuthenticationUpdate.php:273
 msgid "LDAP login successful"
 msgstr "LDAPによるログインが成功しました"
+
+#: include/classes/api/services/CAuthentication.php:171
+msgid "LDAP must be enabled"
+msgstr "LDAPを有効にしてください"
 
 #: app/views/administration.authentication.edit.php:336
 msgid "LDAP settings"
@@ -10705,6 +10904,10 @@ msgstr "リンク"
 msgid "List is empty"
 msgstr "リストがありません"
 
+#: include/classes/data/CItemData.php:983
+msgid "List of OS processes with attributes. Returns JSON array"
+msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
@@ -10779,6 +10982,10 @@ msgstr "読み込み中..."
 msgid "Local"
 msgstr "ローカル"
 
+#: include/classes/widgets/fields/CWidgetFieldTimeZone.php:58
+msgid "Local default"
+msgstr "ローカルのデフォルト"
+
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
 #: include/views/monitoring.history.php:292
@@ -10837,9 +11044,17 @@ msgstr "ログインの試行"
 msgid "Login blocking interval"
 msgstr "ログインブロックの間隔"
 
+#: app/controllers/CControllerPopupLdapTestSend.php:86
+msgid "Login failed"
+msgstr "ログイン失敗"
+
 #: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
 msgstr "ログイン名かパスワードが間違っています。"
+
+#: app/controllers/CControllerPopupLdapTestSend.php:76
+msgid "Login successful"
+msgstr "ログイン成功"
 
 #: app/controllers/CControllerAuditLogList.php:193
 msgid "Logout"
@@ -11349,6 +11564,10 @@ msgstr "メンバー"
 #, c-format
 msgid "Memory limit: %1$s"
 msgstr "メモリ上限: %1$s"
+
+#: include/classes/data/CItemData.php:1433
+msgid "Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1210
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -11986,6 +12205,10 @@ msgstr "未監視"
 msgid "New API token"
 msgstr "新規APIトークン"
 
+#: app/views/popup.ldap.edit.php:145
+msgid "New LDAP server"
+msgstr "新規LDAPサーバー"
+
 #: app/views/popup.sla.edit.php:255 app/views/popup.sla.edit.php:283
 msgid "New SLA"
 msgstr "新規SLA"
@@ -12038,6 +12261,10 @@ msgstr "新しいホストの作成"
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
 msgstr "実行内容の作成"
+
+#: app/views/popup.proxy.edit.php:229 app/views/popup.proxy.edit.php:258
+msgid "New proxy"
+msgstr "新規プロキシ"
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14167,6 +14394,12 @@ msgstr "PrometheusからJSON"
 msgid "Properties"
 msgstr "プロパティ"
 
+#: include/classes/vaults/CVaultCyberArk.php:64
+#: include/classes/vaults/CVaultHashiCorp.php:55
+#, c-format
+msgid "Provided API endpoint \"%1$s\" is invalid."
+msgstr "指定されたAPIエンドポイント \"%1$s\" は正しくありません。"
+
 #: app/controllers/CControllerMenuPopup.php:405
 #: app/controllers/CControllerMenuPopup.php:693
 #: app/controllers/CControllerWidgetUrlView.php:64
@@ -14175,6 +14408,21 @@ msgstr "プロパティ"
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "指定されたURL \"%1$s\"は正しくありません。"
+
+#: include/classes/vaults/CVaultHashiCorp.php:64
+#, c-format
+msgid "Provided authentication token \"%1$s\" is empty."
+msgstr "指定された認証トークン \"%1$s\" が空です。"
+
+#: include/classes/vaults/CVaultHashiCorp.php:60
+#, c-format
+msgid "Provided secret path \"%1$s\" is invalid."
+msgstr "指定されたシークレットパス\"%1$s\"は正しくありません。"
+
+#: include/classes/vaults/CVaultCyberArk.php:70
+#, c-format
+msgid "Provided secret query string \"%1$s\" is invalid."
+msgstr "指定されたシークレットクエリ文字列\"%1$s\"は正しくありません。"
 
 #: app/controllers/CControllerPopupGeneric.php:157
 #: app/views/administration.proxy.edit.php:29
@@ -14468,6 +14716,18 @@ msgstr "長方形"
 #: app/views/administration.user.edit.php:276
 msgid "Refresh"
 msgstr "リフレッシュ"
+
+#: app/views/popup.proxy.edit.php:216 app/views/proxy.list.php:178
+msgid "Refresh configuration"
+msgstr "設定リフレッシュ"
+
+#: app/views/js/proxy.list.js.php:106
+msgid "Refresh configuration of the selected proxies?"
+msgstr "選択したプロキシの設定をリフレッシュしますか？"
+
+#: app/views/js/proxy.list.js.php:107 app/views/popup.proxy.edit.php:217
+msgid "Refresh configuration of the selected proxy?"
+msgstr "選択したプロキシの設定をリフレッシュしますか？"
 
 #: include/classes/widgets/forms/CWidgetForm.php:58 jsLoader.php:169
 msgid "Refresh interval"
@@ -14812,9 +15072,17 @@ msgstr "リクエストボディ"
 msgid "Request body type"
 msgstr "リクエストボディのタイプ"
 
+#: app/controllers/CControllerProxyConfigRefresh.php:71
+msgid "Request created successfully"
+msgstr "リクエストが正常に作成されました"
+
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
 msgid "Request sent successfully"
 msgstr "リクエストを送信しました"
+
+#: app/controllers/CControllerItemMassCheckNow.php:236
+msgid "Request sent successfully. Some items are filtered due to access permissions or type."
+msgstr "リクエストを送信しました。いくつかのアイテムはアクセス権限かタイプの問題でフィルタリングされました。"
 
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.item.edit.php:328
@@ -15033,6 +15301,10 @@ msgstr "Zabbixに設定されたホストのネットワークインターフェ
 #: include/classes/data/CItemData.php:1674
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスをJSONオブジェクトで返す。"
+
+#: include/classes/data/CItemData.php:1673
+msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1614
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -15616,6 +15888,10 @@ msgstr "検索"
 msgid "Search attribute"
 msgstr "検索の属性"
 
+#: app/views/popup.ldap.edit.php:128
+msgid "Search filter"
+msgstr "検索フィルター"
+
 #: app/controllers/CControllerSearch.php:73
 msgid "Search pattern is empty"
 msgstr "検索パターンが空白です"
@@ -15656,6 +15932,10 @@ msgstr "セカンダリPOC電話番号B"
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
 msgstr "セカンダリPOCスクリーン名"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:173
+msgid "Seconds"
+msgstr "秒表示"
 
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
@@ -15827,6 +16107,10 @@ msgstr "サーバーまたはプロキシ"
 #: include/classes/widgets/forms/CWidgetFormClock.php:33
 msgid "Server time"
 msgstr "サーバー時間"
+
+#: app/views/administration.authentication.edit.php:146
+msgid "Servers"
+msgstr "サーバー"
 
 #: app/controllers/CControllerAuditLogList.php:225
 #: app/views/js/slareport.list.js.php:39
@@ -16083,6 +16367,10 @@ msgstr "共有"
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "マップ\"%2$s\"の共有オプション\"%1$s\"の値がありません。"
+
+#: include/classes/widgets/forms/CWidgetFormClock.php:243
+msgid "Short"
+msgstr "短縮"
 
 #: app/partials/monitoring.latest.filter.php:154
 #: app/partials/monitoring.problem.filter.php:222
@@ -16481,6 +16769,10 @@ msgstr "開始時刻はSLA\"%1$s\"の終了時刻よりも前にしてくださ�
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
 msgstr "開始時刻はSLA\"%1$s\"の除外ダウンタイム\"%2$s\"よりも前にしてください。"
 
+#: app/views/popup.ldap.edit.php:121
+msgid "StartTLS"
+msgstr "StartTLS"
+
 #: include/classes/validators/CLdapAuthValidator.php:81
 msgid "Starting TLS failed."
 msgstr "TLS接続の開始に失敗しました。"
@@ -16671,6 +16963,10 @@ msgstr "スライドショーの停止"
 msgid "Stopped"
 msgstr "停止中"
 
+#: app/views/administration.miscconfig.edit.php:100
+msgid "Storage of secrets"
+msgstr "シークレットの保管"
+
 #: app/views/popup.lldoperation.php:191 app/views/popup.lldoperation.php:212
 #: app/views/popup.massupdate.item.php:294
 #: app/views/popup.massupdate.item.php:310
@@ -16689,6 +16985,11 @@ msgstr "資格情報保存先"
 #: include/classes/setup/CSetupWizard.php:657
 msgid "Stored in HashiCorp Vault secret"
 msgstr "HashiCorp Vaultのシークレット内に保存"
+
+#: include/classes/setup/CSetupWizard.php:757
+#: include/classes/setup/CSetupWizard.php:758
+msgid "Stored in Vault secret"
+msgstr "Vaultシークレットに保存"
 
 #: include/hosts.inc.php:35
 msgid "Straight"
@@ -17152,6 +17453,10 @@ msgstr "テンプレート"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "テンプレート\"%1$s\"とホスト\"%2$s\"のリンクを削除しました。"
 
+#: app/partials/configuration.host.edit.html.php:187
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr "ホストのディスカバリでリンクされたテンプレートは削除できません。"
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr "テンプレートを更新しました"
@@ -17390,6 +17695,10 @@ msgstr "今月"
 #: include/func.inc.php:2477
 msgid "This month so far"
 msgstr "今月(現在まで)"
+
+#: app/views/popup.tophosts.column.edit.php:172
+msgid "This setting applies only to numeric data. Non-numeric data will always be taken from history."
+msgstr "この設定は数値データにだけ適用されます。非数値データは常にヒストリから取得されます。"
 
 #: include/views/configuration.item.edit.php:125
 #: include/views/configuration.item.prototype.edit.php:111
@@ -17700,6 +18009,61 @@ msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "トリガー\"%1$s\"はリンクされている他のテンプレートに含まれています。"
 
+#: include/triggers.inc.php:372 include/triggers.inc.php:433
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/triggers.inc.php:373 include/triggers.inc.php:434
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2679
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2678
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2572
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2305
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2300
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2316
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2423
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2808
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2807
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
@@ -17798,6 +18162,66 @@ msgstr "トリガーのプロトタイプ\"%1$s\"はすでに\"%2$s\"に存在�
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr "トリガーのプロトタイプ\"%1$s\"はリンクされている他のテンプレートに含まれています。"
+
+#: include/classes/api/services/CDiscoveryRule.php:916
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:915
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2684
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2683
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2573
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2424
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2813
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2812
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2306
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2301
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2317
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:1325
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
+msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1715
 #, c-format
@@ -18483,6 +18907,10 @@ msgstr "イベントのステータスの文字色を変更"
 msgid "Use default"
 msgstr "デフォルトを使用"
 
+#: app/partials/configuration.host.edit.html.php:188
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr "ディスカバリ時に自動的にテンプレートのリンクが削除されるよう、ホストのプロトタイプを設定してください。"
+
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:88
 msgid "Use if severity"
 msgstr "指定した深刻度のときに使用"
@@ -18579,6 +19007,15 @@ msgstr "ユーザーは自分の役割のユーザーの種類を変更できま
 msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] "ユーザーを削除しました"
+
+#: app/controllers/CControllerAuditLogList.php:246
+msgid "User directory"
+msgstr "ユーザーディレクトリ"
+
+#: include/classes/api/services/CUserDirectory.php:330
+#, c-format
+msgid "User directory \"%1$s\" already exists."
+msgstr "ユーザーディレクトリ\"%1$s\"はすでに存在します。"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -18797,6 +19234,10 @@ msgstr "ユーザー名"
 msgid "Username and password"
 msgstr "ユーザー名とパスワード"
 
+#: include/classes/vaults/CVaultCyberArk.php:112
+msgid "Username and password must be stored in Vault secret keys \"UserName\" and \"Content\"."
+msgstr "ユーザー名とパスワードは、Vaultの秘密鍵\"UserName\"と\"Content\"に保存してください。"
+
 #: include/classes/setup/CSetupWizard.php:206
 #: include/classes/setup/CSetupWizard.php:802
 msgid "Username and password must be stored in Vault secret keys \"username\" and \"password\"."
@@ -18824,6 +19265,14 @@ msgstr "ユーザー名の属性"
 msgid "Users"
 msgstr "ユーザー"
 
+#: include/classes/data/CItemData.php:1255
+msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
+msgstr "VMware分散仮想スイッチ、<url> - VMwareサービスURL。JSONで返す"
+
+#: include/classes/data/CItemData.php:1259
+msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
+msgstr "VMware FetchDVPortラッパー、<url> - VMwareサービスURL、<filter> - VMwareのDistributedVirtualSwitchPortCriteriaデータオブジェクト、<mode> - state(デフォルト)/full。JSONで返す"
+
 #: include/classes/data/CItemData.php:1702
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMwareのキャッシュ統計。利用可能なモード：total, free, pfree, used, pused。"
@@ -18835,6 +19284,10 @@ msgstr "VMwareクラスターのパフォーマンスカウンター、 <url> - 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> - VMwareクラスター名"
+
+#: include/classes/data/CItemData.php:1251
+msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
+msgstr "VMwareデータセンターとそのID、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
@@ -18877,6 +19330,10 @@ msgstr "VMwareハイパーバイザーのバルーニングされたメモリサ
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのクラスター名、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
+#: include/classes/data/CItemData.php:1275
+msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr "VMwareハイパーバイザーの接続状態、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
+
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr "VMwareハイパーバイザーデータセンターの名前、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。文字列値を返す"
@@ -18909,6 +19366,10 @@ msgstr "VMwareハイパーバイザー名、<url> - VMwareサービスURL、<uui
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMwareハイパーバイザーネットワーク入力統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<mode> - bps"
 
+#: include/classes/data/CItemData.php:1387
+msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
+msgstr "VMwareハイパーバイザーのネットワークインターフェーススピード、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<ifname> - インターフェース名"
+
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMwareハイパーバイザーネットワーク出力統計、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<mode> - bps"
@@ -18928,6 +19389,14 @@ msgstr "VMwareハイパーバイザーのプロセッサーモデル、<url> - V
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMwareハイパーバイザーのプロセッサー利用量(Hz)、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
+
+#: include/classes/data/CItemData.php:1351
+msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
+msgstr "VMwareハイパーバイザーのセンサー値、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
+
+#: include/classes/data/CItemData.php:1355
+msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
+msgstr "VMwareハイパーバイザーのシリアル番号、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -18973,6 +19442,10 @@ msgstr "VMware仮想マシンのコミットされたストレージ容量、<ur
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンの圧縮されたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
+#: include/classes/data/CItemData.php:1431
+msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
+msgstr "VMware仮想マシンのカスタム属性値、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<name> - カスタム属性名"
+
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr "VMware仮想マシンデータセンターの名前、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。文字列値を返す"
@@ -18984,6 +19457,10 @@ msgstr "VMware仮想マシンのディスクデバイスの読み込み統計、
 #: include/classes/data/CItemData.php:1558
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware仮想マシンのディスクデバイスの書き込み統計、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<instance> - ディスクデバイスインスタンス、<mode> - bps/ops - 毎秒のバイト/オペレーション"
+
+#: include/classes/data/CItemData.php:1439
+msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr "VMware仮想マシンのディスクの統合要求、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/data/CItemData.php:1566
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -19037,9 +19514,21 @@ msgstr "VMware仮想マシンのプロセッサ利用量(Hz)、<url> - VMwareサ
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンの共有メモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
+#: include/classes/data/CItemData.php:1555
+msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
+msgstr "VMware仮想マシンのスナップショットの状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。JSONで返す"
+
+#: include/classes/data/CItemData.php:1559
+msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
+msgstr "VMware仮想マシンの状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
+
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware仮想マシンのスワップされたメモリサイズ、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
+
+#: include/classes/data/CItemData.php:1591
+msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
+msgstr "VMware仮想マシンのツールの状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<mode> - versionまたはstatus"
 
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -19260,10 +19749,19 @@ msgstr "VaultのAPIエンドポイント"
 msgid "Vault authentication token"
 msgstr "Vaultの認証トークン"
 
+#: include/classes/setup/CSetupWizard.php:618
+#: include/classes/setup/CSetupWizard.php:817
+msgid "Vault certificates"
+msgstr "Vault証明書"
+
 #: include/classes/core/ZBase.php:231
 #: include/classes/setup/CSetupWizard.php:203 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "Vaultへの接続に失敗しました。"
+
+#: app/views/administration.miscconfig.edit.php:101
+msgid "Vault provider"
+msgstr "Vaultプロバイダー"
 
 #: include/classes/html/CMacroValue.php:158
 msgid "Vault secret"
@@ -19273,6 +19771,11 @@ msgstr "Vaultのシークレット"
 #: include/classes/setup/CSetupWizard.php:700
 msgid "Vault secret path"
 msgstr "Vaultのシークレットパス"
+
+#: include/classes/setup/CSetupWizard.php:609
+#: include/classes/setup/CSetupWizard.php:813
+msgid "Vault secret query string"
+msgstr "Vaultシークレットクエリ文字列"
 
 #: include/hosts.inc.php:249
 msgid "Vendor"
@@ -19509,6 +20012,13 @@ msgstr "ウィジェットは廃止予定です。"
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "指定された列と行の数に対してウィジェットが小さすぎます。"
 
+#: app/controllers/CControllerDashboardWidgetCheck.php:46
+#: app/controllers/CControllerDashboardWidgetConfigure.php:46
+#: app/controllers/CControllerDashboardWidgetEdit.php:47
+#: app/controllers/CControllerDashboardWidgetsSanitize.php:66
+msgid "Widget type is not supported in this context."
+msgstr "このコンテキストでは、ウィジェットタイプはサポートされていません。"
+
 #: graphs.php:44 include/classes/widgets/CWidgetHelper.php:923
 #: include/classes/widgets/CWidgetHelper.php:956
 #: include/classes/widgets/CWidgetHelper.php:957
@@ -19558,6 +20068,10 @@ msgstr "障害名と一緒に"
 #: app/views/monitoring.widget.problemhosts.view.php:33
 msgid "With problems"
 msgstr "障害あり"
+
+#: app/views/popup.tophosts.column.edit.php:119
+msgid "With this setting only numeric items will be displayed in this column."
+msgstr "この設定では、数値アイテムだけがこの列内に表示されます。"
 
 #: include/forms.inc.php:346 include/forms.inc.php:566
 msgid "With triggers"
@@ -21103,6 +21617,15 @@ msgstr "マクロ"
 msgid "mad() - Median absolute deviation"
 msgstr "mad() - 中央絶対偏差"
 
+#: include/classes/parsers/CVaultSecretParser.php:180
+msgid "mandatory key is missing"
+msgstr "必須キーがありません"
+
+#: include/classes/parsers/CVaultSecretParser.php:177
+#, c-format
+msgid "mandatory parameter \"%1$s\" is missing"
+msgstr "必須パラメーター\"%1$s\"がありません"
+
 #: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
 msgid "mandatory parameter is missing in function \"%1$s\""
@@ -21276,6 +21799,10 @@ msgstr "新規"
 msgctxt "new element in multiselect"
 msgid "new"
 msgstr "新規"
+
+#: include/classes/api/services/CAuthentication.php:180
+msgid "no LDAP servers"
+msgstr "LDAPサーバーがありません"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1464
 #: include/classes/graphdraw/CPieGraphDraw.php:320
@@ -21473,6 +22000,11 @@ msgstr "サービスへの表示/設定アクセス権限を保持していま�
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:110
 msgid "reference to a non-existent tree element"
 msgstr "存在しないツリー要素への参照です"
+
+#: include/classes/api/services/CAuthentication.php:154
+#: include/classes/api/services/CUserGroup.php:1208
+msgid "referred object does not exist"
+msgstr "参照したオブジェクトが存在しません"
 
 #: app/controllers/CControllerQueueDetails.php:110
 #: app/controllers/CControllerQueueOverview.php:82
@@ -22149,6 +22681,11 @@ msgstr "ディスカバリルールのタイプが間違っている"
 #: include/classes/api/services/CTask.php:444
 msgid "wrong item type"
 msgstr "アイテムのタイプが間違っている"
+
+#: app/controllers/CControllerItemMassCheckNow.php:178
+#: include/classes/api/services/CTask.php:591
+msgid "wrong master item type"
+msgstr "マスターアイテムのタイプが間違っています"
 
 #: include/func.inc.php:591 jsLoader.php:221
 msgctxt "year short"

@@ -19,7 +19,7 @@
 
 #include "report_writer.h"
 
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxjson.h"
@@ -314,7 +314,7 @@ static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispat
 {
 	int			ret = FAIL;
 	zbx_vector_str_t	recipients;
-	DB_MEDIATYPE		mt;
+	ZBX_DB_MEDIATYPE		mt;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

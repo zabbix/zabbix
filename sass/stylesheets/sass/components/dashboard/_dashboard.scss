@@ -420,6 +420,14 @@
 	.msg-warning {
 		margin: 0 10px;
 	}
+
+	&.no-padding {
+		.msg-bad,
+		.msg-good,
+		.msg-warning {
+			margin: 8px 10px;
+		}
+	}
 }
 
 .dashboard-grid-widget-mask {

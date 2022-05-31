@@ -19,7 +19,7 @@ This template was tested on:
 1\. Create PostgreSQL user for monitoring (`<password>` at your discretion):
 
 ```bash
-CREATE USER 'zbx_monitor' WITH PASSWORD '<PASSWORD>' INHERIT;
+CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_dir(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_stat_file(text) TO zbx_monitor;
 GRANT EXECUTE ON FUNCTION pg_catalog.pg_ls_waldir() TO zbx_monitor;
@@ -55,8 +55,8 @@ No specific Zabbix configuration is required.
 |{$PG.LLD.FILTER.APPLICATION} |<p>-</p> |`(.+)` |
 |{$PG.LLD.FILTER.DBNAME} |<p>-</p> |`(.+)` |
 |{$PG.PASSWORD} |<p>-</p> |`postgres` |
-|{$PG.QUERY_ETIME.MAX.WARN} |<p>Execution time limit for count of slow queries</p> |`30` |
-|{$PG.SLOW_QUERIES.MAX.WARN} |<p>Slow queries count threshold for a trigger</p> |`5` |
+|{$PG.QUERY_ETIME.MAX.WARN} |<p>Execution time limit for count of slow queries.</p> |`30` |
+|{$PG.SLOW_QUERIES.MAX.WARN} |<p>Slow queries count threshold for a trigger.</p> |`5` |
 |{$PG.URI} |<p>-</p> |`tcp://localhost:5432` |
 |{$PG.USER} |<p>-</p> |`postgres` |
 
@@ -186,13 +186,13 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m) |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}` |AVERAGE | |
+|Connections sum: Total number of connections is too high |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}` |AVERAGE | |
 |PostgreSQL: Oldest xid is too big |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.oldest.xid["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) > 18000000` |AVERAGE | |
-|PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE}) |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) < 600` |AVERAGE | |
+|PostgreSQL: Service has been restarted |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.uptime["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]) < 600` |AVERAGE | |
 |PostgreSQL: Service is down |<p>-</p> |`last(/PostgreSQL by Zabbix agent 2/pgsql.ping["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"])=0` |HIGH | |
-|DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m) |<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.</p><p>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}` |AVERAGE | |
-|DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m) |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}` |HIGH | |
-|DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m) |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}` |WARNING | |
+|DB {#DBNAME}: Too many recovery conflicts |<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.</p><p>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}` |AVERAGE | |
+|DB {#DBNAME}: Deadlock occurred |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}` |HIGH | |
+|DB {#DBNAME}: Too many slow queries |<p>-</p> |`min(/PostgreSQL by Zabbix agent 2/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}` |WARNING | |
 
 ## Feedback
 

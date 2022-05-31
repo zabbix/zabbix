@@ -138,17 +138,14 @@ else {
 				$template_link = new CSpan($template['name']);
 			}
 
-			$unlink_parameters = array_map('json_encode', [
-				$form->getName(),
-				'unlink['.$template['templateid'].']',
-				'1'
-			]);
-
 			$linked_templates->addRow([
 				$template_link->addClass(ZBX_STYLE_WORDWRAP),
 				(new CCol(
 					(new CSimpleButton(_('Unlink')))
-						->onClick('submitFormWithParam('.implode(', ', $unlink_parameters).');')
+						->setAttribute('data-templateid', $template['templateid'])
+						->onClick('
+							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
+						')
 						->addClass(ZBX_STYLE_BTN_LINK)
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]);

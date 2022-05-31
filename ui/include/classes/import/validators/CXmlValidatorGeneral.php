@@ -118,8 +118,6 @@ abstract class CXmlValidatorGeneral {
 	 * @param array|string $data   Import data.
 	 * @param string       $path   XML path (for error reporting).
 	 *
-	 * @throws Exception if $data does not correspond to validation rules.
-	 *
 	 * @return mixed  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted data is returned.
 	 */

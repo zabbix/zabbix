@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
 #include "dbupgrade.h"
 #include "dbupgrade_macros.h"
+
+#include "zbxdbhigh.h"
 #include "log.h"
-#include "../zbxalgo/vectorimpl.h"
+#include "zbxcrypto.h"
 
 extern unsigned char	program_type;
 
@@ -336,28 +336,6 @@ static int	DBpatch_5050031(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_5050032(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("update config set default_lang='en_US' where default_lang='en_GB'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_5050033(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("update users set lang='en_US' where lang='en_GB'"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
 static int	DBpatch_5050034(void)
 {
 	const ZBX_FIELD	field = {"default_lang", "en_US", NULL, NULL, 5, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -484,7 +462,7 @@ static int	dbpatch_update_simple_macro(const char *table, const char *field, con
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select %s,%s from %s", id, field, table);
 
@@ -538,7 +516,7 @@ static int	dbpatch_update_simple_macro(const char *table, const char *field, con
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -1211,7 +1189,7 @@ static int	DBpatch_5050114(void)
 	/* 22 - ZBX_PREPROC_PROMETHEUS_PATTERN */
 	result = DBselect("select item_preprocid,params from item_preproc where type=22");
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
@@ -1236,7 +1214,7 @@ static int	DBpatch_5050114(void)
 
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -1791,7 +1769,7 @@ static int	DBpatch_5050132(void)
 	DB_ROW		row;
 	DB_RESULT	result;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect("select serviceid,name from services");
 
@@ -1806,7 +1784,7 @@ static int	DBpatch_5050132(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -1942,6 +1920,17 @@ static int	DBpatch_5050147(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_5050148(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("update services set algorithm=case algorithm when 1 then 2 when 2 then 1 else 0 end"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(5050)
@@ -1974,8 +1963,6 @@ DBPATCH_ADD(5050023, 0, 1)
 DBPATCH_ADD(5050024, 0, 1)
 DBPATCH_ADD(5050030, 0, 1)
 DBPATCH_ADD(5050031, 0, 1)
-DBPATCH_ADD(5050032, 0, 1)
-DBPATCH_ADD(5050033, 0, 1)
 DBPATCH_ADD(5050034, 0, 1)
 DBPATCH_ADD(5050040, 0, 1)
 DBPATCH_ADD(5050041, 0, 1)
@@ -2083,5 +2070,6 @@ DBPATCH_ADD(5050144, 0, 1)
 DBPATCH_ADD(5050145, 0, 1)
 DBPATCH_ADD(5050146, 0, 1)
 DBPATCH_ADD(5050147, 0, 1)
+DBPATCH_ADD(5050148, 0, 1)
 
 DBPATCH_END()

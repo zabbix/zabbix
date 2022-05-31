@@ -3,6 +3,7 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
+	include \
 	src \
 	database \
 	man \
@@ -52,8 +53,8 @@ dist-hook:
 	mv $(top_distdir)/src/go/pkg/version/version.go.new $(top_distdir)/src/go/pkg/version/version.go
 
 	rm -rf `find $(top_distdir) -name ".gitignore" -o -name ".gitattributes"`
-	rm -f $(top_distdir)/include/config.h
-	rm -f $(top_distdir)/include/config.h.in~
+	rm -f $(top_distdir)/include/common/config.h
+	rm -f $(top_distdir)/include/common/config.h.in~
 	rm -f $(top_distdir)/ui/conf/zabbix.conf.php
 	rm -rf $(top_distdir)/ui/tests
 	rm -rf $(top_distdir)/sass/img_source
@@ -81,7 +82,7 @@ dbschema_sqlite3:
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql
 
 dbschema_c:
-	cd src/libs/zbxdbhigh && \
+	cd src/libs/zbxdbschema && \
 	$(MAKE) $(AM_MAKEFLAGS) dbschema.c
 
 dbschema: dbschema_mysql dbschema_oracle dbschema_postgresql dbschema_sqlite3 dbschema_c

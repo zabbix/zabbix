@@ -718,29 +718,19 @@ function parseUrlString(url) {
  * Message formatting function.
  *
  * @param {string}       type            Message type. ('good'|'bad'|'warning')
- * @param {string|array} messages        Array with details messages or message string with normal font.
- * @param {string}       title           Larger font title.
+ * @param {array}        messages        Error messages.
+ * @param {string|null}  title           Error title.
  * @param {boolean}      show_close_box  Show close button.
- * @param {boolean}      show_details    Show details on opening.
+ * @param {boolean|null} show_details    Show details on opening.
  *
  * @return {jQuery}
  */
-function makeMessageBox(type, messages, title, show_close_box, show_details) {
+function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
 	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
 		msg_class = classes[type];
 
-	if (typeof msg_class === 'undefined') {
-		return jQuery('<output>').text(Array.isArray(messages) ? messages.join(' ') : messages);
-	}
-
-	if (typeof title === 'undefined') {
-		title = null;
-	}
-	if (typeof show_close_box === 'undefined') {
-		show_close_box = true;
-	}
-	if (typeof show_details === 'undefined') {
-		show_details = false;
+	if (show_details === null) {
+		show_details = type === 'bad' || type === 'warning';
 	}
 
 	var	$list = jQuery('<ul>')
@@ -790,24 +780,15 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		}
 	}
 
-	if (messages.length > 0) {
-		if (Array.isArray(messages)) {
-			jQuery.map(messages, function (message) {
-				jQuery('<li>')
-					.text(message)
-					.appendTo($list);
-				return null;
-			});
-
-			$msg_box.append($msg_details);
-		}
-		else {
+	if (Array.isArray(messages) && messages.length > 0) {
+		jQuery.map(messages, function (message) {
 			jQuery('<li>')
-				.text(messages ? messages : ' ')
+				.text(message)
 				.appendTo($list);
+			return null;
+		});
 
-			$msg_box.append($msg_details);
-		}
+		$msg_box.append($msg_details);
 	}
 
 	if (show_close_box) {
@@ -941,15 +922,37 @@ function urlEncodeData(parameters, prefix = '') {
 		else {
 			result.push([encodeURIComponent(prefixed_name), encodeURIComponent(value)].join('='));
 		}
-	};
+	}
 
 	return result.join('&');
 }
 
 /**
- * Get all input fields from the given form and return them. The order of returned fields is not predictable.
+ * Get form field values as deep object.
  *
- * @param {object}  form    Form object from which fields are retrieved.
+ * Example:
+ *     <form>
+ *         <input name="a" value="1">
+ *         <input name="b[c]" value="2">
+ *         <input name="b[d]" value="3">
+ *         <input name="e[f][]" value="4">
+ *         <input name="e[f][]" value="5">
+ *     </form>
+ *
+ *    ... will result in:
+ *
+ *    {
+ *        a: "1",
+ *        b: {
+ *            c: "2",
+ *            d: "3"
+ *        },
+ *        e: {
+ *            f: ["4", "5"]
+ *        }
+ *    }
+ *
+ * @param {HTMLFormElement} form
  *
  * @return {object}
  */
@@ -957,6 +960,8 @@ function getFormFields(form) {
 	const fields = {};
 
 	for (let [key, value] of new FormData(form)) {
+		value = value.replace(/\r?\n/g, '\r\n');
+
 		const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
 
 		let key_fields = fields;
