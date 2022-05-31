@@ -360,11 +360,10 @@ class testPageMonitoringHosts extends CWebTest {
 		$form->fill($data['filter']);
 		$result_form = $this->query('xpath://form[@name="host_view"]')->one();
 		$this->query('button:Apply')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
 		$result_form->waitUntilReloaded();
 		$this->assertTableDataColumn($data['expected']);
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
+		$result_form->waitUntilReloaded();
 	}
 
 	public static function getTagsFilterData() {
