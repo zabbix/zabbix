@@ -24,10 +24,6 @@
  */
 ?>
 
-/**
- * @param {Overlay} overlay
- */
-
 window.update_problem_popup = new class {
 	init() {
 		this.problem_suppressible = !document.getElementById('suppress_problem').disabled;
@@ -59,14 +55,14 @@ window.update_problem_popup = new class {
 	}
 
 	_update() {
-		const suppress_checked = !!document.querySelector('#suppress_problem:checked');
-		const unsuppress_checked = !!document.querySelector('#unsuppress_problem:checked');
-		const close_problem_checked = !!document.querySelector('#close_problem:checked');
+		const suppress_checked = document.getElementById('suppress_problem').checked;
+		const unsuppress_checked = document.getElementById('unsuppress_problem').checked;
+		const close_problem_checked = document.getElementById('close_problem').checked;
 
 		this._update_suppress_problem_state(close_problem_checked || unsuppress_checked);
 		this._update_unsuppress_problem_state(close_problem_checked || suppress_checked);
 
-		this._update_suppress_time_options()
+		this._update_suppress_time_options();
 	}
 
 	_update_suppress_problem_state(state) {
@@ -90,7 +86,7 @@ window.update_problem_popup = new class {
 	_update_suppress_time_options() {
 
 		for (const element of document.querySelectorAll('#suppress_time_option input[type="radio"]')) {
-			element.disabled = !document.querySelector('#suppress_problem:checked');
+			element.disabled = !document.getElementById('suppress_problem').checked;
 
 			document.getElementById('suppress_until_problem').disabled = element.disabled;
 			document.getElementById('suppress_until_problem_calendar').disabled = element.disabled;
@@ -103,6 +99,9 @@ window.update_problem_popup = new class {
 		}
 	}
 
+	/**
+	 * @param {Overlay} overlay
+	 */
 	submitAcknowledge(overlay) {
 		var $form = overlay.$dialogue.find('form'),
 			url = new Curl('zabbix.php', false),
@@ -122,11 +121,14 @@ window.update_problem_popup = new class {
 			complete: function() {
 				overlay.unsetLoading();
 			}
-		}).done(function(response) {
-			overlay.$dialogue.find('.<?= ZBX_STYLE_MSG_BAD ?>').remove();
+		})
+		.done(function(response) {
+			overlay.$dialogue.find('.msg-bad').remove();
 
 			if ('error' in response) {
-				const message_box = makeMessageBox(<?= ZBX_STYLE_MSG_BAD ?>, response.error.messages, response.error.title);
+				const message_box = makeMessageBox('bad', response.error.messages,
+					response.error.title
+				);
 
 				message_box.insertBefore($form);
 			}
