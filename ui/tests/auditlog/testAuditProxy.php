@@ -88,7 +88,7 @@ class testAuditProxy extends testPageReportsAuditValues {
 //		$this->query('button:Refresh configuration')->one()->click();
 //		$this->page->acceptAlert();
 //		$this->page->waitUntilReady();
-//
+
 //		$this->checkAuditValues(self::$ids, 'Configuration refresh');
 //	}
 

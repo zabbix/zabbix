@@ -111,16 +111,16 @@ class testAuditUser extends testPageReportsAuditValues {
 //				'name' => 'Updated user group name'
 //			]
 //		]);
-//
+
 //		$this->checkAuditValues(self::$ids, 'Update');
 //	}
-//
+
 //	/**
 //	 * Check audit of deleted User group.
 //	 */
 //	public function testAuditUser_Delete() {
 //		CDataHelper::call('usergroup.delete', [self::$ids]);
-//
+
 //		$this->checkAuditValues(self::$ids, 'Delete');
 //	}
 }
