@@ -796,7 +796,7 @@ static int	DBpatch_6010033_split_groups(void)
 	ADD_GROUPIDS_FROM_FIELD("config", "discovery_groupid");
 	ADD_GROUPIDS_FROM("corr_condition_group");
 	ADD_GROUPIDS_FROM("group_discovery");
-	ADD_GROUPIDS_FROM("maintenance_groups");
+	ADD_GROUPIDS_FROM("maintenances_groups");
 	ADD_GROUPIDS_FROM("opcommand_grp");
 	ADD_GROUPIDS_FROM("opgroup");
 	ADD_GROUPIDS_FROM("scripts");
