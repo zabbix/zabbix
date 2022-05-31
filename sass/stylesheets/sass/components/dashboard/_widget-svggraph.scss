@@ -80,6 +80,7 @@ form.dashboard-grid-widget-svggraph {
 				width: 2px;
 				background: $ui-border-color;
 			}
+
 		}
 
 		&.list-accordion-item-closed {
@@ -126,5 +127,9 @@ form.dashboard-grid-widget-svggraph {
 		.single-item-table-row td {
 			padding: 0px 5px 0 0;
 		}
+	}
+
+	.single-item-table-empty-msg {
+		display: none;
 	}
 }

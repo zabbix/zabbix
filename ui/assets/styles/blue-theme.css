@@ -682,6 +682,8 @@ footer {
     grid-column-start: 4 !important; }
   .form-grid .form-field table {
     width: 100%; }
+    .form-grid .form-field table.table-initial-width {
+      width: auto; }
   .form-grid .form-field th {
     padding: 0 5px 0 0;
     color: #768d99; }
@@ -2935,6 +2937,90 @@ z-select,
     .z-select[readonly] button:focus {
       border-color: #02659f; }
 
+<<<<<<< Updated upstream
+=======
+div.dashboard-grid-widget-slareport .date-vertical {
+  writing-mode: vertical-lr;
+  transform: rotate(180deg); }
+
+form.dashboard-grid-widget-svggraph .table-forms-container, form.dashboard-grid-widget-svggraph .browser-warning-container {
+  border: 1px solid #dfe4e7; }
+form.dashboard-grid-widget-svggraph .dataset-head {
+  display: grid;
+  grid-template-columns: 24px 24px 1fr 1fr 24px;
+  grid-gap: 10px; }
+form.dashboard-grid-widget-svggraph .dataset-body.list-accordion-item-body {
+  display: grid;
+  grid-template-columns: 24px 1fr 1fr 24px;
+  grid-gap: 10px;
+  align-items: start;
+  position: relative;
+  margin-top: 10px; }
+  form.dashboard-grid-widget-svggraph .dataset-body.list-accordion-item-body .form-grid {
+    padding-top: 0; }
+    form.dashboard-grid-widget-svggraph .dataset-body.list-accordion-item-body .form-grid:first-child {
+      grid-column-start: 2; }
+form.dashboard-grid-widget-svggraph .drag-icon {
+  position: absolute;
+  left: -14px; }
+form.dashboard-grid-widget-svggraph .td-drag-icon .drag-icon {
+  position: relative;
+  top: 8px;
+  left: 9px;
+  margin-right: 5px; }
+form.dashboard-grid-widget-svggraph .dataset-actions {
+  text-align: right; }
+  form.dashboard-grid-widget-svggraph .dataset-actions .btn-remove {
+    top: 0;
+    right: 0;
+    vertical-align: baseline; }
+form.dashboard-grid-widget-svggraph .items-list {
+  grid-column: 2 / span 3; }
+form.dashboard-grid-widget-svggraph .list-vertical-accordion {
+  position: relative;
+  margin-left: 15px;
+  padding-left: 0; }
+form.dashboard-grid-widget-svggraph .list-accordion-item {
+  position: relative;
+  margin-bottom: 10px; }
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
+    content: ' ';
+    position: absolute;
+    top: 24px;
+    bottom: 0;
+    left: 11px;
+    width: 2px;
+    background: #dfe4e7; }
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .multiselect {
+    height: 24px;
+    overflow: hidden; }
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-body {
+    display: none; }
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .table-forms-separator {
+    border: none; }
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table thead,
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table tfoot,
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
+    display: none; }
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .single-item-table-row td {
+    padding: 0px 5px 5px 0; }
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
+    padding-left: 0; }
+form.dashboard-grid-widget-svggraph .single-item-table .table-col-handle {
+  width: 26px; }
+form.dashboard-grid-widget-svggraph .single-item-table .table-col-no {
+  width: 20px; }
+form.dashboard-grid-widget-svggraph .single-item-table .table-col-color {
+  width: 24px; }
+form.dashboard-grid-widget-svggraph .single-item-table .table-col-action {
+  width: 55px; }
+form.dashboard-grid-widget-svggraph .single-item-table .single-item-table-row td {
+  padding: 0px 5px 0 0; }
+form.dashboard-grid-widget-svggraph .single-item-table-empty-msg {
+  display: none; }
+
+>>>>>>> Stashed changes
 .link-action {
   border-bottom: 1px dotted;
   cursor: pointer;

@@ -653,7 +653,9 @@ class CWidgetHelper {
 			$tags = [['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']];
 		}
 
-		$tags_table = (new CTable())->setId('tags_table_'.$field->getName());
+		$tags_table = (new CTable())
+			->setId('tags_table_'.$field->getName())
+			->addClass('table-initial-width');
 
 		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
 		$i = 0;
@@ -1236,6 +1238,8 @@ class CWidgetHelper {
 					->setAttribute('data-number', $i + 1);
 			}
 
+			$empty_msg_block = (new CDiv(_('No item selected.')))->addClass('single-item-table-empty-msg');
+
 			$items_list = (new CTable())
 				->addClass('single-item-table')
 				->setAttribute('data-set', $row_num)
@@ -1263,7 +1267,7 @@ class CWidgetHelper {
 				]);
 
 			$dataset_head = array_merge($dataset_head, [
-				(new CDiv($items_list))->addClass('items-list table-forms-separator')
+				(new CDiv([$empty_msg_block, $items_list]))->addClass('items-list table-forms-separator')
 			]);
 		}
 

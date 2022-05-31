@@ -193,8 +193,6 @@ class CSvgGraphHelper {
 					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 				],
 				'itemids' => $data_set['itemids'],
-				'sortfield' => 'name',
-				'sortorder' => ZBX_SORT_UP,
 				'limit' => $max_metrics
 			]);
 

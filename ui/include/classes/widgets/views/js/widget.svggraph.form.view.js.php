@@ -74,9 +74,28 @@ window.widget_svggraph_form = new class {
 			.on("collapse", function(event, data) {
 				jQuery("textarea, .multiselect", data.section).scrollTop(0);
 				jQuery(window).trigger("resize");
+				const dataset = data.section[0];
+
+
+				if (dataset.dataset.type == '0') {
+					const message_block = dataset.querySelector('.single-item-table-empty-msg');
+
+					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
+						message_block.style.display = 'block';
+					}
+				}
 			})
-			.on("expand", function() {
+			.on("expand", function(event, data) {
 				jQuery(window).trigger("resize");
+				const dataset = data.section[0];
+
+				if (dataset.dataset.type == '0') {
+					const message_block = dataset.querySelector('.single-item-table-empty-msg');
+
+					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
+						message_block.style.display = 'none';
+					}
+				}
 			})
 			.zbx_vertical_accordion({handler: ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>"});
 
@@ -343,6 +362,8 @@ window.widget_svggraph_form = new class {
 
 		jQuery("#lefty_static_units").prop("disabled",
 			(!on || jQuery("#lefty_units").val() != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>));
+
+		jQuery("#percentile_left").prop("disabled", !on);
 	}
 
 	onRightYChange() {
@@ -356,6 +377,9 @@ window.widget_svggraph_form = new class {
 
 		jQuery("#righty_static_units").prop("disabled",
 			(!on || jQuery("#righty_units").val() != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>));
+
+
+		jQuery("#percentile_right").prop("disabled", !on);
 	}
 
 	onGraphConfigChange() {
@@ -698,6 +722,7 @@ clone() {
 	});
 
 	this.onGraphConfigChange();
+	this.rewriteNameLinks();
 }
 };
 
@@ -746,6 +771,7 @@ function changeDataSetDrawType(obj) {
 			jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
 			jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
 			jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
+			jQuery("#ds_" + row_num + "_stacked").prop("disabled", true);
 			break;
 		case "<?= SVG_GRAPH_TYPE_BAR ?>":
 			jQuery("#ds_" + row_num + "_width").rangeControl("disable");
@@ -756,6 +782,8 @@ function changeDataSetDrawType(obj) {
 			jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);
 			jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
 			jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
+			jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
+			jQuery("#ds_" + row_num + "_stacked").prop("disabled", true);
 			break;
 		default:
 			jQuery("#ds_" + row_num + "_width").rangeControl("enable");
@@ -766,6 +794,11 @@ function changeDataSetDrawType(obj) {
 			jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);
 			jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);
 			jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", false);
+			jQuery("#ds_" + row_num + "_stacked").prop("disabled", false);
+
+			if (jQuery(":checked", jQuery(obj)).val() == "<?= SVG_GRAPH_TYPE_STAIRCASE ?>") {
+				jQuery("#ds_" + row_num + "_stacked").prop("disabled", true);
+			}
 			break;
 	}
 };
