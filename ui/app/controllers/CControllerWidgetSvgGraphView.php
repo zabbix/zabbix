@@ -44,9 +44,6 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		]);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	protected function doAction(): void {
 		$fields = $this->getForm()->getFieldsData();
 		$edit_mode = $this->getInput('edit_mode', 0);

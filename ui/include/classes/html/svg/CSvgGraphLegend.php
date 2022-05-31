@@ -77,9 +77,9 @@ class CSvgGraphLegend extends CDiv {
 	private function draw(): void {
 		if ($this->show_statistic) {
 			$this->addItem([
-				(new CDiv('min'))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_HEADER),
-				(new CDiv('avg'))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_HEADER),
-				(new CDiv('max'))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_HEADER)
+				(new CDiv(_('min')))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_HEADER),
+				(new CDiv(_('avg')))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_HEADER),
+				(new CDiv(_('max')))->addClass(self::ZBX_STYLE_GRAPH_LEGEND_HEADER)
 			]);
 		}
 
