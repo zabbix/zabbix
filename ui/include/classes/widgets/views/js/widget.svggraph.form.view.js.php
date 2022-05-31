@@ -186,31 +186,39 @@ window.widget_svggraph_form = new class {
 	_legendTabInit() {
 		document.getElementById('legend')
 			.addEventListener('click', (e) => {
-				jQuery("#legend_lines").rangeControl(
-					e.target.checked ? "enable" : "disable"
+				jQuery('#legend_lines').rangeControl(
+					e.target.checked ? 'enable' : 'disable'
 				);
-				jQuery("#legend_columns").rangeControl(
-					e.target.checked ? "enable" : "disable"
-				);
+				if (!e.target.checked) {
+					jQuery('#legend_columns').rangeControl('disable');
+				}
+				else {
+					if (document.getElementById('legend_statistic').checked) {
+						jQuery('#legend_columns').rangeControl('enable');
+					}
+				}
 				document.getElementById('legend_statistic').disabled = !e.target.checked;
 			});
+
 		document.getElementById('legend_statistic')
 			.addEventListener('click', (e) => {
-				jQuery("#legend_columns").rangeControl(
-					e.target.checked ? "enable" : "disable"
+				jQuery('#legend_columns').rangeControl(
+					e.target.checked ? 'enable' : 'disable'
 				);
 			});
 	}
 
-	_problemsTabInit() { // TODO: Problems tab - update controls enable status on 'Show problems' checkbox change
-		var on = jQuery(this).is(":checked"),
-			widget = jQuery(this).closest(".ui-widget");
+	_problemsTabInit() {
+		const widget = document.getElementById('problems');
 
-		jQuery("#graph_item_problems, #problem_name, #problemhosts_select").prop("disabled", !on);
-		jQuery("#problemhosts_").multiSelect(on ? "enable" : "disable");
-		jQuery("[name^=\"severities[\"]", widget).prop("disabled", !on);
-		jQuery("[name=\"evaltype\"]", widget).prop("disabled", !on);
-		jQuery("input, button, z-select", jQuery("#tags_table_tags", widget)).prop("disabled", !on);
+		document.getElementById('show_problems')
+			.addEventListener('click', (e) => {
+				jQuery('#graph_item_problems, #problem_name, #problemhosts_select').prop('disabled', !e.target.checked);
+				jQuery('#problemhosts_').multiSelect(e.target.checked ? 'enable' : 'disable');
+				jQuery("[name^='severities[']", jQuery(widget)).prop('disabled', !e.target.checked);
+				jQuery("[name='evaltype']", jQuery(widget)).prop('disabled', !e.target.checked);
+				jQuery('input, button, z-select', jQuery('#tags_table_tags', jQuery(widget))).prop('disabled', !e.target.checked);
+			});
 	}
 
 	_addDatasetMenu(e) {
