@@ -1254,7 +1254,8 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 
 #ifdef HAVE_ORACLE
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"create trigger %s_delete before delete on %s for each row\n"
+			"create trigger %s_delete before delete on %s\n"
+				"for each row\n"
 				"begin\n"
 					"insert into changelog (object,objectid,operation,clock)\n"
 						"values (%d,:old.%s,%d,(cast(sys_extract_utc(systimestamp) as date)"
