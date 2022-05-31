@@ -97,7 +97,7 @@ class CPieGraphDraw extends CGraphDraw {
 		$sizeX -= $count;
 		$sizeY -= $count;
 
-		return [$sizeX, $sizeY];
+		return [(int) $sizeX, (int) $sizeY];
 	}
 
 	protected function calc3DAngle($sizeX, $sizeY) {
