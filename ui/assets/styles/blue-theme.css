@@ -2841,6 +2841,10 @@ form.dashboard-grid-widget-svggraph .list-accordion-item {
   form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
   form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
     display: none; }
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .single-item-table-row td {
+    padding: 0px 5px 5px 0; }
+  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
+    padding-left: 0; }
 form.dashboard-grid-widget-svggraph .single-item-table .table-col-handle {
   width: 26px; }
 form.dashboard-grid-widget-svggraph .single-item-table .table-col-no {
@@ -2849,6 +2853,8 @@ form.dashboard-grid-widget-svggraph .single-item-table .table-col-color {
   width: 24px; }
 form.dashboard-grid-widget-svggraph .single-item-table .table-col-action {
   width: 55px; }
+form.dashboard-grid-widget-svggraph .single-item-table .single-item-table-row td {
+  padding: 0px 5px 0 0; }
 
 .link-action {
   border-bottom: 1px dotted;
