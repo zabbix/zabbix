@@ -1273,7 +1273,7 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 			"begin\n"
 				"insert into changelog (object,objectid,operation,clock)\n"
 					"values (%d,old.%s,%d,cast(extract(epoch from now()) as int));\n"
-				"return new;\n"
+				"return old;\n"
 			"end;\n"
 			"$$ language plpgsql;\n"
 			"create trigger %s_delete before delete on %s\n"
