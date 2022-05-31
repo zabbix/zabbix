@@ -708,49 +708,13 @@ class CSvgGraph extends CSvg {
 
 	private function drawMetricsLine(): void {
 		foreach ($this->metrics as $index => $metric) {
-			switch ($metric['options']['approximation']) {
-				case APPROXIMATION_MIN:
-					$approximation = 'min';
-					break;
-				case APPROXIMATION_MAX:
-					$approximation = 'max';
-					break;
-				default:
-					$approximation = 'avg';
-			}
-
-			if (array_key_exists($index, $this->paths)
-					&& in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])) {
-
-				$line_group = new CSvgGraphLineGroup($this->paths[$index], $metric);
-
-				if ($metric['options']['fill'] > 0) {
-					$y_zero = $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT
-						? $this->right_y_zero
-						: $this->left_y_zero;
-
-					foreach ($this->paths[$index] as $path) {
-						if (count($path) > 1) {
-							if ($metric['options']['approximation'] == APPROXIMATION_ALL) {
-								$line_group->addItem(
-									new CSvgGraphArea(
-										array_merge(
-											array_column($path, 'max'),
-											array_reverse(array_column($path, 'min'))
-										),
-										$metric,
-										null
-									)
-								);
-							}
-							else {
-								$line_group->addItem(new CSvgGraphArea(array_column($path, $approximation), $metric, $y_zero));
-							}
-						}
-					}
-				}
-
-				$this->addItem($line_group);
+			if (in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])
+					&& array_key_exists($index, $this->paths)) {
+				$this->addItem(
+					new CSvgGraphLineGroup($this->paths[$index], $metric,
+						$metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT ? $this->right_y_zero : $this->left_y_zero
+					)
+				);
 			}
 		}
 	}

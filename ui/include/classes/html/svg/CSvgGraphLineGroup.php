@@ -26,14 +26,16 @@ class CSvgGraphLineGroup extends CSvgGroup {
 
 	private $paths;
 	private $metric;
+	private $y_zero;
 
 	private $options;
 
-	public function __construct(array $paths, array $metric) {
+	public function __construct(array $paths, array $metric, $y_zero) {
 		parent::__construct();
 
 		$this->paths = $paths;
 		$this->metric = $metric;
+		$this->y_zero = $y_zero;
 
 		$this->options = $metric['options'] + [
 			'transparency' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY,
@@ -105,6 +107,24 @@ class CSvgGraphLineGroup extends CSvgGroup {
 				if ($this->options['approximation'] == APPROXIMATION_ALL) {
 					$this->addItem(new CSvgGraphLine(array_column($path, 'min'), $this->metric, true));
 					$this->addItem(new CSvgGraphLine(array_column($path, 'max'), $this->metric, true));
+				}
+
+				if ($this->options['approximation'] == APPROXIMATION_ALL) {
+					$this->addItem(
+						new CSvgGraphArea(
+							array_merge(
+								array_column($path, 'max'),
+								array_reverse(array_column($path, 'min'))
+							),
+							$this->metric,
+							null
+						)
+					);
+				}
+				else {
+					$this->addItem(
+						new CSvgGraphArea(array_column($path, $approximation), $this->metric, $this->y_zero)
+					);
 				}
 			}
 			else {
