@@ -88,6 +88,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'unsuppress_problem' => $this->getInput('unsuppress_problem', ZBX_PROBLEM_UPDATE_NONE),
 			'related_problems_count' => 0,
 			'problem_can_be_closed' => false,
+			'problem_can_be_suppressed' => false,
+			'problem_can_be_unsuppressed' => false,
 			'problem_severity_can_be_changed' => false,
 			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 			'allowed_close' => $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
