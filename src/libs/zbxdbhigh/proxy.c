@@ -4870,7 +4870,7 @@ static void	zbx_db_flush_proxy_lastaccess(void)
 		{
 			zbx_uint64_pair_t	*pair = &lastaccess.values[i];
 
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update hosts"
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update host_rtdata"
 					" set lastaccess=%d"
 					" where hostid=" ZBX_FS_UI64 ";\n",
 					(int)pair->second, pair->first);

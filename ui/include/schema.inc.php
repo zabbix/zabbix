@@ -205,12 +205,6 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'lastaccess' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
 			'ipmi_authtype' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -8897,6 +8891,12 @@ return [
 				'ref_field' => 'hostid'
 			],
 			'active_available' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'lastaccess' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

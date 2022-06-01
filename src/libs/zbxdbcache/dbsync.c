@@ -969,11 +969,11 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
-				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
-				"status,name,lastaccess,tls_connect,tls_accept,tls_issuer,tls_subject,"
-				"tls_psk_identity,tls_psk,proxy_address,auto_compress,maintenanceid"
-			" from hosts"
+			"select h.hostid,h.proxy_hostid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username"
+				"h.ipmi_password,h.maintenance_status,h.maintenance_type,h.maintenance_from"
+				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject"
+				"h.tls_psk_identity,h.tls_psk,h.proxy_address,h.auto_compress,h.maintenanceid"
+			" from hosts h"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
@@ -983,11 +983,12 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 	dbsync_prepare(sync, 22, NULL);
 #else
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
-				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
-				"status,name,lastaccess,tls_connect,tls_accept,"
-				"proxy_address,auto_compress,maintenanceid"
-			" from hosts"
+			"select h.hostid,h.proxy_hostid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,"
+				"h.ipmi_password,h.maintenance_status,h.maintenance_type,h.maintenance_from,"
+				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,"
+				"h.proxy_address,h.auto_compress,h.maintenanceid"
+			" from hosts h"
+			" join host_rtdata hr on h.hostid=hr.hostid"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
@@ -1004,7 +1005,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hostid", "and",
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "h.hostid", "and",
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)]);
 out:
 	zbx_free(sql);

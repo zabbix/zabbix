@@ -809,6 +809,30 @@ static int	DBpatch_6010078(void)
 	return DBadd_foreign_key("item_tag", 1, &field);
 }
 
+static int	DBpatch_6010079(void)
+{
+	const ZBX_FIELD	field = {"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_rtdata", &field);
+}
+
+static int	DBpatch_6010080(void)
+{
+	/* status 5,6 - HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE */
+	if (ZBX_DB_OK > DBexecute("insert into host_rtdata (hostid,lastaccess)"
+			" select hostid,lastaccess from hosts where status in (5,6)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010081(void)
+{
+	return DBdrop_field("hosts", "lastaccess");
+}
+
 #endif
 
 DBPATCH_START(6010)
@@ -894,5 +918,8 @@ DBPATCH_ADD(6010075, 0,	1)
 DBPATCH_ADD(6010076, 0,	1)
 DBPATCH_ADD(6010077, 0,	1)
 DBPATCH_ADD(6010078, 0,	1)
+DBPATCH_ADD(6010079, 0,	1)
+DBPATCH_ADD(6010080, 0,	1)
+DBPATCH_ADD(6010081, 0,	1)
 
 DBPATCH_END()
