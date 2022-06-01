@@ -37,6 +37,7 @@ require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
+require_once dirname(__FILE__).'/testActiveAvailability.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -62,6 +63,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testHighAvailability');
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
+		$suite->addTestSuite('testActiveAvailability');
 
 		return $suite;
 	}
