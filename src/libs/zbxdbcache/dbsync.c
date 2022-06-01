@@ -969,11 +969,12 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select h.hostid,h.proxy_hostid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username"
-				"h.ipmi_password,h.maintenance_status,h.maintenance_type,h.maintenance_from"
-				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject"
+			"select h.hostid,h.proxy_hostid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,"
+				"h.ipmi_password,h.maintenance_status,h.maintenance_type,h.maintenance_from,"
+				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,"
 				"h.tls_psk_identity,h.tls_psk,h.proxy_address,h.auto_compress,h.maintenanceid"
 			" from hosts h"
+			" join host_rtdata hr on h.hostid=hr.hostid"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
