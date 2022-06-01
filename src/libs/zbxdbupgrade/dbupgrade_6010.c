@@ -688,6 +688,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", NULL);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
@@ -721,11 +722,12 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 	}
 
 	zbx_db_insert_autoincrement(&db_insert, "rightid");
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
 		goto out;
 
-	if (ZBX_DB_OK > DBexecute("%s", sql))
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
 out:
 	zbx_free(sql);
