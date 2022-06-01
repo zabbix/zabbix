@@ -64,8 +64,8 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|HPE |HPE Primera: Get data |<p>The JSON with result of WSAPI requests.</p> |SCRIPT |hpe.primera.get_data<p>**Expression**:</p>`The text is too long. Please see the template.` |
-|HPE |HPE Primera: Get errors |<p>A list of errors from WSAPI requests.</p> |DEPENDENT |hpe.primera.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
+|HPE |HPE Primera: Get data |<p>The JSON with result of WSAPI requests.</p> |SCRIPT |hpe.primera.data.get<p>**Expression**:</p>`The text is too long. Please see the template.` |
+|HPE |HPE Primera: Get errors |<p>A list of errors from WSAPI requests.</p> |DEPENDENT |hpe.primera.data.errors<p>**Preprocessing**:</p><p>- JSONPATH: `$.errors`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |HPE |HPE Primera: Capacity allocated |<p>Allocated capacity in the system.</p> |DEPENDENT |hpe.primera.system.capacity.allocated<p>**Preprocessing**:</p><p>- JSONPATH: `$.system.allocatedCapacityMiB`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- MULTIPLIER: `1048576`</p> |
 |HPE |HPE Primera: Chunklet size |<p>Chunklet size.</p> |DEPENDENT |hpe.primera.system.chunklet.size<p>**Preprocessing**:</p><p>- JSONPATH: `$.system.chunkletSizeMiB`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>- MULTIPLIER: `1048576`</p> |
 |HPE |HPE Primera: System contact |<p>Contact of the system.</p> |DEPENDENT |hpe.primera.system.contact<p>**Preprocessing**:</p><p>- JSONPATH: `$.system.contact`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
@@ -162,7 +162,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|HPE Primera: There are errors in requests to WSAPI |<p>Zabbix has received errors in requests to WSAPI.</p> |`length(last(/HPE Primera by HTTP/hpe.primera.errors))>0` |AVERAGE |<p>**Depends on**:</p><p>- HPE Primera: Service is unavailable</p> |
+|HPE Primera: There are errors in requests to WSAPI |<p>Zabbix has received errors in requests to WSAPI.</p> |`length(last(/HPE Primera by HTTP/hpe.primera.data.errors))>0` |AVERAGE |<p>**Depends on**:</p><p>- HPE Primera: Service is unavailable</p> |
 |HPE Primera: Service is unavailable |<p>-</p> |`max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{HOST.CONN}","{$HPE.PRIMERA.API.PORT}"],5m)=0` |HIGH |<p>Manual close: YES</p> |
 |CPG [{#NAME}]: Degraded |<p>CPG [{#NAME}] is in degraded state.</p> |`last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#ID}"])=2` |AVERAGE | |
 |CPG [{#NAME}]: Failed |<p>CPG [{#NAME}] is in failed state.</p> |`last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#ID}"])=3` |HIGH | |
