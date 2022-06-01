@@ -48,14 +48,6 @@
 			return;
 		}
 	}
-
-	jQuery(function($) {
-		$('#host')
-			.on('input keydown paste', function () {
-				$('#name').attr('placeholder', $(this).val());
-			})
-			.trigger('input');
-	});
 </script>
 
 <script type="text/javascript">
@@ -261,5 +253,11 @@
 		}
 
 		jQuery('input[name=tls_connect]').trigger('change');
+
+		jQuery('#host')
+			.on('input keydown paste', function () {
+				$('#name').attr('placeholder', $(this).val());
+			})
+			.trigger('input');
 	});
 </script>
