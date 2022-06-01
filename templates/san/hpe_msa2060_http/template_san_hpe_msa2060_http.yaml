@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-31T14:53:27Z'
+  date: '2022-06-01T12:48:57Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -55,7 +55,7 @@ zabbix_export:
           triggers:
             -
               uuid: 2133ddf10a3641d78e609948d6842687
-              expression: 'length(last(/HPE MSA 2060 Storage by HTTP/hpe.msa.data.errors))>2'
+              expression: 'length(last(/HPE MSA 2060 Storage by HTTP/hpe.msa.data.errors))>0'
               name: 'There are errors in method requests to API'
               priority: AVERAGE
               description: 'There are errors in method requests to API.'
@@ -110,12 +110,12 @@ zabbix_export:
             var response, request = new HttpRequest();
             request.addHeader('datatype: json');
             
-            auth_string = sha256(params.username + '_' + params.password)
+            auth_string = sha256(params.username + '_' + params.password);
             
             response = request.get(params.base_url + 'api/login/' + auth_string);
             
             if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+                throw 'Authentication request has failed with status code ' + request.getStatus() + ': ' + response;
             }
             
             if (response !== null) {
@@ -123,24 +123,24 @@ zabbix_export:
                     auth_data = JSON.parse(response);
                 }
                 catch (error) {
-                   throw 'Failed to parse auth response received from device API. Check debug log for more information.';
+                   throw 'Failed to parse authentication response received from device API.';
                 }
             }
             
             session_key = auth_data['status'][0]['response'];
             
-            request = new HttpRequest();
             request.addHeader('sessionKey: ' + session_key);
-            request.addHeader('datatype: json');
             
-            data['errors'] = [];
+            data.errors = [];
             
             methods.forEach(function (method) {
                 response = request.get(params.base_url + 'api/show/' + method);
-                method_error = {};
+                method_error = '';
                 
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    method_error[method] = 'Request failed with status code ' + request.getStatus() + ': ' + response;;
+                    method_error = 'Method: ' + method + '. Request has failed with status code ' + request.getStatus() + ': ' + response;
+                    data.errors.push(method_error);
+                    return;
                 }
             
                 if (response !== null) {
@@ -171,14 +171,21 @@ zabbix_export:
                         }
                     }
                     catch (error) {
-                        method_error[method] = 'Failed to parse response received from device API. Check debug log for more information.';
+                        method_error = 'Method: ' + method + '. Failed to parse response received from device API.';
                     }
                 }
+                else {
+                    method_error = 'Method: ' + method + '. No data received by request.';
+                }
             
-                if (Object.keys(method_error).length > 0) {
-                    data['errors'].push(method_error);
+                if (method_error.length > 0) {
+                    data.errors.push(method_error);
                 }
             });
+            
+            if (data.errors.length == 0) {
+                data.errors = '';
+            }
             
             return JSON.stringify(data);
           description: 'The JSON with result of API requests.'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-05-31T14:53:20Z'
+  date: '2022-06-01T12:48:50Z'
   groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -55,7 +55,7 @@ zabbix_export:
           triggers:
             -
               uuid: 7f80562a0b4f4329be454c418de3f517
-              expression: 'length(last(/HPE MSA 2040 Storage by HTTP/hpe.msa.data.errors))>2'
+              expression: 'length(last(/HPE MSA 2040 Storage by HTTP/hpe.msa.data.errors))>0'
               name: 'There are errors in method requests to API'
               priority: AVERAGE
               description: 'There are errors in method requests to API.'
@@ -112,11 +112,11 @@ zabbix_export:
             var response, request = new HttpRequest();
             request.addHeader('datatype: xml');
             
-            auth_string = md5(params.username + '_' + params.password)
+            auth_string = md5(params.username + '_' + params.password);
             response = request.get(params.base_url + 'api/login/' + auth_string);
             
             if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                throw 'Authentication request has failed with status code ' + request.getStatus() + ': ' + response;
             }
             
             if (response !== null) {
@@ -125,7 +125,7 @@ zabbix_export:
                     return_code = XML.query(response, '/RESPONSE/OBJECT/PROPERTY[@name="return-code"]/text()');
                 }
                 catch (error) {
-                    throw 'Failed to parse auth response received from device API. Check debug log for more information.';
+                    throw 'Failed to parse authentication response received from device API.';
                 }
             }
             
@@ -133,21 +133,23 @@ zabbix_export:
                 throw 'Authentication failed.'
             }
             else if (session_key === '') {
-                throw 'Failed to retrieve session key from auth response.';
+                throw 'Failed to retrieve session key from authentication response.';
             }
             
-            request = new HttpRequest();
+            request.clearHeader();
             request.addHeader('sessionKey: ' + session_key);
             request.addHeader('datatype: api-embed');
             
-            data['errors'] = [];
+            data.errors = [];
             
             methods.forEach(function (method) {
                 response = request.get(params.base_url + 'api/show/' + method);
-                method_error = {};
+                method_error = '';
             
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    method_error[method] = 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                    method_error = 'Method: ' + method + '. Request has failed with status code ' + request.getStatus() + ': ' + response;
+                    data.errors.push(method_error);
+                    return;
                 }
             
                 if (response !== null) {
@@ -158,7 +160,7 @@ zabbix_export:
                         result_tmp.RESPONSE.OBJECT.forEach(function (object) {
                             var data_tmp = {};
             
-                            if (object['@basetype'] != 'status' && object['@basetype'] != 'enclosure-sku') {
+                            if (object['@basetype'] !== 'status' && object['@basetype'] !== 'enclosure-sku') {
                                 object.PROPERTY.forEach(function (property) {
                                     name = property['@name'];
                                     value = property['#text'] || '';
@@ -174,14 +176,21 @@ zabbix_export:
                         });
                     }
                     catch (error) {
-                        method_error[method] = 'Failed to parse response received from device API. Check debug log for more information.';
+                        method_error = 'Method: ' + method + '. Failed to parse response received from device API.';
                     }
                 }
+                else {
+                    method_error = 'Method: ' + method + '. No data received by request.';
+                }
             
-                if (Object.keys(method_error).length > 0) {
-                    data['errors'].push(method_error);
+                if (method_error.length > 0) {
+                    data.errors.push(method_error);
                 }
             });
+            
+            if (data.errors.length == 0) {
+                data.errors = '';
+            }
             
             response = request.get(params.base_url + 'api/exit');
             

@@ -166,7 +166,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|There are errors in method requests to API |<p>There are errors in method requests to API.</p> |`length(last(/HPE MSA 2040 Storage by HTTP/hpe.msa.data.errors))>2` |AVERAGE |<p>**Depends on**:</p><p>- Service is down or unavailable</p> |
+|There are errors in method requests to API |<p>There are errors in method requests to API.</p> |`length(last(/HPE MSA 2040 Storage by HTTP/hpe.msa.data.errors))>0` |AVERAGE |<p>**Depends on**:</p><p>- Service is down or unavailable</p> |
 |System health is in degraded state |<p>System health is in degraded state.</p> |`last(/HPE MSA 2040 Storage by HTTP/hpe.msa.system.health)=1` |WARNING | |
 |System health is in fault state |<p>System health is in fault state.</p> |`last(/HPE MSA 2040 Storage by HTTP/hpe.msa.system.health)=2` |AVERAGE | |
 |System health is in unknown state |<p>System health is in unknown state.</p> |`last(/HPE MSA 2040 Storage by HTTP/hpe.msa.system.health)=3` |INFO | |
