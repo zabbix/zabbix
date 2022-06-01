@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-04-22 11:29+0000\n"
+"PO-Revision-Date: 2022-05-11 06:05+0000\n"
 "Last-Translator: Óscar <oscar.zabbix@linaresdigital.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -111,7 +111,7 @@ msgstr "%1$s - lanzado por el módulo ubicado en %2$s."
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] "%1$s Item"
+msgstr[0] "Monitores %1$s"
 msgstr[1] "%1$s Items"
 
 #: include/classes/api/services/CItemGeneral.php:2342
@@ -3584,7 +3584,7 @@ msgstr "Configuración de imágenes"
 
 #: disc_prototypes.php:27
 msgid "Configuration of item prototypes"
-msgstr "Configuración de prototipos de item"
+msgstr "Configuración de prototipos de monitor"
 
 #: items.php:27
 msgid "Configuration of items"
@@ -4093,11 +4093,11 @@ msgstr "Crear monitor"
 
 #: include/views/configuration.item.list.php:39
 msgid "Create item (select host first)"
-msgstr "Crear item (seleccione un host primero)"
+msgstr "Crear monitor (seleccione un equipo primero)"
 
 #: include/views/configuration.item.prototype.list.php:30
 msgid "Create item prototype"
-msgstr "Crear prototipo de item"
+msgstr "Crear prototipo de monitor"
 
 #: include/views/configuration.item.prototype.list.php:193
 msgid "Create items from selected prototypes as disabled?"
@@ -4685,7 +4685,7 @@ msgstr "¿Desea eliminar la asociación de iconos?"
 
 #: include/views/configuration.item.list.php:242
 msgid "Delete history of selected items?"
-msgstr "¿Desea eliminar el historial de los items seleccionados?"
+msgstr "¿Desea eliminar el historial de los monitores seleccionados?"
 
 #: include/views/configuration.httpconf.list.php:193
 msgid "Delete history of selected web scenarios?"
@@ -4697,11 +4697,11 @@ msgstr "¿Desea eliminar la asignación de icono?"
 
 #: include/views/configuration.item.prototype.edit.php:746
 msgid "Delete item prototype?"
-msgstr "¿Desea eliminar el prototipo de item?"
+msgstr "¿Desea eliminar el prototipo de monitor?"
 
 #: include/views/configuration.item.edit.php:892
 msgid "Delete item?"
-msgstr "¿Desea eliminar el item?"
+msgstr "¿Desea eliminar el monitor?"
 
 #: jsLoader.php:208
 msgid "Delete links between selected elements?"
@@ -4803,11 +4803,11 @@ msgstr "¿Desea eliminar la imagen seleccionada?"
 
 #: include/views/configuration.item.prototype.list.php:197
 msgid "Delete selected item prototypes?"
-msgstr "¿Desea eliminar los prototipos de items seleccionados?"
+msgstr "¿Desea eliminar los prototipos de monitores seleccionados?"
 
 #: include/views/configuration.item.list.php:262
 msgid "Delete selected items?"
-msgstr "¿Desea eliminar los items seleccionados?"
+msgstr "¿Desea eliminar los monitores seleccionados?"
 
 #: include/views/configuration.maintenance.list.php:121
 msgid "Delete selected maintenance periods?"
@@ -4954,7 +4954,7 @@ msgstr "Dependiente"
 
 #: include/items.inc.php:103
 msgid "Dependent item"
-msgstr "Elemento dependiente"
+msgstr "Monitor dependiente"
 
 #: app/views/popup.generic.php:313 include/triggers.inc.php:2554
 #: include/views/configuration.services.edit.php:161
@@ -5107,7 +5107,7 @@ msgstr "¿Desea desactivar los hosts seleccionados?"
 
 #: include/views/configuration.item.list.php:257
 msgid "Disable selected items?"
-msgstr "¿Desea desactivar los items seleccionados?"
+msgstr "¿Desea desactivar los monitores seleccionados?"
 
 #: app/views/administration.mediatype.list.php:163
 msgid "Disable selected media types?"
@@ -5484,7 +5484,7 @@ msgstr "Valor \"%2$s\" duplicado \"%1$s\" para la correlación \"%3$s\"."
 #: include/classes/api/services/CCorrelation.php:742
 #, c-format
 msgid "Duplicate \"%1$s\" value \"%2$s\" for correlation."
-msgstr ""
+msgstr "Valor \"%2$s\" duplicado \"%1$s\" para la correlación."
 
 #: include/classes/api/services/CItemPrototype.php:360
 #, c-format
@@ -5890,7 +5890,7 @@ msgstr "¿Activar hosts seleccionados?"
 
 #: include/views/configuration.item.list.php:256
 msgid "Enable selected items?"
-msgstr "¿Desea activar los items seleccionados?"
+msgstr "¿Desea activar los monitores seleccionados?"
 
 #: app/views/administration.mediatype.list.php:162
 msgid "Enable selected media types?"
@@ -8783,7 +8783,7 @@ msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:735
 msgid "Incorrect templated web scenario step count."
-msgstr ""
+msgstr "Número de pasos de la plantilla de escenario web incorrecto."
 
 #: include/classes/api/services/CService.php:926
 #, c-format
@@ -8939,7 +8939,7 @@ msgstr ""
 #: include/classes/db/DB.php:349
 #, c-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
-msgstr ""
+msgstr "Valor incorrecto \"%1$s\" para el campo entero sin signo \"%2$s\"."
 
 #: include/classes/api/services/CCorrelation.php:606
 #: include/classes/api/services/CCorrelation.php:626
@@ -9508,7 +9508,7 @@ msgstr ""
 #: include/classes/api/services/CUserMacro.php:771
 #, c-format
 msgid "Invalid hostid for macro \"%1$s\"."
-msgstr ""
+msgstr "Hostid incorrecta para la macro \"%1$s\"."
 
 #: include/profiles.inc.php:85
 #, c-format
@@ -9793,7 +9793,7 @@ msgstr "Inventario"
 #: include/classes/api/services/CHost.php:1269
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
-msgstr ""
+msgstr "El equipo \"%1$s\" tiene el inventario deshabilitado."
 
 #: app/views/administration.iconmap.edit.php:58
 msgid "Inventory field"
@@ -9851,38 +9851,38 @@ msgstr "Monitor"
 #: include/classes/api/services/CItem.php:62
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr ""
+msgstr "Ya existe el monitor \"%1$s\" en \"%2$s\", heredado de otra plantilla."
 
 #: include/classes/api/services/CItem.php:63
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Ya existe el monitor \"%1$s\" en \"%2$s\"."
 
 #: include/items.inc.php:534
 #, c-format
 msgid "Item \"%1$s\" cannot be copied without its master item."
-msgstr ""
+msgstr "No puede ser copiado el monitor \"%1$s\" sin su monitor maestro."
 
 #: include/classes/api/services/CItem.php:950
 #, c-format
 msgid "Item \"%1$s\" cannot populate a missing host inventory field number \"%2$d\". Choices are: from 0 (do not populate) to %3$d."
-msgstr ""
+msgstr "El monitor \"%1$s\" no puede rellenar el campo de inventario de equipo inexistente número \"%2$d\". Las opciones son: desde 0 (no rellenar) a %3$d."
 
 #: include/classes/api/services/CTemplateScreen.php:564
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr ""
+msgstr "No existe el monitor \"%1$s\" en la plantilla \"%2$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:2218
 #: include/classes/api/services/CItemGeneral.php:1968
 #, c-format
 msgid "Item \"%1$s\" does not exist or you have no access to this item"
-msgstr ""
+msgstr "No existe el monitor \"%1$s\" o no tienes acceso a este monitor"
 
 #: include/classes/import/CConfigurationImport.php:747
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
-msgstr ""
+msgstr "Monitor \"%1$s\" de \"%2$s\": no existe la aplicación \"%3$s\"."
 
 #: items.php:849
 msgid "Item added"
@@ -10209,7 +10209,7 @@ msgstr "Monitor"
 #: include/classes/api/services/CItemGeneral.php:427
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
-msgstr ""
+msgstr "La clave \"%1$s\" no coincide con <grpmax|grpmin|grpsum|grpavg>[\"Grupo(s) de equipos\", \"Clave de monitor\", \"<last|min|max|avg|sum|count>\", \"parámetro\"]."
 
 #: app/partials/popup.operations.php:298
 #: include/views/js/common.item.edit.js.php:214
@@ -10447,15 +10447,15 @@ msgstr "Izquierda"
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:136
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:476
 msgid "Left Y"
-msgstr ""
+msgstr "Y izquierda"
 
 #: include/items.inc.php:1784
 msgid "Left trim"
-msgstr ""
+msgstr "Ajuste izquierdo"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:292
 msgid "Legend"
-msgstr ""
+msgstr "Leyenda"
 
 #: app/views/administration.gui.edit.php:38
 msgid "Limit for search and filter results"
@@ -10469,19 +10469,19 @@ msgstr "Límite para resultados de búsqueda y filtros"
 #: include/views/js/monitoring.sysmaps.js.php:764
 #: include/views/js/monitoring.sysmaps.js.php:854
 msgid "Line"
-msgstr ""
+msgstr "Línea"
 
 #: include/views/js/monitoring.sysmaps.js.php:581
 msgid "Line colour"
-msgstr ""
+msgstr "Color de línea"
 
 #: include/views/js/monitoring.sysmaps.js.php:559
 msgid "Line type"
-msgstr ""
+msgstr "Tipo de línea"
 
 #: include/views/js/monitoring.sysmaps.js.php:571
 msgid "Line width"
-msgstr ""
+msgstr "Grosor de línea"
 
 #: include/views/configuration.host.massupdate.php:130
 #: include/views/configuration.template.massupdate.php:94
@@ -10493,13 +10493,13 @@ msgstr "Vínculo"
 #: include/views/js/monitoring.sysmaps.js.php:732
 #: include/views/js/monitoring.sysmaps.js.php:773
 msgid "Link indicators"
-msgstr ""
+msgstr "Indicadores de línea"
 
 #: include/views/configuration.host.edit.php:309
 #: include/views/configuration.host.prototype.edit.php:267
 #: include/views/configuration.template.edit.php:186
 msgid "Link new templates"
-msgstr ""
+msgstr "Vincular nuevas plantillas"
 
 #: include/classes/api/services/CMap.php:994
 #: include/classes/api/services/CMap.php:1458
@@ -10518,7 +10518,7 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:162
 #: include/views/configuration.template.massupdate.php:126
 msgid "Link templates"
-msgstr ""
+msgstr "Vincular plantillas"
 
 #: include/actions.inc.php:1061
 msgid "Link to template"
@@ -10526,7 +10526,7 @@ msgstr "Vincular con plantilla"
 
 #: include/actions.inc.php:687
 msgid "Link to templates"
-msgstr ""
+msgstr "Vincular a plantillas"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:40
 msgid "Linked map"
@@ -10542,40 +10542,40 @@ msgstr "Mapa enlazado"
 #: include/views/configuration.template.list.php:158
 #: include/views/configuration.template.massupdate.php:158
 msgid "Linked templates"
-msgstr ""
+msgstr "Plantillas vinculadas"
 
 #: include/views/configuration.template.list.php:159
 msgid "Linked to templates"
-msgstr ""
+msgstr "Vinculado a plantillas"
 
 #: include/views/js/monitoring.sysmaps.js.php:718
 #: include/views/js/monitoring.sysmaps.js.php:729
 msgid "Links"
-msgstr ""
+msgstr "Vínculos"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
-msgstr ""
+msgstr "El listado está vacío"
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:639
 msgid "List of block devices and their type. Returns JSON"
-msgstr ""
+msgstr "Listado de dispositivos de bloques y su tipo. Devuelve JSON"
 
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:547
 msgid "List of detected CPUs/CPU cores. Returns JSON"
-msgstr ""
+msgstr "Listado de CPUs/núcleos detectados. Devuelve JSON"
 
 #: include/classes/items/CHelpItems.php:341
 #: include/classes/items/CHelpItems.php:691
 msgid "List of mounted filesystems and their types. Returns JSON"
-msgstr ""
+msgstr "Listado de sistemas de archivos montados y sus tipos. Devuelve JSON"
 
 #: include/classes/items/CHelpItems.php:345
 #: include/classes/items/CHelpItems.php:695
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
-msgstr ""
+msgstr "Listado de sistemas de archivos montados, sus tipos y estadísticas de inodos. Devuelve JSON"
 
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:451
@@ -10695,7 +10695,7 @@ msgstr "Iniciar sesión"
 
 #: include/classes/api/services/CUser.php:1221
 msgid "Login failed."
-msgstr ""
+msgstr "Inicio de sesión fallido."
 
 #: include/classes/validators/CLdapAuthValidator.php:87
 msgid "Login name or password is incorrect."
@@ -10707,11 +10707,11 @@ msgstr "Finalizar sesión"
 
 #: app/views/administration.authentication.edit.php:218
 msgid "Logout requests"
-msgstr ""
+msgstr "Peticiones de cierre de sesión"
 
 #: app/views/administration.authentication.edit.php:224
 msgid "Logout responses"
-msgstr ""
+msgstr "Respuestas de cierre de sesión"
 
 #: include/discovery.inc.php:139
 msgid "Lost"
@@ -10780,7 +10780,7 @@ msgstr ""
 #: include/classes/api/services/CUserMacro.php:990
 #, c-format
 msgid "Macro with hostmacroid \"%1$s\" does not exist."
-msgstr ""
+msgstr "No existe la macro con hostmacroid \"%1$s\"."
 
 #: app/partials/massupdate.macros.tab.php:118
 #: app/views/administration.macros.edit.php:33
@@ -10864,7 +10864,7 @@ msgstr ""
 
 #: maintenance.php:108
 msgid "Maintenance updated"
-msgstr ""
+msgstr "Mantenimiento actualizado"
 
 #: include/html.inc.php:951
 msgid "Maintenance with data collection"
@@ -10944,7 +10944,7 @@ msgstr ""
 
 #: sysmap.php:105
 msgid "Map is updated! Return to map list?"
-msgstr ""
+msgstr "¡Mapa actualizado! ¿Volver al listado de mapas?"
 
 #: include/views/monitoring.sysmap.edit.php:205
 msgid "Map label type"
@@ -10970,7 +10970,7 @@ msgstr ""
 
 #: sysmap.php:110
 msgid "Map update failed."
-msgstr ""
+msgstr "Falló la actualización del mapa."
 
 #: include/classes/api/services/CDashboard.php:798
 #, c-format
@@ -11029,11 +11029,11 @@ msgstr "Actualizar masivamente"
 
 #: include/views/js/monitoring.sysmaps.js.php:608
 msgid "Mass update elements"
-msgstr ""
+msgstr "Elementos de actualización masiva"
 
 #: include/views/js/monitoring.sysmaps.js.php:484
 msgid "Mass update shapes"
-msgstr ""
+msgstr "Actualización masiva de formas"
 
 #: disc_prototypes.php:53 host_discovery.php:54
 #: include/views/configuration.host.discovery.edit.php:354
@@ -11234,7 +11234,7 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:297
 msgid "Message templates"
-msgstr ""
+msgstr "Plantillas de mensaje"
 
 #: app/views/administration.user.edit.php:376
 #: app/views/administration.user.edit.php:388
@@ -11244,7 +11244,7 @@ msgstr "Tiempo de espera de mensajes"
 #: app/views/administration.mediatype.edit.php:279
 #: app/views/popup.mediatype.message.php:44
 msgid "Message type"
-msgstr ""
+msgstr "Tipo de mensaje"
 
 #: include/actions.inc.php:1854 include/actions.inc.php:1949
 msgid "Message/Command"
@@ -11372,7 +11372,7 @@ msgstr ""
 #: include/graphs.inc.php:404
 #, c-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
-msgstr ""
+msgstr "Falta la clave \"%1$s\" en el equipo \"%2$s\"."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:198
 #: app/views/administration.proxy.list.php:47
@@ -11420,7 +11420,7 @@ msgstr[1] ""
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
 msgid "Module updated: %1$s."
-msgstr ""
+msgstr "Módulo actualizado: %1$s."
 
 #: include/classes/core/CModuleManager.php:222
 #, c-format
@@ -11436,7 +11436,7 @@ msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:127
 msgid "Modules updated"
-msgstr ""
+msgstr "Módulos actualizados"
 
 #: include/func.inc.php:216
 msgid "Mon"
@@ -11454,11 +11454,11 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:105
 #: include/views/configuration.host.prototype.edit.php:117
 msgid "Monitored by proxy"
-msgstr ""
+msgstr "Monitorizado por proxy"
 
 #: include/classes/screens/CScreenDiscovery.php:119
 msgid "Monitored host"
-msgstr ""
+msgstr "Equipo monitorizado"
 
 #: include/menu.inc.php:27 include/menu.inc.php:82
 #: include/views/inventory.host.view.php:133
@@ -11496,7 +11496,7 @@ msgstr "Más de 10 minutos"
 #: include/classes/api/services/CGraphGeneral.php:785
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
-msgstr ""
+msgstr "Más de una gráfica con el nombre \"%1$s\" en el equipo."
 
 #: include/httptest.inc.php:418
 msgid "Mozilla Firefox"
@@ -12025,21 +12025,21 @@ msgstr "No se agregaron gráficos."
 
 #: include/classes/api/services/CDiscoveryRule.php:623
 msgid "No host IDs given."
-msgstr ""
+msgstr "No se proporcionaron IDs de equipo."
 
 #: include/classes/api/services/CUserMacro.php:767
 #, c-format
 msgid "No host given for macro \"%1$s\"."
-msgstr ""
+msgstr "No se proporcionó equipo para la macro \"%1$s\"."
 
 #: include/classes/api/services/CScreenItem.php:476
 msgid "No host group ID provided for screen element."
-msgstr ""
+msgstr "No se proporcionó ID de grupo de equipos para el elemento de la pantalla."
 
 #: include/hosts.inc.php:487
 #, c-format
 msgid "No host groups with groupid \"%1$s\"."
-msgstr ""
+msgstr "No hay grupos de equipos con el groupid \"%1$s\"."
 
 #: app/controllers/CControllerWidgetUrlView.php:41
 #: include/classes/screens/CScreenUrl.php:36
@@ -12049,7 +12049,7 @@ msgstr "No hay host seleccionado."
 #: include/hosts.inc.php:530
 #, c-format
 msgid "No host with hostid \"%1$s\"."
-msgstr ""
+msgstr "No hay equipos con hostid \"%1$s\"."
 
 #: include/classes/api/services/CMapElement.php:176
 #, c-format
@@ -12083,7 +12083,7 @@ msgstr ""
 #: include/classes/api/services/CHost.php:2271
 #, c-format
 msgid "No interfaces for host \"%1$s\"."
-msgstr ""
+msgstr "No hay interfaces para el equipo \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1957
 msgid "No inventory mode specified for action operation."
@@ -12347,11 +12347,11 @@ msgstr ""
 
 #: triggers.php:607
 msgid "No target selected"
-msgstr ""
+msgstr "No hay seleccionado un objetivo"
 
 #: graphs.php:404 items.php:1280
 msgid "No target selected."
-msgstr ""
+msgstr "No hay seleccionado un objetivo."
 
 #: include/triggers.inc.php:275
 #, c-format
@@ -12558,15 +12558,15 @@ msgstr "Número de problemas y expandir el más crítico"
 
 #: include/classes/items/CHelpItems.php:875
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Número de núcleos del procesador en el hipervisor VMware, <url> - URL de servicio VMware, <uuid> - nombre de equipo del hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:879
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Número de hilos del procesador en el hipervisor VMware hypervisor, <url> - URL de servicio VMware, <uuid> - nombre de equipo del hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:955
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Número de procesadores en la máquina virtual de VMware, <url> - URL de servicio VMware, <uuid> - nombre del equipo de la máquina virtual de VMware"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:279
 msgid "Number of rows"
@@ -12644,7 +12644,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:943
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Número de máquinas virtuales en el hipervisor VMware, <url> - URL de servicio VMware, <uuid> - nombre de equipo del hipervisor de VMware"
 
 #: include/classes/items/CHelpItems.php:349
 #: include/classes/items/CHelpItems.php:699
@@ -12795,11 +12795,11 @@ msgstr "Uno"
 
 #: include/classes/api/services/CHostGroup.php:1255
 msgid "One of the objects is left without a host group."
-msgstr ""
+msgstr "Uno de los objetos se queda sin un grupo de equipos."
 
 #: app/views/popup.maintenance.period.php:75 include/maintenances.inc.php:25
 msgid "One time only"
-msgstr ""
+msgstr "Solo una vez"
 
 #: include/views/configuration.services.edit.php:198
 #: include/views/configuration.services.edit.php:245
@@ -12808,7 +12808,7 @@ msgstr "Una vez inoperativo"
 
 #: include/classes/api/services/CHostGroup.php:729
 msgid "Only Super Admins can create host groups."
-msgstr ""
+msgstr "Solo los Súper Administradores pueden crear grupos de equipos."
 
 #: include/classes/api/services/CMediatype.php:171
 msgid "Only Super Admins can create media types."
@@ -12832,7 +12832,7 @@ msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:285
 msgid "Only Super Admins can update user groups."
-msgstr ""
+msgstr "Solo los Súper Administradores pueden actualizar grupos de usuarios."
 
 #: include/classes/api/services/CDRule.php:481
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -12897,11 +12897,11 @@ msgstr "Solo super admins pueden definir el propietario del tablero."
 
 #: include/classes/api/services/CCorrelation.php:689
 msgid "Only super admins can update correlations."
-msgstr ""
+msgstr "Solo los súper administradores pueden actualizar las correlaciones."
 
 #: include/classes/api/services/CValueMap.php:312
 msgid "Only super admins can update value maps."
-msgstr ""
+msgstr "Solo los súper administradores pueden actualizar las asignaciones de valores."
 
 #: include/services.inc.php:270
 #, c-format
@@ -12932,7 +12932,7 @@ msgstr ""
 
 #: jsLoader.php:111
 msgid "Operation details"
-msgstr ""
+msgstr "Detalles de la operación"
 
 #: include/classes/api/services/CAction.php:1930
 msgid "Operation has no group to operate."
@@ -12954,7 +12954,7 @@ msgstr "Operación a realizar"
 #: include/views/configuration.triggers.edit.php:93
 #: include/views/configuration.triggers.list.php:200
 msgid "Operational data"
-msgstr ""
+msgstr "Datos operativos"
 
 #: app/views/popup.lldoverride.php:190
 #: include/views/configuration.action.edit.php:319
@@ -12997,7 +12997,7 @@ msgstr "Operador"
 
 #: app/views/administration.mediatype.edit.php:343
 msgid "Options"
-msgstr ""
+msgstr "Opciones"
 
 #: app/partials/popup.operations.php:380 app/views/monitoring.host.view.php:53
 #: app/views/monitoring.problem.view.php:243 app/views/popup.lldoverride.php:69
@@ -13638,7 +13638,7 @@ msgstr "Por favor cree la base de datos manualmente, y configure los parámetros
 
 #: include/classes/setup/CSetupWizard.php:361
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
-msgstr ""
+msgstr "Por favor, introduzca el nombre o dirección IP del equipo y el número de puerto del servidor Zabbix, así como el nombre de la instalación (opcional)."
 
 #: jsLoader.php:193
 msgid "Please select two elements"
@@ -13689,7 +13689,7 @@ msgstr "Puerto"
 
 #: include/classes/api/services/CHostInterface.php:831
 msgid "Port cannot be empty for host interface."
-msgstr ""
+msgstr "La interfaz del equipo no puede tener el puerto vacío."
 
 #: app/views/popup.discovery.check.php:56
 msgid "Port range"
@@ -13887,7 +13887,7 @@ msgstr "Problema en"
 #: app/views/popup.mediatype.message.php:52
 #: include/classes/helpers/CMediatypeHelper.php:61
 msgid "Problem recovery"
-msgstr ""
+msgstr "Recuperación del problema"
 
 #: include/actions.inc.php:2088
 msgid "Problem resolved"
@@ -13900,7 +13900,7 @@ msgstr "Hora del problema"
 #: app/views/popup.mediatype.message.php:55
 #: include/classes/helpers/CMediatypeHelper.php:76
 msgid "Problem update"
-msgstr ""
+msgstr "Actualización del problema"
 
 #: include/services.inc.php:25
 msgid "Problem, if all children have problems"
@@ -14210,7 +14210,7 @@ msgstr ""
 
 #: include/views/configuration.action.edit.php:407
 msgid "Recovery operations"
-msgstr ""
+msgstr "Operaciones de recuperación"
 
 #: app/views/hintbox.eventlist.php:73
 #: app/views/monitoring.widget.problems.view.php:53
@@ -14465,7 +14465,7 @@ msgstr "Borrar del grupo de host"
 
 #: include/actions.inc.php:668
 msgid "Remove from host groups"
-msgstr ""
+msgstr "Quitar de los grupos de equipos"
 
 #: include/actions.inc.php:641 include/actions.inc.php:1056
 msgid "Remove host"
@@ -14731,7 +14731,7 @@ msgstr "Devuelve el tiempo de respuesta del ping ICMP en segundos. Ejemplo: 0.02
 
 #: include/classes/items/CHelpItems.php:1115
 msgid "Returns a JSON array describing the host network interfaces configured in Zabbix. Can be used for LLD."
-msgstr ""
+msgstr "Devuelve una matriz JSON que describe las interfaces de red del equipo configuradas en Zabbix. Puede ser usado para LLD."
 
 #: include/classes/items/CHelpItems.php:385
 #: include/classes/items/CHelpItems.php:731
@@ -14853,7 +14853,7 @@ msgstr "Ejecutar instrucciones remotas en otros hosts"
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:595
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
-msgstr ""
+msgstr "Ejecute la instrucción especificada en el equipo. Devuelve el resultado en texto de la instrucción; 1 - con modo como nowait/noesperar (independientemente del resultado de la instrucción)"
 
 #: include/locales.inc.php:73
 msgid "Russian (ru_RU)"
@@ -15125,7 +15125,7 @@ msgstr "Planificación"
 #: app/views/popup.acknowledge.edit.php:52
 msgctxt "selected problems"
 msgid "Scope"
-msgstr ""
+msgstr "Ámbito"
 
 #: app/controllers/CControllerAuditLogList.php:205
 #: include/views/monitoring.screen.edit.php:124
@@ -15260,13 +15260,13 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:120
 msgid "Script parameters"
-msgstr ""
+msgstr "Parámetros del script"
 
 #: include/classes/api/services/CMediatype.php:332
 #: include/classes/api/services/CMediatype.php:658
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
-msgstr ""
+msgstr "Falta la última nueva línea en el parámetro del script \"%1$s\" del tipo de medio \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:145
 msgid "Script profiler"
@@ -15384,7 +15384,7 @@ msgstr "Seleccionar widget"
 #: app/views/administration.script.edit.php:88
 #: include/views/monitoring.history.php:190
 msgid "Selected"
-msgstr ""
+msgstr "Seleccionado/s"
 
 #: actionconf.php:400
 msgid "Selected actions deleted"
@@ -15615,7 +15615,7 @@ msgstr ""
 
 #: include/actions.inc.php:1063
 msgid "Set host inventory mode"
-msgstr ""
+msgstr "Establecer el modo de inventario del equipo"
 
 #: include/classes/html/CInputSecret.php:79 jsLoader.php:342
 msgid "Set new value"
@@ -15701,7 +15701,7 @@ msgstr ""
 
 #: include/menu.inc.php:203
 msgid "Share"
-msgstr ""
+msgstr "Compartir"
 
 #: include/views/monitoring.screen.edit.php:219
 #: include/views/monitoring.slideconf.edit.php:272
@@ -15780,7 +15780,7 @@ msgstr "Mostrar líneas"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:139
 #: include/classes/widgets/forms/CWidgetFormProblems.php:159
 msgid "Show operational data"
-msgstr ""
+msgstr "Mostrar datos operativos"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:299
 msgid "Show problems"
@@ -15874,15 +15874,15 @@ msgstr "Acceder"
 
 #: include/views/general.login.php:45
 msgid "Sign in with HTTP"
-msgstr ""
+msgstr "Identificarse con HTTP"
 
 #: include/views/general.login.php:49
 msgid "Sign in with Single Sign-On (SAML)"
-msgstr ""
+msgstr "Identificarse con Inicio de Sesión Único (SAML)"
 
 #: include/menu.inc.php:241 include/menu.inc.php:244
 msgid "Sign out"
-msgstr ""
+msgstr "Cerrar sesión"
 
 #: include/views/js/configuration.graph.edit.js.php:201
 #: include/views/js/configuration.graph.edit.js.php:268
@@ -16265,7 +16265,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupHttpStep.php:145
 msgid "Step of web scenario"
-msgstr ""
+msgstr "Paso del escenario web"
 
 #: app/controllers/CControllerPopupHttpStep.php:110
 #, c-format
@@ -17666,7 +17666,7 @@ msgstr ""
 
 #: include/actions.inc.php:2105
 msgid "Unacknowledged"
-msgstr ""
+msgstr "Sin reconocer"
 
 #: app/views/administration.trigdisplay.edit.php:40
 msgid "Unacknowledged PROBLEM events"
@@ -17775,7 +17775,7 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:324
 msgid "Unlimited"
-msgstr ""
+msgstr "Ilimitadas"
 
 #: include/views/configuration.host.edit.php:268
 #: include/views/configuration.host.massupdate.php:132
@@ -17826,7 +17826,7 @@ msgstr ""
 #: include/classes/api/services/CHostGeneral.php:559
 #, c-format
 msgid "Unlinked: Web scenario \"%1$s\" on \"%2$s\"."
-msgstr ""
+msgstr "Desvinculado: Escenario web \"%1$s\" de \"%2$s\"."
 
 #: jsLoader.php:218
 msgid "Unmute"
@@ -17965,7 +17965,7 @@ msgstr "Intervalo de actualización"
 
 #: include/views/configuration.action.edit.php:487
 msgid "Update operations"
-msgstr ""
+msgstr "Operaciones de actualización"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:174
 #: app/controllers/CControllerPopup.php:45
@@ -18236,7 +18236,7 @@ msgstr "Sesiones de usuario"
 
 #: include/menu.inc.php:233
 msgid "User settings"
-msgstr ""
+msgstr "Configuración de usuario"
 
 #: include/classes/api/services/CMap.php:701
 #: include/classes/api/services/CMap.php:1166
@@ -18762,7 +18762,7 @@ msgstr ""
 #: app/views/monitoring.charts.view.php:50
 #: include/views/monitoring.history.php:91
 msgid "View as"
-msgstr ""
+msgstr "Mostrar como"
 
 #: include/classes/items/CHelpItems.php:361
 #: include/classes/items/CHelpItems.php:711
@@ -18833,27 +18833,27 @@ msgstr "Monitorización web"
 #: app/controllers/CControllerAuditLogList.php:206 httpconf.php:182
 #: httpconf.php:490
 msgid "Web scenario"
-msgstr ""
+msgstr "Escenario web"
 
 #: include/classes/api/managers/CHttpTestManager.php:366
 #: include/classes/api/managers/CHttpTestManager.php:379
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
-msgstr ""
+msgstr "Ya existe el escenario web \"%1$s\" en el equipo \"%2$s\"."
 
 #: include/classes/api/services/CHttpTest.php:651
 #, c-format
 msgid "Web scenario \"%1$s\" already exists."
-msgstr ""
+msgstr "Ya existe el escenario web \"%1$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1548
 #, c-format
 msgid "Web scenario \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
-msgstr ""
+msgstr "Escenario web \"%1$s\" de \"%2$s\": no existe la aplicación \"%3$s\"."
 
 #: httpconf.php:198
 msgid "Web scenario added"
-msgstr ""
+msgstr "Agregado escenario web"
 
 #: httpconf.php:150 httpconf.php:512
 msgid "Web scenario deleted"
@@ -18862,22 +18862,22 @@ msgstr "Escenario Web eliminado"
 #: httpconf.php:453
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Escenario web desactivado"
+msgstr[1] "Escenarios web desactivados"
 
 #: httpconf.php:452
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Escenario web activado"
+msgstr[1] "Escenarios web activados"
 
 #: httpconf.php:194
 msgid "Web scenario updated"
-msgstr ""
+msgstr "Escenario web actualizado"
 
 #: include/html.inc.php:426 include/views/conf.import.php:42
 msgid "Web scenarios"
-msgstr ""
+msgstr "Escenarios web"
 
 #: include/media.inc.php:27
 msgid "Webhook"
@@ -19158,7 +19158,7 @@ msgstr ""
 #: include/classes/import/validators/C50XmlValidator.php:1891
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
-msgstr ""
+msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/views/report.services.php:57 app/views/report.services.php:80
 #: report4.php:116 report4.php:152
@@ -19205,7 +19205,7 @@ msgstr ""
 #: include/func.inc.php:1534
 #, c-format
 msgid "You are logged in as \"%1$s\"."
-msgstr ""
+msgstr "Has iniciado sesión como \"%1$s\"."
 
 #: app/views/administration.user.edit.php:167
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
@@ -19213,7 +19213,7 @@ msgstr "No puede elegir algunos idiomas, porque las locales para ellos no están
 
 #: include/func.inc.php:1551 index_http.php:90 index_sso.php:257
 msgid "You are not logged in"
-msgstr ""
+msgstr "No has iniciado sesión"
 
 #: app/views/popup.generic.php:91
 msgid "You can not switch hosts for current selection."
@@ -19296,7 +19296,7 @@ msgstr "Administrador Zabbix"
 
 #: include/menu.inc.php:206
 msgid "Zabbix Share"
-msgstr ""
+msgstr "Zabbix Share"
 
 #: include/users.inc.php:56
 msgid "Zabbix Super Admin"
@@ -19341,7 +19341,7 @@ msgstr "Autenticación interna de Zabbix"
 
 #: app/views/administration.authentication.edit.php:51
 msgid "Zabbix login form"
-msgstr ""
+msgstr "Formulario de inicio de sesión de Zabbix"
 
 #: app/partials/popup.operations.php:235
 #: app/views/administration.script.edit.php:57 include/actions.inc.php:880
@@ -19394,7 +19394,7 @@ msgstr "Trapper ZABBIX"
 
 #: include/classes/html/CFilter.php:251
 msgid "Zoom out"
-msgstr ""
+msgstr "Disminuir zoom"
 
 #: include/func.inc.php:148
 #, c-format
@@ -20439,7 +20439,7 @@ msgstr "conectado"
 
 #: app/controllers/CControllerPopupItemTestSend.php:187
 msgid "only one time unit is allowed"
-msgstr ""
+msgstr "Solo se permite una unidad de tiempo"
 
 #: include/views/configuration.httpconf.edit.php:104
 msgid "other"
@@ -20581,7 +20581,7 @@ msgstr "mostrar asignaciones de icono"
 #: include/views/configuration.item.prototype.edit.php:667
 #: include/views/configuration.item.prototype.massupdate.php:393
 msgid "show value mappings"
-msgstr "mostrar mapeos de valores"
+msgstr "mostrar asignaciones de valores"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:319
 msgid "str() - Find string V in last (most recent) value (1 - found, 0 - not found)"

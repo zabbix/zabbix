@@ -145,8 +145,6 @@ class testPageProblems extends CLegacyWebTest {
 	 * Search by all options in filter
 	 */
 	public function testPageProblems_FilterByAllOptions() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');
@@ -384,8 +382,6 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	public function testPageProblems_SuppressedProblems() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
 		$this->zbxTestClickButtonText('Reset');

@@ -595,11 +595,11 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		if ($tag === 'select') {
-			return $this->asDropdown($options);
+			return $this->asList($options);
 		}
 
 		if ($tag === 'z-select') {
-			return $this->asZDropdown($options);
+			return $this->asDropdown($options);
 		}
 
 		if ($tag === 'table') {
