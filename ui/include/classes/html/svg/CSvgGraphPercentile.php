@@ -69,23 +69,19 @@ class CSvgGraphPercentile extends CSvgGroup {
 	}
 
 	private function draw(): void {
-		$range = $this->max - $this->min;
+		$total = $this->max - $this->min;
 
-		if ($range == INF) {
-			$y = $this->height + $this->y - CMathHelper::safeMul([
-				$this->height,
-				($this->value - $this->min) / 10,
-				1 / $range / 10
-			]);
+		if ($total == INF) {
+			$total = $this->max / 10 - $this->min / 10;
+			$fraction = $this->value / 10 - $this->min / 10;
 		}
 		else {
-			$y = $this->height + $this->y - CMathHelper::safeMul([
-				$this->height,
-				$this->value - $this->min,
-				1 / $range
-			]);
+			$fraction = $this->value - $this->min;
 		}
 
+		$y = $this->height + $this->y - CMathHelper::safeMul([
+			$this->height, $fraction, 1 / $total
+		]);
 		$label_x = $this->side == GRAPH_YAXIS_SIDE_RIGHT
 			? $this->width + $this->x - self::LABEL_MARGIN
 			: $this->x + self::LABEL_MARGIN;
