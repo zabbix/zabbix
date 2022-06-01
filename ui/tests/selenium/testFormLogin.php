@@ -28,21 +28,12 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  **/
 class testFormLogin extends CWebTest {
 
-	/**
-	 * Not permanent API request to create user before data_test.sql file is refactored.
-	 **/
 	public function prepareLdapUserData() {
 		CDataHelper::call('user.create', [
 			[
 				'username' => 'LDAP user',
 				'passwd' => 'zabbix12345',
-				'autologin' => 0,
-				'autologout' => 0,
-				'lang' => 'default',
-				'refresh' => '30',
 				'roleid' => 3,
-				'theme' => 'default',
-				'rows_per_page' => 50,
 				'usrgrps' => [
 					[
 						'usrgrpid' => 16
@@ -59,8 +50,7 @@ class testFormLogin extends CWebTest {
 					'login' => 'LDAP user',
 					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
-					'error_message' => 'Cannot bind anonymously to LDAP server.',
-					'dbCheck' => false
+					'error_message' => 'Cannot bind anonymously to LDAP server.'
 				]
 			],
 			[
@@ -68,8 +58,7 @@ class testFormLogin extends CWebTest {
 					'login' => 'disabled-user',
 					'password' => 'zabbix',
 					'expected' => TEST_BAD,
-					'error_message' => 'No permissions for system access.',
-					'dbCheck' => false
+					'error_message' => 'No permissions for system access.'
 				]
 			],
 			[
@@ -77,8 +66,7 @@ class testFormLogin extends CWebTest {
 					'login' => 'no-access-to-the-frontend',
 					'password' => 'zabbix',
 					'expected' => TEST_BAD,
-					'error_message' => 'GUI access disabled.',
-					'dbCheck' => false
+					'error_message' => 'GUI access disabled.'
 				]
 			],
 			[
@@ -86,8 +74,7 @@ class testFormLogin extends CWebTest {
 					'login' => 'admin',
 					'password' => 'zabbix',
 					'expected' => TEST_BAD,
-					'error_message' => 'Incorrect user name or password or account is temporarily blocked.',
-					'dbCheck' => false
+					'error_message' => 'Incorrect user name or password or account is temporarily blocked.'
 				]
 			],
 			[
@@ -121,16 +108,14 @@ class testFormLogin extends CWebTest {
 				[
 					'login' => 'Admin',
 					'password' => 'zabbix',
-					'expected' => TEST_GOOD,
-					'dbCheck' => false
+					'expected' => TEST_GOOD
 				]
 			],
 			[
 				[
 					'login' => 'guest',
 					'password' => '',
-					'expected' => TEST_GOOD,
-					'dbCheck' => false
+					'expected' => TEST_GOOD
 				]
 			]
 		];
@@ -148,7 +133,8 @@ class testFormLogin extends CWebTest {
 	 **/
 	public function testFormLogin_LoginLogout($data) {
 		$this->page->userLogin($data['login'], $data['password']);
-		if($data['expected'] === TEST_BAD) {
+
+		if ($data['expected'] === TEST_BAD) {
 			$this->assertEquals($data['error_message'], $this->query('class:red')->waitUntilVisible()->one()->getText());
 		}
 		else {
@@ -157,12 +143,10 @@ class testFormLogin extends CWebTest {
 			$this->assertEquals('Remember me for 30 days', $this->query('xpath://label[@for="autologin"]')->one()->getText());
 		}
 
-		if ($data['dbCheck']) {
-			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
-					->waitUntilVisible()->one()->getText());
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_failed>0 AND username='".$data['login']."'"));
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_clock>0 AND username='".$data['login']."'"));
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE attempt_ip<>'' AND username='".$data['login']."'"));
+		if (CTestArrayHelper::get($data, 'dbCheck', false)) {
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM users WHERE attempt_failed>0 AND username='.zbx_dbstr($data['login'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM users WHERE attempt_clock>0 AND username='.zbx_dbstr($data['login'])));
+			$this->assertEquals(1, CDBHelper::getCount("SELECT NULL FROM users WHERE attempt_ip<>'' AND username=".zbx_dbstr($data['login'])));
 		}
 	}
 
@@ -172,15 +156,16 @@ class testFormLogin extends CWebTest {
 	 * and properly returns message stating how many times failed attempts have been made to login into account.
 	 **/
 	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
+		$user = 'user-for-blocking';
+
 		$this->page->open('index.php');
 		for ($i = 1; $i < 5; $i++) {
-			$user = 'user-for-blocking';
 			$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
 			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
 					->waitUntilVisible()->one()->getText());
-			$this->assertEquals($i, CDBHelper::getValue("SELECT attempt_failed FROM users WHERE username='".$user."'"));
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE username='".$user."' AND attempt_clock>0"));
-			$this->assertEquals(1, CDBHelper::getCount("SELECT * FROM users WHERE username='".$user."' AND attempt_ip<>''"));
+			$this->assertEquals($i, CDBHelper::getValue('SELECT attempt_failed FROM users WHERE username='.zbx_dbstr($user)));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM users WHERE username='.zbx_dbstr($user).' AND attempt_clock>0'));
+			$this->assertEquals(1, CDBHelper::getCount("SELECT NULL FROM users WHERE username=".zbx_dbstr($user)." AND attempt_ip<>''"));
 		}
 
 		$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
