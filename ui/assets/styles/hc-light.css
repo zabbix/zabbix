@@ -7670,6 +7670,9 @@ td.inactive-bg {
 .icon-action-unack::before {
   background-position: -173px -285px; }
 
+.icon-visible::before {
+  background-position: -249px -836px; }
+
 .icon-invisible::before {
   background-position: -249px -803px; }
 
