@@ -358,14 +358,12 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
-		$result_form = $this->query('xpath://form[@name="host_view"]')->one();
+		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
 		$this->query('button:Apply')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
-		$result_form->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->assertTableDataColumn($data['expected']);
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
-		$result_form->waitUntilReloaded();
+		$table->waitUntilReloaded();
 	}
 
 	public static function getTagsFilterData() {
