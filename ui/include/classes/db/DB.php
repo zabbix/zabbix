@@ -445,7 +445,7 @@ class DB {
 								break;
 
 							case ZBX_DB_POSTGRESQL:
-								$values[$field] = "'".pg_escape_bytea($values[$field])."'";
+								$values[$field] = "'".pg_escape_bytea($DB['DB'], $values[$field])."'";
 								break;
 
 							case ZBX_DB_ORACLE:

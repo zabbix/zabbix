@@ -518,8 +518,7 @@ function closeDialogHandler(event) {
  * @return {object|undefined|null}  Overlay object, if found.
  */
 function removeFromOverlaysStack(dialogueid, return_focus) {
-	var overlay = null,
-		index;
+	var overlay = null;
 
 	if (return_focus !== false) {
 		return_focus = true;

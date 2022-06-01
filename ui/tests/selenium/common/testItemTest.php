@@ -268,7 +268,8 @@ class testItemTest extends CWebTest {
 					'snmp_fields' => [
 						'version' => 'SNMPv1',
 						'community' => 'public'
-					]
+					],
+					'interface_text_part' => 'SNMPv1, Community: {$SNMP_COMMUNITY}'
 				]
 			],
 			[
@@ -288,7 +289,8 @@ class testItemTest extends CWebTest {
 						'authentication_passphrase' => '{$TEST}',
 						'privacy_protocol' => 'AES128',
 						'privacy_passphrase' => 'test_privpassphrase'
-					]
+					],
+					'interface_text_part' => 'SNMPv3, Context name: test_context, (priv: AES128, auth: SHA1)'
 				]
 			],
 			[
@@ -660,7 +662,13 @@ class testItemTest extends CWebTest {
 		if ($is_host) {
 			// If host fill interface.
 			if (CTestArrayHelper::get($data, 'host_interface')) {
-				$item_form->getField('Host interface')->fill($data['host_interface']);
+				/**
+				 * The value of an SNMP interface option element contains not only the IP and port, but also the
+				 * interface type and context name or community. In this case the address and details must be merged.
+				 */
+				$interface = $data['host_interface'].CTestArrayHelper::get($data, 'interface_text_part', '');
+
+				$item_form->getField('Host interface')->fill($interface);
 			}
 			// Get ip and port separately.
 			$host_interface = explode(':', $item_form->getField('Host interface')->getText(), 2);

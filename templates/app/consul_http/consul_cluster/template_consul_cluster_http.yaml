@@ -1,0 +1,638 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-05-17T15:36:33Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: 3db29bb6b2b14fa289ba7915264efcdf
+      template: 'HashiCorp Consul Cluster by HTTP'
+      name: 'HashiCorp Consul Cluster by HTTP'
+      description: |
+        Get HashiCorp Consul Cluster services and nodes by HTTP agent from API endpoints.
+        
+        Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.TOKEN}.
+        Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.
+        More information about metrics you can find in official documentation: https://www.consul.io/docs/agent/telemetry
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: fd087c72bb7842c6b84b0b70788506b0
+          name: 'Consul cluster: Get services'
+          type: HTTP_AGENT
+          key: consul.get_catalog_services
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Catalog of services registered in a given datacenter.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          timeout: 15s
+          url: '{$CONSUL.CLUSTER.URL}/v1/catalog/services'
+          headers:
+            -
+              name: X-Consul-Token
+              value: '{$CONSUL.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: cad23435cc454f01b47034bd8427931d
+          name: 'Consul cluster: Get nodes Serf health status'
+          type: HTTP_AGENT
+          key: consul.get_cluster_serf
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Get Serf Health Status for all agents in cluster.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          timeout: 15s
+          url: '{$CONSUL.CLUSTER.URL}/v1/health/state/any?filter=CheckID==serfHealth'
+          headers:
+            -
+              name: X-Consul-Token
+              value: '{$CONSUL.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: raw
+        -
+          uuid: e52fcc1af52e4df5b18118355260a8d6
+          name: 'Consul cluster: Cluster leader'
+          type: HTTP_AGENT
+          key: consul.get_leader
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'Current leader address.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+            -
+              type: TRIM
+              parameters:
+                - '"'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          timeout: 15s
+          url: '{$CONSUL.CLUSTER.URL}/v1/status/leader'
+          headers:
+            -
+              name: X-Consul-Token
+              value: '{$CONSUL.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: leader
+            -
+              tag: component
+              value: raw
+          triggers:
+            -
+              uuid: 8f612c3cfbb74f55a7defed05039e2a5
+              expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#1)<>last(/HashiCorp Consul Cluster by HTTP/consul.get_leader,#2) and length(last(/HashiCorp Consul Cluster by HTTP/consul.get_leader))>0'
+              name: 'Consul cluster: Leader has been changed'
+              event_name: 'Consul cluster: Leader has been changed (new value received: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Consul cluster version has changed. Ack to close.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 859451004516499e9636d96cde023d21
+          name: 'Consul cluster: Get nodes'
+          type: HTTP_AGENT
+          key: consul.get_nodes
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Catalog of nodes registered in a given datacenter.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+          timeout: 15s
+          url: '{$CONSUL.CLUSTER.URL}/v1/catalog/nodes'
+          headers:
+            -
+              name: X-Consul-Token
+              value: '{$CONSUL.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 2400f78a5ada4a59b63fc049b6e3b3bf
+          name: 'Consul cluster: Nodes: peers'
+          type: HTTP_AGENT
+          key: consul.get_peers
+          history: 7d
+          description: 'The number of Raft peers for the datacenter in which the agent is running.'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+            -
+              type: JSONPATH
+              parameters:
+                - $.length()
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          timeout: 15s
+          url: '{$CONSUL.CLUSTER.URL}/v1/status/peers'
+          headers:
+            -
+              name: X-Consul-Token
+              value: '{$CONSUL.API.TOKEN}'
+          tags:
+            -
+              tag: component
+              value: raft
+        -
+          uuid: 31be2fd640a141279d41871df877a42c
+          name: 'Consul: Nodes: critical'
+          type: DEPENDENT
+          key: consul.nodes_critical
+          delay: '0'
+          history: 7d
+          description: 'Number of agents on current dc with serf health status ''critical''.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Status == "critical")].length()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_cluster_serf
+          tags:
+            -
+              tag: component
+              value: consul
+          triggers:
+            -
+              uuid: 8660702ae3674eb083d6dacb81ec3a4d
+              expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_critical)>0'
+              name: 'Consul: One or more nodes in cluster in ''critical'' state'
+              priority: AVERAGE
+              description: 'One or more agents on current dc with serf health status ''critical''.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 6303f2b128f64bec9760bc3807bb9a34
+          name: 'Consul: Nodes: passing'
+          type: DEPENDENT
+          key: consul.nodes_passing
+          delay: '0'
+          history: 7d
+          description: 'Number of agents on current dc with serf health status ''passing''.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Status == "passing")].length()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_cluster_serf
+          tags:
+            -
+              tag: component
+              value: consul
+        -
+          uuid: 3eef4079f15d4db8852822ebda6d36fe
+          name: 'Consul: Nodes: total'
+          type: DEPENDENT
+          key: consul.nodes_total
+          delay: '0'
+          history: 7d
+          description: 'Number of nodes on current dc.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.length()
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_nodes
+          tags:
+            -
+              tag: component
+              value: consul
+        -
+          uuid: b02337cc9a6b4c34a85d85a231c4e51f
+          name: 'Consul: Nodes: warning'
+          type: DEPENDENT
+          key: consul.nodes_warning
+          delay: '0'
+          history: 7d
+          description: 'Number of agents on current dc with serf health status ''warning''.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.Status == "warning")].length()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_cluster_serf
+          tags:
+            -
+              tag: component
+              value: consul
+          triggers:
+            -
+              uuid: 92136d6ee73b4bb5b88b9f1da1afe740
+              expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.nodes_warning)>0'
+              name: 'Consul: One or more nodes in cluster in ''warning'' state'
+              priority: WARNING
+              description: 'One or more agents on current dc with serf health status ''warning''.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 30101e37fce144bdacce0a58b4c9de0e
+          name: 'Consul: Services: total'
+          type: DEPENDENT
+          key: consul.services_total
+          delay: '0'
+          history: 7d
+          description: 'Number of services on current dc.'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return Object.keys(JSON.parse(value)).length;'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: consul.get_catalog_services
+          tags:
+            -
+              tag: component
+              value: consul
+      discovery_rules:
+        -
+          uuid: ea1b655bdf7940f6a431e2e04a8dfcd6
+          name: 'Consul cluster nodes discovery'
+          type: DEPENDENT
+          key: consul.lld_nodes
+          delay: '0'
+          filter:
+            conditions:
+              -
+                macro: '{#NODE_NAME}'
+                value: '{$CONSUL.LLD.FILTER.NODE_NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#NODE_NAME}'
+                value: '{$CONSUL.LLD.FILTER.NODE_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: ddb71b90bde94760a4a456c15e647917
+              name: 'Consul: Node ["{#NODE_NAME}"]: Serf Health'
+              type: DEPENDENT
+              key: 'consul.serf.health["{#NODE_NAME}"]'
+              delay: '0'
+              history: 7d
+              description: 'Node Serf Health Status.'
+              valuemap:
+                name: 'Consul health state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.Node == "{#NODE_NAME}" && @.CheckID == "serfHealth")].Status.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var state = ['passing', 'warning', 'critical'];
+                      
+                      return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: consul.get_cluster_serf
+              tags:
+                -
+                  tag: component
+                  value: health
+          host_prototypes:
+            -
+              uuid: 20efdd208e1548a7877a970e1600e5ba
+              host: 'Consul {#NODE_NAME}'
+              name: 'Consul {#NODE_NAME}'
+              group_links:
+                -
+                  group:
+                    name: Templates/Applications
+              group_prototypes:
+                -
+                  name: 'Consul cluster/{#NODE_DATACENTER}'
+              templates:
+                -
+                  name: 'HashiCorp Consul Node by HTTP'
+              macros:
+                -
+                  macro: '{$CONSUL.NODE.API.URL}'
+                  value: '{#NODE_API_URL}'
+                  description: 'Consul instance URL'
+              tags:
+                -
+                  tag: address
+                  value: '{#NODE_ADDRESS}'
+                -
+                  tag: datacenter
+                  value: '{#NODE_DATACENTER}'
+              custom_interfaces: 'YES'
+              interfaces:
+                -
+                  ip: '{#NODE_ADDRESS}'
+          master_item:
+            key: consul.get_nodes
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value),
+                      consul_api_scheme = '{$CONSUL.API.SCHEME}',
+                      consul_api_port = '{$CONSUL.API.PORT}',
+                      result = [];
+                  
+                  data.forEach(function(instance) {
+                      if (instance["ID"] != '') {
+                        result.push({
+                        '{#NODE_NAME}': instance["Node"],
+                        '{#NODE_ADDRESS}': instance["Address"],
+                        '{#NODE_API_URL}': consul_api_scheme + '://' + instance["Address"] + ':' + consul_api_port,
+                        '{#NODE_DATACENTER}': instance["Datacenter"]
+                        });
+                      }
+                    });
+                  
+                  return JSON.stringify(result)
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+        -
+          uuid: d84aadcb4d4d4215826c859de416b739
+          name: 'Consul cluster services discovery'
+          type: DEPENDENT
+          key: consul.lld_services
+          delay: '0'
+          filter:
+            conditions:
+              -
+                macro: '{#SERVICE_NAME}'
+                value: '{$CONSUL.LLD.FILTER.SERVICE_NAME.MATCHES}'
+                formulaid: A
+              -
+                macro: '{#SERVICE_NAME}'
+                value: '{$CONSUL.LLD.FILTER.SERVICE_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          item_prototypes:
+            -
+              uuid: 38576dd458a94259ab273204ffe9aebd
+              name: 'Consul cluster: ["{#SERVICE_NAME}"]: Get raw service state'
+              type: HTTP_AGENT
+              key: 'consul.get_service_stats["{#SERVICE_NAME}"]'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Retrieve service instances providing the service indicated on the path.'
+              preprocessing:
+                -
+                  type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - ''
+              timeout: 15s
+              url: '{$CONSUL.CLUSTER.URL}/v1/health/service/{#SERVICE_NAME}'
+              status_codes: '200, 429, 503'
+              headers:
+                -
+                  name: X-Consul-Token
+                  value: '{$CONSUL.API.TOKEN}'
+              tags:
+                -
+                  tag: component
+                  value: service
+                -
+                  tag: service
+                  value: '{#SERVICE_NAME}'
+            -
+              uuid: 70a37e9934fa47f3bd7d553c70179d10
+              name: 'Consul: Service ["{#SERVICE_NAME}"]: Nodes critical'
+              type: DEPENDENT
+              key: 'consul.service.nodes_critical["{#SERVICE_NAME}"]'
+              delay: '0'
+              history: 7d
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''critical'')].length()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'consul.get_service_stats["{#SERVICE_NAME}"]'
+              tags:
+                -
+                  tag: component
+                  value: service
+                -
+                  tag: service
+                  value: '{#SERVICE_NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 60919b58bd484597aa7ec03f308eb614
+                  expression: 'last(/HashiCorp Consul Cluster by HTTP/consul.service.nodes_critical["{#SERVICE_NAME}"])>{$CONSUL.CLUSTER.SERVICE_NODES.CRITICAL.MAX.AVG:"{#SERVICE_NAME}"}'
+                  name: 'Consul: Service ["{#SERVICE_NAME}"]: Too many nodes with service status ''critical'''
+                  event_name: 'Consul: Service ["{#SERVICE_NAME}"]: Too many nodes with service status ''critical'' (over {$CONSUL.CLUSTER.SERVICE_NODES.CRITICAL.MAX.AVG:"{#SERVICE_NAME}"})'
+                  priority: AVERAGE
+                  description: 'One or more nodes with service status ''critical''.'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 3807bd01fda5425694eb8e4169eb4078
+              name: 'Consul: Service ["{#SERVICE_NAME}"]: Nodes passing'
+              type: DEPENDENT
+              key: 'consul.service.nodes_passing["{#SERVICE_NAME}"]'
+              delay: '0'
+              history: 7d
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.Node == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''passing'')].length()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'consul.get_service_stats["{#SERVICE_NAME}"]'
+              tags:
+                -
+                  tag: component
+                  value: service
+                -
+                  tag: service
+                  value: '{#SERVICE_NAME}'
+            -
+              uuid: 8a23dbb1d28c472291c06e0da572424a
+              name: 'Consul: Service ["{#SERVICE_NAME}"]: Nodes warning'
+              type: DEPENDENT
+              key: 'consul.service.nodes_warning["{#SERVICE_NAME}"]'
+              delay: '0'
+              history: 7d
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''warning'')].length()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3h
+              master_item:
+                key: 'consul.get_service_stats["{#SERVICE_NAME}"]'
+              tags:
+                -
+                  tag: component
+                  value: service
+                -
+                  tag: service
+                  value: '{#SERVICE_NAME}'
+          master_item:
+            key: consul.get_catalog_services
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = [];
+                  
+                  Object.keys(JSON.parse(value)).forEach(function (v) {
+                      data.push({ '{#SERVICE_NAME}': v })
+                  });
+                  
+                  return JSON.stringify(data);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: consul
+      macros:
+        -
+          macro: '{$CONSUL.API.PORT}'
+          value: '8500'
+          description: 'Consul API port. Using in node LLD.'
+        -
+          macro: '{$CONSUL.API.SCHEME}'
+          value: http
+          description: 'Consul API scheme. Using in node LLD.'
+        -
+          macro: '{$CONSUL.CLUSTER.URL}'
+          value: 'http://localhost:8500'
+          description: 'Consul cluster URL.'
+        -
+          macro: '{$CONSUL.LLD.FILTER.NODE_NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable discovered nodes.'
+        -
+          macro: '{$CONSUL.LLD.FILTER.NODE_NAME.NOT_MATCHES}'
+          value: 'CHANGE IF NEEDED'
+          description: 'Filter to exclude discovered nodes.'
+        -
+          macro: '{$CONSUL.LLD.FILTER.SERVICE_NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable discovered services.'
+        -
+          macro: '{$CONSUL.LLD.FILTER.SERVICE_NAME.NOT_MATCHES}'
+          value: 'CHANGE IF NEEDED'
+          description: 'Filter to exclude discovered services.'
+        -
+          macro: '{$CONSUL.SERVICE_NODES.CRITICAL.MAX.AVG}'
+          value: '0'
+          description: 'Maximum number of service nodes in status ''critical'' for trigger expression. Can be used with context.'
+        -
+          macro: '{$CONSUL.TOKEN}'
+          value: '<PUT YOUR AUTH TOKEN>'
+          description: 'Consul auth token.'
+      valuemaps:
+        -
+          uuid: 9c120a74ede844e6a410b7e2c2d712bb
+          name: 'Consul health state'
+          mappings:
+            -
+              value: '0'
+              newvalue: passing
+            -
+              value: '1'
+              newvalue: warning
+            -
+              value: '2'
+              newvalue: critical
+            -
+              value: '255'
+              newvalue: unknown

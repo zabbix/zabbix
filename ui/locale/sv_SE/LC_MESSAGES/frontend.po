@@ -1,32 +1,33 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2021-03-19 18:15+0300\n"
-"Last-Translator: Anonymous Pootle User\n"
+"PO-Revision-Date: 2022-05-23 11:11+0000\n"
+"Last-Translator: Johan <johan.lindgren@metricio.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
-"Language: sv\n"
+"Language: sv_SE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1616170507.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "\"%1$s\" datum måste vara mindre än \"%2$s\" datum."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" istället \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:321
 #: include/classes/import/validators/C10XmlValidator.php:338
@@ -43,125 +44,125 @@ msgstr ""
 #: include/classes/import/validators/C60XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" förväntas"
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" måste vara en tom sträng eller större än \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "\"%1$s\"-värdet måste vara mindre än eller lika med \"%2$s\"-värdet"
 
 #: include/classes/import/validators/C10XmlValidator.php:356
 #: include/classes/import/validators/C10XmlValidator.php:378
 #: include/classes/import/validators/C10XmlValidator.php:399
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "\"host:key\"-par förväntas"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"hostid\" för beroende item och master item bör matcha"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"ruleid\" för beroende item och master item bör matcha"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:900
 #: include/views/js/configuration.host.discovery.edit.js.php:86
 #: include/views/js/item.preprocessing.js.php:171
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.path.to.node"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "%1$d tecken överskrider den maximala längden på %2$d tecken"
 
 #: include/func.inc.php:488
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d dag"
+msgstr[1] "%1$d dagar"
 
 #: jsLoader.php:347
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d matchningar för %2$s hittades"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d av %3$d%2$s problem visas"
+msgstr[1] "%1$d av %3$d%2$s problem visas"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d problem har valts."
 
 #: chart4.php:94
 #, c-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (år %2$s)"
 
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - kastad av modulen som finns på %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Rad: %2$s | Kolumn: %3$s]"
 
 #: include/actions.inc.php:1893
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s action"
 msgid_plural "%1$s actions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s åtgärd"
+msgstr[1] "%1$s åtgärder"
 
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s tecken"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s tecken kvar"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s event"
+msgstr[1] "%1$s events"
 
 #: include/maps.inc.php:410
 #, c-format
 msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s värd under underhåll"
+msgstr[1] "%1$s värdar under underhåll"
 
 #: include/func.inc.php:2549
 #, c-format
 msgid "%1$s hour"
 msgid_plural "%1$s hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s timme"
+msgstr[1] "%1$s timmar"
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -169,16 +170,16 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s item"
+msgstr[1] "%1$s items"
 
 #: include/actions.inc.php:1731
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s message"
 msgid_plural "%1$s messages"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s meddelande"
+msgstr[1] "%1$s meddelanden"
 
 #: include/classes/widgets/CWidgetConfig.php:308
 #: include/classes/widgets/CWidgetConfig.php:309
@@ -188,36 +189,36 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s minut"
+msgstr[1] "%1$s minuter"
 
 #: include/classes/helpers/CMapHelper.php:316
 #, c-format
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s av %2$s element i problemtillstånd"
+msgstr[1] "%1$s av %2$s element i problemtillstånd"
 
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s förvald, använd ned-,upp-piltangenterna och enter för att välja"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problem"
+msgstr[1] "%1$s problem"
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
 msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s problem totalt"
+msgstr[1] "%1$s problem totalt"
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2172
@@ -225,8 +226,8 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s återförsök kvarstår"
+msgstr[1] "%1$s återförsök kvarstår"
 
 #: app/views/administration.user.edit.php:667
 #: include/classes/widgets/CWidgetConfig.php:306
@@ -235,82 +236,82 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s sekund"
+msgstr[1] "%1$s sekunder"
 
 #: include/maps.inc.php:368 include/maps.inc.php:371 include/maps.inc.php:378
 #: include/maps.inc.php:383
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s icke-bekräftat problem"
+msgstr[1] "%1$s icke-bekräftade problem"
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Allvarlighetsgrad, %2$s"
 
 #: jsLoader.php:342
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, enbart läsbar"
 
 #: jsLoader.php:388
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, vald"
 
 #: include/func.inc.php:1947
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%4$s misslyckat inloggningsförsök loggad. Senaste misslyckade försöket var från %1$s på %2$s kl. %3$s."
+msgstr[1] "%4$s misslyckade inloggningsförsök loggade. Senaste misslyckade försöket var från %1$s på %2$s kl. %3$s."
 
 #: include/classes/screens/CScreenDiscovery.php:213
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d enhet"
+msgstr[1] "%d enheter"
 
 #: include/users.inc.php:143
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: app/partials/popup.operations.php:56
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - oändligt)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - använd standard action)"
 
 #: include/views/configuration.hostgroups.list.php:36
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Endast superadministratörer kan skapa grupper)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
 #: app/views/popup.massupdate.host.php:121
 #: include/views/configuration.host.prototype.edit.php:282
 msgid "(no proxy)"
-msgstr ""
+msgstr "(ingen proxy)"
 
 #: include/classes/setup/CSetupWizard.php:494
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - använd standardport"
 
 #: include/triggers.inc.php:1595
 msgid "0 or 1"
-msgstr ""
+msgstr "0 eller 1"
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -324,11 +325,11 @@ msgstr "10 sekunder"
 
 #: include/views/reports.toptriggers.php:118 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100 mest utlösta triggers"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
-msgstr ""
+msgstr "24x7"
 
 #: app/views/administration.queue.overview.php:48
 #: app/views/administration.queue.overview.proxy.php:48
@@ -337,7 +338,7 @@ msgstr "30 sekunder"
 
 #: include/views/configuration.graph.edit.php:323
 msgid "3D view"
-msgstr ""
+msgstr "3D-vy"
 
 #: app/views/administration.queue.overview.php:50
 #: app/views/administration.queue.overview.proxy.php:50
@@ -356,25 +357,25 @@ msgstr "500 senaste värdena"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<tom sträng>"
 
 #: include/forms.inc.php:1406 include/views/js/item.preprocessing.js.php:220
 msgid "<label name>"
-msgstr ""
+msgstr "<etikettnamn>"
 
 #: include/views/monitoring.sysmap.edit.php:127
 msgid "<manual>"
-msgstr ""
+msgstr "<manuell>"
 
 #: include/forms.inc.php:1389 include/forms.inc.php:1414
 #: include/views/js/item.preprocessing.js.php:218
 #: include/views/js/item.preprocessing.js.php:227
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<metriskt namn>{<etikettnamn>=\"<etikettvärde>\", ...} == <värde>"
 
 #: app/views/administration.script.edit.php:109
 msgid "<sub-menu/sub-menu/...>"
-msgstr ""
+msgstr "<undermeny/undermeny/...>"
 
 #: jsLoader.php:185
 msgctxt "abbreviation of severity level"
@@ -1314,12 +1315,14 @@ msgstr ""
 msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
 msgstr[0] ""
+msgstr[1] ""
 
 #: include/maintenances.inc.php:50
 #, c-format
 msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
 msgstr[0] ""
+msgstr[1] ""
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -2109,6 +2112,11 @@ msgid_plural "Cannot copy triggers"
 msgstr[0] ""
 msgstr[1] ""
 
+#: include/triggers.inc.php:246
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+msgstr ""
+
 #: include/triggers.inc.php:226
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
@@ -2235,11 +2243,10 @@ msgid "Cannot delete graphs"
 msgstr ""
 
 #: hostgroups.php:134 hostgroups.php:156
-#, fuzzy
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Kan inte ta bort grupp"
-msgstr[1] "Kan inte ta bort grupp"
+msgstr[1] "Kan inte ta bort grupper"
 
 #: app/controllers/CControllerHostMassDelete.php:74
 msgid "Cannot delete host"
@@ -2356,11 +2363,10 @@ msgid "Cannot delete selected actions"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Kan inte ta bort tjänst"
-msgstr[1] "Kan inte ta bort tjänst"
+msgstr[1] "Kan inte ta bort tjänster"
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
@@ -2790,6 +2796,11 @@ msgstr ""
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostBase.php:644
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
@@ -2804,6 +2815,11 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:802
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:641
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:381
@@ -2825,6 +2841,16 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:799
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:502
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:638
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:705
@@ -3004,6 +3030,26 @@ msgstr ""
 
 #: include/classes/api/services/CHost.php:1095
 msgid "Cannot unlink template"
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:331
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:415
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:414
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:330
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:256
@@ -7506,11 +7552,10 @@ msgid "Group added"
 msgstr "Grupp lades till"
 
 #: hostgroups.php:134 hostgroups.php:155
-#, fuzzy
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Grupp togs bort"
-msgstr[1] "Grupp togs bort"
+msgstr[1] "Grupper togs bort"
 
 #: app/views/administration.miscconfig.edit.php:39
 msgid "Group for discovered hosts"
@@ -16023,11 +16068,10 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Tjänst togs bort"
-msgstr[1] "Tjänst togs bort"
+msgstr[1] "Tjänster togs bort"
 
 #: app/views/administration.userrole.edit.php:144
 #: app/views/administration.userrole.edit.php:185
@@ -17442,6 +17486,21 @@ msgstr ""
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
+#: include/classes/api/services/CTriggerGeneral.php:2245
+#, c-format
+msgid "The dependency of trigger \"%1$s\" on trigger \"%2$s\" already exists."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2249
+#, c-format
+msgid "The dependency of trigger prototype \"%1$s\" on trigger \"%2$s\" already exists."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2250
+#, c-format
+msgid "The dependency of trigger prototype \"%1$s\" on trigger prototype \"%2$s\" already exists."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr ""
@@ -17872,6 +17931,61 @@ msgstr ""
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr ""
 
+#: include/triggers.inc.php:372 include/triggers.inc.php:433
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/triggers.inc.php:373 include/triggers.inc.php:434
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2728
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2727
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2621
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2354
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2349
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2365
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2472
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2857
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2856
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
@@ -17972,6 +18086,66 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:1818
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:916
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:915
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2733
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2732
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2622
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2473
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2862
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2861
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2355
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2350
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2366
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:1325
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
 msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1716

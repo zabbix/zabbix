@@ -500,7 +500,8 @@ class CElement extends CBaseElement implements IWaitable {
 	* @inheritdoc
 	*/
 	public function isEnabled($enabled = true) {
-		$classes = explode(' ', parent::getAttribute('class'));
+		$attribute = parent::getAttribute('class');
+		$classes = ($attribute !== null) ? explode(' ', $attribute) : [];
 
 		$is_enabled = parent::isEnabled()
 				&& (parent::getAttribute('disabled') === null)
@@ -605,11 +606,11 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		if ($tag === 'select') {
-			return $this->asDropdown($options);
+			return $this->asList($options);
 		}
 
 		if ($tag === 'z-select') {
-			return $this->asZDropdown($options);
+			return $this->asDropdown($options);
 		}
 
 		if ($tag === 'table') {
