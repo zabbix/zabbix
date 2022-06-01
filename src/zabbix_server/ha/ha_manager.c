@@ -1703,7 +1703,8 @@ out:
  ******************************************************************************/
 void	zbx_ha_kill(void)
 {
-	if (ZBX_THREAD_ERROR != ha_pid) {
+	if (ZBX_THREAD_ERROR != ha_pid)
+	{
 		kill(ha_pid, SIGKILL);
 		zbx_thread_wait(ha_pid);
 		ha_pid = ZBX_THREAD_ERROR;
