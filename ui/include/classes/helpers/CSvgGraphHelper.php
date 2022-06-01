@@ -168,7 +168,6 @@ class CSvgGraphHelper {
 		}
 	}
 
-
 	private static function getMetricsItems(array &$metrics, array $data_sets): void {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
@@ -185,7 +184,7 @@ class CSvgGraphHelper {
 				break;
 			}
 
-			$items = API::Item()->get([
+			$items_db = API::Item()->get([
 				'output' => ['itemid', 'name', 'history', 'trends', 'units', 'value_type'],
 				'selectHosts' => ['name'],
 				'webitems' => true,
@@ -193,8 +192,17 @@ class CSvgGraphHelper {
 					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
 				],
 				'itemids' => $data_set['itemids'],
+				'preservekeys' => true,
 				'limit' => $max_metrics
 			]);
+
+			$items = [];
+
+			foreach ($data_set['itemids'] as $itemid) {
+				if (array_key_exists($itemid, $items_db)) {
+					$items[] = $items_db[$itemid];
+				}
+			}
 
 			if (!$items) {
 				continue;

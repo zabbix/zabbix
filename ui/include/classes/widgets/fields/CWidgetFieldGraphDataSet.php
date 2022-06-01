@@ -42,9 +42,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
 		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 			'dataset_type'			=> ['type' => API_INT32, 'in' => implode(',', [CWidgetHelper::DATASET_TYPE_SINGLE_ITEM, CWidgetHelper::DATASET_TYPE_PATTERN_ITEM])],
-			'hosts'					=> ['type' => API_STRINGS_UTF8],
-			'items'					=> ['type' => API_STRINGS_UTF8],
-			'itemids'				=> ['type' => API_IDS],
+			'hosts'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
+			'items'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
+			'itemids'				=> ['type' => API_IDS, 'flags' => null],
 			'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'type'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_STAIRCASE, SVG_GRAPH_TYPE_BAR])],
 			'stacked'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_STACKED_OFF, SVG_GRAPH_STACKED_ON])],
@@ -92,8 +92,6 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		if ($flags & self::FLAG_NOT_EMPTY) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
-			self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
-			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
 			$this->setStrictValidationRules($strict_validation_rules);
 		}
 		else {
@@ -152,26 +150,28 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			$label = ($this->label === null) ? $this->name : $this->label;
 		}
 
-		foreach ($value as $data) {
-			$validation_rules_by_type = $validation_rules;
+		if ($strict) {
+			foreach ($value as $data) {
+				$validation_rules_by_type = $validation_rules;
 
-			if ($data['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
-				$validation_rules_by_type['fields']['itemids']['flags'] = API_REQUIRED;
-				$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
+				if ($data['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
+					$validation_rules_by_type['fields']['itemids']['flags'] = API_REQUIRED;
+					$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
 
-				unset($data['hosts'], $data['items']);
-			}
-			else {
-				$validation_rules_by_type['fields']['hosts']['flags'] = API_REQUIRED;
-				$validation_rules_by_type['fields']['items']['flags'] = API_REQUIRED;
+					unset($data['hosts'], $data['items']);
+				}
+				else {
+					$validation_rules_by_type['fields']['hosts']['flags'] |= API_REQUIRED;
+					$validation_rules_by_type['fields']['items']['flags'] |= API_REQUIRED;
 
-				unset($data['itemids']);
-			}
+					unset($data['itemids']);
+				}
 
-			$data = [$data];
+				$data = [$data];
 
-			if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label, $error)) {
-				$errors[] = $error;
+				if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label, $error)) {
+					$errors[] = $error;
+				}
 			}
 		}
 
