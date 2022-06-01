@@ -1107,7 +1107,7 @@ out:
 					db_version_info.friendly_current_version);
 
 			zabbix_log(LOG_LEVEL_ERR, "Must be up to (%s).",
-						db_version_info.friendly_max_version);
+					db_version_info.friendly_max_version);
 
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
