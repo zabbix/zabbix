@@ -1238,6 +1238,14 @@ class CScreenProblem extends CScreenBase {
 			if ($data['actions']['severities'][$problem['eventid']]['count'] > 0) {
 				$actions_performed[] = _('Severity changes');
 			}
+
+			if ((bool) array_column($problem['suppression_data'], 'userid')) {
+				$actions_performed[] = _('Suppressed');
+			}
+			elseif ($data['actions']['suppressions'][$problem['eventid']]['count'] > 0) {
+				$actions_performed[] = _('Unsuppressed');
+			}
+
 			if ($data['actions']['actions'][$problem['eventid']]['count'] > 0) {
 				$actions_performed[] = _('Actions').' ('.$data['actions']['actions'][$problem['eventid']]['count'].')';
 			}
