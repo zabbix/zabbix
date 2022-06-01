@@ -23,6 +23,11 @@
 #include "log.h"
 #include "zbxjson.h"
 
+#if (__FreeBSD_version) >= 800099
+#include "sys/jail.h"
+#include "jail.h"
+#endif
+
 #if (__FreeBSD_version) < 500000
 #	define ZBX_COMMLEN		MAXCOMLEN
 #	define ZBX_PROC_PID		kp_proc.p_pid
@@ -93,6 +98,9 @@ typedef struct
 	int		ppid;
 	int		tid;
 	int		jid;
+#if (__FreeBSD_version) >= 800099
+	char		*jname;
+#endif
 
 	char		*name;
 	char		*tname;
@@ -799,6 +807,9 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->pid = proc_thread[k].ZBX_PROC_PID;
 				proc_data->ppid = proc_thread[k].ZBX_PROC_PPID;
 				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
+#if (__FreeBSD_version) >= 800099
+				proc_data->jname = jail_getname(proc_thread[k].ZBX_PROC_JID);
+#endif
 				proc_data->name = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_COMM);
 				proc_data->state = get_state(&proc_thread[k]);
 				proc_data->uid = proc[i].ZBX_PROC_UID;
@@ -858,6 +869,9 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->pid = proc[i].ZBX_PROC_PID;
 				proc_data->ppid = proc[i].ZBX_PROC_PPID;
 				proc_data->jid = proc[i].ZBX_PROC_JID;
+#if (__FreeBSD_version) >= 800099
+				proc_data->jname = jail_getname(proc[i].ZBX_PROC_JID);
+#endif
 				proc_data->cmdline = zbx_strdup(NULL, args);
 				proc_data->state = get_state(&proc[i]);
 				proc_data->uid = proc[i].ZBX_PROC_UID;
@@ -938,6 +952,9 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "pid", pdata->pid);
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
+#if (__FreeBSD_version) > 800099
+			zbx_json_addstring(&j, "jname", ZBX_NULL2EMPTY_STR(pdata->jname), ZBX_JSON_TYPE_STRING);
+#endif
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
@@ -966,6 +983,9 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "pid", pdata->pid);
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
+#if (__FreeBSD_version) > 800099
+			zbx_json_addstring(&j, "jname", ZBX_NULL2EMPTY_STR(pdata->jname), ZBX_JSON_TYPE_STRING);
+#endif
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
