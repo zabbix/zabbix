@@ -133,8 +133,8 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 
 /* extern unsigned char			program_type; */
 
-/* extern int				CONFIG_PASSIVE_FORKS; */
-/* extern int				CONFIG_ACTIVE_FORKS; */
+/* extern int				config_passive_forks; */
+/* extern int				config_active_forks; */
 
 /* extern char				*CONFIG_TLS_CONNECT; */
 /* extern char				*CONFIG_TLS_ACCEPT; */
@@ -752,7 +752,8 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
  *           parameters must match the value of CONFIG_TLS_ACCEPT parameter.  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char program_type)
+void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char program_type,
+		int config_active_forks, int config_passive_forks)
 {
 	zbx_tls_parameter_not_empty(&(zbx_config_tls->CONFIG_TLS_CONNECT), zbx_config_tls, program_type);
 	zbx_tls_parameter_not_empty(&(zbx_config_tls->CONFIG_TLS_ACCEPT), zbx_config_tls, program_type);
@@ -936,7 +937,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char pro
 
 	/* active agentd, active proxy, zabbix_get, and zabbix_sender specific validation */
 
-	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != CONFIG_ACTIVE_FORKS) ||
+	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_active_forks) ||
 			(0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_GET |
 					ZBX_PROGRAM_TYPE_SENDER))))
 	{
@@ -971,7 +972,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char pro
 
 	/* passive agentd and passive proxy specific validation */
 
-	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != CONFIG_PASSIVE_FORKS) ||
+	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_passive_forks) ||
 			0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 	{
 		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
@@ -982,13 +983,13 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char pro
 					&(zbx_config_tls->CONFIG_TLS_ACCEPT), zbx_config_tls, program_type);
 		}
 
-		if (NULL != CONFIG_TLS_PSK_FILE && NULL == zbx_config_tls->CONFIG_TLS_ACCEPT)
+		if (NULL != zbx_config_tls->CONFIG_TLS_PSK_FILE && NULL == zbx_config_tls->CONFIG_TLS_ACCEPT)
 		{
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->CONFIG_TLS_PSK_FILE),
 					&(zbx_config_tls->CONFIG_TLS_ACCEPT), zbx_config_tls, program_type);
 		}
 
-		if (0 != (zbx_config_tls->configured_tls_accept_modes & zbx_config_tls->ZBX_TCP_SEC_TLS_CERT) &&
+		if (0 != (zbx_config_tls->configured_tls_accept_modes & ZBX_TCP_SEC_TLS_CERT) &&
 				NULL == zbx_config_tls->CONFIG_TLS_CERT_FILE)
 		{
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &(zbx_config_tls->CONFIG_TLS_ACCEPT),
@@ -1013,10 +1014,10 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char pro
 					&(zbx_config_tls->CONFIG_TLS_CERT_FILE), zbx_config_tls, program_type);
 	}
 
-	if (NULL != CONFIG_TLS_CIPHER_CERT && NULL == CONFIG_TLS_CERT_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CERT && NULL == zbx_config_tls->CONFIG_TLS_CERT_FILE)
 	{
-		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->CONFIG_TLS_CIPHER_CERT,
-				&(zbx_config_tls->CONFIG_TLS_CERT_FILE, zbx_config_tls, program_type)));
+		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->CONFIG_TLS_CIPHER_CERT),
+				&(zbx_config_tls->CONFIG_TLS_CERT_FILE), zbx_config_tls, program_type);
 	}
 	/* For server and proxy 'TLSCipherPSK13' and 'TLSCipherPSK' are optional and do not depend on other */
 	/* TLS parameters. Validate only in case of agent, zabbix_get and sender. */
@@ -1027,14 +1028,15 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char pro
 				zbx_config_tls->CONFIG_TLS_PSK_IDENTITY)
 		{
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY,
-					&(zbx_config_tls->CONFIG_TLS_CIPHER_PSK13,
-					&(zbx_config_tls->CONFIG_TLS_PSK_IDENTITY, zbx_config_tls, program_type);
+					&(zbx_config_tls->CONFIG_TLS_CIPHER_PSK13),
+					&(zbx_config_tls->CONFIG_TLS_PSK_IDENTITY), zbx_config_tls, program_type);
 		}
 
-		if (NULL !=  zbx_config_tls->CONFIG_TLS_CIPHER_PSK && NULL == zbx_config_tls->CONFIG_TLS_PSK_IDENTITY)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_PSK && NULL == zbx_config_tls->CONFIG_TLS_PSK_IDENTITY)
 		{
-			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->CONFIG_TLS_CIPHER_PSK,
-					&(zbx_config_tls->CONFIG_TLS_PSK_IDENTITY, zbx_config_tls, program_type);
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY,
+					&(zbx_config_tls->CONFIG_TLS_CIPHER_PSK),
+					&(zbx_config_tls->CONFIG_TLS_PSK_IDENTITY), zbx_config_tls, program_type);
 		}
 	}
 
@@ -1043,8 +1045,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char pro
 	/* server and proxy (at least some hosts may be connecting with PSK). */
 	/* 'zabbix_get' and sender do not use these parameters. Validate only in case of agent. */
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) &&
-			NULL == CONFIG_TLS_CERT_FILE && NULL == zbx_config_tls->CONFIG_TLS_PSK_IDENTITY)
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && NULL == zbx_config_tls->CONFIG_TLS_CERT_FILE &&
+			NULL == zbx_config_tls->CONFIG_TLS_PSK_IDENTITY)
 	{
 		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_ALL13)
 		{
@@ -1280,7 +1282,7 @@ static unsigned int	zbx_psk_client_cb(SSL *ssl, const char *hint, char *identity
  *                                                                            *
  ******************************************************************************/
 static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned char *psk,
-		unsigned int max_psk_len)
+		unsigned int max_psk_len, unsigned char program_type)
 {
 	char		*psk_loc;
 	size_t		psk_len = 0;
@@ -1406,7 +1408,7 @@ static void	zbx_check_psk_identity_len(size_t psk_identity_len)
  *     at runtime.                                                            *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_read_psk_file(void)
+static void	zbx_read_psk_file(char *config_tls_psk_file)
 {
 	FILE		*f;
 	size_t		len;
@@ -1415,15 +1417,15 @@ static void	zbx_read_psk_file(void)
 							/* 1 byte for terminating '\0' */
 	char		buf_bin[HOST_TLS_PSK_LEN / 2];	/* up to 256 bytes of binary PSK */
 
-	if (NULL == (f = fopen(CONFIG_TLS_PSK_FILE, "r")))
+	if (NULL == (f = fopen(config_tls_psk_file, "r")))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot open file \"%s\": %s", CONFIG_TLS_PSK_FILE, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot open file \"%s\": %s", config_tls_psk_file, zbx_strerror(errno));
 		goto out;
 	}
 
 	if (NULL == fgets(buf, (int)sizeof(buf), f))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot read from file \"%s\" or file empty", CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_CRIT, "cannot read from file \"%s\" or file empty", config_tls_psk_file);
 		goto out;
 	}
 
@@ -1431,27 +1433,27 @@ static void	zbx_read_psk_file(void)
 
 	if (0 == (len = strlen(buf)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "file \"%s\" is empty", CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_CRIT, "file \"%s\" is empty", config_tls_psk_file);
 		goto out;
 	}
 
 	if (HOST_TLS_PSK_LEN_MIN > len)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too short. Minimum is %d hex-digits",
-				CONFIG_TLS_PSK_FILE, HOST_TLS_PSK_LEN_MIN);
+				config_tls_psk_file, HOST_TLS_PSK_LEN_MIN);
 		goto out;
 	}
 
 	if (HOST_TLS_PSK_LEN < len)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too long. Maximum is %d hex-digits",
-				CONFIG_TLS_PSK_FILE, HOST_TLS_PSK_LEN);
+				config_tls_psk_file, HOST_TLS_PSK_LEN);
 		goto out;
 	}
 
 	if (0 >= (len_bin = zbx_hex2bin((unsigned char *)buf, (unsigned char *)buf_bin, sizeof(buf_bin))))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid PSK in file \"%s\"", CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid PSK in file \"%s\"", config_tls_psk_file);
 		goto out;
 	}
 
@@ -1463,7 +1465,7 @@ static void	zbx_read_psk_file(void)
 out:
 	if (NULL != f && 0 != fclose(f))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot close file \"%s\": %s", CONFIG_TLS_PSK_FILE, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot close file \"%s\": %s", config_tls_psk_file, zbx_strerror(errno));
 		ret = FAIL;
 	}
 
@@ -2199,7 +2201,8 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
  *     SUCCEED or FAIL                                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
+int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error, char *config_tls_server_cert_issuer,
+		char *config_tls_server_cert_subject)
 {
 	zbx_tls_conn_attr_t	attr;
 
@@ -2212,14 +2215,14 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 	}
 
 	/* simplified match, not compliant with RFC 4517, 4518 */
-	if (NULL != CONFIG_TLS_SERVER_CERT_ISSUER && 0 != strcmp(CONFIG_TLS_SERVER_CERT_ISSUER, attr.issuer))
+	if (NULL != config_tls_server_cert_issuer && 0 != strcmp(config_tls_server_cert_issuer, attr.issuer))
 	{
 		*error = zbx_dsprintf(*error, "certificate issuer does not match for %s", sock->peer);
 		return FAIL;
 	}
 
 	/* simplified match, not compliant with RFC 4517, 4518 */
-	if (NULL != CONFIG_TLS_SERVER_CERT_SUBJECT && 0 != strcmp(CONFIG_TLS_SERVER_CERT_SUBJECT, attr.subject))
+	if (NULL != config_tls_server_cert_subject && 0 != strcmp(config_tls_server_cert_subject, attr.subject))
 	{
 		*error = zbx_dsprintf(*error, "certificate subject does not match for %s", sock->peer);
 		return FAIL;
@@ -2324,7 +2327,7 @@ static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, co
 	}
 }
 
-void	zbx_tls_init_child(void)
+void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, unsigned char program_type)
 {
 	int		res;
 #ifndef _WINDOWS
@@ -2347,7 +2350,7 @@ void	zbx_tls_init_child(void)
 #endif
 	/* need to allocate certificate credentials store? */
 
-	if (NULL != CONFIG_TLS_CERT_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CERT_FILE)
 	{
 		if (GNUTLS_E_SUCCESS != (res = gnutls_certificate_allocate_credentials(&my_cert_creds)))
 		{
@@ -2359,22 +2362,23 @@ void	zbx_tls_init_child(void)
 	}
 
 	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf) */
-	if (NULL != CONFIG_TLS_CA_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CA_FILE)
 	{
-		if (0 < (res = gnutls_certificate_set_x509_trust_file(my_cert_creds, CONFIG_TLS_CA_FILE,
+		if (0 < (res = gnutls_certificate_set_x509_trust_file(my_cert_creds, zbx_config_tls->CONFIG_TLS_CA_FILE,
 				GNUTLS_X509_FMT_PEM)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded %d CA certificate(s) from file \"%s\"",
-					__func__, res, CONFIG_TLS_CA_FILE);
+					__func__, res, zbx_config_tls->CONFIG_TLS_CA_FILE);
 		}
 		else if (0 == res)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "no CA certificate(s) in file \"%s\"", CONFIG_TLS_CA_FILE);
+			zabbix_log(LOG_LEVEL_WARNING, "no CA certificate(s) in file \"%s\"",
+					zbx_config_tls->CONFIG_TLS_CA_FILE);
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CA certificate(s) in file \"%s\": %d: %s",
-				CONFIG_TLS_CA_FILE, res, gnutls_strerror(res));
+					zbx_config_tls->CONFIG_TLS_CA_FILE, res, gnutls_strerror(res));
 			zbx_tls_free();
 			exit(EXIT_FAILURE);
 		}
@@ -2382,21 +2386,21 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSCRLFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load CRL (certificate revocation list) file. */
-	if (NULL != CONFIG_TLS_CRL_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CRL_FILE)
 	{
-		if (0 < (res = gnutls_certificate_set_x509_crl_file(my_cert_creds, CONFIG_TLS_CRL_FILE,
+		if (0 < (res = gnutls_certificate_set_x509_crl_file(my_cert_creds, zbx_config_tls->CONFIG_TLS_CRL_FILE,
 				GNUTLS_X509_FMT_PEM)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded %d CRL(s) from file \"%s\"", __func__, res,
-					CONFIG_TLS_CRL_FILE);
+					zbx_config_tls->CONFIG_TLS_CRL_FILE);
 		}
 		else if (0 == res)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "no CRL(s) in file \"%s\"", CONFIG_TLS_CRL_FILE);
+			zabbix_log(LOG_LEVEL_WARNING, "no CRL(s) in file \"%s\"", zbx_config_tls->CONFIG_TLS_CRL_FILE);
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CRL file \"%s\": %d: %s", CONFIG_TLS_CRL_FILE, res,
+			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CRL file \"%s\": %d: %s", zbx_config_tls->CONFIG_TLS_CRL_FILE, res,
 					gnutls_strerror(res));
 			zbx_tls_free();
 			exit(EXIT_FAILURE);
@@ -2405,33 +2409,34 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSCertFile' and 'TLSKeyFile' parameters (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load certificate and private key. */
-	if (NULL != CONFIG_TLS_CERT_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CERT_FILE)
 	{
-		if (GNUTLS_E_SUCCESS != (res = gnutls_certificate_set_x509_key_file(my_cert_creds, CONFIG_TLS_CERT_FILE,
-				CONFIG_TLS_KEY_FILE, GNUTLS_X509_FMT_PEM)))
+		if (GNUTLS_E_SUCCESS != (res = gnutls_certificate_set_x509_key_file(my_cert_creds,
+				zbx_config_tls->CONFIG_TLS_CERT_FILE, zbx_config_tls->CONFIG_TLS_KEY_FILE,
+				GNUTLS_X509_FMT_PEM)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot load certificate or private key from file \"%s\" or \"%s\":"
-					" %d: %s", CONFIG_TLS_CERT_FILE, CONFIG_TLS_KEY_FILE, res,
-					gnutls_strerror(res));
+					" %d: %s", zbx_config_tls->CONFIG_TLS_CERT_FILE,
+					zbx_config_tls->CONFIG_TLS_KEY_FILE, res, gnutls_strerror(res));
 			zbx_tls_free();
 			exit(EXIT_FAILURE);
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded certificate from file \"%s\"", __func__,
-					CONFIG_TLS_CERT_FILE);
+					zbx_config_tls->CONFIG_TLS_CERT_FILE);
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded private key from file \"%s\"", __func__,
-					CONFIG_TLS_KEY_FILE);
+					zbx_config_tls->CONFIG_TLS_KEY_FILE);
 		}
 	}
 
 	/* 'TLSPSKIdentity' and 'TLSPSKFile' parameters (in zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load pre-shared key and identity to be used with the pre-shared key. */
-	if (NULL != CONFIG_TLS_PSK_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_PSK_FILE)
 	{
 		gnutls_datum_t	key;
 
-		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
+		my_psk_identity = zbx_config_tls->CONFIG_TLS_PSK_IDENTITY;
 		my_psk_identity_len = strlen(my_psk_identity);
 
 		zbx_check_psk_identity_len(my_psk_identity_len);
@@ -2483,8 +2488,10 @@ void	zbx_tls_init_child(void)
 			gnutls_psk_set_server_credentials_function(my_psk_server_creds, zbx_psk_cb);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK identity \"%s\"", __func__, CONFIG_TLS_PSK_IDENTITY);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK from file \"%s\"", __func__, CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK identity \"%s\"", __func__,
+				zbx_config_tls->CONFIG_TLS_PSK_IDENTITY);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK from file \"%s\"", __func__,
+				zbx_config_tls->CONFIG_TLS_PSK_FILE);
 	}
 
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
@@ -2519,7 +2526,7 @@ void	zbx_tls_init_child(void)
 	{
 		const char	*priority_str;
 
-		if (NULL == CONFIG_TLS_CIPHER_PSK)
+		if (NULL == zbx_config_tls->CONFIG_TLS_CIPHER_PSK)
 		{
 			/* for GnuTLS 3.1.18 and up */
 			priority_str = "NONE:+VERS-TLS1.2:+ECDHE-PSK:+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:"
@@ -2530,7 +2537,7 @@ void	zbx_tls_init_child(void)
 		}
 		else
 		{
-			priority_str = CONFIG_TLS_CIPHER_PSK;
+			priority_str = zbx_config_tls->CONFIG_TLS_CIPHER_PSK;
 
 			zbx_gnutls_priority_init_or_exit(&ciphersuites_psk, priority_str,
 					"\"ciphersuites_psk\" with TLSCipherPSK or --tls-cipher parameter");
@@ -2546,7 +2553,7 @@ void	zbx_tls_init_child(void)
 	{
 		const char	*priority_str;
 
-		if (NULL == CONFIG_TLS_CIPHER_ALL)
+		if (NULL == zbx_config_tls->CONFIG_TLS_CIPHER_ALL)
 		{
 			/* for GnuTLS 3.1.18 and up */
 			priority_str = "NONE:+VERS-TLS1.2:+ECDHE-RSA:"
@@ -2558,7 +2565,7 @@ void	zbx_tls_init_child(void)
 		}
 		else
 		{
-			priority_str = CONFIG_TLS_CIPHER_ALL;
+			priority_str = zbx_config_tls->CONFIG_TLS_CIPHER_ALL;
 
 			zbx_gnutls_priority_init_or_exit(&ciphersuites_all, priority_str,
 					"\"ciphersuites_all\" with TLSCipherAll parameter");
@@ -2628,7 +2635,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 	return ret;
 }
 
-void	zbx_tls_init_child(void)
+void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, unsigned char program_type)
 {
 #define ZBX_CIPHERS_CERT_ECDHE		"EECDH+aRSA+AES128:"
 #define ZBX_CIPHERS_CERT		"RSA+aRSA+AES128"
@@ -2683,7 +2690,7 @@ void	zbx_tls_init_child(void)
 		method = TLS_method();
 
 	/* create context for certificate-only authentication if certificate is configured */
-	if (NULL != CONFIG_TLS_CERT_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CERT_FILE)
 	{
 		if (NULL == (ctx_cert = SSL_CTX_new(method)))
 			goto out_method;
@@ -2694,7 +2701,8 @@ void	zbx_tls_init_child(void)
 #if defined(HAVE_OPENSSL_WITH_PSK)
 	/* Create context for PSK-only authentication. PSK can come from configuration file (in proxy, agentd) */
 	/* and later from database (in server, proxy). */
-	if (NULL != CONFIG_TLS_PSK_FILE || 0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
+	if (NULL != zbx_config_tls->CONFIG_TLS_PSK_FILE || 0 != (program_type &
+			(ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
 	{
 		if (NULL == (ctx_psk = SSL_CTX_new(method)))
 			goto out_method;
@@ -2715,23 +2723,23 @@ void	zbx_tls_init_child(void)
 	}
 #endif
 	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf) */
-	if (NULL != CONFIG_TLS_CA_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CA_FILE)
 	{
 #if defined(HAVE_OPENSSL_WITH_PSK)
-		if (1 != SSL_CTX_load_verify_locations(ctx_cert, CONFIG_TLS_CA_FILE, NULL) ||
-				(NULL != ctx_all && 1 != SSL_CTX_load_verify_locations(ctx_all, CONFIG_TLS_CA_FILE,
-				NULL)))
+		if (1 != SSL_CTX_load_verify_locations(ctx_cert, zbx_config_tls->CONFIG_TLS_CA_FILE, NULL) ||
+				(NULL != ctx_all && 1 != SSL_CTX_load_verify_locations(ctx_all,
+				zbx_config_tls->CONFIG_TLS_CA_FILE, NULL)))
 #else
-		if (1 != SSL_CTX_load_verify_locations(ctx_cert, CONFIG_TLS_CA_FILE, NULL))
+		if (1 != SSL_CTX_load_verify_locations(ctx_cert, zbx_config_tls->CONFIG_TLS_CA_FILE, NULL))
 #endif
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load CA certificate(s) from"
-					" file \"%s\":", CONFIG_TLS_CA_FILE);
+					" file \"%s\":", zbx_config_tls->CONFIG_TLS_CA_FILE);
 			goto out;
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded CA certificate(s) from file \"%s\"", __func__,
-				CONFIG_TLS_CA_FILE);
+				zbx_config_tls->CONFIG_TLS_CA_FILE);
 
 		/* It is possible to limit the length of certificate chain being verified. For example: */
 		/* SSL_CTX_set_verify_depth(ctx_cert, 2); */
@@ -2747,7 +2755,7 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSCRLFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load CRL (certificate revocation list) file. */
-	if (NULL != CONFIG_TLS_CRL_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CRL_FILE)
 	{
 		X509_STORE	*store_cert;
 		X509_LOOKUP	*lookup_cert;
@@ -2758,21 +2766,23 @@ void	zbx_tls_init_child(void)
 		if (NULL == (lookup_cert = X509_STORE_add_lookup(store_cert, X509_LOOKUP_file())))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_add_lookup() #%d failed"
-					" when loading CRL(s) from file \"%s\":", 1, CONFIG_TLS_CRL_FILE);
+					" when loading CRL(s) from file \"%s\":", 1,
+					zbx_config_tls->CONFIG_TLS_CRL_FILE);
 			goto out;
 		}
 
-		if (0 >= (count_cert = X509_load_crl_file(lookup_cert, CONFIG_TLS_CRL_FILE, X509_FILETYPE_PEM)))
+		if (0 >= (count_cert = X509_load_crl_file(lookup_cert, zbx_config_tls->CONFIG_TLS_CRL_FILE,
+				X509_FILETYPE_PEM)))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load CRL(s) from file \"%s\":",
-					CONFIG_TLS_CRL_FILE);
+					zbx_config_tls->CONFIG_TLS_CRL_FILE);
 			goto out;
 		}
 
 		if (1 != X509_STORE_set_flags(store_cert, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_set_flags() #%d failed when"
-					" loading CRL(s) from file \"%s\":", 1, CONFIG_TLS_CRL_FILE);
+					" loading CRL(s) from file \"%s\":", 1, zbx_config_tls->CONFIG_TLS_CRL_FILE);
 			goto out;
 		}
 #if defined(HAVE_OPENSSL_WITH_PSK)
@@ -2788,22 +2798,23 @@ void	zbx_tls_init_child(void)
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_add_lookup() #%d"
 						" failed when loading CRL(s) from file \"%s\":", 2,
-						CONFIG_TLS_CRL_FILE);
+						zbx_config_tls->CONFIG_TLS_CRL_FILE);
 				goto out;
 			}
 
-			if (0 >= (count_all = X509_load_crl_file(lookup_all, CONFIG_TLS_CRL_FILE, X509_FILETYPE_PEM)))
+			if (0 >= (count_all = X509_load_crl_file(lookup_all, zbx_config_tls->CONFIG_TLS_CRL_FILE,
+					X509_FILETYPE_PEM)))
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load CRL(s) from file"
-						" \"%s\":", CONFIG_TLS_CRL_FILE);
+						" \"%s\":", zbx_config_tls->CONFIG_TLS_CRL_FILE);
 				goto out;
 			}
 
 			if (count_cert != count_all)
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "number of CRL(s) loaded from"
-						" file \"%s\" does not match: %d and %d", CONFIG_TLS_CRL_FILE,
-						count_cert, count_all);
+						" file \"%s\" does not match: %d and %d",
+						zbx_config_tls->CONFIG_TLS_CRL_FILE, count_cert, count_all);
 				goto out1;
 			}
 
@@ -2811,53 +2822,55 @@ void	zbx_tls_init_child(void)
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_set_flags() #%d"
 						" failed when loading CRL(s) from file \"%s\":", 2,
-						CONFIG_TLS_CRL_FILE);
+						zbx_config_tls->CONFIG_TLS_CRL_FILE);
 				goto out;
 			}
 		}
 #endif
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded %d CRL(s) from file \"%s\"", __func__, count_cert,
-				CONFIG_TLS_CRL_FILE);
+				zbx_config_tls->CONFIG_TLS_CRL_FILE);
 	}
 
 	/* 'TLSCertFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load certificate. */
-	if (NULL != CONFIG_TLS_CERT_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CERT_FILE)
 	{
 #if defined(HAVE_OPENSSL_WITH_PSK)
-		if (1 != SSL_CTX_use_certificate_chain_file(ctx_cert, CONFIG_TLS_CERT_FILE) || (NULL != ctx_all &&
-				1 != SSL_CTX_use_certificate_chain_file(ctx_all, CONFIG_TLS_CERT_FILE)))
+		if (1 != SSL_CTX_use_certificate_chain_file(ctx_cert, zbx_config_tls->CONFIG_TLS_CERT_FILE) ||
+				(NULL != ctx_all && 1 != SSL_CTX_use_certificate_chain_file(ctx_all,
+				zbx_config_tls->CONFIG_TLS_CERT_FILE)))
 #else
-		if (1 != SSL_CTX_use_certificate_chain_file(ctx_cert, CONFIG_TLS_CERT_FILE))
+		if (1 != SSL_CTX_use_certificate_chain_file(ctx_cert, zbx_config_tls->CONFIG_TLS_CERT_FILE))
 #endif
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load certificate(s) from file"
-					" \"%s\":", CONFIG_TLS_CERT_FILE);
+					" \"%s\":", zbx_config_tls->CONFIG_TLS_CERT_FILE);
 			goto out;
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded certificate(s) from file \"%s\"", __func__,
-				CONFIG_TLS_CERT_FILE);
+				zbx_config_tls->CONFIG_TLS_CERT_FILE);
 	}
 
 	/* 'TLSKeyFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load private key. */
-	if (NULL != CONFIG_TLS_KEY_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_KEY_FILE)
 	{
 #if defined(HAVE_OPENSSL_WITH_PSK)
-		if (1 != SSL_CTX_use_PrivateKey_file(ctx_cert, CONFIG_TLS_KEY_FILE, SSL_FILETYPE_PEM) ||
-				(NULL != ctx_all && 1 != SSL_CTX_use_PrivateKey_file(ctx_all, CONFIG_TLS_KEY_FILE,
-				SSL_FILETYPE_PEM)))
+		if (1 != SSL_CTX_use_PrivateKey_file(ctx_cert, zbx_config_tls->CONFIG_TLS_KEY_FILE, SSL_FILETYPE_PEM) ||
+				(NULL != ctx_all && 1 != SSL_CTX_use_PrivateKey_file(ctx_all,
+				zbx_config_tls->CONFIG_TLS_KEY_FILE, SSL_FILETYPE_PEM)))
 #else
-		if (1 != SSL_CTX_use_PrivateKey_file(ctx_cert, CONFIG_TLS_KEY_FILE, SSL_FILETYPE_PEM))
+		if (1 != SSL_CTX_use_PrivateKey_file(ctx_cert, zbx_config_tls->CONFIG_TLS_KEY_FILE, SSL_FILETYPE_PEM))
 #endif
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load private key from file"
-					" \"%s\":", CONFIG_TLS_KEY_FILE);
+					" \"%s\":", zbx_config_tls->CONFIG_TLS_KEY_FILE);
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded private key from file \"%s\"", __func__, CONFIG_TLS_KEY_FILE);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded private key from file \"%s\"", __func__,
+				zbx_config_tls->CONFIG_TLS_KEY_FILE);
 
 		if (1 != SSL_CTX_check_private_key(ctx_cert))
 		{
@@ -2869,18 +2882,20 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSPSKIdentity' and 'TLSPSKFile' parameters (in zabbix_proxy.conf, zabbix_agentd.conf). */
 	/*  Load pre-shared key and identity to be used with the pre-shared key. */
-	if (NULL != CONFIG_TLS_PSK_FILE)
+	if (NULL != zbx_config_tls->CONFIG_TLS_PSK_FILE)
 	{
-		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
+		my_psk_identity = zbx_config_tls->CONFIG_TLS_PSK_IDENTITY;
 		my_psk_identity_len = strlen(my_psk_identity);
 
 		zbx_check_psk_identity_len(my_psk_identity_len);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK identity \"%s\"", __func__, CONFIG_TLS_PSK_IDENTITY);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK identity \"%s\"", __func__,
+				zbx_config_tls->CONFIG_TLS_PSK_IDENTITY);
 
 		zbx_read_psk_file();
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK from file \"%s\"", __func__, CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK from file \"%s\"", __func__,
+				zbx_config_tls->CONFIG_TLS_PSK_FILE);
 	}
 #if defined(HAVE_OPENSSL_WITH_PSK)
 	/* set up PSK global variables for client callback if PSK comes only from configuration file or command line */
@@ -2919,13 +2934,16 @@ void	zbx_tls_init_child(void)
 			ciphers = ZBX_CIPHERS_CERT;
 
 		/* override TLS 1.3 certificate ciphersuites with user-defined settings */
-		if (NULL != CONFIG_TLS_CIPHER_CERT13 || NULL != CONFIG_TLS_CIPHER_CMD13)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CERT13 || NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD13)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL && !defined(LIBRESSL_VERSION_NUMBER)	/* only OpenSSL 1.1.1 or newer */
-			const char	*override_ciphers = CONFIG_TLS_CIPHER_CERT13;	/* can be NULL */
+			const char	*override_ciphers = zbx_config_tls->CONFIG_TLS_CIPHER_CERT13; /* can be NULL */
 
-			if (NULL != CONFIG_TLS_CIPHER_CMD13 && ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
-				override_ciphers = CONFIG_TLS_CIPHER_CMD13;
+			if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD13 && ZBX_TCP_SEC_TLS_CERT ==
+					configured_tls_connect_mode)
+			{
+				override_ciphers = zbx_config_tls->CONFIG_TLS_CIPHER_CMD13;
+			}
 
 			if (NULL != override_ciphers && 1 != SSL_CTX_set_ciphersuites(ctx_cert, override_ciphers))
 			{
@@ -2944,12 +2962,15 @@ void	zbx_tls_init_child(void)
 		}
 
 		/* override TLS 1.2 certificate ciphersuites with user-defined settings */
-		if (NULL != CONFIG_TLS_CIPHER_CERT || NULL != CONFIG_TLS_CIPHER_CMD)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CERT || NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD)
 		{
-			const char	*override_ciphers = CONFIG_TLS_CIPHER_CERT;	/* can be NULL */
+			const char	*override_ciphers = zbx_config_tls->CONFIG_TLS_CIPHER_CERT;	/* can be NULL */
 
-			if (NULL != CONFIG_TLS_CIPHER_CMD && ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
-				override_ciphers = CONFIG_TLS_CIPHER_CMD;
+			if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD && ZBX_TCP_SEC_TLS_CERT ==
+					configured_tls_connect_mode)
+			{
+				override_ciphers = zbx_config_tls->CONFIG_TLS_CIPHER_CMD;
+			}
 
 			if (NULL != override_ciphers && 1 != SSL_CTX_set_cipher_list(ctx_cert, override_ciphers))
 			{
@@ -2995,13 +3016,16 @@ void	zbx_tls_init_child(void)
 			ciphers = ZBX_CIPHERS_PSK;
 
 		/* override TLS 1.3 PSK ciphersuites with user-defined settings */
-		if (NULL != CONFIG_TLS_CIPHER_PSK13 || NULL != CONFIG_TLS_CIPHER_CMD13)
+		if (NULL != CONFIG_TLS_CIPHER_PSK13 || NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD13)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
-			const char	*override_ciphers = CONFIG_TLS_CIPHER_PSK13;	/* can be NULL */
+			const char	*override_ciphers = zbx_config_tls->CONFIG_TLS_CIPHER_PSK13; /* can be NULL */
 
-			if (NULL != CONFIG_TLS_CIPHER_CMD13 && ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
-				override_ciphers = CONFIG_TLS_CIPHER_CMD13;
+			if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD13 && ZBX_TCP_SEC_TLS_PSK ==
+					configured_tls_connect_mode)
+			{
+				override_ciphers = zbx_config_tls->CONFIG_TLS_CIPHER_CMD13;
+			}
 
 			if (NULL != override_ciphers && 1 != SSL_CTX_set_ciphersuites(ctx_psk, override_ciphers))
 			{
@@ -3026,12 +3050,15 @@ void	zbx_tls_init_child(void)
 		}
 #endif
 		/* override TLS 1.2 PSK ciphersuites with user-defined settings */
-		if (NULL != CONFIG_TLS_CIPHER_PSK || NULL != CONFIG_TLS_CIPHER_CMD)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_PSK || NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD)
 		{
-			const char	*override_ciphers = CONFIG_TLS_CIPHER_PSK;	/* can be NULL */
+			const char	*override_ciphers = zbx_config_tls->CONFIG_TLS_CIPHER_PSK; /* can be NULL */
 
-			if (NULL != CONFIG_TLS_CIPHER_CMD && ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
-				override_ciphers = CONFIG_TLS_CIPHER_CMD;
+			if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD && ZBX_TCP_SEC_TLS_PSK ==
+					configured_tls_connect_mode)
+			{
+				override_ciphers = zbx_config_tls->CONFIG_TLS_CIPHER_CMD;
+			}
 
 			if (NULL != override_ciphers && 1 != SSL_CTX_set_cipher_list(ctx_psk, override_ciphers))
 			{
@@ -3070,10 +3097,10 @@ void	zbx_tls_init_child(void)
 			ciphers = ZBX_CIPHERS_CERT ":" ZBX_CIPHERS_PSK;
 
 		/* override TLS 1.3 ciphersuites with user-defined setting */
-		if (NULL != CONFIG_TLS_CIPHER_ALL13)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_ALL13)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
-			if (1 != SSL_CTX_set_ciphersuites(ctx_all, CONFIG_TLS_CIPHER_ALL13))
+			if (1 != SSL_CTX_set_ciphersuites(ctx_all, zbx_config_tls->CONFIG_TLS_CIPHER_ALL13))
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.3"
 						" ciphersuites from \"TLSCipherAll13\" parameter:");
@@ -3088,9 +3115,9 @@ void	zbx_tls_init_child(void)
 		}
 
 		/* override TLS 1.2 ciphersuites with user-defined setting */
-		if (NULL != CONFIG_TLS_CIPHER_ALL)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_ALL)
 		{
-			if (1 != SSL_CTX_set_cipher_list(ctx_all, CONFIG_TLS_CIPHER_ALL))
+			if (1 != SSL_CTX_set_cipher_list(ctx_all, zbx_config_tls->CONFIG_TLS_CIPHER_ALL))
 			{
 				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of TLS 1.2"
 						" ciphersuites from \"TLSCipherAll\" parameter:");
@@ -3109,7 +3136,7 @@ void	zbx_tls_init_child(void)
 	if (NULL == ctx_psk)
 	{
 		/* cannot override TLS 1.3 PSK ciphersuites */
-		if (NULL != CONFIG_TLS_CIPHER_PSK13)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_PSK13)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK13\" cannot"
@@ -3122,7 +3149,7 @@ void	zbx_tls_init_child(void)
 		}
 
 		/* cannot override TLS 1.2 PSK ciphersuites */
-		if (NULL != CONFIG_TLS_CIPHER_PSK)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_PSK)
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherPSK\" cannot"
 					" be applied: the list of PSK ciphersuites is not used");
@@ -3133,7 +3160,7 @@ void	zbx_tls_init_child(void)
 	if (NULL == ctx_all)
 	{
 		/* cannot override TLS 1.3 ciphersuites */
-		if (NULL != CONFIG_TLS_CIPHER_ALL13)
+		if (NULL != zbx_conifg_tls->CONFIG_TLS_CIPHER_ALL13)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll13\" cannot"
@@ -3148,7 +3175,7 @@ void	zbx_tls_init_child(void)
 		}
 
 		/* cannot override TLS 1.2 ciphersuites */
-		if (NULL != CONFIG_TLS_CIPHER_ALL)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_ALL)
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll\" cannot"
 					" be applied: the combined list of certificate and PSK ciphersuites is"
@@ -3160,8 +3187,9 @@ void	zbx_tls_init_child(void)
 #else	/* HAVE_OPENSSL_WITH_PSK is not defined */
 	/* cannot use TLSCipherPSK13, TLSCipherPSK, TLSCipherAll13 and TLSCipherAll13 parameters */
 	/* if PSK is not supported by crypto library */
-	if (NULL != CONFIG_TLS_CIPHER_PSK13 || NULL != CONFIG_TLS_CIPHER_PSK ||
-			NULL != CONFIG_TLS_CIPHER_ALL13 || NULL != CONFIG_TLS_CIPHER_ALL)
+	if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_PSK13 || NULL != zbx_config_tls->CONFIG_TLS_CIPHER_PSK ||
+			NULL != zbx_config_tls->CONFIG_TLS_CIPHER_ALL13 ||
+			NULL != zbx_config_tls->CONFIG_TLS_CIPHER_ALL)
 	{
 		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "at least one of parameters TLSCipherPSK13,"
 				" TLSCipherPSK, TLSCipherAll13 or TLSCipherAll is defined. These parameters must not"

@@ -91,7 +91,7 @@ unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
 /* char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/\* not used in agent, defined for linking with tls.c *\/ */
 /* char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/\* not used in agent, defined for linking with tls.c *\/ */
 
-zbx_config_tls_t zbx_config_tls;
+zbx_config_tls_t	zbx_config_tls;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
@@ -822,7 +822,7 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
  * Parameters: requirement - produce error if config file missing or not      *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
+static void	zbx_load_config(int requirement, ZBX_TASK_EX *task, zbx_config_tls_t *zbx_config_tls)
 {
 	static char			*active_hosts;
 	zbx_vector_str_t		hostnames;
@@ -906,37 +906,37 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"PerfCounterEn",		&CONFIG_PERF_COUNTERS_EN,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #endif
-		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
+		{"TLSConnect",			&(zbx_config_tls->CONFIG_TLS_CONNECT),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING_LIST,
+		{"TLSAccept",			&(zbx_config_tls->CONFIG_TLS_ACCEPT),	TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+		{"TLSCAFile",			&(zbx_config_tls->CONFIG_TLS_CA_FILE),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+		{"TLSCRLFile",			&(zbx_config_tls->CONFIG_TLS_CRL_FILE),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertIssuer",		&CONFIG_TLS_SERVER_CERT_ISSUER,		TYPE_STRING,
+		{"TLSServerCertIssuer",		&(zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertSubject",	&CONFIG_TLS_SERVER_CERT_SUBJECT,	TYPE_STRING,
+		{"TLSServerCertSubject",	&(zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+		{"TLSCertFile",			&(zbx_config_tls->CONFIG_TLS_CERT_FILE),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+		{"TLSKeyFile",			&(zbx_config_tls->CONFIG_TLS_KEY_FILE),			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+		{"TLSPSKIdentity",		&(zbx_config_tls->CONFIG_TLS_PSK_IDENTITY),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+		{"TLSPSKFile",			&(zbx_config_tls->CONFIG_TLS_PSK_FILE),			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&CONFIG_TLS_CIPHER_CERT13,		TYPE_STRING,
+		{"TLSCipherCert13",		&(zbx_config_tls->CONFIG_TLS_CIPHER_CERT13),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&CONFIG_TLS_CIPHER_CERT,		TYPE_STRING,
+		{"TLSCipherCert",		&(zbx_config_tls->CONFIG_TLS_CIPHER_CERT),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&CONFIG_TLS_CIPHER_PSK13,		TYPE_STRING,
+		{"TLSCipherPSK13",		&(zbx_config_tls->CONFIG_TLS_CIPHER_PSK13),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&CONFIG_TLS_CIPHER_PSK,			TYPE_STRING,
+		{"TLSCipherPSK",		&(zbx_config_tls->CONFIG_TLS_CIPHER_PSK),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&CONFIG_TLS_CIPHER_ALL13,		TYPE_STRING,
+		{"TLSCipherAll13",		&(zbx_config_tls->CONFIG_TLS_CIPHER_ALL13),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&CONFIG_TLS_CIPHER_ALL,			TYPE_STRING,
+		{"TLSCipherAll",		&(zbx_config_tls->CONFIG_TLS_CIPHER_ALL),		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"AllowKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
@@ -992,7 +992,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		zbx_validate_config_hostnames(&hostnames);
 		zbx_validate_config(task);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config();
+		zbx_tls_validate_config(&zbx_config_tls, program_type, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS);
 #endif
 	}
 
@@ -1338,6 +1338,9 @@ int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		*error = NULL;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_config_tls_t	zbx_config_tls;
+#endif
 #ifdef _WINDOWS
 	int		ret;
 
@@ -1352,6 +1355,9 @@ int	main(int argc, char **argv)
 #endif
 	progname = get_program_name(argv[0]);
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_init_config_tls_t(&zbx_config_tls);
+#endif
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -1378,7 +1384,7 @@ int	main(int argc, char **argv)
 			break;
 #ifndef _WINDOWS
 		case ZBX_TASK_RUNTIME_CONTROL:
-			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t, &zbx_config_tls);
 			exit(SUCCEED == zbx_sigusr_send(t.data, CONFIG_PID_FILE) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
@@ -1390,7 +1396,7 @@ int	main(int argc, char **argv)
 			{
 				char	*p, *first_hostname;
 
-				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
+				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t, &zbx_config_tls);
 
 				first_hostname = NULL != (p = strchr(CONFIG_HOSTNAMES, ',')) ? zbx_dsprintf(NULL,
 						"%.*s", (int)(p - CONFIG_HOSTNAMES), CONFIG_HOSTNAMES) :
@@ -1402,7 +1408,7 @@ int	main(int argc, char **argv)
 				zbx_free(first_hostname);
 			}
 			else
-				zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
+				zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t, &zbx_config_tls);
 
 			zbx_free_config();
 
@@ -1417,7 +1423,7 @@ int	main(int argc, char **argv)
 #endif
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
-			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
+			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t, &zbx_config_tls);
 #ifdef _WINDOWS
 			if (SUCCEED != init_perf_collector(ZBX_SINGLE_THREADED, &error))
 			{
@@ -1484,7 +1490,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		default:
-			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t, &zbx_config_tls);
 			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
 			load_aliases(CONFIG_ALIASES);
 			break;

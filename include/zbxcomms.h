@@ -94,7 +94,7 @@ typedef struct
 	char	*CONFIG_TLS_CIPHER_CMD;	/* not used in agent, defined for linking with tls.c */
 } zbx_config_tls_t;
 
-void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls_);
+void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls);
 
 typedef struct
 {
@@ -292,10 +292,11 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 
 #endif	/* #if defined(_WINDOWS) */
 
-void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char program_type);
+void    zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char program_type,
+		int config_active_forks, int config_passive_forks);
 void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(void);
-void	zbx_tls_init_child(void);
+void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, unsigned char program_type);
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);
 void	zbx_tls_version(void);
@@ -312,7 +313,8 @@ zbx_tls_conn_attr_t;
 
 int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
-int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
+int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error, char *config_tls_server_cert_issuer,
+				char *config_tls_server_cert_subject);
 unsigned int	zbx_tls_get_psk_usage(void);
 
 /* TLS BLOCK END */
