@@ -1760,7 +1760,9 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 	$total = $data['count'];
 	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Action'), _('Suppress until')]);
 
-	foreach ($data['suppress_until'] as $suppression) {
+	for ($i = 0; $i < $total && $i < ZBX_WIDGET_ROWS; $i++) {
+		$suppression = $data['suppress_until'][$i];
+
 		// Added in order to reuse makeActionTableUser().
 		$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
