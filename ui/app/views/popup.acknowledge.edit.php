@@ -123,7 +123,8 @@ if ($data['has_unack_events']) {
 }
 
 if ($data['has_ack_events']) {
-	$form_list->addRow(_('Unacknowledge'),
+	$form_list->addRow(
+		(new CLabel([_('Unacknowledge'), makeHelpIcon(_('Undo problem acknowledgement.'))])),
 		(new CCheckBox('unacknowledge_problem', ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
 			->onChange("$('#acknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
