@@ -974,7 +974,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,"
 				"h.tls_psk_identity,h.tls_psk,h.proxy_address,h.auto_compress,h.maintenanceid"
 			" from hosts h"
-			" join host_rtdata hr on h.hostid=hr.hostid"
+			" left join host_rtdata hr on h.hostid=hr.hostid"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
@@ -989,7 +989,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,"
 				"h.proxy_address,h.auto_compress,h.maintenanceid"
 			" from hosts h"
-			" join host_rtdata hr on h.hostid=hr.hostid"
+			" left join host_rtdata hr on h.hostid=hr.hostid"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
