@@ -360,9 +360,11 @@ class testPageMonitoringHosts extends CWebTest {
 		$form->fill($data['filter']);
 		$result_form = $this->query('xpath://form[@name="host_view"]')->one();
 		$this->query('button:Apply')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 		$result_form->waitUntilReloaded();
 		$this->assertTableDataColumn($data['expected']);
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 		$result_form->waitUntilReloaded();
 	}
 
@@ -811,7 +813,6 @@ class testPageMonitoringHosts extends CWebTest {
 		$form->fill(['Name' => 'Empty host']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
-//		$this->page->waitUntilReady();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
@@ -890,7 +891,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * Check enabled links and that correct host is displayed.
 	 */
 	public function testPageMonitoringHosts_EnabledLinks($data) {
-		$this->page->login()->open('zabbix.php?action=host.view');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		switch ($data['name']) {
 			case 'Dynamic widgets H1':
@@ -1012,7 +1013,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * Click on host name from the table and check displayed popup context.
 	 */
 	public function testPageMonitoringHosts_HostContextMenu($data) {
-		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1')->waitUntilReady();
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
 		$row->query('link', $data['name'])->one()->click();
 		$this->page->waitUntilReady();
