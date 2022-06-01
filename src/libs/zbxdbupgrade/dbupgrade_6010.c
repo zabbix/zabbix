@@ -926,7 +926,6 @@ static int	DBpatch_6010036(void)
 		return FAIL;
 
 	return SUCCEED;
-
 }
 
 #undef DBPATCH_HOSTGROUP_TYPE_HOST
