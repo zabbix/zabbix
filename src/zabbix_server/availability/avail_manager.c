@@ -388,7 +388,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 			{
 				continue;
 			}
-			zbx_hashset_remove(&cache->proxy_avail, &proxy_avail->hostid);
+			zbx_hashset_iter_remove(&iter);
 		}
 	}
 }
