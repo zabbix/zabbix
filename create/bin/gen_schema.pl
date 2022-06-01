@@ -772,7 +772,7 @@ sub open_function($)
 
 	$out = "create or replace function changelog_${table_name}_${type}() returns trigger as \$\$${eol}\n";
 	$out .= "begin${eol}\n";
-	$out .= "insert into changelog (object,objectid,operation,clock)\n";
+	$out .= "insert into changelog (object,objectid,operation,clock)${eol}\n";
 
 	return $out;
 }

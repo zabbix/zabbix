@@ -814,7 +814,8 @@ static int	get_proxyconfig_table(zbx_uint64_t proxy_hostid, struct zbx_json *j, 
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s t", table->table);
 
-	if (SUCCEED == str_in_list("hosts,interface,host_inventory,hosts_templates,hostmacro", table->table, ','))
+	if (SUCCEED == str_in_list("hosts,interface,host_inventory,hosts_templates,hostmacro,host_rtdata",
+			table->table, ','))
 	{
 		if (0 == hosts->values_num)
 			goto skip_data;
@@ -1113,6 +1114,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 		"httpstepitem",
 		"httpstep_field",
 		"config_autoreg_tls",
+		"host_rtdata",
 		NULL
 	};
 
