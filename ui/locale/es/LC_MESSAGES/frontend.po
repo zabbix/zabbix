@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-04-20 13:55+0000\n"
+"PO-Revision-Date: 2022-05-24 14:36+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -503,7 +503,7 @@ msgstr "Reconocer"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
-msgstr "Aceptada"
+msgstr "Reconocer"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
@@ -2112,6 +2112,11 @@ msgid_plural "Cannot copy triggers"
 msgstr[0] "No se pudo copiar el iniciador"
 msgstr[1] "No se pudieron copiar los iniciadores"
 
+#: include/triggers.inc.php:246
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+msgstr ""
+
 #: include/triggers.inc.php:226
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
@@ -2194,7 +2199,6 @@ msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr "No se puede eliminar el rol de usuario asignado \"%1$s\"."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "No se pudo borrar la correlación"
@@ -2213,7 +2217,6 @@ msgid "Cannot delete dependency"
 msgstr "No es posible eliminar la dependecia"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "No es posible eliminar la regla"
@@ -2260,8 +2263,8 @@ msgstr[1] "No se pueden eliminar los equipos %1$s porque el mantenimiento \"%2$s
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el grupo de hosts %1$s porque el mantenimiento \"%2$s\" debe contener al menos un host o grupo de hosts."
+msgstr[1] "No se pueden eliminar los grupos de hosts %1$s porque el mantenimiento \"%2$s\" debe contener al menos un host o grupo de hosts."
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2278,7 +2281,7 @@ msgstr "No es posible eliminar la imágen"
 #: include/classes/api/services/CHostInterface.php:636
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "No se puede eliminar la interfaz para el host descubierto \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1142
 msgid "Cannot delete inventory."
@@ -2315,7 +2318,7 @@ msgstr[1] "No es posible eliminar el tipo de medio"
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
 msgstr[0] ""
-msgstr[1] ""
+msgstr[1] "No puede eliminar el módulo: %1$s."
 
 #: sysmaps.php:261
 msgid "Cannot delete network map"
@@ -2330,7 +2333,7 @@ msgstr[1] "No es posible eliminar el proxy"
 #: include/classes/api/services/CRole.php:369
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "No se puede eliminar el rol de usuario de solo lectura \"%1$s\"."
 
 #: app/controllers/CControllerRegExDelete.php:55
 msgid "Cannot delete regular expression"
@@ -2341,8 +2344,8 @@ msgstr[1] "No es posible eliminar las expresiones regulares"
 #: app/controllers/CControllerScheduledReportDelete.php:71
 msgid "Cannot delete scheduled report"
 msgid_plural "Cannot delete scheduled reports"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el informe programado"
+msgstr[1] "No se puede eliminar el reporte programado"
 
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
@@ -2360,7 +2363,6 @@ msgid "Cannot delete selected actions"
 msgstr "No es posible eliminar las acciones seleccionadas"
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "No es posible eliminar el servicio"
@@ -2370,7 +2372,7 @@ msgstr[1] "No es posible eliminar el servicio"
 #: include/classes/api/services/CService.php:470
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "No se puede eliminar el servicio \"%1$s\": %2$s."
 
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Cannot delete template"
@@ -2378,15 +2380,15 @@ msgstr "No es posible eliminar las plantilla"
 
 #: include/classes/api/services/CGraphPrototype.php:374
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "No se puede eliminar el prototipo de gráfico con plantilla."
 
 #: include/classes/api/services/CGraph.php:374
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "No se puede eliminar plantilla de gráficos."
 
 #: include/classes/api/services/CItemPrototype.php:663
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "No es posible eliminar el prototipo de item de la plantilla."
 
 #: include/classes/api/services/CItem.php:778
 msgid "Cannot delete templated item."
@@ -2404,7 +2406,7 @@ msgstr "No se pudo eliminar el disparador \"%1$s:%2$s\" de la plantilla."
 #: include/classes/api/services/CTriggerPrototype.php:523
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "No se puede eliminar el prototipo de disparador con plantilla \"%1$s:%2$s\"."
 
 #: include/classes/api/services/CHttpTest.php:610
 #, c-format
@@ -2431,19 +2433,19 @@ msgstr "No es posible eliminar los iniciadores"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "No es posible eliminar al usuario"
-msgstr[1] ""
+msgstr[1] "No es posible eliminar el usuario"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No es posible eliminar el grupo de usuarios"
+msgstr[1] "No es posible eliminar los grupos de usuarios"
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede eliminar el rol de usuario"
+msgstr[1] "No es posible eliminar los roles de usuarios"
 
 #: httpconf.php:177 httpconf.php:442
 msgid "Cannot delete web scenario"
@@ -2452,14 +2454,14 @@ msgstr "No se pudo eliminar el escenario web"
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede deshabilitar el token de la API"
+msgstr[1] "No se pueden deshabilitar los tokens del API"
 
 #: app/controllers/CControllerSlaDisable.php:88
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede deshabilitar el SLA"
+msgstr[1] "No se puede deshabilitar los SLAs"
 
 #: actionconf.php:499
 msgid "Cannot disable action"
@@ -2502,14 +2504,14 @@ msgstr[1] "No pude desactivar los tipos de soporte"
 #, c-format
 msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede deshabilitar el módulo: %1$s."
+msgstr[1] "No se puede deshabilitar los módulos: %1$s."
 
 #: app/controllers/CControllerScheduledReportDisable.php:78
 msgid "Cannot disable scheduled report"
 msgid_plural "Cannot disable scheduled reports"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede deshabilitar el reporte programado"
+msgstr[1] "No se puede deshabilitar los reportes programados"
 
 #: triggers.php:490
 msgid "Cannot disable trigger"
@@ -2536,14 +2538,14 @@ msgstr "No se puede mostrar más de un ítem de tipo \"Graph sum\"."
 #: app/controllers/CControllerTokenEnable.php:66
 msgid "Cannot enable API token"
 msgid_plural "Cannot enable API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede habilitar el token de API"
+msgstr[1] "No se puede habilitar los tokens del API"
 
 #: app/controllers/CControllerSlaEnable.php:88
 msgid "Cannot enable SLA"
 msgid_plural "Cannot enable SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede habilitar el SLA"
+msgstr[1] "No se puede habilitar los SLAs"
 
 #: actionconf.php:498
 msgid "Cannot enable action"
@@ -2794,6 +2796,11 @@ msgstr ""
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostBase.php:644
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
@@ -2808,6 +2815,11 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:802
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:641
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:381
@@ -2829,6 +2841,16 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:799
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:502
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:638
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:705
@@ -3010,6 +3032,26 @@ msgstr "No se puede desenlazar y limpiar un escenario web."
 msgid "Cannot unlink template"
 msgstr "No se pudo desenlazar la plantilla"
 
+#: include/classes/api/services/CHostBase.php:331
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:415
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:414
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:330
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to dependency of trigger \"%4$s\"."
@@ -3176,7 +3218,6 @@ msgid "Cannot update host encryption settings. Connection settings for both dire
 msgstr "No pude actualizar la configuración del cifrado del host. Debería ser especificada la configuración de la conexión en ambos sentidos."
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de equipo"
@@ -3206,7 +3247,6 @@ msgid "Cannot update item"
 msgstr "No es posible actualizar el monitor"
 
 #: disc_prototypes.php:556 disc_prototypes.php:583 disc_prototypes.php:617
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de ítem"
@@ -3316,7 +3356,6 @@ msgstr "No se pudo actualizar el iniciador \"%1$s\": %2$s."
 
 #: trigger_prototypes.php:365 trigger_prototypes.php:440
 #: trigger_prototypes.php:488
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "No se pudo actualizar el prototipo de disparador"
@@ -4202,7 +4241,6 @@ msgid "Correlation added"
 msgstr "Correlación agregada"
 
 #: app/controllers/CControllerCorrelationDelete.php:65
-#, fuzzy
 msgid "Correlation deleted"
 msgid_plural "Correlations deleted"
 msgstr[0] "Correlación borrada"
@@ -5780,7 +5818,6 @@ msgid "Discovery rule created"
 msgstr "Regla de descubrimiento creada"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Regla de descubrimiento eliminada"
@@ -5823,7 +5860,6 @@ msgid "Discovery status"
 msgstr "Estado del descubrimiento"
 
 #: include/classes/data/CItemData.php:1137
-#, fuzzy
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
 msgstr "Estadísticas de lectura de disco. Devuelve entero si tipo es sectores, operaciones, bytes; decimal si tipo es sps, ops, bps"
 
@@ -6706,7 +6742,6 @@ msgid "Expires in less than"
 msgstr ""
 
 #: app/views/popup.generic.php:503 include/graphs.inc.php:27
-#, fuzzy
 msgid "Exploded"
 msgstr "Separado"
 
@@ -7872,7 +7907,6 @@ msgid "Host IP"
 msgstr "IP del equipo"
 
 #: app/views/administration.script.list.php:82
-#, fuzzy
 msgid "Host access"
 msgstr "Acceso al equipo"
 
@@ -8075,7 +8109,6 @@ msgid "Host prototype macros"
 msgstr ""
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:340
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Prototipo de equipo actualizado"
@@ -8799,7 +8832,6 @@ msgid "Incorrect action condition service. Service does not exist or you have no
 msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:155
-#, fuzzy
 msgid "Incorrect action condition trigger severity."
 msgstr "Gravedad del iniciador de la acción de la condición incorrecta"
 
@@ -9013,7 +9045,6 @@ msgid "Incorrect inventory field \"%1$s\"."
 msgstr ""
 
 #: app/controllers/CControllerActionOperationValidate.php:176
-#, fuzzy
 msgid "Incorrect inventory mode in action operation."
 msgstr "Modo de inventario incorrecto en operación de acción."
 
@@ -16037,7 +16068,6 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Servicio eliminado"
@@ -17456,6 +17486,21 @@ msgstr ""
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
+#: include/classes/api/services/CTriggerGeneral.php:2245
+#, c-format
+msgid "The dependency of trigger \"%1$s\" on trigger \"%2$s\" already exists."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2249
+#, c-format
+msgid "The dependency of trigger prototype \"%1$s\" on trigger \"%2$s\" already exists."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2250
+#, c-format
+msgid "The dependency of trigger prototype \"%1$s\" on trigger prototype \"%2$s\" already exists."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr ""
@@ -17886,6 +17931,61 @@ msgstr ""
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr ""
 
+#: include/triggers.inc.php:372 include/triggers.inc.php:433
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/triggers.inc.php:373 include/triggers.inc.php:434
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2728
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2727
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2621
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2354
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2349
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2365
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2472
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2857
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2856
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
@@ -17986,6 +18086,66 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:1818
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:916
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:915
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2733
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2732
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2622
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2473
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2862
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2861
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2355
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2350
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2366
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:1325
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
 msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1716

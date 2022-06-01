@@ -24,10 +24,10 @@ import (
 
 	"gopkg.in/mgo.v2"
 
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 const pluginName = "Mongo"

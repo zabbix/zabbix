@@ -22,7 +22,7 @@ package log
 import (
 	"time"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // Plugin -

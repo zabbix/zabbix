@@ -120,7 +120,7 @@ typedef struct
 	unsigned char	ipmi_privilege;
 	char		ipmi_username[HOST_IPMI_USERNAME_LEN_MAX];
 	char		ipmi_password[HOST_IPMI_PASSWORD_LEN_MAX];
-	char		inventory_mode;
+	signed char	inventory_mode;
 	unsigned char	status;
 	unsigned char	tls_connect;
 	unsigned char	tls_accept;
