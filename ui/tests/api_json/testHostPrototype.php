@@ -33,7 +33,7 @@ class testHostPrototype extends CAPITest {
 			'simplest create' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -45,7 +45,7 @@ class testHostPrototype extends CAPITest {
 			'empty interfaces' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -58,7 +58,7 @@ class testHostPrototype extends CAPITest {
 			'inherit interfaces with empty interfaces' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -72,7 +72,7 @@ class testHostPrototype extends CAPITest {
 			'custom interfaces with empty interfaces' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -86,7 +86,7 @@ class testHostPrototype extends CAPITest {
 			'custom interfaces with valid interface' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -108,7 +108,7 @@ class testHostPrototype extends CAPITest {
 			'non-snmp interface with empty details' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -131,7 +131,7 @@ class testHostPrototype extends CAPITest {
 			'multiple interfaces single main' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -171,7 +171,7 @@ class testHostPrototype extends CAPITest {
 			'invalid groupLinks format' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => ['50014'],
 						'host' => 'new {#HOST} 9'
 					]
@@ -181,7 +181,7 @@ class testHostPrototype extends CAPITest {
 			'invalid interfaces format' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -194,7 +194,7 @@ class testHostPrototype extends CAPITest {
 			'inherit interfaces with filled interfaces' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -216,7 +216,7 @@ class testHostPrototype extends CAPITest {
 			'interfaces without type' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -232,7 +232,7 @@ class testHostPrototype extends CAPITest {
 			'interfaces without useip' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -250,7 +250,7 @@ class testHostPrototype extends CAPITest {
 			'interfaces without port' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -259,7 +259,8 @@ class testHostPrototype extends CAPITest {
 						'interfaces' => [
 							[
 								'type' => INTERFACE_TYPE_AGENT,
-								'useip' => INTERFACE_USE_IP
+								'useip' => INTERFACE_USE_IP,
+								'ip' => '127.0.0.1'
 							]
 						]
 					]
@@ -269,7 +270,7 @@ class testHostPrototype extends CAPITest {
 			'interfaces without main' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -279,7 +280,8 @@ class testHostPrototype extends CAPITest {
 							[
 								'type' => INTERFACE_TYPE_AGENT,
 								'useip' => INTERFACE_USE_IP,
-								'port' => '1234'
+								'port' => '1234',
+								'ip' => '127.0.0.1'
 							]
 						]
 					]
@@ -289,7 +291,7 @@ class testHostPrototype extends CAPITest {
 			'interfaces without ip' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -310,7 +312,7 @@ class testHostPrototype extends CAPITest {
 			'interfaces with empty ip' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -332,7 +334,7 @@ class testHostPrototype extends CAPITest {
 			'interfaces without dns' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -353,7 +355,7 @@ class testHostPrototype extends CAPITest {
 			'interfaces with empty dns' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -375,7 +377,7 @@ class testHostPrototype extends CAPITest {
 			'snmp interface without details' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -397,7 +399,7 @@ class testHostPrototype extends CAPITest {
 			'snmp interface with empty details' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -420,7 +422,7 @@ class testHostPrototype extends CAPITest {
 			'snmp v1 interface without community' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -445,7 +447,7 @@ class testHostPrototype extends CAPITest {
 			'snmp v1 interface with empty community' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -468,10 +470,87 @@ class testHostPrototype extends CAPITest {
 				],
 				'expected_error' => "Invalid parameter \"/1/interfaces/1/details/community\": cannot be empty."
 			],
+			'snmp v3 interface with non-empty community' => [
+				'request' => [
+					[
+						'ruleid' => 400660,
+						'groupLinks' => [[
+							'groupid' => 50014
+						]],
+						'host' => 'new {#HOST} snmp1',
+						'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+						'interfaces' => [
+							[
+								'type' => INTERFACE_TYPE_SNMP,
+								'useip' => INTERFACE_USE_IP,
+								'ip' => '127.0.0.0',
+								'port' => '1234',
+								'main' => 1,
+								'details' => [
+									'version' => SNMP_V3,
+									'community' => 'non-empty'
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => "Invalid parameter \"/1/interfaces/1/details/community\": value must be empty."
+			],
+			'snmp v3 interface with empty community' => [
+				'request' => [
+					[
+						'ruleid' => 400660,
+						'groupLinks' => [[
+							'groupid' => 50014
+						]],
+						'host' => 'new {#HOST} snmp2',
+						'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+						'interfaces' => [
+							[
+								'type' => INTERFACE_TYPE_SNMP,
+								'useip' => INTERFACE_USE_IP,
+								'ip' => '127.0.0.0',
+								'port' => '1234',
+								'main' => 1,
+								'details' => [
+									'version' => SNMP_V3,
+									'community' => ''
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'snmp v3 interface with community not specified' => [
+				'request' => [
+					[
+						'ruleid' => 400660,
+						'groupLinks' => [[
+							'groupid' => 50014
+						]],
+						'host' => 'new {#HOST} snmp3',
+						'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+						'interfaces' => [
+							[
+								'type' => INTERFACE_TYPE_SNMP,
+								'useip' => INTERFACE_USE_IP,
+								'ip' => '127.0.0.0',
+								'port' => '1234',
+								'main' => 1,
+								'details' => [
+									'version' => SNMP_V3
+								]
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
 			'non-snmp interface with filled details' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -491,12 +570,12 @@ class testHostPrototype extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => "Invalid parameter \"/1/interfaces/1/details\": unexpected parameter \"version\"."
+				'expected_error' => "Invalid parameter \"/1/interfaces/1/details\": should be empty."
 			],
 			'multiple interfaces, all main' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -520,12 +599,12 @@ class testHostPrototype extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => "Host prototype cannot have more than one default interface of the same type."
+				'expected_error' => 'Invalid parameter "/1/interfaces": cannot have more than one default interface of the same type.'
 			],
 			'multiple interfaces no main' => [
 				'request' => [
 					[
-						'ruleid' => 40066,
+						'ruleid' => 400660,
 						'groupLinks' => [[
 							'groupid' => 50014
 						]],
@@ -549,7 +628,7 @@ class testHostPrototype extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => "No default interface for \"JMX\" type on \"new {#HOST} 26\"."
+				'expected_error' => 'Invalid parameter "/1/interfaces": no default interface for "JMX" type.'
 			]
 		];
 	}
@@ -709,55 +788,6 @@ class testHostPrototype extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'update in same interfaces' => [
-				'create_interfaces' => [
-					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
-					'interfaces' => [
-						[
-							'type' => INTERFACE_TYPE_JMX,
-							'useip' => INTERFACE_USE_IP,
-							'ip' => '127.0.0.0',
-							'port' => '1234',
-							'main' => 1
-						],
-						[
-							'type' => INTERFACE_TYPE_SNMP,
-							'useip' => INTERFACE_USE_IP,
-							'ip' => '127.0.0.1',
-							'port' => '1234',
-							'main' => 1,
-							'details' => [
-								'version' => SNMP_V1,
-								'community' => 'community'
-							]
-						]
-					]
-				],
-				'update_interfaces' => [
-					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
-					'interfaces' => [
-						[
-							'type' => INTERFACE_TYPE_JMX,
-							'useip' => INTERFACE_USE_IP,
-							'ip' => '127.0.0.3',
-							'port' => '1234',
-							'main' => 1
-						],
-						[
-							'type' => INTERFACE_TYPE_SNMP,
-							'useip' => INTERFACE_USE_IP,
-							'ip' => '127.0.0.1',
-							'port' => '1234',
-							'main' => 1,
-							'details' => [
-								'version' => SNMP_V2C,
-								'community' => 'community'
-							]
-						]
-					]
-				],
-				'expected_error' => null
-			],
 			'change to inherit; delete snmp details' => [
 				'create_interfaces' => [
 					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
@@ -787,6 +817,104 @@ class testHostPrototype extends CAPITest {
 					'interfaces' => []
 				],
 				'expected_error' => null
+			],
+			'update in same interfaces' => [
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.26',
+							'port' => '1234',
+							'main' => 1
+						],
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V2C,
+								'community' => 'community'
+							]
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.26',
+							'port' => '1234',
+							'main' => 1
+						],
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V2C,
+								'community' => 'community'
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'update to interfaces' => [
+				'create_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.27',
+							'port' => '1234',
+							'main' => 1
+						],
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V1,
+								'community' => 'community'
+							]
+						]
+					]
+				],
+				'update_interfaces' => [
+					'custom_interfaces' => HOST_PROT_INTERFACES_CUSTOM,
+					'interfaces' => [
+						[
+							'type' => INTERFACE_TYPE_JMX,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.28',
+							'port' => '1234',
+							'main' => 1
+						],
+						[
+							'type' => INTERFACE_TYPE_SNMP,
+							'useip' => INTERFACE_USE_IP,
+							'ip' => '127.0.0.1',
+							'port' => '1234',
+							'main' => 1,
+							'details' => [
+								'version' => SNMP_V2C,
+								'community' => 'community'
+							]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -804,7 +932,7 @@ class testHostPrototype extends CAPITest {
 	 */
 	public function testHostPrototype_Update_Interfaces($create_interfaces, $update_interfaces, $expected_error) {
 		$host_prototype = $this->call('hostprototype.create', [
-			'ruleid' => 40066,
+			'ruleid' => 400660,
 			'groupLinks' => [[
 				'groupid' => 50014
 			]],
@@ -852,11 +980,13 @@ class testHostPrototype extends CAPITest {
 		$old_interfaceids = array_column($old_interfaces, 'interfaceid');
 		$new_interfaceids = array_column($new_interfaces, 'interfaceid');
 
-		$this->assertEquals(
-			min($expected_old_interface_count, $expected_new_interface_count),
-			count(array_intersect($old_interfaceids, $new_interfaceids)),
-			'Interfaceid\'s not preserved, when updating interfaces.'
-		);
+		if ($create_interfaces == $update_interfaces) {
+			$this->assertEquals(
+				min($expected_old_interface_count, $expected_new_interface_count),
+				count(array_intersect($old_interfaceids, $new_interfaceids)),
+				'Interface IDs not preserved when updating interfaces.'
+			);
+		}
 
 		foreach ($new_interfaces as $interface) {
 			$this->assertEquals(
