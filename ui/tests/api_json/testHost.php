@@ -3427,7 +3427,8 @@ class testHost extends CAPITest {
 
 		$host = $this->call('host.get', $request);
 
-		$this->assertSame($expected_results, $host['result']);
+		// Ignore the order due to MySQL returning macros in different order.
+		$this->assertEqualsCanonicalizing($expected_results, $host['result']);
 	}
 
 	/**
