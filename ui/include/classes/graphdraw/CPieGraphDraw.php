@@ -434,8 +434,8 @@ class CPieGraphDraw extends CGraphDraw {
 			list($sizeX, $sizeY) = $this->calcExplodedRadius($sizeX, $sizeY, count($values));
 		}
 
-		$xc = $x = (int) $this->sizeX / 2 + $this->shiftXleft;
-		$yc = $y = (int) $this->sizeY / 2 + $this->shiftY;
+		$xc = $x = (int) ($this->sizeX / 2) + $this->shiftXleft;
+		$yc = $y = (int) ($this->sizeY / 2) + $this->shiftY;
 
 		$anglestart = 0;
 		$angleend = 0;
@@ -515,8 +515,8 @@ class CPieGraphDraw extends CGraphDraw {
 
 		list($sizeX, $sizeY) = $this->calc3DAngle($sizeX, $sizeY);
 
-		$xc = $x = (int) $this->sizeX / 2 + $this->shiftXleft;
-		$yc = $y = (int) $this->sizeY / 2 + $this->shiftY;
+		$xc = $x = (int) ($this->sizeX / 2) + $this->shiftXleft;
+		$yc = $y = (int) ($this->sizeY / 2) + $this->shiftY;
 
 		// bottom angle line
 		$anglestart = 0;
