@@ -776,18 +776,7 @@ class CTabFilter extends CBaseComponent {
 			});
 		this._filters_footer.querySelector('[name="filter_reset"]')
 			.addEventListener('click', () => {
-				if (this._active_item._index == 0) {
-					this.profileUpdate('properties', {
-						idx2: 0,
-						value_str: 'filter_name='
-					})
-					.then(() => {
-						this._events.buttonResetAction();
-					});
-				}
-				else {
-					this._events.buttonResetAction();
-				}
+				this._events.buttonResetAction();
 			});
 		this._filters_footer.addEventListener('click', this._events.buttonActionNotify);
 

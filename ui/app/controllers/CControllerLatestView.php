@@ -118,11 +118,15 @@ class CControllerLatestView extends CControllerLatest {
 	}
 
 	protected function doAction(): void {
+		$filter_tabs = [];
 		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
 			->read()
 			->setInput($this->cleanInput($this->getInputAll()));
 
-		$filter_tabs = [];
+		if ($this->hasInput('filter_reset')) {
+			$profile->reset();
+		}
+
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($index == $profile->selected) {
 				// Initialize multiselect data for filter_scr to allow tabfilter correctly handle unsaved state.

@@ -104,6 +104,10 @@ class CControllerProblemView extends CControllerProblem {
 			->read()
 			->setInput($this->cleanInput($this->getInputAll()));
 
+		if ($this->hasInput('filter_reset')) {
+			$profile->reset();
+		}
+
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($filter_tab['filter_custom_time']) {
 				$filter_tab['show'] = TRIGGERS_OPTION_ALL;

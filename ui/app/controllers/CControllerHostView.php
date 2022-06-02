@@ -90,6 +90,10 @@ class CControllerHostView extends CControllerHost {
 			->read()
 			->setInput($this->cleanInput($this->getInputAll()));
 
+		if ($this->hasInput('filter_reset')) {
+			$profile->reset();
+		}
+
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($index == $profile->selected) {
 				// Initialize multiselect data for filter_scr to allow tabfilter correctly handle unsaved state.
