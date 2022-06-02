@@ -299,7 +299,7 @@ static void	dbsync_journal_init(zbx_dbsync_journal_t *journal)
 	zbx_vector_dbsync_obj_changelog_create(&journal->changelog);
 }
 
-static	dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
+static void	dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
 {
 	zbx_vector_uint64_destroy(&journal->inserts);
 	zbx_vector_uint64_destroy(&journal->updates);
