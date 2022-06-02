@@ -30,12 +30,12 @@ class CItemTypeIpmi extends CItemType {
 	 */
 	public static function getCreateValidationRules(array $item): array {
 		return [
-			'interfaceid' =>	self::getCreateFieldRule('interfaceid'),
+			'interfaceid' =>	self::getCreateFieldRule('interfaceid', $item),
 			'ipmi_sensor' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'key_', 'in' => 'ipmi.get'], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ipmi_sensor')],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'ipmi_sensor')]
 			]],
-			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}
 
@@ -63,7 +63,7 @@ class CItemTypeIpmi extends CItemType {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item),
 			'ipmi_sensor' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'delay' =>			['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
 

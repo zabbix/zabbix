@@ -5900,6 +5900,306 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/active_till": cannot be less than or equal to the value of parameter "/active_since".'
 			],
 			[
+				['type' => API_ITEM_KEY],
+				'key',
+				'/1/item_key',
+				'key'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key',
+				'/1/item_key',
+				'super.key'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[]',
+				'/1/item_key',
+				'super.key[]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[0]',
+				'/1/item_key',
+				'super.key[0]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[a, b, c]',
+				'/1/item_key',
+				'super.key[a, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[{HOST.HOST}]',
+				'/1/item_key',
+				'super.key[{HOST.HOST}]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[abc{HOST.HOST}def]',
+				'/1/item_key',
+				'super.key[abc{HOST.HOST}def]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[{#LLD_MACRO}, b, c]',
+				'/1/item_key',
+				'super.key[{#LLD_MACRO}, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key[{#LLD_MACRO1}abc{#LLD_MACRO2}, b, c]',
+				'/1/item_key',
+				'super.key[{#LLD_MACRO1}abc{#LLD_MACRO2}, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key["{#LLD_MACRO}", "b b", "c\""]',
+				'/1/item_key',
+				'super.key["{#LLD_MACRO}", "b b", "c\""]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'super.key["{#LLD_MACRO1} {#LLD_MACRO2}", b, c]',
+				'/1/item_key',
+				'super.key["{#LLD_MACRO1} {#LLD_MACRO2}", b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[{#LLD_MACRO}, b, c]',
+				'/1/item_key',
+				'super.key[{#LLD_MACRO}, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, b, c{#LLD_MACRO}d]',
+				'/1/item_key',
+				'super.key[a, b, c{#LLD_MACRO}d]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[{{#LLD_MACRO}.fmtnum(2)}, b, c]',
+				'/1/item_key',
+				'super.key[{{#LLD_MACRO}.fmtnum(2)}, b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, b, c{{#LLD_MACRO}.fmtnum(2)}d]',
+				'/1/item_key',
+				'super.key[a, b, c{{#LLD_MACRO}.fmtnum(2)}d]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key["{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)}", b, c]',
+				'/1/item_key',
+				'super.key["{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)}", b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, b, "{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)}"]',
+				'/1/item_key',
+				'super.key[a, b, "{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)}"]'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key["{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)", b, c]',
+				'/1/item_key',
+				'super.key["{{#LLD_MACRO}.regsub(\"(.*)_([0-9]+)\", \1)", b, c]'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				null,
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				123,
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				true,
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				[],
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": cannot be empty.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'length' => 2],
+				'key',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": value is too long.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'/key',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "/key".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'{#LLD_MACRO}',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "{#LLD_MACRO}".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'[{#LLD_MACRO}]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "[{#LLD_MACRO}]".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'[key',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "[key".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'key]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "]".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'[key]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "[key]".'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'key[',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": unexpected end of key.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'key[a',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": unexpected end of key.'
+			],
+			[
+				['type' => API_ITEM_KEY],
+				'key[a, "]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": unexpected end of key.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, b, c]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[a, {$MACRO}, c]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[{#LLD_MACRO, b, c]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": must contain at least one low-level discovery macro.'
+			],
+			[
+				['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO],
+				'super.key[{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}, b, c]',
+				'/1/item_key',
+				'Invalid parameter "/1/item_key": incorrect syntax near "+)", \1)}, b, c]".'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				null,
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a character string is expected.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'abc',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": invalid delay.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				123,
+				'/1/item_delay',
+				'123'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'1m',
+				'/1/item_delay',
+				'1m'
+			],
+			[
+				['type' => API_ITEM_DELAY, 'length' => 2],
+				'10m',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": value is too long.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				0,
+				'/1/item_delay',
+				'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'0;1m/1-5,10:00-18:00',
+				'/1/item_delay',
+				'0;1m/1-5,10:00-18:00'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				SEC_PER_DAY + 1,
+				'/1/item_delay',
+				'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'1m;30s/1-7,10:00-18:00',
+				'/1/item_delay',
+				'1m;30s/1-7,10:00-18:00'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'1m;h9m/30',
+				'/1/item_delay',
+				'1m;h9m/30'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'{$MACRO}',
+				'/1/item_delay',
+				'{$MACRO}'
+			],
+			[
+				['type' => API_ITEM_DELAY],
+				'{#LLD}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": invalid delay.'
+			],
+			[
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#LLD}',
+				'/1/item_delay',
+				'{#LLD}'
+			],
+			[
 				['type' => API_XML],
 				null,
 				'/1/xml',
@@ -6855,156 +7155,6 @@ class CApiInputValidatorTest extends TestCase {
 				'{{#LLD_MACRO}.regsub("(.*)_([0-9]+)", \1)}{{#LLD_MACRO2}.regsub("(.*)_([0-9]+)", \1)}',
 				'/1/prometheus_label',
 				'Invalid parameter "/1/prometheus_label": invalid Prometheus label.'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				null,
-				'/1/item_key',
-				'Invalid parameter "/1/item_key": a character string is expected.'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				123,
-				'/1/item_key',
-				'Invalid parameter "/1/item_key": a character string is expected.'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				'',
-				'/1/item_key',
-				'Invalid parameter "/1/item_key": cannot be empty.'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				'abc',
-				'/1/item_key',
-				'abc'
-			],
-			[
-				['type' => API_ITEM_KEY, 'length' => 2],
-				'abc',
-				'/1/item_key',
-				'Invalid parameter "/1/item_key": value is too long.'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				'/abc',
-				'/1/item_key',
-				'Invalid parameter "/1/item_key": incorrect syntax near "/abc".'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				'abc[',
-				'/1/item_key',
-				'Invalid parameter "/1/item_key": unexpected end of key.'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				'abc]',
-				'/1/item_key',
-				'Invalid parameter "/1/item_key": incorrect syntax near "]".'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				'[abc]',
-				'/1/item_key',
-				'Invalid parameter "/1/item_key": incorrect syntax near "[abc]".'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				'abc[]',
-				'/1/item_key',
-				'abc[]'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				'abc[0]',
-				'/1/item_key',
-				'abc[0]'
-			],
-			[
-				['type' => API_ITEM_KEY],
-				'item.key[server_{HOST.HOST}_local]',
-				'/1/item_key',
-				'item.key[server_{HOST.HOST}_local]'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				null,
-				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": a character string is expected.'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				'abc',
-				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": invalid delay.'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				123,
-				'/1/item_delay',
-				'123'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				'1m',
-				'/1/item_delay',
-				'1m'
-			],
-			[
-				['type' => API_ITEM_DELAY, 'length' => 2],
-				'10m',
-				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": value is too long.'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				0,
-				'/1/item_delay',
-				'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				'0;1m/1-5,10:00-18:00',
-				'/1/item_delay',
-				'0;1m/1-5,10:00-18:00'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				SEC_PER_DAY + 1,
-				'/1/item_delay',
-				'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				'1m;30s/1-7,10:00-18:00',
-				'/1/item_delay',
-				'1m;30s/1-7,10:00-18:00'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				'1m;h9m/30',
-				'/1/item_delay',
-				'1m;h9m/30'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				'{$MACRO}',
-				'/1/item_delay',
-				'{$MACRO}'
-			],
-			[
-				['type' => API_ITEM_DELAY],
-				'{#LLD}',
-				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": invalid delay.'
-			],
-			[
-				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_LLD_MACRO],
-				'{#LLD}',
-				'/1/item_delay',
-				'{#LLD}'
 			]
 		];
 	}

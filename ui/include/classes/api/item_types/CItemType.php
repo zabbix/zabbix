@@ -22,6 +22,8 @@ abstract class CItemType {
 
 	/**
 	 * Field names of specific type.
+	 *
+	 * @var array
 	 */
 	const FIELD_NAMES = [];
 
@@ -53,15 +55,19 @@ abstract class CItemType {
 
 	/**
 	 * @param string $field_name
+	 * @param array  $item
 	 *
 	 * @return array
 	 */
-	final protected static function getCreateFieldRule(string $field_name): array {
+	final protected static function getCreateFieldRule(string $field_name, array $item): array {
+		$is_item_prototype = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
 		$field_rules = [
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID, 'flags' => API_REQUIRED],
 									['else' => true, 'type' => API_UNEXPECTED]
-			]]
+			]],
+			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')]
 		];
 
 		return $field_rules[$field_name];
@@ -113,7 +119,7 @@ abstract class CItemType {
 									['if' => static function () use ($db_item): bool {
 										return in_array($db_item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
 											|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($db_item['key_'], 'mqtt.get', 8) === 0);
-									}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
+									}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
 									['else' => true, 'type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
 			]]
 		];
@@ -128,13 +134,16 @@ abstract class CItemType {
 	 * @return array
 	 */
 	final protected static function getUpdateFieldRuleInherited(string $field_name, array $db_item): array {
+		$is_item_prototype = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE;
+
 		$field_rules = [
 			'interfaceid' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function () use ($db_item): bool {
 										return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 									}, 'type' => API_ID],
 									['else' => true, 'type' => API_UNEXPECTED]
-			]]
+			]],
+			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')]
 		];
 
 		return $field_rules[$field_name];

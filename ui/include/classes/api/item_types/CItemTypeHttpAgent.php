@@ -73,7 +73,7 @@ class CItemTypeHttpAgent extends CItemType {
 										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
 										['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'delay' =>				['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')],
+			'delay' =>				self::getCreateFieldRule('delay', $item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => DB::getDefault('items', 'allow_traps')],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
@@ -174,7 +174,7 @@ class CItemTypeHttpAgent extends CItemType {
 			'ssl_key_file' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'ssl_key_password' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'interfaceid' =>		self::getUpdateFieldRuleInherited('interfaceid', $db_item),
-			'delay' =>				['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')],
+			'delay' =>				self::getUpdateFieldRuleInherited('delay', $db_item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],

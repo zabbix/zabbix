@@ -2016,7 +2016,7 @@ class CApiInputValidator {
 	/**
 	 * Array of ids, int32 or strings uniqueness validator.
 	 *
-	 * @param bool       $rule
+	 * @param array      $rule
 	 * @param integer    $rule['type']
 	 * @param bool       $rule['uniq']    (optional)
 	 * @param array|null $data
@@ -3195,7 +3195,7 @@ class CApiInputValidator {
 
 	/**
 	 * @param array  $rule
-	 * @param int    $rule['length']  (optional)
+	 * @param int    $rule['length']  (optional) API_REQUIRED_LLD_MACRO
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -3212,6 +3212,7 @@ class CApiInputValidator {
 			return false;
 		}
 
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 		$item_key_parser = new CItemKey();
 
 		if ($item_key_parser->parse($data) != CParser::PARSE_SUCCESS) {
@@ -3219,12 +3220,41 @@ class CApiInputValidator {
 			return false;
 		}
 
+		if (($flags & API_REQUIRED_LLD_MACRO)) {
+			$parameters = $item_key_parser->getParamsRaw();
+			$lld_macro_parser = new CLLDMacroParser();
+			$lld_macro_function_parser = new CLLDMacroFunctionParser();
+			$has_lld_macros = false;
+
+			if ($parameters) {
+				$parameters = $parameters[0]['raw'];
+				$p = 1;
+
+				while (isset($parameters[$p])) {
+					if ($lld_macro_parser->parse($parameters, $p) != CParser::PARSE_FAIL
+							|| $lld_macro_function_parser->parse($parameters, $p) != CParser::PARSE_FAIL) {
+						$has_lld_macros = true;
+						break;
+					}
+
+					$p++;
+				}
+			}
+
+			if (!$has_lld_macros) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+					_('must contain at least one low-level discovery macro')
+				);
+				return false;
+			}
+		}
+
 		return true;
 	}
 
 	/**
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_ALLOW_LLD_MACRO
+	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param int    $rule['length']  (optional)
 	 * @param mixed  $data
 	 * @param string $path
@@ -3250,12 +3280,17 @@ class CApiInputValidator {
 		}
 
 		$update_interval_parser = new CUpdateIntervalParser([
-			'usermacros' => true,
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO)
+			'usermacros' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => (bool) ($flags & API_ALLOW_LLD_MACRO)
 		]);
 
 		if ($update_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid delay'));
+			if (strpos($data, ';') === false) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'));
+			}
+			else {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, $update_interval_parser->getError());
+			}
 
 			return false;
 		}
@@ -3265,36 +3300,120 @@ class CApiInputValidator {
 		if ($delay[0] !== '{') {
 			$delay_sec = timeUnitToSeconds($delay);
 			$intervals = $update_interval_parser->getIntervals();
-			$flexible_intervals = $update_interval_parser->getIntervals(ITEM_DELAY_FLEXIBLE);
-			$has_scheduling_intervals = (bool) $update_interval_parser->getIntervals(ITEM_DELAY_SCHEDULING);
-			$has_macros = false;
-
-			foreach ($intervals as $interval) {
-				if (strpos($interval['interval'], '{') !== false) {
-					$has_macros = true;
-					break;
-				}
-			}
 
 			// If delay is 0, there must be at least one either flexible or scheduling interval.
 			if ($delay_sec == 0 && !$intervals) {
-				$error = _('Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.');
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be a zero without custom intervals'));
 
 				return false;
 			}
 
 			if ($delay_sec < 0 || $delay_sec > SEC_PER_DAY) {
-				$error = _('Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.');
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+					_('value must be one of %1$s', implode(':', [0, SEC_PER_DAY]))
+				);
 
 				return false;
 			}
 
-			// If there are scheduling intervals or intervals with macros, skip the next check calculation.
-			if (!$has_macros && !$has_scheduling_intervals && $flexible_intervals
-					&& calculateItemNextCheck(0, $delay_sec, $flexible_intervals, time()) == ZBX_JAN_2038) {
-				$error = _('Item will not be refreshed. Please enter a correct update interval.');
+			$flexible_intervals = [];
 
-				return false;
+			foreach ($intervals as $interval) {
+				if (strpos($interval['interval'], '{') !== false || $interval['type'] != ITEM_DELAY_FLEXIBLE) {
+					$flexible_intervals = [];
+					break;
+				}
+
+				$update_interval = timeUnitToSeconds($interval['update_interval']);
+
+				if ($delay_sec != 0 && $update_interval != 0) {
+					continue;
+				}
+
+				[$day_period, $time_period] = explode(',', $interval['time_period']);
+
+				[$day_from, $day_to] = (strpos($day_period, '-') === false)
+					? [$day_period, $day_period]
+					: explode('-', $day_period);
+
+				[$time_from, $time_to] = explode('-', $time_period);
+
+				[$time_from_hours, $time_from_minutes] = explode(':', $time_from);
+				[$time_to_hours, $time_to_minutes] = explode(':', $time_to);
+
+				$time_from = $time_from_hours * SEC_PER_HOUR + $time_from_minutes * SEC_PER_MIN;
+				$time_to = $time_to_hours * SEC_PER_HOUR + $time_to_minutes * SEC_PER_MIN;
+
+				$time_from_hours = (strlen($time_from_hours) == 1) ? '0'.$time_from_hours : $time_from_hours;
+				$time_to_hours = (strlen($time_to_hours) == 1) ? '0'.$time_to_hours : $time_to_hours;
+
+				for ($day = $day_from; $day <= $day_to; $day++) {
+					$_interval = [
+						'update_interval' => $update_interval,
+						'time_from' => ($day - 1) * SEC_PER_DAY + $time_from,
+						'time_to' => ($day - 1) * SEC_PER_DAY + $time_to,
+					];
+
+					$key = $_interval['update_interval'].'/'.$day.','.$time_from_hours.':'.$time_from_minutes.'-'.
+						$time_to_hours.':'.$time_to_minutes;
+
+					$flexible_intervals[$key] = $_interval;
+				}
+			}
+
+			if ($flexible_intervals) {
+				ksort($flexible_intervals);
+
+				$zero_periods = [];
+				$has_active_period = false;
+
+				foreach ($flexible_intervals as $key => $interval) {
+					if ($interval['update_interval'] == 0) {
+						unset($flexible_intervals[$key]);
+						$last_period = end($zero_periods);
+
+						if ($last_period === false || $interval['time_from'] > $last_period['time_to']) {
+							$zero_periods[] = [
+								'time_from' => $interval['time_from'],
+								'time_to' => $interval['time_to']
+							];
+						}
+						elseif ($interval['time_from'] == $last_period['time_to']
+								|| $interval['time_to'] > $last_period['time_to']) {
+							$zero_periods[key($zero_periods)]['time_to'] = $interval['time_to'];
+						}
+					}
+					else {
+						foreach ($zero_periods as $zero_period) {
+							if ($interval['time_from'] < $zero_period['time_from']
+									|| $interval['time_to'] > $zero_period['time_to']) {
+								$has_active_period = true;
+								break 2;
+							}
+						}
+					}
+				}
+
+				if ($delay_sec == 0 && !$flexible_intervals) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot have only zero intervals'));
+
+					return false;
+				}
+				elseif ($delay_sec == 0 && !$has_active_period) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+						_('must have at least one flexible interval with active period')
+					);
+
+					return false;
+				}
+				elseif ($delay_sec != 0 && $zero_periods && $zero_periods[0]['time_from'] == 0
+						&& $zero_periods[0]['time_to'] == 7 * SEC_PER_DAY) {
+					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+						_('cannot have flexible intervals with zero interval for all times')
+					);
+
+					return false;
+				}
 			}
 		}
 

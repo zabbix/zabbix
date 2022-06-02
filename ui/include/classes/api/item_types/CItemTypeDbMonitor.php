@@ -33,7 +33,7 @@ class CItemTypeDbMonitor extends CItemType {
 			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'params' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-			'delay' =>		['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>		self::getCreateFieldRule('delay', $item)
 		];
 	}
 
@@ -57,7 +57,7 @@ class CItemTypeDbMonitor extends CItemType {
 			'username' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
 			'password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'params' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-			'delay' =>		['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>		self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
 

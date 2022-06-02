@@ -32,7 +32,7 @@ class CItemTypeSsh extends CItemType {
 	 */
 	public static function getCreateValidationRules(array $item): array {
 		return [
-			'interfaceid' =>	self::getCreateFieldRule('interfaceid'),
+			'interfaceid' =>	self::getCreateFieldRule('interfaceid', $item),
 			'authtype' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]), 'default' => DB::getDefault('items', 'authtype')],
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')],
 			'publickey' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -45,7 +45,7 @@ class CItemTypeSsh extends CItemType {
 			]],
 			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'params' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-			'delay' =>			['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}
 
@@ -103,7 +103,7 @@ class CItemTypeSsh extends CItemType {
 			]],
 			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'params' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
-			'delay' =>			['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
 

@@ -30,7 +30,7 @@ class CItemTypeSnmpTrap extends CItemType {
 	 */
 	public static function getCreateValidationRules(array $item): array {
 		return [
-			'interfaceid' =>	self::getCreateFieldRule('interfaceid')
+			'interfaceid' =>	self::getCreateFieldRule('interfaceid', $item)
 		];
 	}
 

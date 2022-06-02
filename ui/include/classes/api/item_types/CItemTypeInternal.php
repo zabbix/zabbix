@@ -30,7 +30,7 @@ class CItemTypeInternal extends CItemType {
 	 */
 	public static function getCreateValidationRules(array $item): array {
 		return [
-			'delay' =>	['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>	self::getCreateFieldRule('delay', $item)
 		];
 	}
 
@@ -48,7 +48,7 @@ class CItemTypeInternal extends CItemType {
 	 */
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
-			'delay' =>	['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>	self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
 

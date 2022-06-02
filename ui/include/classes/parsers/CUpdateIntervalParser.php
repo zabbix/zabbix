@@ -76,6 +76,8 @@ class CUpdateIntervalParser extends CParser {
 
 		// First interval must be simple interval (or macro). Other intervals may be mixed and repeat multiple times.
 		if ($this->simple_interval_parser->parse($source, $p) == self::PARSE_FAIL) {
+			$this->errorPos($source, $p);
+
 			return self::PARSE_FAIL;
 		}
 		$p += $this->simple_interval_parser->getLength();
@@ -111,7 +113,13 @@ class CUpdateIntervalParser extends CParser {
 		$this->length = $p - $pos;
 		$this->match = substr($source, $pos, $this->length);
 
-		return isset($source[$p]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS;
+		if (!isset($source[$p])) {
+			return self::PARSE_SUCCESS;
+		}
+
+		$this->errorPos($source, $p);
+
+		return self::PARSE_SUCCESS_CONT;
 	}
 
 	/**

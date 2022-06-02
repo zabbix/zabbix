@@ -38,7 +38,7 @@ class CItemTypeScript extends CItemType {
 			]],
 			'params' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
 			'timeout' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')],
-			'delay' =>		['type' => API_ITEM_DELAY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>		self::getCreateFieldRule('delay', $item)
 		];
 	}
 
@@ -65,7 +65,7 @@ class CItemTypeScript extends CItemType {
 			'parameters' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'params' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'timeout' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'delay' =>		['type' => API_ITEM_DELAY, 'length' => DB::getFieldLength('items', 'delay')]
+			'delay' =>		self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
 
