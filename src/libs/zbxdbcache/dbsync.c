@@ -288,7 +288,7 @@ static char	**dbsync_preproc_row(zbx_dbsync_t *sync, char **row)
 	return sync->row;
 }
 
-void	zbx_dbsync_journal_init(zbx_dbsync_journal_t *journal)
+static void	dbsync_journal_init(zbx_dbsync_journal_t *journal)
 {
 	zbx_vector_uint64_create(&journal->inserts);
 	zbx_vector_uint64_create(&journal->updates);
@@ -299,7 +299,7 @@ void	zbx_dbsync_journal_init(zbx_dbsync_journal_t *journal)
 	zbx_vector_dbsync_obj_changelog_create(&journal->changelog);
 }
 
-void	zbx_dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
+static	dbsync_journal_destroy(zbx_dbsync_journal_t *journal)
 {
 	zbx_vector_uint64_destroy(&journal->inserts);
 	zbx_vector_uint64_destroy(&journal->updates);
@@ -435,7 +435,7 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	zbx_hashset_create(&dbsync_env.strpool, 100, dbsync_strpool_hash_func, dbsync_strpool_compare_func);
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
-		zbx_dbsync_journal_init(&dbsync_env.journals[i]);
+		dbsync_journal_init(&dbsync_env.journals[i]);
 
 	if (ZBX_DBSYNC_INIT == mode)
 	{
@@ -575,7 +575,7 @@ void	zbx_dbsync_env_clear(void)
 	zbx_hashset_destroy(&dbsync_env.strpool);
 
 	for (i = 0; i < ARRSIZE(dbsync_env.journals); i++)
-		zbx_dbsync_journal_destroy(&dbsync_env.journals[i]);
+		dbsync_journal_destroy(&dbsync_env.journals[i]);
 
 }
 
