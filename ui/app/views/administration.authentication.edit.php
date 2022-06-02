@@ -26,18 +26,18 @@
 
 $this->includeJsFile('administration.authentication.edit.js.php');
 
-// Authentication general, HTTP authentication and password policy fields.
+// Authentication general fields.
 $auth_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Default authentication'), 'authentication_type'),
-		new CFormField([
+		new CFormField(
 			(new CRadioButtonList('authentication_type', (int) $data['authentication_type']))
 				->setAttribute('autofocus', 'autofocus')
 				->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL)
 				->addValue(_('LDAP'), ZBX_AUTH_LDAP)
 				->setModern(true)
 				->removeId()
-		])
+		)
 	])
 	->addItem(
 		new CFormField(
@@ -52,7 +52,8 @@ $auth_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel([_('Password must contain'),
+		new CLabel([
+			_('Password must contain'),
 			makeHelpIcon([
 				_('Password requirements:'),
 				(new CList([
@@ -67,9 +68,7 @@ $auth_tab = (new CFormGrid())
 					]),
 					new CListItem([
 						_('must contain at least one special character'),
-						' (', (new CSpan(
-							' !"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'))->addClass(ZBX_STYLE_MONOSPACE_FONT
-						), ')'
+						' (', (new CSpan(' !"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~'))->addClass(ZBX_STYLE_MONOSPACE_FONT), ')'
 					])
 				]))->addClass(ZBX_STYLE_LIST_DASHED)
 			])
@@ -91,12 +90,12 @@ $auth_tab = (new CFormGrid())
 					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SPECIAL) == PASSWD_CHECK_SPECIAL)
 					->setUncheckedValue(0x00)
 					->setId('passwd_check_rules_special')
-			]))
-				->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			]))->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 		)
 	])
 	->addItem([
-		new CLabel([_('Avoid easy-to-guess passwords'),
+		new CLabel([
+			_('Avoid easy-to-guess passwords'),
 			makeHelpIcon([
 				_('Password requirements:'),
 				(new CList([
@@ -167,7 +166,7 @@ $ldap_tab = (new CFormGrid())
 	])
 	->addItem([
 		(new CLabel(_('Servers')))->setAsteriskMark(),
-		(new CFormField(
+		new CFormField(
 			(new CDiv(
 				(new CTable())
 					->setId('ldap-servers')
@@ -189,12 +188,11 @@ $ldap_tab = (new CFormGrid())
 										->addClass('js-add')
 								))->setColSpan(5)
 							)
-					)
-					->addStyle('width: 100%;')
+					)->addStyle('width: 100%;')
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		))
+		)
 	])
 	->addItem([
 		new CLabel(_('Case-sensitive login'), 'ldap_case_sensitive'),
@@ -221,7 +219,8 @@ $saml_tab = (new CFormGrid())
 		(new CLabel(_('IdP entity ID'), 'saml_idp_entityid'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('saml_idp_entityid', $data['saml_idp_entityid'], false,
-					DB::getFieldLength('config', 'saml_idp_entityid')))
+				DB::getFieldLength('config', 'saml_idp_entityid')
+			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -230,8 +229,7 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('SSO service URL'), 'saml_sso_url'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('saml_sso_url', $data['saml_sso_url'], false,
-					DB::getFieldLength('config', 'saml_sso_url')))
+			(new CTextBox('saml_sso_url', $data['saml_sso_url'], false, DB::getFieldLength('config', 'saml_sso_url')))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired())
@@ -239,8 +237,7 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('SLO service URL'), 'saml_slo_url'),
 		new CFormField(
-			(new CTextBox('saml_slo_url', $data['saml_slo_url'], false,
-					DB::getFieldLength('config', 'saml_slo_url')))
+			(new CTextBox('saml_slo_url', $data['saml_slo_url'], false, DB::getFieldLength('config', 'saml_slo_url')))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
@@ -249,7 +246,8 @@ $saml_tab = (new CFormGrid())
 		(new CLabel(_('Username attribute'), 'saml_username_attribute'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('saml_username_attribute', $data['saml_username_attribute'], false,
-					DB::getFieldLength('config', 'saml_username_attribute')))
+					DB::getFieldLength('config', 'saml_username_attribute')
+			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -258,8 +256,7 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('SP entity ID'), 'saml_sp_entityid'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid'], false,
-					DB::getFieldLength('config', 'saml_sp_entityid')))
+			(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid'], false, DB::getFieldLength('config', 'saml_sp_entityid')))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -269,7 +266,8 @@ $saml_tab = (new CFormGrid())
 		new CLabel(_('SP name ID format'), 'saml_nameid_format'),
 		new CFormField(
 			(new CTextBox('saml_nameid_format', $data['saml_nameid_format'], false,
-					DB::getFieldLength('config', 'saml_nameid_format')))
+					DB::getFieldLength('config', 'saml_nameid_format')
+			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('placeholder', 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient')
@@ -278,7 +276,7 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Sign')),
 		new CFormField(
-			(new CList([
+			new CList([
 				(new CCheckBox('saml_sign_messages'))
 					->setLabel(_('Messages'))
 					->setChecked($data['saml_sign_messages'] == 1)
@@ -304,7 +302,7 @@ $saml_tab = (new CFormGrid())
 					->setChecked($data['saml_sign_logout_responses'] == 1)
 					->setUncheckedValue(0)
 					->setEnabled($data['saml_enabled'])
-			]))
+			])
 		)
 	])
 	->addItem([
@@ -321,8 +319,7 @@ $saml_tab = (new CFormGrid())
 					->setChecked($data['saml_encrypt_assertions'] == 1)
 					->setUncheckedValue(0)
 					->setEnabled($data['saml_enabled'])
-			]))
-				->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
+			]))->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 		)
 	])
 	->addItem([
@@ -354,8 +351,7 @@ $saml_tab = (new CFormGrid())
 				(new CSubmit('update', _('Update')))
 			))
 			->onTabChange('jQuery("[name=ldap_test]")[(ui.newTab.index() == 2) ? "show" : "hide"]()')
-	))
-	->show();
+	))->show();
 
 (new CScriptTag(
 	'view.init('. json_encode([
