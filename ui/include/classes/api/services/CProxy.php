@@ -120,7 +120,7 @@ class CProxy extends CApiService {
 			'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
 			'tls_subject', 'proxy_address', 'auto_compress'
 		];
-		$options['output'] = ($options['output'] == API_OUTPUT_EXTEND) ? $fields : (array) $options['output'];
+		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ? $fields : (array) $options['output'];
 
 		/*
 		 * For internal calls of API method, is possible to get the write-only fields if they were specified in output.
