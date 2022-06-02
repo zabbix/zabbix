@@ -89,8 +89,10 @@ class CControllerPopupAcknowledgeCreate extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret && $this->getInput('suppress_problem', ZBX_PROBLEM_UPDATE_NONE) == ZBX_PROBLEM_UPDATE_SUPPRESS
-				&& $this->getInput('suppress_time_option', '') == ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE) {
+		$suppress = $this->getInput('suppress_problem', ZBX_PROBLEM_UPDATE_NONE);
+		$suppress_time = $this->getInput('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE);
+
+		if ($ret && $suppress == ZBX_PROBLEM_UPDATE_SUPPRESS && $suppress_time == ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE) {
 			$this->suppress_until_time_parser = new CRangeTimeParser();
 			$this->suppress_until_time_parser->parse($this->getInput('suppress_until_problem', ''));
 			$suppress_until = $this->suppress_until_time_parser->getDateTime(false)->getTimestamp();
