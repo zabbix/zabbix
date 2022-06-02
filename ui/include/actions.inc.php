@@ -1774,7 +1774,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 			}
 			else {
 				$suppress_until = $suppression['suppress_until'] < strtotime('tomorrow')
-						&& $suppression['suppress_until'] > time()
+						&& $suppression['suppress_until'] > strtotime('today')
 					? zbx_date2str(TIME_FORMAT, $suppression['suppress_until'])
 					: zbx_date2str(DATE_TIME_FORMAT, $suppression['suppress_until']);
 			}
@@ -2215,7 +2215,7 @@ function makeActionTableIcon(array $action) {
 				}
 				else {
 					$suppress_until = $action['suppress_until'] < strtotime('tomorrow')
-					&& $action['suppress_until'] > time()
+							&& $action['suppress_until'] > strtotime('today')
 						? zbx_date2str(TIME_FORMAT, $action['suppress_until'])
 						: zbx_date2str(DATE_TIME_FORMAT, $action['suppress_until']);
 				}
