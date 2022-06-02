@@ -53,6 +53,8 @@
 #	define ZBX_PROC_STIME		kp_eproc.e_pstats.p_ru.ru_stime.tv_sec
 #	define ZBX_PROC_UID		kp_proc.p_ruid
 #	define ZBX_PROC_GID		kp_proc.p_rgid
+#elif (__FreeBSD_version) < 900040
+#	define ZBX_PROC_TNAME		ki_ocomm
 #else
 #	define ZBX_COMMLEN		COMMLEN
 #	define ZBX_PROC_PID		ki_pid
