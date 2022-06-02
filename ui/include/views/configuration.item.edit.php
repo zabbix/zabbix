@@ -647,7 +647,7 @@ if ($data['display_interfaces']) {
 	}
 }
 
-// Append SNMP common fields fields.
+// Append SNMP common fields.
 $item_tab->addItem([
 	(new CLabel(_('SNMP OID'), 'snmp_oid'))
 		->setAsteriskMark()

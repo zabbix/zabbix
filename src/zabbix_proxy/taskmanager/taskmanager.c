@@ -23,10 +23,10 @@
 #include "zbxself.h"
 #include "zbxtasks.h"
 #include "log.h"
-#include "zbxcrypto.h"
 #include "zbxdiag.h"
 #include "zbxrtc.h"
 #include "proxy.h"
+#include "zbxcomms.h"
 #include "dbcache.h"
 
 #include "../../zabbix_server/scripts/scripts.h"

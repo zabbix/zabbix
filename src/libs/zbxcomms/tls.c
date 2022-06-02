@@ -17,17 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxcomms.h"
+#include "tls.h"
+
 #include "zbxsysinc.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
-#include "tls.h"
-#include "zbxcomms.h"
 #include "zbxthreads.h"
 #include "log.h"
 #include "zbxcrypto.h"
-#include "tls_tcp.h"
-#include "tls_tcp_active.h"
 
 #if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER)
 /* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) or LibreSSL */
@@ -128,17 +127,6 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 	return OPENSSL_init_ssl(opts, settings);
 }
 #endif
-
-struct zbx_tls_context
-{
-#if defined(HAVE_GNUTLS)
-	gnutls_session_t		ctx;
-	gnutls_psk_client_credentials_t	psk_client_creds;
-	gnutls_psk_server_credentials_t	psk_server_creds;
-#elif defined(HAVE_OPENSSL)
-	SSL				*ctx;
-#endif
-};
 
 extern unsigned int			configured_tls_connect_mode;
 extern unsigned int			configured_tls_accept_modes;

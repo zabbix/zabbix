@@ -18,10 +18,9 @@
 **/
 
 #include "common.h"
+
 #include "zbxthreads.h"
 #include "module.h"
-
-#include "zbxcrypto.h"
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>
@@ -47,15 +46,11 @@ static const char	help_message_footer[] =
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	version(void)
+void	zbx_version(void)
 {
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	printf("\n");
-	zbx_tls_version();
-#endif
 }
 
 /******************************************************************************
@@ -67,7 +62,7 @@ void	version(void)
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	usage(void)
+void	zbx_usage(void)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
@@ -121,11 +116,11 @@ void	usage(void)
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	help(void)
+void	zbx_help(void)
 {
 	const char	**p = help_message;
 
-	usage();
+	zbx_usage();
 	printf("\n");
 
 	while (NULL != *p)

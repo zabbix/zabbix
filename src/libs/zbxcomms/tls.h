@@ -17,23 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TLS_TCP_ACTIVE_H
-#define ZABBIX_TLS_TCP_ACTIVE_H
+#ifndef ZABBIX_TLS_H
+#define ZABBIX_TLS_H
+
+#include "zbxcomms.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-typedef struct
-{
-	const char	*psk_identity;
-	size_t		psk_identity_len;
-	char		issuer[HOST_TLS_ISSUER_LEN_MAX];
-	char		subject[HOST_TLS_SUBJECT_LEN_MAX];
-}
-zbx_tls_conn_attr_t;
+int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+		const char *server_name, char **error);
+int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error);
+ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error);
+ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error);
+void	zbx_tls_close(zbx_socket_t *s);
+#endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 
-int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
-int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
-int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
-unsigned int	zbx_tls_get_psk_usage(void);
-#endif
-
-#endif	/* ZABBIX_TLS_TCP_ACTIVE_H */
+#endif /* ZABBIX_TLS_H */

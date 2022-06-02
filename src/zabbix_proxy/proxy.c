@@ -49,6 +49,7 @@
 #include "../zabbix_server/vmware/vmware.h"
 #include "setproctitle.h"
 #include "zbxcrypto.h"
+#include "zbxcomms.h"
 #include "../zabbix_server/preprocessor/preproc_manager.h"
 #include "../zabbix_server/preprocessor/preproc_worker.h"
 #include "zbxavailability.h"
@@ -1031,18 +1032,22 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}
