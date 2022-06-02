@@ -112,6 +112,7 @@ class CSvgGraphSimpleTrigger extends CSvgGroup {
 		$this
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addClass(self::ZBX_STYLE_CLASS.'-'.$this->index.'-'.$this->side)
+			->setAttribute('severity-color', $this->color)
 			->setAttribute('constant', $this->constant)
 			->setAttribute('description', $this->description)
 			->draw();
