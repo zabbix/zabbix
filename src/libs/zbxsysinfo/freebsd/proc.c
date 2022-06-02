@@ -23,7 +23,7 @@
 #include "log.h"
 #include "zbxjson.h"
 
-#if (__FreeBSD_version) >= 800099
+#if HAVE_LIBJAIL
 #include "sys/jail.h"
 #include "jail.h"
 #endif
@@ -98,7 +98,7 @@ typedef struct
 	int		ppid;
 	int		tid;
 	int		jid;
-#if (__FreeBSD_version) >= 800099
+#if HAVE_LIBJAIL
 	char		*jname;
 #endif
 
@@ -148,7 +148,6 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data->state);
 	zbx_free(proc_data->user);
 	zbx_free(proc_data->group);
-
 	zbx_free(proc_data);
 }
 
@@ -807,7 +806,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->pid = proc_thread[k].ZBX_PROC_PID;
 				proc_data->ppid = proc_thread[k].ZBX_PROC_PPID;
 				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
-#if (__FreeBSD_version) >= 800099
+#if HAVE_LIBJAIL
 				proc_data->jname = jail_getname(proc_thread[k].ZBX_PROC_JID);
 #endif
 				proc_data->name = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_COMM);
@@ -869,7 +868,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->pid = proc[i].ZBX_PROC_PID;
 				proc_data->ppid = proc[i].ZBX_PROC_PPID;
 				proc_data->jid = proc[i].ZBX_PROC_JID;
-#if (__FreeBSD_version) >= 800099
+#if HAVE_LIBJAIL
 				proc_data->jname = jail_getname(proc[i].ZBX_PROC_JID);
 #endif
 				proc_data->cmdline = zbx_strdup(NULL, args);
