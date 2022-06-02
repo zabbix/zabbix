@@ -219,11 +219,11 @@ class CControllerAuthenticationUpdate extends CController {
 				$this->getInput('ldap_servers', []),
 				$this->getInput('ldap_default_row_index', 0)
 			);
+			CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 		}
 
 		if (!$auth_valid) {
 			$this->response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot add server'));
 			$this->setResponse($this->response);
 
 			return;
