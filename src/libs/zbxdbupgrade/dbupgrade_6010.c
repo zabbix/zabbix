@@ -633,10 +633,13 @@ static int	DBpatch_6010033_update_empty_groups(zbx_vector_hstgrp_t *hstgrps)
 		if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps->values[i])))
 			break;
 	}
+
+	return ret;
 }
+
 static void	DBpatch_6010033_update_mixed_parents(zbx_vector_hstgrp_t *hstgrps)
 {
-	int	i, ret;
+	int	i;
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
@@ -647,7 +650,9 @@ static void	DBpatch_6010033_update_mixed_parents(zbx_vector_hstgrp_t *hstgrps)
 
 		if (SUCCEED == DBpatch_6010033_check_types(hstgrps->values[i], hstgrps, &group_type) &&
 				DBPATCH_HOSTGROUP_TYPE_HOST != group_type)
+		{
 			hstgrps->values[i]->type = DBPATCH_HOSTGROUP_TYPE_MIXED;
+		}
 	}
 }
 
@@ -747,7 +752,9 @@ out:
 	}												\
 	DBfree_result(result);
 #define ADD_GROUPIDS_FROM(table) ADD_GROUPIDS_FROM_FIELD(table, "groupid")
-#define CONDITION_TYPE_GROUPID	"0"
+#define DBPATCH_CONDITION_TYPE_HOST_GROUP	0
+#define DBPATCH_CONDITION_OPERATOR_EQUAL	0
+#define DBPATCH_CONDITION_OPERATOR_NOT_EQUAL	1
 
 static int	DBpatch_6010033_split_groups(void)
 {
@@ -801,8 +808,13 @@ static int	DBpatch_6010033_split_groups(void)
 	ADD_GROUPIDS_FROM("opgroup");
 	ADD_GROUPIDS_FROM("scripts");
 
-	result = DBselect("select distinct value from conditions where value is not null and conditiontype="
-			CONDITION_TYPE_GROUPID);
+	result = DBselect(
+			"select distinct value"
+			" from conditions"
+			" where value is not null"
+			" and conditiontype=%d"
+			" and operator in (%d,%d)", DBPATCH_CONDITION_TYPE_HOST_GROUP,
+			DBPATCH_CONDITION_OPERATOR_EQUAL, DBPATCH_CONDITION_OPERATOR_NOT_EQUAL);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -903,15 +915,21 @@ static int	DBpatch_6010034(void)
 	return SUCCEED;
 }
 
-#define DBPATCH_HOSTGROUP_TYPE_TEMPLATE_STR	"1"
 static int	DBpatch_6010035(void)
 {
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from tag_filter where groupid in (select groupid from hstgrp where type="
-				DBPATCH_HOSTGROUP_TYPE_TEMPLATE_STR ")"))
+	if (ZBX_DB_OK > DBexecute(
+			"delete from tag_filter"
+			" where groupid in ("
+				"select groupid"
+				" from hstgrp"
+				" where type=%d"
+			")", DBPATCH_HOSTGROUP_TYPE_TEMPLATE))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -921,9 +939,16 @@ static int	DBpatch_6010036(void)
 	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > DBexecute("delete from widget_field where value_groupid in (select groupid from hstgrp where type="
-				DBPATCH_HOSTGROUP_TYPE_TEMPLATE_STR ")"))
+	if (ZBX_DB_OK > DBexecute(
+			"delete from widget_field"
+			" where value_groupid in ("
+				"select groupid"
+				" from hstgrp"
+				" where type=%d"
+			")", DBPATCH_HOSTGROUP_TYPE_TEMPLATE))
+	{
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -932,10 +957,11 @@ static int	DBpatch_6010036(void)
 #undef DBPATCH_HOSTGROUP_TYPE_TEMPLATE
 #undef DBPATCH_HOSTGROUP_TYPE_EMPTY
 #undef DBPATCH_HOSTGROUP_TYPE_MIXED
-#undef CONDITION_TYPE_GROUPID
+#undef DBPATCH_CONDITION_TYPE_HOST_GROUP
+#undef DBPATCH_CONDITION_OPERATOR_EQUAL
+#undef DBPATCH_CONDITION_OPERATOR_NOT_EQUAL
 #undef ADD_GROUPIDS_FROM_FIELD
 #undef ADD_GROUPIDS_FROM
-#undef DBPATCH_HOSTGROUP_TYPE_TEMPLATE_STR
 
 #endif
 
