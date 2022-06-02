@@ -208,7 +208,7 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
 		$data['saml_error']
-			? (new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED)
+			? new CFormField((new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED))
 			: new CFormField(
 				(new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
 					->setChecked($data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED)
