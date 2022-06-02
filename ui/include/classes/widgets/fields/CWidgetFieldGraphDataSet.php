@@ -92,6 +92,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		if ($flags & self::FLAG_NOT_EMPTY) {
 			$strict_validation_rules = $this->getValidationRules();
 			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
+			self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($strict_validation_rules['fields']['itemids'], API_NOT_EMPTY);
 			$this->setStrictValidationRules($strict_validation_rules);
 		}
 		else {
@@ -151,11 +154,17 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		}
 
 		if ($strict) {
+			if (!count($value)) {
+				if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
+					$errors[] = $error;
+				}
+			}
+
 			foreach ($value as $data) {
 				$validation_rules_by_type = $validation_rules;
 
 				if ($data['dataset_type'] == CWidgetHelper::DATASET_TYPE_SINGLE_ITEM) {
-					$validation_rules_by_type['fields']['itemids']['flags'] = API_REQUIRED;
+					$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
 					$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
 
 					unset($data['hosts'], $data['items']);
@@ -231,7 +240,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			}
 			foreach ($val['itemids'] as $num => $itemid) {
 				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 					'name' => $this->name.'.itemids.'.$index.'.'.$num,
 					'value' => $itemid
 				];

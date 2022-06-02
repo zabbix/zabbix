@@ -1299,7 +1299,7 @@ class CWidgetHelper {
 									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
 									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
 									->addValue(_('Bar'), SVG_GRAPH_TYPE_BAR)
-									->onChange('changeDataSetDrawType(this)')
+									->onChange('widget_svggraph_form.changeDataSetDrawType(this)')
 									->setModern(true)
 							)
 						])

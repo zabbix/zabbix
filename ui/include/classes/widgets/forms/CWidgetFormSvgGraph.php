@@ -198,10 +198,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	private function initTimePeriodFields(): void {
 		// Checkbox to specify either relative dashboard time or widget's own time.
 		$field_graph_time = new CWidgetFieldCheckBox('graph_time', _('Set custom time period'));
-//		$field_graph_time = (new CWidgetFieldCheckBox('graph_time', _('Set custom time period'))) // TODO: 6940 move to js
-//			->setAction('jQuery("#time_from, #time_to, #time_from_calendar, #time_to_calendar")'.
-//				'.prop("disabled", !jQuery(this).is(":checked"));'
-//			);
 
 		if (array_key_exists('graph_time', $this->data)) {
 			$field_graph_time->setValue($this->data['graph_time']);
@@ -241,7 +237,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	private function initAxesFields(): void {
 		// Show left Y axis.
 		$field_lefty = (new CWidgetFieldCheckBox('lefty', _('Left Y'), _('Show')))->setDefault(SVG_GRAPH_AXIS_SHOW);
-//			->setAction('widget_svggraph_form.onLeftYChange()'); // TODO: 6940 move to js
 
 		if (array_key_exists('lefty', $this->data)) {
 			$field_lefty->setValue($this->data['lefty']);
@@ -311,7 +306,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Show right Y axis.
 		$field_righty = (new CWidgetFieldCheckBox('righty', _('Right Y'), _('Show')))->setDefault(SVG_GRAPH_AXIS_SHOW);
-//			->setAction('widget_svggraph_form.onRightYChange()'); // TODO: 6940 move to js
 
 		if (array_key_exists('righty', $this->data)) {
 			$field_righty->setValue($this->data['righty']);
@@ -395,12 +389,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		 *
 		 * Contains check-box field to show/hide legend and field to specify number of lines in which legend is shown.
 		 */
-		// Show legend.
-//		$field_legend = (new CWidgetFieldCheckBox('legend', _('Show legend')))
-//			->setAction('jQuery("[name=legend_lines]").rangeControl('. // TODO: 6940 move to js
-//				'jQuery(this).is(":checked") ? "enable" : "disable"'.
-//				');')
-//			->setDefault(SVG_GRAPH_LEGEND_ON);
 
 		$field_legend = (new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(SVG_GRAPH_LEGEND_ON);
 
@@ -455,17 +443,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	private function initProblemsFields(): void {
 		// Checkbox: Selected items only.
 		$field_show_problems = new CWidgetFieldCheckBox('show_problems', _('Show problems'));
-//		$field_show_problems = (new CWidgetFieldCheckBox('show_problems', _('Show problems'))) // TODO: 6940 move to js
-//			->setAction(
-//				'var on = jQuery(this).is(":checked"),'.
-//				'widget = jQuery(this).closest(".ui-widget");'.
-//				'jQuery("#graph_item_problems, #problem_name, #problemhosts_select")'.
-//				'.prop("disabled", !on);'.
-//				'jQuery("#problemhosts_").multiSelect(on ? "enable" : "disable");'.
-//				'jQuery("[name^=\"severities[\"]", widget).prop("disabled", !on);'.
-//				'jQuery("[name=\"evaltype\"]", widget).prop("disabled", !on);'.
-//				'jQuery("input, button, z-select", jQuery("#tags_table_tags", widget)).prop("disabled", !on);'
-//			);
 
 		if (array_key_exists('show_problems', $this->data)) {
 			$field_show_problems->setValue($this->data['show_problems']);
