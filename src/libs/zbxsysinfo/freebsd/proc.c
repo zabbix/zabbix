@@ -951,7 +951,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "pid", pdata->pid);
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
-#if (__FreeBSD_version) > 800099
+#if HAVE_LIBJAIL
 			zbx_json_addstring(&j, "jname", ZBX_NULL2EMPTY_STR(pdata->jname), ZBX_JSON_TYPE_STRING);
 #endif
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
@@ -982,7 +982,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "pid", pdata->pid);
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
-#if (__FreeBSD_version) > 800099
+#if HAVE_LIBJAIL
 			zbx_json_addstring(&j, "jname", ZBX_NULL2EMPTY_STR(pdata->jname), ZBX_JSON_TYPE_STRING);
 #endif
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
