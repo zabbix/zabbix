@@ -118,6 +118,7 @@ class CProxy extends CApiService {
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
 			$options['output'] = array_keys(DB::getSchema($this->tableName())['fields']);
+			$options['output'][] = 'lastaccess';
 		}
 
 		if (is_array($options['output'])) {
@@ -378,6 +379,7 @@ class CProxy extends CApiService {
 	public function delete(array $proxyids) {
 		$this->validateDelete($proxyids, $db_proxies);
 
+		DB::delete('host_rtdata', ['hostid' => $proxyids]);
 		DB::delete('interface', ['hostid' => $proxyids]);
 		DB::delete('hosts', ['hostid' => $proxyids]);
 
