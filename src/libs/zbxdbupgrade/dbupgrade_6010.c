@@ -570,32 +570,20 @@ static int	DBpatch_6010033_check_types(hstgrp_t *hstgrp, zbx_vector_hstgrp_t *hs
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
 		size_t	t_sz;
-		char	tmp[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 		if (DBPATCH_HOSTGROUP_TYPE_MIXED == hstgrps->values[i]->type)
 			continue;
 
 		t_sz = strlen(hstgrps->values[i]->name);
 
-		if (g_sz == t_sz)
+		if (g_sz == t_sz || 0 != strncmp(hstgrp->name, hstgrps->values[i]->name, MIN(g_sz, t_sz)))
 			continue;
 
-		if (g_sz > t_sz)
-		{
-			strscpy(tmp, hstgrps->values[i]->name);
-			strscat(tmp, "/");
+		if (g_sz > t_sz && hstgrp->name[t_sz] != '/')
+			continue;
 
-			if (0 != strncmp(tmp, hstgrp->name, strlen(tmp)))
-				continue;
-		}
-		else
-		{
-			strscpy(tmp, hstgrp->name);
-			strscat(tmp, "/");
-
-			if (0 != strncmp(tmp, hstgrps->values[i]->name, strlen(tmp)))
-				continue;
-		}
+		if (g_sz < t_sz && hstgrps->values[i]->name[g_sz] != '/')
+			continue;
 
 		if (FAIL != last_type && last_type != hstgrps->values[i]->type)
 		{
