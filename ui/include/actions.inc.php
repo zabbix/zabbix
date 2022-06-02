@@ -1343,7 +1343,7 @@ function getEventsSuppressions(array $events) {
 		CArrayHelper::sort($event_suppressions, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
 
 		$suppressions[$event['eventid']] = [
-			'suppress_until' => $event_suppressions,
+			'suppress_until' => array_values($event_suppressions),
 			'count' => count($event_suppressions)
 		];
 	}
@@ -1768,6 +1768,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 
 		if (array_key_exists('suppress_until', $suppression)) {
 			$icon = ZBX_STYLE_ICON_INVISIBLE;
+			$title = _('Suppressed');
 
 			if ($suppression['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
 				$suppress_until = _s('Indefinitely');
@@ -1781,20 +1782,21 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 		}
 		else {
 			$icon = ZBX_STYLE_ICON_VISIBLE;
+			$title = _('Unsuppressed');
 			$suppress_until = '';
 		}
 
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $suppression['clock']),
 			makeActionTableUser($suppression, $users),
-			makeActionIcon(['icon' => $icon]),
+			makeActionIcon(['icon' => $icon, 'title' => $title]),
 			$suppress_until
 		]);
 	}
 
 	return $total
 		? makeActionIcon([
-			'icon' => array_key_exists('suppress_until', $data['suppress_until'][$total-1])
+			'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
 				? ZBX_STYLE_ICON_INVISIBLE
 				: ZBX_STYLE_ICON_VISIBLE,
 			'button' => true,
