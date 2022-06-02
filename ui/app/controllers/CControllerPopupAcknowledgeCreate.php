@@ -98,7 +98,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			$suppress_until = $this->suppress_until_time_parser->getDateTime(false)->getTimestamp();
 
 			if (!validateUnixTime($suppress_until) || $suppress_until < time()) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Suppress until problem'), _('invalid time')));
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Suppress'), _('invalid time')));
 				$ret = false;
 			}
 		}
