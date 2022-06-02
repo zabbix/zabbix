@@ -812,8 +812,8 @@ static int	DBpatch_6010033_split_groups(void)
 			"select distinct value"
 			" from conditions"
 			" where value is not null"
-			" and conditiontype=%d"
-			" and operator in (%d,%d)", DBPATCH_CONDITION_TYPE_HOST_GROUP,
+				" and conditiontype=%d"
+				" and operator in (%d,%d)", DBPATCH_CONDITION_TYPE_HOST_GROUP,
 			DBPATCH_CONDITION_OPERATOR_EQUAL, DBPATCH_CONDITION_OPERATOR_NOT_EQUAL);
 
 	while (NULL != (row = DBfetch(result)))
