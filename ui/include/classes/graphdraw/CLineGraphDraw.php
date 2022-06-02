@@ -1761,15 +1761,8 @@ class CLineGraphDraw extends CGraphDraw {
 				break;
 
 			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
-				if (function_exists('imagesetstyle')) {
-					// use imagesetstyle+imageline instead of bugged imagedashedline
-					$style = [$avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT];
-					imagesetstyle($this->im, $style);
-					zbx_imageline($this->im, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
-				}
-				else {
-					imagedashedline($this->im, $x1, $y1, $x2, $y2, $avg_color);
-				}
+				imagesetstyle($this->im, [$avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT]);
+				zbx_imageline($this->im, $x1, $y1, $x2, $y2, IMG_COLOR_STYLED);
 				break;
 
 			case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
@@ -1828,12 +1821,9 @@ class CLineGraphDraw extends CGraphDraw {
 						$steps = $this->sizeY + $this->shiftY - $gy + 1;
 
 						for ($j = 0; $j < $steps; $j++) {
-							if (($gy + $j) < ($this->shiftY + $startAlpha)) {
-								$alpha = 0;
-							}
-							else {
-								$alpha = 127 - (int) abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
-							}
+							$alpha = ($gy + $j) < ($this->shiftY + $startAlpha)
+								? 0
+								: 127 - (int) abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
 
 							$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
 							imagesetpixel($this->im, $x2 + $i, $gy + $j, $color);
