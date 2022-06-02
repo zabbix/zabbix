@@ -116,28 +116,22 @@ class CProxy extends CApiService {
 		}
 
 		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$options['output'] = array_keys(DB::getSchema($this->tableName())['fields']);
-			$options['output'][] = 'lastaccess';
+		$fields = [
+			'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
+			'tls_subject', 'proxy_address', 'auto_compress'
+		];
+		$options['output'] = ($options['output'] == API_OUTPUT_EXTEND) ? $fields : (array) $options['output'];
+
+		/*
+		 * For internal calls of API method, is possible to get the write-only fields if they were specified in output.
+		 * Specify write-only fields in output only if they will not appear in debug mode.
+		 */
+		if (APP::getMode() !== APP::EXEC_MODE_API) {
+			$fields[] = 'tls_psk_identity';
+			$fields[] = 'tls_psk';
 		}
 
-		if (is_array($options['output'])) {
-			$output = [
-				'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
-				'tls_subject', 'proxy_address', 'auto_compress'
-			];
-
-			/*
-			* For internal calls of API method, is possible to get the write-only fields if they were specified in output.
-			* Specify write-only fields in output only if they will not appear in debug mode.
-			*/
-			if (APP::getMode() === APP::EXEC_MODE_API) {
-				$output[] = 'tls_psk_identity';
-				$output[] = 'tls_psk';
-			}
-
-			$options['output'] = array_intersect($options['output'], $output);
-		}
+		$options['output'] = array_intersect($options['output'], $fields);
 
 		// countOutput
 		if ($options['countOutput']) {
