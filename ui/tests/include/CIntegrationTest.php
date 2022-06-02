@@ -400,7 +400,7 @@ class CIntegrationTest extends CAPITest {
 		$iterations = 0;
 
 		do {
-			for ($i = count($pids) -1; $i >= 1; $i--) {
+			for ($i = count($pids) -1; $i >= 0; $i--) {
 				$child_pid = $pids[$i];
 
 				if  (is_numeric($child_pid) && posix_kill($child_pid, 0)) {
