@@ -117,9 +117,7 @@ class testFormFilter extends CWebTest {
 
 			$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertTrue($this->query('xpath://li[@data-target="tabfilter_1"]//span[@data-indicator-value="1"]')
-					->one()->isVisible()
-			);
+			$this->assertFalse($this->query('xpath://li[@data-target="tabfilter_1"]//span')->one()->hasClass('display-none'));
 
 			$filter_container->selectTab('update_tab');
 

@@ -1532,9 +1532,7 @@ class testUserRolesPermissions extends CWebTest {
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
 		$table->waitUntilReloaded();
-//		$this->page->waitUntilReady();
 
-//		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
 		$selected_count = $this->query('id:selected_count')->one();
 		$select_all = $this->query('id:all_items')->asCheckbox()->one();
 

@@ -355,7 +355,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @dataProvider getCheckFilterData
 	 */
 	public function testPageMonitoringHosts_CheckFilter($data) {
-		$this->page->login()->open('zabbix.php?action=host.view');
+		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
 		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();

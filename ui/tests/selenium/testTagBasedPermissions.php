@@ -311,7 +311,6 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();
-//			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			//Reset filter
@@ -415,7 +414,6 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();
-//			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			//Reset filter

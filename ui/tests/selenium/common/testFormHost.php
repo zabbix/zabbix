@@ -1909,10 +1909,7 @@ class testFormHost extends CWebTest {
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
-//		$this->page->waitUntilReady();
 
-//		$host_link = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible()
-//				->findRow('Name', $host)->getColumn('Name')->query('tag:a')->waitUntilClickable();
 		$host_link = $table->findRow('Name', $host)->getColumn('Name')->query('tag:a')->waitUntilClickable();
 
 		if ($this->monitoring) {
