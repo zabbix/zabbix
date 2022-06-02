@@ -1826,7 +1826,7 @@ class CLineGraphDraw extends CGraphDraw {
 								: 127 - (int) abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
 
 							$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
-							imagesetpixel($this->im, $x2 + $i, $gy + $j, $color);
+							imagesetpixel($this->im, $x2 + $i, (int) $gy + $j, $color);
 						}
 					}
 				}
