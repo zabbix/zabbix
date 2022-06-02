@@ -209,7 +209,7 @@ static void	dbsync_add_row(zbx_dbsync_t *sync, zbx_uint64_t rowid, unsigned char
 
 	if (NULL != dbrow)
 	{
-		row->row = (char **)zbx_malloc(NULL, sizeof(char *) * sync->columns_num);
+		row->row = (char **)zbx_malloc(NULL, sizeof(char *) * (size_t)sync->columns_num);
 
 		for (i = 0; i < sync->columns_num; i++)
 			row->row[i] = (NULL == dbrow[i] ? NULL : dbsync_strdup(dbrow[i]));
@@ -250,8 +250,8 @@ static void	dbsync_prepare(zbx_dbsync_t *sync, int columns_num, zbx_dbsync_prepr
 	sync->columns_num = columns_num;
 	sync->preproc_row_func = preproc_row_func;
 
-	sync->row = (char **)zbx_malloc(NULL, sizeof(char *) * columns_num);
-	memset(sync->row, 0, sizeof(char *) * columns_num);
+	sync->row = (char **)zbx_malloc(NULL, sizeof(char *) * (size_t)columns_num);
+	memset(sync->row, 0, sizeof(char *) * (size_t)columns_num);
 }
 
 /******************************************************************************
@@ -275,7 +275,7 @@ static char	**dbsync_preproc_row(zbx_dbsync_t *sync, char **row)
 	zbx_vector_ptr_clear_ext(&sync->columns, zbx_ptr_free);
 
 	/* copy the original data */
-	memcpy(sync->row, row, sizeof(char *) * sync->columns_num);
+	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
 
 	sync->row = sync->preproc_row_func(sync->row);
 
@@ -410,7 +410,7 @@ static void	dbsync_remove_duplicate_ids(zbx_vector_uint64_t *dst, const zbx_vect
 	if (j == src->values_num && i < dst->values_num)
 	{
 		if (k != i)
-			memmove(dst->values + k, dst->values + i, (dst->values_num - i) * sizeof(zbx_uint64_t));
+			memmove(dst->values + k, dst->values + i, (size_t)(dst->values_num - i) * sizeof(zbx_uint64_t));
 
 		k += dst->values_num - i;
 	}
@@ -521,7 +521,7 @@ static void	dbsync_env_flush_journal(zbx_dbsync_journal_t *journal)
 		objects_num += journal->syncs.values[i]->rows.values_num;
 
 	zbx_vector_uint64_create(&objectids);
-	zbx_vector_uint64_reserve(&objectids, objects_num);
+	zbx_vector_uint64_reserve(&objectids, (size_t)objects_num);
 
 	for (j = 0; j < journal->syncs.values_num; j++)
 	{
@@ -601,7 +601,7 @@ static int	dbsync_get_rows(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc, si
 	zbx_vector_uint64_t	read_ids;
 
 	zbx_vector_uint64_create(&read_ids);
-	zbx_vector_uint64_reserve(&read_ids, ids->values_num);
+	zbx_vector_uint64_reserve(&read_ids, (size_t)ids->values_num);
 
 	for (batch = ids->values; batch < ids->values + ids->values_num; batch += ZBX_DBSYNC_BATCH_SIZE)
 	{
@@ -675,10 +675,10 @@ static int	dbsync_read_journal(zbx_dbsync_t *sync, char **sql, size_t *sql_alloc
 		dbsync_add_row(sync, journal->deletes.values[i], ZBX_DBSYNC_ROW_REMOVE, NULL);
 
 	/* the obtained object identifiers are removed from journal */
-	sync->add_num = inserts_num - journal->inserts.values_num;
-	sync->update_num = updates_num - journal->updates.values_num;
+	sync->add_num = (zbx_uint64_t)(inserts_num - journal->inserts.values_num);
+	sync->update_num = (zbx_uint64_t)(updates_num - journal->updates.values_num);
 
-	sync->remove_num = journal->deletes.values_num;
+	sync->remove_num = (zbx_uint64_t)journal->deletes.values_num;
 
 	return SUCCEED;
 }
@@ -1085,7 +1085,7 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->host_inventories.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->host_inventories.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -1292,7 +1292,7 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->gmacros.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->gmacros.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -1420,7 +1420,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->hmacros.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->hmacros.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -1592,7 +1592,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->interfaces.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->interfaces.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -1825,7 +1825,7 @@ int	zbx_dbsync_compare_template_items(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->template_items.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->template_items.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -2226,7 +2226,7 @@ int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->expressions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->expressions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -2324,7 +2324,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->actions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->actions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -2518,7 +2518,7 @@ int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->action_conditions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->action_conditions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -2719,7 +2719,7 @@ int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->correlations.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->correlations.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -2855,7 +2855,7 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->corr_conditions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->corr_conditions.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -2951,7 +2951,7 @@ int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->corr_operations.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->corr_operations.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -3035,7 +3035,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->hostgroups.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->hostgroups.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -3210,7 +3210,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->itemscript_params.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->itemscript_params.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -3283,7 +3283,7 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->maintenances.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->maintenances.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -3375,7 +3375,7 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->maintenance_tags.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->maintenance_tags.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
@@ -3486,7 +3486,7 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync)
 		return SUCCEED;
 	}
 
-	zbx_hashset_create(&ids, dbsync_env.cache->maintenance_periods.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&ids, (size_t)dbsync_env.cache->maintenance_periods.num_data, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	while (NULL != (dbrow = DBfetch(result)))
