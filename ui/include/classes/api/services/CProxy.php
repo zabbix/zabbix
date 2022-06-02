@@ -117,9 +117,10 @@ class CProxy extends CApiService {
 
 		// output
 		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$options['output'] = ['proxyid', 'host', 'status', 'lastaccess'];
+			$options['output'] = array_keys(DB::getSchema($this->tableName())['fields']);
 		}
-		else if (is_array($options['output'])) {
+
+		if (is_array($options['output'])) {
 			$output = [
 				'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
 				'tls_subject', 'proxy_address', 'auto_compress'
