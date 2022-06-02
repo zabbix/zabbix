@@ -54,6 +54,9 @@ class CAPIHelper {
 	 */
 	public static function callRaw($data) {
 		global $URL;
+		if (!is_string($URL)) {
+			$URL = PHPUNIT_URL.'api_jsonrpc.php';
+		}
 
 		if (is_array($data)) {
 			$data = json_encode($data);
