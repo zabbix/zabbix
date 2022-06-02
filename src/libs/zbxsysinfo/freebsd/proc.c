@@ -148,6 +148,7 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data->state);
 	zbx_free(proc_data->user);
 	zbx_free(proc_data->group);
+
 	zbx_free(proc_data);
 }
 
