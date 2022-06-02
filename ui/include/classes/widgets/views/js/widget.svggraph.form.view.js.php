@@ -214,7 +214,7 @@ window.widget_svggraph_form = new class {
 					jQuery('#legend_columns').rangeControl('disable');
 				}
 				else {
-					if (document.getElementById('legend_statistic').checked) {
+					if (!document.getElementById('legend_statistic').checked) {
 						jQuery('#legend_columns').rangeControl('enable');
 					}
 				}
@@ -224,7 +224,7 @@ window.widget_svggraph_form = new class {
 		document.getElementById('legend_statistic')
 			.addEventListener('click', (e) => {
 				jQuery('#legend_columns').rangeControl(
-					e.target.checked ? 'enable' : 'disable'
+					!e.target.checked ? 'enable' : 'disable'
 				);
 			});
 	}

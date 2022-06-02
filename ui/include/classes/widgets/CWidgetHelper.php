@@ -1228,7 +1228,9 @@ class CWidgetHelper {
 						(new CButton('button', _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('element-table-remove'),
-						(new CVar($field_name.'['.$row_num.'][itemids][]', $itemid, 'items_'.$row_num.'_'.($i + 1).'_input'))
+						new CVar($field_name.'['.$row_num.'][itemids][]', $itemid,
+							'items_'.$row_num.'_'.($i + 1).'_input'
+						)
 					]))
 						->addClass('table-col-action')
 						->addClass(ZBX_STYLE_NOWRAP)
