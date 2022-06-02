@@ -55,7 +55,7 @@ static int	interface_availability_compare(const void *d1, const void *d2)
 static void	process_new_active_check_heartbeat(zbx_avail_active_hb_cache_t *cache,
 		zbx_host_active_avail_t *avail_new)
 {
-	zbx_host_active_avail_t	*avail_cached;
+	zbx_host_active_avail_t	*avail_cached, *avail_queued;
 
 	if (NULL == (avail_cached = zbx_hashset_search(&cache->hosts, &avail_new->hostid)))
 	{
@@ -63,8 +63,14 @@ static void	process_new_active_check_heartbeat(zbx_avail_active_hb_cache_t *cach
 
 		zbx_hashset_insert(&cache->hosts, avail_new, sizeof(zbx_host_active_avail_t));
 
-		if (NULL == zbx_hashset_search(&cache->queue, &avail_new->hostid))
+		if (NULL == (avail_queued = zbx_hashset_search(&cache->queue, &avail_new->hostid)))
+		{
 			zbx_hashset_insert(&cache->queue, avail_new, sizeof(zbx_host_active_avail_t));
+		}
+		else
+		{
+			avail_queued->active_status = INTERFACE_AVAILABLE_TRUE;
+		}
 	}
 	else
 	{
@@ -382,7 +388,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 			{
 				continue;
 			}
-			zbx_hashset_remove(&cache->proxy_avail, &proxy_avail->hostid);
+			zbx_hashset_iter_remove(&iter);
 		}
 	}
 }
