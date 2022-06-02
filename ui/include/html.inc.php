@@ -1000,7 +1000,7 @@ function makeSuppressedProblemIcon(array $icon_data) {
 	$maintenances = implode(',', $maintenance_names);
 
 	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INVISIBLE)
+		->addClass(ZBX_STYLE_ACTION_ICON_SUPPRESS)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
 			"\n".

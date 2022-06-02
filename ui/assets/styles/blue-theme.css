@@ -6270,8 +6270,9 @@ svg {
 .icon-action-message,
 .icon-action-ack,
 .icon-action-unack,
+.icon-action-suppress,
+.icon-action-unsuppress,
 .icon-invisible,
-.icon-visible,
 .icon-problem-generated,
 .icon-problem-recovery,
 .icon-actions-number-gray,
@@ -6298,8 +6299,9 @@ svg {
   .icon-action-message::before,
   .icon-action-ack::before,
   .icon-action-unack::before,
+  .icon-action-suppress::before,
+  .icon-action-unsuppress::before,
   .icon-invisible::before,
-  .icon-visible::before,
   .icon-problem-generated::before,
   .icon-problem-recovery::before,
   .icon-actions-number-gray::before,
@@ -6318,24 +6320,28 @@ svg {
     background-image: url("../img/icon-sprite.svg?20220519");
     background-repeat: no-repeat; }
 
-.icon-invisible:link, .icon-invisible:hover, .icon-invisible:focus,
-.icon-visible:link,
-.icon-visible:hover,
-.icon-visible:focus {
+.icon-action-suppress:link, .icon-action-suppress:hover, .icon-action-suppress:focus,
+.icon-action-unsuppress:link,
+.icon-action-unsuppress:hover,
+.icon-action-unsuppress:focus,
+.icon-invisible:link,
+.icon-invisible:hover,
+.icon-invisible:focus {
   border-bottom: none; }
-.icon-invisible:focus,
-.icon-visible:focus {
+.icon-action-suppress:focus,
+.icon-action-unsuppress:focus,
+.icon-invisible:focus {
   box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
   border-radius: 2px; }
 
-button.icon-action-command, button.icon-action-close, button.icon-action-msg, button.icon-action-msgs, button.icon-action-severity-up, button.icon-action-severity-down, button.icon-action-severity-changed, button.icon-action-message, button.icon-action-ack, button.icon-invisible, button.icon-visible, button.icon-problem-generated, button.icon-problem-recovery, button.icon-actions-number-gray, button.icon-actions-number-yellow, button.icon-actions-number-red {
+button.icon-action-command, button.icon-action-close, button.icon-action-msg, button.icon-action-msgs, button.icon-action-severity-up, button.icon-action-severity-down, button.icon-action-severity-changed, button.icon-action-message, button.icon-action-ack, button.icon-action-suppress, button.icon-action-unsuppress, button.icon-problem-generated, button.icon-problem-recovery, button.icon-actions-number-gray, button.icon-actions-number-yellow, button.icon-actions-number-red {
   background: none;
   border: none;
   padding: 0px;
   margin: 0px;
   margin-right: 5px;
   min-height: 0px; }
-  button.icon-action-command::after, button.icon-action-close::after, button.icon-action-msg::after, button.icon-action-msgs::after, button.icon-action-severity-up::after, button.icon-action-severity-down::after, button.icon-action-severity-changed::after, button.icon-action-message::after, button.icon-action-ack::after, button.icon-invisible::after, button.icon-visible::after, button.icon-problem-generated::after, button.icon-problem-recovery::after, button.icon-actions-number-gray::after, button.icon-actions-number-yellow::after, button.icon-actions-number-red::after {
+  button.icon-action-command::after, button.icon-action-close::after, button.icon-action-msg::after, button.icon-action-msgs::after, button.icon-action-severity-up::after, button.icon-action-severity-down::after, button.icon-action-severity-changed::after, button.icon-action-message::after, button.icon-action-ack::after, button.icon-action-suppress::after, button.icon-action-unsuppress::after, button.icon-problem-generated::after, button.icon-problem-recovery::after, button.icon-actions-number-gray::after, button.icon-actions-number-yellow::after, button.icon-actions-number-red::after {
     left: 0px;
     top: 4px; }
 
@@ -6377,11 +6383,14 @@ button.icon-action-command, button.icon-action-close, button.icon-action-msg, bu
 .icon-action-unack::before {
   background-position: -173px -245px; }
 
-.icon-invisible::before {
+.icon-action-suppress::before {
   background-position: -89px -803px; }
 
-.icon-visible::before {
+.icon-action-unsuppress::before {
   background-position: -89px -836px; }
+
+.icon-invisible::before {
+  background-position: -89px -803px; }
 
 .icon-problem-generated::before {
   background-position: -449px -245px; }

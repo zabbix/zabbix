@@ -1767,7 +1767,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 		$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		if (array_key_exists('suppress_until', $suppression)) {
-			$icon = ZBX_STYLE_ICON_INVISIBLE;
+			$icon = ZBX_STYLE_ACTION_ICON_SUPPRESS;
 			$title = _('Suppressed');
 
 			if ($suppression['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
@@ -1781,7 +1781,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 			}
 		}
 		else {
-			$icon = ZBX_STYLE_ICON_VISIBLE;
+			$icon = ZBX_STYLE_ACTION_ICON_UNSUPPRESS;
 			$title = _('Unsuppressed');
 			$suppress_until = '';
 		}
@@ -1797,8 +1797,8 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButton {
 	return $total
 		? makeActionIcon([
 			'icon' => array_key_exists('suppress_until', $data['suppress_until'][0])
-				? ZBX_STYLE_ICON_INVISIBLE
-				: ZBX_STYLE_ICON_VISIBLE,
+				? ZBX_STYLE_ACTION_ICON_SUPPRESS
+				: ZBX_STYLE_ACTION_ICON_UNSUPPRESS,
 			'button' => true,
 			'hint' => [
 				$table,
@@ -2223,14 +2223,17 @@ function makeActionTableIcon(array $action) {
 				}
 
 				$action_icons[] = makeActionIcon([
-					'icon' => ZBX_STYLE_ICON_INVISIBLE,
+					'icon' => ZBX_STYLE_ACTION_ICON_SUPPRESS,
 					'button' => true,
 					'hint' => _s('Suppressed till: %1$s', $suppress_until)
 				]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
-				$action_icons[] = makeActionIcon(['icon' => ZBX_STYLE_ICON_VISIBLE, 'title' => _('Unsuppressed')]);
+				$action_icons[] = makeActionIcon([
+					'icon' => ZBX_STYLE_ACTION_ICON_UNSUPPRESS,
+					'title' => _('Unsuppressed')
+				]);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {

@@ -1198,7 +1198,11 @@ td.inactive-bg {
 	background-position: -173px -285px;
 }
 
-.icon-visible::before {
+.icon-action-suppress::before {
+	background-position: -249px -803px;
+}
+
+.icon-action-unsuppress::before {
 	background-position: -249px -836px;
 }
 

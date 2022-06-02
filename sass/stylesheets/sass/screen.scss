@@ -5366,8 +5366,9 @@ svg {
 .icon-action-message,
 .icon-action-ack,
 .icon-action-unack,
+.icon-action-suppress,
+.icon-action-unsuppress,
 .icon-invisible,
-.icon-visible,
 .icon-problem-generated,
 .icon-problem-recovery,
 .icon-actions-number-gray,
@@ -5398,8 +5399,9 @@ svg {
 	}
 }
 
-.icon-invisible,
-.icon-visible	{
+.icon-action-suppress,
+.icon-action-unsuppress,
+.icon-invisible {
 	&:link,
 	&:hover,
 	&:focus {
@@ -5422,8 +5424,8 @@ button {
 	&.icon-action-severity-changed,
 	&.icon-action-message,
 	&.icon-action-ack,
-	&.icon-invisible,
-	&.icon-visible,
+	&.icon-action-suppress,
+	&.icon-action-unsuppress,
 	&.icon-problem-generated,
 	&.icon-problem-recovery,
 	&.icon-actions-number-gray,
@@ -5490,12 +5492,16 @@ button {
 	background-position: -173px -245px;
 }
 
-.icon-invisible::before {
+.icon-action-suppress::before {
 	background-position: -89px -803px;
 }
 
-.icon-visible::before {
+.icon-action-unsuppress::before {
 	background-position: -89px -836px;
+}
+
+.icon-invisible::before {
+	background-position: -89px -803px;
 }
 
 .icon-problem-generated::before {
