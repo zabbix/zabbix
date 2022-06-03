@@ -675,7 +675,9 @@ class CControllerMenuPopup extends CController {
 				if ($events) {
 					$event = $events[0];
 
-					$can_be_closed = !isEventClosed($event);
+					if ($can_be_closed) {
+						$can_be_closed = !isEventClosed($event);
+					}
 
 					foreach ($event['urls'] as $url) {
 						$menu_data['urls'][] = [
