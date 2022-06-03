@@ -506,6 +506,7 @@ typedef struct
 	int		action;
 	int		old_severity;
 	int		new_severity;
+	int		suppress_until;
 }
 DB_ACKNOWLEDGE;
 
