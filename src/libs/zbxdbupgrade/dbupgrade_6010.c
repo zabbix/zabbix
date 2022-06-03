@@ -721,7 +721,7 @@ static int	DBpatch_6010033_split_groups(void)
 		ZBX_STR2UINT64(hstgrp->groupid, row[0]);
 		hstgrp->name = zbx_strdup(NULL, row[1]);
 		hstgrp->uuid = zbx_strdup(NULL, row[2]);
-		hstgrp->type = 0;
+		hstgrp->type = DBPATCH_HOSTGROUP_TYPE_EMPTY;
 
 		zbx_vector_hstgrp_append(&hstgrps, hstgrp);
 	}
