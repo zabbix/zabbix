@@ -23,33 +23,19 @@ class CSvgGraphArea extends CSvgGraphLine {
 
 	public const ZBX_STYLE_CLASS = 'svg-graph-area';
 
-	private $y_zero;
+	public function __construct(array $path, array $metric) {
+		parent::__construct($path, $metric, false);
 
-	public function __construct(array $path, array $metric, ?int $y_zero) {
-		parent::__construct($path, $metric, true);
-
-		$this->y_zero = $y_zero;
 		$this->options = $metric['options'] + [
-			'fill' => 5
+			'fill' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY
 		];
 	}
 
 	protected function draw(): void {
-		parent::draw();
-
 		$this->addClass(self::ZBX_STYLE_CLASS);
 
-		if ($this->path) {
-			if ($this->y_zero !== null) {
-				$first_point = reset($this->path);
-				$last_point = end($this->path);
+		parent::draw();
 
-				$this
-					->lineTo($last_point[0], $this->y_zero)
-					->lineTo($first_point[0], $this->y_zero);
-			}
-
-			$this->closePath();
-		}
+		$this->closePath();
 	}
 }

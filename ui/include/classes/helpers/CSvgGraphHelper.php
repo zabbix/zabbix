@@ -49,6 +49,7 @@ class CSvgGraphHelper {
 		// Find which metrics will be shown in graph and calculate time periods and display options.
 		self::getMetricsPattern($metrics, $options['data_sets']);
 		self::getMetricsItems($metrics, $options['data_sets']);
+		self::sortByDataset($metrics);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['overrides']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
@@ -225,6 +226,12 @@ class CSvgGraphHelper {
 				$max_metrics--;
 			}
 		}
+	}
+
+	private static function sortByDataset(array &$metrics): void {
+		usort($metrics, static function(array $a, array $b): int {
+			return $a['data_set'] <=> $b['data_set'];
+		});
 	}
 
 	/**

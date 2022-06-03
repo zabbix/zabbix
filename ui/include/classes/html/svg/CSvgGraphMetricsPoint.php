@@ -19,20 +19,20 @@
 **/
 
 
-class CSvgGraphBar extends CSvgGroup {
+class CSvgGraphMetricsPoint extends CSvgGroup {
 
-	private const ZBX_STYLE_CLASS = 'svg-graph-bar';
+	private const ZBX_STYLE_CLASS = 'svg-graph-points';
 
 	private $path;
 	private $itemid;
 	private $item_name;
-	private $options;
+
+	protected $options;
 
 	public function __construct(array $path, array $metric) {
 		parent::__construct();
 
-		$this->path = $path;
-
+		$this->path = $path ? : [];
 		$this->itemid = $metric['itemid'];
 		$this->item_name = $metric['name'];
 
@@ -40,7 +40,6 @@ class CSvgGraphBar extends CSvgGroup {
 			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
 			'pointsize' => CSvgGraph::SVG_GRAPH_DEFAULT_POINTSIZE,
 			'transparency' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY,
-			'width' => CSvgGraph::SVG_GRAPH_DEFAULT_LINE_WIDTH,
 			'order' => 1
 		];
 	}
@@ -58,36 +57,22 @@ class CSvgGraphBar extends CSvgGroup {
 		];
 	}
 
-	private function draw(): void {
+	protected function draw(): void {
 		$this->addItem(
-			(new CSvgCircle(-10, -10, $this->options['width'] + 4))
+			(new CSvgCircle(-10, -10, $this->options['pointsize'] + 4))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 		);
 
 		foreach ($this->path as $point) {
-			if (array_key_exists(3, $point)) {
-				[$x, $y, $label, $width, $group_x] = $point;
-
-				$this->addItem(
-					(new CSvgPolygon(
-						[
-							[round($x - floor($width / 2)), ceil($this->options['y_zero'])],
-							[round($x - floor($width / 2)), ceil($y)],
-							[round($x + ceil($width / 2)), ceil($y)],
-							[round($x + ceil($width / 2)), ceil($this->options['y_zero'])]
-						]
-					))
-						// Value.
-						->setAttribute('label', $label)
-						// X for tooltip.
-						->setAttribute('data-px', floor($group_x))
-				);
-			}
+			$this->addItem(
+				(new CSvgCircle($point[0], $point[1], $this->options['pointsize']))->setAttribute('label', $point[2])
+			);
 		}
 	}
 
 	public function toString($destroy = true): string {
-		$this->setAttribute('data-set', 'bar')
+		$this
+			->setAttribute('data-set', 'points')
 			->setAttribute('data-metric', CHtml::encode($this->item_name))
 			->setAttribute('data-color', $this->options['color'])
 			->draw();

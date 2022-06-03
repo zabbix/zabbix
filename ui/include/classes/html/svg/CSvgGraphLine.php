@@ -31,14 +31,14 @@ class CSvgGraphLine extends CSvgPath {
 	protected $units;
 	protected $host;
 
-	protected $is_auxiliary;
+	protected $add_labels;
 
 	protected $options;
 
-	public function __construct(array $path, array $metric, bool $is_auxiliary = false) {
+	public function __construct(array $path, array $metric, bool $add_labels = true) {
 		parent::__construct();
 
-		$this->is_auxiliary = $is_auxiliary;
+		$this->add_labels = $add_labels;
 		$this->path = $path;
 
 		$this->itemid = $metric['itemid'];
@@ -76,10 +76,7 @@ class CSvgGraphLine extends CSvgPath {
 
 	public function toString($destroy = true): string {
 		if ($this->path) {
-			if ($this->is_auxiliary) {
-				$this->addClass(self::ZBX_STYLE_LINE_AUXILIARY);
-			}
-			else {
+			if ($this->add_labels) {
 				$line_values = '';
 
 				foreach ($this->path as $point) {

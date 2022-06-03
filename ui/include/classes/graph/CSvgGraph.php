@@ -196,58 +196,8 @@ class CSvgGraph extends CSvg {
 		];
 
 		foreach ($metrics as $index => $metric) {
-			$min_value = null;
-			$max_value = null;
-
-			if (array_key_exists('points', $metric)) {
-				$metrics_for_each_axes[$metric['options']['axisy']]++;
-
-				foreach ($metric['points'] as $point) {
-					switch ($metric['options']['approximation']) {
-						case APPROXIMATION_MIN:
-							$point_min = $point['min'];
-							$point_max = $point['min'];
-							break;
-						case APPROXIMATION_MAX:
-							$point_min = $point['max'];
-							$point_max = $point['max'];
-							break;
-						case APPROXIMATION_ALL:
-							$point_min = $point['min'];
-							$point_max = $point['max'];
-							break;
-						default:
-							$point_min = $point['avg'];
-							$point_max = $point['avg'];
-							break;
-					}
-					if ($min_value === null || $min_value > $point_min) {
-						$min_value = (float) $point_min;
-					}
-					if ($max_value === null || $max_value < $point_max) {
-						$max_value = (float) $point_max;
-					}
-				}
-
-				if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
-					if ($this->min_value_left === null || $this->min_value_left > $min_value) {
-						$this->min_value_left = $min_value;
-					}
-					if ($this->max_value_left === null || $this->max_value_left < $max_value) {
-						$this->max_value_left = $max_value;
-					}
-				}
-				else {
-					if ($this->min_value_right === null || $this->min_value_right > $min_value) {
-						$this->min_value_right = $min_value;
-					}
-					if ($this->max_value_right === null || $this->max_value_right < $max_value) {
-						$this->max_value_right = $max_value;
-					}
-				}
-			}
-
 			$this->metrics[$index] = [
+				'data_set' => $metric['data_set'],
 				'name' => $metric['name'],
 				'itemid' => $metric['itemid'],
 				'units' => $metric['units'],
@@ -255,7 +205,84 @@ class CSvgGraph extends CSvg {
 				'options' => ['order' => $index] + $metric['options']
 			];
 
-			$this->points[$index] = $metric['points'];
+			if (!array_key_exists($index, $this->points)) {
+				$this->points[$index] = [];
+			}
+
+			if (!array_key_exists('points', $metric)) {
+				continue;
+			}
+
+			$min_value = null;
+			$max_value = null;
+
+//			$has_next_metric = $metric['options']['stacked'] == SVG_GRAPH_STACKED_ON
+//				&& array_key_exists($index + 1, $metrics)
+//				&& $metrics[$index + 1]['data_set'] == $metric['data_set'];
+
+			$metrics_for_each_axes[$metric['options']['axisy']]++;
+
+			foreach ($metric['points'] as $clock => $point) {
+//				if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON
+//						&& array_key_exists($clock, $this->points[$index])) {
+
+//					if ($this->points[$index][$clock] === null) {
+//						$point = [
+//							'min' => $point['min'] + $this->points[$index - 1][$clock]['min'],
+//							'avg' => $point['avg'] + $this->points[$index - 1][$clock]['avg'],
+//							'max' => $point['max'] + $this->points[$index - 1][$clock]['max'],
+//						];
+//					}
+//				}
+
+				$this->points[$index][$clock] = $point;
+
+//				if ($has_next_metric) {
+//					$this->points[$index + 1][$clock] = null;
+//				}
+
+				switch ($metric['options']['approximation']) {
+					case APPROXIMATION_MIN:
+						$point_min = $point['min'];
+						$point_max = $point['min'];
+						break;
+					case APPROXIMATION_MAX:
+						$point_min = $point['max'];
+						$point_max = $point['max'];
+						break;
+					case APPROXIMATION_ALL:
+						$point_min = $point['min'];
+						$point_max = $point['max'];
+						break;
+					default:
+						$point_min = $point['avg'];
+						$point_max = $point['avg'];
+						break;
+				}
+				if ($min_value === null || $min_value > $point_min) {
+					$min_value = (float) $point_min;
+				}
+				if ($max_value === null || $max_value < $point_max) {
+					$max_value = (float) $point_max;
+				}
+			}
+
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
+				if ($this->min_value_left === null || $this->min_value_left > $min_value) {
+					$this->min_value_left = $min_value;
+				}
+				if ($this->max_value_left === null || $this->max_value_left < $max_value) {
+					$this->max_value_left = $max_value;
+				}
+			}
+			else {
+				if ($this->min_value_right === null || $this->min_value_right > $min_value) {
+					$this->min_value_right = $min_value;
+				}
+				if ($this->max_value_right === null || $this->max_value_right < $max_value) {
+					$this->max_value_right = $max_value;
+				}
+			}
 		}
 
 		$this->left_y_empty = ($metrics_for_each_axes[GRAPH_YAXIS_SIDE_LEFT] == 0);
@@ -708,14 +735,59 @@ class CSvgGraph extends CSvg {
 
 	private function drawMetricsLine(): void {
 		foreach ($this->metrics as $index => $metric) {
-			if (in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])
-					&& array_key_exists($index, $this->paths)) {
-				$this->addItem(
-					new CSvgGraphLineGroup($this->paths[$index], $metric,
-						$metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT ? $this->right_y_zero : $this->left_y_zero
-					)
-				);
+			if (!array_key_exists($index, $this->paths)) {
+				continue;
 			}
+			if (!in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])) {
+				continue;
+			}
+
+			switch ($metric['options']['approximation']) {
+				case APPROXIMATION_MIN:
+					$approximation = 'min';
+					break;
+				case APPROXIMATION_MAX:
+					$approximation = 'max';
+					break;
+				default:
+					$approximation = 'avg';
+			}
+
+			$y_zero = $metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT ? $this->right_y_zero : $this->left_y_zero;
+			$metric_paths = [];
+
+			foreach ($this->paths[$index] as $path) {
+				$metric_path = [
+					'line' => array_column($path, $approximation)
+				];
+
+				if ($metric['options']['approximation'] == APPROXIMATION_ALL) {
+					$metric_path['min'] = array_column($path, 'min');
+					$metric_path['max'] = array_column($path, 'max');
+				}
+
+				if (count($path) > 1) {
+					if ($metric['options']['approximation'] == APPROXIMATION_ALL) {
+						$metric_path['fill'] = array_merge(
+							$metric_path['max'],
+							array_reverse($metric_path['min'])
+						);
+					}
+					else {
+						$first_point = reset($metric_path['line']);
+						$last_point = end($metric_path['line']);
+
+						$metric_path['fill'] = array_merge($metric_path['line'], [
+							[$last_point[0], $y_zero],
+							[$first_point[0], $y_zero]
+						]);
+					}
+				}
+
+				$metric_paths[] = $metric_path;
+			}
+
+			$this->addItem(new CSvgGraphMetricsLine($metric_paths, $metric));
 		}
 	}
 
@@ -733,7 +805,7 @@ class CSvgGraph extends CSvg {
 						$approximation = 'avg';
 				}
 
-				$this->addItem(new CSvgGraphPoints(array_column(reset($this->paths[$index]), $approximation), $metric));
+				$this->addItem(new CSvgGraphMetricsPoint(array_column(reset($this->paths[$index]), $approximation), $metric));
 			}
 		}
 	}
@@ -828,7 +900,7 @@ class CSvgGraph extends CSvg {
 					: $this->left_y_zero;
 				$metric['options']['bar_width'] = $bar_min_width[$metric['options']['axisy']];
 
-				$this->addItem(new CSvgGraphBar(reset($this->paths[$index]), $metric));
+				$this->addItem(new CSvgGraphMetricsBar(reset($this->paths[$index]), $metric));
 			}
 		}
 	}

@@ -22,20 +22,18 @@
 /*
  * Class to draw graph line. Single data points will be drawn as points instead of lines.
  */
-class CSvgGraphLineGroup extends CSvgGroup {
+class CSvgGraphMetricsLine extends CSvgGroup {
 
-	private $paths;
+	private $metric_paths;
 	private $metric;
-	private $y_zero;
 
 	private $options;
 
-	public function __construct(array $paths, array $metric, $y_zero) {
+	public function __construct(array $metric_paths, array $metric) {
 		parent::__construct();
 
-		$this->paths = $paths;
+		$this->metric_paths = $metric_paths;
 		$this->metric = $metric;
-		$this->y_zero = $y_zero;
 
 		$this->options = $metric['options'] + [
 			'transparency' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY,
@@ -88,51 +86,31 @@ class CSvgGraphLineGroup extends CSvgGroup {
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 		);
 
-		switch ($this->options['approximation']) {
-			case APPROXIMATION_MIN:
-				$approximation = 'min';
-				break;
-			case APPROXIMATION_MAX:
-				$approximation = 'max';
-				break;
-			default:
-				$approximation = 'avg';
-		}
-
-		foreach ($this->paths as $path) {
+		foreach ($this->metric_paths as $metric_path) {
 			// Draw single data point paths as circles instead of lines.
-			if (count($path) > 1) {
-				$this->addItem(new CSvgGraphLine(array_column($path, $approximation), $this->metric));
+			if (count($metric_path) > 1) {
+				$this->addItem(new CSvgGraphLine($metric_path['line'], $this->metric));
 
-				if ($this->options['approximation'] == APPROXIMATION_ALL) {
-					$this->addItem(new CSvgGraphLine(array_column($path, 'min'), $this->metric, true));
-					$this->addItem(new CSvgGraphLine(array_column($path, 'max'), $this->metric, true));
-				}
-
-				if ($this->options['approximation'] == APPROXIMATION_ALL) {
+				if (array_key_exists('min', $metric_path)) {
 					$this->addItem(
-						new CSvgGraphArea(
-							array_merge(
-								array_column($path, 'max'),
-								array_reverse(array_column($path, 'min'))
-							),
-							$this->metric,
-							null
-						)
+						(new CSvgGraphLine($metric_path['min'], $this->metric, false))
+							->addClass(CSvgGraphLine::ZBX_STYLE_LINE_AUXILIARY)
 					);
-				}
-				else {
 					$this->addItem(
-						new CSvgGraphArea(array_column($path, $approximation), $this->metric, $this->y_zero)
+						(new CSvgGraphLine($metric_path['max'], $this->metric, false))
+							->addClass(CSvgGraphLine::ZBX_STYLE_LINE_AUXILIARY)
 					);
 				}
 			}
 			else {
 				$this->addItem(
-					(new CSvgCircle($path[0][$approximation][0], $path[0][$approximation][1],
-						$this->options['pointsize'])
-					)->setAttribute('label', $path[0][$approximation][2])
+					(new CSvgCircle($metric_path['line'][0][0], $metric_path['line'][0][1], $this->options['pointsize']))
+						->setAttribute('label', $metric_path['line'][0][2])
 				);
+			}
+
+			if (array_key_exists('fill', $metric_path)) {
+				$this->addItem(new CSvgGraphArea($metric_path['fill'], $this->metric));
 			}
 		}
 	}
