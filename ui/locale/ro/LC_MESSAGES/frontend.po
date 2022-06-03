@@ -11115,6 +11115,10 @@ msgstr "Lista este goală"
 msgid "List of OS processes with attributes. Returns JSON array"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr ""
@@ -13202,6 +13206,10 @@ msgstr "Număr de itemuri in baza de date Zabbix."
 #: include/classes/data/CItemData.php:1654
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Număr de itemuri în istoricul proxy care nu au fost încă trimise către server"
+
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -19932,6 +19940,10 @@ msgstr "Statistici valori cache. Moduri valide sunt: total, free, pfree, used an
 
 #: include/classes/helpers/CCookieHelper.php:75
 msgid "Value cannot be empty."
+msgstr ""
+
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:247
