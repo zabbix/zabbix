@@ -1,8 +1,13 @@
 Changes for 6.2.0rc1
 
 New features:
+.........T [ZBXNEXT-7632] added template for HPE Primera (vkhaliev)
+..F....... [ZBXNEXT-7567] implemented saving the state of the default filters in monitoring sections (acikuns)
+.........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
 
 Bug fixes:
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta3
