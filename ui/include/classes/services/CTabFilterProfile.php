@@ -281,7 +281,7 @@ class CTabFilterProfile {
 		$this->tabfilters = CProfile::getArray($this->namespace.'.properties', []);
 
 		foreach ($this->tabfilters as &$tabfilter) {
-			$tabfilter = json_decode($tabfilter, true) + ['filter_name' => ''];
+			$tabfilter = json_decode($tabfilter, true);
 		}
 		unset($tabfilter);
 
