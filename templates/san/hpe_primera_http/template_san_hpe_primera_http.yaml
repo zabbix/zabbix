@@ -154,12 +154,11 @@ zabbix_export:
                     }
             
                     if (raw_data !== null) {
-                        if (typeof raw_data === 'object') {
+                        try {
                             return JSON.parse(raw_data);
                         }
-                        else {
-                            throw 'Received data is not an object.';
-                        }
+                        catch (error) {
+                            throw 'Failed to parse response received from device API.';
                     }
                     else {
                         throw 'No data received by ' + method + ' request.';
