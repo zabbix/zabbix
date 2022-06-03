@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 #include "log.h"
 #include "sysinfo.h"
@@ -64,7 +64,7 @@ static int	DBpatch_6010002(void)
 		" from triggers"
 		" where " ZBX_DB_CHAR_LENGTH(description) ">%d", 255);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -79,7 +79,7 @@ static int	DBpatch_6010002(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -118,11 +118,11 @@ static int	DBpatch_6010005(void)
 		" from hosts_templates ht, hosts h"
 		" where ht.hostid=h.hostid and h.flags=4"); /* ZBX_FLAG_DISCOVERY_CREATED */
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		/* set TEMPLATE_LINK_LLD as link_type */
+		/* set ZBX_TEMPLATE_LINK_LLD as link_type */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update hosts_templates set link_type=1 where hosttemplateid=%s;\n", row[0]);
 
@@ -130,7 +130,7 @@ static int	DBpatch_6010005(void)
 			goto out;
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		ret = FAIL;
@@ -352,7 +352,7 @@ static int	DBpatch_6010024(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select hi.itemid,hi.type,ht.name"
@@ -393,7 +393,7 @@ static int	DBpatch_6010024(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -419,7 +419,7 @@ static int	DBpatch_6010025(void)
 	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
 		return SUCCEED;
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = DBselect(
 			"select hi.itemid,hi.type,hs.name,ht.name"
@@ -461,7 +461,7 @@ static int	DBpatch_6010025(void)
 	}
 	DBfree_result(result);
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
@@ -475,6 +475,47 @@ static int	DBpatch_6010025(void)
 	return ret;
 }
 
+static int	DBpatch_6010026(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.auditlog.filter.action' and value_int=-1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010027(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"update profiles"
+			" set idx='web.auditlog.filter.actions'"
+			" where idx='web.auditlog.filter.action'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010028(void)
+{
+	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"delete from role_rule where value_str='trigger.adddependencies' or "
+			"value_str='trigger.deletedependencies'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6010)
@@ -507,5 +548,8 @@ DBPATCH_ADD(6010022, 0,	1)
 DBPATCH_ADD(6010023, 0,	1)
 DBPATCH_ADD(6010024, 0,	1)
 DBPATCH_ADD(6010025, 0,	1)
+DBPATCH_ADD(6010026, 0,	1)
+DBPATCH_ADD(6010027, 0,	1)
+DBPATCH_ADD(6010028, 0,	1)
 
 DBPATCH_END()

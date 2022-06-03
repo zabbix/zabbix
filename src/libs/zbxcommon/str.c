@@ -18,10 +18,9 @@
 **/
 
 #include "common.h"
+
 #include "zbxthreads.h"
 #include "module.h"
-
-#include "zbxcrypto.h"
 
 #ifdef HAVE_ICONV
 #	include <iconv.h>
@@ -47,15 +46,11 @@ static const char	help_message_footer[] =
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	version(void)
+void	zbx_version(void)
 {
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	printf("\n");
-	zbx_tls_version();
-#endif
 }
 
 /******************************************************************************
@@ -67,7 +62,7 @@ void	version(void)
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	usage(void)
+void	zbx_usage(void)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
@@ -121,11 +116,11 @@ void	usage(void)
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	help(void)
+void	zbx_help(void)
 {
 	const char	**p = help_message;
 
-	usage();
+	zbx_usage();
 	printf("\n");
 
 	while (NULL != *p)
@@ -829,7 +824,7 @@ char	*zbx_strdcatf(char *dest, const char *f, ...)
  *                                                                            *
  * Return value: return SUCCEED if hostname is valid                          *
  *               or FAIL if hostname contains invalid chars, is empty         *
- *               or is longer than MAX_ZBX_HOSTNAME_LEN                       *
+ *               or is longer than ZBX_MAX_HOSTNAME_LEN                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_check_hostname(const char *hostname, char **error)
@@ -855,10 +850,10 @@ int	zbx_check_hostname(const char *hostname, char **error)
 		return FAIL;
 	}
 
-	if (MAX_ZBX_HOSTNAME_LEN < len)
+	if (ZBX_MAX_HOSTNAME_LEN < len)
 	{
 		if (NULL != error)
-			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", MAX_ZBX_HOSTNAME_LEN);
+			*error = zbx_dsprintf(NULL, "name is too long (max %d characters)", ZBX_MAX_HOSTNAME_LEN);
 		return FAIL;
 	}
 

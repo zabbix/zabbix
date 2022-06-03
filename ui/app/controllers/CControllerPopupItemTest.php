@@ -1236,25 +1236,30 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 			}
 			elseif (strstr($inputs[$field], '{') !== false) {
-				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($inputs[$field], $types);
+				if ($field === 'key') {
+					$inputs[$field] = CMacrosResolverGeneral::resolveItemKeyMacros($inputs[$field], $macros_posted, $types);
+				}
+				else {
+					$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($inputs[$field], $types);
 
-				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					$macro_value = array_key_exists($macro, $macros_posted)
-						? $macros_posted[$macro]
-						: '';
+					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+						$macro_value = array_key_exists($macro, $macros_posted)
+							? $macros_posted[$macro]
+							: '';
 
-					if ($inputs['type'] == ITEM_TYPE_HTTPAGENT && $field === 'posts') {
-						if ($inputs['post_type'] == ZBX_POSTTYPE_JSON && !is_numeric($macro_value)) {
-							$macro_value = json_encode($macro_value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-							// Remove " wrapping.
-							$macro_value = substr($macro_value, 1, -1);
+						if ($inputs['type'] == ITEM_TYPE_HTTPAGENT && $field === 'posts') {
+							if ($inputs['post_type'] == ZBX_POSTTYPE_JSON && !is_numeric($macro_value)) {
+								$macro_value = json_encode($macro_value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+								// Remove " wrapping.
+								$macro_value = substr($macro_value, 1, -1);
+							}
+							elseif ($inputs['post_type'] == ZBX_POSTTYPE_XML) {
+								$macro_value = htmlentities($macro_value);
+							}
 						}
-						elseif ($inputs['post_type'] == ZBX_POSTTYPE_XML) {
-							$macro_value = htmlentities($macro_value);
-						}
+
+						$inputs[$field] = substr_replace($inputs[$field], $macro_value, $pos, strlen($macro));
 					}
-
-					$inputs[$field] = substr_replace($inputs[$field], $macro_value, $pos, strlen($macro));
 				}
 			}
 		}

@@ -516,7 +516,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 		default:
 			zbx_error("mutually exclusive options used");
-			usage();
+			zbx_usage();
 			ret = FAIL;
 			goto out;
 	}
@@ -576,9 +576,9 @@ static void	set_defaults(void)
 			assert(*value);
 			zbx_trim_str_list(*value, ',');
 
-			if (NULL == strchr(*value, ',') && MAX_ZBX_HOSTNAME_LEN < strlen(*value))
+			if (NULL == strchr(*value, ',') && ZBX_MAX_HOSTNAME_LEN < strlen(*value))
 			{
-				(*value)[MAX_ZBX_HOSTNAME_LEN] = '\0';
+				(*value)[ZBX_MAX_HOSTNAME_LEN] = '\0';
 				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
 			}
 
@@ -1371,7 +1371,7 @@ int	main(int argc, char **argv)
 	switch (t.task)
 	{
 		case ZBX_TASK_SHOW_USAGE:
-			usage();
+			zbx_usage();
 			exit(EXIT_FAILURE);
 			break;
 #ifndef _WINDOWS
@@ -1466,7 +1466,11 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_VERSION:
-			version();
+			zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			printf("\n");
+			zbx_tls_version();
+#endif
 #ifdef _AIX
 			printf("\n");
 			tl_version();
@@ -1474,7 +1478,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
-			help();
+			zbx_help();
 			exit(EXIT_SUCCESS);
 			break;
 		default:

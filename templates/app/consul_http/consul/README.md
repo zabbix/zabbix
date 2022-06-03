@@ -26,7 +26,7 @@ Internal service metrics are collected from /v1/agent/metrics endpoint.
 Do not forget to enable Prometheus format for export metrics. See [documentation](https://www.consul.io/docs/agent/options#telemetry-prometheus_retention_time).
 Template need to use Authorization via API token.
 
-Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.API.TOKEN}.  
+Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.TOKEN}.  
 Also, see the Macros section for a list of macros used to set trigger values.  
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
 

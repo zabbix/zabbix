@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-05-12T14:07:06Z'
+  date: '2022-05-17T15:36:33Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,7 @@ zabbix_export:
       description: |
         Get HashiCorp Consul Cluster services and nodes by HTTP agent from API endpoints.
         
-        Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.API.TOKEN}.
+        Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.TOKEN}.
         Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.
         More information about metrics you can find in official documentation: https://www.consul.io/docs/agent/telemetry
         

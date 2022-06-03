@@ -19,6 +19,7 @@
 
 #include "item_preproc.h"
 
+#include "../db_lengths.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxembed.h"

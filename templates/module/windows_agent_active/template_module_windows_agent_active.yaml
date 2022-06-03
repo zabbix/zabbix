@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-05-16T06:44:49Z'
+  date: '2022-05-18T22:34:07Z'
   groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
@@ -490,7 +490,7 @@ zabbix_export:
             -
               uuid: ed8075fd5332427ca0f9b56d55f4912b
               expression: 'fuzzytime(/Windows generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'System time is out of syn'
+              name: 'System time is out of sync'
               event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
