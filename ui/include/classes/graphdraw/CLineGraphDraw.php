@@ -1647,14 +1647,14 @@ class CLineGraphDraw extends CGraphDraw {
 		$x1 = $from + $this->shiftXleft - 1;
 		$x2 = $to + $this->shiftXleft;
 
-		$y1min = (int) ($zero - ($min_from - $oxy) / $unit2px);
-		$y2min = (int) ($zero - ($min_to - $oxy) / $unit2px);
+		$y1min = (int) round($zero - ($min_from - $oxy) / $unit2px);
+		$y2min = (int) round($zero - ($min_to - $oxy) / $unit2px);
 
-		$y1max = (int) ($zero - ($max_from - $oxy) / $unit2px);
-		$y2max = (int) ($zero - ($max_to - $oxy) / $unit2px);
+		$y1max = (int) round($zero - ($max_from - $oxy) / $unit2px);
+		$y2max = (int) round($zero - ($max_to - $oxy) / $unit2px);
 
-		$y1avg = (int) ($zero - ($avg_from - $oxy) / $unit2px);
-		$y2avg = (int) ($zero - ($avg_to - $oxy) / $unit2px);
+		$y1avg = (int) round($zero - ($avg_from - $oxy) / $unit2px);
+		$y2avg = (int) round($zero - ($avg_to - $oxy) / $unit2px);
 
 		switch ($calc_fnc) {
 			case CALC_FNC_MAX:
