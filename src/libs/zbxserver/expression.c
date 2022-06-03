@@ -112,7 +112,7 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
  *               FAIL    - no matching actions were made                      *
  *                                                                            *
  ******************************************************************************/
-static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, char **out)
+static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, const char *tz, char **out)
 {
 	const char	*prefixes[] = {"", ", ", ", ", ", ", ", "};
 	char		*buf = NULL;
@@ -180,7 +180,17 @@ static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, ch
 	if (0 != (flags & ZBX_PROBLEM_UPDATE_SUPPRESS))
 	{
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "suppressed");
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "suppressed ");
+		if (0 == ack->suppress_until)
+		{
+			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "indefinitely");
+		}
+		else
+		{
+			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "until %s %s",
+					zbx_date2str((time_t)ack->suppress_until, tz),
+					zbx_time2str((time_t)ack->suppress_until, tz));
+		}
 	}
 
 	if (0 != (flags & ZBX_PROBLEM_UPDATE_UNSUPPRESS))
@@ -1273,7 +1283,7 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 	buf = (char *)zbx_malloc(buf, buf_alloc);
 	*buf = '\0';
 
-	result = DBselect("select clock,userid,message,action,old_severity,new_severity"
+	result = DBselect("select clock,userid,message,action,old_severity,new_severity,suppress_until"
 			" from acknowledges"
 			" where eventid=" ZBX_FS_UI64 " order by clock",
 			event->eventid);
@@ -1291,6 +1301,7 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 		ack.action = atoi(row[3]);
 		ack.old_severity = atoi(row[4]);
 		ack.new_severity = atoi(row[5]);
+		ack.suppress_until = atoi(row[6]);
 
 		if (SUCCEED == zbx_check_user_permissions(&ack.userid, recipient_userid))
 			user_name = zbx_user_string(ack.userid);
@@ -1306,7 +1317,7 @@ static void	get_event_update_history(const DB_EVENT *event, char **replace_to, c
 		if (SUCCEED == get_problem_update_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
 					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
 					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY |
-					ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS, &actions))
+					ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS, tz, &actions))
 		{
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
 			zbx_free(actions);
@@ -2846,7 +2857,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 								ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
 								ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
 								ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_SUPPRESS
-								| ZBX_PROBLEM_UPDATE_UNSUPPRESS, &replace_to);
+								| ZBX_PROBLEM_UPDATE_UNSUPPRESS, tz, &replace_to);
 					}
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_STATUS))

@@ -2481,7 +2481,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 			zbx_escalation_status_string(escalation->status));
 
 	result = DBselect(
-			"select message,userid,clock,action,old_severity,new_severity from acknowledges"
+			"select message,userid,clock,action,old_severity,new_severity,suppress_until from acknowledges"
 			" where acknowledgeid=" ZBX_FS_UI64,
 			escalation->acknowledgeid);
 
@@ -2496,6 +2496,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 		ack.action = atoi(row[3]);
 		ack.old_severity = atoi(row[4]);
 		ack.new_severity = atoi(row[5]);
+		ack.suppress_until = atoi(row[6]);
 
 		escalation_execute_update_operations(event, r_event, action, &ack, NULL, NULL, default_timezone, roles);
 	}
