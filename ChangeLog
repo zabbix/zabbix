@@ -3,6 +3,7 @@ Changes for 5.0.25rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.24
