@@ -764,6 +764,7 @@ $item_tab
 		(new CFormField((new CTextBox('delay', $data['delay']))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
+			->setReadonly($discovered_item)
 		))->setId('js-item-delay-field')
 	]);
 
@@ -780,7 +781,7 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 			->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 			->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 			->setModern(true)
-			->setEnabled(!$discovered_item);
+			->setEnabled(false);
 	}
 	else {
 		$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
