@@ -160,20 +160,7 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
  * @return CTableInfo
  */
 function make_event_details(array $event, array $allowed) {
-	$can_be_closed = $allowed['close'];
-
-	if ($event['r_eventid'] != 0) {
-		$can_be_closed = false;
-	}
-	else {
-		foreach ($event['acknowledges'] as $acknowledge) {
-			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-				$can_be_closed = false;
-				break;
-			}
-		}
-	}
-
+	$can_be_closed = $allowed['close'] && !isEventClosed($event);
 	$is_acknowledged = ($event['acknowledged'] == EVENT_ACKNOWLEDGED);
 
 	$table = (new CTableInfo())
@@ -370,12 +357,9 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		else {
 			$in_closing = false;
 
-			foreach ($event['acknowledges'] as $acknowledge) {
-				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-					$in_closing = true;
-					$can_be_closed = false;
-					break;
-				}
+			if (hasEventCloseAction($event['acknowledges'])) {
+				$in_closing = true;
+				$can_be_closed = false;
 			}
 
 			$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
@@ -422,6 +406,45 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 	}
 
 	return $table;
+}
+
+/**
+ * Checks if event is closed.
+ *
+ * @param array $event                              Event object.
+ * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
+ * @param array $event['acknowledges']              List of problem updates.
+ * @param array $event['acknowledges'][]['action']  Action performed in update.
+ *
+ * @return bool
+ */
+function isEventClosed(array $event): bool {
+	if ($event['r_eventid'] != 0) {
+		return true;
+	}
+	else {
+		return hasEventCloseAction($event['acknowledges']);
+	}
+}
+
+/**
+ * Checks if event has manual close action.
+ *
+ * @param array $event                              Event object.
+ * @param array $event['acknowledges']              List of problem updates.
+ * @param array $event['acknowledges'][]['action']  Action performed in update.
+ *
+ * @return bool
+ */
+function hasEventCloseAction(array $acknowledges): bool {
+	foreach ($acknowledges as $acknowledge) {
+		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
+			// If at least one manual close update was found, event is closing.
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**

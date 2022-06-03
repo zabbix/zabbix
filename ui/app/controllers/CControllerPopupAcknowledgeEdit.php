@@ -168,13 +168,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 				$can_be_closed = false;
 			}
 			// Look if problem is not currently in closing state due acknowledge actions.
-			elseif ($event['acknowledges']) {
-				foreach ($event['acknowledges'] as $acknowledge) {
-					if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-						$can_be_closed = false;
-						break;
-					}
-				}
+			elseif (hasEventCloseAction($event['acknowledges'])) {
+				$can_be_closed = false;
 			}
 
 			// If at least one event can be closed, enable 'Close problem' checkbox.

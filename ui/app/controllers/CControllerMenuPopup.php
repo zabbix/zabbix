@@ -675,17 +675,7 @@ class CControllerMenuPopup extends CController {
 				if ($events) {
 					$event = $events[0];
 
-					if ($event['r_eventid'] != 0) {
-						$can_be_closed = false;
-					}
-					else {
-						foreach ($event['acknowledges'] as $acknowledge) {
-							if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-								$can_be_closed = false;
-								break;
-							}
-						}
-					}
+					$can_be_closed = !isEventClosed($event);
 
 					foreach ($event['urls'] as $url) {
 						$menu_data['urls'][] = [

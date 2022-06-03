@@ -351,10 +351,12 @@ class CControllerPopupAcknowledgeCreate extends CController {
 			if ($this->unacknowledge && $event['acknowledged'] == EVENT_ACKNOWLEDGED) {
 				$eventid_groups['unacknowledgeable'][] = $event['eventid'];
 			}
-			if ($this->suppress && !$this->isEventClosed($event)) {
+
+			if ($this->suppress && !isEventClosed($event)) {
 				$eventid_groups['suppressible'][] = $event['eventid'];
 			}
-			if ($this->unsuppress && !$this->isEventClosed($event) && $this->isEventSuppressed($event)) {
+
+			if ($this->unsuppress && !isEventClosed($event) && $this->isEventSuppressed($event)) {
 				$eventid_groups['unsuppressible'][] = $event['eventid'];
 			}
 
@@ -379,43 +381,11 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	protected function isEventClosable(array $event, array $editable_triggers) {
 		if (!array_key_exists($event['objectid'], $editable_triggers)
 				|| $editable_triggers[$event['objectid']]['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
-				|| bccomp($event['r_eventid'], '0') > 0) {
+				|| isEventClosed($event)) {
 			return false;
 		}
 
-		foreach ($event['acknowledges'] as $acknowledge) {
-			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-				return false;
-			}
-		}
-
 		return true;
-	}
-
-	/**
-	 * Checks if event are closed.
-	 *
-	 * @param array $event                              Event object.
-	 * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
-	 * @param array $event['acknowledges']              List of problem updates.
-	 * @param array $event['acknowledges'][]['action']  Action performed in update.
-	 *
-	 * @return bool
-	 */
-	protected function isEventClosed(array $event) {
-		if (bccomp($event['r_eventid'], '0') == 1) {
-			return true;
-		}
-		else {
-			foreach ($event['acknowledges'] as $acknowledge) {
-				if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-					// If at least one manual close update was found, event is closing.
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 
 	/**
