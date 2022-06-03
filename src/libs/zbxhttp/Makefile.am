@@ -7,4 +7,3 @@ libzbxhttp_a_SOURCES = \
 	punycode.c \
 	punycode.h \
 	urlencode.c
-
