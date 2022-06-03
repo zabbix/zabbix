@@ -977,8 +977,6 @@ class CScreenProblem extends CScreenBase {
 					$can_be_closed = false;
 				}
 				else {
-					$in_closing = false;
-
 					$can_be_closed = !hasEventCloseAction($problem['acknowledges']);
 					$in_closing = !$can_be_closed;
 					$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
