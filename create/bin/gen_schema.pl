@@ -711,7 +711,7 @@ sub open_trigger($)
 	my $type = shift;
 	my $out;
 
-	$out = "create trigger ${table_name}_${type}${eol} ";
+	$out = "create trigger ${table_name}_${type} ";
 	if ($type eq "insert")
 	{
 		$out .= "after insert";
