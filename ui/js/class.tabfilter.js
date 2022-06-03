@@ -775,9 +775,7 @@ class CTabFilter extends CBaseComponent {
 				}
 			});
 		this._filters_footer.querySelector('[name="filter_reset"]')
-			.addEventListener('click', () => {
-				this._events.buttonResetAction();
-			});
+			.addEventListener('click', this._events.buttonResetAction);
 		this._filters_footer.addEventListener('click', this._events.buttonActionNotify);
 
 		this.on('keydown', this._events.keydown);
