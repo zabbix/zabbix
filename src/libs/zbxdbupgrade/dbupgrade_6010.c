@@ -699,7 +699,7 @@ out:
 
 static int	DBpatch_6010033_split_groups(void)
 {
-	int			i, has_hosts, has_templates, ret = FAIL;
+	int			i, ret = FAIL;
 	zbx_uint64_t		groupid;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -721,6 +721,7 @@ static int	DBpatch_6010033_split_groups(void)
 		ZBX_STR2UINT64(hstgrp->groupid, row[0]);
 		hstgrp->name = zbx_strdup(NULL, row[1]);
 		hstgrp->uuid = zbx_strdup(NULL, row[2]);
+		hstgrp->type = 0;
 
 		zbx_vector_hstgrp_append(&hstgrps, hstgrp);
 	}
@@ -779,25 +780,13 @@ static int	DBpatch_6010033_split_groups(void)
 
 	for (i = 0; i < hstgrps.values_num; i++)
 	{
-		has_hosts = zbx_vector_uint64_bsearch(&host_groupids, hstgrps.values[i]->groupid,
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		has_templates = zbx_vector_uint64_bsearch(&template_groupids, hstgrps.values[i]->groupid,
-				ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		groupid = hstgrps.values[i]->groupid;
 
-		if (FAIL == has_hosts && FAIL == has_templates)
-		{
-			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_EMPTY;
-		}
-		else if (FAIL == has_templates)
-		{
-			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_HOST;
-		}
-		else if (FAIL == has_hosts)
-		{
-			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_TEMPLATE;
-		}
-		else
-			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_MIXED;
+		if (FAIL != zbx_vector_uint64_bsearch(&host_groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			hstgrps.values[i]->type |= DBPATCH_HOSTGROUP_TYPE_HOST;
+
+		if (FAIL != zbx_vector_uint64_bsearch(&template_groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			hstgrps.values[i]->type |= DBPATCH_HOSTGROUP_TYPE_TEMPLATE;
 	}
 
 	DBpatch_6010033_update_nested_groups(&hstgrps);
