@@ -37,7 +37,7 @@ else {
 		? $data['filter']['severities']
 		: range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1);
 
-	$header = [[_('Host group'), (new CSpan())->addClass(ZBX_STYLE_ARROW_UP)]];
+	$header = [[_x('Host group', 'compact table header'), (new CSpan())->addClass(ZBX_STYLE_ARROW_UP)]];
 
 	for ($severity = TRIGGER_SEVERITY_COUNT - 1; $severity >= TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity--) {
 		if (in_array($severity, $filter_severities)) {

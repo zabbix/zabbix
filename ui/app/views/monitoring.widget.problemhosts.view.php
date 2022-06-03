@@ -28,10 +28,10 @@ $sort_div = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
 
 $table = (new CTableInfo())
 	->setHeader([
-		[_('Host group'), $sort_div],
-		_('Without problems'),
-		_('With problems'),
-		_('Total')
+		[_x('Host group', 'compact table header'), $sort_div],
+		_x('Without problems', 'compact table header'),
+		_x('With problems', 'compact table header'),
+		_x('Total', 'compact table header')
 	])
 	->setHeadingColumn(0);
 
