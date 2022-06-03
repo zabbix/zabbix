@@ -313,9 +313,9 @@ class CTabFilterProfile {
 	public function reset(): CTabFilterProfile {
 		if ($this->selected == 0) {
 			$this->setTabFilter($this->selected, ['filter_name' => '']);
+			$this->update();
 		}
 
-		$this->update();
 		return $this;
 	}
 
