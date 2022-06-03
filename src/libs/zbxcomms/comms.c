@@ -21,7 +21,6 @@
 #include "comms.h"
 
 #include "common.h"
-#include "base64.h"
 #include "log.h"
 #include "../zbxcrypto/tls_tcp.h"
 #include "zbxcompress.h"
