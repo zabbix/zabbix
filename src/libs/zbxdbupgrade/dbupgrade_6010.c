@@ -500,7 +500,6 @@ static int	DBpatch_6010028(void)
 	return SUCCEED;
 }
 
-#define DBPATCH_HOST_STATUS_TEMPLATE		"3"
 #define	DBPATCH_HOSTGROUP_TYPE_EMPTY		0x00
 #define DBPATCH_HOSTGROUP_TYPE_HOST		0x01
 #define DBPATCH_HOSTGROUP_TYPE_TEMPLATE		0x02
@@ -664,7 +663,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 					" and hostid in ("
 						"select hostid"
 						" from hosts"
-						" where status=" DBPATCH_HOST_STATUS_TEMPLATE
+						" where status=3" /* HOST_STATUS_TEMPLATE */
 					");\n", hstgrps->values[i]->newgroupid, hstgrps->values[i]->groupid);
 
 		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
@@ -697,9 +696,6 @@ out:
 	}												\
 	DBfree_result(result);
 #define ADD_GROUPIDS_FROM(table) ADD_GROUPIDS_FROM_FIELD(table, "groupid")
-#define DBPATCH_CONDITION_TYPE_HOST_GROUP	0
-#define DBPATCH_CONDITION_OPERATOR_EQUAL	0
-#define DBPATCH_CONDITION_OPERATOR_NOT_EQUAL	1
 
 static int	DBpatch_6010033_split_groups(void)
 {
@@ -735,7 +731,7 @@ static int	DBpatch_6010033_split_groups(void)
 			" from hstgrp g,hosts_groups hg,hosts h"
 			" where g.groupid=hg.groupid"
 				" and hg.hostid=h.hostid"
-				" and h.status<>" DBPATCH_HOST_STATUS_TEMPLATE);
+				" and h.status<>3" /* HOST_STATUS_TEMPLATE */);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -753,13 +749,8 @@ static int	DBpatch_6010033_split_groups(void)
 	ADD_GROUPIDS_FROM("opgroup");
 	ADD_GROUPIDS_FROM("scripts");
 
-	result = DBselect(
-			"select distinct value"
-			" from conditions"
-			" where value is not null"
-				" and conditiontype=%d"
-				" and operator in (%d,%d)", DBPATCH_CONDITION_TYPE_HOST_GROUP,
-			DBPATCH_CONDITION_OPERATOR_EQUAL, DBPATCH_CONDITION_OPERATOR_NOT_EQUAL);
+	/* 0 - CONDITION_TYPE_HOST_GROUP */
+	result = DBselect("select distinct value from conditions where conditiontype=0");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -773,7 +764,7 @@ static int	DBpatch_6010033_split_groups(void)
 			" from hstgrp g,hosts_groups hg,hosts h"
 			" where g.groupid=hg.groupid"
 				" and hg.hostid=h.hostid"
-				" and h.status=" DBPATCH_HOST_STATUS_TEMPLATE);
+				" and h.status=3" /* HOST_STATUS_TEMPLATE */);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -874,7 +865,7 @@ static int	DBpatch_6010035(void)
 			" where groupid in ("
 				"select groupid"
 				" from hstgrp"
-				" where type=1"	/* HOST_GROUP_TYPE_TEMPLATE_GROUP */
+				" where type=1" /* HOST_GROUP_TYPE_TEMPLATE_GROUP */
 			")"))
 	{
 		return FAIL;
@@ -893,7 +884,7 @@ static int	DBpatch_6010036(void)
 			" where value_groupid in ("
 				"select groupid"
 				" from hstgrp"
-				" where type=1"	/* HOST_GROUP_TYPE_TEMPLATE_GROUP */
+				" where type=1" /* HOST_GROUP_TYPE_TEMPLATE_GROUP */
 			")"))
 	{
 		return FAIL;
@@ -902,13 +893,10 @@ static int	DBpatch_6010036(void)
 	return SUCCEED;
 }
 
+#undef DBPATCH_HOSTGROUP_TYPE_EMPTY
 #undef DBPATCH_HOSTGROUP_TYPE_HOST
 #undef DBPATCH_HOSTGROUP_TYPE_TEMPLATE
-#undef DBPATCH_HOSTGROUP_TYPE_EMPTY
 #undef DBPATCH_HOSTGROUP_TYPE_MIXED
-#undef DBPATCH_CONDITION_TYPE_HOST_GROUP
-#undef DBPATCH_CONDITION_OPERATOR_EQUAL
-#undef DBPATCH_CONDITION_OPERATOR_NOT_EQUAL
 #undef ADD_GROUPIDS_FROM_FIELD
 #undef ADD_GROUPIDS_FROM
 
