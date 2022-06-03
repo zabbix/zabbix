@@ -489,6 +489,11 @@ msgstr ""
 msgid "Ack"
 msgstr "인지"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "인지"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "인지"
@@ -646,6 +651,11 @@ msgstr "액션을 갱신하였습니다"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "액션"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "액션"
 
@@ -6084,6 +6094,11 @@ msgstr "맵 \"%2$s\"를 위한 유저 내의 userid \"%1$s\"가 중복되었습�
 msgid "Duration"
 msgstr "기간"
 
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
+msgid "Duration"
+msgstr "기간"
+
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
 msgstr "네덜란드어 (nl_NL)"
@@ -6852,6 +6867,11 @@ msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "실패"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "실패"
 
@@ -7910,6 +7930,12 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "호스트"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "호스트"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -7995,6 +8021,13 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "호스트 그룹"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "호스트 그룹"
 
@@ -9555,6 +9588,12 @@ msgstr ""
 msgid "Info"
 msgstr "정보"
 
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
+msgid "Info"
+msgstr "정보"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -10900,6 +10939,10 @@ msgstr "리스트가 없습니다"
 
 #: include/classes/data/CItemData.php:983
 msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
 #: include/classes/data/CItemData.php:1126
@@ -12971,6 +13014,10 @@ msgstr "Zabbix데이터베이스 안의 아이템수."
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "서버에 송신되지 않은 프록시의 히스토리 아이템 수"
 
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "from에서 to까지의 시간이 늦는 큐의 아이템수."
@@ -13170,6 +13217,11 @@ msgstr "OFF"
 msgid "Ok"
 msgstr "OK"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "OK"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13310,6 +13362,11 @@ msgstr "조작대상의 템플릿이 없습니다."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr ""
 
@@ -14288,6 +14345,12 @@ msgstr "특권 레벨"
 msgid "Problem"
 msgstr "장애"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "장애"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "장애 발생"
@@ -14655,6 +14718,12 @@ msgstr "최근 장애"
 msgid "Recipient"
 msgstr "송신처"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "송신처"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr ""
@@ -14699,6 +14768,11 @@ msgstr "복구시 실행내용"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "복구시각"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "복구시각"
 
@@ -16319,6 +16393,12 @@ msgstr ""
 msgid "Severity"
 msgstr "심각도"
 
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
+msgid "Severity"
+msgstr "심각도"
+
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
 msgid "Severity changed"
@@ -16864,6 +16944,13 @@ msgstr ""
 msgid "Status"
 msgstr "상태"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "상태"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17287,6 +17374,11 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "태그"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "태그"
 
@@ -17776,6 +17868,12 @@ msgstr "종료"
 msgid "Time"
 msgstr "시각"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "시각"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "특정 Zabbix프록시 혹은 프록시 그룹 (<type>이나 <mode>로 특정할 수 있는 것)이<state>로 소비되고 있는 시간의 퍼센테이지."
@@ -17893,6 +17991,11 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "합계"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "합계"
 
@@ -18394,6 +18497,12 @@ msgstr ""
 msgid "Type"
 msgstr "종류"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "종류"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "종류 (전체설명)"
@@ -18643,6 +18752,11 @@ msgstr "단위"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "알 수 없음"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "알 수 없음"
 
@@ -19653,6 +19767,10 @@ msgstr "값의 캐쉬 통계. 유효한 파라미터：total, free, pfree, used,
 msgid "Value cannot be empty."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"
 msgstr "값 매핑"
@@ -20064,6 +20182,11 @@ msgstr ""
 msgid "With problems"
 msgstr "장애 있음"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "장애 있음"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20077,6 +20200,11 @@ msgid "Without data"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "장애 없음"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "장애 없음"
 

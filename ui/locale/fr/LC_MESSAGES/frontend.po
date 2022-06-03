@@ -509,6 +509,11 @@ msgstr ""
 msgid "Ack"
 msgstr "Acquitté"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "Acquitté"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Acquittement"
@@ -668,6 +673,11 @@ msgstr "Action mise à jour"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "Actions"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "Actions"
 
@@ -6168,6 +6178,11 @@ msgstr "Identifiant d'utilisateur \"%1$s\" en doublon dans les utilisateurs pour
 msgid "Duration"
 msgstr "Durée"
 
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
+msgid "Duration"
+msgstr "Durée"
+
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
 msgstr "Néerlandais (nl_NL)"
@@ -6937,6 +6952,11 @@ msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "Échoué"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "Échoué"
 
@@ -7998,6 +8018,12 @@ msgid_plural "Hosts"
 msgstr[0] "Hôte"
 msgstr[1] "Hôtes"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "Hôte"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8085,6 +8111,13 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "Groupe d'hôtes"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "Groupe d'hôtes"
 
@@ -9648,6 +9681,12 @@ msgstr ""
 msgid "Info"
 msgstr "Info"
 
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
+msgid "Info"
+msgstr "Info"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -11003,6 +11042,10 @@ msgstr "La liste est vide"
 
 #: include/classes/data/CItemData.php:983
 msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
 #: include/classes/data/CItemData.php:1126
@@ -13083,6 +13126,10 @@ msgstr "Nombre d'éléments dans la base de données Zabbix."
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Nombre d'éléments dans l'historique du proxy qui ne sont pas encore envoyés au serveur"
 
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Nombre d'éléments dans la queue qui rencontrent un délai de from à to secondes, incluses."
@@ -13282,6 +13329,11 @@ msgstr "Inactif"
 msgid "Ok"
 msgstr "Ok"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "Ok"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13423,6 +13475,11 @@ msgstr "L'opération n'a pas de modèle à exploiter."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr ""
 
@@ -14401,6 +14458,12 @@ msgstr "Niveau de privilège"
 msgid "Problem"
 msgstr "Problème"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "Problème"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "Problème créé"
@@ -14769,6 +14832,12 @@ msgstr "Problèmes récents"
 msgid "Recipient"
 msgstr "Destinataire"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "Destinataire"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr ""
@@ -14813,6 +14882,11 @@ msgstr "Opérations de récupération"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "Moment de la récupération"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "Moment de la récupération"
 
@@ -16442,6 +16516,12 @@ msgstr ""
 msgid "Severity"
 msgstr "Sévérité"
 
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
+msgid "Severity"
+msgstr "Sévérité"
+
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
 msgid "Severity changed"
@@ -16987,6 +17067,13 @@ msgstr ""
 msgid "Status"
 msgstr "État"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "État"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17410,6 +17497,11 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "Tags"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "Tags"
 
@@ -17901,6 +17993,12 @@ msgstr "À"
 msgid "Time"
 msgstr "Temps"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "Temps"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Durée d'un processus Zabbix particulier ou d'un groupe de processus (identifié par <type> et <mode>) passé en pourcentage dans <state>."
@@ -18018,6 +18116,11 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "Total"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "Total"
 
@@ -18523,6 +18626,12 @@ msgstr ""
 msgid "Type"
 msgstr "Type"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "Type"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "Type (détails complet)"
@@ -18772,6 +18881,11 @@ msgstr "Unités"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "Inconnu"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -19788,6 +19902,10 @@ msgstr "Statistiques du cache de valeurs. Les modes valides sont : total, free, 
 msgid "Value cannot be empty."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"
 msgstr "Table de correspondance"
@@ -20201,6 +20319,11 @@ msgstr ""
 msgid "With problems"
 msgstr "Avec problèmes"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "Avec problèmes"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20214,6 +20337,11 @@ msgid "Without data"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "Sans problème"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "Sans problème"
 

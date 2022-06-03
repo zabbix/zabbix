@@ -490,6 +490,11 @@ msgstr "サービスへのアクセス"
 msgid "Ack"
 msgstr "確認済"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "確認済"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "障害確認"
@@ -647,6 +652,11 @@ msgstr "アクションを更新しました"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "アクション"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "アクション"
 
@@ -6090,6 +6100,11 @@ msgstr "マップ\"%2$s\"のためのユーザー内のuserid \"%1$s\"が重複�
 msgid "Duration"
 msgstr "継続期間"
 
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
+msgid "Duration"
+msgstr "継続期間"
+
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
 msgstr "オランダ語 (nl_NL)"
@@ -6858,6 +6873,11 @@ msgstr "フェールオーバーの遅延： %1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "失敗"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "失敗"
 
@@ -7916,6 +7936,12 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "ホスト"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "ホスト"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8001,6 +8027,13 @@ msgstr "ホストのグラフ"
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "ホストグループ"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "ホストグループ"
 
@@ -9561,6 +9594,12 @@ msgstr "無限大"
 msgid "Info"
 msgstr "情報"
 
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
+msgid "Info"
+msgstr "情報"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -10907,6 +10946,10 @@ msgstr "リストがありません"
 #: include/classes/data/CItemData.php:983
 msgid "List of OS processes with attributes. Returns JSON array"
 msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
+
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -12977,6 +13020,10 @@ msgstr "Zabbixデータベース内のアイテム数。"
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "サーバーへ未送信のプロキシ内のヒストリアイテム数"
 
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "fromからtoまでの時間遅れているキュー内のアイテム数。"
@@ -13176,6 +13223,11 @@ msgstr "OFF"
 msgid "Ok"
 msgstr "正常"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "正常"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13316,6 +13368,11 @@ msgstr "操作対象のテンプレートがありません。"
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr "運用データ"
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr "運用データ"
 
@@ -14294,6 +14351,12 @@ msgstr "特権レベル"
 msgid "Problem"
 msgstr "障害"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "障害"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "障害発生"
@@ -14661,6 +14724,12 @@ msgstr "最近の障害"
 msgid "Recipient"
 msgstr "送信先"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "送信先"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr "送信先がすでに存在しています。"
@@ -14705,6 +14774,11 @@ msgstr "復旧時の実行内容"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "復旧時刻"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "復旧時刻"
 
@@ -16324,6 +16398,12 @@ msgstr "設定"
 msgid "Severity"
 msgstr "深刻度"
 
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
+msgid "Severity"
+msgstr "深刻度"
+
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
 msgid "Severity changed"
@@ -16869,6 +16949,13 @@ msgstr "Zabbixの書き込みキャッシュの統計。cacheがvaluesならmode
 msgid "Status"
 msgstr "ステータス"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "ステータス"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr "ステータス計算ルール"
@@ -17292,6 +17379,11 @@ msgstr "タグの値"
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "タグ"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "タグ"
 
@@ -17781,6 +17873,12 @@ msgstr "終了"
 msgid "Time"
 msgstr "時間"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "時間"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "特定のZabbixのプロセスもしくはプロセスグループ(<type>や<mode>で特定できるもの)が<state>で消費している時間のパーセンテージ。"
@@ -17898,6 +17996,11 @@ msgstr "上位ホスト"
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "合計"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "合計"
 
@@ -18399,6 +18502,12 @@ msgstr "2つ以上のフィールドを同じスペースに配置できませ�
 msgid "Type"
 msgstr "タイプ"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "タイプ"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "タイプ(詳細)"
@@ -18648,6 +18757,11 @@ msgstr "単位"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "不明"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "不明"
 
@@ -19658,6 +19772,10 @@ msgstr "値キャッシュの統計。有効なパラメータ：total, free, pf
 msgid "Value cannot be empty."
 msgstr "値を設定してください。"
 
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"
 msgstr "値のマッピング"
@@ -20069,6 +20187,11 @@ msgstr "障害名と一緒に"
 msgid "With problems"
 msgstr "障害あり"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "障害あり"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "この設定では、数値アイテムだけがこの列内に表示されます。"
@@ -20082,6 +20205,11 @@ msgid "Without data"
 msgstr "データなし"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "障害なし"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "障害なし"
 

@@ -489,6 +489,11 @@ msgstr ""
 msgid "Ack"
 msgstr "Ghi nhận"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "Ghi nhận"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Ghi nhận"
@@ -646,6 +651,11 @@ msgstr "Hành động đã cập nhật"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "Hành động"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "Hành động"
 
@@ -6087,6 +6097,11 @@ msgstr "Tạo bản sao id người dùng \"%1$s\" trong người dùng cho sơ 
 msgid "Duration"
 msgstr "Khoảng thời gian"
 
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
+msgid "Duration"
+msgstr "Khoảng thời gian"
+
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
 msgstr "Dutch (nl_NL)"
@@ -6855,6 +6870,11 @@ msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "Đã thất bại"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "Đã thất bại"
 
@@ -7913,6 +7933,12 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "Host"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -7998,6 +8024,13 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "Nhóm host"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "Nhóm host"
 
@@ -9558,6 +9591,12 @@ msgstr ""
 msgid "Info"
 msgstr "Thông tin"
 
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
+msgid "Info"
+msgstr "Thông tin"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -10903,6 +10942,10 @@ msgstr "Danh sách rỗng"
 
 #: include/classes/data/CItemData.php:983
 msgid "List of OS processes with attributes. Returns JSON array"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
 msgstr ""
 
 #: include/classes/data/CItemData.php:1126
@@ -12974,6 +13017,10 @@ msgstr "Số lượng item trong cơ sở dữ liệu Zabbix."
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Số lượng itrm trong lịch sử proxy mà chưa được gửi đến máy chủ"
 
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Số lượng item trong hàng đợi mà đang bị trễ từ giây thứ, bao gồm."
@@ -13173,6 +13220,11 @@ msgstr "Off"
 msgid "Ok"
 msgstr "Ok"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "Ok"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13313,6 +13365,11 @@ msgstr "Thao tác không có template để hoạt động."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr ""
 
@@ -14291,6 +14348,12 @@ msgstr "Cấp đặc quyền"
 msgid "Problem"
 msgstr "Vấn đề"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "Vấn đề"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "Vấn đề được tạo"
@@ -14658,6 +14721,12 @@ msgstr "Vấn đề gần đây"
 msgid "Recipient"
 msgstr "Người nhận"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "Người nhận"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr ""
@@ -14702,6 +14771,11 @@ msgstr "Phục hồi hoạt động"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "Thời gian phục hồi"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "Thời gian phục hồi"
 
@@ -16322,6 +16396,12 @@ msgstr ""
 msgid "Severity"
 msgstr "Mức độ quan trọng"
 
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
+msgid "Severity"
+msgstr "Mức độ quan trọng"
+
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
 msgid "Severity changed"
@@ -16867,6 +16947,13 @@ msgstr ""
 msgid "Status"
 msgstr "Trạng thái"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "Trạng thái"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17290,6 +17377,11 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "Thẻ"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "Thẻ"
 
@@ -17779,6 +17871,12 @@ msgstr "Cho tới"
 msgid "Time"
 msgstr "Thời gian"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "Thời gian"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Thời gian một quy trình Zabbix cụ thể hoặc một nhóm các quy trình (được xác định bởi <type> và <mode>) được chi tiêu theo <state> theo tỷ lệ phần trăm."
@@ -17896,6 +17994,11 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "Tổng cộng"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "Tổng cộng"
 
@@ -18397,6 +18500,12 @@ msgstr ""
 msgid "Type"
 msgstr "Kiểu"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "Kiểu"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "Kiểu (đầy đủ chi tiết)"
@@ -18646,6 +18755,11 @@ msgstr "Đơn vị"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "Không rõ"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "Không rõ"
 
@@ -19656,6 +19770,10 @@ msgstr "Thống kê giá trị của cache. Các chế độ hợp lệ l
 msgid "Value cannot be empty."
 msgstr ""
 
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"
 msgstr "Giá trị bản đồ"
@@ -20067,6 +20185,11 @@ msgstr ""
 msgid "With problems"
 msgstr "Các vấn đề"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "Các vấn đề"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20080,6 +20203,11 @@ msgid "Without data"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "Ngoài các vấn đề"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "Ngoài các vấn đề"
 

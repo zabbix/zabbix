@@ -509,6 +509,11 @@ msgstr "גישה לשירותים"
 msgid "Ack"
 msgstr "מוכר"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "מוכר"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "הכרה"
@@ -668,6 +673,11 @@ msgstr "המשימה עודכנה"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "פעולות"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "פעולות"
 
@@ -6174,6 +6184,11 @@ msgstr "userid משוכפל „%1$s” במשתמשים עבור המפה „%2$
 msgid "Duration"
 msgstr "משך"
 
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
+msgid "Duration"
+msgstr "משך"
+
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
 msgstr "הולנדית (nl_NL)"
@@ -6943,6 +6958,11 @@ msgstr "השהיית מעבר בעת כשל: %1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "נכשל"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "נכשל"
 
@@ -8004,6 +8024,12 @@ msgid_plural "Hosts"
 msgstr[0] "מארח"
 msgstr[1] "מארחים"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "מארח"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8091,6 +8117,13 @@ msgstr "תרשימי מארח"
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "קבוצת מארחים"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "קבוצת מארחים"
 
@@ -9654,6 +9687,12 @@ msgstr "אינסוף"
 msgid "Info"
 msgstr "מידע"
 
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
+msgid "Info"
+msgstr "מידע"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -11010,6 +11049,10 @@ msgstr "הרשימה ריקה"
 #: include/classes/data/CItemData.php:983
 msgid "List of OS processes with attributes. Returns JSON array"
 msgstr "רשימת תהליכי מערכת הפעלה עם מאפיינים. מחזיר מערך JSON"
+
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -13089,6 +13132,10 @@ msgstr "מספר הפריטים במסד הנתונים של Zabbix."
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "מספר הפריטים בהיסטוריה של המתווך שלא נשלחו עדיין לשרת"
 
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "מספר הפריטים בתור שהושהו למשך תקופת שניות מ־ עד, כולל."
@@ -13288,6 +13335,11 @@ msgstr "כבוי"
 msgid "Ok"
 msgstr "בסדר"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "בסדר"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13429,6 +13481,11 @@ msgstr "לפעולה אין תבנית לפעילות."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr "נתונים תפעוליים"
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr "נתונים תפעוליים"
 
@@ -14407,6 +14464,12 @@ msgstr "רמת ההרשאות"
 msgid "Problem"
 msgstr "תקלה"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "תקלה"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "נוצרה תקלה"
@@ -14775,6 +14838,12 @@ msgstr "תקלות אחרונות"
 msgid "Recipient"
 msgstr "מען"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "מען"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr "הנמען כבר קיים."
@@ -14819,6 +14888,11 @@ msgstr "פעולות שחזור"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "מועד השחזור"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "מועד השחזור"
 
@@ -16447,6 +16521,12 @@ msgstr "הגדרות"
 msgid "Severity"
 msgstr "חומרה"
 
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
+msgid "Severity"
+msgstr "חומרה"
+
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
 msgid "Severity changed"
@@ -16992,6 +17072,13 @@ msgstr "סטטיסטיקה וזמינות זיכרון מטמון הכתיבה �
 msgid "Status"
 msgstr "מצב"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "מצב"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr "כלל חישוב מצב"
@@ -17415,6 +17502,11 @@ msgstr "ערכי תגיות"
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "תגיות"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "תגיות"
 
@@ -17906,6 +17998,12 @@ msgstr "עד"
 msgid "Time"
 msgstr "שעה"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "שעה"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "הזמן שתהליך או קבוצת תהליכים של Zabbix (מזוהים ב־<type>וב־<mode>) היו במצב <state> באחוזים."
@@ -18023,6 +18121,11 @@ msgstr "מארחים מובילים"
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "סך הכול"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "סך הכול"
 
@@ -18528,6 +18631,12 @@ msgstr "שני שדות ומעלה לא יכולים לתפוס את אותו ה
 msgid "Type"
 msgstr "סוג"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "סוג"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "סוג (פרטים מלאים)"
@@ -18777,6 +18886,11 @@ msgstr "יחידות"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "לא ידוע"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "לא ידוע"
 
@@ -19793,6 +19907,10 @@ msgstr "סטטיסטיקת זכרון המטמון של הערכים. המשתנ
 msgid "Value cannot be empty."
 msgstr "הערך לא יכול להיות ריק."
 
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"
 msgstr "מפת ערכים"
@@ -20206,6 +20324,11 @@ msgstr "עם שם התקלה"
 msgid "With problems"
 msgstr "עם תקלות"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "עם תקלות"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "עם ההגדרה הזאת רק פריטים מספריים יוצגו בעמודה הזאת."
@@ -20219,6 +20342,11 @@ msgid "Without data"
 msgstr "ללא נתונים"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "בלי תקלות"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "בלי תקלות"
 

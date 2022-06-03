@@ -493,6 +493,11 @@ msgstr "访问服务"
 msgid "Ack"
 msgstr "确认"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "确认"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "确认"
@@ -650,6 +655,11 @@ msgstr "动作已更新"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "动作"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "动作"
 
@@ -6093,6 +6103,11 @@ msgstr "用户ID \"%1$s\" 与 \"%2$s\" 冲突"
 msgid "Duration"
 msgstr "持续时间"
 
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
+msgid "Duration"
+msgstr "持续时间"
+
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
 msgstr "荷兰(nl_NL)"
@@ -6861,6 +6876,11 @@ msgstr "故障转移延迟：%1$s"
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "已失败"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "已失败"
 
@@ -7921,6 +7941,12 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主机"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "主机"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8006,6 +8032,13 @@ msgstr "主机图形"
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "主机群组"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "主机群组"
 
@@ -9566,6 +9599,12 @@ msgstr "无穷"
 msgid "Info"
 msgstr "信息"
 
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
+msgid "Info"
+msgstr "信息"
+
 #: app/views/administration.trigdisplay.edit.php:110 include/items.inc.php:31
 #: jsLoader.php:177
 msgid "Information"
@@ -10912,6 +10951,10 @@ msgstr "清单是空的"
 #: include/classes/data/CItemData.php:983
 msgid "List of OS processes with attributes. Returns JSON array"
 msgstr "操作系统进程及属性列表。返回 JSON 数组"
+
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -12982,6 +13025,10 @@ msgstr "Zabbix 数据库中的监控项数量"
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "系统代理程序历史数据中未发送给服务端的监控项数量"
 
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "队列中延时秒数的项目的数量，包括."
@@ -13181,6 +13228,11 @@ msgstr "关"
 msgid "Ok"
 msgstr "正常"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "正常"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13321,6 +13373,11 @@ msgstr "操作并无模板来操作."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr "操作数据"
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr "操作数据"
 
@@ -14299,6 +14356,12 @@ msgstr "优先权层级"
 msgid "Problem"
 msgstr "问题"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "问题"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "问题已创建"
@@ -14666,6 +14729,12 @@ msgstr "最近的问题"
 msgid "Recipient"
 msgstr "接收者"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "接收者"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr "收件人已经存在。"
@@ -14710,6 +14779,11 @@ msgstr "恢复操作"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "恢复时间"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "恢复时间"
 
@@ -16330,6 +16404,12 @@ msgstr "设置"
 msgid "Severity"
 msgstr "严重性"
 
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
+msgid "Severity"
+msgstr "严重性"
+
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
 msgid "Severity changed"
@@ -16875,6 +16955,13 @@ msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：al
 msgid "Status"
 msgstr "状态"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "状态"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr "状态计算规则"
@@ -17298,6 +17385,11 @@ msgstr "标签值"
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "标记"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "标记"
 
@@ -17787,6 +17879,12 @@ msgstr "直到"
 msgid "Time"
 msgstr "时间"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "时间"
+
 #: include/classes/data/CItemData.php:1646
 #, fuzzy
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
@@ -17905,6 +18003,11 @@ msgstr "前排主机"
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "合计"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "合计"
 
@@ -18406,6 +18509,12 @@ msgstr "两个或多个字段不能占用相同的空间。"
 msgid "Type"
 msgstr "类型"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "类型"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "类型(全细节)"
@@ -18655,6 +18764,11 @@ msgstr "单位"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "未知的"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "未知的"
 
@@ -19665,6 +19779,10 @@ msgstr "数值缓存统计。合法的mode参数有：total, free, pfree, used a
 msgid "Value cannot be empty."
 msgstr "值不能为空。"
 
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"
 msgstr "值映射"
@@ -20076,6 +20194,11 @@ msgstr "带有问题名称"
 msgid "With problems"
 msgstr "异常设备"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "异常设备"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "使用此设置，此列中将仅显示数字项目。"
@@ -20089,6 +20212,11 @@ msgid "Without data"
 msgstr "无数据"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "正常设备"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "正常设备"
 
