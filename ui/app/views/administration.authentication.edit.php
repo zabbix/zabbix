@@ -207,12 +207,11 @@ $ldap_tab = (new CFormGrid())
 $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable SAML authentication'), 'saml_auth_enabled'),
-		$data['saml_error']
-			? new CFormField((new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED))
-			: new CFormField(
-				(new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
-					->setChecked($data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED)
-					->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
+		new CFormField($data['saml_error']
+			? (new CLabel($data['saml_error']))->addClass(ZBX_STYLE_RED)
+			: (new CCheckBox('saml_auth_enabled', ZBX_AUTH_SAML_ENABLED))
+				->setChecked($data['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_SAML_DISABLED)
 		)
 	])
 	->addItem([
@@ -246,7 +245,7 @@ $saml_tab = (new CFormGrid())
 		(new CLabel(_('Username attribute'), 'saml_username_attribute'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('saml_username_attribute', $data['saml_username_attribute'], false,
-					DB::getFieldLength('config', 'saml_username_attribute')
+				DB::getFieldLength('config', 'saml_username_attribute')
 			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -256,7 +255,9 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('SP entity ID'), 'saml_sp_entityid'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid'], false, DB::getFieldLength('config', 'saml_sp_entityid')))
+			(new CTextBox('saml_sp_entityid', $data['saml_sp_entityid'], false,
+				DB::getFieldLength('config', 'saml_sp_entityid')
+			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -266,7 +267,7 @@ $saml_tab = (new CFormGrid())
 		new CLabel(_('SP name ID format'), 'saml_nameid_format'),
 		new CFormField(
 			(new CTextBox('saml_nameid_format', $data['saml_nameid_format'], false,
-					DB::getFieldLength('config', 'saml_nameid_format')
+				DB::getFieldLength('config', 'saml_nameid_format')
 			))
 				->setEnabled($data['saml_enabled'])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -351,7 +352,8 @@ $saml_tab = (new CFormGrid())
 				(new CSubmit('update', _('Update')))
 			))
 			->onTabChange('jQuery("[name=ldap_test]")[(ui.newTab.index() == 2) ? "show" : "hide"]()')
-	))->show();
+	))
+	->show();
 
 (new CScriptTag(
 	'view.init('. json_encode([
