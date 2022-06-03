@@ -501,10 +501,10 @@ static int	DBpatch_6010028(void)
 }
 
 #define DBPATCH_HOST_STATUS_TEMPLATE		"3"
-#define DBPATCH_HOSTGROUP_TYPE_HOST		0
-#define DBPATCH_HOSTGROUP_TYPE_TEMPLATE		1
-#define	DBPATCH_HOSTGROUP_TYPE_EMPTY		2
-#define DBPATCH_HOSTGROUP_TYPE_MIXED		3
+#define	DBPATCH_HOSTGROUP_TYPE_EMPTY		0x00
+#define DBPATCH_HOSTGROUP_TYPE_HOST		0x01
+#define DBPATCH_HOSTGROUP_TYPE_TEMPLATE		0x02
+#define DBPATCH_HOSTGROUP_TYPE_MIXED		(DBPATCH_HOSTGROUP_TYPE_HOST | DBPATCH_HOSTGROUP_TYPE_TEMPLATE)
 typedef struct
 {
 	zbx_uint64_t	groupid;
@@ -547,22 +547,9 @@ static void	DBpatch_6010033_hstgrp_free(hstgrp_t *hstgrp)
 	zbx_free(hstgrp);
 }
 
-static int	DBpatch_6010033_update_group_type(hstgrp_t *hstgrp)
+static void	DBpatch_6010033_update_nested_group(hstgrp_t *hstgrp, zbx_vector_hstgrp_t *hstgrps)
 {
-	int	type = hstgrp->type;
-
-	if (DBPATCH_HOSTGROUP_TYPE_MIXED == type || DBPATCH_HOSTGROUP_TYPE_EMPTY == type)
-		type = DBPATCH_HOSTGROUP_TYPE_HOST;
-
-	if (ZBX_DB_OK > DBexecute("update hstgrp set type=%d where groupid=" ZBX_FS_UI64, type, hstgrp->groupid))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_6010033_check_types(hstgrp_t *hstgrp, zbx_vector_hstgrp_t *hstgrps, int *type)
-{
-	int	i, last_type = FAIL;
+	int	i, parent_type = DBPATCH_HOSTGROUP_TYPE_EMPTY, child_type = DBPATCH_HOSTGROUP_TYPE_EMPTY;
 	size_t	g_sz;
 
 	g_sz = strlen(hstgrp->name);
@@ -571,76 +558,46 @@ static int	DBpatch_6010033_check_types(hstgrp_t *hstgrp, zbx_vector_hstgrp_t *hs
 	{
 		size_t	t_sz;
 
-		if (DBPATCH_HOSTGROUP_TYPE_MIXED == hstgrps->values[i]->type)
-			continue;
-
 		t_sz = strlen(hstgrps->values[i]->name);
 
 		if (g_sz == t_sz || 0 != strncmp(hstgrp->name, hstgrps->values[i]->name, MIN(g_sz, t_sz)))
 			continue;
 
-		if (g_sz > t_sz && hstgrp->name[t_sz] != '/')
-			continue;
-
-		if (g_sz < t_sz && hstgrps->values[i]->name[g_sz] != '/')
-			continue;
-
-		if (FAIL != last_type && last_type != hstgrps->values[i]->type)
+		if (g_sz > t_sz)
 		{
-			*type = DBPATCH_HOSTGROUP_TYPE_MIXED;
-			return SUCCEED;
+			if (hstgrp->name[t_sz] != '/')
+				continue;
+
+			parent_type = hstgrps->values[i]->type;
 		}
 
-		last_type = hstgrps->values[i]->type;
+		if (g_sz < t_sz)
+		{
+			if (hstgrps->values[i]->name[g_sz] != '/')
+				continue;
+
+			child_type |= hstgrps->values[i]->type;
+		}
 	}
 
-	if (FAIL == last_type)
-		return FAIL;
-
-	*type = last_type;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_6010033_update_empty_groups(zbx_vector_hstgrp_t *hstgrps)
-{
-	int	i, ret = SUCCEED;
-
-	for (i = 0; i < hstgrps->values_num; i++)
+	if (child_type != DBPATCH_HOSTGROUP_TYPE_EMPTY)
 	{
-		int	group_type;
-
-		if (DBPATCH_HOSTGROUP_TYPE_EMPTY != hstgrps->values[i]->type)
-			continue;
-
-		if (SUCCEED != DBpatch_6010033_check_types(hstgrps->values[i], hstgrps, &group_type))
-			hstgrps->values[i]->type = DBPATCH_HOSTGROUP_TYPE_HOST;
-		else
-			hstgrps->values[i]->type = group_type;
-
-		if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps->values[i])))
-			break;
+		hstgrp->type |= child_type;
 	}
-
-	return ret;
+	else if (hstgrp->type == DBPATCH_HOSTGROUP_TYPE_EMPTY)
+	{
+		hstgrp->type = DBPATCH_HOSTGROUP_TYPE_EMPTY == parent_type ? DBPATCH_HOSTGROUP_TYPE_HOST : parent_type;
+	}
 }
 
-static void	DBpatch_6010033_update_mixed_parents(zbx_vector_hstgrp_t *hstgrps)
+static void	DBpatch_6010033_update_nested_groups(zbx_vector_hstgrp_t *hstgrps)
 {
 	int	i;
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
-		int	group_type;
-
-		if (DBPATCH_HOSTGROUP_TYPE_HOST != hstgrps->values[i]->type)
-			continue;
-
-		if (SUCCEED == DBpatch_6010033_check_types(hstgrps->values[i], hstgrps, &group_type) &&
-				DBPATCH_HOSTGROUP_TYPE_HOST != group_type)
-		{
-			hstgrps->values[i]->type = DBPATCH_HOSTGROUP_TYPE_MIXED;
-		}
+		if (DBPATCH_HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
+			DBpatch_6010033_update_nested_group(hstgrps->values[i], hstgrps);
 	}
 }
 
@@ -673,7 +630,7 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 
 		hstgrps->values[i]->newgroupid = nextid++;
 		zbx_db_insert_add_values(&db_insert, hstgrps->values[i]->newgroupid, hstgrps->values[i]->name,
-				DBPATCH_HOSTGROUP_TYPE_TEMPLATE, hstgrps->values[i]->uuid);
+				1 /* HOST_GROUP_TYPE_TEMPLATE_GROUP */, hstgrps->values[i]->uuid);
 	}
 
 	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
@@ -746,7 +703,7 @@ out:
 
 static int	DBpatch_6010033_split_groups(void)
 {
-	int			i, has_hosts, has_templates, ret = SUCCEED;
+	int			i, has_hosts, has_templates, ret = FAIL;
 	zbx_uint64_t		groupid;
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -843,26 +800,30 @@ static int	DBpatch_6010033_split_groups(void)
 		else if (FAIL == has_templates)
 		{
 			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_HOST;
-
-			if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps.values[i])))
-				goto out;
 		}
 		else if (FAIL == has_hosts)
 		{
 			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_TEMPLATE;
-
-			if (SUCCEED != (ret = DBpatch_6010033_update_group_type(hstgrps.values[i])))
-				goto out;
 		}
 		else
 			hstgrps.values[i]->type = DBPATCH_HOSTGROUP_TYPE_MIXED;
 	}
 
-	if (SUCCEED == (ret = DBpatch_6010033_update_empty_groups(&hstgrps)))
+	DBpatch_6010033_update_nested_groups(&hstgrps);
+
+	for (i = 0; i < hstgrps.values_num; i++)
 	{
-		DBpatch_6010033_update_mixed_parents(&hstgrps);
-		ret = DBpatch_6010033_create_template_groups(&hstgrps);
+		if (DBPATCH_HOSTGROUP_TYPE_TEMPLATE != hstgrps.values[i]->type)
+			continue;
+
+		/* 1 - HOST_GROUP_TYPE_TEMPLATE_GROUP */
+		if (ZBX_DB_OK > DBexecute("update hstgrp set type=1 where groupid=" ZBX_FS_UI64,
+				hstgrps.values[i]->groupid)) {
+			goto out;
+		}
 	}
+
+	ret = DBpatch_6010033_create_template_groups(&hstgrps);
 out:
 	zbx_vector_uint64_destroy(&host_groupids);
 	zbx_vector_uint64_destroy(&template_groupids);
@@ -913,8 +874,8 @@ static int	DBpatch_6010035(void)
 			" where groupid in ("
 				"select groupid"
 				" from hstgrp"
-				" where type=%d"
-			")", DBPATCH_HOSTGROUP_TYPE_TEMPLATE))
+				" where type=1"	/* HOST_GROUP_TYPE_TEMPLATE_GROUP */
+			")"))
 	{
 		return FAIL;
 	}
@@ -932,8 +893,8 @@ static int	DBpatch_6010036(void)
 			" where value_groupid in ("
 				"select groupid"
 				" from hstgrp"
-				" where type=%d"
-			")", DBPATCH_HOSTGROUP_TYPE_TEMPLATE))
+				" where type=1"	/* HOST_GROUP_TYPE_TEMPLATE_GROUP */
+			")"))
 	{
 		return FAIL;
 	}
