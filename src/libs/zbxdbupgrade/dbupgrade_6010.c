@@ -809,7 +809,8 @@ static int	DBpatch_6010033_split_groups(void)
 
 		/* 1 - HOST_GROUP_TYPE_TEMPLATE_GROUP */
 		if (ZBX_DB_OK > DBexecute("update hstgrp set type=1 where groupid=" ZBX_FS_UI64,
-				hstgrps.values[i]->groupid)) {
+				hstgrps.values[i]->groupid))
+		{
 			goto out;
 		}
 	}
