@@ -967,10 +967,11 @@ function makeMaintenanceIcon($type, $name, $description) {
  * @param string $icon_data[]['suppress_until']    Time until the problem is suppressed.
  * @param string $icon_data[]['maintenance_name']  Name of the maintenance.
  * @param string $icon_data[]['username']          User who created manual suppression.
+ * @param bool   $blink                            Add 'blink' CSS class for jqBlink.
  *
  * @return CLink
  */
-function makeSuppressedProblemIcon(array $icon_data) {
+function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
 	$suppress_until_values = array_column($icon_data, 'suppress_until');
 
 	if (in_array(ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE, $suppress_until_values)) {
@@ -999,8 +1000,9 @@ function makeSuppressedProblemIcon(array $icon_data) {
 
 	$maintenances = implode(',', $maintenance_names);
 
-	return (new CLink())
+	return (new CSimpleButton())
 		->addClass(ZBX_STYLE_ACTION_ICON_SUPPRESS)
+		->addClass($blink ? 'blink' : null)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
 			"\n".

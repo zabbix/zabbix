@@ -258,7 +258,6 @@ class CScreenProblem extends CScreenBase {
 			}
 			if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 				unset($options['suppressed']);
-				$options['selectSuppressionData'] = ['maintenanceid', 'userid', 'suppress_until'];
 			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
@@ -270,10 +269,6 @@ class CScreenProblem extends CScreenBase {
 			if ($problems) {
 				$eventid_till = end($problems)['eventid'] - 1;
 				$triggerids = [];
-
-				if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
-					self::addSuppressionNames($problems);
-				}
 
 				foreach ($problems as $problem) {
 					if (!array_key_exists($problem['objectid'], $seen_triggerids)) {
@@ -493,6 +488,7 @@ class CScreenProblem extends CScreenBase {
 			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
+			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -549,6 +545,7 @@ class CScreenProblem extends CScreenBase {
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
+			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -654,6 +651,7 @@ class CScreenProblem extends CScreenBase {
 				$problem['correlationid'] = $problem_data['correlationid'];
 				$problem['userid'] = $problem_data['userid'];
 				$problem['acknowledged'] = $problem_data['acknowledged'];
+				$problem['suppression_data'] = $problem_data['suppression_data'];
 
 				if ($problem['correlationid'] != 0) {
 					$correlationids[$problem['correlationid']] = true;
@@ -667,6 +665,8 @@ class CScreenProblem extends CScreenBase {
 			}
 		}
 		unset($problem);
+
+		self::addSuppressionNames($data['problems']);
 
 		// Possible performance improvement: one API call may be saved, if r_clock for problem will be used.
 		$actions = getEventsActionsIconsData($data['problems'], $data['triggers']);
@@ -1019,8 +1019,32 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
-				if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
-					$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
+				if (array_key_exists('suppression_data', $problem)) {
+					if (count($problem['suppression_data']) == 1
+							&& $problem['suppression_data'][0]['maintenanceid'] == 0
+							&& isEventRecentlyUnsuppressed($problem['acknowledges'], $unsuppression_action)) {
+						// Show blinking button if the last manual suppression was recently revoked.
+						$user_unsuppressed = array_key_exists($unsuppression_action['userid'], $data['users'])
+							? getUserFullname($data['users'][$unsuppression_action['userid']])
+							: _('Inaccessible user');
+
+						$info_icons[] = (new CSimpleButton())
+							->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
+							->addClass('blink')
+							->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
+					}
+					elseif ($problem['suppression_data']) {
+						$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data'], false);
+					}
+					elseif (isEventRecentlySuppressed($problem['acknowledges'], $suppression_action)) {
+						// Show blinking button if suppression was made but is not yet processed by server.
+						$info_icons[] = makeSuppressedProblemIcon([[
+							'suppress_until' => $suppression_action['clock'],
+							'username' => array_key_exists($suppression_action['userid'], $data['users'])
+								? getUserFullname($data['users'][$suppression_action['userid']])
+								: _('Inaccessible user')
+						]], true);
+					}
 				}
 
 				if ($this->data['filter']['compact_view'] && $this->data['filter']['show_suppressed']

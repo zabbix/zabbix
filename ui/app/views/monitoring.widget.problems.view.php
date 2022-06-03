@@ -167,8 +167,32 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
-		$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
+	if (array_key_exists('suppression_data', $problem)) {
+		if (count($problem['suppression_data']) == 1
+				&& $problem['suppression_data'][0]['maintenanceid'] == 0
+				&& isEventRecentlyUnsuppressed($problem['acknowledges'], $unsuppression_action)) {
+			// Show blinking button if the last manual suppression was recently revoked.
+			$user_unsuppressed = array_key_exists($unsuppression_action['userid'], $data['data']['users'])
+				? getUserFullname($data['data']['users'][$unsuppression_action['userid']])
+				: _('Inaccessible user');
+
+			$info_icons[] = (new CSimpleButton())
+				->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
+				->addClass('blink')
+				->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
+		}
+		elseif ($problem['suppression_data']) {
+			$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data'], false);
+		}
+		elseif (isEventRecentlySuppressed($problem['acknowledges'], $suppression_action)) {
+			// Show blinking button if suppression was made but is not yet processed by server.
+			$info_icons[] = makeSuppressedProblemIcon([[
+				'suppress_until' => $suppression_action['clock'],
+				'username' => array_key_exists($suppression_action['userid'], $data['data']['users'])
+					? getUserFullname($data['data']['users'][$suppression_action['userid']])
+					: _('Inaccessible user')
+			]], true);
+		}
 	}
 
 	$opdata = null;

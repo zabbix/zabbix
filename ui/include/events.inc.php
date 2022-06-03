@@ -414,7 +414,7 @@ function make_small_eventlist(array $startEvent, array $allowed) {
  * @param array $event                              Event object.
  * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
  * @param array $event['acknowledges']              List of problem updates.
- * @param array $event['acknowledges'][]['action']  Action performed in update.
+ * @param int   $event['acknowledges'][]['action']  Action performed in update.
  *
  * @return bool
  */
@@ -432,7 +432,7 @@ function isEventClosed(array $event): bool {
  *
  * @param array $event                              Event object.
  * @param array $event['acknowledges']              List of problem updates.
- * @param array $event['acknowledges'][]['action']  Action performed in update.
+ * @param int   $event['acknowledges'][]['action']  Action performed in update.
  *
  * @return bool
  */
@@ -440,6 +440,56 @@ function hasEventCloseAction(array $acknowledges): bool {
 	foreach ($acknowledges as $acknowledge) {
 		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
 			// If at least one manual close update was found, event is closing.
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Returns true if event is suppressed and not unsuppressed after that.
+ *
+ * @param array $acknowledges
+ * @param int   $acknowledges['action']
+ * @param ?array $unsuppression_action   [OUT] Variable to store suppression action data.
+ *
+ * @return bool
+ */
+function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = null): bool {
+	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+
+	foreach ($acknowledges as $ack) {
+		if (($ack['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+			return false;
+		}
+		elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
+			$suppression_action = $ack;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Returns true if event is unsuppressed and not suppressed after that.
+ *
+ * @param array  $acknowledges
+ * @param int    $acknowledges['action']
+ * @param ?array $unsuppression_action   [OUT] Variable to store unsuppression action data.
+ *
+ * @return bool
+ */
+function isEventRecentlyUnsuppressed(array $acknowledges, &$unsuppression_action = null): bool {
+	CArrayHelper::sort($acknowledges, [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+
+	foreach ($acknowledges as $ack) {
+		if (($ack['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
+			return false;
+		}
+		elseif (($ack['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+			$unsuppression_action = $ack;
 			return true;
 		}
 	}
