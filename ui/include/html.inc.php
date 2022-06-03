@@ -1004,8 +1004,8 @@ function makeSuppressedProblemIcon(array $icon_data) {
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
 			"\n".
-			($username != '' ? _s('Manually by: %1$s', $username)."\n" : '').
-			($maintenances != '' ? _s('Maintenance: %1$s', $maintenances)."\n" : '')
+			($username !== '' ? _s('Manually by: %1$s', $username)."\n" : '').
+			($maintenances !== '' ? _s('Maintenance: %1$s', $maintenances)."\n" : '')
 		);
 }
 

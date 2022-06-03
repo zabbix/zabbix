@@ -111,9 +111,7 @@ if ($data['has_unack_events']) {
 	$form_list->addRow(
 		(new CLabel([_('Acknowledge'),
 			makeHelpIcon(
-				_('Confirms the problem is noticed (acknowledging user will be recorded).
-					Status change triggers action update operation.'
-				)
+				_('Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation.')
 			)
 		])),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
