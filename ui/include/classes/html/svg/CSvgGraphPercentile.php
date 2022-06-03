@@ -82,7 +82,7 @@ class CSvgGraphPercentile extends CSvgGroup {
 		$y = $this->height + $this->y - CMathHelper::safeMul([
 			$this->height, $fraction, 1 / $total
 		]);
-		$label_x = $this->side == GRAPH_YAXIS_SIDE_RIGHT
+		$label_x = ($this->side == GRAPH_YAXIS_SIDE_RIGHT)
 			? $this->width + $this->x - self::LABEL_MARGIN
 			: $this->x + self::LABEL_MARGIN;
 
