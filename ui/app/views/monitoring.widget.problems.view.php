@@ -98,14 +98,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 	else {
 		$in_closing = false;
 
-		foreach ($problem['acknowledges'] as $acknowledge) {
-			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-				$in_closing = true;
-				$can_be_closed = false;
-				break;
-			}
-		}
-
+		$can_be_closed = hasEventCloseAction($problem['acknowledges']);
+		$in_closing = !$can_be_closed;
 		$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 		$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 		$value_clock = $in_closing ? time() : $problem['clock'];
