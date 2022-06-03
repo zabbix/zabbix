@@ -312,6 +312,7 @@ $ipmi_tab = (new CFormGrid())
 $tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'host',
 	'tags' => $data['host']['tags'],
+	'with_automatic' => true,
 	'readonly' => false,
 	'tabs_id' => 'host-tabs'
 ]);

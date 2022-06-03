@@ -28,7 +28,8 @@ if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');
 }
 
-$show_inherited_tags = (array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags']);
+$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
+$with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
 
 // form list
 $tags_form_list = new CFormList('tagsFormList');
@@ -47,10 +48,15 @@ $allowed_ui_conf_templates = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION
 
 // fields
 foreach ($data['tags'] as $i => $tag) {
-	$tag += ['type' => ZBX_PROPERTY_OWN, 'automatic' => ZBX_TAG_MANUAL];
+	$tag += ['type' => ZBX_PROPERTY_OWN];
 
-	$readonly = $data['readonly'] || ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED)
-		|| $tag['automatic'] == ZBX_TAG_AUTOMATIC;
+	if ($with_automatic) {
+		$tag += ['automatic' => ZBX_TAG_MANUAL];
+	}
+
+	$readonly = $data['readonly']
+		|| ($show_inherited_tags && $tag['type'] == ZBX_PROPERTY_INHERITED)
+		|| ($with_automatic && $tag['automatic'] == ZBX_TAG_AUTOMATIC);
 
 	$tag_input = (new CTextAreaFlexible('tags['.$i.'][tag]', $tag['tag'], ['readonly' => $readonly]))
 		->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
@@ -62,13 +68,17 @@ foreach ($data['tags'] as $i => $tag) {
 		$tag_cell[] = new CVar('tags['.$i.'][type]', $tag['type']);
 	}
 
+	if ($with_automatic) {
+		$tag_cell[] = new CVar('tags['.$i.'][automatic]', $tag['automatic']);
+	}
+
 	$value_input = (new CTextAreaFlexible('tags['.$i.'][value]', $tag['value'], ['readonly' => $readonly]))
 		->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
 	$actions = [];
 
-	if ($tag['automatic'] == ZBX_TAG_AUTOMATIC) {
+	if ($with_automatic && $tag['automatic'] == ZBX_TAG_AUTOMATIC) {
 		switch ($data['source']) {
 			case 'host':
 				$actions[] = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
