@@ -848,6 +848,9 @@ static void	tm_process_temp_suppression(const char *data)
 		return;
 	}
 
+	if (SUCCEED != DBlock_record("users", userid, NULL, 0))
+		return;
+
 	if (ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS == action ||
 			(ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME != ts && time(NULL) >= ts))
 	{
