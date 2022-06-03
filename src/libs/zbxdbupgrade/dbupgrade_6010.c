@@ -510,6 +510,7 @@ typedef struct
 	zbx_uint64_t	newgroupid;
 	char		*name;
 	char		*uuid;
+	int		type_orig;
 	int		type;
 }
 hstgrp_t;
@@ -567,7 +568,8 @@ static void	DBpatch_6010033_update_nested_group(hstgrp_t *hstgrp, zbx_vector_hst
 			if (hstgrp->name[t_sz] != '/')
 				continue;
 
-			parent_type = hstgrps->values[i]->type;
+			if (hstgrps->values[i]->type_orig != DBPATCH_HOSTGROUP_TYPE_EMPTY)
+				parent_type = hstgrps->values[i]->type_orig;
 		}
 
 		if (g_sz < t_sz)
@@ -787,6 +789,8 @@ static int	DBpatch_6010033_split_groups(void)
 
 		if (FAIL != zbx_vector_uint64_bsearch(&template_groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			hstgrps.values[i]->type |= DBPATCH_HOSTGROUP_TYPE_TEMPLATE;
+
+		hstgrps.values[i]->type_orig = hstgrps.values[i]->type;
 	}
 
 	DBpatch_6010033_update_nested_groups(&hstgrps);
