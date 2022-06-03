@@ -2404,7 +2404,12 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_lld_host
 		zbx_substitute_lld_macros(&value, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 
 		if (SUCCEED != lld_tag_validate(proto_tags.values, proto_tags.values_num, tag, value, info))
+		{
+			zbx_free(tag);
+			zbx_free(value);
+
 			continue;
+		}
 
 		proto_tag = lld_hosttag_create(tag, value, proto_tag->automatic);
 		zbx_vector_lld_hosttag_ptr_append(&proto_tags, proto_tag);
