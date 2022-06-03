@@ -5476,6 +5476,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	zbx_hashset_t		trend_queue;
 	zbx_vector_uint64_t	active_avail_diff;
+	/* identifiers of triggers to be added to cache, filled during function sync and used to filter */
+	/* out template/prototype triggers when caching triggers                                        */
 	zbx_hashset_t		triggers_new;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
