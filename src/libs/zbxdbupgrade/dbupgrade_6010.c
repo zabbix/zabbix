@@ -571,8 +571,7 @@ static void	DBpatch_6010033_update_nested_group(hstgrp_t *hstgrp, zbx_vector_hst
 			if (hstgrps->values[i]->type_orig != DBPATCH_HOSTGROUP_TYPE_EMPTY)
 				parent_type = hstgrps->values[i]->type_orig;
 		}
-
-		if (g_sz < t_sz)
+		else
 		{
 			if (hstgrps->values[i]->name[g_sz] != '/')
 				continue;
