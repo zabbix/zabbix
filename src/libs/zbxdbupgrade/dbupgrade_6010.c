@@ -603,7 +603,7 @@ static void	DBpatch_6010033_update_nested_groups(zbx_vector_hstgrp_t *hstgrps)
 static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 {
 	int			i, permission, new_count = 0, ret = SUCCEED;
-	zbx_uint64_t		nextid, groupid;
+	zbx_uint64_t		groupid;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	DB_RESULT		result;
@@ -620,14 +620,14 @@ static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
-	nextid = DBget_maxid_num("hstgrp", new_count);
+	groupid = DBget_maxid_num("hstgrp", new_count);
 
 	for (i = 0; i < hstgrps->values_num; i++)
 	{
 		if (DBPATCH_HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
 			continue;
 
-		hstgrps->values[i]->newgroupid = nextid++;
+		hstgrps->values[i]->newgroupid = groupid++;
 		zbx_db_insert_add_values(&db_insert, hstgrps->values[i]->newgroupid, hstgrps->values[i]->name,
 				1 /* HOST_GROUP_TYPE_TEMPLATE_GROUP */, hstgrps->values[i]->uuid);
 	}
