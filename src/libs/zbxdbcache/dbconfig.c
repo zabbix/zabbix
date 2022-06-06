@@ -5780,7 +5780,6 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	FINISH_SYNC;
 
 	/* sync rest of the data */
-
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_triggers(&triggers_sync))
 		goto out;
@@ -10062,8 +10061,11 @@ static void	DCconfig_sort_triggers_topologically(void)
 	{
 		trigger = trigdep->trigger;
 
-		if (NULL == trigger || 1 < trigger->topoindex || 0 == trigdep->dependencies.values_num)
+		if (NULL == trigger || ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags || 1 < trigger->topoindex ||
+				0 == trigdep->dependencies.values_num)
+		{
 			continue;
+		}
 
 		DCconfig_sort_triggers_topologically_rec(trigdep, 0);
 	}
