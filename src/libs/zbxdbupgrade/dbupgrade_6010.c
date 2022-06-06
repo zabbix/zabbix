@@ -530,6 +530,13 @@ static int	DBpatch_6010030(void)
 
 	return DBadd_foreign_key("event_suppress", 3, &field);
 }
+
+static int	DBpatch_6010031(void)
+{
+	const ZBX_FIELD field = {"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBmodify_field_type("task_data", &field, NULL);
+}
 #endif
 
 DBPATCH_START(6010)
@@ -567,5 +574,6 @@ DBPATCH_ADD(6010027, 0,	1)
 DBPATCH_ADD(6010028, 0,	1)
 DBPATCH_ADD(6010029, 0,	1)
 DBPATCH_ADD(6010030, 0,	1)
+DBPATCH_ADD(6010031, 0,	1)
 
 DBPATCH_END()
