@@ -543,11 +543,11 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
-void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info);
-void	DBflush_version_requirements(const char *version);
+void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info);
+void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info);
+void	zbx_db_flush_version_requirements(const char *version);
 #ifdef HAVE_POSTGRESQL
-int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
+int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver);
 char	*zbx_db_get_schema_esc(void);
 #endif
 

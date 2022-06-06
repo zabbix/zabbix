@@ -796,7 +796,7 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  * Purpose: connects to DB and tries to detect DB version                     *
  *                                                                            *
  ******************************************************************************/
-void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
+void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 {
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 	zbx_dbms_version_info_extract(version_info);
@@ -808,7 +808,7 @@ void	DBextract_version_info(struct zbx_db_version_info_t *version_info)
  * Purpose: connects to DB and tries to detect DB extension version info      *
  *                                                                            *
  ******************************************************************************/
-void	DBextract_dbextension_info(struct zbx_db_version_info_t *version_info)
+void	zbx_db_extract_dbextension_info(struct zbx_db_version_info_t *version_info)
 {
 #ifdef HAVE_POSTGRESQL
 	DB_RESULT	result;
@@ -845,7 +845,7 @@ out:
  * Parameters: version - [IN] entry of DB versions                            *
  *                                                                            *
  ******************************************************************************/
-void	DBflush_version_requirements(const char *version)
+void	zbx_db_flush_version_requirements(const char *version)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -871,7 +871,7 @@ void	DBflush_version_requirements(const char *version)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	DBcheck_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver)
+int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info, int allow_unsupported_ver)
 {
 	int	ret = SUCCEED;
 
