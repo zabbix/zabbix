@@ -181,7 +181,12 @@ static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
 static char	*CONFIG_PID_FILE = NULL;
 
-unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
+unsigned char	program_type	= ZBX_PROGRAM_TYPE_SERVER;
+unsigned char	*zbx_get_program_type(void)
+{
+	return program_type;
+}
+
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
 ZBX_THREAD_LOCAL int		process_num	= 0;
 ZBX_THREAD_LOCAL int		server_num	= 0;
