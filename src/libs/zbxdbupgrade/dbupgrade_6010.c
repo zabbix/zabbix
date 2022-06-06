@@ -519,19 +519,26 @@ static int	DBpatch_6010028(void)
 
 static int	DBpatch_6010029(void)
 {
+	const ZBX_FIELD	field = {"suppress_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_6010030(void)
+{
 	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("event_suppress", &field);
 }
 
-static int	DBpatch_6010030(void)
+static int	DBpatch_6010031(void)
 {
 	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 3, &field);
 }
 
-static int	DBpatch_6010031(void)
+static int	DBpatch_6010032(void)
 {
 	const ZBX_FIELD field = {"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
@@ -575,5 +582,6 @@ DBPATCH_ADD(6010028, 0,	1)
 DBPATCH_ADD(6010029, 0,	1)
 DBPATCH_ADD(6010030, 0,	1)
 DBPATCH_ADD(6010031, 0,	1)
+DBPATCH_ADD(6010032, 0,	1)
 
 DBPATCH_END()
