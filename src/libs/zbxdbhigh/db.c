@@ -859,10 +859,10 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  ******************************************************************************/
 void	zbx_db_check_tsdb_capabilities(void)
 {
-#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB	100002
-#define ZBX_TIMESCALE_MIN_VERSION			10500
-#define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_CONFIG	20000
-#define ZBX_TIMESCALE_LICENSE_COMMUNITY			"timescale"
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB		100002
+#define ZBX_TIMESCALE_MIN_VERSION				10500
+#define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
+#define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"
 	int		major, minor, patch, version;
 	int		compression_available = OFF;
 	char		*tsdb_lic = NULL;
@@ -904,7 +904,7 @@ void	zbx_db_check_tsdb_capabilities(void)
 	if (ZBX_TIMESCALE_MIN_VERSION > version)
 		goto clean;
 
-	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_CONFIG > version)
+	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT > version)
 	{
 		compression_available = ON;
 		goto clean;
@@ -934,7 +934,7 @@ out:
 	DBclose();
 #undef ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB
 #undef ZBX_TIMESCALE_MIN_VERSION
-#undef ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_CONFIG
+#undef ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT
 #undef ZBX_TIMESCALE_LICENSE_COMMUNITY
 }
 #endif
