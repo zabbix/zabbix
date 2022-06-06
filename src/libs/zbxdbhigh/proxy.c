@@ -368,7 +368,8 @@ int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, ch
  *     FAIL    - access is denied                                             *
  *                                                                            *
  ******************************************************************************/
-int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req)
+int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
+		char *config_tls_server_cert_issuer, char *config_tls_server_cert_subject)
 {
 	char	*msg = NULL;
 
@@ -401,8 +402,11 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		if (SUCCEED == zbx_check_server_issuer_subject(sock, &msg))
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, &msg, config_tls_server_cert_issuer,
+				config_tls_server_cert_subject))
+		{
 			return SUCCEED;
+		}
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s from server \"%s\" is not allowed: %s", req, sock->peer, msg);
 

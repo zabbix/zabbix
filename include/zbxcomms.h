@@ -292,11 +292,13 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 
 #endif	/* #if defined(_WINDOWS) */
 
-void    zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, unsigned char program_type,
-		int config_active_forks, int config_passive_forks);
+void    zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks, int config_passive_forks);
 void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(void);
-void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, unsigned char program_type);
+
+typedef unsigned char	(*zbx_get_program_type_f)(void);
+void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
+
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);
 void	zbx_tls_version(void);

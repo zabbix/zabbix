@@ -39,7 +39,8 @@
 
 int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
-int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req);
+int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
+		char *config_tls_server_cert_issuer, char *config_tls_server_cert_subject);
 
 void	update_proxy_lastaccess(const zbx_uint64_t hostid, time_t last_access);
 

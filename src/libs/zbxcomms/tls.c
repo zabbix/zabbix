@@ -128,6 +128,8 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 }
 #endif
 
+static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
+
 /* extern unsigned int			configured_tls_connect_mode; */
 /* extern unsigned int			configured_tls_accept_modes; */
 
@@ -899,31 +901,27 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 		if (NULL != zbx_config_tls->CONFIG_TLS_CERT_FILE && NULL == zbx_config_tls->CONFIG_TLS_CONNECT)
 		{
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->CONFIG_TLS_CERT_FILE),
-					&(zbx_config_tls->CONFIG_TLS_CONNECT), zbx_config_tls,
-					zbx_get_program_type_cb());
+					&(zbx_config_tls->CONFIG_TLS_CONNECT), zbx_config_tls);
 		}
 
 		if (NULL != zbx_config_tls->CONFIG_TLS_PSK_FILE && NULL == zbx_config_tls->CONFIG_TLS_CONNECT)
 		{
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->CONFIG_TLS_PSK_FILE),
-					&(zbx_config_tls->CONFIG_TLS_CONNECT), zbx_config_tls,
-					zbx_get_program_type_cb());
+					&(zbx_config_tls->CONFIG_TLS_CONNECT), zbx_config_tls);
 		}
 
 		if (0 != (zbx_config_tls->configured_tls_connect_mode & ZBX_TCP_SEC_TLS_CERT) && NULL ==
 				zbx_config_tls->CONFIG_TLS_CERT_FILE)
 		{
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &(zbx_config_tls->CONFIG_TLS_CONNECT),
-					&(zbx_config_tls->CONFIG_TLS_CERT_FILE), zbx_config_tls,
-					zbx_get_program_type_cb());
+					&(zbx_config_tls->CONFIG_TLS_CERT_FILE), zbx_config_tls);
 		}
 
 		if (0 != (zbx_config_tls->configured_tls_connect_mode & ZBX_TCP_SEC_TLS_PSK) && NULL ==
 				zbx_config_tls->CONFIG_TLS_PSK_FILE)
 		{
 			zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &(zbx_config_tls->CONFIG_TLS_CONNECT),
-					&(zbx_config_tls->CONFIG_TLS_PSK_FILE), zbx_config_tls,
-					zbx_get_program_type_cb());
+					&(zbx_config_tls->CONFIG_TLS_PSK_FILE), zbx_config_tls);
 		}
 	}
 
@@ -2262,9 +2260,6 @@ void	zbx_tls_init_parent(void)
 #endif
 }
 
-typedef unsigned char	(*zbx_get_program_type_f)(void);
-static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: read available configuration parameters and initialize TLS        *
@@ -3128,7 +3123,7 @@ void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f
 	if (NULL == ctx_all)
 	{
 		/* cannot override TLS 1.3 ciphersuites */
-		if (NULL != zbx_conifg_tls->CONFIG_TLS_CIPHER_ALL13)
+		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_ALL13)
 		{
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	/* OpenSSL 1.1.1 or newer */
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "parameter \"TLSCipherAll13\" cannot"

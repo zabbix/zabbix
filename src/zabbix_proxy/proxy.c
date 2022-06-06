@@ -282,28 +282,28 @@ char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
-/* TLS parameters */
-unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
-unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
+/* /\* TLS parameters *\/ */
+/* unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED; */
+/* unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED; */
 
-char	*CONFIG_TLS_CONNECT		= NULL;
-char	*CONFIG_TLS_ACCEPT		= NULL;
-char	*CONFIG_TLS_CA_FILE		= NULL;
-char	*CONFIG_TLS_CRL_FILE		= NULL;
-char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
-char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
-char	*CONFIG_TLS_CERT_FILE		= NULL;
-char	*CONFIG_TLS_KEY_FILE		= NULL;
-char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
-char	*CONFIG_TLS_PSK_FILE		= NULL;
-char	*CONFIG_TLS_CIPHER_CERT13	= NULL;
-char	*CONFIG_TLS_CIPHER_CERT		= NULL;
-char	*CONFIG_TLS_CIPHER_PSK13	= NULL;
-char	*CONFIG_TLS_CIPHER_PSK		= NULL;
-char	*CONFIG_TLS_CIPHER_ALL13	= NULL;
-char	*CONFIG_TLS_CIPHER_ALL		= NULL;
-char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/* not used in proxy, defined for linking with tls.c */
-char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/* not used in proxy, defined for linking with tls.c */
+/* char	*CONFIG_TLS_CONNECT		= NULL; */
+/* char	*CONFIG_TLS_ACCEPT		= NULL; */
+/* char	*CONFIG_TLS_CA_FILE		= NULL; */
+/* char	*CONFIG_TLS_CRL_FILE		= NULL; */
+/* char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL; */
+/* char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL; */
+/* char	*CONFIG_TLS_CERT_FILE		= NULL; */
+/* char	*CONFIG_TLS_KEY_FILE		= NULL; */
+/* char	*CONFIG_TLS_PSK_IDENTITY	= NULL; */
+/* char	*CONFIG_TLS_PSK_FILE		= NULL; */
+/* char	*CONFIG_TLS_CIPHER_CERT13	= NULL; */
+/* char	*CONFIG_TLS_CIPHER_CERT		= NULL; */
+/* char	*CONFIG_TLS_CIPHER_PSK13	= NULL; */
+/* char	*CONFIG_TLS_CIPHER_PSK		= NULL; */
+/* char	*CONFIG_TLS_CIPHER_ALL13	= NULL; */
+/* char	*CONFIG_TLS_CIPHER_ALL		= NULL; */
+/* char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/\* not used in proxy, defined for linking with tls.c *\/ */
+/* char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/\* not used in proxy, defined for linking with tls.c *\/ */
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
@@ -686,7 +686,7 @@ static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vec
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config(ZBX_TASK_EX *task)
+static void	zbx_load_config(ZBX_TASK_EX *task, zbx_config_tls_t *zbx_config_tls)
 {
 	static struct cfg_line	cfg[] =
 	{
@@ -848,37 +848,37 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
+		{"TLSConnect",			&(zbx_config_tls->CONFIG_TLS_CONNECT),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING_LIST,
+		{"TLSAccept",			&(zbx_config_tls->CONFIG_TLS_ACCEPT),	TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+		{"TLSCAFile",			&(zbx_config_tls->CONFIG_TLS_CA_FILE),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+		{"TLSCRLFile",			&(zbx_config_tls->CONFIG_TLS_CRL_FILE),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertIssuer",		&CONFIG_TLS_SERVER_CERT_ISSUER,		TYPE_STRING,
+		{"TLSServerCertIssuer",	&(zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertSubject",	&CONFIG_TLS_SERVER_CERT_SUBJECT,	TYPE_STRING,
+		{"TLSServerCertSubject",	&(zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+		{"TLSCertFile",		&(zbx_config_tls->CONFIG_TLS_CERT_FILE),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+		{"TLSKeyFile",			&(zbx_config_tls->CONFIG_TLS_KEY_FILE),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+		{"TLSPSKIdentity",		&(zbx_config_tls->CONFIG_TLS_PSK_IDENTITY),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+		{"TLSPSKFile",			&(zbx_config_tls->CONFIG_TLS_PSK_FILE),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&CONFIG_TLS_CIPHER_CERT13,		TYPE_STRING,
+		{"TLSCipherCert13",		&(zbx_config_tls->CONFIG_TLS_CIPHER_CERT13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&CONFIG_TLS_CIPHER_CERT,		TYPE_STRING,
+		{"TLSCipherCert",		&(zbx_config_tls->CONFIG_TLS_CIPHER_CERT),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&CONFIG_TLS_CIPHER_PSK13,		TYPE_STRING,
+		{"TLSCipherPSK13",		&(zbx_config_tls->CONFIG_TLS_CIPHER_PSK13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&CONFIG_TLS_CIPHER_PSK,			TYPE_STRING,
+		{"TLSCipherPSK",		&(zbx_config_tls->CONFIG_TLS_CIPHER_PSK),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&CONFIG_TLS_CIPHER_ALL13,		TYPE_STRING,
+		{"TLSCipherAll13",		&(zbx_config_tls->CONFIG_TLS_CIPHER_ALL13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&CONFIG_TLS_CIPHER_ALL,			TYPE_STRING,
+		{"TLSCipherAll",		&(zbx_config_tls->CONFIG_TLS_CIPHER_ALL),	TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},

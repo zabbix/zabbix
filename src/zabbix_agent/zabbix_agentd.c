@@ -91,7 +91,7 @@ unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
 /* char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/\* not used in agent, defined for linking with tls.c *\/ */
 /* char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/\* not used in agent, defined for linking with tls.c *\/ */
 
-zbx_config_tls_t	zbx_config_tls;
+/*zbx_config_tls_t	zbx_config_tls;*/
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
@@ -992,7 +992,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task, zbx_config_tls_t
 		zbx_validate_config_hostnames(&hostnames);
 		zbx_validate_config(task);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(&zbx_config_tls, program_type, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS);
+		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS);
 #endif
 	}
 
