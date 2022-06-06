@@ -859,6 +859,10 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
  ******************************************************************************/
 void	DBcheck_tsdb_capabilities(void)
 {
+#define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB	100002
+#define ZBX_TIMESCALE_MIN_VERSION			10500
+#define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_CONFIG	20000
+#define ZBX_TIMESCALE_LICENSE_COMMUNITY			"timescale"
 	int		major, minor, patch, version;
 	int		compression_available = OFF;
 	char		*tsdb_lic = NULL;
@@ -900,7 +904,7 @@ void	DBcheck_tsdb_capabilities(void)
 	if (ZBX_TIMESCALE_MIN_VERSION > version)
 		goto clean;
 
-	if (ZBX_TIMESCALE_MIN_SUPPORTED_VERSION > version)
+	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_CONFIG > version)
 	{
 		compression_available = ON;
 		goto clean;
@@ -916,8 +920,7 @@ void	DBcheck_tsdb_capabilities(void)
 	if (0 != zbx_strcmp_null(tsdb_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
-				" supported in %s.", ZBX_NULL2EMPTY_STR(tsdb_lic),
-				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
+				" supported in TimescaleDB Community Edition.", ZBX_NULL2EMPTY_STR(tsdb_lic));
 		goto clean;
 	}
 
