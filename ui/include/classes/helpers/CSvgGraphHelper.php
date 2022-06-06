@@ -658,6 +658,10 @@ class CSvgGraphHelper {
 		$limit = 3;
 
 		foreach ($metrics as &$metric) {
+			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
+				continue;
+			}
+
 			$db_triggers = DBselect(
 				'SELECT DISTINCT h.host,tr.description,tr.triggerid,tr.expression,tr.priority,tr.value'.
 				' FROM triggers tr,functions f,items i,hosts h'.

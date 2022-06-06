@@ -840,7 +840,7 @@ class CSvgGraph extends CSvg {
 				$px_per_sec = ceil($this->canvas_width / ($this->time_till - $this->time_from));
 
 				$y_axis_side = $this->metrics[$index]['options']['axisy'];
-				$time_points = array_keys($this->points[$index]);
+				$time_points = array_keys(reset($this->points[$index]));
 				$last_point = 0;
 				$path = reset($path);
 
@@ -921,6 +921,10 @@ class CSvgGraph extends CSvg {
 		}
 
 		foreach ($this->metrics as $index => $metric) {
+			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
+				continue;
+			}
+
 			if (!array_key_exists($index, $this->points) || !array_key_exists($metric['options']['axisy'], $values)) {
 				continue;
 			}
@@ -936,10 +940,12 @@ class CSvgGraph extends CSvg {
 					$approximation = 'avg';
 			}
 
-			$values[$metric['options']['axisy']] = array_merge(
-				$values[$metric['options']['axisy']],
-				array_column($this->points[$index], $approximation)
-			);
+			foreach ($this->points[$index] as $points) {
+				$values[$metric['options']['axisy']] = array_merge(
+					$values[$metric['options']['axisy']],
+					array_column($points, $approximation)
+				);
+			}
 		}
 
 		foreach ($values as $side => $points) {
