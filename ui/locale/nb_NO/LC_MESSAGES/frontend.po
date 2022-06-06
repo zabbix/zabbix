@@ -12923,6 +12923,10 @@ msgstr "Antall elementer i Zabbix-databasen."
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Antall elementer i proxy-historikk som ennå ikke er sendt til serveren"
 
+#: include/classes/data/CItemData.php:1668
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Antall elementer i køen som er forsinket med fra til til sekunder, inkludert."
