@@ -1,27 +1,55 @@
+Changes for 6.0.6rc1
+
+New features:
+.........T [ZBXNEXT-7632] added template for HPE Primera (vkhaliev)
+.........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
+
+Bug fixes:
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.5
+
+6.0.5rc1 was released as 6.0.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.5rc1
 
 New features:
+.........T [ZBXNEXT-7453] added templates HashiCorp Consul by HTTP (ychukina)
 ..F....... [ZBXNEXT-6893] implemented audit log filtering by multiple actions (rdetlavs)
 ....I..... [ZBXNEXT-7693] replaced filename-length-max=99 option with tar-pax in configure.ac (yurii)
-..F....... [ZBX-20946] enabled German and Vietnamese languages in frontend (miks)
+..F....... [ZBX-20946] enabled German and Vietnamese languages in the frontend (miks)
 .......PS. [ZBXNEXT-7604] modified functionality to ignore NaN in Prometheus preprocessing aggregate functions (akozlovs)
 ..F....... [ZBXNEXT-7526] added number of items for Latest data column in Monitoring -> Hosts page (Ivo)
-A.F....... [ZBXNEXT-7476] disabled php 8 strict type validation (ashubin)
-..F....... [ZBXNEXT-7461] implemented expandable subfilters in latest data page; fixed clickable tags (miks)
+A.F....... [ZBXNEXT-7476] disabled PHP 8 strict type validation (ashubin)
+..F....... [ZBXNEXT-7461] implemented expandable subfilters in the Latest data page; fixed clickable tags (miks)
 .........T [ZBXNEXT-7607] added template Envoy Proxy by HTTP (ychukina)
 .........T [ZBXNEXT-7547] added CockroachDB template (drasihov)
 A.F....... [ZBXNEXT-7491] fixed PHP 8.1 runtime warnings with PostgreSQL backend (Sasha)
 
 Bug fixes:
+A......... [ZBX-20859] fixed incorrectly exported host groups in map elements (Sasha)
+A.F....... [ZBX-20613] returned the ability to edit the dependencies of inherited triggers; improved validation upon unlinking templates with triggers that have dependencies; improved performance of trigger dependency functionality; prevented the ability to fully replace trigger dependencies of inherited triggers if the new dependency was added to parent trigger; supplemented validation of trigger dependencies on templates to prevent linkage dead-ends (vmaksimovs)
+..F....... [ZBX-20814] fixed Map->Sharing user group shares table not showing saved user groups (esekace)
+.........T [ZBX-20898] fixed duplicated UUID in the official template (abakaldin)
+..F....... [ZBX-20242] fixed inability to change LDAP bind password (agriscenko)
+...G...... [ZBX-20911] added process state check in PROC_NUM() for Oracle Solaris (Andris)
+..F....... [ZBX-20752] fixed saved properties of classic graphs being lost when reopening graph configuration (agriscenko)
+..F....... [ZBX-19381] fixed resolving of macros in item key parameters when testing items in web interface (Sasha)
+..F....... [ZBX-18520] fixed showing of fields that do not belong to the selected item type in the item edit form (miks)
+.........T [ZBX-20950] updated regular expressions for services discovery in Windows templates (vkhaliev)
+..F....... [ZBX-20684] fixed item value widget not showing trailing zeros (mkrisjanis)
 .......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
 ........S. [ZBX-20823] fixed inability to update hosts that were created by LLD on aarch64 (vso)
 ..F....... [ZBX-20945] fixed broken trigger link in trigger mass update => dependencies (esekace)
-...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent2 (vso)
+...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent 2 (vso)
 ...G...... [ZBX-20886] fixed handle leak on Zabbix agent 2 in vfs.fs.get (vso)
 ..F....... [ZBX-21008] fixed broken popup for SLA selection for User role (averza)
 ..F....... [ZBX-20380] fixed maintenance highlighting having priority over problem severity highlighting for map elements of map, host group and trigger types (agriscenko)
 ..F....... [ZBX-20573] fixed service filter functionality in SLA report page (rdetlavs)
-.........T [ZBX-20982] fixed api request by coordinates in openweathermap template (vkhaliev)
+.........T [ZBX-20982] fixed API request by coordinates in the OpenWeatherMap template (vkhaliev)
 ........S. [ZBX-20918] moved final history/trends cache sync in main process to be done before stopping HA (wiper)
 ..F....... [ZBX-20548] fixed broken host link not opening in Inventory (rdetlavs)
 
@@ -1888,12 +1916,29 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.25rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.24
+
+5.0.24rc1 was released as 5.0.24 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.24rc1
 
 New features:
 ..F....... [ZBX-20946] enabled German, Greek, Romanian, Spanish and Vietnamese languages in frontend (miks)
 
 Bug fixes:
+...G...... [ZBX-20911] added process state check in PROC_NUM() for Oracle Solaris (Andris)
+..F....... [ZBX-19381] fixed resolving of macros in item key parameters when testing items in web interface (Sasha)
+..F....... [ZBX-18520] fixed showing of fields that do not belong to selected item type in item edit form (miks)
+.........T [ZBX-20950] updated regular expressions for services discovery in windows templates (vkhaliev)
 .......PS. [ZBX-20600] fixed vmware hv.datastore.latency item when multiple datastores with duplicate name (MVekslers)
 ...G...... [ZBX-20356] fixed perfomance counters not working when removed and added again on Zabbix agent2 (vso)
 ...G...... [ZBX-20886] fixed handle leak on Zabbix agent 2 in vfs.fs.get (vso)
@@ -4377,6 +4422,18 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.42rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.41
+
+4.0.41rc1 was released as 4.0.41 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.41rc1
