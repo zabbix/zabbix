@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
+ * @backup profiles
+ *
  * @dataSource TagFilter
  */
 class testPageTemplates extends CLegacyWebTest {
@@ -119,8 +121,6 @@ class testPageTemplates extends CLegacyWebTest {
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('templates.php');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();

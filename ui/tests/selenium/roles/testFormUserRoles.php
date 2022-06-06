@@ -926,11 +926,11 @@ class testFormUserRoles extends CWebTest {
 						'template.delete', 'template.get', 'template.massadd', 'template.massremove', 'template.massupdate',
 						'template.update', 'templatedashboard.create', 'templatedashboard.delete', 'templatedashboard.get',
 						'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
-						'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete', 'trigger.deletedependencies',
-						'trigger.get', 'trigger.update', 'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
-						'triggerprototype.update', 'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.create',
-						'usermacro.delete', 'usermacro.get', 'usermacro.update', 'valuemap.create', 'valuemap.delete', 'valuemap.get',
-						'valuemap.update'
+						'token.update', 'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get', 'trigger.update',
+						'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
+						'triggerprototype.update', 'user.get', 'user.logout', 'user.update', 'usergroup.get',
+						'usermacro.create','usermacro.delete', 'usermacro.get', 'usermacro.update', 'valuemap.create',
+						'valuemap.delete', 'valuemap.get', 'valuemap.update'
 					]
 				]
 			],
@@ -973,14 +973,15 @@ class testFormUserRoles extends CWebTest {
 						'template.create', 'template.delete', 'template.get', 'template.massadd', 'template.massremove',
 						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
 						'templatedashboard.get', 'templatedashboard.update', 'token.create', 'token.delete', 'token.generate',
-						'token.get', 'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete',
-						'trigger.deletedependencies', 'trigger.get', 'trigger.update', 'triggerprototype.create',
-						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
-						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'userdirectory.create',
-						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update', 'usergroup.create',
-						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create', 'usermacro.createglobal',
-						'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get', 'usermacro.update', 'usermacro.updateglobal',
-						'valuemap.create', 'valuemap.delete', 'valuemap.get', 'valuemap.update'
+						'token.get', 'token.update', 'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get',
+						'trigger.update', 'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
+						'triggerprototype.update', 'user.create', 'user.delete', 'user.get', 'user.logout',
+						'user.unblock', 'user.update', 'userdirectory.create', 'userdirectory.delete',
+						'userdirectory.get', 'userdirectory.test', 'userdirectory.update', 'usergroup.create',
+						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create',
+						'usermacro.createglobal', 'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get',
+						'usermacro.update', 'usermacro.updateglobal', 'valuemap.create', 'valuemap.delete',
+						'valuemap.get', 'valuemap.update'
 					]
 				]
 			]

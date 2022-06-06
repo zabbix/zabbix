@@ -234,5 +234,10 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
+int	check_vcenter_rp_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_rp_memory(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 #endif

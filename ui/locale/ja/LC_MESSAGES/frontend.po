@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-05-03 15:27+0000\n"
+"PO-Revision-Date: 2022-05-27 12:36+0000\n"
 "Last-Translator: Atsushi <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -317,11 +317,11 @@ msgstr "障害発生数上位100項目"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12時間表示"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24時間表示"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -665,7 +665,7 @@ msgstr "有効"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "アクティブチェック"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -1158,7 +1158,7 @@ msgstr "ゲストの物理メモリページをバックアップするために
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
-msgstr ""
+msgstr "アナログ"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
@@ -1795,6 +1795,10 @@ msgstr "インターバル中のCPU使用率、<url> - VMwareサービスURL、<
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "インターバル中のCPU使用率、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
+#: include/classes/data/CItemData.php:1429
+msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
 msgstr "CPU使用率。浮動小数点値を返す"
@@ -2100,6 +2104,11 @@ msgstr[0] "アイテムをコピーできません"
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
 msgstr[0] "トリガーをコピーできません"
+
+#: include/triggers.inc.php:246
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+msgstr "条件式内に複数のホストがあるため、トリガー\"%1$s\"をコピーできません。"
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2773,6 +2782,11 @@ msgstr "トリガー\"%3$s\"の依存関係によってテンプレート\"%1$s\
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "トリガー\"%3$s\"の条件式によってテンプレート\"%1$s\"をホスト\"%2$s\"にリンクできません。"
 
+#: include/classes/api/services/CHostBase.php:644
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr "親テンプレート\"%3$s\"を二重リンクすることになるので、テンプレート\"%1$s\"をホスト\"%2$s\"にリンクできません。"
+
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" because its parent template \"%3$s\" will be linked twice."
@@ -2788,6 +2802,11 @@ msgstr "トリガー\"%3$s\"の依存関係によってテンプレート\"%1$s\
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "トリガー\"%3$s\"の条件式によってテンプレート\"%1$s\"をホストプロトタイプ\"%2$s\"にリンクできません。"
+
+#: include/classes/api/services/CHostBase.php:641
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr "親テンプレート\"%3$s\"を二重リンクすることになるので、テンプレート\"%1$s\"をホストプロトタイプ\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
@@ -2809,6 +2828,16 @@ msgstr "トリガー\"%3$s\"の依存関係によってテンプレート\"%1$s\
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "トリガー\"%3$s\"の条件式によってテンプレート\"%1$s\"をテンプレート\"%2$s\"にリンクできません。"
+
+#: include/classes/api/services/CHostBase.php:502
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr "循環参照(%3$s)になってしまうので、テンプレート\"%1$s\"をテンプレート\"%2$s\"にリンクできません。"
+
+#: include/classes/api/services/CHostBase.php:638
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
+msgstr "親テンプレート\"%3$s\"を二重リンクすることになるので、テンプレート\"%1$s\"をテンプレート\"%2$s\"にリンクできません。"
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
@@ -2986,6 +3015,26 @@ msgstr "Webシナリオのリンク削除と削除が行えません。"
 #: include/classes/api/services/CHost.php:1095
 msgid "Cannot unlink template"
 msgstr "テンプレートのリンクを削除できません"
+
+#: include/classes/api/services/CHostBase.php:331
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr "トリガー\"%3$s\"の依存関係によって、ホスト\"%2$s\"からテンプレート\"%1$s\"へのリンクを削除できません。"
+
+#: include/classes/api/services/CHostBase.php:415
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
+msgstr "ホスト\"%4$s\"上のトリガー\"%3$s\"の依存関係によって、テンプレート\"%2$s\"からテンプレート\"%1$s\"へのリンクを削除できません。"
+
+#: include/classes/api/services/CHostBase.php:414
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:330
+#, c-format
+msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
@@ -3598,7 +3647,7 @@ msgstr "時刻"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:72
 msgid "Clock type"
-msgstr ""
+msgstr "時計のタイプ"
 
 #: app/partials/scheduledreport.formgrid.html.php:225
 #: app/views/administration.iconmap.edit.php:139
@@ -5465,7 +5514,7 @@ msgstr "Digest"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:74
 msgid "Digital"
-msgstr ""
+msgstr "デジタル"
 
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
@@ -5730,7 +5779,7 @@ msgstr "VMwareハイパーバイザーのデータストアのディスカバリ
 
 #: include/classes/data/CItemData.php:1379
 msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのネットワークインターフェースのディスカバリ、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザー。JSONで返す"
 
 #: include/classes/data/CItemData.php:1306
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
@@ -7123,7 +7172,7 @@ msgstr "フォームデータ"
 #: include/classes/widgets/forms/CWidgetFormClock.php:182
 #: include/classes/widgets/forms/CWidgetFormClock.php:242
 msgid "Format"
-msgstr ""
+msgstr "表示形式"
 
 #: include/items.inc.php:1769 include/views/configuration.item.edit.php:734
 #: include/views/configuration.item.prototype.edit.php:707
@@ -10859,6 +10908,10 @@ msgstr "リストがありません"
 msgid "List of OS processes with attributes. Returns JSON array"
 msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
 
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ブロックデバイスとそのタイプのリスト。JSONで返す"
@@ -10935,7 +10988,7 @@ msgstr "ローカル"
 
 #: include/classes/widgets/fields/CWidgetFieldTimeZone.php:58
 msgid "Local default"
-msgstr ""
+msgstr "ローカルのデフォルト"
 
 #: include/classes/screens/CScreenHistory.php:267
 #: include/classes/widgets/forms/CWidgetFormClock.php:32
@@ -11515,6 +11568,10 @@ msgstr "メンバー"
 #, c-format
 msgid "Memory limit: %1$s"
 msgstr "メモリ上限: %1$s"
+
+#: include/classes/data/CItemData.php:1433
+msgid "Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1210
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -12923,6 +12980,10 @@ msgstr "Zabbixデータベース内のアイテム数。"
 #: include/classes/data/CItemData.php:1654
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "サーバーへ未送信のプロキシ内のヒストリアイテム数"
+
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -15249,6 +15310,10 @@ msgstr "Zabbixに設定されたホストのネットワークインターフェ
 msgid "Returns a JSON object containing Zabbix server or proxy internal metrics."
 msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスをJSONオブジェクトで返す。"
 
+#: include/classes/data/CItemData.php:1673
+msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1614
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
 msgstr "ホスト上の特定のチェック種別の稼働状況を返す。このアイテムの値がホストリストの稼働状況アイコンに対応する。有効なtypes： agent, snmp, ipmi, jmx。"
@@ -15878,7 +15943,7 @@ msgstr "セカンダリPOCスクリーン名"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:173
 msgid "Seconds"
-msgstr ""
+msgstr "秒表示"
 
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
@@ -16313,7 +16378,7 @@ msgstr "マップ\"%2$s\"の共有オプション\"%1$s\"の値がありませ�
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:243
 msgid "Short"
-msgstr ""
+msgstr "短縮"
 
 #: app/partials/monitoring.latest.filter.php:154
 #: app/partials/monitoring.problem.filter.php:222
@@ -17952,6 +18017,61 @@ msgstr "トリガー\"%1$s\"は\"%2$s\"にすでに存在します。"
 msgid "Trigger \"%1$s\" belongs to templates with different linkages."
 msgstr "トリガー\"%1$s\"はリンクされている他のテンプレートに含まれています。"
 
+#: include/triggers.inc.php:372 include/triggers.inc.php:433
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/triggers.inc.php:373 include/triggers.inc.php:434
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2679
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2678
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2572
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2305
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2300
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2316
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2423
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2808
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2807
+#, c-format
+msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
@@ -18050,6 +18170,66 @@ msgstr "トリガーのプロトタイプ\"%1$s\"はすでに\"%2$s\"に存在�
 #, c-format
 msgid "Trigger prototype \"%1$s\" belongs to templates with different linkages."
 msgstr "トリガーのプロトタイプ\"%1$s\"はリンクされている他のテンプレートに含まれています。"
+
+#: include/classes/api/services/CDiscoveryRule.php:916
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:915
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2684
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2683
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2573
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2424
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2813
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2812
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2306
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2301
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:2317
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:1325
+#, c-format
+msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
+msgstr ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1715
 #, c-format
@@ -19095,11 +19275,11 @@ msgstr "ユーザー"
 
 #: include/classes/data/CItemData.php:1255
 msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware分散仮想スイッチ、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/data/CItemData.php:1259
 msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
-msgstr ""
+msgstr "VMware FetchDVPortラッパー、<url> - VMwareサービスURL、<filter> - VMwareのDistributedVirtualSwitchPortCriteriaデータオブジェクト、<mode> - state(デフォルト)/full。JSONで返す"
 
 #: include/classes/data/CItemData.php:1702
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
@@ -19115,7 +19295,7 @@ msgstr "VMwareクラスターの状態、<url> - VMwareサービスURL、<name> 
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMwareデータセンターとそのID、<url> - VMwareサービスURL。JSONで返す"
 
 #: include/classes/data/CItemData.php:1250
 msgid "VMware datacenters and their IDs. Returns JSON"
@@ -19160,7 +19340,7 @@ msgstr "VMwareハイパーバイザーのクラスター名、<url> - VMwareサ�
 
 #: include/classes/data/CItemData.php:1275
 msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMwareハイパーバイザーの接続状態、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
@@ -19196,7 +19376,7 @@ msgstr "VMwareハイパーバイザーネットワーク入力統計、<url> - V
 
 #: include/classes/data/CItemData.php:1387
 msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
-msgstr ""
+msgstr "VMwareハイパーバイザーのネットワークインターフェーススピード、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名、<ifname> - インターフェース名"
 
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
@@ -19220,11 +19400,11 @@ msgstr "VMwareハイパーバイザーのプロセッサー利用量(Hz)、<url>
 
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
-msgstr ""
+msgstr "VMwareハイパーバイザーのセンサー値、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名。JSONで返す"
 
 #: include/classes/data/CItemData.php:1355
 msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "VMwareハイパーバイザーのシリアル番号、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -19272,7 +19452,7 @@ msgstr "VMware仮想マシンの圧縮されたメモリサイズ、<url> - VMwa
 
 #: include/classes/data/CItemData.php:1431
 msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
-msgstr ""
+msgstr "VMware仮想マシンのカスタム属性値、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<name> - カスタム属性名"
 
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
@@ -19288,7 +19468,7 @@ msgstr "VMware仮想マシンのディスクデバイスの書き込み統計、
 
 #: include/classes/data/CItemData.php:1439
 msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware仮想マシンのディスクの統合要求、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/data/CItemData.php:1566
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
@@ -19344,11 +19524,11 @@ msgstr "VMware仮想マシンの共有メモリサイズ、<url> - VMwareサー�
 
 #: include/classes/data/CItemData.php:1555
 msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "VMware仮想マシンのスナップショットの状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名。JSONで返す"
 
 #: include/classes/data/CItemData.php:1559
 msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware仮想マシンの状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名"
 
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -19356,7 +19536,7 @@ msgstr "VMware仮想マシンのスワップされたメモリサイズ、<url> 
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
-msgstr ""
+msgstr "VMware仮想マシンのツールの状態、<url> - VMwareサービスURL、<uuid> - VMware仮想マシンのホスト名、<mode> - versionまたはstatus"
 
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -19485,6 +19665,10 @@ msgstr "値キャッシュの統計。有効なパラメータ：total, free, pf
 #: include/classes/helpers/CCookieHelper.php:75
 msgid "Value cannot be empty."
 msgstr "値を設定してください。"
+
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"

@@ -21,10 +21,10 @@
 #define ZABBIX_ZBXSERVICE_H
 
 #include "zbxtypes.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 
-ZBX_PTR_VECTOR_DECL(service, DB_SERVICE *)
+ZBX_PTR_VECTOR_DECL(service, ZBX_DB_SERVICE *)
 
 #define ZBX_IPC_SERVICE_SERVICE			"service"
 #define ZBX_IPC_SERVICE_SERVICE_PROBLEMS	1
