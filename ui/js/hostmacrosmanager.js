@@ -30,9 +30,9 @@ class HostMacrosManager {
 	static ZBX_STYLE_ICON_INVISIBLE = 'icon-invisible';
 	static ZBX_STYLE_ICON_SECRET_TEXT = 'icon-secret';
 	static ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
-	static DISCOVERY_STATE_AUTOMATIC = 1;
-	static DISCOVERY_STATE_CONVERTING = 2;
-	static DISCOVERY_STATE_MANUAL = 3;
+	static DISCOVERY_STATE_AUTOMATIC = 0x1;
+	static DISCOVERY_STATE_CONVERTING = 0x2;
+	static DISCOVERY_STATE_MANUAL = 0x3;
 
 	constructor({parent_hostid}) {
 		this.parent_hostid = parent_hostid ?? null;
