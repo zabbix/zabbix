@@ -5,10 +5,6 @@ form.dashboard-grid-widget-svggraph {
 		border: 1px solid $ui-border-color;
 	}
 
-	// table {
-	// 	width: initial;
-	// }
-
 	.dataset-head {
 		display: grid;
 		grid-template-columns: 24px 24px 1fr 1fr 24px;
@@ -129,7 +125,8 @@ form.dashboard-grid-widget-svggraph {
 		}
 	}
 
-	.single-item-table-empty-msg {
+	.no-items-message {
 		display: none;
+		color: $font-alt-color;
 	}
 }

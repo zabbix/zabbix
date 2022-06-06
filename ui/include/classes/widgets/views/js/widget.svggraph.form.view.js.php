@@ -78,7 +78,7 @@ window.widget_svggraph_form = new class {
 
 
 				if (dataset.dataset.type == '0') {
-					const message_block = dataset.querySelector('.single-item-table-empty-msg');
+					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
 						message_block.style.display = 'block';
@@ -90,7 +90,7 @@ window.widget_svggraph_form = new class {
 				const dataset = data.section[0];
 
 				if (dataset.dataset.type == '0') {
-					const message_block = dataset.querySelector('.single-item-table-empty-msg');
+					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
 						message_block.style.display = 'none';

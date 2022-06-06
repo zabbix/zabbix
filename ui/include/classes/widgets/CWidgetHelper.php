@@ -1240,7 +1240,7 @@ class CWidgetHelper {
 					->setAttribute('data-number', $i + 1);
 			}
 
-			$empty_msg_block = (new CDiv(_('No item selected.')))->addClass('single-item-table-empty-msg');
+			$empty_msg_block = (new CDiv(_('No item selected.')))->addClass('no-items-message');
 
 			$items_list = (new CTable())
 				->addClass('single-item-table')

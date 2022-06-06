@@ -264,6 +264,7 @@ class CSvgGraph extends CSvg {
 	public function draw(): self {
 		$this->applyMissingDataFunc();
 		$this->recalculatePoints();
+
 		$this->calculateDimensions();
 
 		if ($this->canvas_width > 0 && $this->canvas_height > 0) {
