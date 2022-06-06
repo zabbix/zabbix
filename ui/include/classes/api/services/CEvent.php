@@ -720,11 +720,10 @@ class CEvent extends CApiService {
 						'type' => ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION,
 						'data' => json_encode([
 							'eventid' => strval($suppress_eventids[$k]),
-							'action' => 'suppress',
+							'action' => ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS,
 							'userid' => $acknowledgement['userid'],
 							'suppress_until' => $suppress_until
-						]),
-						'parent_taskid' => $id
+						])
 					];
 				}
 
@@ -741,11 +740,9 @@ class CEvent extends CApiService {
 						'type' => ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION,
 						'data' => json_encode([
 							'eventid' => strval($unsuppress_eventids[$k]),
-							'action' => 'unsuppress',
-							'userid' => $acknowledgement['userid'],
-							'suppress_until' => 0
-						]),
-						'parent_taskid' => $id
+							'action' => ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS,
+							'userid' => $acknowledgement['userid']
+						])
 					];
 				}
 			}
