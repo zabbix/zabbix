@@ -151,6 +151,10 @@ form.dashboard-grid-widget-svggraph {
 		.single-item-table-row:last-child td {
 			padding-bottom: 0;
 		}
+
+		tfoot td {
+			padding: 5px 5px 5px 10px;
+		}
 	}
 
 	.no-items-message {
