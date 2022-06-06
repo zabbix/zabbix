@@ -1069,7 +1069,7 @@ function getDataOverviewCellData(array $db_items, array $data, int $show_suppres
  *
  * @return array
  */
-function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?string $application = ''): array {
+function getDataOverviewItems(?array $groupids = null, ?array $hostids, ?string $application = ''): array {
 	if ($application !== '') {
 		$db_applications = API::Application()->get([
 			'output' => ['hostid'],
@@ -1087,15 +1087,21 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 	}
 
 	if ($hostids === null) {
+		$config = select_config();
 		$db_hosts = API::Host()->get([
-			'output' => [],
+			'output' => ['name'],
 			'groupids' => $groupids,
 			'applicationids' => $applicationids,
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
-			'preservekeys' => true,
-			'limit' => ZBX_MAX_TABLE_COLUMNS + 1
+			'sortfield' => ['name'],
+			'limit' => $config['search_limit'],
+			'preservekeys' => true
 		]);
+
+		CArrayHelper::sort($db_hosts, ['name']);
+		$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS + 1, true);
+
 		$hostids = array_keys($db_hosts);
 	}
 
@@ -1128,7 +1134,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		['field' => 'itemid', 'order' => ZBX_SORT_UP]
 	]);
 
-	return [$db_items, $hostids];
+	return $db_items;
 }
 
 /**
@@ -1141,7 +1147,7 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
  * @return array
  */
 function getDataOverview(?array $groupids, ?array $hostids, array $filter): array {
-	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $filter['application']);
+	$db_items = getDataOverviewItems($groupids, $hostids, $filter['application']);
 
 	$data = [];
 	$item_counter = [];
@@ -1193,35 +1199,51 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 		['field' => 'name', 'order' => ZBX_SORT_UP]
 	]);
 
-	$has_hidden_hosts = (count($db_hosts) > ZBX_MAX_TABLE_COLUMNS);
+	$has_hidden_data = count($data) > ZBX_MAX_TABLE_COLUMNS || count($db_hosts) > ZBX_MAX_TABLE_COLUMNS;
 	$db_hosts = array_slice($db_hosts, 0, ZBX_MAX_TABLE_COLUMNS, true);
+	$host_names = array_column($db_hosts, 'name', 'name');
 
-	$data = array_slice($data, 0, ZBX_MAX_TABLE_COLUMNS, true);
-	$items_left = ZBX_MAX_TABLE_COLUMNS;
 	$itemids = [];
-	array_walk($data, function (array &$item_columns) use (&$itemids, &$items_left) {
+	$items_left = ZBX_MAX_TABLE_COLUMNS;
+
+	foreach ($data as &$item_columns) {
 		if ($items_left != 0) {
 			$item_columns = array_slice($item_columns, 0, min(ZBX_MAX_TABLE_COLUMNS, $items_left));
 			$items_left -= count($item_columns);
 		}
 		else {
 			$item_columns = null;
-			return;
+			break;
 		}
 
-		array_walk($item_columns, function (array &$item_column) use (&$itemids) {
+		foreach ($item_columns as &$item_column) {
+			CArrayHelper::ksort($item_column);
 			$item_column = array_slice($item_column, 0, ZBX_MAX_TABLE_COLUMNS, true);
-			$itemids += array_column($item_column, 'itemid', 'itemid');
-		});
-	});
-	$data = array_filter($data);
 
-	$has_hidden_items = (count($db_items) != count($itemids));
+			foreach ($item_column as $host_name => $item) {
+				if (array_key_exists($host_name, $host_names)) {
+					$itemids[$item['itemid']] = true;
+				}
+				else {
+					unset($item_column[$host_name]);
+				}
+			}
+		}
+		unset($item_column);
+
+		$item_columns = array_filter($item_columns);
+	}
+	unset($item_columns);
+
+	$data = array_filter($data);
+	$data = array_slice($data, 0, ZBX_MAX_TABLE_COLUMNS, true);
+
+	$has_hidden_data = $has_hidden_data || count($db_items) != count($itemids);
 
 	$db_items = array_intersect_key($db_items, $itemids);
 	$data = getDataOverviewCellData($db_items, $data, $filter['show_suppressed']);
 
-	return [$data, $db_hosts, ($has_hidden_items || $has_hidden_hosts)];
+	return [$data, $db_hosts, $has_hidden_data];
 }
 
 /**
