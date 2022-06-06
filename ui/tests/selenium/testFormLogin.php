@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
- * @backup users
+ * @backup users, users_groups
  *
  * @onBefore prepareLdapUserData
  **/
