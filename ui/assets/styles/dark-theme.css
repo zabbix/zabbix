@@ -1685,6 +1685,8 @@ form.dashboard-grid-widget-svggraph .graph-widget-config-tabs {
 form.dashboard-grid-widget-svggraph .table-forms-container, form.dashboard-grid-widget-svggraph .browser-warning-container {
   border: 1px solid #303030;
   border-top: none; }
+form.dashboard-grid-widget-svggraph .table-forms-separator {
+  padding: 0; }
 form.dashboard-grid-widget-svggraph .dataset-head {
   display: grid;
   grid-template-columns: 24px 24px 1fr 1fr 24px;
@@ -1704,8 +1706,6 @@ form.dashboard-grid-widget-svggraph .drag-icon {
   position: absolute;
   left: -14px; }
 form.dashboard-grid-widget-svggraph .td-drag-icon .drag-icon {
-  position: relative;
-  top: 8px;
   left: 9px;
   margin-right: 5px; }
 form.dashboard-grid-widget-svggraph .dataset-actions {
@@ -1720,6 +1720,8 @@ form.dashboard-grid-widget-svggraph .list-vertical-accordion {
   position: relative;
   margin-left: 15px;
   padding-left: 0; }
+  form.dashboard-grid-widget-svggraph .list-vertical-accordion .list-accordion-item-head {
+    padding: 0; }
 form.dashboard-grid-widget-svggraph .list-accordion-item {
   position: relative;
   margin-bottom: 10px; }
@@ -1743,8 +1745,6 @@ form.dashboard-grid-widget-svggraph .list-accordion-item {
   form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
   form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
     display: none; }
-  form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .single-item-table-row td {
-    padding: 0px 5px 5px 0; }
   form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
     padding-left: 0; }
 form.dashboard-grid-widget-svggraph .single-item-table .table-col-handle {
@@ -1755,10 +1755,15 @@ form.dashboard-grid-widget-svggraph .single-item-table .table-col-color {
   width: 24px; }
 form.dashboard-grid-widget-svggraph .single-item-table .table-col-action {
   width: 55px; }
+form.dashboard-grid-widget-svggraph .single-item-table th {
+  padding: 5px 5px 5px 0; }
 form.dashboard-grid-widget-svggraph .single-item-table .single-item-table-row td {
-  padding: 0px 5px 0 0; }
+  padding: 0 5px 5px 0; }
+form.dashboard-grid-widget-svggraph .single-item-table .single-item-table-row:last-child td {
+  padding-bottom: 0; }
 form.dashboard-grid-widget-svggraph .no-items-message {
   display: none;
+  line-height: 24px;
   color: #737373; }
 
 form.dashboard-grid-widget-tophosts #list_columns .text {
