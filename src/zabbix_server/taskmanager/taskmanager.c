@@ -817,14 +817,6 @@ static void	tm_process_temp_suppression(const char *data)
 		return;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SUPPRESS_UNTIL, tmp_ts, sizeof(tmp_ts), NULL) ||
-			FAIL == is_uint32(tmp_ts, &ts))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
-				" \"%s\" tag", ZBX_PROTO_TAG_SUPPRESS_UNTIL);
-		return;
-	}
-
 	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ACTION, tmp_action, sizeof(tmp_action), NULL))
 	{
 		if (0 == strcmp(ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS, tmp_action))
@@ -848,6 +840,18 @@ static void	tm_process_temp_suppression(const char *data)
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
 				" \"%s\" tag", ZBX_PROTO_TAG_ACTION);
 		return;
+	}
+
+	if (ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS == action)
+	{
+		if (FAIL == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SUPPRESS_UNTIL, tmp_ts, sizeof(tmp_ts), NULL) ||
+				FAIL == is_uint32(tmp_ts, &ts))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to parse temporary suppression data request: failed to retrieve "
+					" \"%s\" tag", ZBX_PROTO_TAG_SUPPRESS_UNTIL);
+			return;
+		}
+
 	}
 
 	if (SUCCEED != DBlock_record("users", userid, NULL, 0))
