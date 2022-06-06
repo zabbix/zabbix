@@ -1194,79 +1194,79 @@ FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|parent_graphid
 
-TABLE|host_inventory|hostid|0
+TABLE|host_inventory|hostid|ZBX_TEMPLATE
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|type		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|alias		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|os		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|os_full	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|os_short	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|serialno_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|serialno_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|tag		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|asset_tag	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|macaddress_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|macaddress_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|hardware	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|hardware_full	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|software	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|software_full	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|software_app_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|software_app_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|software_app_c	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|software_app_d	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|software_app_e	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|contact	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|location	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|type		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|type_full	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|alias		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|os		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|os_full	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|os_short	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|serialno_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|serialno_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|tag		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|asset_tag	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|macaddress_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|macaddress_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|hardware	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|hardware_full	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|software	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|software_full	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|software_app_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|software_app_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|software_app_c	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|software_app_d	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|software_app_e	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|contact	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|location	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 FIELD		|location_lat	|t_varchar(16)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|location_lon	|t_varchar(16)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|notes		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|chassis	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|model		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|hw_arch	|t_varchar(32)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|vendor		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|contract_number|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|installer_name	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|deployment_status|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY
-FIELD		|url_a		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|url_b		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|url_c		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|host_networks	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|host_netmask	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|host_router	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|oob_ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|oob_netmask	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|oob_router	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|date_hw_purchase|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|date_hw_install|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|date_hw_expiry	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|date_hw_decomm	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|site_address_a	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|site_address_b	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|site_address_c	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|site_city	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|site_state	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|site_country	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|site_zip	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|site_rack	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|site_notes	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_1_name	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_1_email	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_1_phone_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_1_phone_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_1_cell	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_1_screen	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_1_notes	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_2_name	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_2_email	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_2_phone_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_2_phone_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_2_cell	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_2_screen	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|poc_2_notes	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|notes		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|chassis	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|model		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|hw_arch	|t_varchar(32)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|vendor		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|contract_number|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|installer_name	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|deployment_status|t_varchar(64)|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|url_a		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|url_b		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|url_c		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|host_networks	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|host_netmask	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|host_router	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|oob_ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|oob_netmask	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|oob_router	|t_varchar(39)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|date_hw_purchase|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|date_hw_install|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|date_hw_expiry	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|date_hw_decomm	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|site_address_a	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|site_address_b	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|site_address_c	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|site_city	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|site_state	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|site_country	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|site_zip	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|site_rack	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|site_notes	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_1_name	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_1_email	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_1_phone_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_1_phone_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_1_cell	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_1_screen	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_1_notes	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_2_name	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_2_email	|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_2_phone_a	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_2_phone_b	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_2_cell	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_2_screen	|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|poc_2_notes	|t_shorttext	|''	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 
 TABLE|housekeeper|housekeeperid|0
 FIELD		|housekeeperid	|t_id		|	|NOT NULL	|0
