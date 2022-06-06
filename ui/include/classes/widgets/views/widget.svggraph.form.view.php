@@ -45,7 +45,7 @@ $graph_preview = (new CDiv())
 	// ->addStyle('height: 10px !important; overflow: hidden;'); // FIXME: debug
 
 $form_tabs = (new CTabView())
-	->addTab('data_set',  _('Data set'), getDatasetTab($fields, $scripts, $jq_templates, $form->getName()),
+	->addTab('data_set',  _('Data set'), getDatasetTab($fields, $jq_templates, $form->getName()),
 		TAB_INDICATOR_GRAPH_DATASET
 	)
 	->addTab('displaying_options',  _('Displaying options'), getDisplayOptionsTab($fields), TAB_INDICATOR_GRAPH_OPTIONS)
@@ -83,7 +83,7 @@ return [
 	'jq_templates' => $jq_templates
 ];
 
-function getGraphDataSetItemRow() {
+function getGraphDataSetItemRow(): string {
 	return (new CRow([
 		(new CCol(
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
@@ -115,7 +115,7 @@ function getGraphDataSetItemRow() {
 		->toString();
 }
 
-function getDatasetTab(array $fields, array &$scripts, array &$jq_templates, string $form_name): CFormGrid {
+function getDatasetTab(array $fields, array &$jq_templates, string $form_name): CFormGrid {
 	$jq_templates['dataset-single-item-tmpl'] = CWidgetHelper::getGraphDataSetTemplate($fields['ds'], $form_name,
 		CWidgetHelper::DATASET_TYPE_SINGLE_ITEM
 	);

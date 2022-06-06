@@ -328,7 +328,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		$this->fields[$field_righty_min->getName()] = $field_righty_min;
 
-		// Max values on right Y axis.
+		// Max value on right Y axis.
 		$field_righty_max = (new CWidgetFieldNumericBox('righty_max', _('Max')))
 			->setPlaceholder(_('calculated'))
 			->setFullName(_('Right Y').'/'._('Max'))
