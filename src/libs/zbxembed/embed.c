@@ -150,14 +150,14 @@ static int	utf8_decode_3byte_sequence(const char *ptr, zbx_uint32_t *out)
  *                                                                            *
  * Parameters: duk_str - [IN] pointer to the first char of NULL terminated    *
  *                       Duktape string                                       *
- *             idx     - [OUT] on success, pointer to pointer to the first    *
+ *             out_str - [OUT] on success, pointer to pointer to the first    *
  *                       char of allocated NULL terminated UTF8 string        *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
  *                                                                            *
  ******************************************************************************/
-int es_duktape_string_decode(const char *duk_str, char **out_str)
+int	es_duktape_string_decode(const char *duk_str, char **out_str)
 {
 	const char	*in, *end;
 	char		*out;
@@ -533,8 +533,8 @@ out:
  *           bytecode parameters.                                             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param, char **script_ret,
-	char **error)
+int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size, const char *param,
+	char **script_ret, char **error)
 {
 	void		*buffer;
 	volatile int	ret = FAIL;
@@ -612,7 +612,9 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 				if (SUCCEED != (ret = es_duktape_string_decode(
 						duk_safe_to_string(es->env->ctx, -1), &output)))
+				{
 					*error = zbx_strdup(*error, "could not convert return value to utf8");
+				}
 				else
 					zabbix_log(LOG_LEVEL_DEBUG, "%s() output:'%s'", __func__, output);
 
