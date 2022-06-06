@@ -1031,7 +1031,7 @@ class CScreenProblem extends CScreenBase {
 					elseif (isEventRecentlySuppressed($problem['acknowledges'], $suppression_action)) {
 						// Show blinking button if suppression was made but is not yet processed by server.
 						$info_icons[] = makeSuppressedProblemIcon([[
-							'suppress_until' => $suppression_action['clock'],
+							'suppress_until' => $suppression_action['suppress_until'],
 							'username' => array_key_exists($suppression_action['userid'], $data['users'])
 								? getUserFullname($data['users'][$suppression_action['userid']])
 								: _('Inaccessible user')
