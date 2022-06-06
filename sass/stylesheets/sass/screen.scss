@@ -5616,23 +5616,6 @@ button {
 	overflow: hidden;
 }
 
-.graph-widget-config-tabs {
-	padding: 10px 0;
-
-	> .tabs-nav {
-		padding-left: calc(15% + 10px);
-		margin-right: 0;
-		margin-left: 0;
-	}
-
-	.ui-tabs-nav {
-		position: sticky;
-		top: 0;
-		background: $header-bg-color;
-		z-index: 3;
-	}
-}
-
 // Screen reader.
 .inline-sr-only {
 	font-size: 0;

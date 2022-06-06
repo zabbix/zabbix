@@ -58,6 +58,7 @@ $form_tabs = (new CTabView())
 	->addTab('overrides',  _('Overrides'), getOverridesTab($fields, $scripts, $jq_templates, $form->getName()),
 		TAB_INDICATOR_GRAPH_OVERRIDES
 	)
+	->addClass('graph-widget-config-tabs')
 	->setSelected(0);
 
 $scripts[] = $form_tabs->makeJavascript();

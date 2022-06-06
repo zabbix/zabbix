@@ -25,29 +25,24 @@ window.widget_svggraph_form = new class {
 	init({form_id, form_tabs_id}) {
 		colorPalette.setThemeColors(<?= json_encode(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
 
+		this.overlay_body = jQuery(".overlay-dialogue-body");
 		this.form_id = form_id;
 		this.form_tabs = form_tabs_id;
 
 		this.dataset_wrapper = document.getElementById('data_sets');
 
-		// jQuery(".overlay-dialogue-body").on("scroll", function() {
-		// 	if (jQuery("#svg-graph-preview").length) {
-		// 		const $dialogue_body = jQuery(this);
-		// 		const $preview_container = jQuery(".<?//= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>//");
+		this.overlay_body.on("scroll", () => {
+			const $preview_container = jQuery(".<?= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>");
 
-		// 		if ($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 400) {
-		// 			jQuery("#svg-graph-preview").css("top", $dialogue_body.offset().top - $preview_container.offset().top);
-		// 			jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
-		// 		}
-		// 		else {
-		// 			jQuery("#svg-graph-preview").css("top", 0);
-		// 			jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", 0);
-		// 		}
-		// 	}
-		// 	else {
-		// 		jQuery(".overlay-dialogue-body").off("scroll");
-		// 	}
-		// });
+			if ($preview_container.offset().top < this.overlay_body.offset().top && this.overlay_body.height() > 400) {
+				jQuery("#svg-graph-preview").css("top", this.overlay_body.offset().top - $preview_container.offset().top);
+				jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
+			}
+			else {
+				jQuery("#svg-graph-preview").css("top", 0);
+				jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", 0);
+			}
+		});
 
 		jQuery(`#${this.form_tabs}`).on("change", "input, z-select, .multiselect", () => this.onGraphConfigChange());
 
@@ -123,7 +118,7 @@ window.widget_svggraph_form = new class {
 
 		this.initDataSetSortable();
 
-		jQuery(".overlay-dialogue-body").on("change", "z-select[id$=\"aggregate_function\"]", (e) => {
+		this.overlay_body.on("change", "z-select[id$=\"aggregate_function\"]", (e) => {
 			widget_svggraph_form.changeDataSetAggregateFunction(e.target);
 		});
 
@@ -284,7 +279,6 @@ window.widget_svggraph_form = new class {
 
 	_addDataset(type) {
 		const row_numb = jQuery('#data_sets .list-accordion-item').length;
-		const container = jQuery(".overlay-dialogue-body");
 
 		let template = new Template(jQuery('#dataset-single-item-tmpl').html());
 
@@ -294,10 +288,12 @@ window.widget_svggraph_form = new class {
 
 		jQuery(this.dataset_wrapper).zbx_vertical_accordion("collapseAll");
 
-		jQuery('#data_sets .list-accordion-foot').before(template.evaluate({rowNum: row_numb, color: colorPalette.getNextColor()}));
+		jQuery('#data_sets .list-accordion-foot').before(
+			template.evaluate({rowNum: row_numb, color: colorPalette.getNextColor()})
+		);
 
-		container.scrollTop(Math.max(container.scrollTop(),
-			jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
+		this.overlay_body.scrollTop(Math.max(this.overlay_body.scrollTop(),
+			jQuery("#widget-dialogue-form")[0].scrollHeight - this.overlay_body.height()
 		));
 
 		jQuery(".<?= ZBX_STYLE_COLOR_PICKER ?> input").colorpicker({onUpdate: function(color) {
@@ -310,7 +306,9 @@ window.widget_svggraph_form = new class {
 			jQuery(this).multiSelect(jQuery(this).data("params"));
 		});
 
-		jQuery(".<?= CRangeControl::ZBX_STYLE_CLASS ?>", jQuery("#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>")).rangeControl();
+		jQuery(".<?= CRangeControl::ZBX_STYLE_CLASS ?>",
+			jQuery("#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>")
+		).rangeControl();
 
 		this.updateVariableOrder(jQuery(this.dataset_wrapper), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
 		this.onGraphConfigChange();

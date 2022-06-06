@@ -1,8 +1,26 @@
 // Widget configuration.
 
 form.dashboard-grid-widget-svggraph {
+	.graph-widget-config-tabs {
+		padding: 10px 0;
+
+		> .tabs-nav {
+			margin-right: 0;
+			margin-left: 0;
+			border-top: 1px solid $ui-border-color;
+		}
+
+		.ui-tabs-nav {
+			position: sticky;
+			top: 0;
+			background: $header-bg-color;
+			z-index: 3;
+		}
+	}
+
 	.table-forms-container {
 		border: 1px solid $ui-border-color;
+		border-top: none;
 	}
 
 	.dataset-head {
