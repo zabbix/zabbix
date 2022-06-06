@@ -500,7 +500,7 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
 #ifdef HAVE_POSTGRESQL
-void	DBcheck_tsdb_capabilities(void);
+void	zbx_db_check_tsdb_capabilities(void);
 char	*zbx_db_get_schema_esc(void);
 #endif
 

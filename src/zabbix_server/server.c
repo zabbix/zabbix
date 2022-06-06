@@ -1173,7 +1173,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_WARNING, "database is not upgraded to use double precision values");
 	}
 #ifdef HAVE_POSTGRESQL
-	DBcheck_tsdb_capabilities();
+	zbx_db_check_tsdb_capabilities();
 #endif
 	if (SUCCEED != zbx_db_check_instanceid())
 		exit(EXIT_FAILURE);

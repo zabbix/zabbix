@@ -852,12 +852,12 @@ zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 #ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
- * Function: DBcheck_tsdb_capabilities                                        *
+ * Function: zbx_db_check_tsdb_capabilities                                        *
  *                                                                            *
  * Purpose: checks TimescaleDB for compression availability                   *
  *                                                                            *
  ******************************************************************************/
-void	DBcheck_tsdb_capabilities(void)
+void	zbx_db_check_tsdb_capabilities(void)
 {
 #define ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB	100002
 #define ZBX_TIMESCALE_MIN_VERSION			10500
@@ -932,6 +932,10 @@ out:
 		zabbix_log(LOG_LEVEL_WARNING, "failed to set database compression availability");
 
 	DBclose();
+#undef ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB
+#undef ZBX_TIMESCALE_MIN_VERSION
+#undef ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_CONFIG
+#undef ZBX_TIMESCALE_LICENSE_COMMUNITY
 }
 #endif
 
