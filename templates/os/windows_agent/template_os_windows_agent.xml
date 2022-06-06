@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-05-16T08:35:27Z</date>
+   <date>2022-06-01T13:46:30Z</date>
    <groups>
       <group>
          <name>Templates/Operating systems</name>
@@ -1767,7 +1767,7 @@ Template tooling version used: 0.39</description>
             </macro>
             <macro>
                <macro>{$SERVICE.NAME.NOT_MATCHES}</macro>
-               <value>^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$</value>
+               <value>^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc)$</value>
                <description>This macro is used in Service discovery. Can be overridden on the host or linked template level.</description>
             </macro>
             <macro>
