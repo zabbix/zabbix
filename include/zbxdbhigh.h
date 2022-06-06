@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_DB_H
-#define ZABBIX_DB_H
+#ifndef ZABBIX_DBHIGH_H
+#define ZABBIX_DBHIGH_H
 
 #include "zbxalgo.h"
 #include "zbxdb.h"
-#include "dbschema.h"
+#include "zbxdbschema.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -42,31 +42,8 @@ extern int	CONFIG_UNAVAILABLE_DELAY;
 
 typedef enum
 {
-	GRAPH_TYPE_NORMAL = 0,
-	GRAPH_TYPE_STACKED = 1
-}
-zbx_graph_types;
-
-typedef enum
-{
-	CALC_FNC_MIN = 1,
-	CALC_FNC_AVG = 2,
-	CALC_FNC_MAX = 4,
-	CALC_FNC_ALL = 7
-}
-zbx_graph_item_calc_function;
-
-typedef enum
-{
-	GRAPH_ITEM_SIMPLE = 0,
-	GRAPH_ITEM_AGGREGATED = 1
-}
-zbx_graph_item_type;
-
-typedef enum
-{
-	TEMPLATE_LINK_MANUAL = 0,
-	TEMPLATE_LINK_LLD = 1
+	ZBX_TEMPLATE_LINK_MANUAL = 0,
+	ZBX_TEMPLATE_LINK_LLD = 1
 }
 zbx_host_template_link_type;
 
@@ -79,165 +56,106 @@ zbx_host_template_link_type;
 #define ZBX_DB_SERVER	1
 #define ZBX_DB_PROXY	2
 
-#define TRIGGER_OPDATA_LEN		255
-#define TRIGGER_URL_LEN			255
-#define TRIGGER_DESCRIPTION_LEN		255
-#define TRIGGER_EXPRESSION_LEN		2048
-#define TRIGGER_EXPRESSION_LEN_MAX	(TRIGGER_EXPRESSION_LEN + 1)
+#define ZBX_INTERFACE_DNS_LEN		255
+#define ZBX_INTERFACE_DNS_LEN_MAX	(ZBX_INTERFACE_DNS_LEN + 1)
+#define ZBX_INTERFACE_IP_LEN		64
+#define ZBX_INTERFACE_IP_LEN_MAX	(ZBX_INTERFACE_IP_LEN + 1)
+#define ZBX_INTERFACE_ADDR_LEN		255	/* MAX(ZBX_INTERFACE_DNS_LEN,ZBX_INTERFACE_IP_LEN) */
+#define ZBX_INTERFACE_ADDR_LEN_MAX	(ZBX_INTERFACE_ADDR_LEN + 1)
+#define ZBX_INTERFACE_PORT_LEN		64
+#define ZBX_INTERFACE_PORT_LEN_MAX	(ZBX_INTERFACE_PORT_LEN + 1)
+#define ZBX_INTERFACE_ERROR_LEN		2048
+#define ZBX_INTERFACE_ERROR_LEN_MAX	(ZBX_INTERFACE_ERROR_LEN + 1)
+
+#define ZBX_ITEM_NAME_LEN			255
+#define ZBX_ITEM_KEY_LEN			2048
+#define ZBX_ITEM_DELAY_LEN			1024
+#define ZBX_ITEM_HISTORY_LEN			255
+#define ZBX_ITEM_TRENDS_LEN			255
+#define ZBX_ITEM_UNITS_LEN			255
+#define ZBX_ITEM_SNMP_COMMUNITY_LEN		64
+#define ZBX_ITEM_SNMP_COMMUNITY_LEN_MAX		(ZBX_ITEM_SNMP_COMMUNITY_LEN + 1)
+#define ZBX_ITEM_SNMP_OID_LEN			512
+#define ZBX_ITEM_SNMP_OID_LEN_MAX		(ZBX_ITEM_SNMP_OID_LEN + 1)
+#define ZBX_ITEM_ERROR_LEN			2048
+#define ZBX_ITEM_ERROR_LEN_MAX			(ZBX_ITEM_ERROR_LEN + 1)
+#define ZBX_ITEM_TRAPPER_HOSTS_LEN		255
+#define ZBX_ITEM_TRAPPER_HOSTS_LEN_MAX		(ZBX_ITEM_TRAPPER_HOSTS_LEN + 1)
+#define ZBX_ITEM_SNMPV3_SECURITYNAME_LEN	64
+#define ZBX_ITEM_SNMPV3_SECURITYNAME_LEN_MAX	(ZBX_ITEM_SNMPV3_SECURITYNAME_LEN + 1)
+#define ZBX_ITEM_SNMPV3_AUTHPASSPHRASE_LEN	64
+#define ZBX_ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX	(ZBX_ITEM_SNMPV3_AUTHPASSPHRASE_LEN + 1)
+#define ZBX_ITEM_SNMPV3_PRIVPASSPHRASE_LEN	64
+#define ZBX_ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX	(ZBX_ITEM_SNMPV3_PRIVPASSPHRASE_LEN + 1)
+#define ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN		255
+#define ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN_MAX	(ZBX_ITEM_SNMPV3_CONTEXTNAME_LEN + 1)
+#define ZBX_ITEM_LOGTIMEFMT_LEN			64
+#define ZBX_ITEM_LOGTIMEFMT_LEN_MAX		(ZBX_ITEM_LOGTIMEFMT_LEN + 1)
+#define ZBX_ITEM_IPMI_SENSOR_LEN		128
+#define ZBX_ITEM_IPMI_SENSOR_LEN_MAX		(ZBX_ITEM_IPMI_SENSOR_LEN + 1)
+#define ZBX_ITEM_USERNAME_LEN			64
+#define ZBX_ITEM_USERNAME_LEN_MAX		(ZBX_ITEM_USERNAME_LEN + 1)
+#define ZBX_ITEM_PASSWORD_LEN			64
+#define ZBX_ITEM_PASSWORD_LEN_MAX		(ZBX_ITEM_PASSWORD_LEN + 1)
+#define ZBX_ITEM_PUBLICKEY_LEN			64
+#define ZBX_ITEM_PUBLICKEY_LEN_MAX		(ZBX_ITEM_PUBLICKEY_LEN + 1)
+#define ZBX_ITEM_PRIVATEKEY_LEN			64
+#define ZBX_ITEM_PRIVATEKEY_LEN_MAX		(ZBX_ITEM_PRIVATEKEY_LEN + 1)
+#define ZBX_ITEM_JMX_ENDPOINT_LEN		255
+#define ZBX_ITEM_JMX_ENDPOINT_LEN_MAX		(ZBX_ITEM_JMX_ENDPOINT_LEN + 1)
+#define ZBX_ITEM_TIMEOUT_LEN			255
+#define ZBX_ITEM_TIMEOUT_LEN_MAX		(ZBX_ITEM_TIMEOUT_LEN + 1)
+#define ZBX_ITEM_URL_LEN			2048
+#define ZBX_ITEM_URL_LEN_MAX			(ZBX_ITEM_URL_LEN + 1)
+#define ZBX_ITEM_QUERY_FIELDS_LEN		2048
+#define ZBX_ITEM_QUERY_FIELDS_LEN_MAX		(ZBX_ITEM_QUERY_FIELDS_LEN + 1)
+#define ZBX_ITEM_STATUS_CODES_LEN		255
+#define ZBX_ITEM_STATUS_CODES_LEN_MAX		(ZBX_ITEM_STATUS_CODES_LEN + 1)
+#define ZBX_ITEM_HTTP_PROXY_LEN			255
+#define ZBX_ITEM_HTTP_PROXY_LEN_MAX		(ZBX_ITEM_HTTP_PROXY_LEN + 1)
+#define ZBX_ITEM_SSL_KEY_PASSWORD_LEN		64
+#define ZBX_ITEM_SSL_KEY_PASSWORD_LEN_MAX	(ZBX_ITEM_SSL_KEY_PASSWORD_LEN + 1)
+#define ZBX_ITEM_SSL_CERT_FILE_LEN		255
+#define ZBX_ITEM_SSL_CERT_FILE_LEN_MAX		(ZBX_ITEM_SSL_CERT_FILE_LEN + 1)
+#define ZBX_ITEM_SSL_KEY_FILE_LEN		255
+#define ZBX_ITEM_SSL_KEY_FILE_LEN_MAX		(ZBX_ITEM_SSL_KEY_FILE_LEN + 1)
 #if defined(HAVE_ORACLE)
-#	define TRIGGER_COMMENTS_LEN	2048
+#	define ZBX_ITEM_PARAM_LEN		2048
+#	define ZBX_ITEM_DESCRIPTION_LEN		2048
+#	define ZBX_ITEM_POSTS_LEN		2048
+#	define ZBX_ITEM_HEADERS_LEN		2048
 #else
-#	define TRIGGER_COMMENTS_LEN	65535
-#endif
-#define TRIGGER_EVENT_NAME_LEN		2048
-#define TAG_NAME_LEN			255
-#define TAG_VALUE_LEN			255
-
-#define GROUP_NAME_LEN			255
-
-#define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
-#define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)
-#define HOST_NAME_LEN			128
-#define HOST_IPMI_USERNAME_LEN		16
-#define HOST_IPMI_USERNAME_LEN_MAX	(HOST_IPMI_USERNAME_LEN + 1)
-#define HOST_IPMI_PASSWORD_LEN		20
-#define HOST_IPMI_PASSWORD_LEN_MAX	(HOST_IPMI_PASSWORD_LEN + 1)
-#define HOST_PROXY_ADDRESS_LEN		255
-#define HOST_PROXY_ADDRESS_LEN_MAX	(HOST_PROXY_ADDRESS_LEN + 1)
-
-#define INTERFACE_DNS_LEN		255
-#define INTERFACE_DNS_LEN_MAX		(INTERFACE_DNS_LEN + 1)
-#define INTERFACE_IP_LEN		64
-#define INTERFACE_IP_LEN_MAX		(INTERFACE_IP_LEN + 1)
-#define INTERFACE_ADDR_LEN		255	/* MAX(INTERFACE_DNS_LEN,INTERFACE_IP_LEN) */
-#define INTERFACE_ADDR_LEN_MAX		(INTERFACE_ADDR_LEN + 1)
-#define INTERFACE_PORT_LEN		64
-#define INTERFACE_PORT_LEN_MAX		(INTERFACE_PORT_LEN + 1)
-#define INTERFACE_ERROR_LEN		2048
-#define INTERFACE_ERROR_LEN_MAX		(INTERFACE_ERROR_LEN + 1)
-
-#define ITEM_NAME_LEN			255
-#define ITEM_KEY_LEN			2048
-#define ITEM_DELAY_LEN			1024
-#define ITEM_HISTORY_LEN		255
-#define ITEM_TRENDS_LEN			255
-#define ITEM_UNITS_LEN			255
-#define ITEM_SNMP_COMMUNITY_LEN		64
-#define ITEM_SNMP_COMMUNITY_LEN_MAX	(ITEM_SNMP_COMMUNITY_LEN + 1)
-#define ITEM_SNMP_OID_LEN		512
-#define ITEM_SNMP_OID_LEN_MAX		(ITEM_SNMP_OID_LEN + 1)
-#define ITEM_ERROR_LEN			2048
-#define ITEM_ERROR_LEN_MAX		(ITEM_ERROR_LEN + 1)
-#define ITEM_TRAPPER_HOSTS_LEN		255
-#define ITEM_TRAPPER_HOSTS_LEN_MAX	(ITEM_TRAPPER_HOSTS_LEN + 1)
-#define ITEM_SNMPV3_SECURITYNAME_LEN		64
-#define ITEM_SNMPV3_SECURITYNAME_LEN_MAX	(ITEM_SNMPV3_SECURITYNAME_LEN + 1)
-#define ITEM_SNMPV3_AUTHPASSPHRASE_LEN		64
-#define ITEM_SNMPV3_AUTHPASSPHRASE_LEN_MAX	(ITEM_SNMPV3_AUTHPASSPHRASE_LEN + 1)
-#define ITEM_SNMPV3_PRIVPASSPHRASE_LEN		64
-#define ITEM_SNMPV3_PRIVPASSPHRASE_LEN_MAX	(ITEM_SNMPV3_PRIVPASSPHRASE_LEN + 1)
-#define ITEM_SNMPV3_CONTEXTNAME_LEN		255
-#define ITEM_SNMPV3_CONTEXTNAME_LEN_MAX		(ITEM_SNMPV3_CONTEXTNAME_LEN + 1)
-#define ITEM_LOGTIMEFMT_LEN		64
-#define ITEM_LOGTIMEFMT_LEN_MAX		(ITEM_LOGTIMEFMT_LEN + 1)
-#define ITEM_IPMI_SENSOR_LEN		128
-#define ITEM_IPMI_SENSOR_LEN_MAX	(ITEM_IPMI_SENSOR_LEN + 1)
-#define ITEM_USERNAME_LEN		64
-#define ITEM_USERNAME_LEN_MAX		(ITEM_USERNAME_LEN + 1)
-#define ITEM_PASSWORD_LEN		64
-#define ITEM_PASSWORD_LEN_MAX		(ITEM_PASSWORD_LEN + 1)
-#define ITEM_PUBLICKEY_LEN		64
-#define ITEM_PUBLICKEY_LEN_MAX		(ITEM_PUBLICKEY_LEN + 1)
-#define ITEM_PRIVATEKEY_LEN		64
-#define ITEM_PRIVATEKEY_LEN_MAX		(ITEM_PRIVATEKEY_LEN + 1)
-#define ITEM_JMX_ENDPOINT_LEN		255
-#define ITEM_JMX_ENDPOINT_LEN_MAX	(ITEM_JMX_ENDPOINT_LEN + 1)
-#define ITEM_TIMEOUT_LEN		255
-#define ITEM_TIMEOUT_LEN_MAX		(ITEM_TIMEOUT_LEN + 1)
-#define ITEM_URL_LEN			2048
-#define ITEM_URL_LEN_MAX		(ITEM_URL_LEN + 1)
-#define ITEM_QUERY_FIELDS_LEN		2048
-#define ITEM_QUERY_FIELDS_LEN_MAX	(ITEM_QUERY_FIELDS_LEN + 1)
-#define ITEM_STATUS_CODES_LEN		255
-#define ITEM_STATUS_CODES_LEN_MAX	(ITEM_STATUS_CODES_LEN + 1)
-#define ITEM_HTTP_PROXY_LEN		255
-#define ITEM_HTTP_PROXY_LEN_MAX		(ITEM_HTTP_PROXY_LEN + 1)
-#define ITEM_SSL_KEY_PASSWORD_LEN	64
-#define ITEM_SSL_KEY_PASSWORD_LEN_MAX	(ITEM_SSL_KEY_PASSWORD_LEN + 1)
-#define ITEM_SSL_CERT_FILE_LEN		255
-#define ITEM_SSL_CERT_FILE_LEN_MAX	(ITEM_SSL_CERT_FILE_LEN + 1)
-#define ITEM_SSL_KEY_FILE_LEN		255
-#define ITEM_SSL_KEY_FILE_LEN_MAX	(ITEM_SSL_KEY_FILE_LEN + 1)
-#if defined(HAVE_ORACLE)
-#	define ITEM_PARAM_LEN		2048
-#	define ITEM_DESCRIPTION_LEN	2048
-#	define ITEM_POSTS_LEN		2048
-#	define ITEM_HEADERS_LEN		2048
-#else
-#	define ITEM_PARAM_LEN		65535
-#	define ITEM_DESCRIPTION_LEN	65535
-#	define ITEM_POSTS_LEN		65535
-#	define ITEM_HEADERS_LEN		65535
+#	define ZBX_ITEM_PARAM_LEN		65535
+#	define ZBX_ITEM_DESCRIPTION_LEN		65535
+#	define ZBX_ITEM_POSTS_LEN		65535
+#	define ZBX_ITEM_HEADERS_LEN		65535
 #endif
 
+#define ZBX_ITEM_PARAMETER_NAME_LEN		255
+#define ZBX_ITEM_PARAMETER_VALUE_LEN		2048
+#define ZBX_ITEM_TAG_FIELD_LEN			255
 
-#define ITEM_PARAMETER_NAME_LEN		255
-#define ITEM_PARAMETER_VALUE_LEN	2048
+#define ZBX_HISTORY_STR_VALUE_LEN		255
+#define ZBX_HISTORY_TEXT_VALUE_LEN		65535
+#define ZBX_HISTORY_LOG_VALUE_LEN		65535
 
-#define ITEM_TAG_FIELD_LEN		255
+#define ZBX_HISTORY_LOG_SOURCE_LEN		64
+#define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
 
-#define HISTORY_STR_VALUE_LEN		255
-#define HISTORY_TEXT_VALUE_LEN		65535
-#define HISTORY_LOG_VALUE_LEN		65535
+#define ZBX_GRAPH_NAME_LEN			128
+#define ZBX_GRAPH_ITEM_COLOR_LEN		6
+#define ZBX_GRAPH_ITEM_COLOR_LEN_MAX		(ZBX_GRAPH_ITEM_COLOR_LEN + 1)
 
-#define HISTORY_LOG_SOURCE_LEN		64
-#define HISTORY_LOG_SOURCE_LEN_MAX	(HISTORY_LOG_SOURCE_LEN + 1)
-
-#define ALERT_ERROR_LEN			2048
-#define ALERT_ERROR_LEN_MAX		(ALERT_ERROR_LEN + 1)
-
-#define GRAPH_NAME_LEN			128
-
-#define GRAPH_ITEM_COLOR_LEN		6
-#define GRAPH_ITEM_COLOR_LEN_MAX	(GRAPH_ITEM_COLOR_LEN + 1)
-
-#define DSERVICE_VALUE_LEN		255
-#define MAX_DISCOVERED_VALUE_SIZE	(DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
-
-#define HTTPTEST_HTTP_USER_LEN		64
-#define HTTPTEST_HTTP_PASSWORD_LEN	64
-
-#define PROXY_DHISTORY_VALUE_LEN	255
-
-#define ITEM_PREPROC_PARAMS_LEN		65535
-
-#define EVENT_NAME_LEN			2048
-
-#define FUNCTION_NAME_LEN		12
-#define FUNCTION_PARAM_LEN		255
-
-#define REPORT_ERROR_LEN		2048
-
-#define ZBX_SQL_ITEM_FIELDS	"i.itemid,i.key_,h.host,i.type,i.history,i.hostid,i.value_type,i.delta,"	\
-				"i.units,i.multiplier,i.formula,i.state,i.valuemapid,i.trends,i.data_type"
-#define ZBX_SQL_ITEM_TABLES	"hosts h,items i"
-#define ZBX_SQL_TIME_FUNCTIONS	"'nodata','date','dayofmonth','dayofweek','time','now'"
-#define ZBX_SQL_ITEM_FIELDS_NUM	15
-#define ZBX_SQL_ITEM_SELECT	ZBX_SQL_ITEM_FIELDS " from " ZBX_SQL_ITEM_TABLES
+#define ZBX_DSERVICE_VALUE_LEN		255
+#define ZBX_MAX_DISCOVERED_VALUE_SIZE	(ZBX_DSERVICE_VALUE_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1)
 
 #ifdef HAVE_ORACLE
 #	define ZBX_PLSQL_BEGIN	"begin\n"
 #	define ZBX_PLSQL_END	"end;"
-#	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)			\
+#	define	zbx_DBbegin_multiple_update(sql, sql_alloc, sql_offset)			\
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_BEGIN)
-#	define	DBend_multiple_update(sql, sql_alloc, sql_offset)			\
+#	define	zbx_DBend_multiple_update(sql, sql_alloc, sql_offset)			\
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_PLSQL_END)
-#	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
-#		define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
-#	else
-#		define	ZBX_SQL_EXEC_FROM	0
-#	endif
-
 #	define	ZBX_SQL_STRCMP		"%s%s%s"
 #	define	ZBX_SQL_STRVAL_EQ(str)				\
 			'\0' != *str ? "='"  : "",		\
@@ -248,10 +166,8 @@ zbx_host_template_link_type;
 			'\0' != *str ? str   : " is not null",	\
 			'\0' != *str ? "'"   : ""
 #else
-#	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
-#	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
-
-#	define	ZBX_SQL_EXEC_FROM	0
+#	define	zbx_DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
+#	define	zbx_DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 #	ifdef HAVE_MYSQL
 #		define	ZBX_SQL_STRCMP		"%s binary '%s'"
 #	else
@@ -277,24 +193,7 @@ typedef struct
 	char		*iprange;
 	char		*name;
 }
-DB_DRULE;
-
-typedef struct
-{
-	zbx_uint64_t	dcheckid;
-	char		*ports;
-	char		*key_;
-	char		*snmp_community;
-	char		*snmpv3_securityname;
-	char		*snmpv3_authpassphrase;
-	char		*snmpv3_privpassphrase;
-	char		*snmpv3_contextname;
-	int		type;
-	unsigned char	snmpv3_securitylevel;
-	unsigned char	snmpv3_authprotocol;
-	unsigned char	snmpv3_privprotocol;
-}
-DB_DCHECK;
+ZBX_DB_DRULE;
 
 typedef struct
 {
@@ -303,22 +202,7 @@ typedef struct
 	int		lastup;
 	int		lastdown;
 }
-DB_DHOST;
-
-typedef struct
-{
-	zbx_uint64_t	dserviceid;
-	int		status;
-	int		lastup;
-	int		lastdown;
-	char		*value;
-}
-DB_DSERVICE;
-
-#define ZBX_DB_TRIGGER_EVAL_NONE			0x0000
-#define ZBX_DB_TRIGGER_EVAL_EXPRESSION			0x0001
-#define ZBX_DB_TRIGGER_EVAL_EXPRESSION_USERMACRO	0x0002
-#define ZBX_DB_TRIGGER_EVAL_RECOVERY_EXPRESSION		0x0004
+ZBX_DB_DHOST;
 
 typedef struct
 {
@@ -340,7 +224,7 @@ typedef struct
 	/* temporary trigger cache for related data */
 	void		*cache;
 }
-DB_TRIGGER;
+ZBX_DB_TRIGGER;
 
 typedef struct
 {
@@ -351,12 +235,12 @@ typedef struct
 	zbx_vector_ptr_t	events;
 	zbx_vector_tags_t	service_tags;
 }
-DB_SERVICE;
+ZBX_DB_SERVICE;
 
 typedef struct
 {
 	zbx_uint64_t		eventid;
-	DB_TRIGGER		trigger;
+	ZBX_DB_TRIGGER		trigger;
 	zbx_uint64_t		objectid;
 	char			*name;
 	int			source;
@@ -376,9 +260,9 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_RECOVER		0x0004
 	zbx_uint64_t		flags;
 }
-DB_EVENT;
+ZBX_DB_EVENT;
 
-typedef struct DB_MEDIATYPE
+typedef struct ZBX_DB_MEDIATYPE
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
@@ -402,12 +286,12 @@ typedef struct DB_MEDIATYPE
 	int			maxsessions;
 	int			maxattempts;
 }
-DB_MEDIATYPE;
+ZBX_DB_MEDIATYPE;
 
-void	zbx_db_mediatype_clean(DB_MEDIATYPE *mt);
+void	zbx_db_mediatype_clean(ZBX_DB_MEDIATYPE *mt);
 void	zbx_serialize_mediatype(unsigned char **data, zbx_uint32_t *data_alloc, zbx_uint32_t *data_offset,
-		const DB_MEDIATYPE *mt);
-zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, DB_MEDIATYPE *mt);
+		const ZBX_DB_MEDIATYPE *mt);
+zbx_uint32_t	zbx_deserialize_mediatype(const unsigned char *data, ZBX_DB_MEDIATYPE *mt);
 
 typedef struct
 {
@@ -570,10 +454,10 @@ typedef struct
 {
 	zbx_uint64_t	itemid;	/* itemid should come first for correct sorting */
 	zbx_uint64_t	gitemid;
-	char		key[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	char		key[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	int		drawtype;
 	int		sortorder;
-	char		color[GRAPH_ITEM_COLOR_LEN_MAX];
+	char		color[ZBX_GRAPH_ITEM_COLOR_LEN_MAX];
 	int		yaxisside;
 	int		calc_fnc;
 	int		type;
@@ -784,12 +668,12 @@ zbx_item_diff_t;
 
 /* event support */
 void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
-void	zbx_db_free_event(DB_EVENT *event);
+void	zbx_db_free_event(ZBX_DB_EVENT *event);
 void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
-void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression);
-void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **expression);
-void	zbx_db_trigger_clean(DB_TRIGGER *trigger);
+void	zbx_db_trigger_get_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_get_recovery_expression(const ZBX_DB_TRIGGER *trigger, char **expression);
+void	zbx_db_trigger_clean(ZBX_DB_TRIGGER *trigger);
 
 typedef struct
 {
@@ -898,13 +782,13 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 
 #define ZBX_TIMEZONE_DEFAULT_VALUE	"default"
 
-void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
-void	zbx_db_trigger_get_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
-int	zbx_db_trigger_get_all_hostids(const DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
-int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out);
-int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
-void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
+void	zbx_db_trigger_get_all_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+void	zbx_db_trigger_get_functionids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *functionids);
+int	zbx_db_trigger_get_all_hostids(const ZBX_DB_TRIGGER *trigger, const zbx_vector_uint64_t **hostids);
+int	zbx_db_trigger_get_constant(const ZBX_DB_TRIGGER *trigger, int index, char **out);
+int	zbx_db_trigger_get_itemid(const ZBX_DB_TRIGGER *trigger, int index, zbx_uint64_t *itemid);
+void	zbx_db_trigger_get_itemids(const ZBX_DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
-#endif
+#endif /* ZABBIX_DBHIGH_H */

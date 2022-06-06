@@ -20,7 +20,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "sysinfo.h"
 
 static char	*called_key = NULL;
@@ -34,7 +34,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	in_command, in_flags;
 	const char		*in_command_string, *flags_string, *p;
-	char			key[ITEM_KEY_LEN];
+	char			key[ZBX_ITEM_KEY_LEN];
 	unsigned		flags_uint32;
 	AGENT_RESULT		result;
 

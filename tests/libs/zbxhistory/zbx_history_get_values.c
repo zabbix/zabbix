@@ -27,7 +27,7 @@
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxdb.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "zbxavailability.h"
 
 void	__wrap_zbx_sleep_loop(int sleeptime);

@@ -1,7 +1,7 @@
 /* SHA256-based Unix crypt implementation.
 Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 
-#include "sha256crypt.h"
+#include "zbxhash.h"
 
 #ifdef __linux__
 	#include <endian.h>

@@ -17,23 +17,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TLS_TCP_ACTIVE_H
-#define ZABBIX_TLS_TCP_ACTIVE_H
+#ifndef ZABBIX_DISCOVERY_H
+#define ZABBIX_DISCOVERY_H
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#include "zbxdbhigh.h"
+
 typedef struct
 {
-	const char	*psk_identity;
-	size_t		psk_identity_len;
-	char		issuer[HOST_TLS_ISSUER_LEN_MAX];
-	char		subject[HOST_TLS_SUBJECT_LEN_MAX];
+	zbx_uint64_t	dcheckid;
+	unsigned short	port;
+	char		dns[ZBX_INTERFACE_DNS_LEN_MAX];
+	char		value[ZBX_MAX_DISCOVERED_VALUE_SIZE];
+	int		status;
+	time_t		itemtime;
 }
-zbx_tls_conn_attr_t;
+zbx_service_t;
 
-int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
-int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
-int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
-unsigned int	zbx_tls_get_psk_usage(void);
+void	zbx_discovery_update_host(ZBX_DB_DHOST *dhost, int status, int now);
+void	zbx_discovery_update_service(const ZBX_DB_DRULE *drule, zbx_uint64_t dcheckid, ZBX_DB_DHOST *dhost,
+		const char *ip, const char *dns, int port, int status, const char *value, int now);
 #endif
-
-#endif	/* ZABBIX_TLS_TCP_ACTIVE_H */

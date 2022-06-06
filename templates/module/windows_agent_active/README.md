@@ -275,7 +275,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|System time is out of syn |<p>The host system time is different from the Zabbix server time.</p> |`fuzzytime(/Windows generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0` |WARNING |<p>Manual close: YES</p> |
+|System time is out of sync |<p>The host system time is different from the Zabbix server time.</p> |`fuzzytime(/Windows generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0` |WARNING |<p>Manual close: YES</p> |
 |System name has changed |<p>System name has changed. Ack to close.</p> |`last(/Windows generic by Zabbix agent active/system.hostname,#1)<>last(/Windows generic by Zabbix agent active/system.hostname,#2) and length(last(/Windows generic by Zabbix agent active/system.hostname))>0` |INFO |<p>Manual close: YES</p> |
 |Host has been restarted |<p>The device uptime is less than 10 minutes.</p> |`last(/Windows generic by Zabbix agent active/system.uptime)<10m` |WARNING |<p>Manual close: YES</p> |
 
@@ -369,7 +369,7 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$SERVICE.NAME.MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^.*$` |
-|{$SERVICE.NAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv)$` |
+|{$SERVICE.NAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv)$` |
 |{$SERVICE.STARTUPNAME.MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:automatic|automatic delayed)$` |
 |{$SERVICE.STARTUPNAME.NOT_MATCHES} |<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p> |`^(?:manual|disabled)$` |
 

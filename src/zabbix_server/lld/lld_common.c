@@ -18,7 +18,7 @@
 **/
 
 #include "log.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
@@ -132,7 +132,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 
 	DBbegin();
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < discovery_ts.values_num; i++)
 	{
@@ -167,7 +167,7 @@ void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_v
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
