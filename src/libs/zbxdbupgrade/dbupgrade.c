@@ -1053,7 +1053,12 @@ int	DBcheck_version(void)
 	}
 
 	if (SUCCEED == ret)
+	{
+		/* clear changelog after successful upgrade, doesn't matter if it fails */
+		(void)DBexecute("delete from changelog");
+
 		zabbix_log(LOG_LEVEL_WARNING, "database upgrade fully completed");
+	}
 	else
 		zabbix_log(LOG_LEVEL_CRIT, "database upgrade failed");
 #endif	/* not HAVE_SQLITE3 */
