@@ -237,6 +237,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			 * @param object target  jQuery element (colorbox) which triggered show action.
 			 */
 			show: function(id, target) {
+				this.hide();
+
 				input = $('#' + id);
 				colorbox = $('#lbl_' + id);
 

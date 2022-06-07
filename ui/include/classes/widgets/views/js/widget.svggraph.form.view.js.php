@@ -44,7 +44,9 @@ window.widget_svggraph_form = new class {
 			}
 		});
 
-		jQuery(`#${this.form_tabs}`).on("change", "input, z-select, .multiselect", () => this.onGraphConfigChange());
+		jQuery(`#${this.form_tabs}`)
+			.on("tabsactivate", () => jQuery.colorpicker("hide"))
+			.on("change", "input, z-select, .multiselect", () => this.onGraphConfigChange());
 
 		this.onGraphConfigChange();
 
