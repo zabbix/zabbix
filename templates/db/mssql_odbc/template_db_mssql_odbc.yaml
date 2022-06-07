@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-13T22:55:23Z'
+  date: '2022-06-07T10:46:01Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -3005,6 +3005,7 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           filter:
+            evaltype: AND
             conditions:
               -
                 macro: '{#JOBNAME}'
