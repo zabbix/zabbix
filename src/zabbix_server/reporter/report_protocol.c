@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxreport.h"
+#include "../zbxreport.h"
 #include "report_protocol.h"
 
 #include "zbxserialize.h"
@@ -294,7 +294,7 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
  *                                                                            *
  ******************************************************************************/
 
-zbx_uint32_t	report_serialize_send_report(unsigned char **data, const DB_MEDIATYPE *mt,
+zbx_uint32_t	report_serialize_send_report(unsigned char **data, const ZBX_DB_MEDIATYPE *mt,
 		const zbx_vector_str_t *emails)
 {
 	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, *params_len;
@@ -329,7 +329,7 @@ zbx_uint32_t	report_serialize_send_report(unsigned char **data, const DB_MEDIATY
 	return data_offset + data_len;
 }
 
-void	report_deserialize_send_report(const unsigned char *data, DB_MEDIATYPE *mt, zbx_vector_str_t *sendtos)
+void	report_deserialize_send_report(const unsigned char *data, ZBX_DB_MEDIATYPE *mt, zbx_vector_str_t *sendtos)
 {
 	zbx_uint32_t	len;
 	int		i, sendto_num;

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -370,6 +370,8 @@ class CWidgetConfig {
 		if ($view_mode == ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER) {
 			switch ($type) {
 				case WIDGET_CLOCK:
+					return $fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG;
+
 				case WIDGET_GRAPH:
 				case WIDGET_MAP:
 				case WIDGET_SVG_GRAPH:
@@ -381,6 +383,9 @@ class CWidgetConfig {
 		}
 		else {
 			switch ($type) {
+				case WIDGET_CLOCK:
+					return $fields['clock_type'] === WIDGET_CLOCK_TYPE_ANALOG;
+
 				case WIDGET_HOST_AVAIL:
 					return (count($fields['interface_type']) != 1);
 

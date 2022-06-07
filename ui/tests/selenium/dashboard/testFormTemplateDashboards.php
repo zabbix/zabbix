@@ -282,7 +282,7 @@ class testFormTemplateDashboards extends CWebTest {
 			],
 			[
 				[
-					'type' => 'Graph (classic)',
+					'type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 					'fields' => [
 						[
 							'name' => 'Name',
@@ -312,7 +312,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 
-					'type' => 'Graph prototype',
+					'type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 					'fields' => [
 						[
 							'name' => 'Name',
@@ -355,7 +355,7 @@ class testFormTemplateDashboards extends CWebTest {
 			],
 			[
 				[
-					'type' => 'Plain text',
+					'type' => CFormElement::RELOADABLE_FILL('Plain text'),
 					'fields' => [
 						[
 							'name' => 'Name',
@@ -391,7 +391,7 @@ class testFormTemplateDashboards extends CWebTest {
 			],
 			[
 				[
-					'type' => 'URL',
+					'type' => CFormElement::RELOADABLE_FILL('URL'),
 					'fields' => [
 						[
 							'name' => 'Name',
@@ -425,7 +425,7 @@ class testFormTemplateDashboards extends CWebTest {
 		// Select the required type of widget.
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
 		$widget_dialog = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
-		$widget_dialog->getField('Type')->fill($data['type']);
+		$widget_dialog->fill(['Type' => $data['type']]);
 		COverlayDialogElement::find()->waitUntilReady();
 
 		// Check form fields and their attributes based on field type.
@@ -610,7 +610,7 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Type' => 'Clock',
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Change widget name'
 					]
 				]
@@ -640,7 +640,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => 'Clock',
 						'Name' => 'Clock widget server time',
-						'Time type' => 'Server time'
+						'Time type' => CFormElement::RELOADABLE_FILL('Server time')
 					]
 				]
 			],
@@ -651,7 +651,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => 'Clock',
 						'Name' => 'Clock widget with Host time no item',
-						'Time type' => 'Host time'
+						'Time type' => CFormElement::RELOADABLE_FILL('Host time')
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
 				]
@@ -662,7 +662,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => 'Clock',
 						'Name' => 'Clock widget with Host time',
-						'Time type' => 'Host time',
+						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
 						'Item' => 'Item ZBX6663 Second'
 					]
 				]
@@ -682,7 +682,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph (classic)',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Graph widget with empty graph',
 						'Source' => 'Graph',
 						'Graph' => []
@@ -697,7 +697,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => 'Graph (classic)',
 						'Name' => 'Graph widget with empty item',
-						'Source' => 'Simple graph',
+						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
 						'Item' => []
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
@@ -721,7 +721,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => 'Graph (classic)',
 						'Name' => 'Simple graph without legend',
-						'Source' => 'Simple graph',
+						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
 						'Item' => ['Item ZBX6663 Second'],
 						'Show legend' => false
 					]
@@ -732,7 +732,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Graph prototype',
+						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with empty graph',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => []
@@ -747,7 +747,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => 'Graph prototype',
 						'Name' => 'Graph prototype widget with empty item prototype',
-						'Source' => 'Simple graph prototype',
+						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
 						'Item prototype' => []
 					],
 					'error_message' => 'Invalid parameter "Item prototype": cannot be empty.'
@@ -857,7 +857,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => 'Graph prototype',
 						'Name' => 'Simple Graph prototype without legend',
-						'Source' => 'Simple graph prototype',
+						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
 						'Item prototype' => ['ItemProto ZBX6663 Second'],
 						'Show legend' => false,
 						'Columns' => 1,
@@ -870,7 +870,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'Plain text',
+						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget with empty Items',
 						'Items' => []
 					],
@@ -947,7 +947,7 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => 'URL',
+						'Type' => CFormElement::RELOADABLE_FILL('URL'),
 						'Name' => 'URL widget with empty URL'
 					],
 					'error_message' => 'Invalid parameter "URL": cannot be empty.'
@@ -1007,9 +1007,8 @@ class testFormTemplateDashboards extends CWebTest {
 
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
-
 		$form->fill($data['fields']);
-		COverlayDialogElement::find()->waitUntilReady();
+
 		// Trimming is only triggered together with an on-change event which is generated once focus is removed.
 		$this->page->removeFocus();
 		$old_values = $form->getFields()->asValues();
@@ -1056,7 +1055,7 @@ class testFormTemplateDashboards extends CWebTest {
 	public function testFormTemplateDashboards_ViewDashboardOnHost() {
 		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::HOST_FOR_TEMPLATE);
 		$this->page->waitUntilReady();
-		$this->query('id:dashboardid')->asZDropdown()->one()->select('Dashboard with all widgets');
+		$this->query('id:dashboardid')->asDropdown()->one()->select('Dashboard with all widgets');
 
 		$skip_selectors = [
 			'class:clock',
@@ -1160,6 +1159,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 * @param string	$check			Action that should be checked.
 	 */
 	private function checkSettings($data, $old_values, $status = 'created', $check = 'dashboard action') {
+//		$this->setNetworkThrottlingMode(self::NETWORK_THROTTLING_SLOW);
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'check_save')) {
 				$this->query('button:Save changes')->one()->click();
@@ -1175,6 +1175,7 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->closeDialogue();
 		}
 		else {
+			COverlayDialogElement::ensureNotPresent();
 			// Wait for widgets to be present as dashboard is slow when there ame many widgets on it.
 			if ($check !== 'dashboard action') {
 				if (CTestArrayHelper::get($data, 'trim') === 'Name') {

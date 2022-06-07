@@ -1,0 +1,43 @@
+---
+hosts:
+  - hostid: 1
+    macros:
+    - macroid: 1
+      macro: "{$V1.1}"
+      value: "a/b:k1"
+      type: ZBX_MACRO_VALUE_VAULT
+    - macroid: 2
+      macro: "{$V1.2}"
+      value: "a/b:k2"
+      type: ZBX_MACRO_VALUE_VAULT
+    - macroid: 3
+      macro: "{$V2.1}"
+      value: "a/c:k1"
+      type: ZBX_MACRO_VALUE_VAULT
+    - macroid: 4
+      macro: "{$V2.2}"
+      value: "a/c:k2"
+      type: ZBX_MACRO_VALUE_VAULT
+    - macroid: 5
+      macro: "{$V0.1}"
+      value: "a/b:k0"
+      type: ZBX_MACRO_VALUE_VAULT
+    - macroid: 6
+      macro: "{$V0.2}"
+      value: "a/c:k0"
+      type: ZBX_MACRO_VALUE_VAULT
+    templates: []
+vault:
+  - path: a/b
+    values:
+    - key: k1
+      value: v1.1
+    - key: k2
+      value: v1.2
+  - path: a/c
+    values:
+    - key: k1
+      value: v2.1
+    - key: k2
+      value: v2.2
+...

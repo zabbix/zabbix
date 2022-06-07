@@ -105,7 +105,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Check types.
 		$value_column = $row->getColumn('Value')->query('xpath:.//input')->one();
-		$dropdown = $row->query('name:mappings[1][type]')->asZDropdown()->one();
+		$dropdown = $row->query('name:mappings[1][type]')->asDropdown()->one();
 		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
 		$this->assertEquals($types, $dropdown->getOptions()->asText());
 
@@ -1072,7 +1072,7 @@ class testFormValueMappings extends CWebTest {
 			$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
 		}
 
-		$form->getField('Groups')->fill('Discovered hosts');
+		$form->getField(ucfirst($source).' groups')->fill(($source === 'host') ? 'Discovered hosts' : 'Templates');
 
 		// Open value mappings tab and add a value mapping.
 		$form->selectTab('Value mapping');

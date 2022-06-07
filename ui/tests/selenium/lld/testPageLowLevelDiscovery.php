@@ -282,10 +282,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Databases'
+						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 84
+					'rows' => 85
 				]
 			],
 			[
@@ -367,7 +367,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => [
+						'Template groups' => [
 							'Inheritance test'
 						],
 						'Templates' => [
@@ -441,7 +441,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Templates/Operating systems',
+						'Template groups' => 'Templates/Operating systems',
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',
@@ -553,6 +553,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->page->acceptAlert();
 		$string = ($table->getRows()->count() == 1) ? 'Discovery rule ' : 'Discovery rules ';
 		$this->assertEquals($string.lcfirst($action).'d', CMessageElement::find()->one()->getTitle());
+		CMessageElement::find()->one()->close();
 	}
 
 	public static function getDeleteAllButtonData() {

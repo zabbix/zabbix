@@ -154,7 +154,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				[
 					'fields' => [
 						'Host name' => 'test Inheritance host prototype',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -287,11 +287,11 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'visible_name' => 'New visible name',
 					'create_enabled' => false,
 					'groups' => [
-						'Templates'
+						'Linux servers'
 					],
 					'group_macro' => '{#GROUP_MACRO}',
 					'templates' => [
-						['name' => 'Inheritance test template', 'group' => 'Templates']
+						['name' => 'Inheritance test template', 'group' => 'Linux servers']
 					],
 					'host_inventory' => 'Automatic'
 				]
@@ -574,8 +574,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$sql = 'SELECT macro,type,value,description FROM hostmacro WHERE hostid=%d ORDER BY hostmacroid';
-		$this->assertSame(CDBHelper::getHash(vsprintf($sql, $template_prototype_id)),
-			CDBHelper::getHash(vsprintf($sql, $host_prototype_id))
+		$this->assertSame(CDBHelper::getHash(vsprintf($sql, [$template_prototype_id])),
+			CDBHelper::getHash(vsprintf($sql, [$host_prototype_id]))
 		);
 	}
 

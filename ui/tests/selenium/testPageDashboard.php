@@ -95,11 +95,12 @@ class testPageDashboard extends CLegacyWebTest {
 		$properties_form->checkValue(['Default page display period' => '30 seconds', 'Name' => 'New dashboard']);
 		$this->assertEquals('255', $properties_form->query('id:name')->one()->getAttribute('maxlength'));
 		$this->assertEquals(['10 seconds', '30 seconds', '1 minute', '2 minutes', '10 minutes', '30 minutes', '1 hour'],
-				$properties_form->query('name:display_period')->asZDropdown()->one()->getOptions()->asText()
+				$properties_form->query('name:display_period')->asDropdown()->one()->getOptions()->asText()
 		);
 
 		$properties_form->fill(['Name' => 'Dashboard creation']);
 		$properties_form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 
@@ -116,7 +117,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$cpu_itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid=10084 AND name='.zbx_dbstr($this->graphCpu));
 		$memory_itemid = CDBHelper::getValue('SELECT itemid FROM items WHERE hostid=10084 AND name='.zbx_dbstr($this->graphMemory));
 
-		$this->zbxTestLogin('zabbix.php?action=latest.view');
+		$this->zbxTestLogin('zabbix.php?action=latest.view&filter_selected=0&filter_reset=1');
 		$this->zbxTestCheckHeader('Latest data');
 
 		$filter = $this->query('name:zbx_filter')->asForm()->one();

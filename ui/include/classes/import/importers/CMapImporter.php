@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -146,7 +146,7 @@ class CMapImporter extends CImporter {
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
-					$groupid = $this->referencer->findGroupidByName($selement['elements'][0]['name']);
+					$groupid = $this->referencer->findHostGroupidByName($selement['elements'][0]['name']);
 
 					if ($groupid === null) {
 						throw new Exception(_s('Cannot find group "%1$s" used in map "%2$s".',

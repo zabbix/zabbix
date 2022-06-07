@@ -9,9 +9,6 @@ libzbxcommon_a_SOURCES = \
 	misc.c \
 	setproctitle.c \
 	str.c \
-	variant.c \
-	variant_misc.c \
-	zbxgetopt.c \
 	time.c \
 	cuid.c
 

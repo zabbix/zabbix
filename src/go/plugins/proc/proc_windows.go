@@ -27,8 +27,8 @@ import (
 	"syscall"
 	"unsafe"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
 
@@ -41,7 +41,7 @@ type Plugin struct {
 
 var impl Plugin
 
-func getProcessUsername(pid uint32) (result string, err error) {
+func getProcessUsername(pid uint32, wsid bool) (result string, sidStr string, err error) {
 	h, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, pid)
 	if err != nil {
 		return
@@ -74,7 +74,14 @@ func getProcessUsername(pid uint32) (result string, err error) {
 	if err = syscall.LookupAccountSid(nil, sid, &name[0], &nameLen, &domain[0], &domainLen, &use); err != nil {
 		return
 	}
-	return windows.UTF16ToString(name), nil
+
+	result = windows.UTF16ToString(name)
+
+	if wsid == true {
+		sidStr, err = sid.String()
+	}
+
+	return
 }
 
 type processEnumerator interface {
@@ -112,7 +119,7 @@ type numEnumerator struct {
 
 func (e *numEnumerator) inspect(p *syscall.ProcessEntry32) {
 	if e.user != "" {
-		if procUser, err := getProcessUsername(p.ProcessID); err != nil || e.user != strings.ToUpper(procUser) {
+		if procUser, _, err := getProcessUsername(p.ProcessID, false); err != nil || e.user != strings.ToUpper(procUser) {
 			return
 		}
 	}
@@ -160,19 +167,21 @@ type procStatus struct {
 	Pid           uint32   `json:"pid"`
 	PPid          uint32   `json:"ppid"`
 	Name          string   `json:"name"`
+	User          string   `json:"user"`
+	Sid           string   `json:"sid"`
 	Vmsize        float64  `json:"vmsize"`
 	Wkset         float64  `json:"wkset"`
 	CpuTimeUser   float64  `json:"cputime_user"`
 	CpuTimeSystem float64  `json:"cputime_system"`
 	Threads       uint32   `json:"threads"`
-	PageFaults    int64   `json:"page_faults"`
+	PageFaults    int64    `json:"page_faults"`
 	Handles       int64    `json:"handles"`
-	IoReadsB      int64   `json:"io_read_b"`
-	IoWritesB     int64   `json:"io_write_b"`
-	IoReadsOp     int64   `json:"io_read_op"`
-	IoWritesOp    int64   `json:"io_write_op"`
-	IoOtherB      int64   `json:"io_other_b"`
-	IoOtherOp     int64   `json:"io_other_op"`
+	IoReadsB      int64    `json:"io_read_b"`
+	IoWritesB     int64    `json:"io_write_b"`
+	IoReadsOp     int64    `json:"io_read_op"`
+	IoWritesOp    int64    `json:"io_write_op"`
+	IoOtherB      int64    `json:"io_other_b"`
+	IoOtherOp     int64    `json:"io_other_op"`
 }
 
 type procSummary struct {
@@ -183,20 +192,22 @@ type procSummary struct {
 	CpuTimeUser   float64 `json:"cputime_user"`
 	CpuTimeSystem float64 `json:"cputime_system"`
 	Threads       uint32  `json:"threads"`
-	PageFaults    int64  `json:"page_faults"`
+	PageFaults    int64   `json:"page_faults"`
 	Handles       int64   `json:"handles"`
-	IoReadsB      int64  `json:"io_read_b"`
-	IoWritesB     int64  `json:"io_write_b"`
-	IoReadsOp     int64  `json:"io_read_op"`
-	IoWritesOp    int64  `json:"io_write_op"`
-	IoOtherB      int64  `json:"io_other_b"`
-	IoOtherOp     int64  `json:"io_other_op"`
+	IoReadsB      int64   `json:"io_read_b"`
+	IoWritesB     int64   `json:"io_write_b"`
+	IoReadsOp     int64   `json:"io_read_op"`
+	IoWritesOp    int64   `json:"io_write_op"`
+	IoOtherB      int64   `json:"io_other_b"`
+	IoOtherOp     int64   `json:"io_other_op"`
 }
 
 type thread struct {
 	Pid           uint32  `json:"pid"`
 	PPid          uint32  `json:"ppid"`
 	Name          string  `json:"name"`
+	User          string  `json:"user"`
+	Sid           string  `json:"sid"`
 	Tid           uint32  `json:"tid"`
 }
 
@@ -418,16 +429,21 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		if name != "" && procName != name {
 			continue
 		}
+		var uname string
+		var sid string
+		uname, sid, err = getProcessUsername(pe.ProcessID, true)
 
-		if userName != "" {
-			var uname string
-			uname, err = getProcessUsername(pe.ProcessID)
-			if strings.ToUpper(uname) != userName {
-				continue
-			}
+		if userName != "" && (err != nil || strings.ToUpper(uname) != userName) {
+			continue
 		}
 
-		proc := procStatus{Pid: pe.ProcessID, PPid: pe.ParentProcessID, Name: procName, Threads: pe.Threads}
+		if err != nil {
+			uname = "-1"
+			sid = "-1"
+		}
+
+		proc := procStatus{Pid: pe.ProcessID, PPid: pe.ParentProcessID, Name: procName, Threads: pe.Threads,
+			User: uname, Sid: sid}
 
 		// process might not exist anymore already, skipping silently
 		h, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, pe.ProcessID)
@@ -492,7 +508,8 @@ func (p *Plugin) exportProcGet(params []string) (interface{}, error) {
 		for procerr = windows.Thread32First(ht, &te); procerr == nil; procerr = windows.Thread32Next(ht, &te) {
 			for _, proc := range array {
 				if te.OwnerProcessID == proc.Pid {
-					threadArray = append(threadArray, thread{proc.Pid, proc.PPid, proc.Name, te.ThreadID})
+					threadArray = append(threadArray, thread{proc.Pid, proc.PPid, proc.Name,
+						proc.User, proc.Sid, te.ThreadID})
 					break
 				}
 			}

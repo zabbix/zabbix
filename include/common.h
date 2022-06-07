@@ -103,12 +103,14 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
 
-#define MAX_ID_LEN		21
-#define MAX_STRING_LEN		2048
-#define MAX_BUFFER_LEN		65536
-#define MAX_ZBX_HOSTNAME_LEN	128
-#define MAX_ZBX_DNSNAME_LEN	255	/* maximum host DNS name length from RFC 1035 (without terminating '\0') */
-#define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
+#define MAX_ID_LEN			21
+#define MAX_STRING_LEN			2048
+#define MAX_BUFFER_LEN			65536
+#define ZBX_MAX_HOSTNAME_LEN		128
+#define ZBX_HOSTNAME_BUF_LEN	(ZBX_MAX_HOSTNAME_LEN + 1)
+#define ZBX_MAX_DNSNAME_LEN		255	/* maximum host DNS name length from RFC 1035 */
+						/*(without terminating '\0') */
+#define MAX_EXECUTE_OUTPUT_LEN		(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
@@ -520,9 +522,6 @@ typedef enum
 }
 zbx_group_status_type_t;
 
-/* group internal flag */
-#define ZBX_INTERNAL_GROUP		1
-
 /* program type */
 #define ZBX_PROGRAM_TYPE_SERVER		0x01
 #define ZBX_PROGRAM_TYPE_PROXY_ACTIVE	0x02
@@ -645,6 +644,10 @@ zbx_prototype_discover_t;
 /*#define HOST_STATUS_DELETED		4*/
 #define HOST_STATUS_PROXY_ACTIVE	5
 #define HOST_STATUS_PROXY_PASSIVE	6
+
+/* host group types */
+#define HOSTGROUP_TYPE_HOST		0
+#define HOSTGROUP_TYPE_TEMPLATE		1
 
 /* host maintenance status */
 #define HOST_MAINTENANCE_STATUS_OFF	0
@@ -959,9 +962,9 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	help(void);
-void	usage(void);
-void	version(void);
+void	zbx_help(void);
+void	zbx_usage(void);
+void	zbx_version(void);
 
 const char	*get_program_name(const char *path);
 
@@ -1260,7 +1263,6 @@ int	is_ip(const char *ip);
 
 int	zbx_validate_hostname(const char *hostname);
 
-void	zbx_on_exit(int ret); /* calls exit() at the end! */
 void	zbx_backtrace(void);
 
 int	int_in_list(char *list, int value);

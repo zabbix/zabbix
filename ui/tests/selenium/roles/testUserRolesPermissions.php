@@ -687,7 +687,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Event correlation',
 						'Discovery'
 					],
-					'link' => ['hostgroups.php']
+					'link' => ['zabbix.php?action=hostgroup.list']
 				]
 			],
 			[
@@ -1416,7 +1416,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		// Filter out unnecessary services.
 		$this->query('id:filter_tags_0_tag')->waitUntilVisible()->one()->fill('action');
-		$this->query('id:filter_tags_0_operator')->asZDropdown()->waitUntilVisible()->one()->fill('Does not exist');
+		$this->query('id:filter_tags_0_operator')->asDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();
@@ -1527,12 +1527,12 @@ class testUserRolesPermissions extends CWebTest {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
 		$selected_count = $this->query('id:selected_count')->one();
 		$select_all = $this->query('id:all_items')->asCheckbox()->one();
 

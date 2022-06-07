@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -303,6 +303,18 @@ class CTabFilterProfile {
 		CProfile::updateArray($this->namespace.'.properties', array_map('json_encode', $tabfilters), PROFILE_TYPE_STR);
 		CProfile::update($this->namespace.'.selected', $this->selected, PROFILE_TYPE_INT);
 		CProfile::update($this->namespace.'.expanded', (int) $this->expanded, PROFILE_TYPE_INT);
+
+		return $this;
+	}
+
+	/**
+	 * Reset default filter profile.
+	 */
+	public function reset(): CTabFilterProfile {
+		if ($this->selected == 0) {
+			$this->setTabFilter($this->selected, ['filter_name' => '']);
+			$this->update();
+		}
 
 		return $this;
 	}

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -1856,8 +1856,8 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_OBJECTS, 'fields' => [
 					'name' => ['type' => API_STRING_UTF8],
-					'col' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'default' => '0'],
-					'row' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'default' => '1'],
+					'col' => ['type' => API_INT32, 'default' => '0'],
+					'row' => ['type' => API_INT32, 'default' => '1'],
 					'width' => ['type' => API_INT32],
 					'height' => ['type' => API_INT32]
 				]],
@@ -5414,6 +5414,44 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Invalid parameter "/active_till": cannot be less than or equal to the value of parameter "/active_since".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'real_hosts' => ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
+					'with_hosts' => ['type' => API_BOOLEAN, 'default' => false]
+				]],
+				[],
+				'/',
+				['with_hosts' => false]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'real_hosts' => ['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
+					'with_hosts' => ['type' => API_BOOLEAN, 'default' => false]
+				]],
+				['with_hosts' => true],
+				'/',
+				['with_hosts' => true]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'real_hosts' =>	['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
+					'with_hosts' =>	['type' => API_BOOLEAN, 'default' => false]
+				]],
+				['real_hosts' => true, 'with_hosts' => true],
+				'/',
+				'Deprecated parameter "/real_hosts" cannot be used with "/with_hosts".'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'real_hosts' =>	['type' => API_BOOLEAN, 'flags' => API_DEPRECATED, 'replacement' => 'with_hosts'],
+					'with_hosts' =>	['type' => API_BOOLEAN, 'default' => false]
+				]],
+				['real_hosts' => true],
+				'/',
+				['with_hosts' => true],
+				true,
+				'Parameter "/real_hosts" is deprecated.'
 			]
 		];
 	}
@@ -5529,16 +5567,23 @@ class CApiInputValidatorTest extends TestCase {
 	/**
 	 * @dataProvider dataProviderInput
 	 *
-	 * @param array  $rule
-	 * @param mixed  $data
-	 * @param string $path
-	 * @param mixed  $exprected
-	 * @param bool   $float_ieee754
+	 * @param array       $rule
+	 * @param mixed       $data
+	 * @param string      $path
+	 * @param mixed       $exprected
+	 * @param bool        $float_ieee754
+	 * @param string|null $deprecation_message
 	 */
-	public function testApiInputValidator(array $rule, $data, $path, $expected, $float_ieee754 = true) {
+	public function testApiInputValidator(array $rule, $data, $path, $expected, $float_ieee754 = true,
+			string $deprecation_message = null) {
 		global $DB;
 
 		$DB['DOUBLE_IEEE754'] = $float_ieee754;
+
+		if ($deprecation_message !== null) {
+//			$this->expectDeprecation();
+//			$this->expectDeprecationMessage($deprecation_message);
+		}
 
 		$rc = CApiInputValidator::validate($rule, $data, $path, $error);
 

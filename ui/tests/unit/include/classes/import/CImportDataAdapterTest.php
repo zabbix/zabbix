@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -33,7 +33,8 @@ class CImportDataAdapterTest extends TestCase {
 	public function testEmptyXml() {
 		$adapter = $this->getAdapter($this->getEmptyXml());
 
-		$this->assertEquals($adapter->getGroups(), []);
+		$this->assertEquals($adapter->getHostGroups(), []);
+		$this->assertEquals($adapter->getTemplateGroups(), []);
 		$this->assertEquals($adapter->getHosts(), []);
 		$this->assertEquals($adapter->getTemplates(), []);
 		$this->assertEquals($adapter->getItems(), []);
@@ -48,7 +49,7 @@ class CImportDataAdapterTest extends TestCase {
 	public function testGetGroups() {
 		$adapter = $this->getAdapter($this->getHostAndTemplateXml());
 
-		$this->assertEquals($adapter->getGroups(), [
+		$this->assertEquals($adapter->getHostGroups(), [
 			[
 				'name' => 'Linux servers',
 				'uuid' => 'dc579cd7a1a34222933f24f52a68bcd8'
@@ -56,7 +57,10 @@ class CImportDataAdapterTest extends TestCase {
 			[
 				'name' => 'Zabbix servers',
 				'uuid' => '6f6799aa69e844b4b3918f779f2abf08'
-			],
+			]
+		]);
+
+		$this->assertEquals($adapter->getTemplateGroups(), [
 			[
 				'name' => 'Templates',
 				'uuid' => '7df96b18c230490a9a0a9e2307226338'
@@ -1968,11 +1972,15 @@ class CImportDataAdapterTest extends TestCase {
 	public function testConversion() {
 		$adapter = $this->getAdapter($this->get18Xml());
 
-		$this->assertEquals($adapter->getGroups(), [
+		$this->assertEquals($adapter->getHostGroups(), [
 				[
 					'uuid' => 'dc579cd7a1a34222933f24f52a68bcd8',
 					'name' => 'Linux servers'
-				],
+				]
+			]
+		);
+
+		$this->assertEquals($adapter->getTemplateGroups(), [
 				[
 					'uuid' => '7df96b18c230490a9a0a9e2307226338',
 					'name' => 'Templates'

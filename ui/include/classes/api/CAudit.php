@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -84,6 +84,8 @@ class CAudit {
 	public const RESOURCE_HA_NODE = 47;
 	public const RESOURCE_SLA = 48;
 	public const RESOURCE_USERDIRECTORY = 49;
+	public const RESOURCE_TEMPLATE_GROUP = 50;
+
 
 	/**
 	 * Audit details actions.
@@ -134,6 +136,7 @@ class CAudit {
 		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE => 'hosts',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'dashboard',
+		self::RESOURCE_TEMPLATE_GROUP => 'hstgrp',
 		self::RESOURCE_USER => 'users',
 		self::RESOURCE_USERDIRECTORY => 'userdirectory',
 		self::RESOURCE_USER_GROUP => 'usrgrp'
@@ -183,6 +186,7 @@ class CAudit {
 		self::RESOURCE_SLA => 'name',
 		self::RESOURCE_TEMPLATE => 'host',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'name',
+		self::RESOURCE_TEMPLATE_GROUP => 'name',
 		self::RESOURCE_USER => 'username',
 		self::RESOURCE_USERDIRECTORY => 'name',
 		self::RESOURCE_USER_GROUP => 'name'
@@ -221,6 +225,7 @@ class CAudit {
 		self::RESOURCE_SLA => 'sla',
 		self::RESOURCE_TEMPLATE => 'template',
 		self::RESOURCE_TEMPLATE_DASHBOARD => 'templatedashboard',
+		self::RESOURCE_TEMPLATE_GROUP => 'templategroup',
 		self::RESOURCE_USER => 'user',
 		self::RESOURCE_USERDIRECTORY => 'userdirectory',
 		self::RESOURCE_USER_GROUP => 'usergroup'
@@ -299,7 +304,6 @@ class CAudit {
 		'dashboard.pages.widgets' => 'widget',
 		'dashboard.pages.widgets.fields' => 'widget_field',
 		'hostgroup.hosts' => 'hosts_groups',
-		'hostgroup.templates' => 'hosts_groups',
 		'hostprototype.groupLinks' => 'group_prototype',
 		'hostprototype.groupPrototypes' => 'group_prototype',
 		'hostprototype.interfaces' => 'interface',
@@ -336,9 +340,11 @@ class CAudit {
 		'templatedashboard.pages' => 'dashboard_page',
 		'templatedashboard.pages.widgets' => 'widget',
 		'templatedashboard.pages.widgets.fields' => 'widget_field',
+		'templategroup.templates' => 'hosts_groups',
 		'user.medias' => 'media',
 		'user.usrgrps' => 'users_groups',
-		'usergroup.rights' => 'rights',
+		'usergroup.hostgroup_rights' => 'rights',
+		'usergroup.templategroup_rights' => 'rights',
 		'usergroup.tag_filters' => 'tag_filter',
 		'usergroup.users' => 'users_groups'
 	];
@@ -377,7 +383,6 @@ class CAudit {
 		'dashboard.pages.widgets' => 'widgetid',
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
 		'hostgroup.hosts' => 'hostgroupid',
-		'hostgroup.templates' => 'hostgroupid',
 		'hostprototype.groupLinks' => 'group_prototypeid',
 		'hostprototype.groupPrototypes' => 'group_prototypeid',
 		'hostprototype.interfaces' => 'interfaceid',
@@ -412,9 +417,11 @@ class CAudit {
 		'templatedashboard.pages' => 'dashboard_pageid',
 		'templatedashboard.pages.widgets' => 'widgetid',
 		'templatedashboard.pages.widgets.fields' => 'widget_fieldid',
+		'templategroup.templates' => 'hostgroupid',
 		'user.medias' => 'mediaid',
 		'user.usrgrps' => 'id',
-		'usergroup.rights' => 'rightid',
+		'usergroup.hostgroup_rights' => 'rightid',
+		'usergroup.templategroup_rights' => 'rightid',
 		'usergroup.tag_filters' => 'tag_filterid',
 		'usergroup.users' => 'id'
 	];

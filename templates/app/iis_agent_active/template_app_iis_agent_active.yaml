@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:41Z'
+  date: '2022-05-18T22:41:10Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -474,7 +474,7 @@ zabbix_export:
               name: 'IIS: has been restarted'
               event_name: 'IIS: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -684,6 +684,39 @@ zabbix_export:
                 -
                   tag: scope
                   value: availability
+        -
+          uuid: bfe53ca77e2046d6bb9ece5250e227f1
+          name: 'IIS: Active agent availability'
+          type: INTERNAL
+          key: 'zabbix[host,active_agent,available]'
+          history: 7d
+          description: |
+            Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.
+            Possible value:
+            0 - unknown
+            1 - available
+            2 - not available
+          valuemap:
+            name: zabbix.host.active_agent.available
+          tags:
+            -
+              tag: component
+              value: health
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: b9d8edc865f54e8eb56e84392817ff5b
+              expression: 'min(/IIS by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
+              name: 'IIS: Zabbix agent: active checks are not available'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: 1dfb7339b81b4237a4e90b29328de297
@@ -762,7 +795,7 @@ zabbix_export:
                   name: 'IIS: {#APPPOOL} has been restarted'
                   event_name: 'IIS: {#APPPOOL} has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -845,6 +878,10 @@ zabbix_export:
           value: iis
       macros:
         -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 5m
+          description: 'Timeout after which agent is considered unavailable.'
+        -
           macro: '{$IIS.APPPOOL.MATCHES}'
           value: .+
           description: 'This macro is used in application pools discovery. Can be overridden on the host or linked template level.'
@@ -870,7 +907,7 @@ zabbix_export:
         -
           macro: '{$IIS.SERVICE}'
           value: http
-          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/simple_checks'
+          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.2/manual/config/items/itemtypes/simple_checks'
       valuemaps:
         -
           uuid: 636c6915a8154b6ea1ea5b00f015c149
@@ -938,6 +975,19 @@ zabbix_export:
             -
               value: '255'
               newvalue: 'No such service'
+        -
+          uuid: c63064c6717e4604805491ce54166356
+          name: zabbix.host.active_agent.available
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: 'not available'
   graphs:
     -
       uuid: e3b3f8f973204070a37b9eb861e2a079

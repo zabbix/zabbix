@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2021 Zabbix SIA
@@ -43,7 +43,7 @@ $left_column = (new CFormGrid())
 						'srcfld1' => 'groupid',
 						'dstfrm' => 'zbx_filter',
 						'dstfld1' => 'groupids_',
-						'real_hosts' => true,
+						'with_hosts' => true,
 						'enrich_parent_groups' => true
 					]
 				]
@@ -275,7 +275,7 @@ if (array_key_exists('render_html', $data)) {
 			name: 'groupids[]',
 			data: data.filter_view_data.groups_multiselect || [],
 			objectOptions: {
-				real_hosts: 1,
+				with_hosts: 1,
 				enrich_parent_groups: 1
 			},
 			popup: {

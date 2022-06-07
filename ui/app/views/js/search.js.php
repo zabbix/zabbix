@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -26,6 +26,27 @@
 
 <script>
 	const view = {
+		original_url: null,
+
+		init() {
+			this.original_url = location.href;
+
+			document.addEventListener('click', (e) => {
+				const group_link = e.target.closest('a');
+
+				if (group_link !== null) {
+					if (group_link.classList.contains('js-edit-templategroup')) {
+						e.preventDefault();
+						this.editTemplateGroup({groupid: e.target.closest('a').dataset.groupid});
+					}
+					else if (group_link.classList.contains('js-edit-hostgroup')) {
+						e.preventDefault();
+						this.editHostGroup({groupid: e.target.closest('a').dataset.groupid});
+					}
+				}
+			});
+		},
+
 		editHost(e, hostid) {
 			e.preventDefault();
 			const host_data = {hostid};
@@ -34,7 +55,6 @@
 		},
 
 		openHostPopup(host_data) {
-			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large',
@@ -45,7 +65,35 @@
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
+				history.replaceState({}, '', this.original_url);
+			}, {once: true});
+		},
+
+		editTemplateGroup(parameters = {}) {
+			const overlay = PopUp('popup.templategroup.edit', parameters, {
+				dialogueid: 'templategroup_edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.groupSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.groupSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', this.original_url);
+			}, {once: true});
+		},
+
+		editHostGroup(parameters = {}) {
+			const overlay = PopUp('popup.hostgroup.edit', parameters, {
+				dialogueid: 'hostgroup_edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.groupSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.groupSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', this.original_url);
 			}, {once: true});
 		},
 
@@ -59,6 +107,16 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
+				}
+
+				location.href = location.href;
+			},
+
+			groupSuccess(e) {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
 				}
 
 				location.href = location.href;

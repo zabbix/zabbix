@@ -28,7 +28,7 @@ import (
 	"path"
 	"time"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type client struct {

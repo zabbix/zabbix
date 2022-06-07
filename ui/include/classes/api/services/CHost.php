@@ -61,7 +61,8 @@ class CHost extends CHostGeneral {
 	 * @param bool          $options['tags']                               Select hosts by given tags.
 	 * @param bool          $options['severities']                         Select hosts that have only problems with given severities.
 	 * @param bool          $options['inheritedTags']                      Select hosts that have given tags also in their linked templates.
-	 * @param string|array  $options['selectGroups']                       Return a "groups" property with host groups data that the host belongs to.
+	 * @param string|array  $options['selectGroups']                       Deprecated! Return a "groups" property with host groups data that the host belongs to.
+	 * @param string|array  $options['selectHostGroups']                   Return a "hostgroups" property with host groups data that the host belongs to.
 	 * @param string|array  $options['selectParentTemplates']              Return a "parentTemplates" property with templates that the host is linked to.
 	 * @param string|array  $options['selectItems']                        Return an "items" property with host items.
 	 * @param string|array  $options['selectDiscoveries']                  Return a "discoveries" property with host low-level discovery rules.
@@ -142,6 +143,7 @@ class CHost extends CHostGeneral {
 			// output
 			'output'							=> API_OUTPUT_EXTEND,
 			'selectGroups'						=> null,
+			'selectHostGroups'					=> null,
 			'selectParentTemplates'				=> null,
 			'selectItems'						=> null,
 			'selectDiscoveries'					=> null,
@@ -168,6 +170,8 @@ class CHost extends CHostGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		$this->validateGet($options);
+
+		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -464,6 +468,15 @@ class CHost extends CHostGeneral {
 				$sqlParts['left_join']['interface'] = ['alias' => 'hi', 'table' => 'interface', 'using' => 'hostid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
+
+			if (array_key_exists('active_available', $options['filter'])
+					&& $options['filter']['active_available'] !== null) {
+				$this->dbFilter('host_rtdata hr', ['filter' => [
+						'active_available' => $options['filter']['active_available']
+					]] + $options,
+					$sqlParts
+				);
+			}
 		}
 
 		// tags
@@ -495,6 +508,7 @@ class CHost extends CHostGeneral {
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$all_keys = array_keys(DB::getSchema($this->tableName())['fields']);
 			$all_keys[] = 'inventory_mode';
+			$all_keys[] = 'active_available';
 			$options['output'] = array_diff($all_keys, $write_only_keys);
 		}
 		/*
@@ -581,15 +595,27 @@ class CHost extends CHostGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output'])) {
-			$sqlParts['select']['inventory_mode'] =
-				dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
-		}
-
 		if ((!$options['countOutput'] && $this->outputIsRequested('inventory_mode', $options['output']))
 				|| ($options['filter'] && array_key_exists('inventory_mode', $options['filter']))) {
 			$sqlParts['left_join'][] = ['alias' => 'hinv', 'table' => 'host_inventory', 'using' => 'hostid'];
 			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		if ((!$options['countOutput'] && $this->outputIsRequested('active_available', $options['output']))
+				|| (is_array($options['filter']) && array_key_exists('active_available', $options['filter']))) {
+			$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		if (!$options['countOutput']) {
+			if ($this->outputIsRequested('inventory_mode', $options['output'])) {
+				$sqlParts['select']['inventory_mode'] =
+					dbConditionCoalesce('hinv.inventory_mode', HOST_INVENTORY_DISABLED, 'inventory_mode');
+			}
+
+			if ($this->outputIsRequested('active_available', $options['output'])) {
+				$sqlParts = $this->addQuerySelect('hr.active_available', $sqlParts);
+			}
 		}
 
 		return $sqlParts;
@@ -644,10 +670,13 @@ class CHost extends CHostGeneral {
 		$hosts_inventory = [];
 		$templates_hostids = [];
 
+		$hosts_rtdata = [];
+
 		$hostids = DB::insert('hosts', $hosts);
 
 		foreach ($hosts as $index => &$host) {
 			$host['hostid'] = $hostids[$index];
+			$hosts_rtdata[$index] = ['hostid' => $hostids[$index]];
 
 			foreach ($host['groups'] as $group) {
 				$hosts_groups[] = [
@@ -721,6 +750,8 @@ class CHost extends CHostGeneral {
 		if ($hosts_inventory) {
 			DB::insert('host_inventory', $hosts_inventory, false);
 		}
+
+		DB::insertBatch('host_rtdata', $hosts_rtdata, false);
 
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_HOST, $hosts);
 
@@ -1562,6 +1593,10 @@ class CHost extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		// adding groups
+		$this->addRelatedGroups($options, $result, 'selectGroups');
+		$this->addRelatedGroups($options, $result, 'selectHostGroups');
+
 		$hostids = array_keys($result);
 
 		// adding inventory
@@ -1733,6 +1768,31 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
+	 * Adds related host groups requested by "select*" options to the resulting object set.
+	 *
+	 * @param array  $options  [IN] Original input options.
+	 * @param array  $result   [IN/OUT] Result output.
+	 * @param string $option   [IN] Possible values:
+	 *                                - "selectGroups" (deprecated);
+	 *                                - "selectHostGroups" (or any other value).
+	 */
+	private function addRelatedGroups(array $options, array &$result, string $option): void {
+		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+			return;
+		}
+
+		$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
+		$groups = API::HostGroup()->get([
+			'output' => $options[$option],
+			'groupids' => $relationMap->getRelatedIds(),
+			'preservekeys' => true
+		]);
+
+		$output_tag = $option === 'selectGroups' ? 'groups' : 'hostgroups';
+		$result = $relationMap->mapMany($result, $groups, $output_tag);
+	}
+
+	/**
 	 * Validates the input parameters for the get() method.
 	 *
 	 * @param array $options
@@ -1751,7 +1811,9 @@ class CHost extends CHostGeneral {
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
 			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => 'templateid,host,name,description,uuid,link_type']
 		]];
+
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
+
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}

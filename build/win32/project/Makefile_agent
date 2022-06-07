@@ -40,9 +40,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
-	..\..\..\src\libs\zbxcommon\variant.o \
 	..\..\..\src\libs\zbxcommon\str.o \
-	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
 	..\..\..\src\libs\zbxcommon\file.o \
 	..\..\..\src\libs\zbxcommon\time.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
@@ -51,8 +49,9 @@ OBJS = \
 	..\..\..\src\libs\zbxcompress\compress.o \
 	..\..\..\src\libs\zbxconf\cfg.o \
 	..\..\..\src\libs\zbxcrypto\base64.o \
+	..\..\..\src\libs\zbxgetopt\getopt.o \
 	..\..\..\src\libs\zbxhash\md5.o \
-	..\..\..\src\libs\zbxcrypto\sha256crypt.o \
+	..\..\..\src\libs\zbxhash\sha256crypt.o \
 	..\..\..\src\libs\zbxcrypto\crypto.o \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
@@ -86,6 +85,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\win32\memory.o \
 	..\..\..\src\libs\zbxsysinfo\win32\net.o \
 	..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o \
+	..\..\..\src\libs\zbxsysinfo\win32\registry.o \
 	..\..\..\src\libs\zbxsysinfo\win32\proc.o \
 	..\..\..\src\libs\zbxsysinfo\win32\services.o \
 	..\..\..\src\libs\zbxsysinfo\win32\swap.o \
@@ -97,6 +97,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\win32\system.o \
 	..\..\..\src\libs\zbxsysinfo\win32\hostname.o \
 	..\..\..\src\libs\zbxsysinfo\alias\alias.o \
+	..\..\..\src\libs\zbxvariant\variant.o \
 	..\..\..\src\libs\zbxwin32\perfmon.o \
 	..\..\..\src\libs\zbxwin32\service.o \
 	..\..\..\src\zabbix_agent\active.o \

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -147,12 +147,6 @@ class CSettings extends CApiService {
 				'values' => $upd_config,
 				'where' => ['configid' => $db_settings['configid']]
 			]);
-
-			if (array_key_exists('discovery_groupid', $upd_config)
-					&& bccomp($upd_config['discovery_groupid'], $db_settings['discovery_groupid']) != 0) {
-				$this->setHostGroupInternal($db_settings['discovery_groupid'], ZBX_NOT_INTERNAL_GROUP);
-				$this->setHostGroupInternal($upd_config['discovery_groupid'], ZBX_INTERNAL_GROUP);
-			}
 		}
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_SETTINGS,
@@ -300,18 +294,5 @@ class CSettings extends CApiService {
 		$output_fields[] = 'configid';
 
 		return DB::select('config', ['output' => $output_fields])[0];
-	}
-
-	/**
-	 * Set or unset the host group as internal
-	 *
-	 * @param string $groupid   Host group ID
-	 * @param int    $internal  Value of internal option
-	 */
-	private function setHostGroupInternal(string $groupid, int $internal): void {
-		DB::update('hstgrp', [
-			'values' => ['internal' =>  $internal],
-			'where' => ['groupid' => $groupid]
-		]);
 	}
 }

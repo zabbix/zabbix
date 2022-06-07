@@ -58,10 +58,14 @@ class CTabFilter extends CBaseComponent {
 
 		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
 			this._templates[template.getAttribute('data-template')] = template;
-		};
+		}
 
 		for (const title of this._target.querySelectorAll('nav [data-target]')) {
 			item = this.create(title, options.data[index] || {});
+
+			if (index > 0) {
+				item.initUnsavedIndicator();
+			}
 
 			if (options.selected == index) {
 				item.renderContentTemplate();
@@ -279,7 +283,6 @@ class CTabFilter extends CBaseComponent {
 
 			if (item) {
 				item.updateCounter(value);
-				return;
 			}
 		});
 
@@ -295,6 +298,7 @@ class CTabFilter extends CBaseComponent {
 	 */
 	setSelectedItem(item) {
 		this._active_item = item;
+		this._active_item.unsetExpandedSubfilters();
 		item.setSelected();
 
 		if (item !== this._timeselector) {
@@ -347,6 +351,22 @@ class CTabFilter extends CBaseComponent {
 		this._active_item.updateUnsavedState();
 		this._active_item.updateApplyUrl();
 		this._active_item.setBrowserLocationToApplyUrl();
+	}
+
+	/**
+	 * Set expanded subfilter name.
+	 */
+	setExpandedSubfilters(name) {
+		return this._active_item.setExpandedSubfilters(name);
+	}
+
+	/**
+	 * Retrieve expanded subfilter names.
+	 *
+	 * @returns {array}
+	 */
+	getExpandedSubfilters() {
+		return this._active_item.getExpandedSubfilters();
 	}
 
 	/**
@@ -628,6 +648,7 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Apply' button press.
 			 */
 			buttonApplyAction: () => {
+				this._active_item.unsetExpandedSubfilters();
 				this._active_item.emptySubfilter();
 				this._active_item.updateUnsavedState();
 				this._active_item.updateApplyUrl();
@@ -745,7 +766,14 @@ class CTabFilter extends CBaseComponent {
 		this._filters_footer.querySelector('[name="filter_new"]')
 			.addEventListener('click', this._events.buttonSaveAsAction);
 		this._filters_footer.querySelector('[name="filter_apply"]')
-			.addEventListener('click', this._events.buttonApplyAction);
+			.addEventListener('click', () => {
+				if (this._active_item._index == 0) {
+					this._events.buttonUpdateAction();
+				}
+				else {
+					this._events.buttonApplyAction();
+				}
+			});
 		this._filters_footer.querySelector('[name="filter_reset"]')
 			.addEventListener('click', this._events.buttonResetAction);
 		this._filters_footer.addEventListener('click', this._events.buttonActionNotify);

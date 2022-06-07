@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -51,6 +51,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'ui_reports_audit' => 						'in 0,1',
 			'ui_reports_action_log' => 					'in 0,1',
 			'ui_reports_notifications' => 				'in 0,1',
+			'ui_configuration_template_groups' => 		'in 0,1',
 			'ui_configuration_host_groups' => 			'in 0,1',
 			'ui_configuration_templates' => 			'in 0,1',
 			'ui_configuration_hosts' => 				'in 0,1',

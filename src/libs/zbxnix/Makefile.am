@@ -15,3 +15,6 @@ libzbxnix_a_SOURCES = \
 	pid.h \
 	sigcommon.h \
 	sighandler.c
+
+libzbxnix_a_CFLAGS = \
+	$(TLS_CFLAGS)

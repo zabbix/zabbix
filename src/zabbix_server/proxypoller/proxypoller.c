@@ -23,7 +23,7 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxserver.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "proxy.h"
 #include "zbxcrypto.h"
@@ -495,9 +495,10 @@ out:
  ******************************************************************************/
 static int	process_proxy(void)
 {
-	DC_PROXY	proxy, proxy_old;
-	int		num, i;
-	time_t		now;
+	DC_PROXY		proxy, proxy_old;
+	int			num, i;
+	time_t			now;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -505,6 +506,8 @@ static int	process_proxy(void)
 		goto exit;
 
 	now = time(NULL);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < num; i++)
 	{
@@ -531,7 +534,7 @@ static int	process_proxy(void)
 			proxy.addr = proxy.addr_orig;
 
 			port = zbx_strdup(port, proxy.port_orig);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 					&port, MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == is_ushort(port, &proxy.port))
 			{
@@ -575,6 +578,7 @@ static int	process_proxy(void)
 			}
 		}
 error:
+
 		if (proxy_old.version != proxy.version || proxy_old.auto_compress != proxy.auto_compress ||
 				proxy_old.lastaccess != proxy.lastaccess)
 		{
@@ -583,6 +587,8 @@ error:
 
 		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

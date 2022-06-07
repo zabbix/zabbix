@@ -835,7 +835,7 @@ class testFormUserRoles extends CWebTest {
 		$this->page->assertHeader('User roles');
 		$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
-		$this->assertEquals($roles, $this->query('id:user-type')->one()->asZDropdown()->getOptions()->asText());
+		$this->assertEquals($roles, $this->query('id:user-type')->one()->asDropdown()->getOptions()->asText());
 
 		// Unchecking API, button and radio button becomes disabled.
 		$form->fill(['Enabled' => false]);
@@ -852,7 +852,7 @@ class testFormUserRoles extends CWebTest {
 
 		$screenshot_area = $this->query('id:user_role_tab')->one();
 		foreach ($roles as $role) {
-			$this->query('id:user-type')->one()->asZDropdown()->select($role);
+			$this->query('id:user-type')->one()->asDropdown()->select($role);
 
 			if ($role === 'Super admin') {
 				$form->invalidate();
@@ -891,8 +891,8 @@ class testFormUserRoles extends CWebTest {
 						'map.delete', 'map.get', 'map.update', 'mediatype.get', 'module.get', 'problem.get', 'proxy.get',
 						'role.get', 'script.execute', 'script.get', 'script.getscriptsbyhosts', 'service.create',
 						'service.delete', 'service.get', 'service.update', 'settings.get', 'sla.get', 'sla.getsli',
-						'template.get', 'templatedashboard.get', 'token.create', 'token.delete', 'token.generate', 'token.get',
-						'token.update', 'trend.get', 'trigger.get', 'triggerprototype.get',
+						'template.get', 'templatedashboard.get', 'templategroup.get', 'token.create', 'token.delete',
+						'token.generate', 'token.get', 'token.update', 'trend.get', 'trigger.get', 'triggerprototype.get',
 						'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.get', 'valuemap.get'
 					]
 				]
@@ -911,8 +911,8 @@ class testFormUserRoles extends CWebTest {
 						'discoveryrule.delete', 'discoveryrule.get', 'discoveryrule.update', 'drule.create', 'drule.delete', 'drule.get',
 						'drule.update', 'dservice.get', 'event.acknowledge', 'event.get', 'graph.create', 'graph.delete', 'graph.get',
 						'graph.update', 'graphitem.get', 'graphprototype.create', 'graphprototype.delete', 'graphprototype.get',
-						'graphprototype.update', 'hanode.get', 'history.clear', 'history.get', 'host.create', 'host.delete', 'host.get', 'host.massadd', 'host.massremove',
-						'host.massupdate', 'host.update', 'hostgroup.delete', 'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove',
+						'graphprototype.update', 'hanode.get', 'history.clear', 'history.get', 'host.create', 'host.delete', 'host.get', 'host.massadd',
+						'host.massremove', 'host.massupdate', 'host.update', 'hostgroup.delete', 'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove',
 						'hostgroup.massupdate', 'hostgroup.update', 'hostinterface.create', 'hostinterface.delete', 'hostinterface.get',
 						'hostinterface.massadd', 'hostinterface.massremove', 'hostinterface.replacehostinterfaces', 'hostinterface.update',
 						'hostprototype.create', 'hostprototype.delete', 'hostprototype.get', 'hostprototype.update', 'housekeeping.get',
@@ -925,12 +925,12 @@ class testFormUserRoles extends CWebTest {
 						'settings.get', 'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'template.create',
 						'template.delete', 'template.get', 'template.massadd', 'template.massremove', 'template.massupdate',
 						'template.update', 'templatedashboard.create', 'templatedashboard.delete', 'templatedashboard.get',
-						'templatedashboard.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
-						'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete', 'trigger.deletedependencies',
-						'trigger.get', 'trigger.update', 'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
-						'triggerprototype.update', 'user.get', 'user.logout', 'user.update', 'usergroup.get', 'usermacro.create',
-						'usermacro.delete', 'usermacro.get', 'usermacro.update', 'valuemap.create', 'valuemap.delete', 'valuemap.get',
-						'valuemap.update'
+						'templatedashboard.update', 'templategroup.delete', 'templategroup.get', 'templategroup.massadd', 'templategroup.massremove',
+						'templategroup.massupdate', 'templategroup.update', 'token.create', 'token.delete', 'token.generate', 'token.get',
+						'token.update', 'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get', 'trigger.update', 'triggerprototype.create',
+						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.get', 'user.logout', 'user.update',
+						'usergroup.get', 'usermacro.create', 'usermacro.delete', 'usermacro.get', 'usermacro.update', 'valuemap.create',
+						'valuemap.delete', 'valuemap.get', 'valuemap.update'
 					]
 				]
 			],
@@ -953,8 +953,8 @@ class testFormUserRoles extends CWebTest {
 						'graphprototype.create', 'graphprototype.delete', 'graphprototype.get', 'graphprototype.update',
 						'hanode.get', 'history.clear', 'history.get', 'host.create', 'host.delete', 'host.get', 'host.massadd',
 						'host.massremove', 'host.massupdate', 'host.update', 'hostgroup.create', 'hostgroup.delete',
-						'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove', 'hostgroup.massupdate', 'hostgroup.update',
-						'hostinterface.create', 'hostinterface.delete', 'hostinterface.get', 'hostinterface.massadd',
+						'hostgroup.get', 'hostgroup.massadd', 'hostgroup.massremove', 'hostgroup.massupdate', 'hostgroup.propagate',
+						'hostgroup.update', 'hostinterface.create', 'hostinterface.delete', 'hostinterface.get', 'hostinterface.massadd',
 						'hostinterface.massremove', 'hostinterface.replacehostinterfaces', 'hostinterface.update',
 						'hostprototype.create', 'hostprototype.delete', 'hostprototype.get', 'hostprototype.update',
 						'housekeeping.get', 'housekeeping.update', 'httptest.create', 'httptest.delete', 'httptest.get',
@@ -972,15 +972,18 @@ class testFormUserRoles extends CWebTest {
 						'sla.create', 'sla.delete', 'sla.get', 'sla.getsli', 'sla.update', 'task.create', 'task.get',
 						'template.create', 'template.delete', 'template.get', 'template.massadd', 'template.massremove',
 						'template.massupdate', 'template.update', 'templatedashboard.create', 'templatedashboard.delete',
-						'templatedashboard.get', 'templatedashboard.update', 'token.create', 'token.delete', 'token.generate',
-						'token.get', 'token.update', 'trend.get', 'trigger.adddependencies', 'trigger.create', 'trigger.delete',
-						'trigger.deletedependencies', 'trigger.get', 'trigger.update', 'triggerprototype.create',
-						'triggerprototype.delete', 'triggerprototype.get', 'triggerprototype.update', 'user.create',
-						'user.delete', 'user.get', 'user.logout', 'user.unblock', 'user.update', 'userdirectory.create',
-						'userdirectory.delete', 'userdirectory.get', 'userdirectory.test', 'userdirectory.update', 'usergroup.create',
-						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create', 'usermacro.createglobal',
-						'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get', 'usermacro.update', 'usermacro.updateglobal',
-						'valuemap.create', 'valuemap.delete', 'valuemap.get', 'valuemap.update'
+						'templatedashboard.get', 'templatedashboard.update', 'templategroup.create', 'templategroup.delete',
+						'templategroup.get', 'templategroup.massadd', 'templategroup.massremove', 'templategroup.massupdate',
+						'templategroup.propagate', 'templategroup.update', 'token.create', 'token.delete', 'token.generate',
+						'token.get', 'token.update', 'trend.get', 'trigger.create', 'trigger.delete', 'trigger.get',
+						'trigger.update', 'triggerprototype.create', 'triggerprototype.delete', 'triggerprototype.get',
+						'triggerprototype.update', 'user.create', 'user.delete', 'user.get', 'user.logout',
+						'user.unblock', 'user.update', 'userdirectory.create', 'userdirectory.delete',
+						'userdirectory.get', 'userdirectory.test', 'userdirectory.update', 'usergroup.create',
+						'usergroup.delete', 'usergroup.get', 'usergroup.update', 'usermacro.create',
+						'usermacro.createglobal', 'usermacro.delete', 'usermacro.deleteglobal', 'usermacro.get',
+						'usermacro.update', 'usermacro.updateglobal', 'valuemap.create', 'valuemap.delete',
+						'valuemap.get', 'valuemap.update'
 					]
 				]
 			]
@@ -1454,7 +1457,7 @@ class testFormUserRoles extends CWebTest {
 					if (is_array($tags)) {
 						if (count($tags) > 3) {
 							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
-									->query('class:icon-wzrd-action')->one()->click();
+									->query('class:icon-wizard-action')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
 							foreach ($tags as $tag) {
 								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")

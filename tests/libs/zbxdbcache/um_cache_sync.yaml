@@ -1,0 +1,165 @@
+---
+test case: Unlocked sync with macro/host template removal
+include:
+  - &include01 um_cache_sync_01.inc.yaml
+  - &include02 um_cache_sync_02.inc.yaml
+  - &include03 um_cache_sync_03.inc.yaml
+  - &include04 um_cache_sync_04.inc.yaml
+  - &include05 um_cache_sync_05.inc.yaml
+  - &include06 um_cache_sync_06.inc.yaml
+  - &include07 um_cache_sync_07.inc.yaml
+  - &include08 um_cache_sync_08.inc.yaml
+  - &include09 um_cache_sync_09.inc.yaml
+  - &include00 um_cache_sync_00.inc.yaml
+in:
+  steps:
+  - config: *include01
+    refs: 1
+  - config: *include02
+    refs: 1
+  - config: *include03
+    refs: 1
+  - config: *include04
+    refs: 1
+  - config: *include05
+    refs: 1
+  - config: *include06
+    refs: 1
+  - config: *include07
+    refs: 1
+  - config: *include08
+    refs: 1
+  - config: *include09
+    refs: 1
+  - config: *include00
+    refs: 1
+out:
+  result: SUCCEED
+---
+test case: Locked sync with macro/host template removal
+include:
+  - &include01 um_cache_sync_01.inc.yaml
+  - &include02 um_cache_sync_02.inc.yaml
+  - &include03 um_cache_sync_03.inc.yaml
+  - &include04 um_cache_sync_04.inc.yaml
+  - &include05 um_cache_sync_05.inc.yaml
+  - &include06 um_cache_sync_06.inc.yaml
+  - &include07 um_cache_sync_07.inc.yaml
+  - &include08 um_cache_sync_08.inc.yaml
+  - &include09 um_cache_sync_09.inc.yaml
+  - &include00 um_cache_sync_00.inc.yaml
+in:
+  steps:
+  - config: *include01
+    refs: 1
+  - config: *include02
+    refs: 2
+  - config: *include03
+    refs: 3
+  - config: *include04
+    refs: 1
+  - config: *include05
+    refs: 2
+  - config: *include06
+    refs: 3
+  - config: *include07
+    refs: 1
+  - config: *include08
+    refs: 2
+  - config: *include09
+    refs: 3
+  - config: *include00
+    refs: 1
+out:
+  result: SUCCEED
+---
+test case: Unlocked sync with macro/host template addition
+include:
+  - &include01 um_cache_sync_09.inc.yaml
+  - &include02 um_cache_sync_08.inc.yaml
+  - &include03 um_cache_sync_07.inc.yaml
+  - &include04 um_cache_sync_06.inc.yaml
+  - &include05 um_cache_sync_05.inc.yaml
+  - &include06 um_cache_sync_04.inc.yaml
+  - &include07 um_cache_sync_03.inc.yaml
+  - &include08 um_cache_sync_02.inc.yaml
+  - &include09 um_cache_sync_01.inc.yaml
+  - &include00 um_cache_sync_00.inc.yaml
+in:
+  steps:
+  - config: *include01
+    refs: 1
+  - config: *include02
+    refs: 1
+  - config: *include03
+    refs: 1
+  - config: *include04
+    refs: 1
+  - config: *include05
+    refs: 1
+  - config: *include06
+    refs: 1
+  - config: *include07
+    refs: 1
+  - config: *include08
+    refs: 1
+  - config: *include09
+    refs: 1
+  - config: *include00
+    refs: 1
+out:
+  result: SUCCEED
+---
+test case: Locked sync with macro/host template addition
+include:
+  - &include01 um_cache_sync_09.inc.yaml
+  - &include02 um_cache_sync_08.inc.yaml
+  - &include03 um_cache_sync_07.inc.yaml
+  - &include04 um_cache_sync_06.inc.yaml
+  - &include05 um_cache_sync_05.inc.yaml
+  - &include06 um_cache_sync_04.inc.yaml
+  - &include07 um_cache_sync_03.inc.yaml
+  - &include08 um_cache_sync_02.inc.yaml
+  - &include09 um_cache_sync_01.inc.yaml
+  - &include00 um_cache_sync_00.inc.yaml
+in:
+  steps:
+  - config: *include01
+    refs: 1
+  - config: *include02
+    refs: 2
+  - config: *include03
+    refs: 3
+  - config: *include04
+    refs: 1
+  - config: *include05
+    refs: 2
+  - config: *include06
+    refs: 3
+  - config: *include07
+    refs: 1
+  - config: *include08
+    refs: 2
+  - config: *include09
+    refs: 3
+  - config: *include00
+    refs: 1
+out:
+  result: SUCCEED
+---
+test case: Global macro update
+include:
+  - &include01 um_cache_sync_09.inc.yaml
+  - &include02 um_cache_sync_10.inc.yaml
+  - &include00 um_cache_sync_00.inc.yaml
+in:
+  steps:
+  - config: *include01
+    refs: 1
+  - config: *include02
+    refs: 1
+  - config: *include00
+    refs: 1
+out:
+  result: SUCCEED
+...

@@ -160,7 +160,7 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs);
 int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req);
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
 void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset);
-void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data);
+void	*zbx_hashset_search(const zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data);
 
@@ -177,6 +177,7 @@ zbx_hashset_iter_t;
 void	zbx_hashset_iter_reset(zbx_hashset_t *hs, zbx_hashset_iter_t *iter);
 void	*zbx_hashset_iter_next(zbx_hashset_iter_t *iter);
 void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter);
+void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size);
 
 /* hashmap */
 
@@ -625,19 +626,6 @@ void	zbx_udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_ui
 void	zbx_umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor);
 
 unsigned int	zbx_isqrt32(unsigned int value);
-
-/* expression evaluation */
-
-#define ZBX_INFINITY	(1.0 / 0.0)	/* "Positive infinity" value used as a fatal error code */
-#define ZBX_UNKNOWN	(-1.0 / 0.0)	/* "Negative infinity" value used as a code for "Unknown" */
-
-#define ZBX_UNKNOWN_STR		"ZBX_UNKNOWN"	/* textual representation of ZBX_UNKNOWN */
-#define ZBX_UNKNOWN_STR_LEN	ZBX_CONST_STRLEN(ZBX_UNKNOWN_STR)
-
-int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_error_len,
-		zbx_vector_ptr_t *unknown_msgs);
-int	zbx_evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
-double	zbx_evaluate_string_to_double(const char *in);
 
 /* forecasting */
 

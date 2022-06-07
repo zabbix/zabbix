@@ -38,8 +38,8 @@ import (
 	"sync"
 	"time"
 
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/procfs"
 )
 
@@ -145,31 +145,35 @@ type procInfo struct {
 
 type procStatus struct {
 	Pid           uint64  `json:"pid"`
-	Ppid          int64  `json:"ppid"`
-	Tgid          int64  `json:"-"`
+	Ppid          int64   `json:"ppid"`
+	Tgid          int64   `json:"-"`
 	Name          string  `json:"name"`
 	ThreadName    string  `json:"-"`
 	Cmdline       string  `json:"cmdline"`
-	Vsize         int64  `json:"vsize"`
+	User          string  `json:"user"`
+	Group         string  `json:"group"`
+	UserID        int64   `json:"uid"`
+	GroupID       int64   `json:"gid"`
+	Vsize         int64   `json:"vsize"`
 	Pmem          float64 `json:"pmem"`
-	Rss           int64  `json:"rss"`
-	Data          int64  `json:"data"`
-	Exe           int64  `json:"exe"`
-	Hwm           int64  `json:"hwm"`
-	Lck           int64  `json:"lck"`
-	Lib           int64  `json:"lib"`
-	Peak          int64  `json:"peak"`
-	Pin           int64  `json:"pin"`
-	Pte           int64  `json:"pte"`
-	Size          int64  `json:"size"`
-	Stk           int64  `json:"stk"`
-	Swap          int64  `json:"swap"`
+	Rss           int64   `json:"rss"`
+	Data          int64   `json:"data"`
+	Exe           int64   `json:"exe"`
+	Hwm           int64   `json:"hwm"`
+	Lck           int64   `json:"lck"`
+	Lib           int64   `json:"lib"`
+	Peak          int64   `json:"peak"`
+	Pin           int64   `json:"pin"`
+	Pte           int64   `json:"pte"`
+	Size          int64   `json:"size"`
+	Stk           int64   `json:"stk"`
+	Swap          int64   `json:"swap"`
 	CpuTimeUser   float64 `json:"cputime_user"`
 	CpuTimeSystem float64 `json:"cputime_system"`
 	State         string  `json:"state"`
-	CtxSwitches   int64  `json:"ctx_switches"`
-	Threads       int64  `json:"threads"`
-	PageFaults    int64  `json:"page_faults"`
+	CtxSwitches   int64   `json:"ctx_switches"`
+	Threads       int64   `json:"threads"`
+	PageFaults    int64   `json:"page_faults"`
 }
 
 type procSummary struct {
@@ -198,6 +202,10 @@ type thread struct {
 	Pid           int64   `json:"pid"`
 	Ppid          int64   `json:"ppid"`
 	Name          string  `json:"name"`
+	User          string  `json:"user"`
+	Group         string  `json:"group"`
+	UserID        int64   `json:"uid"`
+	GroupID       int64   `json:"gid"`
 	Tid           uint64  `json:"tid"`
 	ThreadName    string  `json:"tname"`
 	CpuTimeUser   float64 `json:"cputime_user"`
@@ -764,7 +772,6 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 
 func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	var name, userName, cmdline, mode string
-	var uid uint64
 	switch len(params) {
 	case 4:
 		mode = params[3]
@@ -783,10 +790,8 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	case 2:
 		userName = params[1]
 		if userName != "" {
-			if u, err := user.Lookup(userName); err != nil {
+			if _, err := user.Lookup(userName); err != nil {
 				return "[]", nil
-			} else {
-				uid, err = strconv.ParseUint(u.Uid, 10, 64)
 			}
 		}
 		fallthrough
@@ -823,15 +828,11 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			getProcessCalculatedMetrics(pid, &data)
 			getProcessCpuTimes(pid, &data)
 
-			processUserID, err := getProcessUserID(pid)
-			if err != nil {
-				continue
-			}
+			pi := procInfo{int64(data.Pid), data.Name, 0, "", data.Name, ""}
+			setProcessUserInfo(pid, &data)
+			pi.userid = data.UserID
+			pi.cmdline = data.Cmdline
 
-			pi := procInfo{int64(data.Pid), data.Name, processUserID, "", data.Name, ""}
-			if mode != "summary" {
-				pi.cmdline = data.Cmdline
-			}
 			if query.match(&pi) {
 				array = append(array, data)
 			}
@@ -854,11 +855,14 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			getProcessCalculatedMetrics(tid, &data)
 			getProcessCpuTimes(procPath, &data)
 
-			pi := procInfo{int64(data.Pid), data.Name, int64(uid), data.Cmdline, data.Name, ""}
+			setProcessUserInfo(tid, &data)
+
+			pi := procInfo{int64(data.Pid), data.Name, data.UserID, data.Cmdline, data.Name, ""}
 			if query.match(&pi) {
-				threadArray = append(threadArray, thread{data.Tgid, data.Ppid, data.Name, data.Pid,
-					data.ThreadName, data.CpuTimeUser, data.CpuTimeSystem, data.State, data.CtxSwitches,
-					data.PageFaults})
+				threadArray = append(threadArray, thread{data.Tgid, data.Ppid,
+					data.Name, data.User, data.Group, data.UserID, data.GroupID,
+					data.Pid, data.ThreadName, data.CpuTimeUser, data.CpuTimeSystem,
+					data.State, data.CtxSwitches, data.PageFaults})
 				}
 			}
 		}
@@ -920,6 +924,38 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	}
 
 	return string(jsonArray), nil
+}
+
+func setProcessUserInfo(pid string, ps *procStatus) {
+	pu, err := getProcessUserInfo(pid)
+	if err != nil {
+		ps.UserID = -1
+		ps.GroupID = -1
+		ps.User = "-1"
+		ps.Group = "-1"
+
+		return
+	}
+
+	ps.UserID = pu.uid
+	ps.GroupID = pu.gid
+
+	uStr := strconv.FormatInt(pu.uid, 10)
+	gStr := strconv.FormatInt(pu.gid, 10)
+
+	u, err := user.LookupId(uStr)
+	if err == nil {
+		ps.User = u.Username
+	} else {
+		ps.User = uStr
+	}
+
+	g, err := user.LookupGroupId(gStr)
+	if err == nil {
+		ps.Group = g.Name
+	} else {
+		ps.Group = gStr
+	}
 }
 
 func getMax(a, b float64) float64 {

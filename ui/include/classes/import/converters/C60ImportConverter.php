@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -34,6 +34,79 @@ class C60ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '6.2';
 
+		if (array_key_exists('groups', $data['zabbix_export'])) {
+			$data['zabbix_export'] = self::convertGroups($data['zabbix_export']);
+		}
+
 		return $data;
+	}
+
+	/**
+	 * Convert groups.
+	 *
+	 * @param array $zabbix_export
+	 *
+	 * @return array
+	 */
+	private static function convertGroups(array $zabbix_export): array {
+		$template_groups = [];
+		$host_groups = [];
+
+		if (array_key_exists('templates', $zabbix_export)) {
+			foreach ($zabbix_export['templates'] as $template) {
+				foreach ($template['groups'] as $group) {
+					$template_groups[] = $group['name'];
+				}
+
+				if (array_key_exists('discovery_rules', $template)) {
+					foreach ($template['discovery_rules'] as $discovery_rule) {
+						if (array_key_exists('host_prototypes', $discovery_rule)) {
+							foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
+								if (array_key_exists('group_links', $host_prototype)) {
+									foreach ($host_prototype['group_links'] as $group_link) {
+										$host_groups[] = $group_link['group']['name'];
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (array_key_exists('hosts', $zabbix_export)) {
+			foreach ($zabbix_export['hosts'] as $host) {
+				foreach ($host['groups'] as $group) {
+					$host_groups[] = $group['name'];
+				}
+
+				if (array_key_exists('discovery_rules', $host)) {
+					foreach ($host['discovery_rules'] as $discovery_rule) {
+						if (array_key_exists('host_prototypes', $discovery_rule)) {
+							foreach ($discovery_rule['host_prototypes'] as $host_prototype) {
+								if (array_key_exists('group_links', $host_prototype)) {
+									foreach ($host_prototype['group_links'] as $group_link) {
+										$host_groups[] = $group_link['group']['name'];
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		foreach ($zabbix_export['groups'] as $group) {
+			if (in_array($group['name'], $host_groups) || !in_array($group['name'], $template_groups)) {
+				$zabbix_export['host_groups'][] = $group;
+			}
+			if (in_array($group['name'], $template_groups)) {
+				$zabbix_export['template_groups'][] = $group;
+			}
+		}
+
+		unset($zabbix_export['groups']);
+
+		return $zabbix_export;
 	}
 }
