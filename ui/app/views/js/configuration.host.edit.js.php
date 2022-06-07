@@ -73,7 +73,7 @@
 			const url = new Curl('', false);
 			url.setArgument('clone', 1);
 
-			const fields = host_edit.preprocessFormFields(getFormFields(this.form));
+			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
 			delete fields.sid;
 
 			post(url.getUrl(), fields);
@@ -83,7 +83,7 @@
 			const url = new Curl('', false);
 			url.setArgument('full_clone', 1);
 
-			const fields = host_edit.preprocessFormFields(getFormFields(this.form));
+			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
 			delete fields.sid;
 
 			post(url.getUrl(), fields);
