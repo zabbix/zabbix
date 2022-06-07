@@ -1696,6 +1696,7 @@ form.dashboard-grid-widget-svggraph .drag-icon {
   position: absolute;
   left: -14px; }
 form.dashboard-grid-widget-svggraph .td-drag-icon .drag-icon {
+  top: 0;
   left: 9px;
   margin-right: 5px; }
 form.dashboard-grid-widget-svggraph .dataset-actions {

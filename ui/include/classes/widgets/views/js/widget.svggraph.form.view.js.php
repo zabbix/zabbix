@@ -156,7 +156,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	_selectItems() {
-		const overlay = PopUp("popup.generic", {
+		PopUp("popup.generic", {
 			srctbl: 'items',
 			srcfld1: 'itemid',
 			srcfld2: 'name',
@@ -166,9 +166,6 @@ window.widget_svggraph_form = new class {
 			multiselect: 1,
 			with_webitems: 1,
 			real_hosts: 1
-		});
-		overlay.$dialogue[0].addEventListener('overlay.submit', (e) => {
-			console.log(e.detail);
 		});
 	}
 
@@ -573,29 +570,32 @@ window.widget_svggraph_form = new class {
 	}
 
 	rewriteNameLinks() {
-		[...document.querySelectorAll('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>[data-set]')].map((elem) => {
-			const dataset_number = elem.dataset.set;
-			const size = jQuery('.single-item-table-row', jQuery(elem)).length + 1;
+		[...document.querySelectorAll('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>[data-set]')].map((element) => {
+			const dataset_number = element.dataset.set;
+			const size = jQuery('.single-item-table-row', jQuery(element)).length + 1;
 
 			for (let i = 0; i < size; i++) {
-				const parameters = {
-					srctbl: "items",
-					srcfld1: 'itemid',
-					srcfld2: 'name',
-					dstfrm: widget_svggraph_form.form_id,
-					dstfld1: `items_${dataset_number}_${i}_input`,
-					dstfld2: `items_${dataset_number}_${i}_name`,
-					numeric: 1,
-					writeonly: 1,
-					multiselect: 1,
-					with_webitems: 1,
-					real_hosts: 1
-				};
+				$('#items_' + dataset_number + '_' + i + '_name').off('click').on('click', () => {
+					let ids = [];
+					for (let i = 0; i < size; i++) {
+						ids.push($('#items_' + dataset_number + '_' + i + '_input').val());
+					}
 
-				$('#items_' + dataset_number + '_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
-					JSON.stringify(parameters) + ',' +
-					'{dialogue_class: "modal-popup-generic"});'
-				);
+					PopUp("popup.generic", {
+						srctbl: "items",
+						srcfld1: 'itemid',
+						srcfld2: 'name',
+						dstfrm: widget_svggraph_form.form_id,
+						dstfld1: `items_${dataset_number}_${i}_input`,
+						dstfld2: `items_${dataset_number}_${i}_name`,
+						numeric: 1,
+						writeonly: 1,
+						with_webitems: 1,
+						real_hosts: 1,
+						dialogue_class: "modal-popup-generic",
+						excludeids: ids
+					});
+				});
 			}
 		});
 	}
@@ -803,8 +803,8 @@ window.addPopupValues = (list) => {
 		}));
 		jQuery(`#items_${dataset_number}_${size}_color`).val(colorPalette.getNextColor());
 		jQuery(`#items_${dataset_number}_${size}_color`).colorpicker();
-
-		widget_svggraph_form.rewriteNameLinks();
-		widget_svggraph_form.initSingleItemSortable();
 	}
+
+	widget_svggraph_form.rewriteNameLinks();
+	widget_svggraph_form.initSingleItemSortable();
 }
