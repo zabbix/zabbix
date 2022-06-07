@@ -29,6 +29,7 @@ require_once __DIR__.'/../include/CAPITest.php';
 class testTaskCreate extends CAPITest {
 
 	private static $data = [
+		'templategroupid' => null,
 		'hostgroupid' => null,
 		'hostids' => [
 			'monitored' => null,
@@ -43,6 +44,15 @@ class testTaskCreate extends CAPITest {
 	private static $clear_taskids = [];
 
 	public function prepareItemsData() {
+		// Create template group.
+		$templategroups = CDataHelper::call('templategroup.create', [
+			[
+				'name' => 'API test task.create'
+			]
+		]);
+		$this->assertArrayHasKey('groupids', $templategroups);
+		self::$data['templategroupid'] = $templategroups['groupids'][0];
+
 		// Create host group.
 		$hostgroups = CDataHelper::call('hostgroup.create', [
 			[
@@ -113,7 +123,7 @@ class testTaskCreate extends CAPITest {
 			'name' => 'API test task.create template',
 			'groups' => [
 				[
-					'groupid' => self::$data['hostgroupid']
+					'groupid' => self::$data['templategroupid']
 				]
 			]
 		]];
@@ -1371,6 +1381,11 @@ class testTaskCreate extends CAPITest {
 		// Delete host group.
 		CDataHelper::call('hostgroup.delete', [
 			self::$data['hostgroupid']
+		]);
+
+		// Delete template group.
+		CDataHelper::call('templategroup.delete', [
+			self::$data['templategroupid']
 		]);
 
 		// Once items are deleted, tasks for those items are also deleted. However diangonstic info task remain.

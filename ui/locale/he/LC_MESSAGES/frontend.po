@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-05-27 06:31+0000\n"
+"PO-Revision-Date: 2022-06-01 07:44+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -5860,7 +5860,7 @@ msgstr "גילוי מאגרי נתונים של hypervisor VMWare,‏ <url> - כ
 
 #: include/classes/data/CItemData.php:1379
 msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
-msgstr ""
+msgstr "גילוי כרטיסי רשת של hypervisor VMWare,‏ <url> - כתובת שירות VMware,‏ <uuid> - ה־VMware hypervisor. מחזירה JSON"
 
 #: include/classes/data/CItemData.php:1306
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
@@ -10253,7 +10253,7 @@ msgstr "מצב מאגר"
 
 #: include/classes/helpers/CRoleHelper.php:480
 msgid "Invoke \"Execute now\" on read-only hosts"
-msgstr ""
+msgstr "הרצת „הפעלה כעת” על מארחים לקריאה בלבד"
 
 #: app/views/administration.user.list.php:112
 msgid "Is online?"
@@ -11011,6 +11011,10 @@ msgstr "הרשימה ריקה"
 msgid "List of OS processes with attributes. Returns JSON array"
 msgstr "רשימת תהליכי מערכת הפעלה עם מאפיינים. מחזיר מערך JSON"
 
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "רשימה של התקני אחסון והסוג שלהם. מחזירה JSON"
@@ -11674,7 +11678,7 @@ msgstr "מגבלת זיכרון: %1$s"
 
 #: include/classes/data/CItemData.php:1433
 msgid "Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory"
-msgstr ""
+msgstr "מדדי הזיכרון של מאגר המשאבים של VMware,‏ <url> - כתובת שירות ה־VMware,‏ <rpid> - מזהה מאגר משאבים של WMware,‏ <mode> - זיכרון נצרך(ברירת מחדל)/מנופח/תקורה"
 
 #: include/classes/data/CItemData.php:1210
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -13088,6 +13092,10 @@ msgstr "מספר הפריטים במסד הנתונים של Zabbix."
 #: include/classes/data/CItemData.php:1654
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "מספר הפריטים בהיסטוריה של המתווך שלא נשלחו עדיין לשרת"
+
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -18147,32 +18155,32 @@ msgstr "ההקפצה „%1$s” לא יכולה להסתמך על ההקפצה �
 #: include/classes/api/services/CTriggerGeneral.php:2679
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” מהמארח „%3$s”, כיוון שתלויות בהקפצות מתבנית צאצאית או מארח אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2678
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” מהתבנית „%3$s”, כיוון שתלויות בהקפצות מתבנית צאצאית או מארח אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2572
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” מהתבנית „%3$s”, כיוון שתלויות בהקפצות מתבנית הורה אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” כיוון שתיווצר קישוריות מעגלית (%3$s) למארח „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2300
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” כיוון שתיווצר קישוריות מעגלית (%3$s) לתבנית „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2316
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” כיוון שתיווצר קישוריות מעגלית (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2423
 #, c-format
@@ -18294,7 +18302,7 @@ msgstr "אבטיפוס ההקפצה „%1$s” שייך לתבניות עם קי
 #: include/classes/api/services/CDiscoveryRule.php:916
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להסתמך על ההקפצה „%2$s” שאינה קיימת, במארח „%3$s”."
 
 #: include/classes/api/services/CDiscoveryRule.php:915
 #, c-format
@@ -18304,17 +18312,17 @@ msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להסתמך על �
 #: include/classes/api/services/CTriggerGeneral.php:2684
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי בהקפצה „%2$s” מהמארח „%3$s”, כיוון שתלויות בהקפצות מתבנית צאצאית או מארח אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2683
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלויה בהקפצה „%2$s” מהתבנית „%3$s”, כיוון שתלויות בהקפצות מתבנית צאצאית או מארח אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2573
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי בהקפצה „%2$s” מהתבנית „%3$s”, כיוון שתלויות בהקפצות מתבנית הורה אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2424
 #, c-format
@@ -18339,12 +18347,12 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:2301
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי באבטיפוס ההקפצה „%2$s” כיוון שתיווצר קישוריות מעגלית (%3$s) לתבנית „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2317
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי באבטיפוס ההקפצה „%2$s”, כיוון שתיווצר קישוריות מעגלית (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:1325
 #, c-format
@@ -19579,7 +19587,7 @@ msgstr "גודל זיכרון דחוס של מכונה וירטואלית ב־VM
 
 #: include/classes/data/CItemData.php:1431
 msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
-msgstr ""
+msgstr "ערך של מאפיין מותאם אישית של מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות VMware,‏ <uuid> - שם מארח המכונה הווירטואלית ב־VMware,‏ <name> - שם מאפיין מותאם אישית"
 
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
@@ -19663,7 +19671,7 @@ msgstr "גודל זיכרון החלפה במכונה וירטואלית של VM
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
-msgstr ""
+msgstr "מצב כלי מכונה וירטואלית ב־VMware,‏ <url> - כתובת שירות ה־VMware,‏ <uuid> - מכונה וירטואלית ב־VMware,‏ <mode> - גרסה או מצב"
 
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -19792,6 +19800,10 @@ msgstr "סטטיסטיקת זכרון המטמון של הערכים. המשתנ
 #: include/classes/helpers/CCookieHelper.php:75
 msgid "Value cannot be empty."
 msgstr "הערך לא יכול להיות ריק."
+
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"

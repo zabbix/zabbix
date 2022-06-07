@@ -560,7 +560,6 @@ if (!$readonly) {
 				dstfld2: "master_itemname",
 				only_hostid: this.dataset.hostid,
 				excludeids: [this.dataset.itemid],
-				with_webitems: 1,
 				normal_only: 1
 			}, {dialogue_class: "modal-popup-generic"});
 		');

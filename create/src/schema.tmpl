@@ -98,10 +98,10 @@ INDEX		|5		|maintenanceid
 TABLE|hstgrp|groupid|ZBX_DATA
 FIELD		|groupid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|internal	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
-INDEX		|1		|name
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+UNIQUE		|1		|type,name
 
 TABLE|group_prototype|group_prototypeid|ZBX_TEMPLATE
 FIELD		|group_prototypeid|t_id		|	|NOT NULL	|0
@@ -1654,7 +1654,6 @@ FIELD		|hosttagid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|automatic	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|hostid
 
 TABLE|config_autoreg_tls|autoreg_tlsid|ZBX_DATA
@@ -1933,7 +1932,7 @@ FIELD		|operator		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value			|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1			|slaid
 
-TABLE|host_rtdata|hostid|0
+TABLE|host_rtdata|hostid|ZBX_TEMPLATE
 FIELD		|hostid			|t_id		|	|NOT NULL	|0	|1|hosts|hostid
 FIELD		|active_available	|t_integer	|'0'	|NOT NULL	|0
 
@@ -1954,4 +1953,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6010030	|6010030
+ROW		|1		|6010038	|6010038

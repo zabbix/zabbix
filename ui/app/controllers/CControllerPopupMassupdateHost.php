@@ -135,7 +135,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				];
 
 				if (array_key_exists('groups', $visible)) {
-					$options['selectGroups'] = ['groupid'];
+					$options['selectHostGroups'] = ['groupid'];
 				}
 
 				if (array_key_exists('templates', $visible)
@@ -239,7 +239,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				foreach ($hosts as &$host) {
 					if (array_key_exists('groups', $visible)) {
 						if ($new_groupids && $mass_update_groups == ZBX_ACTION_ADD) {
-							$current_groupids = array_column($host['groups'], 'groupid');
+							$current_groupids = array_column($host['hostgroups'], 'groupid');
 							$host['groups'] = zbx_toObject(array_unique(array_merge($current_groupids, $new_groupids)),
 								'groupid'
 							);
@@ -248,9 +248,10 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 							$host['groups'] = zbx_toObject($new_groupids, 'groupid');
 						}
 						elseif ($remove_groupids) {
-							$current_groupids = array_column($host['groups'], 'groupid');
+							$current_groupids = array_column($host['hostgroups'], 'groupid');
 							$host['groups'] = zbx_toObject(array_diff($current_groupids, $remove_groupids), 'groupid');
 						}
+						unset($host['hostgroups']);
 					}
 
 					if (array_key_exists('templates', $visible)) {

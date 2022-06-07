@@ -17,4 +17,5 @@ libzbxdbcache_a_SOURCES = \
 
 libzbxdbcache_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \
+	$(TLS_CFLAGS) \
 	$(TEST_FLAGS)

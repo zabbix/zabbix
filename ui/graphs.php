@@ -35,7 +35,9 @@ $fields = [
 	'parent_discoveryid' =>	[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'copy_type' =>			[T_ZBX_INT, O_OPT, P_SYS,
-								IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+								IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
+									COPY_TYPE_TO_TEMPLATE
+								]),
 								'isset({copy})'
 							],
 	'copy_mode' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null],
@@ -347,29 +349,11 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 			'templated_hosts' => true
 		];
 
-		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
 			$options['hostids'] = getRequest('copy_targetids');
 		}
-		// host groups
 		else {
-			$groupids = getRequest('copy_targetids');
-			zbx_value2array($groupids);
-
-			$dbGroups = API::HostGroup()->get([
-				'output' => ['groupid'],
-				'groupids' => $groupids,
-				'editable' => true
-			]);
-			$dbGroups = zbx_toHash($dbGroups, 'groupid');
-
-			foreach ($groupids as $groupid) {
-				if (!isset($dbGroups[$groupid])) {
-					access_deny();
-				}
-			}
-
-			$options['groupids'] = $groupids;
+			$options['groupids'] = getRequest('copy_targetids');
 		}
 
 		$dbHosts = API::Host()->get($options);
@@ -430,51 +414,32 @@ elseif (hasRequest('filter_rst')) {
 /*
  * Display
  */
-if (hasRequest('parent_discoveryid')) {
-	// Argument parent_discoveryid is considered as alternative filter.
-	$filter = [
-		'groups' => null,
-		'hosts' => null
-	];
-}
-else {
-	$filter = [
-		'groups' => CProfile::getArray($prefix.'graphs.filter_groupids', null),
-		'hosts' => CProfile::getArray($prefix.'graphs.filter_hostids', null)
-	];
-}
+$filter_groupids = hasRequest('parent_discoveryid') ? [] : CProfile::getArray($prefix.'graphs.filter_groupids', []);
+$filter_hostids = hasRequest('parent_discoveryid') ? [] : CProfile::getArray($prefix.'graphs.filter_hostids', []);
 
-// Get host groups.
-$filter['groups'] = $filter['groups']
-	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groups'],
-		'editable' => true,
-		'preservekeys' => true
-	]), ['groupid' => 'id'])
-	: [];
+$filter = [
+	'groups' => [],
+	'hosts' => []
+];
 
-$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
-if ($filter_groupids) {
-	$filter_groupids = getSubGroups($filter_groupids);
-}
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
 
 // Get hosts.
 if (getRequest('context') === 'host') {
-	$filter['hosts'] = $filter['hosts']
+	$filter['hosts'] = $filter_hostids
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
-			'hostids' => $filter['hosts'],
+			'hostids' => $filter_hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['hostid' => 'id'])
 		: [];
 }
 else {
-	$filter['hosts'] = $filter['hosts']
+	$filter['hosts'] = $filter_hostids
 		? CArrayHelper::renameObjectsKeys(API::Template()->get([
 			'output' => ['templateid', 'name'],
-			'templateids' => $filter['hosts'],
+			'templateids' => $filter_hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['templateid' => 'id'])
@@ -716,7 +681,7 @@ else {
 	$options = [
 		'output' => ['graphid', 'name', 'graphtype'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
-		'groupids' => $filter_groupids,
+		'groupids' => $filter_groupids ? $filter_groupids : null,
 		'discoveryids' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
 		'templated' => ($data['context'] === 'template'),
 		'editable' => true,

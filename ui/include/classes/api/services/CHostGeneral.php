@@ -35,7 +35,7 @@ abstract class CHostGeneral extends CHostBase {
 	];
 
 	/**
-	 * Check for valid host groups.
+	 * Check for valid host groups and template groups.
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
@@ -71,7 +71,8 @@ abstract class CHostGeneral extends CHostBase {
 			return;
 		}
 
-		$count = API::HostGroup()->get([
+		$entity = $this instanceof CTemplate ? API::TemplateGroup() : API::HostGroup();
+		$count = $entity->get([
 			'countOutput' => true,
 			'groupids' => array_keys($edit_groupids),
 			'editable' => true
@@ -1373,16 +1374,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		$hostids = array_keys($result);
 
-		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
-			$groups = API::HostGroup()->get([
-				'output' => $options['selectGroups'],
-				'groupids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $groups, 'groups');
-		}
-
+		// Add templates.
 		if ($options['selectParentTemplates'] !== null) {
 			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
 				$templates = [];
@@ -1732,7 +1724,7 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Add the existing host groups, templates, tags, macros.
+	 * Add the existing host or template groups, templates, tags, macros.
 	 *
 	 * @param array $hosts
 	 * @param array $db_hosts
@@ -1765,11 +1757,20 @@ abstract class CHostGeneral extends CHostBase {
 		$filter = ['hostid' => $hostids];
 
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-			$db_groups = API::HostGroup()->get([
-				'output' => [],
-				$id_field_name.'s' => $hostids,
-				'preservekeys' => true
-			]);
+			if ($this instanceof CTemplate) {
+				$db_groups = API::TemplateGroup()->get([
+					'output' => [],
+					'templateids' => $hostids,
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$db_groups = API::HostGroup()->get([
+					'output' => [],
+					'hostids' => $hostids,
+					'preservekeys' => true
+				]);
+			}
 
 			$filter += ['groupid' => array_keys($db_groups)];
 		}
@@ -1808,11 +1809,20 @@ abstract class CHostGeneral extends CHostBase {
 				$filter += ['groupid' => $objectids];
 			}
 			elseif (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$db_groups = API::HostGroup()->get([
-					'output' => [],
-					$id_field_name.'s' => array_keys($db_hosts),
-					'preservekeys' => true
-				]);
+				if ($this instanceof CTemplate) {
+					$db_groups = API::TemplateGroup()->get([
+						'output' => [],
+						'templateids' => array_keys($db_hosts),
+						'preservekeys' => true
+					]);
+				}
+				else {
+					$db_groups = API::HostGroup()->get([
+						'output' => [],
+						'hostids' => array_keys($db_hosts),
+						'preservekeys' => true
+					]);
+				}
 
 				$filter += ['groupid' => array_keys($db_groups)];
 			}

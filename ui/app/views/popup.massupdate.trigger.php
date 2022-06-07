@@ -94,9 +94,46 @@ $dependencies_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('Name'), (new CColHeader(_('Action')))->setWidth(50)]);
 
-$bttn_prototype = '';
+$normal_only = $data['prototype'] ? ['normal_only' => 1] : [];
+
+if ($data['context'] === 'host') {
+	$buttons[] = (new CButton('add_dep_trigger', _('Add')))
+		->onClick('
+			PopUp("popup.generic", '.json_encode([
+				'srctbl' => 'triggers',
+				'srcfld1' => 'triggerid',
+				'dstfrm' => 'massupdate',
+				'dstfld1' => 'new_dependency',
+				'dstact' => 'add_dependency',
+				'reference' => 'deptrigger',
+				'objname' => 'triggers',
+				'multiselect' => 1,
+				'with_triggers' => 1,
+				'real_hosts' => 1
+			] + $normal_only).', {dialogue_class: "modal-popup-generic"});
+		')
+		->addClass(ZBX_STYLE_BTN_LINK);
+}
+else {
+	$buttons[] = (new CButton('add_dep_trigger', _('Add')))
+		->onClick('
+			PopUp("popup.generic", '.json_encode([
+				'srctbl' => 'template_triggers',
+				'srcfld1' => 'triggerid',
+				'dstfrm' => 'massupdate',
+				'dstfld1' => 'new_dependency',
+				'dstact' => 'add_dependency',
+				'reference' => 'deptrigger',
+				'objname' => 'triggers',
+				'multiselect' => 1,
+				'with_triggers' => 1
+			]).', {dialogue_class: "modal-popup-generic"});
+		')
+		->addClass(ZBX_STYLE_BTN_LINK);
+}
+
 if ($data['prototype']) {
-	$bttn_prototype = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
+	$buttons[] = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
 		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 		->onClick('
 			PopUp("popup.generic", {
@@ -106,10 +143,29 @@ if ($data['prototype']) {
 				dstfld1: "new_dependency",
 				dstact: "add_dependency",
 				reference: "deptrigger_prototype",
-				multiselect: 1,
 				objname: "triggers",
-				parent_discoveryid: this.dataset.parent_discoveryid
+				parent_discoveryid: this.dataset.parent_discoveryid,
+				multiselect: 1
 			}, {dialogue_class: "modal-popup-generic"});
+		')
+		->addClass(ZBX_STYLE_BTN_LINK);
+}
+
+if ($data['context'] === 'template') {
+	$buttons[] = (new CButton('add_dep_host_trigger', _('Add host trigger')))
+		->onClick('
+			PopUp("popup.generic", '.json_encode([
+				'srctbl' => 'triggers',
+				'srcfld1' => 'triggerid',
+				'dstfrm' => 'massupdate',
+				'dstfld1' => 'new_dependency',
+				'dstact' => 'add_dependency',
+				'reference' => 'deptrigger',
+				'objname' => 'triggers',
+				'multiselect' => 1,
+				'with_triggers' => 1,
+				'real_hosts' => 1
+			] + $normal_only).', {dialogue_class: "modal-popup-generic"});
 		')
 		->addClass(ZBX_STYLE_BTN_LINK);
 }
@@ -117,28 +173,7 @@ if ($data['prototype']) {
 $dependencies_form_list->addRow(
 	(new CVisibilityBox('visible[dependencies]', 'dependencies-div', _('Original')))
 		->setLabel(_('Replace dependencies')),
-	(new CDiv([
-		$dependencies_table,
-		new CHorList([
-			(new CButton('btn1', _('Add')))
-				->onClick(
-					'return PopUp("popup.generic", '.json_encode([
-						'srctbl' => 'triggers',
-						'srcfld1' => 'triggerid',
-						'dstfrm' => 'massupdate',
-						'dstfld1' => 'new_dependency',
-						'dstact' => 'add_dependency',
-						'reference' => 'deptrigger',
-						'objname' => 'triggers',
-						'multiselect' => '1',
-						'with_triggers' => '1',
-						'normal_only' => '1'
-					]).', {dialogue_class: "modal-popup-generic"});'
-				)
-				->addClass(ZBX_STYLE_BTN_LINK),
-			$bttn_prototype
-		])
-	]))->setId('dependencies-div')
+	(new CDiv([$dependencies_table, new CHorList($buttons)]))->setId('dependencies-div')
 );
 
 // Append tabs to the form.

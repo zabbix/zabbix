@@ -346,8 +346,8 @@ elseif (hasRequest('filter_rst')) {
 }
 
 $filter = [
-	'groups' => CProfile::getArray($prefix.'host_discovery.filter.groupids', []),
-	'hosts' => CProfile::getArray($prefix.'host_discovery.filter.hostids', []),
+	'groups' => [],
+	'hosts' => [],
 	'name' => CProfile::get($prefix.'host_discovery.filter.name', ''),
 	'key' => CProfile::get($prefix.'host_discovery.filter.key', ''),
 	'type' => CProfile::get($prefix.'host_discovery.filter.type', -1),
@@ -358,44 +358,37 @@ $filter = [
 	'status' => CProfile::get($prefix.'host_discovery.filter.status', -1)
 ];
 
-$filter_groupids = [];
-$filter_hostids = [];
+$filter_groupids = CProfile::getArray($prefix.'host_discovery.filter.groupids', []);
+$filter_hostids = CProfile::getArray($prefix.'host_discovery.filter.hostids', []);
 
 // Get host groups.
-if ($filter['groups']) {
-	$filter['groups'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groups'],
-		'editable' => true,
-		'preservekeys' => true
-	]), ['groupid' => 'id']);
-
-	$filter_groupids = getSubGroups(array_keys($filter['groups']));
-}
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
 
 // Get hosts.
-if ($filter['hosts']) {
-	if (getRequest('context') === 'host') {
-		$filter['hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
+if (getRequest('context') === 'host') {
+	$filter['hosts'] = $filter_hostids
+		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
-			'hostids' => $filter['hosts'],
+			'hostids' => $filter_hostids,
 			'editable' => true,
 			'preservekeys' => true
-		]), ['hostid' => 'id']);
-	}
-	else {
-		$filter['hosts'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
-			'output' => ['templateid', 'name'],
-			'templateids' => $filter['hosts'],
-			'editable' => true,
-			'preservekeys' => true
-		]), ['templateid' => 'id']);
-	}
-
-	$filter_hostids = array_keys($filter['hosts']);
-
-	sort($filter_hostids);
+		]), ['hostid' => 'id'])
+		: [];
 }
+else {
+	$filter['hosts'] = $filter_hostids
+		? CArrayHelper::renameObjectsKeys(API::Template()->get([
+			'output' => ['templateid', 'name'],
+			'templateids' => $filter_hostids,
+			'editable' => true,
+			'preservekeys' => true
+		]), ['templateid' => 'id'])
+		: [];
+}
+
+$filter_hostids = array_keys($filter['hosts']);
+
+sort($filter_hostids);
 
 $checkbox_hash = crc32(implode('', $filter_hostids));
 

@@ -196,7 +196,7 @@ $host_tab
 		))
 	])
 	->addItem([
-		(new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
+		(new CLabel(_('Host groups'), 'groups__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'groups[]',

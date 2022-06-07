@@ -1439,13 +1439,13 @@ class testScripts extends CAPITest {
 					'result_keys' => ['hosts', 'scriptid']
 				]
 			],
-			// selectGroups test
+			// selectHostGroups test
 			[
 				'params' => [
 					'output' => ['scriptid'],
 					'hostids' => ['90021'],
 					'preservekeys' => true,
-					'selectGroups' => ['groupid']
+					'selectHostGroups' => ['groupid']
 				],
 				'expect' => [
 					'error' => null,
@@ -1453,10 +1453,10 @@ class testScripts extends CAPITest {
 						'90020' => ['90020', '90021', '90022', '90023'],
 						'90021' => ['90021', '90022', '90023']
 					],
-					'result_keys' => ['groups', 'scriptid']
+					'result_keys' => ['hostgroups', 'scriptid']
 				]
 			],
-			// selectGroups test
+			// selectHostGroups test
 			// user has no write permission for group 90021, that group is not shown
 			[
 				'params' => [
@@ -1464,7 +1464,7 @@ class testScripts extends CAPITest {
 					'output' => ['scriptid'],
 					'hostids' => ['90021'],
 					'preservekeys' => true,
-					'selectGroups' => ['groupid']
+					'selectHostGroups' => ['groupid']
 				],
 				'expect' => [
 					'error' => null,
@@ -1476,10 +1476,10 @@ class testScripts extends CAPITest {
 						'90020' => [],
 						'90021' => ['90021']
 					],
-					'result_keys' => ['groups', 'scriptid']
+					'result_keys' => ['hostgroups', 'scriptid']
 				]
 			],
-			// selectGroups test
+			// selectHostGroups test
 			// no extra output is present
 			[
 				'params' => [
@@ -1487,12 +1487,12 @@ class testScripts extends CAPITest {
 					'output' => ['scriptid'],
 					'hostids' => ['90021'],
 					'preservekeys' => true,
-					'selectGroups' => ['flags']
+					'selectHostGroups' => ['flags']
 				],
 				'expect' => [
 					'error' => null,
 					'groupsObjectProperties' => ['flags'],
-					'result_keys' => ['groups', 'scriptid']
+					'result_keys' => ['hostgroups', 'scriptid']
 				]
 			],
 			// Get scripts parameters.
@@ -1605,7 +1605,7 @@ class testScripts extends CAPITest {
 		if (array_key_exists('has.scriptid:groupid', $expect)) {
 			foreach ($expect['has.scriptid:groupid'] as $scriptid => $groupids) {
 				$this->assertTrue(array_key_exists($scriptid, $response['result']), 'expected script id '.$scriptid);
-				$ids = array_column($response['result'][$scriptid]['groups'], 'groupid');
+				$ids = array_column($response['result'][$scriptid]['hostgroups'], 'groupid');
 				$this->assertEmpty(array_diff($groupids, $ids), 'Expected ids: '.implode(',', $groupids));
 			}
 		}
@@ -1613,7 +1613,7 @@ class testScripts extends CAPITest {
 		if (array_key_exists('!has.scriptid:groupid', $expect)) {
 			foreach ($expect['!has.scriptid:groupid'] as $scriptid => $groupids) {
 				$this->assertTrue(array_key_exists($scriptid, $response['result']), 'expected script id '.$scriptid);
-				$ids = array_column($response['result'][$scriptid]['groups'], 'groupid');
+				$ids = array_column($response['result'][$scriptid]['hostgroups'], 'groupid');
 				$this->assertEquals($groupids, array_diff($groupids, $ids));
 			}
 		}
@@ -1621,7 +1621,7 @@ class testScripts extends CAPITest {
 		if (array_key_exists('groupsObjectProperties', $expect)) {
 			sort($expect['groupsObjectProperties']);
 			foreach ($response['result'] as $script) {
-				foreach ($script['groups'] as $group) {
+				foreach ($script['hostgroups'] as $group) {
 					ksort($group);
 					$this->assertEquals($expect['groupsObjectProperties'], array_keys($group));
 				}

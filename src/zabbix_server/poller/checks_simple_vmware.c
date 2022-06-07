@@ -2135,12 +2135,6 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 		datastore = service->data->datastores.values[i];
 	}
 
-	if (NULL == datastore->uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-		goto unlock;
-	}
-
 	switch (direction)
 	{
 		case ZBX_DATASTORE_DIRECTION_READ:
