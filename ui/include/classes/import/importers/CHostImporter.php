@@ -293,7 +293,7 @@ class CHostImporter extends CImporter {
 	 */
 	protected function resolveHostReferences(array $host): array {
 		foreach ($host['groups'] as $index => $group) {
-			$groupid = $this->referencer->findGroupidByName($group['name']);
+			$groupid = $this->referencer->findHostGroupidByName($group['name']);
 
 			if ($groupid === null) {
 				throw new Exception(_s('Group "%1$s" for host "%2$s" does not exist.', $group['name'], $host['host']));

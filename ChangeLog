@@ -1,8 +1,13 @@
 Changes for 6.2.0rc1
 
 New features:
+.........T [ZBXNEXT-7632] added template for HPE Primera (vkhaliev)
+..F....... [ZBXNEXT-7567] implemented saving the state of the default filters in monitoring sections (acikuns)
+.........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
 
 Bug fixes:
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta3
@@ -113,6 +118,17 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.6rc1
+
+New features:
+.........T [ZBXNEXT-7632] added template for HPE Primera (vkhaliev)
+.........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
+
+Bug fixes:
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.5
@@ -2020,6 +2036,14 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.25rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.24
@@ -4520,6 +4544,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.42rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.41

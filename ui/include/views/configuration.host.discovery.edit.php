@@ -519,7 +519,6 @@ $item_tab
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
-						'webitems' => true,
 						'normal_only' => true
 					]
 				]
