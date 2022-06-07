@@ -126,8 +126,8 @@ static void	es_free(void *udata, void *ptr)
  * Parameters: ptr - [IN] pointer to the 3 byte sequence                      *
  *             out - [OUT] the decoded value                                  *
  *                                                                            *
- * Return value: SUCCEED on success                                           *
- *               FAIL on failure                                              *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
  *                                                                            *
  ******************************************************************************/
 static int	utf8_decode_3byte_sequence(const char *ptr, zbx_uint32_t *out)
@@ -141,6 +141,7 @@ static int	utf8_decode_3byte_sequence(const char *ptr, zbx_uint32_t *out)
 		return FAIL;
 
 	*out |= ((unsigned char)*ptr & 0x3F);
+
 	return SUCCEED;
 }
 
@@ -231,9 +232,11 @@ int	es_duktape_string_decode(const char *duk_str, char **out_str)
 		goto fail;
 	}
 	*out = '\0';
+
 	return SUCCEED;
 fail:
 	zbx_free(*out_str);
+
 	return FAIL;
 }
 
