@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-03-03T15:04:54Z</date>
+   <date>2022-06-07T10:40:25Z</date>
    <groups>
       <group>
          <name>Templates/Databases</name>
@@ -1855,7 +1855,7 @@ WHERE a.counter_name='Cache Hit Ratio' AND a.OBJECT_NAME='{$MSSQL.INSTANCE}:Plan
                      <expression>{last()}&lt;10m</expression>
                      <name>MSSQL: Service has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -3002,7 +3002,7 @@ FROM sys.databases</params>
                <username>{$MSSQL.USER}</username>
                <password>{$MSSQL.PASSWORD}</password>
                <filter>
-                  <evaltype>AND_OR</evaltype>
+                  <evaltype>AND</evaltype>
                   <conditions>
                      <condition>
                         <macro>{#JOBNAME}</macro>
