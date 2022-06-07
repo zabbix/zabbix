@@ -71,10 +71,17 @@ window.widget_svggraph_form = new class {
 	_datasetTabInit() {
 		// Initialize vertical accordion.
 		jQuery(this.dataset_wrapper)
-			.on("focus", ".<?= CMultiSelect::ZBX_STYLE_CLASS ?> input.input, .js-click-expend, .color-picker-preview", function() {
-				jQuery("#data_sets").zbx_vertical_accordion("expandNth",
-					jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index()
-				);
+			.on("click", function(e) {
+				if (!e.target.classList.contains('color-picker-preview')) {
+					jQuery.colorpicker("hide")
+				}
+
+				if (e.target.classList.contains('js-click-expend')
+						|| e.target.classList.contains('color-picker-preview')) {
+					jQuery("#data_sets").zbx_vertical_accordion("expandNth",
+						$(e.target).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index()
+					);
+				}
 			})
 			.on("collapse", function(event, data) {
 				jQuery("textarea, .multiselect", data.section).scrollTop(0);
