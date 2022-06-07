@@ -77,7 +77,9 @@ window.widget_svggraph_form = new class {
 				}
 
 				if (e.target.classList.contains('js-click-expend')
-						|| e.target.classList.contains('color-picker-preview')) {
+						|| e.target.classList.contains('color-picker-preview')
+						|| e.target.classList.contains('<?= CMultiSelect::ZBX_STYLE_CLASS ?>')
+						|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
 					jQuery("#data_sets").zbx_vertical_accordion("expandNth",
 						$(e.target).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index()
 					);
@@ -87,7 +89,6 @@ window.widget_svggraph_form = new class {
 				jQuery("textarea, .multiselect", data.section).scrollTop(0);
 				jQuery(window).trigger("resize");
 				const dataset = data.section[0];
-
 
 				if (dataset.dataset.type == '0') {
 					const message_block = dataset.querySelector('.no-items-message');
@@ -113,14 +114,6 @@ window.widget_svggraph_form = new class {
 
 		// Initialize rangeControl UI elements.
 		jQuery(".<?= CRangeControl::ZBX_STYLE_CLASS ?>", jQuery(this.dataset_wrapper)).rangeControl();
-
-		// Expand dataset when click in pattern fields.
-		jQuery(this.dataset_wrapper).on("click", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= CMultiSelect::ZBX_STYLE_CLASS ?>, .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= ZBX_STYLE_BTN_GREY ?>", function(e) {
-			jQuery(this.dataset_wrapper).zbx_vertical_accordion("expandNth",
-				jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index());
-
-			jQuery(e.currentTarget).find("input.input").focus();
-		});
 
 		// Initialize pattern fields.
 		jQuery(".multiselect", jQuery(this.dataset_wrapper)).each(function() {
