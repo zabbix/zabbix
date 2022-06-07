@@ -422,6 +422,9 @@ typedef struct
 
 	/* list of custom queries to monitor */
 	zbx_hashset_t			cust_queries;
+
+	/* linked jobs count */
+	int				jobs_num;
 }
 zbx_vmware_service_t;
 
@@ -434,8 +437,22 @@ typedef struct
 	zbx_vector_ptr_t	services;
 	zbx_hashset_t		strpool;
 	zbx_uint64_t		strpool_sz;
+	zbx_binary_heap_t	jobs_queue;
 }
 zbx_vmware_t;
+
+typedef struct
+{
+	int			nextcheck;
+#define ZBX_VMWARE_UPDATE_CONF		1
+#define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
+#define ZBX_VMWARE_UPDATE_REST_TAGS	3
+#define ZBX_VMWARE_REMOVE_SERVICE	4
+	int			type;
+	int			finished;
+	zbx_vmware_service_t	*service;
+}
+zbx_vmware_job_t;
 
 /* the vmware collector statistics */
 typedef struct
@@ -457,6 +474,12 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 char	*zbx_vmware_get_vm_resourcepool_path(zbx_vector_vmware_resourcepool_t *rp, char *id);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+int	zbx_vmware_service_update(zbx_vmware_service_t *service);
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service);
+void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
+void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
+void	zbx_vmware_job_remove(zbx_vmware_job_t *job);
 
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 
