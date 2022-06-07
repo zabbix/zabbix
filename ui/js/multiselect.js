@@ -487,25 +487,36 @@
 	 * @return {object}
 	 */
 	function getFilterPreselectField($obj, action) {
-		var ms = $obj.data('multiSelect'),
-			preselect_options = ms.options[(action == MS_ACTION_AUTOSUGGEST) ? 'autosuggest' : 'popup'] || null,
-			ret = {};
+		const ms = $obj.data('multiSelect');
+		const preselect_options = ms.options[(action == MS_ACTION_AUTOSUGGEST) ? 'autosuggest' : 'popup'] || null;
+		const ret = {};
 
 		if (!preselect_options) {
 			return ret;
 		}
 
 		if (typeof preselect_options.filter_preselect_fields.hosts !== 'undefined') {
-			var hosts = $('#' + preselect_options.filter_preselect_fields.hosts).multiSelect('getData');
+			const hosts = $('#' + preselect_options.filter_preselect_fields.hosts).multiSelect('getData');
+
 			if (hosts.length != 0) {
 				ret.hostid = hosts[0].id;
 			}
 		}
 
 		if (typeof preselect_options.filter_preselect_fields.hostgroups !== 'undefined') {
-			var host_groups = $('#' + preselect_options.filter_preselect_fields.hostgroups).multiSelect('getData');
+			const host_groups = $('#' + preselect_options.filter_preselect_fields.hostgroups).multiSelect('getData');
+
 			if (host_groups.length != 0) {
 				ret.groupid = host_groups[0].id;
+			}
+		}
+
+		if (typeof preselect_options.filter_preselect_fields.templategroups !== 'undefined') {
+			const template_groups = $('#' + preselect_options.filter_preselect_fields.templategroups)
+				.multiSelect('getData');
+
+			if (template_groups.length != 0) {
+				ret.templategroupid = template_groups[0].id;
 			}
 		}
 

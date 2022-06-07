@@ -20,8 +20,7 @@
 #include "common.h"
 #include "zbxdbhigh.h"
 #include "dbupgrade.h"
-#include "log.h"
-#include "sysinfo.h"
+#include "zbxalgo.h"
 
 extern unsigned char	program_type;
 
@@ -486,22 +485,6 @@ static int	DBpatch_6010026(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6010027(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute(
-			"update profiles"
-			" set idx='web.auditlog.filter.actions'"
-			" where idx='web.auditlog.filter.action'"))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static int	DBpatch_6010028(void)
 {
 	if (0 == (ZBX_PROGRAM_TYPE_SERVER & program_type))
@@ -517,14 +500,407 @@ static int	DBpatch_6010028(void)
 	return SUCCEED;
 }
 
+#define	DBPATCH_HOSTGROUP_TYPE_EMPTY		0x00
+#define DBPATCH_HOSTGROUP_TYPE_HOST		0x01
+#define DBPATCH_HOSTGROUP_TYPE_TEMPLATE		0x02
+#define DBPATCH_HOSTGROUP_TYPE_MIXED		(DBPATCH_HOSTGROUP_TYPE_HOST | DBPATCH_HOSTGROUP_TYPE_TEMPLATE)
+typedef struct
+{
+	zbx_uint64_t	groupid;
+	zbx_uint64_t	newgroupid;
+	char		*name;
+	char		*uuid;
+	int		type_orig;
+	int		type;
+}
+hstgrp_t;
+
+ZBX_PTR_VECTOR_DECL(hstgrp, hstgrp_t *)
+ZBX_PTR_VECTOR_IMPL(hstgrp, hstgrp_t *)
+
 static int	DBpatch_6010029(void)
+{
+	return DBdrop_field("hstgrp", "internal");
+}
+
+static int	DBpatch_6010030(void)
+{
+	const ZBX_FIELD	field = {"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hstgrp", &field);
+}
+
+static int	DBpatch_6010031(void)
+{
+	return DBdrop_index("hstgrp", "hstgrp_1");
+}
+
+static int	DBpatch_6010032(void)
+{
+	return DBcreate_index("hstgrp", "hstgrp_1", "type,name", 1);
+}
+
+static void	DBpatch_6010033_hstgrp_free(hstgrp_t *hstgrp)
+{
+	zbx_free(hstgrp->name);
+	zbx_free(hstgrp->uuid);
+	zbx_free(hstgrp);
+}
+
+static void	DBpatch_6010033_update_nested_group(hstgrp_t *hstgrp, zbx_vector_hstgrp_t *hstgrps)
+{
+	int	i, parent_type = DBPATCH_HOSTGROUP_TYPE_EMPTY, child_type = DBPATCH_HOSTGROUP_TYPE_EMPTY;
+	size_t	g_sz;
+
+	g_sz = strlen(hstgrp->name);
+
+	for (i = 0; i < hstgrps->values_num; i++)
+	{
+		size_t	t_sz;
+
+		t_sz = strlen(hstgrps->values[i]->name);
+
+		if (g_sz == t_sz || 0 != strncmp(hstgrp->name, hstgrps->values[i]->name, MIN(g_sz, t_sz)))
+			continue;
+
+		if (g_sz > t_sz)
+		{
+			if (hstgrp->name[t_sz] != '/')
+				continue;
+
+			if (hstgrps->values[i]->type_orig != DBPATCH_HOSTGROUP_TYPE_EMPTY)
+				parent_type = hstgrps->values[i]->type_orig;
+		}
+		else
+		{
+			if (hstgrps->values[i]->name[g_sz] != '/')
+				continue;
+
+			child_type |= hstgrps->values[i]->type;
+		}
+	}
+
+	if (child_type != DBPATCH_HOSTGROUP_TYPE_EMPTY)
+	{
+		hstgrp->type |= child_type;
+	}
+	else if (hstgrp->type == DBPATCH_HOSTGROUP_TYPE_EMPTY)
+	{
+		hstgrp->type = DBPATCH_HOSTGROUP_TYPE_EMPTY == parent_type ? DBPATCH_HOSTGROUP_TYPE_HOST : parent_type;
+	}
+}
+
+static void	DBpatch_6010033_update_nested_groups(zbx_vector_hstgrp_t *hstgrps)
+{
+	int	i;
+
+	for (i = 0; i < hstgrps->values_num; i++)
+	{
+		if (DBPATCH_HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
+			DBpatch_6010033_update_nested_group(hstgrps->values[i], hstgrps);
+	}
+}
+
+static int	DBpatch_6010033_create_template_groups(zbx_vector_hstgrp_t *hstgrps)
+{
+	int			i, permission, new_count = 0, ret = SUCCEED;
+	zbx_uint64_t		groupid;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_db_insert_t		db_insert;
+
+	for (i = 0; i < hstgrps->values_num; i++)
+	{
+		if (DBPATCH_HOSTGROUP_TYPE_MIXED == hstgrps->values[i]->type)
+			new_count++;
+	}
+
+	if (0 == new_count)
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "type", "uuid", NULL);
+	groupid = DBget_maxid_num("hstgrp", new_count);
+
+	for (i = 0; i < hstgrps->values_num; i++)
+	{
+		if (DBPATCH_HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
+			continue;
+
+		hstgrps->values[i]->newgroupid = groupid++;
+		zbx_db_insert_add_values(&db_insert, hstgrps->values[i]->newgroupid, hstgrps->values[i]->name,
+				1 /* HOST_GROUP_TYPE_TEMPLATE_GROUP */, hstgrps->values[i]->uuid);
+	}
+
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
+		goto out;
+
+	zbx_db_insert_clean(&db_insert);
+	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "groupid", "permission", "id", NULL);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < hstgrps->values_num; i++)
+	{
+		if (DBPATCH_HOSTGROUP_TYPE_MIXED != hstgrps->values[i]->type)
+			continue;
+
+		result = DBselect("select groupid,permission from rights where id=" ZBX_FS_UI64,
+				hstgrps->values[i]->groupid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(groupid, row[0]);
+			permission = atoi(row[1]);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid, permission,
+					hstgrps->values[i]->newgroupid);
+		}
+		DBfree_result(result);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update hosts_groups"
+				" set groupid=" ZBX_FS_UI64
+				" where groupid=" ZBX_FS_UI64
+					" and hostid in ("
+						"select hostid"
+						" from hosts"
+						" where status=3" /* HOST_STATUS_TEMPLATE */
+					");\n", hstgrps->values[i]->newgroupid, hstgrps->values[i]->groupid);
+
+		if (SUCCEED != (ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			goto out;
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "rightid");
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED != (ret = zbx_db_insert_execute(&db_insert)))
+		goto out;
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		ret = FAIL;
+out:
+	zbx_free(sql);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+#define ADD_GROUPIDS_FROM_FIELD(table,field)								\
+													\
+	result = DBselect("select distinct " field " from " table " where " field " is not null");	\
+													\
+	while (NULL != (row = DBfetch(result)))								\
+	{												\
+		ZBX_STR2UINT64(groupid, row[0]);							\
+		zbx_vector_uint64_append(&host_groupids, groupid);					\
+	}												\
+	DBfree_result(result);
+#define ADD_GROUPIDS_FROM(table) ADD_GROUPIDS_FROM_FIELD(table, "groupid")
+
+static int	DBpatch_6010033_split_groups(void)
+{
+	int			i, ret = FAIL;
+	zbx_uint64_t		groupid;
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_vector_hstgrp_t	hstgrps;
+	zbx_vector_uint64_t	host_groupids, template_groupids;
+
+	zbx_vector_hstgrp_create(&hstgrps);
+	zbx_vector_uint64_create(&host_groupids);
+	zbx_vector_uint64_create(&template_groupids);
+
+	result = DBselect("select groupid,name,uuid from hstgrp order by length(name)");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		hstgrp_t	*hstgrp;
+
+		hstgrp = (hstgrp_t *)zbx_malloc(NULL, sizeof(hstgrp_t));
+
+		ZBX_STR2UINT64(hstgrp->groupid, row[0]);
+		hstgrp->name = zbx_strdup(NULL, row[1]);
+		hstgrp->uuid = zbx_strdup(NULL, row[2]);
+		hstgrp->type = DBPATCH_HOSTGROUP_TYPE_EMPTY;
+
+		zbx_vector_hstgrp_append(&hstgrps, hstgrp);
+	}
+	DBfree_result(result);
+
+	result = DBselect(
+			"select distinct g.groupid"
+			" from hstgrp g,hosts_groups hg,hosts h"
+			" where g.groupid=hg.groupid"
+				" and hg.hostid=h.hostid"
+				" and h.status<>3" /* HOST_STATUS_TEMPLATE */);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+		zbx_vector_uint64_append(&host_groupids, groupid);
+	}
+	DBfree_result(result);
+
+	ADD_GROUPIDS_FROM("group_prototype");
+	ADD_GROUPIDS_FROM_FIELD("config", "discovery_groupid");
+	ADD_GROUPIDS_FROM("corr_condition_group");
+	ADD_GROUPIDS_FROM("group_discovery");
+	ADD_GROUPIDS_FROM("maintenances_groups");
+	ADD_GROUPIDS_FROM("opcommand_grp");
+	ADD_GROUPIDS_FROM("opgroup");
+	ADD_GROUPIDS_FROM("scripts");
+
+	/* 0 - CONDITION_TYPE_HOST_GROUP */
+	result = DBselect("select distinct value from conditions where conditiontype=0");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+		zbx_vector_uint64_append(&host_groupids, groupid);
+	}
+	DBfree_result(result);
+
+	result = DBselect(
+			"select distinct g.groupid"
+			" from hstgrp g,hosts_groups hg,hosts h"
+			" where g.groupid=hg.groupid"
+				" and hg.hostid=h.hostid"
+				" and h.status=3" /* HOST_STATUS_TEMPLATE */);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+		zbx_vector_uint64_append(&template_groupids, groupid);
+	}
+	DBfree_result(result);
+
+	zbx_vector_uint64_sort(&template_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(&host_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&host_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (i = 0; i < hstgrps.values_num; i++)
+	{
+		groupid = hstgrps.values[i]->groupid;
+
+		if (FAIL != zbx_vector_uint64_bsearch(&host_groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			hstgrps.values[i]->type |= DBPATCH_HOSTGROUP_TYPE_HOST;
+
+		if (FAIL != zbx_vector_uint64_bsearch(&template_groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			hstgrps.values[i]->type |= DBPATCH_HOSTGROUP_TYPE_TEMPLATE;
+
+		hstgrps.values[i]->type_orig = hstgrps.values[i]->type;
+	}
+
+	DBpatch_6010033_update_nested_groups(&hstgrps);
+
+	for (i = 0; i < hstgrps.values_num; i++)
+	{
+		if (DBPATCH_HOSTGROUP_TYPE_TEMPLATE != hstgrps.values[i]->type)
+			continue;
+
+		/* 1 - HOST_GROUP_TYPE_TEMPLATE_GROUP */
+		if (ZBX_DB_OK > DBexecute("update hstgrp set type=1 where groupid=" ZBX_FS_UI64,
+				hstgrps.values[i]->groupid))
+		{
+			goto out;
+		}
+	}
+
+	ret = DBpatch_6010033_create_template_groups(&hstgrps);
+out:
+	zbx_vector_uint64_destroy(&host_groupids);
+	zbx_vector_uint64_destroy(&template_groupids);
+	zbx_vector_hstgrp_clear_ext(&hstgrps, DBpatch_6010033_hstgrp_free);
+	zbx_vector_hstgrp_destroy(&hstgrps);
+
+	return ret;
+}
+
+static int	DBpatch_6010033(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	return DBpatch_6010033_split_groups();
+}
+
+static int	DBpatch_6010034(void)
+{
+	int		i;
+	const char	*values[] = {
+			"web.auditlog.filter.action", "web.auditlog.filter.actions",
+			"web.hostgroups.php.sort", "web.hostgroups.sort",
+			"web.hostgroups.php.sortorder", "web.hostgroups.sortorder",
+			"web.groups.filter_name", "web.hostgroups.filter_name",
+			"web.groups.filter.active", "web.hostgroups.filter.active",
+		};
+
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > DBexecute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010035(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"delete from tag_filter"
+			" where groupid in ("
+				"select groupid"
+				" from hstgrp"
+				" where type=1" /* HOST_GROUP_TYPE_TEMPLATE_GROUP */
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010036(void)
+{
+	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > DBexecute(
+			"delete from widget_field"
+			" where value_groupid in ("
+				"select groupid"
+				" from hstgrp"
+				" where type=1" /* HOST_GROUP_TYPE_TEMPLATE_GROUP */
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+#undef DBPATCH_HOSTGROUP_TYPE_EMPTY
+#undef DBPATCH_HOSTGROUP_TYPE_HOST
+#undef DBPATCH_HOSTGROUP_TYPE_TEMPLATE
+#undef DBPATCH_HOSTGROUP_TYPE_MIXED
+#undef ADD_GROUPIDS_FROM_FIELD
+#undef ADD_GROUPIDS_FROM
+
+static int	DBpatch_6010037(void)
 {
 	const	ZBX_FIELD field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hostmacro", &field);
 }
 
-static int	DBpatch_6010030(void)
+static int	DBpatch_6010038(void)
 {
 	if (ZBX_DB_OK > DBexecute(
 			"update hostmacro"
@@ -566,16 +942,23 @@ DBPATCH_ADD(6010016, 0, 1)
 DBPATCH_ADD(6010017, 0, 1)
 DBPATCH_ADD(6010018, 0, 1)
 DBPATCH_ADD(6010019, 0, 1)
-DBPATCH_ADD(6010020, 0,	1)
-DBPATCH_ADD(6010021, 0,	1)
-DBPATCH_ADD(6010022, 0,	1)
-DBPATCH_ADD(6010023, 0,	1)
-DBPATCH_ADD(6010024, 0,	1)
-DBPATCH_ADD(6010025, 0,	1)
-DBPATCH_ADD(6010026, 0,	1)
-DBPATCH_ADD(6010027, 0,	1)
-DBPATCH_ADD(6010028, 0,	1)
-DBPATCH_ADD(6010029, 0,	1)
-DBPATCH_ADD(6010030, 0,	1)
+DBPATCH_ADD(6010020, 0, 1)
+DBPATCH_ADD(6010021, 0, 1)
+DBPATCH_ADD(6010022, 0, 1)
+DBPATCH_ADD(6010023, 0, 1)
+DBPATCH_ADD(6010024, 0, 1)
+DBPATCH_ADD(6010025, 0, 1)
+DBPATCH_ADD(6010026, 0, 1)
+DBPATCH_ADD(6010028, 0, 1)
+DBPATCH_ADD(6010029, 0, 1)
+DBPATCH_ADD(6010030, 0, 1)
+DBPATCH_ADD(6010031, 0, 1)
+DBPATCH_ADD(6010032, 0, 1)
+DBPATCH_ADD(6010033, 0, 1)
+DBPATCH_ADD(6010034, 0, 1)
+DBPATCH_ADD(6010035, 0, 1)
+DBPATCH_ADD(6010036, 0, 1)
+DBPATCH_ADD(6010037, 0, 1)
+DBPATCH_ADD(6010038, 0, 1)
 
 DBPATCH_END()

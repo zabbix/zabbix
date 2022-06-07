@@ -826,6 +826,11 @@ a.link-action {
 	}
 }
 
+.icon-count,
+a.icon-count {
+	color: $ui-bg-color;
+}
+
 .disabled {
 	opacity: .6;
 }

@@ -6193,6 +6193,20 @@ svg {
     background-color: #e6e6e6;
     animation: fadein .5s; }
 
+.icon-count {
+  font-size: 12px;
+  padding: 3px 5px 2px;
+  color: #ffffff;
+  background-color: #333333;
+  border-radius: 3px; }
+  .icon-count:link, .icon-count:hover, .icon-count:focus {
+    border-bottom: none; }
+  .icon-count:focus {
+    box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.35); }
+
+a.icon-count {
+  color: #ffffff; }
+
 .problem-icon-link,
 .problem-icon-list {
   display: inline-flex;

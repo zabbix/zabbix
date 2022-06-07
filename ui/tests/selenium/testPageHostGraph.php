@@ -427,7 +427,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		$this->selectGraph($data);
 		$this->zbxTestClickButtonText('Copy');
 
-		$copy_type = 'copy_type_'.array_search($data['target_type'], ['Host groups', 'Hosts', 'Templates']);
+		$copy_type = 'copy_type_'.array_search($data['target_type'], ['Template groups', 'Host groups', 'Hosts', 'Templates']);
 		$this->zbxTestClickXpathWait('//label[@for="'.$copy_type.'"][text()="'.$data['target_type'].'"]');
 
 		// Select check boxes of defined targets.
@@ -440,7 +440,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			if ($data['target_type'] === 'Hosts' || $data['target_type'] === 'Templates') {
 				// Select host group.
 				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
-				$this->zbxTestLaunchOverlayDialog('Host groups');
+				$this->zbxTestLaunchOverlayDialog(rtrim($data['target_type'], "s").' groups');
 				COverlayDialogElement::find()->all()->last()->query('link', $data['group'])->waitUntilVisible()->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				foreach ($data['targets'] as $target) {
@@ -697,15 +697,16 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function testPageHostGraph_CheckFilter($data) {
 		$context = CTestArrayHelper::get($data, 'context', 'host');
+		$group_field = ($context === 'template') ? 'Template groups' : 'Host groups';
 		$this->openPageHostGraphs($data['host'], $context);
 
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		if (array_key_exists('group', $data)) {
 			if ($data['group'] === 'all') {
-				$filter->getField('Host groups')->clear();
+				$filter->getField($group_field)->clear();
 			}
 			else {
-				$filter->getField('Host groups')->select($data['group']);
+				$filter->getField($group_field)->select($data['group']);
 			}
 		}
 
@@ -719,8 +720,8 @@ class testPageHostGraph extends CLegacyWebTest {
 				$filter->getField($field_label)->fill($data['host']);
 			}
 			if (array_key_exists('change_group', $data)) {
-				$filter->getField('Host groups')->clear();
-				$filter->getField('Host groups')->select($data['change_group']);
+				$filter->getField($group_field)->clear();
+				$filter->getField($group_field)->select($data['change_group']);
 			}
 		}
 		$filter->submit();

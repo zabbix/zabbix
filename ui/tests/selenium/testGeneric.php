@@ -56,7 +56,8 @@ class testGeneric extends CLegacyWebTest {
 			['toptriggers.php?severities[5]=5&filter_set=Filter',	'100 busiest triggers'],
 
 			// configuration
-			['hostgroups.php',					'Configuration of host groups'],
+			['zabbix.php?action=hostgroup.list',		'Configuration of host groups'],
+			['zabbix.php?action=templategroup.list',	'Configuration of template groups'],
 			['templates.php',					'Configuration of templates'],
 			[self::HOST_LIST_PAGE,				'Configuration of hosts'],
 			['maintenance.php',				'Configuration of maintenance periods'],

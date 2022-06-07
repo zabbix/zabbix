@@ -6164,7 +6164,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		groupid;
-	int			index, internal;
+	int			index;
 
 	if (0 == groupids->values_num)
 		return;
@@ -6194,44 +6194,43 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select g.groupid,g.internal,g.name"
-			" from hstgrp g"
+			"select g.groupid,g.name,c.discovery_groupid"
+			" from hstgrp g,config c"
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid", groupids->values, groupids->values_num);
 	if (0 < hostids.values_num)
 	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				" and (g.internal=%d"
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				" and (g.groupid=c.discovery_groupid"
 					" or exists ("
 						"select null"
 						" from hosts_groups hg"
 						" where g.groupid=hg.groupid"
-							" and",
-				ZBX_INTERNAL_GROUP);
+							" and");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values, hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "))");
 	}
 	else
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and g.internal=%d", ZBX_INTERNAL_GROUP);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and g.groupid=c.discovery_groupid");
 
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(groupid, row[0]);
-		internal = atoi(row[1]);
 
 		if (FAIL != (index = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			zbx_vector_uint64_remove(groupids, index);
 
-		if (ZBX_INTERNAL_GROUP == internal)
+		if (0 == hostids.values_num || 0 == strcmp(row[0], row[2]))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" is internal and cannot be deleted", row[2]);
+			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" is used for network discovery"
+					" and cannot be deleted", row[1]);
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" cannot be deleted,"
-					" because some hosts or templates depend on it", row[2]);
+					" because some hosts or templates depend on it", row[1]);
 		}
 	}
 	DBfree_result(result);

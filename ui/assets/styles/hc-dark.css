@@ -6193,6 +6193,20 @@ svg {
     background-color: #3c3c3c;
     animation: fadein .5s; }
 
+.icon-count {
+  font-size: 12px;
+  padding: 3px 5px 2px;
+  color: #ffffff;
+  background-color: #dddddd;
+  border-radius: 3px; }
+  .icon-count:link, .icon-count:hover, .icon-count:focus {
+    border-bottom: none; }
+  .icon-count:focus {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35); }
+
+a.icon-count {
+  color: #ffffff; }
+
 .problem-icon-link,
 .problem-icon-list {
   display: inline-flex;
@@ -7385,6 +7399,10 @@ a.link-action {
   .tag.green-bg, .green-bg.btn-tag, .tag.yellow-bg, .yellow-bg.btn-tag {
     background-color: #dddddd;
     color: #000000 !important; }
+
+.icon-count,
+a.icon-count {
+  color: #000000; }
 
 .disabled {
   opacity: .6; }

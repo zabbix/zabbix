@@ -46,7 +46,7 @@ class CControllerWidgetWebView extends CControllerWidget {
 				if ($filter_groupids === null) {
 					$filter_groupids = array_keys(API::HostGroup()->get([
 						'output' => [],
-						'real_hosts' => true,
+						'with_hosts' => true,
 						'preservekeys' => true
 					]));
 				}
@@ -74,7 +74,7 @@ class CControllerWidgetWebView extends CControllerWidget {
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter_groupids,
 			'hostids' => $filter_hostids,
-			'monitored_hosts' => true,
+			'with_monitored_hosts' => true,
 			'with_monitored_httptests' => true,
 			'preservekeys' => true
 		]);

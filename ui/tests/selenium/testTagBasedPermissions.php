@@ -41,7 +41,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			}
 
 			$this->zbxTestClickLinkTextWait($group_name);
-			$this->zbxTestTabSwitch('Tag filter');
+			$this->zbxTestTabSwitch('Problem tag filter');
 
 			// Add tag permissions
 			foreach ($hostgroups as $hostgroup => $tags) {
@@ -200,6 +200,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Triggers');
 			COverlayDialogElement::find()->one()->waitUntilReady()->setDataContext($this->trigger_host);
 			$this->zbxTestClickLinkTextWait($name);
+			COverlayDialogElement::ensureNotPresent();
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();

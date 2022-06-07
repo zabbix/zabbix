@@ -26,51 +26,119 @@ class testUrlParameters extends CLegacyWebTest {
 	public static function data() {
 		return [
 			[
-				'title' => 'Configuration of host groups',
+				'title' => 'Configuration of host group',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'hostgroups.php?form=update&groupid=1',
+						'url' => 'zabbix.php?action=hostgroup.edit&groupid=4',
 						'text_present' => 'Host groups'
 					],
 					[
-						'url' => 'hostgroups.php?form=update&groupid=9999999',
+						'url' => 'zabbix.php?action=hostgroup.edit&groupid=9999999',
 						'text_not_present' => 'Host groups',
+						'access_denied' => true,
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => 'zabbix.php?action=hostgroup.edit&groupid=abc',
+						'text_not_present' => 'Host groups',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value "abc" for "groupid" field.',
+							'Controller: hostgroup.edit',
+							'action: hostgroup.edit',
+							'groupid: abc'
 						]
 					],
 					[
-						'url' => 'hostgroups.php?form=update&groupid=abc',
+						'url' => 'zabbix.php?action=hostgroup.edit&groupid=',
 						'text_not_present' => 'Host groups',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.'
+							'Incorrect value "" for "groupid" field.',
+							'Controller: hostgroup.edit',
+							'action: hostgroup.edit',
+							'groupid:'
 						]
 					],
 					[
-						'url' => 'hostgroups.php?form=update&groupid=',
+						'url' => 'zabbix.php?action=hostgroup.edit&groupid=-1',
 						'text_not_present' => 'Host groups',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is not integer.'
+							'Incorrect value "-1" for "groupid" field.',
+							'Controller: hostgroup.edit',
+							'action: hostgroup.edit',
+							'groupid: -1'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Configuration of template group',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => 'zabbix.php?action=templategroup.edit&groupid=1',
+						'text_present' => 'Template groups'
+					],
+					[
+						'url' => 'zabbix.php?action=templategroup.edit&groupid=9999999',
+						'text_not_present' => 'Template groups',
+						'access_denied' => true,
+						'text_present' => [
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => 'zabbix.php?action=templategroup.edit&groupid=abc',
+						'text_not_present' => 'Template groups',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value "abc" for "groupid" field.',
+							'Controller: templategroup.edit',
+							'action: templategroup.edit',
+							'groupid: abc'
 						]
 					],
 					[
-						'url' => 'hostgroups.php?form=update&groupid=-1',
-						'text_not_present' => 'Host groups',
+						'url' => 'zabbix.php?action=templategroup.edit&groupid=',
+						'text_not_present' => 'Template groups',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "groupid" field.'
+							'Incorrect value "" for "groupid" field.',
+							'Controller: templategroup.edit',
+							'action: templategroup.edit',
+							'groupid:'
 						]
 					],
 					[
-						'url' => 'hostgroups.php?form=update',
-						'text_not_present' => 'Host groups',
+						'url' => 'zabbix.php?action=templategroup.edit&groupid=-1',
+						'text_not_present' => 'Template groups',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "groupid" is mandatory.'
+							'Incorrect value "-1" for "groupid" field.',
+							'Controller: templategroup.edit',
+							'action: templategroup.edit',
+							'groupid: -1'
 						]
 					]
 				]

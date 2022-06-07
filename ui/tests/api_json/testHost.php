@@ -66,6 +66,7 @@ class testHost extends CAPITest {
 			// Discovered host to test host.get with limitSelects option.
 			'discovered_limit_selects' => null
 		],
+		'templategroupid' => null,
 		'templateids' => [
 			'api_test_hosts_f_tpl' => null,
 			'api_test_hosts_c_tpl' => null,
@@ -321,6 +322,15 @@ class testHost extends CAPITest {
 		$this->assertArrayHasKey('maintenanceids', $maintenances);
 		self::$data['maintenanceids'] = $maintenances['maintenanceids'];
 
+		// Create template group.
+		$templategroups = CDataHelper::call('templategroup.create', [
+			[
+				'name' => 'API test templates'
+			]
+		]);
+		$this->assertArrayHasKey('groupids', $templategroups);
+		self::$data['templategroupid'] = $templategroups['groupids'][0];
+
 		// Create templates that will be added to host prototypes and essentially discovered hosts.
 		$templates_data = [
 			// Templates for discovered hosts. When host.get "limitSelects" is used, templates should be sorted A-Z.
@@ -329,7 +339,7 @@ class testHost extends CAPITest {
 				'name' => 'API test hosts - F template',
 				'groups' => [
 					[
-						'groupid' => self::$data['hostgroupid']
+						'groupid' => self::$data['templategroupid']
 					]
 				]
 			],
@@ -338,7 +348,7 @@ class testHost extends CAPITest {
 				'name' => 'API test hosts - C template',
 				'groups' => [
 					[
-						'groupid' => self::$data['hostgroupid']
+						'groupid' => self::$data['templategroupid']
 					]
 				]
 			],
@@ -347,7 +357,7 @@ class testHost extends CAPITest {
 				'name' => 'API test hosts - A template',
 				'groups' => [
 					[
-						'groupid' => self::$data['hostgroupid']
+						'groupid' => self::$data['templategroupid']
 					]
 				]
 			],
@@ -356,7 +366,7 @@ class testHost extends CAPITest {
 				'name' => 'API test hosts - E template',
 				'groups' => [
 					[
-						'groupid' => self::$data['hostgroupid']
+						'groupid' => self::$data['templategroupid']
 					]
 				]
 			],
@@ -365,7 +375,7 @@ class testHost extends CAPITest {
 				'name' => 'API test hosts - B template',
 				'groups' => [
 					[
-						'groupid' => self::$data['hostgroupid']
+						'groupid' => self::$data['templategroupid']
 					]
 				]
 			],
@@ -374,7 +384,7 @@ class testHost extends CAPITest {
 				'name' => 'API test hosts - D template',
 				'groups' => [
 					[
-						'groupid' => self::$data['hostgroupid']
+						'groupid' => self::$data['templategroupid']
 					]
 				]
 			],
@@ -388,7 +398,7 @@ class testHost extends CAPITest {
 				'name' => 'API test hosts - template with item',
 				'groups' => [
 					[
-						'groupid' => self::$data['hostgroupid']
+						'groupid' => self::$data['templategroupid']
 					]
 				]
 			]
@@ -4109,7 +4119,8 @@ class testHost extends CAPITest {
 		CDataHelper::call('host.delete', $hostids);
 		CDataHelper::call('template.delete', array_values(self::$data['templateids']));
 
-		// Delete host group.
+		// Delete groups.
 		CDataHelper::call('hostgroup.delete', [self::$data['hostgroupid']]);
+		CDataHelper::call('templategroup.delete', [self::$data['templategroupid']]);
 	}
 }

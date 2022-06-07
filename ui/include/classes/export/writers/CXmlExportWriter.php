@@ -102,6 +102,8 @@ class CXmlExportWriter extends CExportWriter {
 			'graphs' => 'graph',
 			'group_links' => 'group_link',
 			'group_prototypes' => 'group_prototype',
+			'host_groups' => 'host_group',
+			'template_groups' => 'template_group',
 			'groups' => 'group',
 			'headers' => 'header',
 			'host_prototypes' => 'host_prototype',
