@@ -584,7 +584,7 @@ class testTemplateGroup extends CAPITest {
 						'SELECT groupid'.
 						' FROM hosts_groups'.
 						' WHERE groupid='.$groupid.
-							'AND hostid='.$template['templateid']
+							' AND hostid='.$template['templateid']
 					);
 					$this->assertEquals($dbRow['groupid'], $templategroup['groups'][$index]['groupid']);
 				}
@@ -714,7 +714,7 @@ class testTemplateGroup extends CAPITest {
 						'SELECT groupid'.
 						' FROM hosts_groups'.
 						' WHERE groupid='.$groupid.
-							'AND hostid='.$templategroup['templates']['templateid']
+							' AND hostid='.$templategroup['templates']['templateid']
 					);
 					$this->assertEquals($dbRow['groupid'], $templategroup['groups']['groupid']);
 				}
