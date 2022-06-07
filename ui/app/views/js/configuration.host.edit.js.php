@@ -38,7 +38,7 @@
 		submit(button) {
 			this.setLoading(button);
 
-			const fields = host_edit.preprocessFormFields(getFormFields(this.form));
+			const fields = host_edit.preprocessFormFields(getFormFields(this.form), false);
 			const curl = new Curl(this.form.getAttribute('action'), false);
 
 			fetch(curl.getUrl(), {
