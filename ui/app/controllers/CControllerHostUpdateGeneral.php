@@ -135,8 +135,9 @@ abstract class CControllerHostUpdateGeneral extends CController {
 					$macro_diff['automatic'] = ZBX_USERMACRO_MANUAL;
 				}
 
-				if (!array_key_exists('discovery_state', $macro)
-						|| $macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_VAULT
+						&& (!array_key_exists('discovery_state', $macro)
+							|| $macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC)) {
 					/**
 					 * Macro value must be passed to be sure its syntax is still valid.
 					 * Syntax may be changed, e.g., if the Vault provider has been changed.
