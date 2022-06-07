@@ -273,7 +273,7 @@ class CSvgGraph extends CSvg {
 			$this->drawWorkingTime();
 
 			$this->drawGrid();
-			$this->drawYaxes();
+			$this->drawYAxes();
 			$this->drawXAxis();
 
 			$this->drawMetricsLine();
@@ -691,7 +691,7 @@ class CSvgGraph extends CSvg {
 		);
 	}
 
-	private function drawYaxes(): void {
+	private function drawYAxes(): void {
 		if ($this->show_left_y_axis) {
 			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 			$this->addItem(
