@@ -1049,6 +1049,13 @@
 	}
 }
 
+.overlay-dialogue {
+	&.modal-popup.modal-widget-configuration {
+		max-width: 1120px;
+		min-width: 650px;
+	}
+}
+
 .wrapper.layout-kioskmode {
 
 	.dashboard-navigation {

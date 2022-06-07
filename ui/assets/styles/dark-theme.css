@@ -1469,6 +1469,10 @@ footer {
     background-color: #e79e0b;
     border-color: #e79e0b; }
 
+.overlay-dialogue.modal-popup.modal-widget-configuration {
+  max-width: 1120px;
+  min-width: 650px; }
+
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
@@ -4948,7 +4952,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
         padding-left: 0; }
   .overlay-dialogue.modal-popup {
     top: 50px;
-    max-width: 1120px; }
+    max-width: 1024px; }
     .overlay-dialogue.modal-popup.modal-popup-small {
       max-width: 450px;
       width: 100%; }
