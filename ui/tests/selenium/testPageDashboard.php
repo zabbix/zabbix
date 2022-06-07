@@ -107,8 +107,7 @@ class testPageDashboard extends CLegacyWebTest {
 						'No permissions to referred object or it does not exist!');
 			}
 			else {
-				$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]".
-						"//h4[text()='ЗАББИКС Сервер: Zabbix server: Number of processed values per second']");
+				$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Performance']");
 			}
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'Top hosts by CPU utilization');
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[4]//h4", 'System information');
@@ -116,7 +115,7 @@ class testPageDashboard extends CLegacyWebTest {
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Problems by severity');
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[9]//h4", 'Geomap');
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[10]//h4", 'Current problems');
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Local']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Local time']");
 			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[6]//h4[text()='Graph']");
 
 			// Logout.
