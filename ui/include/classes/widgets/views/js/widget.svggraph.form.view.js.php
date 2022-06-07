@@ -647,6 +647,10 @@ window.widget_svggraph_form = new class {
 			dataset_elem = Array.from(this.dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> ')).pop();
 		}
 
+		if (!dataset_elem) {
+			return;
+		}
+
 		const dataset_number = this.getDataSetNumber();
 		const dataset_type = dataset_elem.dataset.type;
 		const inputs = dataset_elem.querySelectorAll('input[name^=ds]');

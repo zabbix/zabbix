@@ -188,8 +188,8 @@ class TabIndicatorFactory {
 				return new GraphDatasetTabIndicatorItem;
 			case 'GraphLegend':
 				return new GraphLegendTabIndicatorItem;
-			case 'GraphOptions':
-				return new GraphOptionsTabIndicatorItem;
+			case 'GraphDisplayOptions':
+				return new GraphDisplayOptionsTabIndicatorItem;
 			case 'GraphOverrides':
 				return new GraphOverridesTabIndicatorItem;
 			case 'GraphProblems':
@@ -1106,27 +1106,31 @@ class GraphDatasetTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class GraphOptionsTabIndicatorItem extends TabIndicatorItem {
+class GraphDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const element = document.querySelector("[name='source']:checked");
+		const names = ['source', 'simple_triggers', 'working_time', 'percentile_left', 'percentile_right'];
 
-		if (element !== null) {
-			return element.value > 0;
+		for (const name of names) {
+			const elem = document.querySelector("[name='" + name + "']:checked");
+			if (elem !== null && elem.value > 0) {
+				return true;
+			}
 		}
 
 		return false;
 	}
 
 	initObserver(element) {
-		for (const input of document.querySelectorAll("[name='source']")) {
-			input.addEventListener('click', () => {
-				this.addAttributes(element);
-			});
+		const names = ['source', 'simple_triggers', 'working_time', 'percentile_left', 'percentile_right'];
+
+		for (const name of names) {
+			const inputs = document.querySelectorAll("[name='" + name + "']");
+			[...inputs].map((elem) => elem.addEventListener('click', () => this.addAttributes(element)));
 		}
 	}
 }

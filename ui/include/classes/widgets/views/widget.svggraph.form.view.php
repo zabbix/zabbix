@@ -48,7 +48,7 @@ $form_tabs = (new CTabView())
 	->addTab('data_set',  _('Data set'), getDatasetTab($fields, $jq_templates, $form->getName()),
 		TAB_INDICATOR_GRAPH_DATASET
 	)
-	->addTab('displaying_options',  _('Displaying options'), getDisplayOptionsTab($fields), TAB_INDICATOR_GRAPH_OPTIONS)
+	->addTab('displaying_options',  _('Displaying options'), getDisplayOptionsTab($fields), TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS)
 	->addTab('time_period',  _('Time period'), getTimePeriodTab($fields), TAB_INDICATOR_GRAPH_TIME)
 	->addTab('axes',  _('Axes'), getAxesTab($fields))
 	->addTab('legend_tab',  _('Legend'), getLegendTab($fields, $scripts), TAB_INDICATOR_GRAPH_LEGEND)
