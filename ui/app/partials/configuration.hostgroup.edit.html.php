@@ -20,56 +20,43 @@
 
 
 /**
- * @var CView $this
+ * @var CPartial $this
+ * @var array $data
  */
 
-$widget = (new CWidget())
-	->setTitle(_('Host groups'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOSTGROUPS_EDIT));
-
 $form = (new CForm())
+	->setId('hostgroupForm')
 	->setName('hostgroupForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('groupid', $data['groupid'])
-	->addVar('form', $data['form']);
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-$form_list = (new CFormList('hostgroupFormList'))
-	->addRow(
+$form_grid = (new CFormGrid())
+	->addItem([
 		(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name'], $data['groupid'] && $data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED))
-			->setAttribute('autofocus', 'autofocus')
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	);
+		new CFormField(
+			(new CTextBox('name', $data['name'], $data['groupid'] != 0 && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED))
+				->setAttribute('autofocus', 'autofocus')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		)
+	]);
 
 if ($data['groupid'] != 0 && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$form_list->addRow(null,
-		(new CCheckBox('subgroups'))
+	$form_grid->addItem([
+		new CFormField((new CCheckBox('subgroups'))
 			->setLabel(_('Apply permissions and tag filters to all subgroups'))
-			->setChecked($data['subgroups'])
-	);
+			->setChecked($data['subgroups']))
+	]);
 }
 
-$tab = (new CTabView())->addTab('hostgroupTab', _('Host group'), $form_list);
+$tabs = (new CTabView(['id' => 'hostgroup-tabs']))->addTab('hostgroup-tab', _('Host group'), $form_grid);
 
-if ($data['groupid'] == 0) {
-	$tab->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
-	));
-}
-else {
-	$tab->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')), [
-			(new CSubmit('clone', _('Clone')))->setEnabled(CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
-			(new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'))),
-			new CButtonCancel()
-		]
-	));
+if (array_key_exists('buttons', $data)) {
+	$primary_btn = array_shift($data['buttons']);
+	$tabs->setFooter(makeFormFooter($primary_btn, $data['buttons']));
 }
 
-$form->addItem($tab);
-
-$widget->addItem($form);
-
-$widget->show();
+$form
+	->addItem($tabs)
+	->show();

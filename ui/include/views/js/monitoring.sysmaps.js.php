@@ -196,7 +196,7 @@ function createFontSelect(string $name): CSelect {
 										'dstfrm' => 'selementForm',
 										'dstfld1' => 'elementNameTriggers',
 										'with_triggers' => true,
-										'editable' => true,
+										'editable' => 1,
 										'real_hosts' => true
 									]
 								]

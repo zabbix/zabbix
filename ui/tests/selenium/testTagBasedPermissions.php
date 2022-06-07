@@ -41,7 +41,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			}
 
 			$this->zbxTestClickLinkTextWait($group_name);
-			$this->zbxTestTabSwitch('Tag filter');
+			$this->zbxTestTabSwitch('Problem tag filter');
 
 			// Add tag permissions
 			foreach ($hostgroups as $hostgroup => $tags) {

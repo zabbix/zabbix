@@ -396,8 +396,7 @@ if ($data['single_host_selected']) {
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
-						'only_hostid' => $data['hostid'],
-						'webitems' => true
+						'only_hostid' => $data['hostid']
 					]
 				]
 			]))
@@ -427,7 +426,6 @@ if ($data['single_host_selected']) {
 					dstfld1: "master_itemid",
 					dstfld2: "master_itemname",
 					only_hostid: this.dataset.hostid,
-					with_webitems: 1,
 					normal_only: 1
 				}, {dialogue_class: "modal-popup-generic"});
 			');

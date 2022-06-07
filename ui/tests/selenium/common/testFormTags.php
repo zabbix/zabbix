@@ -278,7 +278,9 @@ class testFormTags extends CWebTest {
 			case 'template':
 				$sql = 'SELECT * FROM hosts ORDER BY hostid';
 				$locator = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:'.$object.'sForm';
-				$fields = [ucfirst($object).' name' => $data['name'], 'Groups' => 'Zabbix servers'];
+				$group_field = ($object === 'template') ? 'Template groups' : 'Host groups';
+				$group_name = ($object === 'template') ? 'Templates' : 'Zabbix servers';
+				$fields = [ucfirst($object).' name' => $data['name'], $group_field => $group_name];
 		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -296,7 +298,7 @@ class testFormTags extends CWebTest {
 		if ($object === 'host prototype') {
 			$data['name'] = $data['name'].' {#KEY}';
 			$form->fill(['Host name' => $data['name']]);
-			$form->fill(['Groups' => 'Zabbix servers']);
+			$form->fill(['Host groups' => 'Zabbix servers']);
 		}
 		elseif ($object === 'web scenario') {
 			$form->fill(['Name' => $data['name']]);

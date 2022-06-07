@@ -154,7 +154,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				[
 					'fields' => [
 						'Host name' => 'test Inheritance host prototype',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -287,11 +287,11 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'visible_name' => 'New visible name',
 					'create_enabled' => false,
 					'groups' => [
-						'Templates'
+						'Linux servers'
 					],
 					'group_macro' => '{#GROUP_MACRO}',
 					'templates' => [
-						['name' => 'Inheritance test template', 'group' => 'Templates']
+						['name' => 'Inheritance test template', 'group' => 'Linux servers']
 					],
 					'host_inventory' => 'Automatic'
 				]
