@@ -55,14 +55,14 @@ class testPageDashboard extends CLegacyWebTest {
 								'x' => 0,
 								'y' => 0,
 								'width' => 12,
-								'height' => 4,
+								'height' => 4
 							],
 							[
 								'type' => 'favmaps',
 								'x' => 13,
 								'y' => 0,
 								'width' => 4,
-								'height' => 4,
+								'height' => 4
 							]
 						]
 					]
