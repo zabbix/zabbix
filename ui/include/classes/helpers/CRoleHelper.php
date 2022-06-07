@@ -43,6 +43,7 @@ class CRoleHelper {
 	public const UI_SERVICES_ACTIONS = 'ui.services.actions';
 	public const UI_SERVICES_SLA = 'ui.services.sla';
 	public const UI_SERVICES_SLA_REPORT = 'ui.services.sla_report';
+	public const UI_CONFIGURATION_TEMPLATE_GROUPS = 'ui.configuration.template_groups';
 	public const UI_CONFIGURATION_HOST_GROUPS = 'ui.configuration.host_groups';
 	public const UI_CONFIGURATION_TEMPLATES = 'ui.configuration.templates';
 	public const UI_CONFIGURATION_HOSTS = 'ui.configuration.hosts';
@@ -239,6 +240,7 @@ class CRoleHelper {
 				self::UI_CONFIGURATION_HOSTS,
 				self::UI_CONFIGURATION_MAINTENANCE,
 				self::UI_CONFIGURATION_TEMPLATES,
+				self::UI_CONFIGURATION_TEMPLATE_GROUPS,
 				self::UI_MONITORING_DISCOVERY,
 				self::UI_REPORTS_NOTIFICATIONS,
 				self::UI_REPORTS_SCHEDULED_REPORTS,
@@ -401,6 +403,7 @@ class CRoleHelper {
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels = [
+						self::UI_CONFIGURATION_TEMPLATE_GROUPS => _('Template groups'),
 						self::UI_CONFIGURATION_HOST_GROUPS => _('Host groups'),
 						self::UI_CONFIGURATION_TEMPLATES => _('Templates'),
 						self::UI_CONFIGURATION_HOSTS => _('Hosts'),

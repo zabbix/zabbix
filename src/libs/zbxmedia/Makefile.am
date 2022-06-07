@@ -5,3 +5,6 @@ noinst_LIBRARIES = libzbxmedia.a
 libzbxmedia_a_SOURCES = \
 			email.c \
 			sms.c
+
+libzbxmedia_a_CFLAGS = \
+	$(TLS_CFLAGS)

@@ -56,7 +56,7 @@ function getSystemStatusData(array $filter) {
 			if ($filter_groupids === null) {
 				$filter_groupids = array_keys(API::HostGroup()->get([
 					'output' => [],
-					'real_hosts' => true,
+					'with_hosts' => true,
 					'preservekeys' => true
 				]));
 			}
@@ -85,7 +85,7 @@ function getSystemStatusData(array $filter) {
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter_groupids,
 			'hostids' => $filter_hostids,
-			'monitored_hosts' => true,
+			'with_monitored_hosts' => true,
 			'preservekeys' => true
 		]),
 		'triggers' => [],
@@ -166,7 +166,7 @@ function getSystemStatusData(array $filter) {
 
 		$options = [
 			'output' => ['priority', 'manual_close'],
-			'selectGroups' => ['groupid'],
+			'selectHostGroups' => ['groupid'],
 			'selectHosts' => ['name'],
 			'triggerids' => array_keys($triggerids),
 			'monitored' => true,
@@ -223,7 +223,7 @@ function getSystemStatusData(array $filter) {
 			}
 
 			// groups
-			foreach ($trigger['groups'] as $trigger_group) {
+			foreach ($trigger['hostgroups'] as $trigger_group) {
 				if (!array_key_exists($trigger_group['groupid'], $data['groups'])) {
 					continue;
 				}

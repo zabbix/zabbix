@@ -57,7 +57,7 @@ if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 	if (getRequest('hostgroupid') && !isReadableHostGroups([getRequest('hostgroupid')])) {
 		access_deny();
 	}
-	if (getRequest('filter_groups') && !isReadableHostGroups([getRequest('filter_groups')])) {
+	if (getRequest('filter_groups') && !isReadableTemplateGroups([getRequest('filter_groups')])) {
 		access_deny();
 	}
 	if (getRequest('filter_templateid') && !isReadableTemplates([getRequest('filter_templateid')])) {
@@ -221,13 +221,15 @@ else {
 	// Make filter fields.
 	if ($report_mode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		// Sanitize $data['filter']['groups'] and prepare "Template group" select options.
-		$groups = API::HostGroup()->get([
+		$groups = API::TemplateGroup()->get([
 			'output' => ['name'],
-			'templated_hosts' => true,
+			'with_templates' => true,
 			'with_triggers' => true,
 			'preservekeys' => true
 		]);
-		$groups = enrichParentGroups($groups);
+
+		$groups = enrichParentTemplateGroups($groups);
+
 		CArrayHelper::sort($groups, ['name']);
 
 		if (!array_key_exists($data['filter']['groups'], $groups)) {
@@ -307,7 +309,7 @@ else {
 		// Sanitize $data['filter']['hostgroupid'] and prepare "Host Group" select options.
 		$host_groups = API::HostGroup()->get([
 			'output' => ['name'],
-			'monitored_hosts' => true,
+			'with_monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 		$host_groups = enrichParentGroups($host_groups);
@@ -409,7 +411,7 @@ else {
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $data['filter']['groups'],
-				'monitored_hosts' => true,
+				'with_monitored_hosts' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];
@@ -457,7 +459,6 @@ else {
 							'dstfrm' => 'zbx_filter',
 							'dstfld1' => 'filter_groups_',
 							'with_triggers' => true,
-							'real_hosts' => 1,
 							'enrich_parent_groups' => true
 						]
 					]

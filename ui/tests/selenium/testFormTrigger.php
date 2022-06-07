@@ -374,8 +374,8 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestTabSwitch('Dependencies');
 		$this->zbxTestTextPresent(['Dependencies', 'Name', 'Action']);
 		if (!isset($data['templatedHost'])) {
-			$this->zbxTestAssertElementPresentId('bnt1');
-			$this->zbxTestAssertElementText("//button[@id='bnt1']", 'Add');
+			$this->zbxTestAssertElementPresentId('add_dep_trigger');
+			$this->zbxTestAssertElementText("//button[@id='add_dep_trigger']", 'Add');
 		}
 	}
 
