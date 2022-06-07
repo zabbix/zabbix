@@ -3048,7 +3048,7 @@ static void	DCsync_prototype_items(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_hashset_t *triggers_new)
+static void	DCsync_triggers(zbx_dbsync_t *sync)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -3068,9 +3068,6 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_hashset_t *triggers_new)
 			break;
 
 		ZBX_STR2UINT64(triggerid, row[0]);
-
-		if (ZBX_DBSYNC_ROW_ADD == tag && NULL == zbx_hashset_search(triggers_new, &triggerid))
-			continue;
 
 		trigger = (ZBX_DC_TRIGGER *)DCfind_id(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER), &found);
 
@@ -3652,7 +3649,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 	}
 }
 
-static void	DCsync_functions(zbx_dbsync_t *sync, zbx_hashset_t *triggers_new)
+static void	DCsync_functions(zbx_dbsync_t *sync)
 {
 	char		**row;
 	zbx_uint64_t	rowid;
@@ -3665,8 +3662,6 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_hashset_t *triggers_new)
 	zbx_uint64_t	itemid, functionid, triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_hashset_reserve(triggers_new, (int)sync->add_num);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3696,10 +3691,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_hashset_t *triggers_new)
 			}
 		}
 		else
-		{
 			function->timer_revision = 0;
-			zbx_hashset_insert(triggers_new, &triggerid, sizeof(triggerid));
-		}
 
 		function->triggerid = triggerid;
 		function->itemid = itemid;
@@ -5474,17 +5466,12 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_uint64_t	update_flags = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
-	zbx_hashset_t		trend_queue;
-	zbx_vector_uint64_t	active_avail_diff;
-	/* identifiers of triggers to be added to cache, filled during function sync and used to filter */
-	/* out template/prototype triggers when caching triggers                                        */
-	zbx_hashset_t		triggers_new;
+	zbx_hashset_t			trend_queue;
+	zbx_vector_uint64_t		active_avail_diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	config->sync_start_ts = time(NULL);
-
-	zbx_hashset_create(&triggers_new, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	sec = zbx_time();
 	changelog_num = zbx_dbsync_env_prepare(mode);
@@ -5775,7 +5762,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	START_SYNC;
 	sec = zbx_time();
-	DCsync_functions(&func_sync, &triggers_new);
+	DCsync_functions(&func_sync);
 	fsec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
@@ -5833,7 +5820,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	START_SYNC;
 
 	sec = zbx_time();
-	DCsync_triggers(&triggers_sync, &triggers_new);
+	DCsync_triggers(&triggers_sync);
 	tsec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6272,8 +6259,6 @@ out:
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
-
-	zbx_hashset_destroy(&triggers_new);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
