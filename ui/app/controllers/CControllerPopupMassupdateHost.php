@@ -315,10 +315,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 								}
 
 								foreach ($tags as $tag) {
-									if (!array_key_exists($tag['tag'], $tags_map)
-											|| !array_key_exists($tag['value'], $tags_map[$tag['tag']])) {
-										$tags_map[$tag['tag']][$tag['value']] = $tag;
-									}
+									$tags_map[$tag['tag']][$tag['value']] = $tag;
 								}
 
 								$host['tags'] = [];
@@ -335,19 +332,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 								foreach ($tags as $tag) {
 									$tags_map[$tag['tag']][$tag['value']] = $tag;
-								}
-
-								foreach ($host['tags'] as $tag) {
-									if ($tag['automatic'] == ZBX_TAG_AUTOMATIC) {
-										if (!array_key_exists($tag['tag'], $tags_map)
-												|| !array_key_exists($tag['value'], $tags_map[$tag['tag']])) {
-											error(_s(
-												'Cannot remove the tag with name "%1$s" and value "%2$s", defined in a host prototype, from host "%3$s".',
-												$tag['tag'], $tag['value'], $host['host']
-											));
-											throw new Exception();
-										}
-									}
 								}
 
 								$host['tags'] = [];
