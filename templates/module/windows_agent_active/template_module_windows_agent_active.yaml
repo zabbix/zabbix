@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-01T14:33:12Z'
-  groups:
+  date: '2022-06-07T19:36:55Z'
+  template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -1361,8 +1361,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Windows network by Zabbix agent active'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 7300d3f66dec4f90bcd6889d206db89f

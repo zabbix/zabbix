@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:53:59Z'
-  groups:
+  date: '2022-06-07T19:33:01Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -229,7 +229,7 @@ zabbix_export:
               name: 'Apache: has been restarted'
               event_name: 'Apache: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -805,8 +805,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Apache: Requests per second'
                         host: 'Apache by HTTP'
+                        name: 'Apache: Requests per second'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -821,8 +821,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Apache: Workers total'
                         host: 'Apache by HTTP'
+                        name: 'Apache: Workers total'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -845,8 +845,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Apache: Current async connections{#SINGLETON}'
                         host: 'Apache by HTTP'
+                        name: 'Apache: Current async connections{#SINGLETON}'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -870,8 +870,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Apache: Current async processes{#SINGLETON}'
                         host: 'Apache by HTTP'
+                        name: 'Apache: Current async processes{#SINGLETON}'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -886,8 +886,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Apache: Worker states'
                         host: 'Apache by HTTP'
+                        name: 'Apache: Worker states'
       valuemaps:
         -
           uuid: a5d1f911fb264bd4bc087ea582626d7f

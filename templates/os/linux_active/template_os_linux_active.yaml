@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-05-18T22:37:39Z'
-  groups:
+  date: '2022-06-07T19:33:41Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -789,7 +789,7 @@ zabbix_export:
                   tag: scope
                   value: performance
         -
-          uuid: 086b2ca542f24b4089a1fc43eeea2f42
+          uuid: 090fb1a5698e4e7080abf379b377b6f5
           name: 'Active agent availability'
           type: INTERNAL
           key: 'zabbix[host,active_agent,available]'
@@ -811,7 +811,7 @@ zabbix_export:
               value: network
           triggers:
             -
-              uuid: 153cc67416614c13878a6f5655d99b09
+              uuid: a022259fc3cf454f93bc82cca27391f1
               expression: 'min(/Linux by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
               name: 'Zabbix agent: active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -1232,12 +1232,12 @@ zabbix_export:
               -
                 macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.MATCHES}'
-                formulaid: B
+                formulaid: A
               -
                 macro: '{#DEVNAME}'
                 value: '{$VFS.DEV.DEVNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-                formulaid: A
+                formulaid: B
           item_prototypes:
             -
               uuid: 9a0448cf8a184d52a7872df410f25d6b
@@ -1883,8 +1883,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}: Network traffic'
                         host: 'Linux by Zabbix agent active'
+                        name: 'Interface {#IFNAME}: Network traffic'
         -
           uuid: 3e6ceed431734cc29836019e93b5f89e
           name: 'System performance'
@@ -1904,8 +1904,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Linux by Zabbix agent active'
                         name: 'System load'
-                        host: 'Linux by Zabbix agent active'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1920,8 +1920,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Linux by Zabbix agent active'
                         name: 'CPU usage'
-                        host: 'Linux by Zabbix agent active'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1936,8 +1936,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'Linux by Zabbix agent active'
+                        name: 'Memory usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1953,8 +1953,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'Linux by Zabbix agent active'
+                        name: 'Swap usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -1977,8 +1977,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
                         host: 'Linux by Zabbix agent active'
+                        name: '{#FSNAME}: Disk space usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -2001,8 +2001,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk read/write rates'
                         host: 'Linux by Zabbix agent active'
+                        name: '{#DEVNAME}: Disk read/write rates'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '20'
@@ -2025,8 +2025,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk average waiting time'
                         host: 'Linux by Zabbix agent active'
+                        name: '{#DEVNAME}: Disk average waiting time'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '25'
@@ -2049,8 +2049,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk utilization and queue'
                         host: 'Linux by Zabbix agent active'
+                        name: '{#DEVNAME}: Disk utilization and queue'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '30'
@@ -2073,8 +2073,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}: Network traffic'
                         host: 'Linux by Zabbix agent active'
+                        name: 'Interface {#IFNAME}: Network traffic'
       valuemaps:
         -
           uuid: 276914b5aee2435da609d3112ecd359d
@@ -2298,7 +2298,7 @@ zabbix_export:
               value: '826'
               newvalue: 'Vsock monitor header'
         -
-          uuid: c75840508f98402498289c5f99e0d59e
+          uuid: d4a5821461a243c9bf320ea58be1af23
           name: zabbix.host.active_agent.available
           mappings:
             -

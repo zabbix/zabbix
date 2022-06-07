@@ -166,7 +166,7 @@ There are no template links in this template.
 |Jenkins: There are deadlocked threads in Jenkins master JVM |<p>There are any deadlocked threads in the Jenkins master JVM.</p><p>Health check message: {{ITEM.LASTVALUE2}.regsub('(.*)',\1)}</p> |`last(/Jenkins by HTTP/jenkins.thread_deadlock)=0 and length(last(/Jenkins by HTTP/jenkins.thread_deadlock.message))>0` |WARNING | |
 |Jenkins: Service has no online nodes |<p>-</p> |`last(/Jenkins by HTTP/jenkins.node.online)=0` |AVERAGE | |
 |Jenkins: Version has changed |<p>Jenkins version has changed. Ack to close.</p> |`last(/Jenkins by HTTP/jenkins.version,#1)<>last(/Jenkins by HTTP/jenkins.version,#2) and length(last(/Jenkins by HTTP/jenkins.version))>0` |INFO |<p>Manual close: YES</p> |
-|Jenkins: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Jenkins by HTTP/jenkins.system.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Jenkins: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Jenkins by HTTP/jenkins.system.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Jenkins: Current number of used files is too high |<p>-</p> |`min(/Jenkins by HTTP/jenkins.descriptor.ratio,5m)>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}` |WARNING | |
 |Jenkins: Service is down |<p>-</p> |`last(/Jenkins by HTTP/jenkins.ping)=0` |AVERAGE |<p>Manual close: YES</p> |
 |Jenkins job [{#NAME}]: Job is unhealthy |<p>-</p> |`last(/Jenkins by HTTP/jenkins.build.health[{#NAME}])<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}` |WARNING |<p>Manual close: YES</p> |

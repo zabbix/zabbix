@@ -1,10 +1,14 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-05-06T14:17:41Z'
-  groups:
+  date: '2022-06-07T19:36:23Z'
+  template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
+  host_groups:
+    -
+      uuid: 748ad4d098d447d492bb935c907f652f
+      name: Databases
   templates:
     -
       uuid: d38b271797bd41f2ad8c79d83b9d8d9c
@@ -854,7 +858,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Databases
+                    name: Databases
               group_prototypes:
                 -
                   name: 'MongoDB sharded cluster/{#REPLICASET}'
@@ -1378,7 +1382,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Databases
+                    name: Databases
               group_prototypes:
                 -
                   name: 'MongoDB sharded cluster/{#ID}'

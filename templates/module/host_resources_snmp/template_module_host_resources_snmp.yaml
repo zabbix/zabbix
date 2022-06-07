@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-13T22:25:50Z'
-  groups:
+  date: '2022-06-07T19:36:47Z'
+  template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -616,8 +616,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU utilization'
                         host: 'HOST-RESOURCES-MIB SNMP'
+                        name: 'CPU utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -640,8 +640,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#MEMNAME}: Memory utilization'
                         host: 'HOST-RESOURCES-MIB SNMP'
+                        name: '{#MEMNAME}: Memory utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -664,8 +664,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
                         host: 'HOST-RESOURCES-MIB SNMP'
+                        name: '{#FSNAME}: Disk space usage'
     -
       uuid: f6572ac29240452596e9f7b2a7ebb408
       template: 'HOST-RESOURCES-MIB storage SNMP'
@@ -881,18 +881,6 @@ zabbix_export:
           value: '80'
   graphs:
     -
-      uuid: f55018667c2242c5a9bb969bbcaf4770
-      name: 'CPU utilization'
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
-      graph_items:
-        -
-          drawtype: GRADIENT_LINE
-          color: 1A7C11
-          item:
-            host: 'HOST-RESOURCES-MIB SNMP'
-            key: system.cpu.util
-    -
       uuid: fe501ac6688d4165a645ef804644cf93
       name: 'CPU utilization'
       ymin_type_1: FIXED
@@ -903,4 +891,16 @@ zabbix_export:
           color: 1A7C11
           item:
             host: 'HOST-RESOURCES-MIB CPU SNMP'
+            key: system.cpu.util
+    -
+      uuid: f55018667c2242c5a9bb969bbcaf4770
+      name: 'CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'HOST-RESOURCES-MIB SNMP'
             key: system.cpu.util

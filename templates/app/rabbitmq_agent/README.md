@@ -7,8 +7,33 @@ For Zabbix version: 6.2 and higher
 The template to monitor RabbitMQ by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `RabbitMQ Cluster` — collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with Zabbix agent.
+  Template `RabbitMQ Cluster` — collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with Zabbix agent.
 
+_setup: |
+  Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
+
+  Create a user to monitor the service:
+
+  ```bash
+  rabbitmqctl add_user zbx_monitor <PASSWORD>
+  rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
+  rabbitmqctl set_user_tags zbx_monitor monitoring
+  ```
+
+  Login and password are also set in macros:
+
+  - {$RABBITMQ.API.USER}
+  - {$RABBITMQ.API.PASSWORD}
+
+  If your cluster consists of several nodes, it is recommended to assign the `cluster` template to a separate balancing host.
+  In the case of a single-node installation, you can assign the `cluster` template to one host with a `node` template.
+
+  If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.CLUSTER_HOST}` macro.
+
+  Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
+
+_zabbix_forum_url: https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
+_template_type: AGENT
 
 
 This template was tested on:
@@ -17,30 +42,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
-
-Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
-
-Create a user to monitor the service:
-
-```bash
-rabbitmqctl add_user zbx_monitor <PASSWORD>
-rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
-rabbitmqctl set_user_tags zbx_monitor monitoring
-```
-
-Login and password are also set in macros:
-
-- {$RABBITMQ.API.USER}
-- {$RABBITMQ.API.PASSWORD}
-
-If your cluster consists of several nodes, it is recommended to assign the `cluster` template to a separate balancing host.
-In the case of a single-node installation, you can assign the `cluster` template to one host with a `node` template.
-
-If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.CLUSTER_HOST}` macro.
-
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
-
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
@@ -128,8 +130,6 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
-
 # RabbitMQ node by Zabbix agent
 
 ## Overview
@@ -138,10 +138,30 @@ For Zabbix version: 6.2 and higher
 The template to monitor RabbitMQ by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
-Template `RabbitMQ Node` — (Zabbix version >= 4.2) collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with Zabbix agent.
+  Template `RabbitMQ Node` — (Zabbix version >= 4.2) collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with Zabbix agent.
 
-It also uses Zabbix agent to collect `RabbitMQ` Linux process stats like CPU usage, memory usage and whether process is running or not.
+  It also uses Zabbix agent to collect `RabbitMQ` Linux process stats like CPU usage, memory usage and whether process is running or not.
 
+_setup: |
+  Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
+
+  Create a user to monitor the service:
+
+  ```bash
+  rabbitmqctl add_user zbx_monitor <PASSWORD>
+  rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
+  rabbitmqctl set_user_tags zbx_monitor monitoring
+  ```
+
+  Login and password are also set in macros:
+
+  - {$RABBITMQ.API.USER}
+  - {$RABBITMQ.API.PASSWORD}
+
+  If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.HOST}` macro.
+  Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
+
+_zabbix_forum_url: https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
 
 
 This template was tested on:
@@ -150,24 +170,7 @@ This template was tested on:
 
 ## Setup
 
-Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
-
-Create a user to monitor the service:
-
-```bash
-rabbitmqctl add_user zbx_monitor <PASSWORD>
-rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
-rabbitmqctl set_user_tags zbx_monitor monitoring
-```
-
-Login and password are also set in macros:
-
-- {$RABBITMQ.API.USER}
-- {$RABBITMQ.API.PASSWORD}
-
-If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.HOST}` macro.
-Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
-
+Refer to the vendor documentation.
 
 ## Zabbix configuration
 
@@ -263,7 +266,7 @@ There are no template links in this template.
 |RabbitMQ: Node is not running |<p>RabbitMQ node is not running</p> |`max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0` |AVERAGE |<p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |
 |RabbitMQ: Memory alarm |<p>https://www.rabbitmq.com/memory.html</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1` |AVERAGE | |
 |RabbitMQ: Free disk space alarm |<p>https://www.rabbitmq.com/disk-alarms.html</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1` |AVERAGE | |
-|RabbitMQ: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|RabbitMQ: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |RabbitMQ: Process is not running |<p>-</p> |`last(/RabbitMQ node by Zabbix agent/proc.num["{$RABBITMQ.PROCESS_NAME}"])=0` |HIGH | |
 |RabbitMQ: Service is down |<p>-</p> |`last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p> |
 |RabbitMQ: Service response time is too high |<p>-</p> |`min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- RabbitMQ: Process is not running</p><p>- RabbitMQ: Service is down</p> |
@@ -279,6 +282,4 @@ There are no template links in this template.
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
-
-You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
 

@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-08T09:22:54Z'
-  groups:
+  date: '2022-06-07T19:37:56Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -1301,8 +1301,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Windows SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: 3b28bdbfdb6d4cf1a69c7466a4f059f3
           name: 'System performance'
@@ -1322,8 +1322,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU utilization'
                         host: 'Windows SNMP'
+                        name: 'CPU utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -1346,8 +1346,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#MEMNAME}: Memory utilization'
                         host: 'Windows SNMP'
+                        name: '{#MEMNAME}: Memory utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -1370,8 +1370,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
                         host: 'Windows SNMP'
+                        name: '{#FSNAME}: Disk space usage'
       valuemaps:
         -
           uuid: 2357d81186e34d5b91db98c2350e0bdf

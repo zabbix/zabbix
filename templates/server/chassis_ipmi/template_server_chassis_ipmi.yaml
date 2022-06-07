@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:44Z'
-  groups:
+  date: '2022-06-07T19:33:35Z'
+  template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -275,8 +275,26 @@ zabbix_export:
             key: ipmi.get
           lld_macro_paths:
             -
+              lld_macro: '{#SENSOR_HI_CRIT}'
+              path: $.threshold.upper.crit
+            -
+              lld_macro: '{#SENSOR_HI_DISAST}'
+              path: $.threshold.upper.non_recover
+            -
+              lld_macro: '{#SENSOR_HI_WARN}'
+              path: $.threshold.upper.non_crit
+            -
               lld_macro: '{#SENSOR_ID}'
               path: $.id
+            -
+              lld_macro: '{#SENSOR_LO_CRIT}'
+              path: $.threshold.lower.crit
+            -
+              lld_macro: '{#SENSOR_LO_DISAST}'
+              path: $.threshold.lower.non_recover
+            -
+              lld_macro: '{#SENSOR_LO_WARN}'
+              path: $.threshold.lower.non_crit
             -
               lld_macro: '{#SENSOR_READING_TYPE}'
               path: $.reading.text
@@ -286,24 +304,6 @@ zabbix_export:
             -
               lld_macro: '{#SENSOR_UNIT}'
               path: $.units
-            -
-              lld_macro: '{#SENSOR_LO_WARN}'
-              path: $.threshold.lower.non_crit
-            -
-              lld_macro: '{#SENSOR_LO_CRIT}'
-              path: $.threshold.lower.crit
-            -
-              lld_macro: '{#SENSOR_LO_DISAST}'
-              path: $.threshold.lower.non_recover
-            -
-              lld_macro: '{#SENSOR_HI_WARN}'
-              path: $.threshold.upper.non_crit
-            -
-              lld_macro: '{#SENSOR_HI_CRIT}'
-              path: $.threshold.upper.crit
-            -
-              lld_macro: '{#SENSOR_HI_DISAST}'
-              path: $.threshold.upper.non_recover
           overrides:
             -
               name: 'trigger SENSOR_HI_CRIT'
