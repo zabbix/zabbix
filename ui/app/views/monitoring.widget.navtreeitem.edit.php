@@ -40,9 +40,10 @@ $form_list = (new CFormList())
 	->addRow(_('Linked map'), [
 		new CVar('sysmapid', $data['sysmap']['sysmapid']),
 		(new CTextBox('sysmapname', $data['sysmap']['name'], true))
-			->setAttribute('onChange',
-				'javascript: if(jQuery("#'.$form->getName().' input[type=text]:first").val() === ""){'.
-					'jQuery("#widget-dialogue-form input[type=text]:first").val(this.value);}')
+			->setAttribute('onchange',
+				'if (document.getElementById("name").value === "") {
+				document.getElementById("name").value = this.value;
+				}')
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
