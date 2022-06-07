@@ -23,7 +23,7 @@
 window.widget_svggraph_form = new class {
 
 	init({form_id, form_tabs_id}) {
-		colorPalette.setThemeColors(<?= json_encode(explode(',', getUserGraphTheme()['colorpalette'])) ?>);
+		colorPalette.setThemeColors(<?= json_encode(CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE) ?>);
 
 		this.overlay_body = jQuery(".overlay-dialogue-body");
 		this.form_id = form_id;
