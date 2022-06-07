@@ -73,7 +73,7 @@ class CSvgGraphMetricsPoint extends CSvgGroup {
 	public function toString($destroy = true): string {
 		$this
 			->setAttribute('data-set', 'points')
-			->setAttribute('data-metric', CHtml::encode($this->item_name))
+			->setAttribute('data-metric', $this->item_name)
 			->setAttribute('data-color', $this->options['color'])
 			->draw();
 
