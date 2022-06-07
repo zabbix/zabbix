@@ -1308,6 +1308,7 @@ class CWidgetHelper {
 								(new CVar($field_name.'['.$row_num.'][stacked]', '0'))->removeId(),
 								(new CCheckBox($field_name.'['.$row_num.'][stacked]'))
 									->setChecked((bool) $value['stacked'])
+									->setEnabled($value['type'] == SVG_GRAPH_TYPE_LINE)
 							])
 						])
 						->addItem([
