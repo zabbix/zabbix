@@ -128,13 +128,22 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			if (array_key_exists('hostmacroid', $macro) && array_key_exists($macro['hostmacroid'], $db_macros)) {
 				$db_macro = $db_macros[$macro['hostmacroid']];
 				$macro_diff = array_diff_assoc(array_intersect_key($macro, $macro_fields), $db_macro);
+				$mandatory_fields = ['hostmacroid' => $macro['hostmacroid']];
 
 				if (array_key_exists('discovery_state', $macro)
 						&& $macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING) {
 					$macro_diff['automatic'] = ZBX_USERMACRO_MANUAL;
 				}
 
-				$macro = ['hostmacroid' => $macro['hostmacroid']] + $macro_diff;
+				if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC) {
+					/**
+					 * Macro value must be passed to be sure its syntax is still valid.
+					 * Syntax may be changed, e.g., if the Vault provider has been changed.
+					 */
+					$mandatory_fields['value'] = $macro['value'];
+				}
+
+				$macro = $mandatory_fields + $macro_diff;
 			}
 			else {
 				unset($macro['discovery_state'], $macro['original_value'], $macro['original_description'],
