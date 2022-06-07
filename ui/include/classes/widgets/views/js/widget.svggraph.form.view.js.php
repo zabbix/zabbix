@@ -58,7 +58,6 @@ window.widget_svggraph_form = new class {
 			}
 		});
 
-
 		// Initialize vertical accordion.
 		jQuery(this.dataset_wrapper)
 			.on("focus", ".<?= CMultiSelect::ZBX_STYLE_CLASS ?> input.input, .js-click-expend, .color-picker-preview", function() {
@@ -110,11 +109,18 @@ window.widget_svggraph_form = new class {
 			jQuery(this).multiSelect(jQuery(this).data("params"));
 		});
 
-		// Initialize color-picker UI elements.
-		jQuery(".<?= ZBX_STYLE_COLOR_PICKER ?> input").colorpicker({onUpdate: function(color){
-			jQuery(".<?= ZBX_STYLE_COLOR_PREVIEW_BOX ?>", jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>"))
-				.css("background-color", "#"+color);
-		}, appendTo: ".overlay-dialogue-body"});
+		for (const colorpicker of jQuery(".<?= ZBX_STYLE_COLOR_PICKER ?> input")) {
+			$(colorpicker).colorpicker({
+				onUpdate: function(color) {
+					jQuery(".<?= ZBX_STYLE_COLOR_PREVIEW_BOX ?>",
+						jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>")
+					).css("background-color", `#${color}`);
+				},
+				appendTo: ".overlay-dialogue-body"
+			});
+
+			colorPalette.incrementNextColor();
+		}
 
 		this.initDataSetSortable();
 
@@ -311,8 +317,6 @@ window.widget_svggraph_form = new class {
 		this.onGraphConfigChange();
 
 		this.initDataSetSortable();
-
-		colorPalette.incrementNextColor();
 	}
 
 	removeDataSet(obj) {
