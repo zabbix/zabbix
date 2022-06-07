@@ -11116,6 +11116,10 @@ msgstr "Список пустой"
 msgid "List of OS processes with attributes. Returns JSON array"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1021
+msgid "List of Windows Registry values or keys located at given key. Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Список блочных устройств и их типы. Возвращает JSON"
@@ -13202,6 +13206,10 @@ msgstr "Количество элементов данных в базе дан�
 #: include/classes/data/CItemData.php:1654
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Количество элементов данных в истории прокси, которые еще не были отправлены на сервер"
+
+#: include/classes/data/CItemData.php:1729
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -19929,6 +19937,10 @@ msgstr "Статистика кэша значений. Допустимые з�
 #: include/classes/helpers/CCookieHelper.php:75
 msgid "Value cannot be empty."
 msgstr "Значение не может быть пустым"
+
+#: include/classes/data/CItemData.php:1017
+msgid "Value data for value name in Windows Registry key."
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"

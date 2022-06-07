@@ -55,6 +55,23 @@ window.popup_generic = {
 		});
 	},
 
+	initTemplategroupsFilter() {
+		const overlay = overlays_stack.end();
+
+		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
+			jQuery(ms).on('change', {overlay: overlay}, function (e) {
+				const groups = jQuery(this).multiSelect('getData').map((item) => item.id);
+				const parameters = groups.length
+					? {templategroupid: groups[0]}
+					: {filter_groupid_rst: 1, templategroupid: []};
+
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
+					dialogueid: e.data.overlay.dialogueid
+				});
+			});
+		});
+	},
+
 	initHostsFilter() {
 		var overlay = overlays_stack.end();
 
@@ -62,6 +79,23 @@ window.popup_generic = {
 			jQuery(ms).on('change', {overlay: overlay}, function (e) {
 				const hosts = jQuery(this).multiSelect('getData').map((item) => item.id);
 				const parameters = hosts.length ? {hostid: hosts[0]} : {filter_hostid_rst: 1, hostid: []};
+
+				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
+					dialogueid: e.data.overlay.dialogueid
+				});
+			});
+		});
+	},
+
+	initTemplatesFilter() {
+		const overlay = overlays_stack.end();
+
+		jQuery('.multiselect', overlay.$dialogue).each(function (i, ms) {
+			jQuery(ms).on('change', {overlay: overlay}, function (e) {
+				const templates = jQuery(this).multiSelect('getData').map((item) => item.id);
+				const parameters = templates.length
+					? {templateid: templates[0]}
+					: {filter_templateid_rst: 1, templateid: []};
 
 				PopUp(e.data.overlay.action, {...e.data.overlay.options, ...parameters}, {
 					dialogueid: e.data.overlay.dialogueid

@@ -56,14 +56,16 @@ class CConfigurationExport {
 		$this->options = array_merge([
 			'hosts' => [],
 			'templates' => [],
-			'groups' => [],
+			'template_groups' => [],
+			'host_groups' => [],
 			'images' => [],
 			'maps' => [],
 			'mediaTypes' => []
 		], $options);
 
 		$this->data = [
-			'groups' => [],
+			'template_groups' => [],
+			'host_groups' => [],
 			'templates' => [],
 			'hosts' => [],
 			'triggers' => [],
@@ -142,8 +144,14 @@ class CConfigurationExport {
 				$simple_triggers = $this->builder->extractSimpleTriggers($this->data['triggers']);
 			}
 
-			if ($this->data['groups']) {
-				$this->builder->buildGroups($schema['rules']['groups'], $this->data['groups']);
+			if ($this->data['template_groups']) {
+				$this->builder->buildTemplateGroups($schema['rules']['template_groups'],
+					$this->data['template_groups']
+				);
+			}
+
+			if ($this->data['host_groups']) {
+				$this->builder->buildHostGroups($schema['rules']['host_groups'], $this->data['host_groups']);
 			}
 
 			if ($this->data['templates']) {
@@ -189,8 +197,12 @@ class CConfigurationExport {
 	protected function gatherData() {
 		$options = $this->filterOptions($this->options);
 
-		if ($options['groups']) {
-			$this->gatherGroups($options['groups']);
+		if ($options['host_groups']) {
+			$this->gatherHostGroups($options['host_groups']);
+		}
+
+		if ($options['template_groups']) {
+			$this->gatherTemplateGroups($options['template_groups']);
 		}
 
 		if ($options['templates']) {
@@ -268,14 +280,27 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get groups for export from database.
+	 * Get host groups for export from database.
 	 *
-	 * @param array $groupIds
+	 * @param array $groupids
 	 */
-	protected function gatherGroups(array $groupIds) {
-		$this->data['groups'] = API::HostGroup()->get([
+	protected function gatherHostGroups(array $groupids) {
+		$this->data['host_groups'] = API::HostGroup()->get([
 			'output' => ['name', 'uuid'],
-			'groupids' => $groupIds,
+			'groupids' => $groupids,
+			'preservekeys' => true
+		]);
+	}
+
+	/**
+	 * Get template groups for export from database.
+	 *
+	 * @param array $groupids
+	 */
+	protected function gatherTemplateGroups(array $groupids) {
+		$this->data['template_groups'] = API::TemplateGroup()->get([
+			'output' => ['name', 'uuid'],
+			'groupids' => $groupids,
 			'preservekeys' => true
 		]);
 	}
@@ -288,7 +313,7 @@ class CConfigurationExport {
 	protected function gatherTemplates(array $templateids) {
 		$templates = API::Template()->get([
 			'output' => ['host', 'name', 'description', 'uuid'],
-			'selectGroups' => ['groupid', 'name', 'uuid'],
+			'selectTemplateGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectDashboards' => API_OUTPUT_EXTEND,
@@ -300,7 +325,7 @@ class CConfigurationExport {
 
 		foreach ($templates as &$template) {
 			// merge host groups with all groups
-			$this->data['groups'] += zbx_toHash($template['groups'], 'groupid');
+			$this->data['template_groups'] += array_column($template['templategroups'], null, 'groupid');
 
 			$template['dashboards'] = [];
 			$template['discoveryRules'] = [];
@@ -333,7 +358,7 @@ class CConfigurationExport {
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'selectInventory' => API_OUTPUT_EXTEND,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectGroups' => ['groupid', 'name', 'uuid'],
+			'selectHostGroups' => ['groupid', 'name', 'uuid'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
 			'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
@@ -343,7 +368,7 @@ class CConfigurationExport {
 
 		foreach ($hosts as &$host) {
 			// merge host groups with all groups
-			$this->data['groups'] += zbx_toHash($host['groups'], 'groupid');
+			$this->data['host_groups'] += array_column($host['hostgroups'], null, 'groupid');
 
 			$host['discoveryRules'] = [];
 			$host['items'] = [];
@@ -860,7 +885,7 @@ class CConfigurationExport {
 		$groups = $this->getGroupsReferences(array_keys($groupids));
 
 		// Export the groups used in group prototypes.
-		$this->data['groups'] += $groups;
+		$this->data['host_groups'] += $groups;
 
 		foreach ($host_prototypes as $host_prototype) {
 			foreach ($host_prototype['groupLinks'] as &$group_link) {

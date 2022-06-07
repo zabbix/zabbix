@@ -61,6 +61,8 @@ final class CItemData {
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
+			'registry.data[key,<value name>]',
+			'registry.get[key,<mode>,<name regexp>]',
 			'sensor[device,sensor,<mode>]',
 			'service.info[service,<param>]',
 			'services[<type>,<state>,<exclude>]',
@@ -161,6 +163,8 @@ final class CItemData {
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
+			'registry.data[key,<value name>]',
+			'registry.get[key,<mode>,<name regexp>]',
 			'sensor[device,sensor,<mode>]',
 			'service.info[service,<param>]',
 			'services[<type>,<state>,<exclude>]',
@@ -1009,6 +1013,14 @@ final class CItemData {
 				'description' => _('Various information about specific process(es). Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
+			'registry.data[key,<value name>]' => [
+				'description' => _('Value data for value name in Windows Registry key.'),
+				'value_type' => null
+			],
+			'registry.get[key,<mode>,<name regexp>]' => [
+				'description' => _('List of Windows Registry values or keys located at given key. Returns JSON.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'sensor[device,sensor,<mode>]' => [
 				'description' => _('Hardware sensor reading. Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
@@ -1714,7 +1726,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[queue,<from>,<to>]' => [
-				'description' => _('Number of items in the queue which are delayed by from to to seconds, inclusive.'),
+				'description' => _('Number of items in the queue which are delayed by from to seconds, inclusive.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[rcache,<cache>,<mode>]' => [

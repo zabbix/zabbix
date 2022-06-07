@@ -5256,6 +5256,28 @@ svg {
 	}
 }
 
+.icon-count {
+	font-size: 12px;
+	padding: 3px 5px 2px;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	border-radius: 3px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px rgba($blue, .35);
+	}
+}
+
+a.icon-count {
+	color: $font-selected-color;
+}
+
 .problem-icon-link,
 .problem-icon-list {
 	display: inline-flex;

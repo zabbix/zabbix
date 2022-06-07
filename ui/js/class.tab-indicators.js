@@ -216,8 +216,10 @@ class TabIndicatorFactory {
 				return new OverridesTabIndicatorItem;
 			case 'Operations':
 				return new OperationsTabIndicatorItem;
-			case 'Permissions':
-				return new PermissionsTabIndicatorItem;
+			case 'TemplatePermissions':
+				return new TemplatePermissionsTabIndicatorItem;
+			case 'HostPermissions':
+				return new HostPermissionsTabIndicatorItem;
 			case 'Preprocessing':
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
@@ -1238,7 +1240,26 @@ class GraphOverridesTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class PermissionsTabIndicatorItem extends TabIndicatorItem {
+class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#templategroup-right-table tbody tr')
+			.length > 1;
+	}
+
+	initObserver(element) {
+		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes(element);
+		});
+	}
+}
+
+class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
