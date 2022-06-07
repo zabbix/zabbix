@@ -58,6 +58,15 @@ window.widget_svggraph_form = new class {
 			}
 		});
 
+		this._datasetTabInit();
+		this._displayingOptionsTabInit();
+		this._timePeriodTabInit();
+		this._axesTabInit();
+		this._legendTabInit();
+		this._problemsTabInit();
+	}
+
+	_datasetTabInit() {
 		// Initialize vertical accordion.
 		jQuery(this.dataset_wrapper)
 			.on("focus", ".<?= CMultiSelect::ZBX_STYLE_CLASS ?> input.input, .js-click-expend, .color-picker-preview", function() {
@@ -97,11 +106,11 @@ window.widget_svggraph_form = new class {
 		jQuery(".<?= CRangeControl::ZBX_STYLE_CLASS ?>", jQuery(this.dataset_wrapper)).rangeControl();
 
 		// Expand dataset when click in pattern fields.
-		jQuery(this.dataset_wrapper).on("click", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= CMultiSelect::ZBX_STYLE_CLASS ?>, .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= ZBX_STYLE_BTN_GREY ?>", function(event) {
+		jQuery(this.dataset_wrapper).on("click", ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= CMultiSelect::ZBX_STYLE_CLASS ?>, .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED ?> .<?= ZBX_STYLE_BTN_GREY ?>", function(e) {
 			jQuery(this.dataset_wrapper).zbx_vertical_accordion("expandNth",
 				jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index());
 
-			jQuery(event.currentTarget).find("input.input").focus();
+			jQuery(e.currentTarget).find("input.input").focus();
 		});
 
 		// Initialize pattern fields.
@@ -153,26 +162,6 @@ window.widget_svggraph_form = new class {
 		document
 			.getElementById('dataset-menu')
 			.addEventListener('click', this._addDatasetMenu);
-
-		this._displayingOptionsTabInit();
-		this._timePeriodTabInit();
-		this._axesTabInit();
-		this._legendTabInit();
-		this._problemsTabInit();
-	}
-
-	_selectItems() {
-		PopUp("popup.generic", {
-			srctbl: 'items',
-			srcfld1: 'itemid',
-			srcfld2: 'name',
-			dstfrm: this.form_id,
-			numeric: 1,
-			writeonly: 1,
-			multiselect: 1,
-			with_webitems: 1,
-			real_hosts: 1
-		});
 	}
 
 	_displayingOptionsTabInit() {
@@ -238,6 +227,20 @@ window.widget_svggraph_form = new class {
 				jQuery("[name='evaltype']", jQuery(widget)).prop('disabled', !e.target.checked);
 				jQuery('input, button, z-select', jQuery('#tags_table_tags', jQuery(widget))).prop('disabled', !e.target.checked);
 			});
+	}
+
+	_selectItems() {
+		PopUp("popup.generic", {
+			srctbl: 'items',
+			srcfld1: 'itemid',
+			srcfld2: 'name',
+			dstfrm: this.form_id,
+			numeric: 1,
+			writeonly: 1,
+			multiselect: 1,
+			with_webitems: 1,
+			real_hosts: 1
+		});
 	}
 
 	_addDatasetMenu(e) {
