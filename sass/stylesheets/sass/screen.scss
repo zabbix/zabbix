@@ -3767,12 +3767,17 @@ $form-icon-btn: (
 	li {
 		padding-left: 23px;
 
-		.svg-graph-hintbox-item-color {
+		.svg-graph-hintbox-item-color,
+		.svg-graph-hintbox-trigger-color {
 			margin: 3px 10px 3px -20px;
 			width: 10px;
 			height: 10px;
 			float: left;
 			display: block;
+		}
+
+		.svg-graph-hintbox-trigger-color {
+			border-radius: 50%;
 		}
 	}
 

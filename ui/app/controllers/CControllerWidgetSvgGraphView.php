@@ -134,6 +134,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			$svg_options['data'] = zbx_array_merge($svg_options['data'], [
 				'sbox' => $graph_data['dashboard_time'] && !$edit_mode,
 				'show_problems' => $graph_data['problems']['show_problems'],
+				'show_simple_triggers' => $graph_data['displaying']['show_simple_triggers'],
 				'time_from' => $graph_data['time_period']['time_from'],
 				'hint_max_rows' => ZBX_WIDGET_ROWS
 			]);
