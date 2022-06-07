@@ -69,8 +69,8 @@ char	*CONFIG_SSL_CERT_LOCATION;
 char	*CONFIG_SSL_KEY_LOCATION;
 
 /* TLS parameters */
-unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
-unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
+/* unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED; */
+/* unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED; */
 
 /* char	*CONFIG_TLS_CONNECT		= NULL; */
 /* char	*CONFIG_TLS_ACCEPT		= NULL; */
@@ -92,6 +92,7 @@ unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
 /* char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/\* not used in agent, defined for linking with tls.c *\/ */
 
 /*zbx_config_tls_t	zbx_config_tls;*/
+zbx_config_tls_t	*zbx_config_tls = NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
@@ -254,7 +255,12 @@ int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 static int		*threads_flags;
 
-unsigned char	program_type = ZBX_PROGRAM_TYPE_AGENTD;
+unsigned char  program_type = ZBX_PROGRAM_TYPE_AGENTD;
+
+static unsigned char	get_program_type(void)
+{
+	return program_type;
+}
 
 ZBX_THREAD_LOCAL unsigned char	process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 ZBX_THREAD_LOCAL int		process_num;
@@ -749,6 +755,8 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 
 		CONFIG_ACTIVE_ARGS[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");
+		CONFIG_ACTIVE_ARGS[forks].zbx_config_tls = zbx_config_tls;
+		CONFIG_ACTIVE_ARGS[forks].zbx_get_program_type_cb_arg = get_program_type;
 	}
 
 	return SUCCEED;
@@ -822,7 +830,7 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
  * Parameters: requirement - produce error if config file missing or not      *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config(int requirement, ZBX_TASK_EX *task, zbx_config_tls_t *zbx_config_tls)
+static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
 	static char			*active_hosts;
 	zbx_vector_str_t		hostnames;
@@ -1086,6 +1094,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef _WINDOWS
 	DWORD		res;
 #endif
+	//zbx_tls_init_child_args_t	tls_init_child_args;
+
+	//tls_init_child_args.zbx_config_tls = zbx_config_tls;
+	//tls_init_child_args.zbx_get_program_type_cb_arg = get_program_type;
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1216,7 +1228,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	for (i = 0; i < threads_num; i++)
 	{
-		zbx_thread_args_t	*thread_args;
+		zbx_thread_args_t		*thread_args;
+		//ZBX_THREAD_LISTENER_ARGS	LISTENER_ARGS;
+		ZBX_THREAD_LISTENER_ARGS	LISTENER_ARGS = {&listen_sock, zbx_config_tls, get_program_type};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 
@@ -1235,7 +1249,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(collector_thread, thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
-				thread_args->args = &listen_sock;
+				/* listener_args_in = (ZBX_THREAD_LISTENER_ARGS *)zbx_malloc(NULL, */
+				/* 		sizeof(ZBX_THREAD_LISTENER_ARGS)); */
+				thread_args->args = &LISTENER_ARGS;
 				zbx_thread_start(listener_thread, thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
@@ -1338,9 +1354,6 @@ int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		*error = NULL;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_config_tls_t	zbx_config_tls;
-#endif
 #ifdef _WINDOWS
 	int		ret;
 
@@ -1350,14 +1363,17 @@ int	main(int argc, char **argv)
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
+	zbx_init_config_tls_t(zbx_config_tls);
+#endif
+
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
 	progname = get_program_name(argv[0]);
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_init_config_tls_t(&zbx_config_tls);
-#endif
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -1384,7 +1400,7 @@ int	main(int argc, char **argv)
 			break;
 #ifndef _WINDOWS
 		case ZBX_TASK_RUNTIME_CONTROL:
-			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t, &zbx_config_tls);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 			exit(SUCCEED == zbx_sigusr_send(t.data, CONFIG_PID_FILE) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
@@ -1396,7 +1412,7 @@ int	main(int argc, char **argv)
 			{
 				char	*p, *first_hostname;
 
-				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t, &zbx_config_tls);
+				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 
 				first_hostname = NULL != (p = strchr(CONFIG_HOSTNAMES, ',')) ? zbx_dsprintf(NULL,
 						"%.*s", (int)(p - CONFIG_HOSTNAMES), CONFIG_HOSTNAMES) :
@@ -1408,7 +1424,7 @@ int	main(int argc, char **argv)
 				zbx_free(first_hostname);
 			}
 			else
-				zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t, &zbx_config_tls);
+				zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 
 			zbx_free_config();
 
@@ -1423,7 +1439,7 @@ int	main(int argc, char **argv)
 #endif
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
-			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t, &zbx_config_tls);
+			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 #ifdef _WINDOWS
 			if (SUCCEED != init_perf_collector(ZBX_SINGLE_THREADED, &error))
 			{
@@ -1490,7 +1506,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		default:
-			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t, &zbx_config_tls);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
 			load_aliases(CONFIG_ALIASES);
 			break;
@@ -1501,5 +1517,6 @@ int	main(int argc, char **argv)
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 #endif
+	zbx_free(zbx_config_tls);
 	exit(EXIT_SUCCESS);
 }

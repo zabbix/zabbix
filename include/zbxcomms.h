@@ -67,8 +67,6 @@ zbx_buf_type_t;
 #	include <openssl/rand.h>
 #endif
 
-
-
 typedef struct
 {
 	unsigned int	configured_tls_connect_mode;
@@ -296,8 +294,15 @@ void    zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_act
 void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(void);
 
-typedef unsigned char	(*zbx_get_program_type_f)(void);
-void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
+/* typedef struct */
+/* { */
+/* 	zbx_config_tls_t	*zbx_config_tls; */
+/* 	zbx_get_program_type_f	zbx_get_program_type_cb_arg; */
+/* } */
+/* zbx_tls_init_child_args_t; */
+
+/*void	zbx_tls_init_child(zbx_tls_init_child_args_t *zbx_tls_init_child_args);*/
+void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb);
 
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);

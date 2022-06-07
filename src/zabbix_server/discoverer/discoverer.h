@@ -22,6 +22,15 @@
 
 #include "zbxthreads.h"
 
+#include "zbxcomms.h"
+
+typedef struct
+{
+	zbx_config_tls_t	*zbx_config_tls;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+}
+ZBX_THREAD_DISCOVERER_ARGS;
+
 ZBX_THREAD_ENTRY(discoverer_thread, args);
 
 #endif

@@ -19,7 +19,6 @@
 
 #include "listener.h"
 
-#include "zbxcomms.h"
 #include "zbxconf.h"
 #include "sysinfo.h"
 #include "log.h"
@@ -112,23 +111,28 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 	int		ret;
 	zbx_socket_t	s;
-
+	//zbx_tls_init_child_args_t	*tls_init_child_args;
+	ZBX_THREAD_LISTENER_ARGS	*init_child_args_in;
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
+	init_child_args_in = (ZBX_THREAD_LISTENER_ARGS *)((((zbx_thread_args_t *)args))->args);
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	//tls_init_child_args = (zbx_tls_init_child_args_t *)((zbx_thread_args_t *)args)->args;
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
-	memcpy(&s, (zbx_socket_t *)((zbx_thread_args_t *)args)->args, sizeof(zbx_socket_t));
+	memcpy(&s, (zbx_socket_t *)(init_child_args_in->listen_sock), sizeof(zbx_socket_t));
 
 	zbx_free(args);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(init_child_args_in->zbx_config_tls, init_child_args_in->zbx_get_program_type_cb_arg);
 #endif
 
 #ifndef _WINDOWS
@@ -147,7 +151,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
-		ret = zbx_tcp_accept(&s, configured_tls_accept_modes);
+		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->configured_tls_accept_modes);
 		zbx_update_env(zbx_time());
 
 		if (SUCCEED == ret)
@@ -159,7 +163,9 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 			{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				if (ZBX_TCP_SEC_TLS_CERT != s.connection_type ||
-						SUCCEED == (ret = zbx_check_server_issuer_subject(&s, &msg)))
+						SUCCEED == (ret = zbx_check_server_issuer_subject(&s, &msg,
+						init_child_args_in->zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER,
+						init_child_args_in->zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT)))
 #endif
 				{
 					process_listener(&s);

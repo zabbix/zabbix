@@ -23,8 +23,6 @@
 #include "dbcache.h"
 #include "zbxvariant.h"
 
-unsigned char	*zbx_get_program_type(void);
-
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
 #define MACRO_TYPE_MESSAGE_RECOVERY	0x00000002
 #define MACRO_TYPE_TRIGGER_URL		0x00000004

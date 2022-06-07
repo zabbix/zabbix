@@ -22,11 +22,21 @@
 
 #include "zbxthreads.h"
 
+#include "zbxcomms.h"
+
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern char	*CONFIG_STATS_ALLOWED_IP;
 
 #define ZBX_IPC_SERVICE_TRAPPER	"trapper"
+
+typedef struct
+{
+	zbx_config_tls_t	*zbx_config_tls;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	zbx_socket_t		*listen_sock;
+}
+ZBX_THREAD_TRAPPER_ARGS;
 
 ZBX_THREAD_ENTRY(trapper_thread, args);
 

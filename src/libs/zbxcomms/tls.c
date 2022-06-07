@@ -2282,15 +2282,15 @@ static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, co
 	}
 }
 
-void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg)
+//void	zbx_tls_init_child(zbx_tls_init_child_args_t	*tls_init_child_args)
+void	zbx_tls_init_child(zbx_config_tls_t	*zbx_config_tls, zbx_get_program_type_f	zbx_get_program_type_cb_arg)
 {
-	int		res;
+	int			res;
 #ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
+	sigset_t		mask, orig_mask;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
 #ifndef _WINDOWS
 	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
@@ -2591,6 +2591,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 	return ret;
 }
 
+//void	zbx_tls_init_child(zbx_tls_init_child_args_t	*tls_init_child_args)
 void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg)
 {
 #define ZBX_CIPHERS_CERT_ECDHE		"EECDH+aRSA+AES128:"
@@ -2610,14 +2611,12 @@ void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f
 #	define ZBX_CIPHERS_PSK		"PSK-AES128-CBC-SHA"
 #endif
 #endif
-
 	char	*error = NULL;
 	size_t	error_alloc = 0, error_offset = 0;
 #ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
 	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
 #ifndef _WINDOWS
 	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
