@@ -145,7 +145,6 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 						'Encrypt' => ['Name ID', 'Assertions'],
 						'Case-sensitive login' => true
 					],
-					'check_disabled' => true,
 					'db_check' => [
 						'saml_auth_enabled' => '1',
 						'saml_idp_entityid' => 'IdP_saml_zabbix.com',
@@ -392,6 +391,7 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		// Check that SAML settings are disabled by default.
 		if ($check_enabled === true) {
 			foreach($fields as $name => $value){
+				var_dump($name);
 				$this->assertFalse($form->getField($name)->isEnabled());
 			}
 		}
