@@ -215,6 +215,21 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 				methods.hide();
 			},
+
+			destroy: function(element) {
+				const id = $(element).attr('id');
+
+				if ($('#lbl_' + id).length == 0) {
+					return;
+				}
+
+				element.next().remove();
+
+				$(element)
+					.off('change')
+					.data('use_default', null);
+			},
+
 			/**
 			 * Hide colorpicker overlay.
 			 */

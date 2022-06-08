@@ -638,25 +638,28 @@ window.widget_svggraph_form = new class {
 
 	recalculateSortOrder() {
 		const dataset_number = widget_svggraph_form.getDataSetNumber();
-		let i = 1;
+		const rows = jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row');
 
-		jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row').each(function () {
+		rows.each(function (i) {
 			const $obj = jQuery(this);
 
-			$obj.data('number', i);
+			$obj.data('number', i + 1);
 
-			jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> button', $obj).destroy();
+			jQuery.colorpicker('destroy', jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input', $obj));
+
+			jQuery('.table-col-name a', $obj).attr('id', `items_${dataset_number}_${i + 1}_name`);
+
+			jQuery('.table-col-action input', $obj).attr('id', `items_${dataset_number}_${i + 1}_input`);
+
+			jQuery('.table-col-no span', $obj).text((i + 1) + ':');
+		});
+
+		rows.each(function (i) {
+			const $obj = jQuery(this);
+
 			jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input', $obj)
-				.attr('id', `items_${dataset_number}_${i}_color`)
+				.attr('id', `items_${dataset_number}_${i + 1}_color`)
 				.colorpicker({appendTo: ".overlay-dialogue-body"});
-
-			jQuery('.table-col-name a', $obj).attr('id', `items_${dataset_number}_${i}_name`);
-
-			jQuery('.table-col-action input', $obj).attr('id', `items_${dataset_number}_${i}_input`);
-
-			jQuery('.table-col-no span', $obj).text(i + ':');
-
-			i++;
 		});
 
 		widget_svggraph_form.rewriteNameLinks();
