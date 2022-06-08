@@ -34,6 +34,11 @@ window.widget_svggraph_form = new class {
 		this.overlay_body.on("scroll", () => {
 			const $preview_container = jQuery(".<?= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>");
 
+			if (!$preview_container.length) {
+				this.overlay_body.off('scroll');
+				return;
+			}
+
 			if ($preview_container.offset().top < this.overlay_body.offset().top && this.overlay_body.height() > 400) {
 				jQuery("#svg-graph-preview").css("top", this.overlay_body.offset().top - $preview_container.offset().top);
 				jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
