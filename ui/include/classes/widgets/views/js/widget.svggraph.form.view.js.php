@@ -46,7 +46,7 @@ window.widget_svggraph_form = new class {
 
 		jQuery(`#${this.form_tabs}`)
 			.on("tabsactivate", () => jQuery.colorpicker("hide"))
-			.on("change", "input, z-select, .multiselect", () => this.onGraphConfigChange());
+			.on("change", "input, z-select, .multiselect", (e) => this.onGraphConfigChange(e));
 
 		this.onGraphConfigChange();
 
@@ -393,7 +393,7 @@ window.widget_svggraph_form = new class {
 		jQuery("#percentile_right_value").prop("disabled", !on);
 	}
 
-	onGraphConfigChange() {
+	onGraphConfigChange(e) {
 		// Update graph preview.
 		const $preview = jQuery("#svg-graph-preview");
 		const $preview_container = $preview.parent();
@@ -410,7 +410,7 @@ window.widget_svggraph_form = new class {
 		url.setArgument("action", "widget.svggraph.view");
 
 		// Enable/disable fields for Y axis.
-		if (this.id !== "lefty" && this.id !== "righty") {
+		if (e === undefined || (e.target.id !== "lefty" && e.target.id !== "righty")) {
 			const axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
 
 			jQuery("[type=radio]", $form).each(function() {
