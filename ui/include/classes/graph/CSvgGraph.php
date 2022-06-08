@@ -994,6 +994,10 @@ class CSvgGraph extends CSvg {
 
 	private function drawMetricsLine(): void {
 		foreach ($this->metrics as $index => $metric) {
+			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
+				continue;
+			}
+
 			if (!array_key_exists($index, $this->paths)) {
 				continue;
 			}
@@ -1253,19 +1257,15 @@ class CSvgGraph extends CSvg {
 					'value' => $value,
 					'units' => $units
 				]);
-			}
-			else {
-				$value = 0;
-				$label = '-';
-			}
 
-			$this->addItem(
-				(new CSvgGraphPercentile(_s('%1$sth percentile: %2$s', $percent, $label), $value, $y_min, $y_max))
-					->setPosition($this->canvas_x, $this->canvas_y)
-					->setSize($this->canvas_width, $this->canvas_height)
-					->setColor('#'.$color)
-					->setSide($side)
-			);
+				$this->addItem(
+					(new CSvgGraphPercentile(_s('%1$sth percentile: %2$s', $percent, $label), $value, $y_min, $y_max))
+						->setPosition($this->canvas_x, $this->canvas_y)
+						->setSize($this->canvas_width, $this->canvas_height)
+						->setColor('#'.$color)
+						->setSide($side)
+				);
+			}
 		}
 	}
 
