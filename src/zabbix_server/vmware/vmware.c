@@ -8180,7 +8180,7 @@ void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int
 	job->type = job_type;
 	job->service = service;
 	service->jobs_num += 1;
-	job->finished = FAIL;
+	job->expired = FAIL;
 	elem_new.data = job;
 	zbx_binary_heap_insert(&vmw->jobs_queue, &elem_new);
 }
@@ -8193,13 +8193,27 @@ void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int
  *             service  - [IN] the vmware service                             *
  *             job_type - [IN] the vmware job type                            *
  *                                                                            *
+ * Return value: count of removed services                                    *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_vmware_job_remove(zbx_vmware_job_t *job)
+int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 {
+	zbx_vmware_service_t	*service = job->service;
+
 	zbx_vmware_lock();
 
 	job->service->jobs_num -= 1;
 	__vm_shmem_free_func(job);
 
 	zbx_vmware_unlock();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d", __func__, service->jobs_num);
+
+	if (0 == service->jobs_num)
+	{
+		zbx_vmware_service_remove(service);
+		return 1;
+	}
+
+	return 0;
 }

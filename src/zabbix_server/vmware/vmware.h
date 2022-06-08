@@ -449,7 +449,7 @@ typedef struct
 #define ZBX_VMWARE_UPDATE_REST_TAGS	3
 #define ZBX_VMWARE_REMOVE_SERVICE	4
 	int			type;
-	int			finished;
+	int			expired;
 	zbx_vmware_service_t	*service;
 }
 zbx_vmware_job_t;
@@ -479,7 +479,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service);
 int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service);
 void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
 void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
-void	zbx_vmware_job_remove(zbx_vmware_job_t *job);
+int	zbx_vmware_job_remove(zbx_vmware_job_t *job);
 
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 
