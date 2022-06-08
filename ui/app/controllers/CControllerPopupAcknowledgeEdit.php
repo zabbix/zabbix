@@ -105,6 +105,9 @@ class CControllerPopupAcknowledgeEdit extends CController {
 			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
+			'selectSuppressionData' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
+				? ['maintenanceid', 'suppress_until']
+				: null,
 			'eventids' => $this->getInput('eventids'),
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -141,7 +144,16 @@ class CControllerPopupAcknowledgeEdit extends CController {
 		foreach ($events as $event) {
 			$can_be_closed = true;
 			$can_be_suppressed = true;
-			$can_be_unsuppressed = isEventRecentlySuppressed($event['acknowledges']);
+			$can_be_unsuppressed = false;
+
+			// Only manually suppressed problems can be unsuppressed.
+			if ($this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
+				foreach ($event['suppression_data'] as $suppression) {
+					if ($suppression['maintenanceid'] == 0) {
+						$can_be_unsuppressed = true;
+					}
+				}
+			}
 
 			// Problems already resolved are not allowed to be closed, suppressed or unsuppressed.
 			if ($event['r_eventid'] != 0 || $event['value'] == TRIGGER_VALUE_FALSE) {
