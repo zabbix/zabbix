@@ -31,6 +31,7 @@ form.dashboard-grid-widget-svggraph {
 		display: grid;
 		grid-template-columns: 24px 24px 1fr 1fr 24px;
 		grid-gap: 10px;
+		align-items: start;
 	}
 
 	.dataset-body.list-accordion-item-body {
