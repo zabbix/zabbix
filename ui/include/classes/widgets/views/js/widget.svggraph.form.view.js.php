@@ -623,7 +623,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	recalculateSortOrder() {
-		const dataset_number = widget_svggraph_form.getDataSetNumber(); // When function added as eventlistener `this` scope not working.
+		const dataset_number = widget_svggraph_form.getDataSetNumber();
 		let i = 1;
 
 		jQuery('.single-item-table[data-set=' + dataset_number + '] .single-item-table-row').each(function () {
@@ -631,8 +631,10 @@ window.widget_svggraph_form = new class {
 
 			$obj.data('number', i);
 
-			jQuery('.color-picker input', $obj).attr('id', `items_${dataset_number}_${i}_color`);
-			jQuery('.color-picker button', $obj).attr('id', `lbl_items_${dataset_number}_${i}_color`);
+			jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> button', $obj).destroy();
+			jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input', $obj)
+				.attr('id', `items_${dataset_number}_${i}_color`)
+				.colorpicker({appendTo: ".overlay-dialogue-body"});
 
 			jQuery('.table-col-name a', $obj).attr('id', `items_${dataset_number}_${i}_name`);
 
