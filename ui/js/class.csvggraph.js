@@ -118,6 +118,7 @@ jQuery(function() {
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
 			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0', graph.parent());
+
 			if (graph.data('simpleTriggersHintbox')) {
 				data.isTriggerHintBoxFrozen = true;
 			}
@@ -132,10 +133,6 @@ jQuery(function() {
 
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				graph.data('widget')._resumeUpdating();
-
-				if (graph.data('simpleTriggersHintbox')) {
-					data.isTriggerHintBoxFrozen = false;
-				}
 
 				data.isTriggerHintBoxFrozen = false;
 				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
@@ -159,10 +156,14 @@ jQuery(function() {
 		var graph = e.data.graph,
 			data = graph.data('options');
 
-		if (data.isHintBoxFroze || data.isTriggerHintBoxFrozen) {
+		if (data.isHintBoxFrozen) {
 			data.isHintBoxFrozen = false;
-			data.isTriggerHintBoxFrozen = false;
 			showHintbox(e, graph);
+			makeHintboxStatic(e, graph);
+		}
+		if (data.isTriggerHintBoxFrozen) {
+			data.isTriggerHintBoxFrozen = false;
+			showSimpleTriggerHintbox(e, graph);
 			makeHintboxStatic(e, graph);
 		}
 	}
