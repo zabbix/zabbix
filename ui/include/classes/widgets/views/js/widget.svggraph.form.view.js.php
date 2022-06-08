@@ -382,9 +382,6 @@ window.widget_svggraph_form = new class {
 
 		jQuery("#lefty_static_units").prop("disabled",
 			(!on || jQuery("#lefty_units").val() != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>));
-
-		jQuery("#percentile_left").prop("disabled", !on);
-		jQuery("#percentile_left_value").prop("disabled", !on);
 	}
 
 	onRightYChange() {
@@ -398,10 +395,6 @@ window.widget_svggraph_form = new class {
 
 		jQuery("#righty_static_units").prop("disabled",
 			(!on || jQuery("#righty_units").val() != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>));
-
-
-		jQuery("#percentile_right").prop("disabled", !on);
-		jQuery("#percentile_right_value").prop("disabled", !on);
 	}
 
 	onGraphConfigChange(e) {
@@ -421,27 +414,25 @@ window.widget_svggraph_form = new class {
 		url.setArgument("action", "widget.svggraph.view");
 
 		// Enable/disable fields for Y axis.
-		if (e === undefined || (e.target.id !== "lefty" && e.target.id !== "righty")) {
-			const axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
+		const axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
 
-			jQuery("[type=radio]", $form).each(function() {
-				if (jQuery(this).attr("name").match(/ds\[\d+]\[axisy]/) && jQuery(this).is(":checked")) {
-					axes_used[jQuery(this).val()]++;
-				}
-			});
+		jQuery("[type=radio]", $form).each(function() {
+			if (jQuery(this).attr("name").match(/ds\[\d+]\[axisy]/) && jQuery(this).is(":checked")) {
+				axes_used[jQuery(this).val()]++;
+			}
+		});
 
-			jQuery("[type=hidden]", $form).each(function() {
-				if (jQuery(this).attr("name").match(/or\[\d+]\[axisy]/)) {
-					axes_used[jQuery(this).val()]++;
-				}
-			});
+		jQuery("[type=hidden]", $form).each(function() {
+			if (jQuery(this).attr("name").match(/or\[\d+]\[axisy]/)) {
+				axes_used[jQuery(this).val()]++;
+			}
+		});
 
-			jQuery("#lefty").prop("disabled", !axes_used[<?= GRAPH_YAXIS_SIDE_LEFT ?>]);
-			jQuery("#righty").prop("disabled", !axes_used[<?= GRAPH_YAXIS_SIDE_RIGHT ?>]);
+		jQuery("#lefty").prop("disabled", !axes_used[<?= GRAPH_YAXIS_SIDE_LEFT ?>]);
+		jQuery("#righty").prop("disabled", !axes_used[<?= GRAPH_YAXIS_SIDE_RIGHT ?>]);
 
-			this.onLeftYChange();
-			this.onRightYChange();
-		}
+		this.onLeftYChange();
+		this.onRightYChange();
 
 		const form_fields = $form.serializeJSON();
 
