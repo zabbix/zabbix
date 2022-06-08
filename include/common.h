@@ -1791,4 +1791,5 @@ typedef enum
 	ERR_Z3008
 }
 zbx_err_codes_t;
+
 #endif

@@ -147,7 +147,7 @@ class CControllerHostEdit extends CController {
 						'port', 'useip'
 					],
 					'selectInventory' => array_column(getHostInventories(), 'db_field'),
-					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
+					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type', 'automatic'],
 					'selectParentTemplates' => ['templateid', 'name', 'link_type'],
 					'selectTags' => ['tag', 'value', 'automatic'],
 					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
@@ -222,14 +222,33 @@ class CControllerHostEdit extends CController {
 
 		$data['host']['macros'] = array_values(order_macros($data['host']['macros'], 'macro'));
 
-		if (!$data['host']['macros'] && $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+		if (!$data['host']['macros']) {
 			$data['host']['macros'][] = [
 				'type' => ZBX_MACRO_TYPE_TEXT,
 				'macro' => '',
 				'value' => '',
-				'description' => ''
+				'description' => '',
+				'automatic' => ZBX_USERMACRO_MANUAL
 			];
 		}
+
+		foreach ($data['host']['macros'] as &$macro) {
+			if (array_key_exists('automatic', $macro) && $macro['automatic'] == ZBX_USERMACRO_AUTOMATIC) {
+				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC;
+
+				$macro['original'] = [
+					'value' => getMacroConfigValue($macro),
+					'description' => $macro['description'],
+					'type' => $macro['type']
+				];
+			}
+			else {
+				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
+			}
+
+			unset($macro['automatic']);
+		}
+		unset($macro);
 
 		// Reset Secret text macros and set warning for cloned host.
 		if ($data['host']['hostid'] === null) {

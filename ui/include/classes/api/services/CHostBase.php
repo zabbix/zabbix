@@ -1561,7 +1561,7 @@ abstract class CHostBase extends CApiService {
 		unset($db_host);
 
 		$options = [
-			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'value', 'description'],
+			'output' => ['hostmacroid', 'hostid', 'macro', 'type', 'value', 'description', 'automatic'],
 			'filter' => ['hostid' => array_keys($db_hosts)]
 		];
 		$db_macros = DBselect(DB::makeSql('hostmacro', $options));
@@ -1627,6 +1627,20 @@ abstract class CHostBase extends CApiService {
 					}
 
 					$db_hostmacro = $db_host['macros'][$hostmacro['hostmacroid']];
+
+					// Check if this is not an attempt to modify automatic host macro.
+					if ($this instanceof CHost) {
+						$macro_fields = array_flip(['macro', 'value', 'type', 'description']);
+						$hostmacro += array_intersect_key($db_hostmacro, array_flip(['automatic']));
+
+						if ($hostmacro['automatic'] == ZBX_USERMACRO_AUTOMATIC
+								&& array_diff_assoc(array_intersect_key($hostmacro, $macro_fields), $db_hostmacro)) {
+							self::exception(ZBX_API_ERROR_PERMISSIONS,
+								_s('Not allowed to modify automatic user macro "%1$s".', $db_hostmacro['macro'])
+							);
+						}
+					}
+
 					$hostmacro += array_intersect_key($db_hostmacro, array_flip(['macro', 'type']));
 
 					if ($hostmacro['type'] != $db_hostmacro['type']) {
