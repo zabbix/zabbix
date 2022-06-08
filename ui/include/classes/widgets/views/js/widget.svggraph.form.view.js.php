@@ -292,16 +292,14 @@ window.widget_svggraph_form = new class {
 	_addDataset(type) {
 		const row_numb = jQuery('#data_sets .list-accordion-item').length;
 
-		let template = new Template(jQuery('#dataset-single-item-tmpl').html());
-
-		if (type == 1) {
-			template = new Template(jQuery('#dataset-pattern-item-tmpl').html());
-		}
-
 		jQuery(this.dataset_wrapper).zbx_vertical_accordion("collapseAll");
 
+		const template = (type == 0)
+			? new Template(jQuery('#dataset-single-item-tmpl').html())
+			: new Template(jQuery('#dataset-pattern-item-tmpl').html());
+
 		jQuery('#data_sets .list-accordion-foot').before(
-			template.evaluate({rowNum: row_numb, color: colorPalette.getNextColor()})
+			template.evaluate({rowNum: row_numb, color: (type == 0) ? '' : colorPalette.getNextColor()})
 		);
 
 		this.overlay_body.scrollTop(Math.max(this.overlay_body.scrollTop(),
