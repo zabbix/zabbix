@@ -95,8 +95,6 @@ static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, int time_now)
 
 	if (time_now - job->service->lastaccess < ZBX_VMWARE_SERVICE_TTL)
 		job->expired = SUCCEED;
-
-
 unlock:
 	zbx_vmware_unlock();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() queue:%d type:%s", __func__, vmw->jobs_queue.elems_num,
@@ -120,7 +118,7 @@ static int	vmware_job_exec(zbx_vmware_job_t *job)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s", __func__, vmware_job_type_string(job));
 
-	if (0 == (job->service->state & ZBX_VMWARE_STATE_READY))
+	if (ZBX_VMWARE_UPDATE_CONF != job->type && 0 == (job->service->state & ZBX_VMWARE_STATE_READY))
 		goto out;
 
 	switch (job->type)
