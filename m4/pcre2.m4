@@ -216,7 +216,6 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 			fi
 		fi
 
-		# we need this for some reason
 		if test "x$enable_static" = "xyes"; then
 			LIBPCRE2_LIBS=" $LIBPCRE2_LIBS -lpthread"
 		elif test "x$enable_static_libs" = "xyes" && test "x$static_linking_support" != "xno"; then

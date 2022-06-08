@@ -216,7 +216,6 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 			fi
 		fi
 
-		# we need this for some reason
 		if test "x$enable_static" = "xyes"; then
 			LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
 		elif test "x$enable_static_libs" = "xyes" && test "x$static_linking_support" != "xno"; then
