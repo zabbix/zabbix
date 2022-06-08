@@ -119,7 +119,7 @@ class CLegacyWebTest extends CWebTest {
 		}
 
 		foreach ($strings as $string) {
-			$this->assertTrue($this->query('xpath://*[contains(text(),"'.$string.'")]')->count() === 0, '"'.$string.'" must not exist.');
+			$this->assertTrue($this->query('xpath://*[not(self::script)][contains(text(),"'.$string.'")]')->count() === 0, '"'.$string.'" must not exist.');
 		}
 	}
 

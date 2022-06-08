@@ -541,7 +541,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_expand_func_t um_expand_cb, void *um_data, char **error)
+		zbx_macro_expand_func_t um_expand_cb, void *data, char **error)
 {
 	int	i;
 
@@ -555,7 +555,7 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 		{
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
-				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
+				ret = um_expand_cb(data, &value, hostids, hostids_num, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
 				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,
@@ -572,7 +572,7 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 				else
 					value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 
-				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
+				ret = um_expand_cb(data, &value, hostids, hostids_num, error);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_ARG_PERIOD:
@@ -582,7 +582,7 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 					continue;
 				}
 				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
-				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
+				ret = um_expand_cb(data, &value, hostids, hostids_num, error);
 				break;
 			case ZBX_EVAL_TOKEN_ARG_QUERY:
 				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,
@@ -592,7 +592,7 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 				}
 				ret = eval_query_expand_user_macros(ctx->expression + token->loc.l,
 						token->loc.r - token->loc.l + 1, hostids, hostids_num,
-						um_expand_cb, um_data, &value, error);
+						um_expand_cb, data, &value, error);
 				break;
 			default:
 				continue;

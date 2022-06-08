@@ -410,8 +410,8 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 		return ['type' => XML_ARRAY, 'rules' => [
 			'version' =>				['type' => XML_STRING | XML_REQUIRED],
 			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
-			'groups' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'group', 'rules' => [
-				'group' =>					['type' => XML_ARRAY, 'rules' => [
+			'host_groups' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_group', 'rules' => [
+				'host_group' =>				['type' => XML_ARRAY, 'rules' => [
 					'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED]
 				]]
@@ -1119,6 +1119,12 @@ class C62XmlValidator extends CXmlValidatorGeneral {
 							]]
 						]]
 					]]
+				]]
+			]],
+			'template_groups' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'template_group', 'rules' => [
+				'template_group' =>			['type' => XML_ARRAY, 'rules' => [
+					'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
+					'name' =>					['type' => XML_STRING | XML_REQUIRED]
 				]]
 			]],
 			'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [

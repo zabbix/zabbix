@@ -30,6 +30,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
 	"zabbix.com/internal/agent/keyaccess"
@@ -538,6 +539,8 @@ func (m *Manager) init() {
 }
 
 func (m *Manager) Start() {
+	log.Infof("%s", comms.GetPluginVersionMessage())
+
 	monitor.Register(monitor.Scheduler)
 	go m.run()
 }

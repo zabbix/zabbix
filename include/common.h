@@ -522,9 +522,6 @@ typedef enum
 }
 zbx_group_status_type_t;
 
-/* group internal flag */
-#define ZBX_INTERNAL_GROUP		1
-
 /* program type */
 #define ZBX_PROGRAM_TYPE_SERVER		0x01
 #define ZBX_PROGRAM_TYPE_PROXY_ACTIVE	0x02
@@ -647,6 +644,10 @@ zbx_prototype_discover_t;
 /*#define HOST_STATUS_DELETED		4*/
 #define HOST_STATUS_PROXY_ACTIVE	5
 #define HOST_STATUS_PROXY_PASSIVE	6
+
+/* host group types */
+#define HOSTGROUP_TYPE_HOST		0
+#define HOSTGROUP_TYPE_TEMPLATE		1
 
 /* host maintenance status */
 #define HOST_MAINTENANCE_STATUS_OFF	0
@@ -1790,4 +1791,5 @@ typedef enum
 	ERR_Z3008
 }
 zbx_err_codes_t;
+
 #endif

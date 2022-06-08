@@ -34,6 +34,20 @@ function isReadableHostGroups(array $groupids) {
 }
 
 /**
+ * Check if user has read permissions for template groups.
+ *
+ * @param array $groupids
+ *
+ * @return bool
+ */
+function isReadableTemplateGroups(array $groupids) {
+	return count($groupids) == API::TemplateGroup()->get([
+		'countOutput' => true,
+		'groupids' => $groupids
+	]);
+}
+
+/**
  * Check if user has write permissions for host groups.
  *
  * @param array $groupids
@@ -49,157 +63,19 @@ function isWritableHostGroups(array $groupids) {
 }
 
 /**
- * Returns list of child groups for host group with given name.
+ * Get sub-groups of selected host groups or template groups.
  *
- * @param string $name     Host group name.
- */
-function getChildGroupIds($name) {
-	$parent = $name.'/';
-	$len = strlen($parent);
-
-	$groups = API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'search' => ['name' => $parent],
-		'startSearch' => true
-	]);
-
-	$child_groupids = [];
-	foreach ($groups as $group) {
-		if (substr($group['name'], 0, $len) === $parent) {
-			$child_groupids[] = $group['groupid'];
-		}
-	}
-
-	return $child_groupids;
-}
-
-/**
- * Apply host group rights to all subgroups.
- *
- * @param string $groupid  Host group ID.
- * @param string $name     Host group name.
- */
-function inheritPermissions($groupid, $name) {
-	$child_groupids = getChildGroupIds($name);
-
-	if (!$child_groupids) {
-		return;
-	}
-
-	$usrgrps = API::UserGroup()->get([
-		'output' => ['usrgrpid'],
-		'selectRights' => ['id', 'permission']
-	]);
-
-	$upd_usrgrps = [];
-
-	foreach ($usrgrps as $usrgrp) {
-		$rights = zbx_toHash($usrgrp['rights'], 'id');
-
-		if (array_key_exists($groupid, $rights)) {
-			foreach ($child_groupids as $child_groupid) {
-				$rights[$child_groupid] = [
-					'id' => $child_groupid,
-					'permission' => $rights[$groupid]['permission']
-				];
-			}
-		}
-		else {
-			foreach ($child_groupids as $child_groupid) {
-				unset($rights[$child_groupid]);
-			}
-		}
-
-		$rights = array_values($rights);
-
-		if ($usrgrp['rights'] !== $rights) {
-			$upd_usrgrps[] = [
-				'usrgrpid' => $usrgrp['usrgrpid'],
-				'rights' => $rights
-			];
-		}
-	}
-
-	if ($upd_usrgrps) {
-		API::UserGroup()->update($upd_usrgrps);
-	}
-}
-
-/**
- * Add subgroups with tag filters inherited from main host group ($groupid) to all user groups in which tag filters for
- * particular group are created.
- *
- * @param string $groupid  Host group ID.
- * @param string $name     Host group name.
- */
-function inheritTagFilters($groupid, $name) {
-	$child_groupids = getChildGroupIds($name);
-
-	if (!$child_groupids) {
-		return;
-	}
-
-	$usrgrps = API::UserGroup()->get([
-		'output' => ['usrgrpid'],
-		'selectTagFilters' => ['groupid', 'tag', 'value']
-	]);
-
-	$upd_usrgrps = [];
-
-	foreach ($usrgrps as $usrgrp) {
-		$tag_filters = [];
-
-		foreach ($usrgrp['tag_filters'] as $tag_filter) {
-			$tag_filters[$tag_filter['groupid']][] = [
-				'tag' => $tag_filter['tag'],
-				'value' => $tag_filter['value']
-			];
-		}
-
-		if (array_key_exists($groupid, $tag_filters)) {
-			foreach ($child_groupids as $child_groupid) {
-				$tag_filters[$child_groupid] = $tag_filters[$groupid];
-			}
-		}
-		else {
-			foreach ($child_groupids as $child_groupid) {
-				unset($tag_filters[$child_groupid]);
-			}
-		}
-
-		$upd_tag_filters = [];
-
-		foreach ($tag_filters as $tag_filter_groupid => $tags) {
-			foreach ($tags as $tag) {
-				$upd_tag_filters[] = ['groupid' => (string) $tag_filter_groupid] + $tag;
-			}
-		}
-
-		if ($usrgrp['tag_filters'] !== $upd_tag_filters) {
-			$upd_usrgrps[] = [
-				'usrgrpid' => $usrgrp['usrgrpid'],
-				'tag_filters' => $upd_tag_filters
-			];
-		}
-	}
-
-	if ($upd_usrgrps) {
-		API::UserGroup()->update($upd_usrgrps);
-	}
-}
-
-/**
- * Get sub-groups of selected host groups.
- *
- * @param array $groupids
- * @param array $ms_groups  [OUT] the list of groups for multiselect.
- * @param array $options    additional API options to select host groups.
+ * @param array  $groupids
+ * @param array  $ms_groups  [OUT] The list of groups for multiselect.
+ * @param array  $options    Additional API options to select host groups or template groups.
+ * @param string $context    Context of hosts or templates.
  *
  * @return array
  */
-function getSubGroups(array $groupids, array &$ms_groups = null, array $options = []) {
+function getSubGroups(array $groupids, array &$ms_groups = null, array $options = [], string $context = 'host') {
+	$entity = $context === 'host' ? API::HostGroup() : API::TemplateGroup();
 	$db_groups = $groupids
-		? API::HostGroup()->get([
+		? $entity->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -217,13 +93,54 @@ function getSubGroups(array $groupids, array &$ms_groups = null, array $options 
 	}
 
 	if ($db_groups_names) {
-		$db_groups += API::HostGroup()->get([
+		$db_groups += $entity->get([
 			'output' => ['groupid'],
 			'search' => ['name' => $db_groups_names],
 			'searchByAny' => true,
 			'startSearch' => true,
 			'preservekeys' => true
 		] + $options);
+	}
+
+	return array_keys($db_groups);
+}
+
+/**
+ * Get sub-groups of selected template groups.
+ *
+ * @param array $template_groupids
+ * @param array $ms_template_groups  [OUT] The list of groups for multiselect.
+ * @param array $options             Additional API options to select template groups.
+ *
+ * @return array
+ */
+function getTemplateSubGroups(array $template_groupids, array &$ms_template_groups = null, array $options = []) {
+	$db_groups = $template_groupids
+		? API::TemplateGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $template_groupids,
+				'preservekeys' => true
+			] + $options)
+		: [];
+
+	if ($ms_template_groups !== null) {
+		$ms_template_groups = CArrayHelper::renameObjectsKeys($db_groups, ['groupid' => 'id']);
+	}
+
+	$db_groups_names = [];
+
+	foreach ($db_groups as $db_group) {
+		$db_groups_names[] = $db_group['name'].'/';
+	}
+
+	if ($db_groups_names) {
+		$db_groups += API::TemplateGroup()->get([
+				'output' => ['groupid'],
+				'search' => ['name' => $db_groups_names],
+				'searchByAny' => true,
+				'startSearch' => true,
+				'preservekeys' => true
+			] + $options);
 	}
 
 	return array_keys($db_groups);
@@ -335,7 +252,8 @@ function enrichParentGroups(array $groups) {
 	foreach ($groups as $group) {
 		$parent = explode('/', $group['name']);
 		while (array_pop($parent) && $parent) {
-			$parents[implode('/', $parent)] = true;
+			$parent_name = implode('/', $parent);
+			$parents[$parent_name] = $parent_name;
 		}
 	}
 
@@ -351,7 +269,47 @@ function enrichParentGroups(array $groups) {
 		$groups += API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'filter' => [
-				'name' => array_keys($parents)
+				'name' => $parents
+			],
+			'preservekeys' => true
+		]);
+	}
+
+	return $groups;
+}
+
+/**
+ * Enriches template groups array by parent groups.
+ *
+ * @param array  $groups
+ * @param string $groups[<groupid>]['groupid']
+ * @param string $groups[<groupid>]['name']
+ *
+ * @return array
+ */
+function enrichParentTemplateGroups(array $groups) {
+	$parents = [];
+	foreach ($groups as $group) {
+		$parent = explode('/', $group['name']);
+		while (array_pop($parent) && $parent) {
+			$parent_name = implode('/', $parent);
+			$parents[$parent_name] = $parent_name;
+		}
+	}
+
+	if ($parents) {
+		foreach ($groups as $group) {
+			if (array_key_exists($group['name'], $parents)) {
+				unset($parents[$group['name']]);
+			}
+		}
+	}
+
+	if ($parents) {
+		$groups += API::TemplateGroup()->get([
+			'output' => ['groupid', 'name'],
+			'filter' => [
+				'name' => $parents
 			],
 			'preservekeys' => true
 		]);

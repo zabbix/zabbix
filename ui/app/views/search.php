@@ -191,22 +191,28 @@ $table = (new CTableInfo())
 	->setHeader((new CRowHeader())
 		->addItem(new CColHeader(_('Host group')))
 		->addItem((new CColHeader(_('Monitoring')))
-			->setColSpan($data['groups'] ? 3 : 1)
+			->setColSpan($data['host_groups'] ? 3 : 1)
 			->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
 		)
-		->addItem($data['admin']
-			? (new CColHeader(_('Configuration')))
-				->setColSpan($data['groups'] ? 2 : 1)
-				->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
-			: null
+		->addItem(
+			$data['admin']
+				? (new CColHeader(_('Configuration')))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
+				: null
 		)
 	);
 
-foreach ($data['groups'] as $groupid => $group) {
+foreach ($data['host_groups'] as $groupid => $group) {
 	$caption = make_decoration($group['name'], $data['search']);
-	$link = 'groupid='.$groupid.'&hostid=0';
+	$name_link = $group['editable'] && $data['allowed_ui_conf_host_groups']
+		? (new CLink($caption, (new CUrl('zabbix.php'))
+			->setArgument('action', 'hostgroup.edit')
+			->setArgument('groupid', $groupid)
+		))
+			->addClass('js-edit-hostgroup')
+			->setAttribute('data-groupid', $groupid)
+		: new CSpan($caption);
+
 	$hosts_link = null;
-	$templates_link = null;
 
 	if ($data['admin']) {
 		$hosts_link = ($group['editable'] && $data['allowed_ui_conf_hosts'] && $group['hosts'])
@@ -218,13 +224,6 @@ foreach ($data['groups'] as $groupid => $group) {
 			: _('Hosts');
 
 		$hosts_link = (new CCol($hosts_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
-
-		$templates_link = ($group['editable'] && $data['allowed_ui_conf_templates'] && $group['templates'])
-			? [new CLink(_('Templates'), (new CUrl('templates.php'))
-				->setArgument('filter_set', '1')
-				->setArgument('filter_groups', [$groupid])
-			), CViewHelper::showNum($group['templates'])]
-			: _('Templates');
 	}
 
 	$latest_data_link = $data['allowed_ui_latest_data']
@@ -239,9 +238,7 @@ foreach ($data['groups'] as $groupid => $group) {
 	$latest_data_link = (new CCol($latest_data_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 	$table->addRow([
-		$group['editable'] && $data['allowed_ui_conf_host_groups']
-			? new CLink($caption, 'hostgroups.php?form=update&'.$link)
-			: new CSpan($caption),
+		$name_link,
 		$latest_data_link,
 		$data['allowed_ui_problems']
 			? new CLink(_('Problems'),
@@ -259,8 +256,7 @@ foreach ($data['groups'] as $groupid => $group) {
 					->setArgument('filter_set', '1')
 			)
 			:_('Web'),
-		$hosts_link,
-		$templates_link
+		$hosts_link
 	]);
 }
 
@@ -269,7 +265,7 @@ $widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
 	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state', true))
 	->setHeader(_('Host groups'), [], 'web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state')
 	->setFooter(new CList([
-		_s('Displaying %1$s of %2$s found', count($data['groups']), $data['total_groups_cnt'])
+		_s('Displaying %1$s of %2$s found', count($data['host_groups']), $data['total_host_groups_cnt'])
 	]));
 
 if ($data['admin']) {
@@ -372,8 +368,56 @@ if ($data['admin']) {
 		]));
 }
 
+$table = (new CTableInfo())
+	->setHeader((new CRowHeader())
+		->addItem(new CColHeader(_('Template group')))
+		->addItem(
+			$data['admin']
+				? (new CColHeader(_('Configuration')))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER)
+				: null
+		)
+	);
+
+foreach ($data['template_groups'] as $groupid => $group) {
+	$caption = make_decoration($group['name'], $data['search']);
+	$name_link = $group['editable'] && $data['allowed_ui_conf_template_groups']
+		? (new CLink($caption, (new CUrl('zabbix.php'))
+			->setArgument('action', 'templategroup.edit')
+			->setArgument('groupid', $groupid)
+		))
+			->addClass('js-edit-templategroup')
+			->setAttribute('data-groupid', $groupid)
+		: new CSpan($caption);
+
+	$templates_link = null;
+
+	if ($data['admin']) {
+		$templates_link = ($group['editable'] && $data['allowed_ui_conf_templates'] && $group['templates'])
+			? [new CLink(_('Templates'), (new CUrl('templates.php'))
+				->setArgument('filter_set', '1')
+				->setArgument('filter_groups', [$groupid])
+			), CViewHelper::showNum($group['templates'])]
+			: _('Templates');
+		$templates_link = (new CCol($templates_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
+	}
+
+	$table->addRow([$name_link, $templates_link]);
+}
+
+$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATEGROUP, $table))
+	->addClass(ZBX_STYLE_DASHBOARD_WIDGET_FLUID)
+	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATEGROUP.'.state', true))
+	->setHeader(_('Template groups'), [], 'web.search.hats.'.WIDGET_SEARCH_TEMPLATEGROUP.'.state')
+	->setFooter(new CList([
+		_s('Displaying %1$s of %2$s found', count($data['template_groups']), $data['total_template_groups_cnt'])
+	]));
+
 (new CWidget())
 	->setTitle(_('Search').': '.$data['search'])
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::SEARCH))
 	->addItem(new CDiv($widgets))
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();

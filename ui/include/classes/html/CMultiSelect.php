@@ -35,7 +35,7 @@ class CMultiSelect extends CTag {
 	 *
 	 * @param array
 	 */
-	protected $preselect_fields = ['hosts', 'hostgroups'];
+	protected $preselect_fields = ['hosts', 'hostgroups', 'templategroups'];
 
 	/**
 	 * @param array $options['objectOptions']  An array of parameters to be added to the request URL.
@@ -247,13 +247,13 @@ class CMultiSelect extends CTag {
 			if (array_key_exists('parameters', $options['popup'])) {
 				$parameters = $options['popup']['parameters'];
 
-				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'monitored_hosts',
-					'with_monitored_triggers', 'editable', 'templated_hosts', 'hostid', 'parent_discoveryid',
-					'webitems', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes', 'with_items',
-					'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers', 'value_types',
-					'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
-					'with_httptests', 'with_hosts_and_templates', 'user_type', 'disable_selected', 'hostids',
-					'with_inherited', 'context', 'enabled_only'
+				$valid_fields = ['srctbl', 'srcfld1', 'srcfld2', 'dstfrm', 'dstfld1', 'real_hosts', 'with_hosts',
+					'monitored_hosts', 'with_monitored_triggers', 'editable', 'templated_hosts', 'with_templates',
+					'hostid', 'parent_discoveryid', 'normal_only', 'numeric', 'with_graphs', 'with_graph_prototypes',
+					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
+					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
+					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
+					'enabled_only'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -314,14 +314,23 @@ class CMultiSelect extends CTag {
 					$autocomplete_parameters['real_hosts'] = true;
 				}
 
+				if (array_key_exists('with_hosts', $parameters) && $parameters['with_hosts']) {
+					$popup_parameters['real_hosts'] = '1';
+					$autocomplete_parameters['with_hosts'] = true;
+				}
+
 				if (array_key_exists('templated_hosts', $parameters) && $parameters['templated_hosts']) {
 					$popup_parameters['templated_hosts'] = '1';
 					$autocomplete_parameters['templated_hosts'] = true;
 				}
 
-				if (array_key_exists('with_hosts_and_templates', $parameters) && $parameters['with_hosts_and_templates']) {
-					$popup_parameters['with_hosts_and_templates'] = '1';
-					$autocomplete_parameters['with_hosts_and_templates'] = true;
+				if ($popup_parameters['srctbl'] == 'template_triggers') {
+					$autocomplete_parameters['templated'] = true;
+				}
+
+				if (array_key_exists('with_templates', $parameters) && $parameters['with_templates']) {
+					$popup_parameters['templated_hosts'] = '1';
+					$autocomplete_parameters['with_templates'] = true;
 				}
 
 				foreach (['with_graphs', 'with_graph_prototypes', 'with_simple_graph_items',
@@ -330,11 +339,6 @@ class CMultiSelect extends CTag {
 						$popup_parameters[$name] = '1';
 						$autocomplete_parameters[$name] = true;
 					}
-				}
-
-				if (array_key_exists('webitems', $parameters) && $parameters['webitems']) {
-					$popup_parameters['with_webitems'] = '1';
-					$autocomplete_parameters['webitems'] = true;
 				}
 
 				if (array_key_exists('editable', $parameters) && $parameters['editable']) {

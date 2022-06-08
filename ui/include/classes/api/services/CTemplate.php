@@ -71,6 +71,7 @@ class CTemplate extends CHostGeneral {
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectGroups'				=> null,
+			'selectTemplateGroups'		=> null,
 			'selectHosts'				=> null,
 			'selectTemplates'			=> null,
 			'selectParentTemplates'		=> null,
@@ -93,6 +94,8 @@ class CTemplate extends CHostGeneral {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 		$this->validateGet($options);
+
+		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -298,8 +301,9 @@ class CTemplate extends CHostGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings,uuid'],
-			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => 'templateid,host,name,description,uuid']
+			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings', 'uuid'])],
+			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])]
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -335,7 +339,7 @@ class CTemplate extends CHostGeneral {
 		$this->checkTemplatesLinks($templates);
 
 		$this->updateGroups($templates);
-		$this->updateTagsNew($templates);
+		$this->updateTags($templates);
 		$this->updateMacros($templates);
 		$this->updateTemplates($templates);
 
@@ -441,7 +445,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$this->updateGroups($templates, $db_templates);
-		$this->updateTagsNew($templates, $db_templates);
+		$this->updateTags($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
 
@@ -754,7 +758,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Add given host groups, macros and templates to given templates.
+	 * Add given template groups, macros and templates to given templates.
 	 *
 	 * @param array $data
 	 *
@@ -775,7 +779,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Replace host groups, macros and templates on the given templates.
+	 * Replace template groups, macros and templates on the given templates.
 	 *
 	 * @param array $data
 	 *
@@ -796,7 +800,7 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Remove given host groups, macros and templates from given templates.
+	 * Remove given template groups, macros and templates from given templates.
 	 *
 	 * @param array $data
 	 *
@@ -862,7 +866,7 @@ class CTemplate extends CHostGeneral {
 		if (array_key_exists('groups', $data) && $data['groups']) {
 			$groupids = array_column($data['groups'], 'groupid');
 
-			$count = API::HostGroup()->get([
+			$count = API::TemplateGroup()->get([
 				'countOutput' => true,
 				'groupids' => $groupids,
 				'editable' => true
@@ -977,7 +981,7 @@ class CTemplate extends CHostGeneral {
 		if (array_key_exists('groups', $data)) {
 			$groupids = array_column($data['groups'], 'groupid');
 
-			$count = API::HostGroup()->get([
+			$count = API::TemplateGroup()->get([
 				'countOutput' => true,
 				'groupids' => $groupids
 			]);
@@ -1008,7 +1012,7 @@ class CTemplate extends CHostGeneral {
 			}
 
 			if ($edit_groupids) {
-				$count = API::HostGroup()->get([
+				$count = API::TemplateGroup()->get([
 					'countOutput' => true,
 					'groupids' => array_keys($edit_groupids),
 					'editable' => true
@@ -1118,7 +1122,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		if (array_key_exists('groupids', $data) && $data['groupids']) {
-			$count = API::HostGroup()->get([
+			$count = API::TemplateGroup()->get([
 				'countOutput' => true,
 				'groupids' => $data['groupids'],
 				'editable' => true
@@ -1130,7 +1134,7 @@ class CTemplate extends CHostGeneral {
 				);
 			}
 
-			CHostGroup::checkObjectsWithoutGroups('templates', $db_templates, $data['groupids']);
+			CTemplateGroup::checkTemplatesWithoutGroups($db_templates, $data['groupids']);
 
 			$this->massAddAffectedObjects('groups', $data['groupids'], $db_templates);
 		}
@@ -1174,9 +1178,12 @@ class CTemplate extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
+		// adding template groups
+		$this->addRelatedGroups($options, $result, 'selectGroups');
+		$this->addRelatedGroups($options, $result, 'selectTemplateGroups');
+
 		$templateids = array_keys($result);
 
-		// Adding Templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
 				$templates = [];
@@ -1211,7 +1218,6 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		// Adding Hosts
 		if ($options['selectHosts'] !== null) {
 			if ($options['selectHosts'] != API_OUTPUT_COUNT) {
 				$hosts = [];
@@ -1246,7 +1252,6 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		// Adding dashboards.
 		if ($options['selectDashboards'] !== null) {
 			if ($options['selectDashboards'] != API_OUTPUT_COUNT) {
 				$dashboards = API::TemplateDashboard()->get([
@@ -1281,6 +1286,59 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
+		if ($options['selectTags'] !== null) {
+			foreach ($result as &$row) {
+				$row['tags'] = [];
+			}
+			unset($row);
+
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$output = ['hosttagid', 'hostid', 'tag', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
+			}
+
+			$sql_options = [
+				'output' => $output,
+				'filter' => ['hostid' => $templateids]
+			];
+			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$hostid = $db_tag['hostid'];
+
+				unset($db_tag['hosttagid'], $db_tag['hostid']);
+
+				$result[$hostid]['tags'][] = $db_tag;
+			}
+		}
+
 		return $result;
+	}
+
+	/**
+	 * Adds related template groups requested by "select*" options to the resulting object set.
+	 *
+	 * @param array  $options [IN] Original input options.
+	 * @param array  $result  [IN/OUT] Result output.
+	 * @param string $option  [IN] Possible values:
+	 *                               - "selectGroups" (deprecated);
+	 *                               - "selectHostGroups" (or any other value).
+	 */
+	private function addRelatedGroups(array $options, array &$result, string $option): void {
+		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+			return;
+		}
+
+		$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
+		$groups = API::TemplateGroup()->get([
+			'output' => $options[$option],
+			'groupids' => $relationMap->getRelatedIds(),
+			'preservekeys' => true
+		]);
+
+		$output_tag = $option === 'selectGroups' ? 'groups' : 'templategroups';
+		$result = $relationMap->mapMany($result, $groups, $output_tag);
 	}
 }

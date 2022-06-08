@@ -87,7 +87,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($data['trigger']);
 		$this->zbxTestClickWait('tab_dependenciesTab');
 
-		$this->zbxTestClick('bnt1');
+		$this->zbxTestClick('add_dep_trigger');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
 		$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
 		$host->fill([
@@ -95,7 +95,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 			'context' => 'Templates'
 		]);
 		$this->zbxTestClickLinkTextWait($data['dependency']);
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('add_dep_trigger'));
 		$this->zbxTestClickWait('update');
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot update trigger', $data['error_message']);

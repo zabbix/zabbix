@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.2.0rc1');
 define('ZABBIX_API_VERSION',	'6.2.0');
 define('ZABBIX_EXPORT_VERSION',	'6.2');
 
-define('ZABBIX_DB_VERSION',		6010028);
+define('ZABBIX_DB_VERSION',		6010040);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -295,6 +295,9 @@ define('EVENT_TYPE_ITEM_NOTSUPPORTED',		0);
 define('EVENT_TYPE_LLDRULE_NOTSUPPORTED',	2);
 define('EVENT_TYPE_TRIGGER_UNKNOWN',		4);
 
+define('ZBX_TAG_MANUAL',	0);
+define('ZBX_TAG_AUTOMATIC',	1);
+
 define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
 define('HOST_STATUS_TEMPLATE',		3);
@@ -342,6 +345,9 @@ define('SNMP_BULK_ENABLED',		1);
 define('MAINTENANCE_STATUS_ACTIVE',		0);
 define('MAINTENANCE_STATUS_APPROACH',	1);
 define('MAINTENANCE_STATUS_EXPIRED',	2);
+
+define('HOST_GROUP_TYPE_HOST_GROUP', 		0);
+define('HOST_GROUP_TYPE_TEMPLATE_GROUP', 	1);
 
 // Modules.
 define('MODULE_STATUS_DISABLED', 0);
@@ -922,9 +928,6 @@ define('USER_TYPE_ZABBIX_USER',		1);
 define('USER_TYPE_ZABBIX_ADMIN',	2);
 define('USER_TYPE_SUPER_ADMIN',		3);
 
-define('ZBX_NOT_INTERNAL_GROUP',	0);
-define('ZBX_INTERNAL_GROUP',		1);
-
 define('GROUP_STATUS_DISABLED', 1);
 define('GROUP_STATUS_ENABLED',	0);
 
@@ -1413,6 +1416,7 @@ define('API_UNEXPECTED',			51);
 define('API_INT32_RANGES',			53);
 define('API_LAT_LNG_ZOOM',			54);
 define('API_TIMESTAMP',				55);
+define('API_TG_NAME',				56);
 define('API_ITEM_KEY',				57);
 define('API_ITEM_DELAY',			58);
 define('API_JSON',					59);
@@ -1475,6 +1479,9 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
 define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in Vault).
+
+define('ZBX_USERMACRO_MANUAL', 0); // Macro value updated by user.
+define('ZBX_USERMACRO_AUTOMATIC', 1); // Macro value updated by discovery rule.
 
 define('ZBX_VAULT_TYPE_UNKNOWN', -1);
 define('ZBX_VAULT_TYPE_HASHICORP', 0);
@@ -1609,6 +1616,7 @@ define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
 define('WIDGET_SEARCH_HOSTS',			'search_hosts');
 define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
 define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
+define('WIDGET_SEARCH_TEMPLATEGROUP',	'search_templategroup');
 
 // dashboard widget dynamic state
 define('WIDGET_SIMPLE_ITEM',	0);
@@ -1699,9 +1707,10 @@ define('QUEUE_OVERVIEW_BY_PROXY', 1);
 define('QUEUE_DETAILS', 2);
 
 // target types to copy items/triggers/graphs
-define('COPY_TYPE_TO_HOST_GROUP',	0);
-define('COPY_TYPE_TO_HOST',			1);
-define('COPY_TYPE_TO_TEMPLATE',		2);
+define('COPY_TYPE_TO_HOST_GROUP',		0);
+define('COPY_TYPE_TO_HOST',				1);
+define('COPY_TYPE_TO_TEMPLATE',			2);
+define('COPY_TYPE_TO_TEMPLATE_GROUP',	3);
 
 define('HISTORY_GRAPH', 'showgraph');
 define('HISTORY_BATCH_GRAPH', 'batchgraph');
@@ -1747,7 +1756,8 @@ define('TAB_INDICATOR_MEDIA', 'media');
 define('TAB_INDICATOR_MESSAGE_TEMPLATE', 'message-template');
 define('TAB_INDICATOR_OPERATIONS', 'operations');
 define('TAB_INDICATOR_OVERRIDES', 'overrides');
-define('TAB_INDICATOR_PERMISSIONS', 'permissions');
+define('TAB_INDICATOR_HOST_PERMISSIONS', 'host-permissions');
+define('TAB_INDICATOR_TEMPLATE_PERMISSIONS', 'template-permissions');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
 define('TAB_INDICATOR_PROXY_ENCRYPTION', 'proxy-encryption');
 define('TAB_INDICATOR_SHARING', 'sharing');
@@ -1902,6 +1912,7 @@ define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
 define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
+define('ZBX_STYLE_ICON_COUNT', 'icon-count');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
 define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_DESCRIPTION', 'icon-description');

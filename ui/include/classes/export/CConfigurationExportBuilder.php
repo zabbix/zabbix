@@ -166,15 +166,27 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format groups.
+	 * Format template groups.
 	 *
 	 * @param array $schema  Tag schema from validation class.
 	 * @param array $groups  Export data.
 	 */
-	public function buildGroups(array $schema, array $groups) {
+	public function buildTemplateGroups(array $schema, array $groups) {
 		$groups = $this->formatGroups($groups);
 
-		$this->data['groups'] = self::build($schema, $groups, 'groups');
+		$this->data['template_groups'] = self::build($schema, $groups, 'template_groups');
+	}
+
+	/**
+	 * Format host groups.
+	 *
+	 * @param array $schema  Tag schema from validation class.
+	 * @param array $groups  Export data.
+	 */
+	public function buildHostGroups(array $schema, array $groups) {
+		$groups = $this->formatGroups($groups);
+
+		$this->data['host_groups'] = self::build($schema, $groups, 'host_groups');
 	}
 
 	/**
@@ -277,7 +289,7 @@ class CConfigurationExportBuilder {
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
-				'groups' => $this->formatGroups($template['groups']),
+				'groups' => $this->formatGroups($template['templategroups']),
 				'items' => $this->formatItems($template['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
 				'httptests' => $this->formatHttpTests($template['httptests']),
@@ -317,7 +329,7 @@ class CConfigurationExportBuilder {
 				'ipmi_username' => $host['ipmi_username'],
 				'ipmi_password' => $host['ipmi_password'],
 				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
-				'groups' => $this->formatGroups($host['groups']),
+				'groups' => $this->formatGroups($host['hostgroups']),
 				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
 				'items' => $this->formatItems($host['items'], $simple_triggers),
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),

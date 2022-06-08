@@ -228,6 +228,9 @@ class CApiInputValidator {
 			case API_TIMESTAMP:
 				return self::validateTimestamp($rule, $data, $path, $error);
 
+			case API_TG_NAME:
+				return self::validateTemplateGroupName($rule, $data, $path, $error);
+
 			case API_ITEM_KEY:
 				return self::validateItemKey($rule, $data, $path, $error);
 
@@ -315,6 +318,7 @@ class CApiInputValidator {
 			case API_UNEXPECTED:
 			case API_LAT_LNG_ZOOM:
 			case API_TIMESTAMP:
+			case API_TG_NAME:
 			case API_ITEM_KEY:
 			case API_ITEM_DELAY:
 			case API_JSON:
@@ -1214,6 +1218,9 @@ class CApiInputValidator {
 	 * @param array  $rule['fields']
 	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED,
 	 *                                                                           API_ALLOW_UNEXPECTED
+	 * @param string $rule['fields'][<field_name>]['replacement']     (optional) Parameter name which replaces the
+	 *                                                                           deprecated one. Can be used with
+	 *                                                                           API_DEPRECATED flag.
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
 	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
 	 * @param mixed  $data
@@ -1290,6 +1297,24 @@ class CApiInputValidator {
 
 			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
 
+			if (array_key_exists($field_name, $data) && ($flags & API_DEPRECATED)) {
+				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
+
+				if (array_key_exists('replacement', $field_rule)) {
+					if (array_key_exists($field_rule['replacement'], $data)) {
+						$error = _s('Deprecated parameter "%1$s" cannot be used with "%2$s".', $subpath,
+							($path === '/' ? $path : $path.'/').$field_rule['replacement']
+						);
+						return false;
+					}
+
+					$data[$field_rule['replacement']] = $data[$field_name];
+					unset($data[$field_name]);
+				}
+
+				trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_DEPRECATED);
+			}
+
 			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
 				$data[$field_name] = $field_rule['default'];
 			}
@@ -1311,9 +1336,6 @@ class CApiInputValidator {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
 				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
 					return false;
-				}
-				if ($flags & API_DEPRECATED) {
-					trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_NOTICE);
 				}
 			}
 			elseif ($flags & API_REQUIRED) {
@@ -3110,6 +3132,40 @@ class CApiInputValidator {
 		}
 
 		return $valid;
+	}
+
+	/**
+	 * Template group name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_REQUIRED_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateTemplateGroupName($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		$template_group_name_parser = new CHostGroupNameParser();
+
+		if ($template_group_name_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid template group name'));
+
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

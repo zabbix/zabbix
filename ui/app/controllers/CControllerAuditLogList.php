@@ -264,6 +264,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_TEMPLATE_DASHBOARD => _('Template dashboard'),
 			CAudit::RESOURCE_TRIGGER => _('Trigger'),
 			CAudit::RESOURCE_TRIGGER_PROTOTYPE => _('Trigger prototype'),
+			CAudit::RESOURCE_TEMPLATE_GROUP => _('Template group'),
 			CAudit::RESOURCE_USER => _('User'),
 			CAudit::RESOURCE_USERDIRECTORY => _('User directory'),
 			CAudit::RESOURCE_USER_GROUP => _('User group'),

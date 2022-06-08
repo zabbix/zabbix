@@ -68,7 +68,7 @@ class testPageTriggerUrl extends CWebTest {
 	public function testPageTriggerUrl_ProblemsWidget($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->getWidget('Problems');
+		$widget = $dashboard->getWidget('Current problems');
 		$table = $widget->getContent()->asTable();
 
 		// Find trigger and open trigger overlay dialogue.

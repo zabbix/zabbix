@@ -41,9 +41,6 @@ class CItemBaseHelper {
 		return $defaults;
 	}
 
-	// $reqdata[host_status]
-	// $reqdata[flags] 4 create
-
 	/**
 	 * Pick out relevant input for various item/prototype types, as expected by API, leaving out general (form) fields.
 	 *

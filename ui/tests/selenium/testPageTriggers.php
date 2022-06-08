@@ -77,7 +77,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 			// Check the filter options text.
 			$labels = [
-				'Host groups', 'Templates', 'Name', 'Severity', 'Status', 'Tags', 'Inherited', 'With dependencies'
+				'Template groups', 'Templates', 'Name', 'Severity', 'Status', 'Tags', 'Inherited', 'With dependencies'
 			];
 		}
 		foreach ($labels as $label) {

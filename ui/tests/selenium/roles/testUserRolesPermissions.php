@@ -351,10 +351,12 @@ class testUserRolesPermissions extends CWebTest {
 			if ($action_status === false) {
 				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 				$row->getColumn('Ack')->query('link:No')->waitUntilCLickable()->one()->click();
+				COverlayDialogElement::find()->waitUntilReady()->one();
 
 				if ($data['activityid'] === 'message') {
 					$dialog->query('id:message')->one()->fill('test_text');
 					$dialog->query('button:Update')->one()->click();
+					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
 					$row->getColumn('Actions')->query('xpath:.//button[contains(@class, "icon-action-msgs")]')->one()->click();
 					$message_hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
@@ -399,7 +401,7 @@ class testUserRolesPermissions extends CWebTest {
 
 			// Problem widget in dashboard.
 			$this->page->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
-			$table = CDashboardElement::find()->one()->getWidget('Problems')->query('class:list-table')->asTable()->one();
+			$table = CDashboardElement::find()->one()->getWidget('Current problems')->query('class:list-table')->asTable()->one();
 			$this->assertEquals($action_status, $table->findRow('Problem • Severity', $problem)->getColumn('Ack')
 					->query('xpath:.//*[text()="No"]')->one()->isAttributePresent('onclick'));
 
@@ -687,7 +689,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Event correlation',
 						'Discovery'
 					],
-					'link' => ['hostgroups.php']
+					'link' => ['zabbix.php?action=hostgroup.list']
 				]
 			],
 			[
@@ -1527,12 +1529,12 @@ class testUserRolesPermissions extends CWebTest {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
 		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
 		$selected_count = $this->query('id:selected_count')->one();
 		$select_all = $this->query('id:all_items')->asCheckbox()->one();
 
