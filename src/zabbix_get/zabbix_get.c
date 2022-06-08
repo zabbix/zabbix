@@ -158,31 +158,7 @@ const char	*help_message[] = {
 	NULL	/* end of text */
 };
 
-/* /\* TLS parameters *\/ */
-/* unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED; */
-/* unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/\* not used in zabbix_get, just for linking *\/ */
-/* 									/\* with tls.c *\/ */
-/* char	*CONFIG_TLS_CONNECT		= NULL; */
-/* char	*CONFIG_TLS_ACCEPT		= NULL;	/\* not used in zabbix_get, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CA_FILE		= NULL; */
-/* char	*CONFIG_TLS_CRL_FILE		= NULL; */
-/* char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL; */
-/* char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL; */
-/* char	*CONFIG_TLS_CERT_FILE		= NULL; */
-/* char	*CONFIG_TLS_KEY_FILE		= NULL; */
-/* char	*CONFIG_TLS_PSK_IDENTITY	= NULL; */
-/* char	*CONFIG_TLS_PSK_FILE		= NULL; */
-
-/* char	*CONFIG_TLS_CIPHER_CERT13	= NULL;	/\* not used in zabbix_get, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CIPHER_CERT		= NULL;	/\* not used in zabbix_get, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CIPHER_PSK13	= NULL;	/\* not used in zabbix_get, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CIPHER_PSK		= NULL;	/\* not used in zabbix_get, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CIPHER_ALL13	= NULL;	/\* not used in zabbix_get, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CIPHER_ALL		= NULL;	/\* not used in zabbix_get, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/\* parameter '--tls-cipher13' from zabbix_get command line *\/ */
-/* char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/\* parameter '--tls-cipher' from zabbix_get command line *\/ */
-
-zbx_config_tls_t	*zbx_config_tls = NULL;
+static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */
 int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */

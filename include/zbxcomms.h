@@ -71,14 +71,16 @@ typedef struct
 	char	*CONFIG_TLS_KEY_FILE;
 	char	*CONFIG_TLS_PSK_IDENTITY;
 	char	*CONFIG_TLS_PSK_FILE;
-	char	*CONFIG_TLS_CIPHER_CERT13; /* not used in zabbix_get */
-	char	*CONFIG_TLS_CIPHER_CERT; /* not used in zabbix_get */
-	char	*CONFIG_TLS_CIPHER_PSK13;  /* not used in zabbix_get */
-	char	*CONFIG_TLS_CIPHER_PSK  /* not used in zabbix_get */;
-	char	*CONFIG_TLS_CIPHER_ALL13; /* not used in zabbix_sender, zabbix_get */
-	char	*CONFIG_TLS_CIPHER_ALL;  /* not used in zabbix_sender, zabbix_get */
-	char	*CONFIG_TLS_CIPHER_CMD13; /* not used in agent, server, proxy */
-	char	*CONFIG_TLS_CIPHER_CMD;	/* not used in agent, server, proxy */
+	char	*CONFIG_TLS_CIPHER_CERT13; /* not used in zabbix_get, config file parameter 'TLSCipherCert13' */
+	char	*CONFIG_TLS_CIPHER_CERT; /* not used in zabbix_get, config file parameter 'TLSCipherCert' */
+	char	*CONFIG_TLS_CIPHER_PSK13;  /* not used in zabbix_get, config file parameter 'TLSCipherPSK13' */
+	char	*CONFIG_TLS_CIPHER_PSK;  /* not used in zabbix_get, config file parameter 'TLSCipherPSK' */
+	char	*CONFIG_TLS_CIPHER_ALL13; /* not used in zabbix_sender, zabbix_get, config file parameter */
+					/*'TLSCipherAll13' */
+	char	*CONFIG_TLS_CIPHER_ALL; /* not used in zabbix_sender, zabbix_get, config file parameter */
+					/*'TLSCipherAll' */
+	char	*CONFIG_TLS_CIPHER_CMD13; /* not used in agent, server, proxy, config file parameter '--tls-cipher13' */
+	char	*CONFIG_TLS_CIPHER_CMD;	/* not used in agent, server, proxy, config file parameter 'tls-cipher' */
 } zbx_config_tls_t;
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

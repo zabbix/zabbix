@@ -286,28 +286,6 @@ char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
-/* /\* TLS parameters *\/ */
-/* unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED; */
-/* unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED; */
-
-/* char	*CONFIG_TLS_CONNECT		= NULL; */
-/* char	*CONFIG_TLS_ACCEPT		= NULL; */
-/* char	*CONFIG_TLS_CA_FILE		= NULL; */
-/* char	*CONFIG_TLS_CRL_FILE		= NULL; */
-/* char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL; */
-/* char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL; */
-/* char	*CONFIG_TLS_CERT_FILE		= NULL; */
-/* char	*CONFIG_TLS_KEY_FILE		= NULL; */
-/* char	*CONFIG_TLS_PSK_IDENTITY	= NULL; */
-/* char	*CONFIG_TLS_PSK_FILE		= NULL; */
-/* char	*CONFIG_TLS_CIPHER_CERT13	= NULL; */
-/* char	*CONFIG_TLS_CIPHER_CERT		= NULL; */
-/* char	*CONFIG_TLS_CIPHER_PSK13	= NULL; */
-/* char	*CONFIG_TLS_CIPHER_PSK		= NULL; */
-/* char	*CONFIG_TLS_CIPHER_ALL13	= NULL; */
-/* char	*CONFIG_TLS_CIPHER_ALL		= NULL; */
-/* char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/\* not used in proxy, defined for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/\* not used in proxy, defined for linking with tls.c *\/ */
 static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 static char	*CONFIG_SOCKET_PATH	= NULL;

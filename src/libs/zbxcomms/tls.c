@@ -130,34 +130,6 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 
 static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
 
-/* extern unsigned int			configured_tls_connect_mode; */
-/* extern unsigned int			configured_tls_accept_modes; */
-
-/* extern unsigned char			program_type; */
-
-/* extern int				config_passive_forks; */
-/* extern int				config_active_forks; */
-
-/* extern char				*CONFIG_TLS_CONNECT; */
-/* extern char				*CONFIG_TLS_ACCEPT; */
-/* extern char				*CONFIG_TLS_CA_FILE; */
-/* extern char				*CONFIG_TLS_CRL_FILE; */
-/* extern char				*CONFIG_TLS_SERVER_CERT_ISSUER; */
-/* extern char				*CONFIG_TLS_SERVER_CERT_SUBJECT; */
-/* extern char				*CONFIG_TLS_CERT_FILE; */
-/* extern char				*CONFIG_TLS_KEY_FILE; */
-/* extern char				*CONFIG_TLS_PSK_IDENTITY; */
-/* extern char				*CONFIG_TLS_PSK_FILE; */
-
-/* extern char	*CONFIG_TLS_CIPHER_CERT13;	/\* parameter 'TLSCipherCert13' from server/proxy/agent config file *\/ */
-/* extern char	*CONFIG_TLS_CIPHER_CERT;	/\* parameter 'TLSCipherCert' from server/proxy/agent config file *\/ */
-/* extern char	*CONFIG_TLS_CIPHER_PSK13;	/\* parameter 'TLSCipherPSK13' from server/proxy/agent config file *\/ */
-/* extern char	*CONFIG_TLS_CIPHER_PSK;		/\* parameter 'TLSCipherPSK' from server/proxy/agent config file *\/ */
-/* extern char	*CONFIG_TLS_CIPHER_ALL13;	/\* parameter 'TLSCipherAll13' from server/proxy/agent config file *\/ */
-/* extern char	*CONFIG_TLS_CIPHER_ALL;		/\* parameter 'TLSCipherAll' from server/proxy/agent config file *\/ */
-/* extern char	*CONFIG_TLS_CIPHER_CMD13;	/\* parameter '--tls-cipher13' from sender or zabbix_get command line *\/ */
-/* extern char	*CONFIG_TLS_CIPHER_CMD;		/\* parameter '--tls-cipher' from sender or zabbix_get command line *\/ */
-
 void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls)
 {
 	zbx_config_tls->configured_tls_connect_mode	= ZBX_TCP_SEC_UNENCRYPTED;
