@@ -22,7 +22,7 @@ It works without any external scripts and uses the Script item.
       - by location name (for example: Riga)
       - by location ID. Link to the list of city ID: http://bulk.openweathermap.org/sample/city.list.json.gz
       - by zip/post code with a country code (for example: 94040,us)
-    A few locations can be added to the macro at the same time by `|` delimiter. 
+    A few locations can be added to the macro at the same time by `|` delimiter.
     For example: `43.81821,7.76115|Riga|2643743|94040,us`.
     Please note that API requests by city name, zip-codes and city id will be deprecated soon.
     
@@ -88,3 +88,4 @@ There are no template links in this template.
 Please report any issues with the template at https://support.zabbix.com
 
 You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/).
+

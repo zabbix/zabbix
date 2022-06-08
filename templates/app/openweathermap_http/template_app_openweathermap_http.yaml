@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:34Z'
+  date: '2022-06-08T11:41:28Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -36,7 +36,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -738,53 +738,70 @@ zabbix_export:
           name: 'Wind direction'
           mappings:
             -
+              type: IN_RANGE
               value: '0 - 11.24'
               newvalue: 'N'
             -
+              type: IN_RANGE
               value: '11.25 - 33.74'
               newvalue: NNE
             -
+              type: IN_RANGE
               value: '33.75 - 56.24'
               newvalue: NE
             -
+              type: IN_RANGE
               value: '56.25 - 78.74'
               newvalue: ENE
             -
+              type: IN_RANGE
               value: '78.75 - 101.24'
               newvalue: E
             -
+              type: IN_RANGE
               value: '101.25 - 123.74'
               newvalue: ESE
             -
+              type: IN_RANGE
               value: '123.75 - 146.24'
               newvalue: SE
             -
+              type: IN_RANGE
               value: '146.25 - 168.74'
               newvalue: SSE
             -
+              type: IN_RANGE
               value: '168.75 - 191.24'
               newvalue: S
             -
+              type: IN_RANGE
               value: '191.25 - 213.74'
               newvalue: SSW
             -
+              type: IN_RANGE
               value: '213.75 - 236.24'
               newvalue: SW
             -
+              type: IN_RANGE
               value: '236.25 - 258.74'
               newvalue: WSW
             -
+              type: IN_RANGE
               value: '258.75 - 281.24'
               newvalue: W
             -
+              type: IN_RANGE
               value: '281.25 - 303.74'
               newvalue: WNW
             -
+              type: IN_RANGE
               value: '303.75 - 326.24'
               newvalue: NW
             -
+              type: IN_RANGE
               value: '326.25 - 348.74'
               newvalue: NNW
             -
+              type: IN_RANGE
               value: '348.75 - 379.99'
               newvalue: 'N'
