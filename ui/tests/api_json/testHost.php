@@ -3513,7 +3513,7 @@ class testHost extends CAPITest {
 						// Change macro name {$MANUAL_MACRO_SECRET_C}.
 						[
 							'hostmacroid' => 'manual_macro_secret_c',
-							'macro' => '{$MANUAL_MACRO_SECRET_C_CHANGED_NAME}',
+							'macro' => '{$MANUAL_MACRO_SECRET_C_CHANGED_NAME}'
 						],
 						// Replace macro {$MANUAL_MACRO_VAULT_C} with this one.
 						[
@@ -3656,7 +3656,7 @@ class testHost extends CAPITest {
 					'macros' => [
 						[
 							// Converts automatic macro to manual with no changes.
-							'hostmacroid' => 'discovered_macro_text_b',
+							'hostmacroid' => 'discovered_macro_text_b'
 						],
 						[
 							// Converts automatic macro to manual with no changes (value is the same).

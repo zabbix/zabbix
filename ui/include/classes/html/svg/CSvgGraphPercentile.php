@@ -63,7 +63,7 @@ class CSvgGraphPercentile extends CSvgGroup {
 			],
 			'.'.self::ZBX_STYLE_CLASS.'-'.$this->side.' text' => [
 				'font-size' => self::LABEL_FONT_SIZE.'px',
-				'fill' => $this->color,
+				'fill' => $this->color
 			]
 		];
 	}
