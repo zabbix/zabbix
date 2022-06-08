@@ -8187,11 +8187,9 @@ void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int
 
 /******************************************************************************
  *                                                                            *
- * Purpose: destroy vmware job and decrease service ref counter               *
+ * Purpose: destroy vmware job and service removing                           *
  *                                                                            *
- * Parameters: vmw      - [IN] the vmware object                              *
- *             service  - [IN] the vmware service                             *
- *             job_type - [IN] the vmware job type                            *
+ * Parameters: job - [IN] the job object                                      *
  *                                                                            *
  * Return value: count of removed services                                    *
  *                                                                            *
