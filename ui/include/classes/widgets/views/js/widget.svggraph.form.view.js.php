@@ -50,13 +50,13 @@ window.widget_svggraph_form = new class {
 
 		this.onGraphConfigChange();
 
-		$(".overlay-dialogue").on("overlay-dialogue-resize", (event, size_new, size_old) => {
+		jQuery(".overlay-dialogue").on("overlay-dialogue-resize", (event, size_new, size_old) => {
 			if (jQuery("#svg-graph-preview").length) {
 				if (size_new.width != size_old.width) {
 					this.onGraphConfigChange();
 				}
 			} else {
-				$(".overlay-dialogue").off("overlay-dialogue-resize");
+				jQuery(".overlay-dialogue").off("overlay-dialogue-resize");
 			}
 		});
 
@@ -71,6 +71,11 @@ window.widget_svggraph_form = new class {
 	_datasetTabInit() {
 		// Initialize vertical accordion.
 		jQuery(this.dataset_wrapper)
+			.on("focus", ".<?= CMultiSelect::ZBX_STYLE_CLASS ?> input.input", function() {
+				jQuery("#data_sets").zbx_vertical_accordion("expandNth",
+					jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index()
+				);
+			})
 			.on("click", function(e) {
 				if (!e.target.classList.contains('color-picker-preview')) {
 					jQuery.colorpicker("hide")
@@ -78,10 +83,9 @@ window.widget_svggraph_form = new class {
 
 				if (e.target.classList.contains('js-click-expend')
 						|| e.target.classList.contains('color-picker-preview')
-						|| e.target.classList.contains('<?= CMultiSelect::ZBX_STYLE_CLASS ?>')
 						|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
 					jQuery("#data_sets").zbx_vertical_accordion("expandNth",
-						$(e.target).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index()
+						jQuery(e.target).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>").index()
 					);
 				}
 			})
@@ -121,7 +125,7 @@ window.widget_svggraph_form = new class {
 		});
 
 		for (const colorpicker of jQuery(".<?= ZBX_STYLE_COLOR_PICKER ?> input")) {
-			$(colorpicker).colorpicker({
+			jQuery(colorpicker).colorpicker({
 				onUpdate: function(color) {
 					jQuery(".<?= ZBX_STYLE_COLOR_PREVIEW_BOX ?>",
 						jQuery(this).closest(".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>")
@@ -557,7 +561,7 @@ window.widget_svggraph_form = new class {
 			update: this.recalculateSortOrder,
 			helper: (e, ui) => {
 				for (const td of ui.find('>td')) {
-					const $td = $(td);
+					const $td = jQuery(td);
 					$td.attr('width', $td.width())
 				}
 
@@ -573,7 +577,7 @@ window.widget_svggraph_form = new class {
 				ui.item.find('>td').removeAttr('width');
 			},
 			start: (e, ui) => {
-				$(ui.placeholder).height($(ui.helper).height());
+				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
 			}
 		});
 	}
@@ -584,10 +588,10 @@ window.widget_svggraph_form = new class {
 			const size = jQuery('.single-item-table-row', jQuery(element)).length + 1;
 
 			for (let i = 0; i < size; i++) {
-				$('#items_' + dataset_number + '_' + i + '_name').off('click').on('click', () => {
+				jQuery('#items_' + dataset_number + '_' + i + '_name').off('click').on('click', () => {
 					let ids = [];
 					for (let i = 0; i < size; i++) {
-						ids.push($('#items_' + dataset_number + '_' + i + '_input').val());
+						ids.push(jQuery('#items_' + dataset_number + '_' + i + '_input').val());
 					}
 
 					PopUp("popup.generic", {
