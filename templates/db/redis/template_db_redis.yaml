@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:29Z'
-  groups:
+  date: '2022-06-07T19:36:40Z'
+  template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1078,7 +1078,7 @@ zabbix_export:
               name: 'Redis: has been restarted'
               event_name: 'Redis: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -3013,8 +3013,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Redis by Zabbix agent 2'
                         name: 'Redis: Clients'
-                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3029,8 +3029,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Redis by Zabbix agent 2'
                         name: 'Redis: Keyspace'
-                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -3045,8 +3045,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Redis by Zabbix agent 2'
                         name: 'Redis: Commands'
-                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3062,8 +3062,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Redis by Zabbix agent 2'
                         name: 'Redis: Expired keys'
-                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -3078,8 +3078,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Redis by Zabbix agent 2'
                         name: 'Redis: Persistence'
-                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3095,8 +3095,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Redis: Slaves'
                         host: 'Redis by Zabbix agent 2'
+                        name: 'Redis: Slaves'
                 -
                   type: GRAPH_CLASSIC
                   'y': '15'
@@ -3111,8 +3111,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Redis: Slowlog'
                         host: 'Redis by Zabbix agent 2'
+                        name: 'Redis: Slowlog'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3128,8 +3128,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Redis: Uptime'
                         host: 'Redis by Zabbix agent 2'
+                        name: 'Redis: Uptime'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '20'
@@ -3152,8 +3152,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Redis: Replication lag time{#SINGLETON}'
                         host: 'Redis by Zabbix agent 2'
+                        name: 'Redis: Replication lag time{#SINGLETON}'
         -
           uuid: ee4c29eb7a0f443fafb7e7d3b9df7b24
           name: 'Redis performance'
@@ -3173,8 +3173,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Redis by Zabbix agent 2'
                         name: 'Redis: CPU'
-                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3189,8 +3189,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Redis by Zabbix agent 2'
                         name: 'Redis: Network'
-                        host: 'Redis by Zabbix agent 2'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -3205,8 +3205,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Redis: Memory'
                         host: 'Redis by Zabbix agent 2'
+                        name: 'Redis: Memory'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -3222,8 +3222,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Redis: Memory fragmentation'
                         host: 'Redis by Zabbix agent 2'
+                        name: 'Redis: Memory fragmentation'
       valuemaps:
         -
           uuid: 82f4dc4ef0c9471d82dbe3605f4f31d0

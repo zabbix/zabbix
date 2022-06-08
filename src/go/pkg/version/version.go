@@ -140,9 +140,15 @@ func TitleMessage() string {
 	return title
 }
 
-func Display() {
+func Display(additionalMessages []string) {
 	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
-	fmt.Printf("Revision %s %s, compilation time: %s %s\n\n", Revision(), RevDate(), CompileDate(), CompileTime())
+	fmt.Printf("Revision %s %s, compilation time: %s %s\n", Revision(), RevDate(), CompileDate(), CompileTime())
+
+	for _, msg := range additionalMessages {
+		fmt.Println(msg)
+	}
+
+	fmt.Println()
 	fmt.Println(CopyrightMessage())
 }
 

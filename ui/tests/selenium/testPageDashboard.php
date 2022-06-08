@@ -24,6 +24,8 @@ use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup profiles
+ *
+ * @onBefore prepareDashboardData
  */
 class testPageDashboard extends CLegacyWebTest {
 
@@ -33,6 +35,42 @@ class testPageDashboard extends CLegacyWebTest {
 	public $screenClock = 'Test screen (clock)';
 	public $mapTest = 'Test map 1';
 	public $mapTestId = 3;
+	protected static $dashboardid;
+
+	/**
+	 * Create dashboard with widgets Favorite graphs and Favorite maps.
+	 * Favorite graphs and Favorite maps have been removed from Global view dashboard since 6.2 version.
+	 */
+	public static function prepareDashboardData() {
+		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard with favorite graphs and maps widgets',
+				'private' => 1,
+				'pages' => [
+					[
+						'name' => 'Page 1',
+						'widgets' => [
+							[
+								'type' => 'favgraphs',
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 4
+							],
+							[
+								'type' => 'favmaps',
+								'x' => 13,
+								'y' => 0,
+								'width' => 4,
+								'height' => 4
+							]
+						]
+					]
+				]
+			]
+		]);
+		self::$dashboardid = $response['dashboardids'][0];
+	}
 
 	/**
 	 * @onBefore removeGuestFromDisabledGroup
@@ -62,18 +100,23 @@ class testPageDashboard extends CLegacyWebTest {
 			}
 			$this->zbxTestCheckTitle('Dashboard');
 			$this->zbxTestCheckHeader('Global view');
-			if ($user != 'super-admin') {
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
+			if ($user !== 'super-admin') {
+				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//tr[@class='nothing-to-show']/td",
+						'No data found.');
+				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[3]//tr[@class='nothing-to-show']/td",
+						'No permissions to referred object or it does not exist!');
 			}
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Favorite graphs');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favorite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Problems');
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Problems by severity']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Local']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Host availability']");
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'System information');
+			else {
+				$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Performance']");
+			}
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'Top hosts by CPU utilization');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[4]//h4", 'System information');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Host availability');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Problems by severity');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[9]//h4", 'Geomap');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[10]//h4", 'Current problems');
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Local time']");
+			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[6]//h4[text()='Graph']");
 
 			// Logout.
 			$this->zbxTestLogout();
@@ -147,9 +190,8 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favorites');
 
-		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->page->waitUntilReady();
-		$url_xpath = '//div[@class="dashboard-grid"]/div[8]//a[@href=';
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$url_xpath = '//div[@class="dashboard-grid"]/div[2]//a[@href=';
 
 		foreach ([$this->graphCpu => $cpu_itemid, $this->graphMemory => $memory_itemid] as $graph => $itemid) {
 			$graph_url = 'history.php?action=showgraph&itemids%5B0%5D='.$itemid;
@@ -164,7 +206,7 @@ class testPageDashboard extends CLegacyWebTest {
 		$exception = null;
 
 		try {
-			$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 			$FavouriteGraphs = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.zbx_dbstr('web.favorite.graphids')));
 			foreach ($FavouriteGraphs as $FavouriteGraph) {
 				$remove_item = $this->query('xpath://button[@data-itemid='.zbx_dbstr($FavouriteGraph['value_id']).
@@ -194,13 +236,13 @@ class testPageDashboard extends CLegacyWebTest {
 		$this->query('id:addrm_fav')->one()->waitUntilAttributesPresent(['title' => 'Remove from favorites']);
 		$this->zbxTestAssertAttribute("//button[@id='addrm_fav']", 'title', 'Remove from favorites');
 
-		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$this->zbxTestAssertElementText('//div[@class="dashboard-grid-widget-container"]/div[2]//a[@href="zabbix.php?action=map.view&sysmapid='.$this->mapTestId.'"]', $this->mapTest);
 		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.zbx_dbstr('web.favorite.sysmapids').' AND value_id='.$this->mapTestId));
 	}
 
 	public function testPageDashboard_RemoveFavouriteMaps() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$widget_content = CDashboardElement::find()->one()->getWidget('Favorite maps')->getContent();
 		$favourite_maps = DBfetchArray(DBselect('SELECT value_id FROM profiles WHERE idx='.
 				zbx_dbstr('web.favorite.sysmapids')));
@@ -219,7 +261,7 @@ class testPageDashboard extends CLegacyWebTest {
 	}
 
 	public function testPageDashboard_KioskMode() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view', false);
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view&dashboardid=1', false);
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
 

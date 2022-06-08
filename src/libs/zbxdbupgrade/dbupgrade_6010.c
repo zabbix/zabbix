@@ -893,6 +893,396 @@ static int	DBpatch_6010036(void)
 #undef ADD_GROUPIDS_FROM_FIELD
 #undef ADD_GROUPIDS_FROM
 
+static int	DBpatch_6010037(void)
+{
+	const	ZBX_FIELD field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hostmacro", &field);
+}
+
+static int	DBpatch_6010038(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update hostmacro"
+			" set automatic=1"	/* ZBX_USERMACRO_AUTOMATIC */
+			" where hostid in ("
+				"select hostid"
+				" from host_discovery"
+				" where parent_hostid is not null"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010039(void)
+{
+	const ZBX_FIELD	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_tag", &field);
+}
+
+static int	DBpatch_6010040(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update host_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where hostid in ("
+				"select hostid"
+				" from host_discovery"
+				" where parent_hostid is not null"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+static int	DBpatch_6010041(void)
+{
+	const ZBX_FIELD	field = {"suppress_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_6010042(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("event_suppress", &field);
+}
+
+static int	DBpatch_6010043(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_suppress", 3, &field);
+}
+
+static int	DBpatch_6010044(void)
+{
+	const ZBX_FIELD field = {"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_default("task_data", &field);
+}
+
+static int	DBpatch_6010045(void)
+{
+	const ZBX_TABLE	table =
+			{"changelog", "changelogid", 0,
+				{
+					{"changelogid", NULL, NULL, NULL, 0, ZBX_TYPE_SERIAL, ZBX_NOTNULL, 0},
+					{"object", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operation", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6010046(void)
+{
+#ifdef HAVE_ORACLE
+	return DBcreate_serial_sequence("changelog");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_6010047(void)
+{
+#ifdef HAVE_ORACLE
+	return DBcreate_serial_trigger("changelog", "changelogid");
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_6010048(void)
+{
+	return DBcreate_index("changelog", "changelog_1", "clock", 0);
+}
+
+static int	DBpatch_6010049(void)
+{
+	return DBcreate_changelog_insert_trigger("hosts", "hostid");
+}
+
+static int	DBpatch_6010050(void)
+{
+	return DBcreate_changelog_update_trigger("hosts", "hostid");
+}
+
+static int	DBpatch_6010051(void)
+{
+	return DBcreate_changelog_delete_trigger("hosts", "hostid");
+}
+
+static int	DBpatch_6010052(void)
+{
+	return DBcreate_changelog_insert_trigger("host_tag", "hosttagid");
+}
+
+static int	DBpatch_6010053(void)
+{
+	return DBcreate_changelog_update_trigger("host_tag", "hosttagid");
+}
+
+static int	DBpatch_6010054(void)
+{
+	return DBcreate_changelog_delete_trigger("host_tag", "hosttagid");
+}
+
+static int	DBpatch_6010055(void)
+{
+	return DBcreate_changelog_insert_trigger("items", "itemid");
+}
+
+static int	DBpatch_6010056(void)
+{
+	return DBcreate_changelog_update_trigger("items", "itemid");
+}
+
+static int	DBpatch_6010057(void)
+{
+	return DBcreate_changelog_delete_trigger("items", "itemid");
+}
+
+static int	DBpatch_6010058(void)
+{
+	return DBcreate_changelog_insert_trigger("item_tag", "itemtagid");
+}
+
+static int	DBpatch_6010059(void)
+{
+	return DBcreate_changelog_update_trigger("item_tag", "itemtagid");
+}
+
+static int	DBpatch_6010060(void)
+{
+	return DBcreate_changelog_delete_trigger("item_tag", "itemtagid");
+}
+
+static int	DBpatch_6010061(void)
+{
+	return DBcreate_changelog_insert_trigger("triggers", "triggerid");
+}
+
+static int	DBpatch_6010062(void)
+{
+	return DBcreate_changelog_update_trigger("triggers", "triggerid");
+}
+
+static int	DBpatch_6010063(void)
+{
+	return DBcreate_changelog_delete_trigger("triggers", "triggerid");
+}
+
+static int	DBpatch_6010064(void)
+{
+	return DBcreate_changelog_insert_trigger("trigger_tag", "triggertagid");
+}
+
+static int	DBpatch_6010065(void)
+{
+	return DBcreate_changelog_update_trigger("trigger_tag", "triggertagid");
+}
+
+static int	DBpatch_6010066(void)
+{
+	return DBcreate_changelog_delete_trigger("trigger_tag", "triggertagid");
+}
+
+static int	DBpatch_6010067(void)
+{
+	return DBcreate_changelog_insert_trigger("functions", "functionid");
+}
+
+static int	DBpatch_6010068(void)
+{
+	return DBcreate_changelog_update_trigger("functions", "functionid");
+}
+
+static int	DBpatch_6010069(void)
+{
+	return DBcreate_changelog_delete_trigger("functions", "functionid");
+}
+
+static int	DBpatch_6010070(void)
+{
+	return DBcreate_changelog_insert_trigger("item_preproc", "item_preprocid");
+}
+
+static int	DBpatch_6010071(void)
+{
+	return DBcreate_changelog_update_trigger("item_preproc", "item_preprocid");
+}
+
+static int	DBpatch_6010072(void)
+{
+	return DBcreate_changelog_delete_trigger("item_preproc", "item_preprocid");
+}
+
+static int	DBpatch_6010073(void)
+{
+	return DBdrop_foreign_key("hosts", 3);
+}
+
+static int	DBpatch_6010074(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("hosts", 3, &field);
+}
+
+static int	DBpatch_6010075(void)
+{
+	return DBdrop_foreign_key("items", 1);
+}
+
+static int	DBpatch_6010076(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("items", 1, &field);
+}
+
+static int	DBpatch_6010077(void)
+{
+	return DBdrop_foreign_key("items", 2);
+}
+
+static int	DBpatch_6010078(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("items", 2, &field);
+}
+
+static int	DBpatch_6010079(void)
+{
+	return DBdrop_foreign_key("items", 5);
+}
+
+static int	DBpatch_6010080(void)
+{
+	const ZBX_FIELD	field = {"master_itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("items", 5, &field);
+}
+
+static int	DBpatch_6010081(void)
+{
+	return DBdrop_foreign_key("triggers", 1);
+}
+
+static int	DBpatch_6010082(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("triggers", 1, &field);
+}
+
+static int	DBpatch_6010083(void)
+{
+	return DBdrop_foreign_key("functions", 1);
+}
+
+static int	DBpatch_6010084(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("functions", 1, &field);
+}
+
+static int	DBpatch_6010085(void)
+{
+	return DBdrop_foreign_key("functions", 2);
+}
+
+static int	DBpatch_6010086(void)
+{
+	const ZBX_FIELD	field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("functions", 2, &field);
+}
+
+static int	DBpatch_6010087(void)
+{
+	return DBdrop_foreign_key("trigger_tag", 1);
+}
+
+static int	DBpatch_6010088(void)
+{
+	const ZBX_FIELD	field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("trigger_tag", 1, &field);
+}
+
+static int	DBpatch_6010089(void)
+{
+	return DBdrop_foreign_key("item_preproc", 1);
+}
+
+static int	DBpatch_6010090(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("item_preproc", 1, &field);
+}
+
+static int	DBpatch_6010091(void)
+{
+	return DBdrop_foreign_key("host_tag", 1);
+}
+
+static int	DBpatch_6010092(void)
+{
+	const ZBX_FIELD	field = {"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("host_tag", 1, &field);
+}
+static int	DBpatch_6010093(void)
+{
+	return DBdrop_foreign_key("item_tag", 1);
+}
+
+static int	DBpatch_6010094(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("item_tag", 1, &field);
+}
+
+static int	DBpatch_6010095(void)
+{
+	const ZBX_FIELD	field = {"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_rtdata", &field);
+}
+
+static int	DBpatch_6010096(void)
+{
+	/* status 5,6 - HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE */
+	if (ZBX_DB_OK > DBexecute("insert into host_rtdata (hostid,lastaccess)"
+			" select hostid,lastaccess from hosts where status in (5,6)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010097(void)
+{
+	return DBdrop_field("hosts", "lastaccess");
+}
 #endif
 
 DBPATCH_START(6010)
@@ -935,5 +1325,66 @@ DBPATCH_ADD(6010033, 0, 1)
 DBPATCH_ADD(6010034, 0, 1)
 DBPATCH_ADD(6010035, 0, 1)
 DBPATCH_ADD(6010036, 0, 1)
+DBPATCH_ADD(6010037, 0, 1)
+DBPATCH_ADD(6010038, 0, 1)
+DBPATCH_ADD(6010039, 0, 1)
+DBPATCH_ADD(6010040, 0, 1)
+DBPATCH_ADD(6010041, 0, 1)
+DBPATCH_ADD(6010042, 0, 1)
+DBPATCH_ADD(6010043, 0, 1)
+DBPATCH_ADD(6010044, 0, 1)
+DBPATCH_ADD(6010045, 0, 1)
+DBPATCH_ADD(6010046, 0, 1)
+DBPATCH_ADD(6010047, 0, 1)
+DBPATCH_ADD(6010048, 0, 1)
+DBPATCH_ADD(6010049, 0, 1)
+DBPATCH_ADD(6010050, 0, 1)
+DBPATCH_ADD(6010051, 0, 1)
+DBPATCH_ADD(6010052, 0, 1)
+DBPATCH_ADD(6010053, 0, 1)
+DBPATCH_ADD(6010054, 0, 1)
+DBPATCH_ADD(6010055, 0, 1)
+DBPATCH_ADD(6010056, 0, 1)
+DBPATCH_ADD(6010057, 0, 1)
+DBPATCH_ADD(6010058, 0, 1)
+DBPATCH_ADD(6010059, 0, 1)
+DBPATCH_ADD(6010060, 0, 1)
+DBPATCH_ADD(6010061, 0, 1)
+DBPATCH_ADD(6010062, 0, 1)
+DBPATCH_ADD(6010063, 0, 1)
+DBPATCH_ADD(6010064, 0, 1)
+DBPATCH_ADD(6010065, 0, 1)
+DBPATCH_ADD(6010066, 0, 1)
+DBPATCH_ADD(6010067, 0, 1)
+DBPATCH_ADD(6010068, 0, 1)
+DBPATCH_ADD(6010069, 0, 1)
+DBPATCH_ADD(6010070, 0, 1)
+DBPATCH_ADD(6010071, 0, 1)
+DBPATCH_ADD(6010072, 0, 1)
+DBPATCH_ADD(6010073, 0, 1)
+DBPATCH_ADD(6010074, 0, 1)
+DBPATCH_ADD(6010075, 0, 1)
+DBPATCH_ADD(6010076, 0, 1)
+DBPATCH_ADD(6010077, 0, 1)
+DBPATCH_ADD(6010078, 0, 1)
+DBPATCH_ADD(6010079, 0, 1)
+DBPATCH_ADD(6010080, 0, 1)
+DBPATCH_ADD(6010081, 0, 1)
+DBPATCH_ADD(6010082, 0, 1)
+DBPATCH_ADD(6010083, 0, 1)
+DBPATCH_ADD(6010084, 0, 1)
+DBPATCH_ADD(6010085, 0, 1)
+DBPATCH_ADD(6010086, 0, 1)
+DBPATCH_ADD(6010087, 0, 1)
+DBPATCH_ADD(6010088, 0, 1)
+DBPATCH_ADD(6010089, 0, 1)
+DBPATCH_ADD(6010090, 0, 1)
+DBPATCH_ADD(6010091, 0, 1)
+DBPATCH_ADD(6010092, 0, 1)
+DBPATCH_ADD(6010093, 0, 1)
+DBPATCH_ADD(6010094, 0, 1)
+DBPATCH_ADD(6010095, 0, 1)
+DBPATCH_ADD(6010096, 0, 1)
+DBPATCH_ADD(6010097, 0, 1)
 
 DBPATCH_END()

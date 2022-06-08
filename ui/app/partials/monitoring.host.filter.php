@@ -248,16 +248,6 @@ if (array_key_exists('render_html', $data)) {
 			}
 		});
 
-		// Show hosts in maintenance events.
-		let maintenance_checkbox = $('[name="maintenance_status"]', container).click(function () {
-			$('[name="show_suppressed"]', container).prop('disabled', !this.checked);
-		});
-
-		if (maintenance_checkbox.attr('unchecked-value') === data['maintenance_status']) {
-			maintenance_checkbox.removeAttr('checked');
-			$('[name="show_suppressed"]', container).prop('disabled', true);
-		}
-
 		// Tags table
 		if (data.tags.length == 0) {
 			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>, uniqid: data.uniqid});

@@ -147,9 +147,9 @@ class CControllerHostEdit extends CController {
 						'port', 'useip'
 					],
 					'selectInventory' => array_column(getHostInventories(), 'db_field'),
-					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type'],
+					'selectMacros' => ['hostmacroid', 'macro', 'value', 'description', 'type', 'automatic'],
 					'selectParentTemplates' => ['templateid', 'name', 'link_type'],
-					'selectTags' => ['tag', 'value'],
+					'selectTags' => ['tag', 'value', 'automatic'],
 					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 					'hostids' => $this->getInput('hostid')
 				]);
@@ -207,29 +207,48 @@ class CControllerHostEdit extends CController {
 
 		// Prepare tags for edit form.
 		if (!$data['host']['tags']) {
-			$data['host']['tags'][] = ['tag' => '', 'value' => ''];
+			$data['host']['tags'][] = ['tag' => '', 'value' => '', 'automatic' => ZBX_TAG_MANUAL];
 		}
 		else {
 			foreach ($data['host']['tags'] as &$tag) {
-				if (!array_key_exists('value', $tag)) {
-					$tag['value'] = '';
-				}
+				$tag += ['automatic' => ZBX_TAG_MANUAL];
 			}
 			unset($tag);
 
-			CArrayHelper::sort($data['host']['tags'], ['tag', 'value']);
+			CArrayHelper::sort($data['host']['tags'],
+				[['field' => 'automatic', 'order' => ZBX_SORT_DOWN], 'tag', 'value']
+			);
 		}
 
 		$data['host']['macros'] = array_values(order_macros($data['host']['macros'], 'macro'));
 
-		if (!$data['host']['macros'] && $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
+		if (!$data['host']['macros']) {
 			$data['host']['macros'][] = [
 				'type' => ZBX_MACRO_TYPE_TEXT,
 				'macro' => '',
 				'value' => '',
-				'description' => ''
+				'description' => '',
+				'automatic' => ZBX_USERMACRO_MANUAL
 			];
 		}
+
+		foreach ($data['host']['macros'] as &$macro) {
+			if (array_key_exists('automatic', $macro) && $macro['automatic'] == ZBX_USERMACRO_AUTOMATIC) {
+				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC;
+
+				$macro['original'] = [
+					'value' => getMacroConfigValue($macro),
+					'description' => $macro['description'],
+					'type' => $macro['type']
+				];
+			}
+			else {
+				$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
+			}
+
+			unset($macro['automatic']);
+		}
+		unset($macro);
 
 		// Reset Secret text macros and set warning for cloned host.
 		if ($data['host']['hostid'] === null) {
@@ -356,9 +375,9 @@ class CControllerHostEdit extends CController {
 	 */
 	protected function extendDiscoveryRule(?array &$editable_discovery_rule): void {
 		$editable_discovery_rule = $this->host['discoveryRule']
-			? API::DiscoveryRule([
+			? API::DiscoveryRule()->get([
 				'output' => [],
-				'itemids' => array_column($this->host['discoveryRule'], 'itemid'),
+				'itemids' => $this->host['discoveryRule']['itemid'],
 				'editable' => true,
 				'preservekeys' => true
 			])

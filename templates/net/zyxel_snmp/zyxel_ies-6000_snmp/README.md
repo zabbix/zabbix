@@ -140,7 +140,7 @@ There are no template links in this template.
 |ZYXEL IES-6000: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID} |<p>The reductions in amplitude of the downstream and upstream DSL signals.</p> |`min(/ZYXEL IES-6000 SNMP/zyxel.ies6000.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}` |WARNING | |
 |ZYXEL IES-6000: Voltage Slot {#ZYXEL.SLOT.ID} {#ZYXEL.VOLT.NOMINAL} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW} or last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.volt[{#SNMPINDEX}])>{#ZYXEL.VOLT.THRESH.HIGH}` |AVERAGE | |
 |ZYXEL IES-6000: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL IES-6000 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL IES-6000: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|ZYXEL IES-6000: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |ZYXEL IES-6000: Temperature Slot {#ZYXEL.SLOT.ID} Sensor: {#ZYXEL.TEMP.ID} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH} or last(/ZYXEL IES-6000 SNMP/zyxel.ies6000.temp[{#SNMPINDEX}])<{#ZYXEL.TEMP.THRESH.LOW}` |AVERAGE | |
 
 ## Feedback
