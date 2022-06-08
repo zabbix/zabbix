@@ -895,26 +895,73 @@ static int	DBpatch_6010036(void)
 
 static int	DBpatch_6010037(void)
 {
+	const	ZBX_FIELD field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hostmacro", &field);
+}
+
+static int	DBpatch_6010038(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update hostmacro"
+			" set automatic=1"	/* ZBX_USERMACRO_AUTOMATIC */
+			" where hostid in ("
+				"select hostid"
+				" from host_discovery"
+				" where parent_hostid is not null"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6010039(void)
+{
+	const ZBX_FIELD	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_tag", &field);
+}
+
+static int	DBpatch_6010040(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update host_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where hostid in ("
+				"select hostid"
+				" from host_discovery"
+				" where parent_hostid is not null"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+static int	DBpatch_6010041(void)
+{
 	const ZBX_FIELD	field = {"suppress_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("acknowledges", &field);
 }
 
-static int	DBpatch_6010038(void)
+static int	DBpatch_6010042(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("event_suppress", &field);
 }
 
-static int	DBpatch_6010039(void)
+static int	DBpatch_6010043(void)
 {
 	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("event_suppress", 3, &field);
 }
 
-static int	DBpatch_6010040(void)
+static int	DBpatch_6010044(void)
 {
 	const ZBX_FIELD field = {"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
@@ -966,5 +1013,9 @@ DBPATCH_ADD(6010037, 0, 1)
 DBPATCH_ADD(6010038, 0, 1)
 DBPATCH_ADD(6010039, 0, 1)
 DBPATCH_ADD(6010040, 0, 1)
+DBPATCH_ADD(6010041, 0, 1)
+DBPATCH_ADD(6010042, 0, 1)
+DBPATCH_ADD(6010043, 0, 1)
+DBPATCH_ADD(6010044, 0, 1)
 
 DBPATCH_END()

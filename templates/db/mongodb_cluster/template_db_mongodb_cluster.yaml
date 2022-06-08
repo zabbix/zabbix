@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:01Z'
+  date: '2022-05-06T14:17:41Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -39,8 +39,8 @@ zabbix_export:
               type: JAVASCRIPT
               parameters:
                 - |
-                  data = JSON.parse(value)
-                  return (data["$clusterTime"].clusterTime-data.sharding.lastSeenConfigServerOpTime.ts)/Math.pow(2,32);
+                  data = JSON.parse(value);
+                  return (data["$clusterTime"].clusterTime.T - data.sharding.lastSeenConfigServerOpTime.ts.T);
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
@@ -388,11 +388,9 @@ zabbix_export:
           description: 'The latest optime of the CSRS primary that the mongos has seen.'
           preprocessing:
             -
-              type: JAVASCRIPT
+              type: JSONPATH
               parameters:
-                - |
-                  data = JSON.parse(value)
-                  return data.sharding.lastSeenConfigServerOpTime.ts/Math.pow(2,32)
+                - $.sharding.lastSeenConfigServerOpTime.ts.T
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
@@ -484,6 +482,7 @@ zabbix_export:
               type: JSONPATH
               parameters:
                 - $.metrics.cursor.open.noTimeout
+              error_handler: DISCARD_VALUE
           master_item:
             key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           tags:
@@ -796,7 +795,7 @@ zabbix_export:
               name: 'MongoDB cluster: has been restarted'
               event_name: 'MongoDB cluster: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -

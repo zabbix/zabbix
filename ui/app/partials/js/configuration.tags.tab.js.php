@@ -21,11 +21,15 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 ?>
 
 <script type="text/x-jquery-tmpl" id="tag-row-tmpl">
-	<?= renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]) ?>
+	<?= renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, [
+		'add_post_js' => false,
+		'with_automatic' => array_key_exists('with_automatic', $data) && $data['with_automatic']
+	]) ?>
 </script>
 
 <script type="text/javascript">

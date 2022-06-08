@@ -192,6 +192,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	try {
 		DBstart();
 
+		foreach ($macros as &$macro) {
+			unset($macro['discovery_state']);
+		}
+		unset($macro);
+
 		$input_templateid = getRequest('templateid', 0);
 		$cloneTemplateId = 0;
 
@@ -635,6 +640,11 @@ if (hasRequest('form')) {
 
 		$data['macros'][] = $macro;
 	}
+
+	foreach ($data['macros'] as &$macro) {
+		$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;
+	}
+	unset($macro);
 
 	if (!hasRequest('form_refresh')) {
 		if ($data['templateid'] != 0) {

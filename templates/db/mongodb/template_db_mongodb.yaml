@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:00Z'
+  date: '2022-05-06T14:09:10Z'
   groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
@@ -486,7 +486,7 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: documents
+              value: cursors
         -
           uuid: f23bf716eced4ba5948b06c24c780904
           name: 'MongoDB: Cursor: open total'
@@ -692,7 +692,7 @@ zabbix_export:
           tags:
             -
               tag: component
-              value: documents
+              value: cursors
         -
           uuid: ba0502f80a044670993bdb63587cd282
           name: 'MongoDB: Bytes in, rate'
@@ -1031,7 +1031,7 @@ zabbix_export:
               name: 'MongoDB: has been restarted'
               event_name: 'MongoDB: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
