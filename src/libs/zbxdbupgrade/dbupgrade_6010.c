@@ -916,6 +916,30 @@ static int	DBpatch_6010038(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_6010039(void)
+{
+	const ZBX_FIELD	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_tag", &field);
+}
+
+static int	DBpatch_6010040(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update host_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where hostid in ("
+				"select hostid"
+				" from host_discovery"
+				" where parent_hostid is not null"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6010)
@@ -960,5 +984,7 @@ DBPATCH_ADD(6010035, 0, 1)
 DBPATCH_ADD(6010036, 0, 1)
 DBPATCH_ADD(6010037, 0, 1)
 DBPATCH_ADD(6010038, 0, 1)
+DBPATCH_ADD(6010039, 0, 1)
+DBPATCH_ADD(6010040, 0, 1)
 
 DBPATCH_END()

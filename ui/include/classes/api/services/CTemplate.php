@@ -301,8 +301,9 @@ class CTemplate extends CHostGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings,uuid'],
-			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => 'templateid,host,name,description,uuid']
+			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value'])],
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings', 'uuid'])],
+			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid'])]
 		]];
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
@@ -338,7 +339,7 @@ class CTemplate extends CHostGeneral {
 		$this->checkTemplatesLinks($templates);
 
 		$this->updateGroups($templates);
-		$this->updateTagsNew($templates);
+		$this->updateTags($templates);
 		$this->updateMacros($templates);
 		$this->updateTemplates($templates);
 
@@ -444,7 +445,7 @@ class CTemplate extends CHostGeneral {
 		}
 
 		$this->updateGroups($templates, $db_templates);
-		$this->updateTagsNew($templates, $db_templates);
+		$this->updateTags($templates, $db_templates);
 		$this->updateMacros($templates, $db_templates);
 		$this->updateTemplates($templates, $db_templates);
 
@@ -1181,7 +1182,6 @@ class CTemplate extends CHostGeneral {
 
 		$templateids = array_keys($result);
 
-		// Adding Templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
 				$templates = [];
@@ -1216,7 +1216,6 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		// Adding Hosts
 		if ($options['selectHosts'] !== null) {
 			if ($options['selectHosts'] != API_OUTPUT_COUNT) {
 				$hosts = [];
@@ -1251,7 +1250,6 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		// Adding dashboards.
 		if ($options['selectDashboards'] !== null) {
 			if ($options['selectDashboards'] != API_OUTPUT_COUNT) {
 				$dashboards = API::TemplateDashboard()->get([
@@ -1283,6 +1281,34 @@ class CTemplate extends CHostGeneral {
 						? $dashboards[$templateid]['rowscount']
 						: '0';
 				}
+			}
+		}
+
+		if ($options['selectTags'] !== null) {
+			foreach ($result as &$row) {
+				$row['tags'] = [];
+			}
+			unset($row);
+
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$output = ['hosttagid', 'hostid', 'tag', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
+			}
+
+			$sql_options = [
+				'output' => $output,
+				'filter' => ['hostid' => $templateids]
+			];
+			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$hostid = $db_tag['hostid'];
+
+				unset($db_tag['hosttagid'], $db_tag['hostid']);
+
+				$result[$hostid]['tags'][] = $db_tag;
 			}
 		}
 

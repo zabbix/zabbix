@@ -70,6 +70,18 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 		$ret = $this->validateInput($fields);
 
+		if ($ret && $this->hasInput('tags')) {
+			foreach ($this->getInput('tags') as $tag) {
+				if (!is_array($tag) || count($tag) != 2
+						|| !array_key_exists('tag', $tag) || !is_string($tag['tag'])
+						|| !array_key_exists('value', $tag) || !is_string($tag['value'])) {
+					error(_s('Incorrect value for "%1$s" field.', 'tags'));
+					$ret = false;
+					break;
+				}
+			}
+		}
+
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
@@ -95,30 +107,29 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 	protected function doAction(): void {
 		if ($this->hasInput('update')) {
-			$output = [];
 			$hostids = $this->getInput('hostids');
 			$visible = $this->getInput('visible', []);
+
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
-				function (array $macro): bool {
+				static function (array $macro): bool {
 					return (bool) array_filter(
 						array_intersect_key($macro, array_flip(['hostmacroid', 'macro', 'value', 'description']))
 					);
 				}
 			);
+
 			$tags = array_filter($this->getInput('tags', []),
-				function (array $tag): bool {
-					return ($tag['tag'] !== '' || $tag['value'] !== '');
+				static function (array $tag): bool {
+					return $tag['tag'] !== '' || $tag['value'] !== '';
 				}
 			);
-
-			$result = true;
 
 			try {
 				DBstart();
 
 				// filter only normal and discovery created hosts
 				$options = [
-					'output' => ['hostid', 'inventory_mode', 'flags'],
+					'output' => ['hostid', 'host', 'inventory_mode', 'flags'],
 					'hostids' => $hostids,
 					'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
 				];
@@ -134,19 +145,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				}
 
 				if (array_key_exists('tags', $visible)) {
-					$mass_update_tags = $this->getInput('mass_update_tags', ZBX_ACTION_ADD);
-
-					if ($mass_update_tags == ZBX_ACTION_ADD || $mass_update_tags == ZBX_ACTION_REMOVE) {
-						$options['selectTags'] = ['tag', 'value'];
-					}
-
-					$unique_tags = [];
-
-					foreach ($tags as $tag) {
-						$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-					}
-
-					$tags = array_values($unique_tags);
+					$options['selectTags'] = ['tag', 'value', 'automatic'];
 				}
 
 				if (array_key_exists('macros', $visible)) {
@@ -307,32 +306,77 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					}
 
 					if (array_key_exists('tags', $visible)) {
-						if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
-							$unique_tags = [];
+						switch ($this->getInput('mass_update_tags', ZBX_ACTION_ADD)) {
+							case ZBX_ACTION_ADD:
+								$tags_map = [];
 
-							foreach (array_merge($host['tags'], $tags) as $tag) {
-								$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-							}
-
-							$host['tags'] = array_values($unique_tags);
-						}
-						elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
-							$host['tags'] = $tags;
-						}
-						elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
-							$diff_tags = [];
-
-							foreach ($host['tags'] as $a) {
-								foreach ($tags as $b) {
-									if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
-										continue 2;
-									}
+								foreach ($host['tags'] as $tag) {
+									unset($tag['automatic']);
+									$tags_map[$tag['tag']][$tag['value']] = $tag;
 								}
 
-								$diff_tags[] = $a;
-							}
+								foreach ($tags as $tag) {
+									$tags_map[$tag['tag']][$tag['value']] = $tag;
+								}
 
-							$host['tags'] = $diff_tags;
+								$host['tags'] = [];
+
+								foreach ($tags_map as $tags_map_2) {
+									foreach ($tags_map_2 as $tag) {
+										$host['tags'][] = $tag;
+									}
+								}
+								break;
+
+							case ZBX_ACTION_REPLACE:
+								$tags_map = [];
+
+								foreach ($tags as $tag) {
+									$tags_map[$tag['tag']][$tag['value']] = $tag;
+								}
+
+								$host['tags'] = [];
+
+								foreach ($tags_map as $tags_map_2) {
+									foreach ($tags_map_2 as $tag) {
+										$host['tags'][] = $tag;
+									}
+								}
+								break;
+
+							case ZBX_ACTION_REMOVE:
+								$tags_map = [];
+
+								foreach ($host['tags'] as $tag) {
+									$tags_map[$tag['tag']][$tag['value']] = $tag;
+								}
+
+								foreach ($tags as $tag) {
+									if (!array_key_exists($tag['tag'], $tags_map)
+											|| !array_key_exists($tag['value'], $tags_map[$tag['tag']])) {
+										continue;
+									}
+
+									if ($tags_map[$tag['tag']][$tag['value']]['automatic'] == ZBX_TAG_AUTOMATIC) {
+										error(_s(
+											'Cannot remove the tag with name "%1$s" and value "%2$s", defined in a host prototype, from host "%3$s".',
+											$tag['tag'], $tag['value'], $host['host']
+										));
+										throw new Exception();
+									}
+
+									unset($tags_map[$tag['tag']][$tag['value']]);
+								}
+
+								$host['tags'] = [];
+
+								foreach ($tags_map as $tags_map_2) {
+									foreach ($tags_map_2 as $tag) {
+										unset($tag['automatic']);
+										$host['tags'][] = $tag;
+									}
+								}
+								break;
 						}
 					}
 
@@ -411,7 +455,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 						unset($host['inventory_mode']);
 					}
-					unset($host['flags']);
+					unset($host['host'], $host['flags']);
 				}
 				unset($host);
 

@@ -179,7 +179,6 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
 					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -199,7 +198,6 @@ class testFormTags extends CWebTest {
 							'value' => 'value'
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(tag, value) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
 				]
 			],
@@ -353,7 +351,6 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/1/tag": cannot be empty.',
 					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
@@ -368,7 +365,6 @@ class testFormTags extends CWebTest {
 							'value' => 'update'
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/2": value (tag, value)=(action, update) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
 				]
 			],
@@ -383,7 +379,6 @@ class testFormTags extends CWebTest {
 							'value' => ''
 						]
 					],
-					'host_error_details' => 'Invalid parameter "/tags/3": value (tag, value)=(tag without value, ) already exists.',
 					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, value)=(tag without value, ) already exists.'
 				]
 			],
@@ -537,14 +532,11 @@ class testFormTags extends CWebTest {
 	 */
 	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$error_details = ($object === 'host')
-					? CTestArrayHelper::get($data, 'host_error_details')
-					: CTestArrayHelper::get($data, 'error_details');
 
 			$title = ($object === 'service')
 				? null
 				: (($action === 'add') ? 'Cannot add '.$object : 'Cannot update '.$object);
-			$this->assertMessage(TEST_BAD, $title, $error_details);
+			$this->assertMessage(TEST_BAD, $title, CTestArrayHelper::get($data, 'error_details'));
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -1183,7 +1175,7 @@ class testFormTags extends CWebTest {
 		foreach ($disabled_rows as $row) {
 			// Check other disabled fields.
 			$this->assertFalse($row->getColumn('Value')->children()->one()->detect()->isEnabled());
-			$this->assertFalse($row->getColumn('Action')->children()->one()->detect()->isEnabled());
+			$this->assertFalse($row->getColumn('')->children()->one()->detect()->isEnabled());
 
 			$values = [];
 			// Get disabled row values.

@@ -853,7 +853,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		$this->updateTags(array_column($hosts, 'tags', 'hostid'));
+		$this->updateTags($hosts, $db_hosts);
 
 		return ['hostids' => array_column($hosts, 'hostid')];
 	}
@@ -1599,7 +1599,6 @@ class CHost extends CHostGeneral {
 
 		$hostids = array_keys($result);
 
-		// adding inventory
 		if ($options['selectInventory'] !== null) {
 			$inventory = API::getApiService()->select('host_inventory', [
 				'output' => $options['selectInventory'],
@@ -1612,7 +1611,6 @@ class CHost extends CHostGeneral {
 			$result = $relation_map->mapOne($result, $inventory, 'inventory');
 		}
 
-		// adding hostinterfaces
 		if ($options['selectInterfaces'] !== null) {
 			if ($options['selectInterfaces'] != API_OUTPUT_COUNT) {
 				$interfaces = API::HostInterface()->get([
@@ -1649,7 +1647,6 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		// Adding dashboards.
 		if ($options['selectDashboards'] !== null) {
 			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
 
@@ -1695,7 +1692,6 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		// adding discovery rule
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			// discovered items
 			$discoveryRules = DBFetchArray(DBselect(
@@ -1714,7 +1710,6 @@ class CHost extends CHostGeneral {
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
-		// adding host discovery
 		if ($options['selectHostDiscovery'] !== null) {
 			$hostDiscoveries = API::getApiService()->select('host_discovery', [
 				'output' => $this->outputExtend($options['selectHostDiscovery'], ['hostid']),
@@ -1729,8 +1724,35 @@ class CHost extends CHostGeneral {
 			$result = $relationMap->mapOne($result, $hostDiscoveries, 'hostDiscovery');
 		}
 
+		if ($options['selectTags'] !== null) {
+			foreach ($result as &$row) {
+				$row['tags'] = [];
+			}
+			unset($row);
+
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$output = ['hosttagid', 'hostid', 'tag', 'value', 'automatic'];
+			}
+			else {
+				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
+			}
+
+			$sql_options = [
+				'output' => $output,
+				'filter' => ['hostid' => $hostids]
+			];
+			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$hostid = $db_tag['hostid'];
+
+				unset($db_tag['hosttagid'], $db_tag['hostid']);
+
+				$result[$hostid]['tags'][] = $db_tag;
+			}
+		}
+
 		if ($options['selectInheritedTags'] !== null && $options['selectInheritedTags'] != API_OUTPUT_COUNT) {
-			$hosts_templates = [];
 			[$hosts_templates, $templateids] = CApiHostHelper::getParentTemplates($hostids);
 
 			$templates = API::Template()->get([
@@ -1802,15 +1824,14 @@ class CHost extends CHostGeneral {
 	protected function validateGet(array $options) {
 		// Validate input parameters.
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'inheritedTags' => ['type' => API_BOOLEAN, 'default' => false],
-			'selectInheritedTags' => ['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
-			'severities' =>	[
-				'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true
-			],
+			'inheritedTags' =>				['type' => API_BOOLEAN, 'default' => false],
+			'selectInheritedTags' =>		['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE],
+			'severities' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE | API_NOT_EMPTY, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true],
 			'withProblemsSuppressed' =>		['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
-			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
-			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => 'templateid,host,name,description,uuid,link_type'],
-			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'hostmacroid,macro,value,type,description,automatic']
+			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value', 'automatic'])],
+			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['valuemapid', 'name', 'mappings'])],
+			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['templateid', 'host', 'name', 'description', 'uuid', 'link_type'])],
+			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'])]
 		]];
 
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
@@ -2028,11 +2049,6 @@ class CHost extends CHostGeneral {
 				$groupids[$group['groupid']] = true;
 			}
 
-			// Validate tags.
-			if (array_key_exists('tags', $host)) {
-				$this->validateTags($host);
-			}
-
 			if (array_key_exists('macros', $host)) {
 				if (!CApiInputValidator::validate($macro_rules, $host['macros'], '/'.($index + 1).'/macros', $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -2040,6 +2056,8 @@ class CHost extends CHostGeneral {
 			}
 		}
 		unset($host);
+
+		self::checkTags($hosts);
 
 		// Check for duplicate "host" and "name" fields.
 		$duplicate = CArrayHelper::findDuplicate($hosts, 'host');
@@ -2290,7 +2308,9 @@ class CHost extends CHostGeneral {
 		]);
 
 		$update_discovered_validator = new CUpdateDiscoveredValidator([
-			'allowed' => ['hostid', 'status', 'inventory', 'description', 'templates', 'templates_clear', 'macros'],
+			'allowed' => ['hostid', 'status', 'description', 'tags', 'macros', 'inventory', 'templates',
+				'templates_clear'
+			],
 			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
 		]);
 
@@ -2393,13 +2413,11 @@ class CHost extends CHostGeneral {
 					}
 				}
 			}
-
-			// Validate tags.
-			if (array_key_exists('tags', $host)) {
-				$this->validateTags($host);
-			}
 		}
 		unset($host);
+
+		$this->addAffectedTags($hosts, $db_hosts);
+		self::checkTags($hosts);
 
 		if (array_key_exists('host', $host_names) || array_key_exists('name', $host_names)) {
 			$filter = [];
@@ -2466,6 +2484,24 @@ class CHost extends CHostGeneral {
 		$this->validateEncryption($hosts, $db_hosts);
 
 		return $hosts;
+	}
+
+	/**
+	 * @param array $hosts
+	 *
+	 * @throws APIException
+	 */
+	private static function checkTags(array &$hosts): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'tags' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
+				'value' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	protected function requiresPostSqlFiltering(array $options) {

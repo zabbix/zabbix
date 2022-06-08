@@ -397,17 +397,31 @@
 		/**
 		 * Normalize field values.
 		 *
-		 * @param {Object} fields  Fields from host form.
+		 * @param {Object}  fields    Fields from host form.
+		 * @param {boolean} is_clone  Submit fields for clone instead of update.
 		 *
-		 * @return {Object}        Processed fields from host form.
+		 * @return {Object}  Processed fields from host form.
 		 */
-		preprocessFormFields(fields) {
+		preprocessFormFields(fields, is_clone) {
 			this.trimFields(fields);
 			fields.status = fields.status || <?= HOST_STATUS_NOT_MONITORED ?>;
 
 			if (document.querySelector('#change_psk')) {
 				delete fields.tls_psk_identity;
 				delete fields.tls_psk;
+			}
+
+			if ('tags' in fields) {
+				for (const key in fields.tags) {
+					const tag = fields.tags[key];
+
+					if (tag.automatic == <?= ZBX_TAG_AUTOMATIC ?> && !is_clone) {
+						delete fields.tags[key];
+					}
+					else {
+						delete tag.automatic;
+					}
+				}
 			}
 
 			return fields;
