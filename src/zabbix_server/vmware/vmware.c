@@ -8197,7 +8197,7 @@ void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 {
 	zbx_vmware_service_t	*service = job->service;
-	int			jobs_num = 0;
+	int			jobs_num;
 
 	zbx_vmware_lock();
 
