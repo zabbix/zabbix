@@ -965,7 +965,7 @@ static int	DBpatch_6010044(void)
 {
 	const ZBX_FIELD field = {"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
-	return DBdrop_default("task_data", &field);
+	return DBdrop_not_null("task_data", &field);
 }
 
 static int	DBpatch_6010045(void)
