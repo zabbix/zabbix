@@ -37,7 +37,7 @@ extern char		*CONFIG_SOURCE_IP;
 extern int		CONFIG_TIMEOUT;
 extern unsigned int	configured_tls_connect_mode;
 
-static int	send_heartbeat(void)
+static int	send_heartbeat(zbx_config_tls_t *zbx_config_tls)
 {
 	zbx_socket_t		sock;
 	struct zbx_json		j;
@@ -61,7 +61,7 @@ static int	send_heartbeat(void)
 	reserved = j.buffer_size;
 
 	if (FAIL == (ret = zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, CONFIG_HEARTBEAT_FREQUENCY,
-			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, LOG_LEVEL_DEBUG))) /* do not retry */
+			CONFIG_TIMEOUT, 0, LOG_LEVEL_DEBUG, zbx_config_tls))) /* do not retry */
 	{
 		goto clean;
 	}
@@ -88,6 +88,8 @@ clean:
  ******************************************************************************/
 ZBX_THREAD_ENTRY(heart_thread, args)
 {
+	ZBX_THREAD_HEART_ARGS	*heart_args_in = (ZBX_THREAD_HEART_ARGS *)
+							(((zbx_thread_args_t *)args)->args);
 	int	start, sleeptime = 0, res;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
@@ -99,13 +101,14 @@ ZBX_THREAD_ENTRY(heart_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(heart_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(heart_args_in->zbx_config_tls, heart_args_in->zbx_get_program_type_cb_arg);
 #endif
 	last_stat_time = time(NULL);
 
@@ -125,7 +128,7 @@ ZBX_THREAD_ENTRY(heart_thread, args)
 		}
 
 		start = time(NULL);
-		res = send_heartbeat();
+		res = send_heartbeat(heart_args_in->zbx_config_tls);
 		total_sec += zbx_time() - sec;
 
 		sleeptime = CONFIG_HEARTBEAT_FREQUENCY - (time(NULL) - start);

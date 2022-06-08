@@ -37,9 +37,9 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
-extern unsigned int	configured_tls_connect_mode;
 
-static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced)
+static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
+						zbx_config_tls_t *zbx_config_tls)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -69,7 +69,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
 	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
-			configured_tls_connect_mode, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING))	/* retry till have a connection */
+			CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING, zbx_config_tls))	/* retry till have a connection */
 	{
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		goto out;
@@ -149,6 +149,8 @@ out:
  ******************************************************************************/
 ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 {
+	ZBX_THREAD_PROXYCONFIG_ARGS	*proxyconfig_args_in = (ZBX_THREAD_PROXYCONFIG_ARGS *)
+							(((zbx_thread_args_t *)args)->args);
 	size_t			data_size;
 	double			sec;
 	zbx_ipc_async_socket_t	rtc;
@@ -159,11 +161,12 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(proxyconfig_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(proxyconfig_args_in->zbx_config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg);
 #endif
 
 	zbx_rtc_subscribe(&rtc, process_type, process_num);
@@ -222,7 +225,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		process_configuration_sync(&data_size, &synced);
+		process_configuration_sync(&data_size, &synced, proxyconfig_args_in->zbx_config_tls);
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",

@@ -940,7 +940,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 				/* once in STAT_INTERVAL seconds */
 
 	//poller_type = *(unsigned char *)((zbx_thread_args_t *)args)->args;
-	poller_type = poller_args_in->poller_type;
+	poller_type = *(poller_args_in->poller_type);
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;

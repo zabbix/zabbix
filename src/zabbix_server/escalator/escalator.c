@@ -29,7 +29,6 @@
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
-#include "zbxcomms.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
@@ -3392,6 +3391,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
  ******************************************************************************/
 ZBX_THREAD_ENTRY(escalator_thread, args)
 {
+	ZBX_THREAD_ESCALATOR_ARGS	*escalator_args_in = (ZBX_THREAD_ESCALATOR_ARGS *)
+							(((zbx_thread_args_t *)args)->args);
 	int		now, nextcheck, sleeptime = -1, escalations_count = 0, old_escalations_count = 0;
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t		last_stat_time;
@@ -3401,8 +3402,9 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+		   	get_program_type_string(escalator_args_in->zbx_get_program_type_cb_arg()), server_num,
+			get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -3410,7 +3412,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 				/* once in STAT_INTERVAL seconds */
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(escalator_args_in->zbx_config_tls, escalator_args_in->zbx_get_program_type_cb_arg);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);

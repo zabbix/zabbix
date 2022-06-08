@@ -21,9 +21,17 @@
 #define ZABBIX_PROXYPOLLER_H
 
 #include "zbxthreads.h"
+#include "zbxcomms.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TRAPPER_TIMEOUT;
+
+typedef struct
+{
+	zbx_config_tls_t	*zbx_config_tls;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+}
+ZBX_THREAD_PROXY_POLLER_ARGS;
 
 ZBX_THREAD_ENTRY(proxypoller_thread, args);
 

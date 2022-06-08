@@ -22,6 +22,15 @@
 
 #include "zbxthreads.h"
 
+typedef struct
+{
+	char	*CONFIG_TLS_CA_FILE;
+	char	*CONFIG_TLS_CERT_FILE;
+	char	*CONFIG_TLS_KEY_FILE;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+}
+ZBX_THREAD_REPORT_WRITER_ARGS;
+
 ZBX_THREAD_ENTRY(report_writer_thread, args);
 
 #endif

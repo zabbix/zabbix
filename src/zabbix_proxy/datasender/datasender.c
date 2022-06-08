@@ -84,7 +84,8 @@ static void	get_hist_upload_state(const char *buffer, int *state)
  *          data and sends 'proxy data' request                               *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t *last_conn_time)
+static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t *last_conn_time,
+		zbx_config_tls_t *zbx_config_tls)
 {
 	static int		data_timestamp = 0, task_timestamp = 0, upload_state = SUCCEED;
 
@@ -188,7 +189,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, time_t 
 
 		/* retry till have a connection */
 		if (FAIL == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
-				configured_tls_connect_mode, CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING))
+				CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING, zbx_config_tls))
 		{
 			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -292,6 +293,9 @@ clean:
  ******************************************************************************/
 ZBX_THREAD_ENTRY(datasender_thread, args)
 {
+	ZBX_THREAD_DATASENDER_ARGS	*datasender_args_in = (ZBX_THREAD_DATASENDER_ARGS *)
+							(((zbx_thread_args_t *)args)->args);
+
 	int		records = 0, hist_upload_state = ZBX_PROXY_UPLOAD_ENABLED, more;
 	double		time_start, time_diff = 0.0, time_now;
 	time_t		last_conn_time;
@@ -300,13 +304,14 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(datasender_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(datasender_args_in->zbx_config_tls, datasender_args_in->zbx_get_program_type_cb_arg);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -327,7 +332,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 		do
 		{
-			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state, &last_conn_time);
+			records += proxy_data_sender(&more, (int)time_now, &hist_upload_state, &last_conn_time,
+					datasender_args_in->zbx_config_tls);
 
 			time_now = zbx_time();
 			time_diff = time_now - time_start;

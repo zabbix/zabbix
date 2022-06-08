@@ -984,7 +984,7 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 
 
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
-		char *config_tls_server_cert_issuer, char *config_tls_server_cert_subject)
+		zbx_config_tls_t	*zbx_config_tls)
 {
 	int	ret = SUCCEED;
 
@@ -1019,8 +1019,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 				zabbix_log(LOG_LEVEL_WARNING, "received configuration data from server"
 						" at \"%s\", datalen " ZBX_FS_SIZE_T,
 						sock->peer, (zbx_fs_size_t)(jp.end - jp.start + 1));
-				recv_proxyconfig(sock, &jp, config_tls_server_cert_issuer,
-						config_tls_server_cert_subject);
+				recv_proxyconfig(sock, &jp, zbx_config_tls);
 			}
 			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
 			{
@@ -1054,8 +1053,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			{
 				if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 				{
-					zbx_send_task_data(sock, ts, config_tls_server_cert_issuer,
-							config_tls_server_cert_subject);
+					zbx_send_task_data(sock, ts, zbx_config_tls);
 				}
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
@@ -1066,8 +1064,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 				}
 				else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 				{
-					zbx_send_proxy_data(sock, ts,  config_tls_server_cert_issuer,
-							config_tls_server_cert_subject);
+					zbx_send_proxy_data(sock, ts, zbx_config_tls);
 				}
 			}
 			else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
@@ -1204,16 +1201,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	return ret;
 }
 
-static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, char *config_tls_server_cert_issuer,
-		char *config_tls_server_cert_subject)
+static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts, zbx_config_tls_t	*zbx_config_tls)
 {
 	ssize_t	bytes_received;
 
 	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
 		return;
 
-	process_trap(sock, sock->buffer, bytes_received, ts, config_tls_server_cert_issuer,
-			config_tls_server_cert_subject);
+	process_trap(sock, sock->buffer, bytes_received, ts, zbx_config_tls);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1300,8 +1295,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			}
 #endif
 			sec = zbx_time();
-			process_trapper_child(&s, &ts, trapper_args_in->zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER,
-					trapper_args_in->zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT);
+			process_trapper_child(&s, &ts, trapper_args_in->zbx_config_tls);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

@@ -63,8 +63,6 @@ typedef struct
 }
 zbx_drule_ip_t;
 
-extern unsigned int	configured_tls_accept_modes;
-
 typedef struct
 {
 	const char		*field;
@@ -369,7 +367,7 @@ int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, ch
  *                                                                            *
  ******************************************************************************/
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		char *config_tls_server_cert_issuer, char *config_tls_server_cert_subject)
+					zbx_config_tls_t *zbx_config_tls)
 {
 	char	*msg = NULL;
 
@@ -384,7 +382,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 		return FAIL;
 	}
 
-	if (0 == (configured_tls_accept_modes & sock->connection_type))
+	if (0 == (zbx_config_tls->configured_tls_accept_modes & sock->connection_type))
 	{
 		msg = zbx_dsprintf(NULL, "%s over connection of type \"%s\" is not allowed", req,
 				zbx_tcp_connection_type_name(sock->connection_type));
@@ -402,8 +400,9 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		if (SUCCEED == zbx_check_server_issuer_subject(sock, &msg, config_tls_server_cert_issuer,
-				config_tls_server_cert_subject))
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, &msg,
+				zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER,
+				zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT))
 		{
 			return SUCCEED;
 		}

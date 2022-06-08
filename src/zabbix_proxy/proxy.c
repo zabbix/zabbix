@@ -148,6 +148,10 @@ static int	*threads_flags;
 static char	*CONFIG_PID_FILE = NULL;
 
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_PROXY_ACTIVE;
+static unsigned char	get_program_type(void)
+{
+	return program_type;
+}
 
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
 ZBX_THREAD_LOCAL int		process_num	= 0;
@@ -304,6 +308,7 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 /* char	*CONFIG_TLS_CIPHER_ALL		= NULL; */
 /* char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/\* not used in proxy, defined for linking with tls.c *\/ */
 /* char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/\* not used in proxy, defined for linking with tls.c *\/ */
+static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 static char	*CONFIG_SOCKET_PATH	= NULL;
 
@@ -686,9 +691,9 @@ static int	proxy_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vec
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config(ZBX_TASK_EX *task, zbx_config_tls_t *zbx_config_tls)
+static void	zbx_load_config(ZBX_TASK_EX *task)
 {
-	static struct cfg_line	cfg[] =
+	struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
@@ -926,7 +931,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task, zbx_config_tls_t *zbx_config_tls)
 	zbx_db_validate_config();
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config();
+	zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS);
 #endif
 }
 
@@ -1378,8 +1383,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	for (i = 0; i < threads_num; i++)
 	{
-		zbx_thread_args_t	thread_args;
-		unsigned char		poller_type;
+		zbx_thread_args_t		thread_args;
+		unsigned char			poller_type;
+		ZBX_THREAD_HEART_ARGS		HEART_ARGS = {zbx_config_tls, get_program_type};
+		ZBX_THREAD_PROXYCONFIG_ARGS	PROXYCONFIG_ARGS = {zbx_config_tls, get_program_type};
+		ZBX_THREAD_DATASENDER_ARGS	DATASENDER_ARGS = {zbx_config_tls, get_program_type};
+		ZBX_THREAD_TASKMANAGER_ARGS	TASKMANAGER_ARGS = {zbx_config_tls, get_program_type};
 
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
 		{
@@ -1393,6 +1402,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_args.process_type)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
+				thread_args.args = &PROXYCONFIG_ARGS;
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
 				if (FAIL == zbx_rtc_wait_config_sync(&rtc))
 					goto out;
@@ -1402,9 +1412,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HEARTBEAT:
+				thread_args.args = &HEART_ARGS;
 				zbx_thread_start(heart_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
+				thread_args.args = &DATASENDER_ARGS;
 				zbx_thread_start(datasender_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
@@ -1456,6 +1468,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 #endif
 			case ZBX_PROCESS_TYPE_TASKMANAGER:
+				thread_args.args = &TASKMANAGER_ARGS;
 				zbx_thread_start(taskmanager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PREPROCMAN:

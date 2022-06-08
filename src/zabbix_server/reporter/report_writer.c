@@ -31,9 +31,9 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern char	*CONFIG_WEBSERVICE_URL;
-extern char	*CONFIG_TLS_CA_FILE;
-extern char	*CONFIG_TLS_CERT_FILE;
-extern char	*CONFIG_TLS_KEY_FILE;
+/* extern char	*CONFIG_TLS_CA_FILE; */
+/* extern char	*CONFIG_TLS_CERT_FILE; */
+/* extern char	*CONFIG_TLS_KEY_FILE; */
 
 typedef struct
 {
@@ -93,7 +93,8 @@ static char	*rw_curl_error(CURLcode err)
  *                                                                            *
  ******************************************************************************/
 static int	rw_get_report(const char *url, const char *cookie, int width, int height, char **report,
-		size_t *report_size, char **error)
+				size_t *report_size, char **error, char *CONFIG_TLS_CA_FILE, char *CONFIG_TLS_CERT_FILE,
+				char *CONFIG_TLS_KEY_FILE)
 {
 #if !defined(HAVE_LIBCURL)
 	ZBX_UNUSED(url);
@@ -249,7 +250,8 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch, char **error)
+static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch, char **error,
+				char *CONFIG_TLS_CA_FILE, char *CONFIG_TLS_CERT_FILE, char *CONFIG_TLS_KEY_FILE)
 {
 	zbx_vector_ptr_pair_t	params;
 	int			i, ret, width, height;
@@ -279,7 +281,8 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 		}
 	}
 
-	if (SUCCEED == (ret = rw_get_report(url, cookie, width, height, &report, &report_size, error)))
+	if (SUCCEED == (ret = rw_get_report(url, cookie, width, height, &report, &report_size, error,
+			CONFIG_TLS_CA_FILE, CONFIG_TLS_CERT_FILE, CONFIG_TLS_KEY_FILE)))
 	{
 		ret = zbx_alerter_begin_dispatch(dispatch, subject, message, name, "application/pdf", report,
 				report_size, error);
@@ -389,6 +392,8 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 {
 #define	ZBX_STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 					/* once in STAT_INTERVAL seconds */
+	ZBX_THREAD_REPORT_WRITER_ARGS	*poller_args_in = (ZBX_THREAD_REPORT_WRITER_ARGS *)
+									(((zbx_thread_args_t *)args)->args);
 
 	pid_t			ppid;
 	char			*error = NULL;
@@ -416,8 +421,9 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	ppid = getppid();
 	zbx_ipc_socket_write(&socket, ZBX_IPC_REPORTER_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,
+			get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
@@ -460,10 +466,17 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 		switch (message.code)
 		{
 			case ZBX_IPC_REPORTER_BEGIN_REPORT:
-				if (SUCCEED != (report_status = rw_begin_report(&message, &dispatch, &error)))
+				if (SUCCEED != (report_status = rw_begin_report(&message, &dispatch, &error,
+						poller_args_in->CONFIG_TLS_CA_FILE,
+						poller_args_in->CONFIG_TLS_CERT_FILE,
+						poller_args_in->CONFIG_TLS_KEY_FILE)))
+				{
 					zabbix_log(LOG_LEVEL_DEBUG, "failed to begin report dispatch: %s", error);
+				}
 				else
+				{
 					started_num++;
+				}
 				break;
 			case ZBX_IPC_REPORTER_SEND_REPORT:
 				if (SUCCEED == report_status)

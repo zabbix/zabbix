@@ -26,7 +26,6 @@
 #include "zbxdiag.h"
 #include "zbxrtc.h"
 #include "proxy.h"
-#include "zbxcomms.h"
 #include "dbcache.h"
 
 #include "../../zabbix_server/scripts/scripts.h"
@@ -421,6 +420,9 @@ static void	force_config_sync(void)
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
+	ZBX_THREAD_TASKMANAGER_ARGS	*taskmanager_args_in = (ZBX_THREAD_TASKMANAGER_ARGS *)
+							(((zbx_thread_args_t *)args)->args);
+
 	static int	cleanup_time = 0;
 
 	double			sec1, sec2;
@@ -431,13 +433,14 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
+			get_program_type_string(taskmanager_args_in->zbx_get_program_type_cb_arg()),
 			server_num, get_process_type_string(process_type), process_num);
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child();
+	zbx_tls_init_child(taskmanager_args_in->zbx_config_tls, taskmanager_args_in->zbx_get_program_type_cb_arg);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
