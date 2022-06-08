@@ -324,7 +324,7 @@ class CDBHelper {
 			$cmd = '';
 			$cmd_tdb = '';
 			$db_extension = '';
-			
+
 			$sql = 'SELECT db_extension'.
 				' FROM config';
 
