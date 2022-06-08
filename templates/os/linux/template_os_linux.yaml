@@ -2217,19 +2217,6 @@ zabbix_export:
               value: '826'
               newvalue: 'Vsock monitor header'
         -
-          uuid: 95fd8cdf901b4f4aac9863b709d34db0
-          name: zabbix.host.active_agent.available
-          mappings:
-            -
-              value: '0'
-              newvalue: unknown
-            -
-              value: '1'
-              newvalue: available
-            -
-              value: '2'
-              newvalue: 'not available'
-        -
           uuid: 5488e5d78d704b78aee60c60414ce0c3
           name: zabbix.host.available
           mappings:

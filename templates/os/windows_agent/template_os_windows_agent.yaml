@@ -2016,19 +2016,6 @@ zabbix_export:
               value: '255'
               newvalue: 'No such service'
         -
-          uuid: e439061687b847019af103a5a32ad217
-          name: zabbix.host.active_agent.available
-          mappings:
-            -
-              value: '0'
-              newvalue: unknown
-            -
-              value: '1'
-              newvalue: available
-            -
-              value: '2'
-              newvalue: 'not available'
-        -
           uuid: c80233756c9d43769f334d632da07b8c
           name: zabbix.host.available
           mappings:
