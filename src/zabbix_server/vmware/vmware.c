@@ -8179,7 +8179,7 @@ void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int
 	job->nextcheck = 0;
 	job->type = job_type;
 	job->service = service;
-	service->jobs_num += 1;
+	service->jobs_num++;
 	job->expired = FAIL;
 	elem_new.data = job;
 	zbx_binary_heap_insert(&vmw->jobs_queue, &elem_new);
@@ -8203,7 +8203,7 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 
 	zbx_vmware_lock();
 
-	job->service->jobs_num -= 1;
+	job->service->jobs_num--;
 	jobs_num = job->service->jobs_num;
 	__vm_shmem_free_func(job);
 

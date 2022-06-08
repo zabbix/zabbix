@@ -79,7 +79,7 @@ static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, int time_now)
 	zbx_vmware_lock();
 
 	if (SUCCEED == zbx_binary_heap_empty(&vmw->jobs_queue))
-		goto unlock;;
+		goto unlock;
 
 	elem = zbx_binary_heap_find_min(&vmw->jobs_queue);
 	job = (zbx_vmware_job_t *)elem->data;
