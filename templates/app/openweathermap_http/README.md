@@ -22,7 +22,7 @@ It works without any external scripts and uses the Script item.
       - by location name (for example: Riga)
       - by location ID. Link to the list of city ID: http://bulk.openweathermap.org/sample/city.list.json.gz
       - by zip/post code with a country code (for example: 94040,us)
-    A few locations can be added to the macro at the same time by `|` delimiter.
+    A few locations can be added to the macro at the same time by `|` delimiter. 
     For example: `43.81821,7.76115|Riga|2643743|94040,us`.
     Please note that API requests by city name, zip-codes and city id will be deprecated soon.
     
@@ -39,7 +39,7 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$LANG} |<p>List of available languages https://openweathermap.org/current#multi.</p> |`en` |
-|{$LOCATION} |<p>Locations can be set by few ways:</p><p>1. by geo coordinates (for example: 56.95,24.0833)</p><p>2. by location name (for example: Riga)</p><p>3. by location ID. Link to the list of city ID: http://bulk.openweathermap.org/sample/city.list.json.gz</p><p>4. by zip/post code with a country code (for example: 94040,us)</p><p>A few locations can be added to the macro at the same time by `|` delimiter. </p><p>For example: `43.81821,7.76115|Riga|2643743|94040,us`.</p><p>Please note that API requests by city name, zip-codes and city id will be deprecated soon.</p> |`Riga` |
+|{$LOCATION} |<p>Locations can be set by few ways:</p><p>1. by geo coordinates (for example: 56.95,24.0833)</p><p>2. by location name (for example: Riga)</p><p>3. by location ID. Link to the list of city ID: http://bulk.openweathermap.org/sample/city.list.json.gz</p><p>4. by zip/post code with a country code (for example: 94040,us)</p><p>A few locations can be added to the macro at the same time by <code>\|</code> delimiter. </p><p>For example: <code>43.81821,7.76115\|Riga\|2643743\|94040,us</code>.</p><p>Please note that API requests by city name, zip-codes and city id will be deprecated soon.</p> |`Riga` |
 |{$OPENWEATHERMAP.API.ENDPOINT} |<p>OpenWeatherMap API endpoint.</p> |`api.openweathermap.org/data/2.5/weather?` |
 |{$OPENWEATHERMAP.API.TOKEN} |<p>Specify openweathermap API key.</p> |`` |
 |{$OPENWEATHERMAP.DATA.TIMEOUT} |<p>Response timeout for OpenWeatherMap API.</p> |`3s` |
@@ -88,4 +88,3 @@ There are no template links in this template.
 Please report any issues with the template at https://support.zabbix.com
 
 You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/).
-
