@@ -100,7 +100,6 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 		fi
 	fi
 
-
 	#
 	# find actual compiler flags and include paths
 	#
@@ -183,7 +182,7 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 					LIBPCRE2_LDFLAGS="-L$libpcre2_dir/lib"
 
 					found_libpcre2="yes"
-				elif test-f /usr/include/pcre2.h; then
+				elif test -f /usr/include/pcre2.h; then
 					found_libpcre2="yes"
 				elif test -f /usr/local/include/pcre2.h; then
 					LIBPCRE2_CFLAGS="-I/usr/local/include"

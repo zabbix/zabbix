@@ -182,7 +182,7 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 					LIBPCRE_LDFLAGS="-L$libpcre_dir/lib"
 
 					found_libpcre="yes"
-				elif test-f /usr/include/pcre.h; then
+				elif test -f /usr/include/pcre.h; then
 					found_libpcre="yes"
 				elif test -f /usr/local/include/pcre.h; then
 					LIBPCRE_CFLAGS="-I/usr/local/include"
