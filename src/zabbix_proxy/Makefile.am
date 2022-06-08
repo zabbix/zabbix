@@ -67,7 +67,6 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself_proxy.a \
-	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
@@ -92,6 +91,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_proxy.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \
+	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
