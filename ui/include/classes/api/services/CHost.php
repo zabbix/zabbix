@@ -1809,7 +1809,8 @@ class CHost extends CHostGeneral {
 			],
 			'withProblemsSuppressed' =>		['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL],
 			'selectValueMaps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'valuemapid,name,mappings'],
-			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => 'templateid,host,name,description,uuid,link_type']
+			'selectParentTemplates' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => 'templateid,host,name,description,uuid,link_type'],
+			'selectMacros' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => 'hostmacroid,macro,value,type,description,automatic']
 		]];
 
 		$options_filter = array_intersect_key($options, $api_input_rules['fields']);
@@ -2195,7 +2196,8 @@ class CHost extends CHostGeneral {
 			'macro' =>			['type' => API_USER_MACRO, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT])],
 			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')],
-			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
+			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
+			'automatic' =>		['type' => API_INT32, 'in' => implode(',', [ZBX_USERMACRO_MANUAL])]
 		]];
 
 		$db_hosts = $this->get([
@@ -2288,7 +2290,7 @@ class CHost extends CHostGeneral {
 		]);
 
 		$update_discovered_validator = new CUpdateDiscoveredValidator([
-			'allowed' => ['hostid', 'status', 'inventory', 'description', 'templates', 'templates_clear'],
+			'allowed' => ['hostid', 'status', 'inventory', 'description', 'templates', 'templates_clear', 'macros'],
 			'messageAllowedField' => _('Cannot update "%2$s" for a discovered host "%1$s".')
 		]);
 

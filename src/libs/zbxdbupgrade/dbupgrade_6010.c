@@ -893,6 +893,29 @@ static int	DBpatch_6010036(void)
 #undef ADD_GROUPIDS_FROM_FIELD
 #undef ADD_GROUPIDS_FROM
 
+static int	DBpatch_6010037(void)
+{
+	const	ZBX_FIELD field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hostmacro", &field);
+}
+
+static int	DBpatch_6010038(void)
+{
+	if (ZBX_DB_OK > DBexecute(
+			"update hostmacro"
+			" set automatic=1"	/* ZBX_USERMACRO_AUTOMATIC */
+			" where hostid in ("
+				"select hostid"
+				" from host_discovery"
+				" where parent_hostid is not null"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6010)
@@ -935,5 +958,7 @@ DBPATCH_ADD(6010033, 0, 1)
 DBPATCH_ADD(6010034, 0, 1)
 DBPATCH_ADD(6010035, 0, 1)
 DBPATCH_ADD(6010036, 0, 1)
+DBPATCH_ADD(6010037, 0, 1)
+DBPATCH_ADD(6010038, 0, 1)
 
 DBPATCH_END()

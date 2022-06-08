@@ -104,7 +104,7 @@ PREPARE_AUDIT_HOST_UPDATE_H(custom_interfaces, int)
 
 void	zbx_audit_host_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
 void	zbx_audit_host_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
-		const char *macro, const char *value, const char *description, int type);
+		const char *macro, const char *value, const char *description, int type, int automatic);
 
 #define PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO_H(resource, type1)					\
 void	zbx_audit_host_update_json_update_hostmacro_##resource(zbx_uint64_t hostid,		\
@@ -172,7 +172,7 @@ PREPARE_AUDIT_TEMPLATE_DELETE_H(host_prototype)
 void	zbx_audit_host_prototype_update_json_delete_interface(zbx_uint64_t hostid, zbx_uint64_t interfaceid);
 
 void	zbx_audit_host_prototype_update_json_add_hostmacro(zbx_uint64_t hostid, zbx_uint64_t macroid,
-		const char *macro, const char *value, const char *description, int type);
+		const char *macro, const char *value, const char *description, int type, int automatic);
 void	zbx_audit_host_update_json_update_hostmacro_create_entry(zbx_uint64_t hostid,
 		zbx_uint64_t hostmacroid);
 void	zbx_audit_host_prototype_update_json_update_hostmacro_create_entry(zbx_uint64_t hostid,
