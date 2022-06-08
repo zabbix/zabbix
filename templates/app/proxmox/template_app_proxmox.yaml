@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T20:49:37Z'
+  date: '2022-06-08T12:23:00Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -590,23 +590,6 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox.lxc.cpu[{#LXC.ID}]'
             -
-              uuid: 2a850f53e5064ee3b4fb99aa191d411d
-              name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk usage'
-              graph_items:
-                -
-                  drawtype: GRADIENT_LINE
-                  color: 1A7C11
-                  item:
-                    host: 'Proxmox VE by HTTP'
-                    key: 'proxmox.lxc.diskwrite[{#LXC.ID}]'
-                -
-                  sortorder: '1'
-                  drawtype: GRADIENT_LINE
-                  color: 2774A4
-                  item:
-                    host: 'Proxmox VE by HTTP'
-                    key: 'proxmox.lxc.diskread[{#LXC.ID}]'
-            -
               uuid: 54e79a1949ed40988a3901acf21bc3af
               name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Memory usage'
               graph_items:
@@ -640,6 +623,36 @@ zabbix_export:
                   item:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox.lxc.netout[{#LXC.ID}]'
+            -
+              uuid: 2a850f53e5064ee3b4fb99aa191d411d
+              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Disk usage'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.lxc.diskwrite[{#LXC.ID}]'
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.diskwrite[{#QEMU.ID}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.lxc.diskread[{#LXC.ID}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.diskread[{#QEMU.ID}]'
           master_item:
             key: proxmox.cluster.resources
           lld_macro_paths:
@@ -1868,20 +1881,7 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'Proxmox VE by HTTP'
-                    key: 'proxmox.qemu.diskwrite[{#QEMU.ID}]'
-                -
-                  drawtype: GRADIENT_LINE
-                  color: 1A7C11
-                  item:
-                    host: 'Proxmox VE by HTTP'
                     key: 'proxmox.qemu.netin[{#QEMU.ID}]'
-                -
-                  sortorder: '1'
-                  drawtype: GRADIENT_LINE
-                  color: 2774A4
-                  item:
-                    host: 'Proxmox VE by HTTP'
-                    key: 'proxmox.qemu.diskread[{#QEMU.ID}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
