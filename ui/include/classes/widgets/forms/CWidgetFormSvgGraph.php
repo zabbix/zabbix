@@ -149,7 +149,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	}
 
 	private function initDisplayingOptionsFields(): void {
-		//History data selection.
+		// History data selection.
 		$field_data_source = (new CWidgetFieldRadioButtonList('source', _('History data selection'), [
 			SVG_GRAPH_DATA_SOURCE_AUTO => _x('Auto', 'history source selection method'),
 			SVG_GRAPH_DATA_SOURCE_HISTORY => _('History'),
