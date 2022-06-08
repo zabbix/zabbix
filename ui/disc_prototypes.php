@@ -255,27 +255,33 @@ $valid_input = check_fields($fields);
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
 unset($_REQUEST[$paramsFieldName]);
 
-// permissions
-$discoveryRule = API::DiscoveryRule()->get([
+// Permissions.
+$discovery_rule = API::DiscoveryRule()->get([
 	'output' => ['hostid'],
 	'selectHosts' => ['status'],
 	'itemids' => getRequest('parent_discoveryid'),
 	'editable' => true
 ]);
-$discoveryRule = reset($discoveryRule);
-if (!$discoveryRule) {
+
+if (!$discovery_rule) {
 	access_deny();
 }
 
-$itemPrototypeId = getRequest('itemid');
-if ($itemPrototypeId) {
-	$item_prorotypes = API::ItemPrototype()->get([
-		'output' => [],
-		'itemids' => $itemPrototypeId,
+$discovery_rule = reset($discovery_rule);
+$item_host = $discovery_rule['hosts'][0];
+
+$itemid = getRequest('itemid');
+$db_items = null;
+
+if ($itemid) {
+	$db_items = API::ItemPrototype()->get([
+		'output' => array_merge(CItemBaseHelper::CONDITION_FIELDS, ['ruleid', 'discover']),
+		'selectHosts' => ['hostid', 'status'],
+		'itemids' => $itemid,
 		'editable' => true
 	]);
 
-	if (!$item_prorotypes) {
+	if (!$db_items) {
 		access_deny();
 	}
 }
@@ -296,112 +302,24 @@ if (hasRequest('delete') && hasRequest('itemid')) {
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	DBstart();
-
-	$result = true;
-	$db_item = null;
-	$item_type = getRequest('type', ITEM_TYPE_ZABBIX);
-	$item_host = $discoveryRule['hosts'][0];
-
-	if (hasRequest('add')) {
-		$item_draft = [
+	$result = false;
+	$input = hasRequest('add')
+		? [
+			'host_status' => $item_host['status'],
 			'hostid' => $item_host['hostid'],
-			'ruleid' => getRequest('parent_discoveryid'),
-			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-			'host_status' => $item_host['status']
-		];
+			'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
+		] + $_REQUEST
+		: $_REQUEST;
+	$items = CItemBaseHelper::sanitizeItems([$input], $db_items);
+
+	if ($items) {
+		DBstart();
+		$result = (bool) (hasRequest('add')
+			? API::ItemPrototype()->create($items)
+			: API::ItemPrototype()->update($items)
+		);
+		$result = DBend($result);
 	}
-	elseif (hasRequest('update')) {
-		$db_items = API::ItemPrototype()->get([
-			'output' => ['key_', 'type', 'authtype', 'templateid', 'flags', 'ruleid'],
-			'itemids' => $itemPrototypeId
-		]);
-
-		$db_item = $db_items[0];
-		$db_item['host_status'] = $item_host['status'];
-		$item_draft = array_intersect_key($_REQUEST, array_flip(['itemid', 'type'])) + $db_item;
-	}
-
-	$item_draft['key_'] = getRequest('key');
-
-	if ($item_type == ITEM_TYPE_HTTPAGENT) {
-		$item_draft = [
-			'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-			'username' => getRequest('http_username', ''),
-			'password' => getRequest('http_password', '')
-		] + $item_draft;
-	}
-
-	$api_input_rules = CItemPrototype::getValidationRules();
-	$item_type_object = CItemTypeFactory::getObject($item_type);
-
-	// This block matches CItemGeneral::validateByType() in general.
-	if ($db_item === null) {
-		$api_input_rules['fields'] += $item_type_object::getCreateValidationRules($item_draft);
-	}
-	elseif ($db_item['templateid'] != 0) {
-		$api_input_rules['fields'] += $item_type_object::getUpdateValidationRulesInherited($db_item);
-	}
-	elseif ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		$api_input_rules['fields'] += $item_type_object::getUpdateValidationRulesDiscovered();
-	}
-	else {
-		$api_input_rules['fields'] += $item_type_object::getUpdateValidationRules($db_item);
-	}
-
-	$req_data = $item_draft + $_REQUEST;
-
-	if (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-		$req_data['trends'] = ITEM_NO_STORAGE_VALUE;
-	}
-
-	if (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-		$req_data['history'] = ITEM_NO_STORAGE_VALUE;
-	}
-
-	if (array_key_exists('preprocessing', $req_data)) {
-		$req_data['preprocessing'] = normalizeItemPreprocessingSteps(getRequest('preprocessing', []));
-	}
-
-	if (array_key_exists('delay', $req_data)) {
-		$delay_error = null;
-		$req_data['delay'] = processItemDelay($item_type, $item_draft['key_'], $delay_error);
-
-		if ($delay_error !== null) {
-			error($delay_error);
-			$result = false;
-		}
-	}
-
-	if ($result) {
-		if (array_key_exists('tags', $req_data)) {
-			$req_data['tags'] = prepareItemTags(getRequest('tags', []));
-		}
-
-		if ($item_type == ITEM_TYPE_SCRIPT) {
-			$req_data = prepareScriptItemFormData($req_data);
-		}
-		elseif ($item_type == ITEM_TYPE_HTTPAGENT) {
-			$req_data = prepareItemHttpAgentFormData($req_data);
-		}
-
-		$item_defaults = DB::getDefaults('items')
-			+ array_fill_keys(['valuemapid', 'interfaceid', 'master_itemid', 'ruleid'], 0);
-		$draft_fields = array_fill_keys(['tags', 'preprocessing'], true)
-			+ CItemHelper::extractConditionFields($api_input_rules['fields']);
-		$item_draft += CItemHelper::combineFromFieldIndex($draft_fields, $req_data, $item_defaults);
-		$input_index = CItemHelper::extractExpectedFieldIndex($api_input_rules, $item_draft, $db_item);
-		$item = CItemHelper::combineFromFieldIndex($input_index, $req_data, $item_defaults);
-
-		if (hasRequest('add')) {
-			$result = (bool) API::ItemPrototype()->create([$item]);
-		}
-		elseif (hasRequest('update')) {
-			$result = (bool) API::ItemPrototype()->update([$item]);
-		}
-	}
-
-	$result = DBend($result);
 
 	if (hasRequest('add')) {
 		show_messages($result, _('Item prototype added'), _('Cannot add item prototype'));
@@ -603,7 +521,7 @@ else {
 	$data = [
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'hostid' => $discoveryRule['hostid'],
+		'hostid' => $discovery_rule['hostid'],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'context' => getRequest('context')

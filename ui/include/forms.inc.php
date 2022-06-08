@@ -617,9 +617,10 @@ function prepareItemHttpAgentFormData(array $item) {
 		$item['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
 	}
 
-	if (array_key_exists('query_fields', $item) && $item['query_fields']) {
-		$query_fields = [];
+	$query_fields = [];
+	$headers = [];
 
+	if (array_key_exists('query_fields', $item) && $item['query_fields']) {
 		foreach ($item['query_fields']['name'] as $index => $key) {
 			$value = $item['query_fields']['value'][$index];
 			$sortorder = $item['query_fields']['sortorder'][$index];
@@ -630,7 +631,6 @@ function prepareItemHttpAgentFormData(array $item) {
 		}
 
 		ksort($query_fields);
-		$item['query_fields'] = $query_fields;
 	}
 
 	if (array_key_exists('headers', $item) && $item['headers']) {
@@ -651,9 +651,10 @@ function prepareItemHttpAgentFormData(array $item) {
 		foreach ($tmp_headers as $key_value_pair) {
 			$headers[key($key_value_pair)] = reset($key_value_pair);
 		}
-
-		$item['headers'] = $headers;
 	}
+
+	$item['query_fields'] = $query_fields;
+	$item['headers'] = $headers;
 
 	return $item;
 }

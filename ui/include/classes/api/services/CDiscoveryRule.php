@@ -428,7 +428,7 @@ class CDiscoveryRule extends CItemGeneralOld {
 		]);
 		$this->validateDependentItems($items);
 
-		$defaults = DB::getDefaults('items');
+		$defaults = CItemBaseHelper::getFieldDefaults();
 		$clean = [
 			ITEM_TYPE_HTTPAGENT => [
 				'url' => '',

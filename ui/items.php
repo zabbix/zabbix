@@ -313,28 +313,34 @@ $subfiltersList = ['subfilter_types', 'subfilter_value_types', 'subfilter_status
 /*
  * Permissions
  */
-$itemId = getRequest('itemid');
-if ($itemId) {
-	$items = API::Item()->get([
-		'output' => ['itemid'],
-		'selectHosts' => ['hostid', 'status'],
-		'itemids' => $itemId,
+$itemid = getRequest('itemid');
+
+if ($itemid) {
+	$db_items = API::Item()->get([
+		'output' => CItemBaseHelper::CONDITION_FIELDS,
+		'selectHosts' => ['status'],
+		'itemids' => $itemid,
 		'editable' => true
 	]);
-	if (!$items) {
+
+	if (!$db_items) {
 		access_deny();
 	}
-	$hosts = $items[0]['hosts'];
+
+	$hosts = $db_items[0]['hosts'];
 }
 else {
-	$hostId = getRequest('hostid');
-	if ($hostId) {
+	$db_items = null;
+	$hostid = getRequest('hostid');
+
+	if ($hostid) {
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'status'],
-			'hostids' => $hostId,
+			'hostids' => $hostid,
 			'templated_hosts' => true,
 			'editable' => true
 		]);
+
 		if (!$hosts) {
 			access_deny();
 		}
@@ -521,109 +527,21 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	show_messages($result, _('Item deleted'), _('Cannot delete item'));
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	DBstart();
+	$result = false;
+	$input = hasRequest('add')
+		? ['host_status' => $item_host['status'], 'flags' => ZBX_FLAG_DISCOVERY_NORMAL] + $_REQUEST
+		: $_REQUEST;
+	$items = CItemBaseHelper::sanitizeItems([$input], $db_items);
 
-	$result = true;
-	$db_item = null;
-	$item_type = (int) getRequest('type', ITEM_TYPE_ZABBIX);
+	if ($items) {
+		DBstart();
 
-	if (hasRequest('add')) {
-		$item_draft = [
-			'hostid' => getRequest('hostid'),
-			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-			'host_status' => $item_host['status']
-		];
+		$result = hasRequest('add')
+			? (bool) API::Item()->create($items)
+			: (bool) API::Item()->update($items);
+
+		$result = DBend($result);
 	}
-	elseif (hasRequest('update')) {
-		$db_items = API::Item()->get([
-			'output' => ['key_', 'type', 'authtype', 'templateid', 'flags'],
-			'itemids' => $itemId
-		]);
-
-		$db_item = $db_items[0];
-		$db_item['host_status'] = $item_host['status'];
-		$item_draft = array_intersect_key($_REQUEST, array_flip(['itemid', 'type'])) + $db_item;
-	}
-
-	$item_draft['key_'] = getRequest('key');
-
-	if ($item_type == ITEM_TYPE_HTTPAGENT) {
-		$item_draft = [
-			'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-			'username' => getRequest('http_username', ''),
-			'password' => getRequest('http_password', '')
-		] + $item_draft;
-	}
-
-	$api_input_rules = CItem::getValidationRules();
-	$item_type_object = CItemTypeFactory::getObject($item_type);
-
-	// This block matches CItemGeneral::validateByType() in general.
-	if ($db_item === null) {
-		$api_input_rules['fields'] += $item_type_object::getCreateValidationRules($item_draft);
-	}
-	elseif ($db_item['templateid'] != 0) {
-		$api_input_rules['fields'] += $item_type_object::getUpdateValidationRulesInherited($db_item);
-	}
-	elseif ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		$api_input_rules['fields'] += $item_type_object::getUpdateValidationRulesDiscovered();
-	}
-	else {
-		$api_input_rules['fields'] += $item_type_object::getUpdateValidationRules($db_item);
-	}
-
-	$req_data = $item_draft + $_REQUEST;
-
-	if (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-		$req_data['trends'] = ITEM_NO_STORAGE_VALUE;
-	}
-
-	if (getRequest('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-		$req_data['history'] = ITEM_NO_STORAGE_VALUE;
-	}
-
-	if (array_key_exists('preprocessing', $req_data)) {
-		$req_data['preprocessing'] = normalizeItemPreprocessingSteps(getRequest('preprocessing', []));
-	}
-
-	if (array_key_exists('delay', $req_data)) {
-		$delay_error = null;
-		$req_data['delay'] = processItemDelay($item_type, $item_draft['key_'], $delay_error);
-
-		if ($delay_error !== null) {
-			error($delay_error);
-			$result = false;
-		}
-	}
-
-	if ($result) {
-		if (array_key_exists('tags', $req_data)) {
-			$req_data['tags'] = prepareItemTags(getRequest('tags', []));
-		}
-
-		if ($item_type == ITEM_TYPE_SCRIPT) {
-			$req_data = prepareScriptItemFormData($req_data);
-		}
-		elseif ($item_type == ITEM_TYPE_HTTPAGENT) {
-			$req_data = prepareItemHttpAgentFormData($req_data);
-		}
-
-		$item_defaults = DB::getDefaults('items') + array_fill_keys(['valuemapid', 'interfaceid', 'master_itemid'], 0);
-		$draft_fields = array_fill_keys(['tags', 'preprocessing'], true)
-			+ CItemHelper::extractConditionFields($api_input_rules['fields']);
-		$item_draft += CItemHelper::combineFromFieldIndex($draft_fields, $req_data, $item_defaults);
-		$input_index = CItemHelper::extractExpectedFieldIndex($api_input_rules, $item_draft, $db_item);
-		$item = CItemHelper::combineFromFieldIndex($input_index, $req_data, $item_defaults);
-
-		if (hasRequest('add')) {
-			$result = (bool) API::Item()->create([$item]);
-		}
-		elseif (hasRequest('update')) {
-			$result = (bool) API::Item()->update([$item]);
-		}
-	}
-
-	$result = DBend($result);
 
 	if (hasRequest('add')) {
 		show_messages($result, _('Item added'), _('Cannot add item'));

@@ -566,6 +566,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 			}
 
 			$item['hostid'] = $dstHost['hostid'];
+			$item['host_status'] = $dstHost['status'];
 
 			if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 				if (array_key_exists($item['master_itemid'], $items)) {
@@ -600,6 +601,8 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 
 			$create_items[] = $item;
 		}
+
+		$create_items = CItemBaseHelper::sanitizeItems($create_items);
 
 		if ($create_items && !API::Item()->create($create_items)) {
 			return false;
@@ -2343,66 +2346,4 @@ function prepareItemTags(array $tags): array {
 	CArrayHelper::sort($tags, ['tag', 'value']);
 
 	return $tags;
-}
-
-/**
- * Converts delay and optionally delay_flex to API input format.
- *
- * @param int $item_type
- * @param string $item_key
- * @param null $error       Non-null if delay_flex could not be parsed.
- *
- * @return string  Empty and $error set if failed to be parsed.
- */
-function processItemDelay(int $item_type, string $item_key, &$error = null): string {
-	$delay = getRequest('delay', DB::getDefault('items', 'delay'));
-
-	/*
-	 * The "delay_flex" is a temporary field that collects flexible and scheduling intervals separated by a semicolon.
-	 * In the end, custom intervals together with "delay" part are stored in the $delay variable.
-	 */
-	if (!in_array($item_type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP]) && hasRequest('delay_flex')
-			&& ($item_type != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item_key, 'mqtt.get', 8) !== 0)) {
-		$intervals = [];
-		$simple_interval_parser = new CSimpleIntervalParser(['usermacros' => true]);
-		$time_period_parser = new CTimePeriodParser(['usermacros' => true]);
-		$scheduling_interval_parser = new CSchedulingIntervalParser(['usermacros' => true]);
-
-		foreach (getRequest('delay_flex') as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
-				if ($interval['delay'] === '' && $interval['period'] === '') {
-					continue;
-				}
-
-				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
-					$error = _s('Invalid interval "%1$s".', $interval['delay']);
-					return '';
-				}
-				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
-					$error = _s('Invalid interval "%1$s".', $interval['period']);
-					return '';
-				}
-
-				$intervals[] = $interval['delay'].'/'.$interval['period'];
-			}
-			else {
-				if ($interval['schedule'] === '') {
-					continue;
-				}
-
-				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
-					$error = _s('Invalid interval "%1$s".', $interval['schedule']);
-					return '';
-				}
-
-				$intervals[] = $interval['schedule'];
-			}
-		}
-
-		if ($intervals) {
-			$delay .= ';'.implode(';', $intervals);
-		}
-	}
-
-	return $delay;
 }

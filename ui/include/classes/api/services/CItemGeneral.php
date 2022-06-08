@@ -1139,7 +1139,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array $db_items
 	 */
 	protected static function addFieldDefaultsByType(array &$items, array $db_items): void {
-		$defaults = DB::getDefaults('items') + array_fill_keys(['valuemapid', 'interfaceid', 'master_itemid'], 0);
+		$defaults = CItemBaseHelper::getFieldDefaults();
 
 		foreach ($items as &$item) {
 			$db_item = $db_items[$item['itemid']];

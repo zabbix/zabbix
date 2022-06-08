@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupMassupdateItem extends CController {
 
+	private $db_items = [];
+
 	protected function checkInput() {
 		$fields = [
 			'allow_traps' => 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_ON, HTTPCHECK_ALLOW_TRAPS_OFF]),
@@ -88,71 +90,50 @@ class CControllerPopupMassupdateItem extends CController {
 	protected function checkPermissions() {
 		$entity = ($this->getInput('prototype') == 1) ? API::ItemPrototype() : API::Item();
 
-		return (bool) $entity->get([
-			'output' => [],
-			'itemids' => $this->getInput('ids'),
-			'editable' => true,
-			'limit' => 1
-		]);
-	}
-
-	protected function doAction() {
-		$this->setResponse($this->hasInput('update') ? $this->update() : $this->form());
-	}
-
-	/**
-	 * Get array of updated items or item prototypes.
-	 *
-	 * @return array
-	 */
-	protected function getItemsOrPrototypes(): array {
-		$options = [
-			'output' => array_merge(['itemid', 'type', 'hostid', 'name', 'key_', 'templateid', 'flags'], [
+		$this->db_items = $entity->get([
+			'output' => array_unique(array_merge(CItemBaseHelper::CONDITION_FIELDS, [
 				'allow_traps',
 				'authtype',
 				'delay',
 				'description',
 				'discover',
-				'history',
+				'discover',
 				'history_mode',
+				'history',
 				'interfaceid',
 				'jmx_endpoint',
 				'logtimefmt',
 				'master_itemid',
+				'name',
 				'parent_discoveryid',
 				'password',
 				'post_type',
 				'posts',
 				'privatekey',
 				'publickey',
+				'ruleid',
 				'status',
-				'trapper_hosts',
-				'trends',
-				'trends_mode',
 				'timeout',
+				'trapper_hosts',
+				'trends_mode',
+				'trends',
 				'units',
 				'url',
 				'username',
 				'value_type',
 				'valuemapid'
-			]),
+			])),
 			'selectTags' => ['tag', 'value'],
 			'selectHosts' => ['status'],
 			'itemids' => $this->getInput('ids'),
-			'preservekeys' => true
-		];
+			'editable' => true
+		]);
 
-		return $this->getInput('prototype') ? API::ItemPrototype()->get($options) : API::Item()->get($options);
+		return (bool) $this->db_items;
 	}
 
-	/**
-	 * Update item or item prototype, return update action status.
-	 *
-	 * @param array $data  Array of item or item prototypes data to update.
-	 * @return bool
-	 */
-	protected function updateItemOrPrototype(array $data): bool {
-		return (bool) ($this->getInput('prototype') ? API::ItemPrototype()->update($data) : API::Item()->update($data));
+	protected function doAction() {
+		$this->setResponse($this->hasInput('update') ? $this->update() : $this->form());
 	}
 
 	/**
@@ -161,175 +142,27 @@ class CControllerPopupMassupdateItem extends CController {
 	 * @return CControllerResponse
 	 */
 	protected function update(): CControllerResponse {
-		$result = true;
-		$ids = $this->getInput('ids');
+		$result = false;
 		$is_prototype = (bool) $this->getInput('prototype');
-		$item_defaults = DB::getDefaults('items') + array_fill_keys(['valuemapid', 'interfaceid', 'master_itemid'], 0);
 
-		$input = $item_defaults + ['tags' => [], 'preprocessing' => []];
-		$this->getInputs($input, array_keys($input));
-		$input = array_intersect_key($input, $this->getInput('visible', []));
+		$input_submitted = array_intersect_key($this->getInputAll(), $this->getInput('visible', []));
+		$input_submitted = array_fill(0, count($this->db_items), $input_submitted);
 
-		if ($this->getInput('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-			$input['trends'] = ITEM_NO_STORAGE_VALUE;
-		}
+		$items = CItemBaseHelper::sanitizeItems($input_submitted, $this->db_items);
+		DBstart();
 
-		if ($this->getInput('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-			$input['history'] = ITEM_NO_STORAGE_VALUE;
-		}
-
-		if (array_key_exists('preprocessing', $input)) {
-			$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
-		}
-
-		if (array_key_exists('tags', $input)) {
-			$input['tags'] = array_filter($input['tags'], static function ($tag) {
-				return ($tag['tag'] !== '' || $tag['value'] !== '');
-			});
-		}
-
-		if (array_key_exists('headers', $input)) {
-			$input['headers']['value'] += array_fill_keys(array_keys($input['headers']['name']), '');
-			$headers = [];
-
-			foreach ($input['headers']['name'] as $i => $header_name) {
-				if ($header_name !== '' || $input['headers']['value'][$i] !== '') {
-					$headers[$header_name] = $input['headers']['value'][$i];
-				}
+		if ($items) {
+			// In case user chose unrelated fields, relay the errors.
+			foreach ($items as $i => $item) {
+				$items[$i] = $item + $input_submitted[$i];
 			}
 
-			$input['headers'] = $headers;
-		}
-
-		$item_general_rules = CItem::getValidationRules();
-		$db_items = $this->getItemsOrPrototypes();
-		$items_to_update = [];
-
-		try {
-			DBstart();
-
-			foreach ($ids as $id) {
-				if (!array_key_exists($id, $db_items)) {
-					continue;
-				}
-
-				$db_item = $db_items[$id];
-				$item_type = array_key_exists('type', $input) ? $input['type'] : $db_item['type'];
-				$item_host = $db_item['hosts'][0];
-				$db_item['host_status'] = $item_host['status'];
-				unset($db_item['hosts']);
-
-				if ($is_prototype) {
-					unset($db_item['inventory_link']);
-				}
-
-				$item_draft = $input + [
-					'type' => $item_type,
-					'host_status' => $item_host['status']
-				];
-
-				$req_data = $item_draft + $db_item;
-
-				if (array_key_exists('delay', $input)) {
-					$delay_error = null;
-					$req_data['delay'] = processItemDelay($item_type, $req_data['key_'], $delay_error);
-
-					if ($delay_error !== null) {
-						error($delay_error);
-						throw new Exception();
-					}
-				}
-
-				if ($item_type == ITEM_TYPE_SCRIPT) {
-					$req_data = prepareScriptItemFormData($req_data);
-				}
-				elseif ($item_type == ITEM_TYPE_HTTPAGENT) {
-					// Headers not in 'sortorder' format, pass as is.
-					$headers = array_key_exists('headers', $input) ? $input['headers'] : [];
-					unset($req_data['headers']);
-					$req_data = prepareItemHttpAgentFormData($req_data);
-					$req_data['headers'] = $headers;
-				}
-
-				$api_input_rules = $item_general_rules;
-				$item_type_object = CItemTypeFactory::getObject($item_type);
-
-				if ($db_item['templateid'] != 0) {
-					$api_input_rules['fields'] += $item_type_object::getUpdateValidationRulesInherited($db_item);
-				}
-				elseif ($db_item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					$api_input_rules['fields'] += $item_type_object::getUpdateValidationRulesDiscovered();
-				}
-				else {
-					$api_input_rules['fields'] += $item_type_object::getUpdateValidationRules($db_item);
-				}
-
-				if (array_key_exists('tags', $input)) {
-					switch ($this->getInput('mass_update_tags', ZBX_ACTION_ADD)) {
-						case ZBX_ACTION_ADD:
-							$unique_tags = [];
-							$req_data['tags'] = [];
-
-							foreach (array_merge($db_item['tags'], $input['tags']) as $tag) {
-								$unique_tags[$tag['tag']][$tag['value']] = $tag;
-							}
-
-							foreach ($unique_tags as $tags_by_name) {
-								foreach ($tags_by_name as $tag) {
-									$req_data['tags'][] = $tag;
-								}
-							}
-							break;
-
-						case ZBX_ACTION_REPLACE:
-							$req_data['tags'] = $input['tags'];
-							break;
-
-						case ZBX_ACTION_REMOVE:
-							$diff_tags = [];
-
-							foreach ($db_item['tags'] as $a) {
-								foreach ($input['tags'] as $b) {
-									if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
-										continue 2;
-									}
-								}
-
-								$diff_tags[] = $a;
-							}
-
-							$req_data['tags'] = $diff_tags;
-							break;
-					}
-				}
-
-				CArrayHelper::sort($req_data['tags'], ['tag', 'value']);
-				$item_draft['tags'] = $req_data['tags'];
-
-				$draft_fields = array_fill_keys(['tags', 'preprocessing', 'key_'], true)
-					+ CItemHelper::extractConditionFields($api_input_rules['fields']);
-				$item_draft += CItemHelper::combineFromFieldIndex($draft_fields, $req_data, $item_defaults);
-				$input_index = CItemHelper::extractExpectedFieldIndex($api_input_rules, $item_draft, $db_item);
-
-				// Add remainder of "visible" input to clean item, as we want to receive complaints
-				// about fields passed erroneously, e.g. master_itemid on non-dependent items.
-				$item = CItemHelper::combineFromFieldIndex($input_index, $req_data, $input) + $input;
-
-				$items_to_update[] = $item;
-			}
-
-			if ($items_to_update && !$this->updateItemOrPrototype($items_to_update)) {
-				throw new Exception();
-			}
-		}
-		catch (Exception $e) {
-			$result = false;
-			CMessageHelper::setErrorTitle($is_prototype ? _('Cannot update item prototypes') : _('Cannot update items'));
+			$result = (bool) ($is_prototype ? API::ItemPrototype()->update($items) : API::Item()->update($items));
 		}
 
 		if (DBend($result)) {
-			$messages = CMessageHelper::getMessages();
 			$output = ['title' => $is_prototype ? _('Item prototypes updated') : _('Items updated')];
+			$messages = CMessageHelper::getMessages();
 
 			if (count($messages)) {
 				$output['messages'] = array_column($messages, 'message');
@@ -337,7 +170,7 @@ class CControllerPopupMassupdateItem extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => CMessageHelper::getTitle(),
+				'title' => $is_prototype ? _('Cannot update item prototypes') : _('Cannot update items'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
