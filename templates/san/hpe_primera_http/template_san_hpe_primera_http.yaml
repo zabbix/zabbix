@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-01T08:17:46Z'
-  groups:
+  date: '2022-06-07T19:33:27Z'
+  template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -2258,14 +2258,14 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.primera.hosts.discovery
           delay: '0'
-          description: 'List of host properties.'
           filter:
             evaltype: AND
             conditions:
-              - 
+              -
                 macro: '{#NAME}'
                 operator: EXISTS
                 formulaid: A
+          description: 'List of host properties.'
           item_prototypes:
             -
               uuid: 142a03a36dbf477ebbcb99994efe4246

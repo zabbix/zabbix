@@ -105,9 +105,9 @@ There are no template links in this template.
 |Asterisk: Service is down |<p>-</p> |`last(/Asterisk by HTTP/net.tcp.service["tcp","{HOST.CONN}","{$AMI.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p> |
 |Asterisk: Service response time is too high |<p>-</p> |`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{HOST.CONN}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Asterisk: Service is down</p> |
 |Asterisk: Version has changed |<p>Asterisk version has changed. Ack to close.</p> |`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0` |INFO |<p>Manual close: YES</p> |
-|Asterisk: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Asterisk by HTTP/asterisk.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Asterisk: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Asterisk by HTTP/asterisk.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Asterisk: Failed to fetch AMI page |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Asterisk: Service is down</p> |
-|Asterisk: has been reloaded |<p>Uptime is less than 10 minutes</p> |`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m` |INFO |<p>Manual close: YES</p> |
+|Asterisk: has been reloaded |<p>Uptime is less than 10 minutes.</p> |`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m` |INFO |<p>Manual close: YES</p> |
 |Asterisk: Total number of active channels of SIP trunks is too high |<p>The SIP trunks may not be able to process new calls.</p> |`min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}` |WARNING | |
 |Asterisk: Total number of active channels of IAX trunks is too high |<p>The IAX trunks may not be able to process new calls.</p> |`min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}` |WARNING | |
 |Asterisk: Total number of active channels of PJSIP trunks is too high |<p>The PJSIP trunks may not be able to process new calls.</p> |`min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}` |WARNING | |

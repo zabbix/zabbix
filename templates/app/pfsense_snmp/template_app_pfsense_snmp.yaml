@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-06T12:23:02Z'
-  groups:
+  date: '2022-06-08T11:23:14Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -22,7 +22,7 @@ zabbix_export:
         BEGEMOT-PF-MIB
         HOST-RESOURCES-MIB
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications

@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:27Z'
-  groups:
+  date: '2022-06-08T13:05:34Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -15,7 +15,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -1209,8 +1209,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ cluster by HTTP'
                         name: 'RabbitMQ: Messages'
-                        host: 'RabbitMQ cluster by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1225,8 +1225,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ cluster by HTTP'
                         name: 'RabbitMQ: Connections'
-                        host: 'RabbitMQ cluster by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1241,8 +1241,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Messages status'
                         host: 'RabbitMQ cluster by HTTP'
+                        name: 'RabbitMQ: Messages status'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1258,8 +1258,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Queues'
                         host: 'RabbitMQ cluster by HTTP'
+                        name: 'RabbitMQ: Queues'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -1274,8 +1274,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Messages per second'
                         host: 'RabbitMQ cluster by HTTP'
+                        name: 'RabbitMQ: Messages per second'
       valuemaps:
         -
           uuid: 3380e05a15774dad92e77c983448698b
@@ -1299,7 +1299,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -1835,7 +1835,7 @@ zabbix_export:
               name: 'RabbitMQ: has been restarted'
               event_name: 'RabbitMQ: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -2813,14 +2813,14 @@ zabbix_export:
             key: rabbitmq.get_queues
           lld_macro_paths:
             -
+              lld_macro: '{#NODE}'
+              path: $.node
+            -
               lld_macro: '{#QUEUE}'
               path: $.name
             -
               lld_macro: '{#VHOST}'
               path: $.vhost
-            -
-              lld_macro: '{#NODE}'
-              path: $.node
       tags:
         -
           tag: class
@@ -2883,8 +2883,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ node by HTTP'
                         name: 'RabbitMQ: Node status'
-                        host: 'RabbitMQ node by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2899,8 +2899,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ node by HTTP'
                         name: 'RabbitMQ: Uptime'
-                        host: 'RabbitMQ node by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2915,8 +2915,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'RabbitMQ node by HTTP'
                         name: 'RabbitMQ: Disk free'
-                        host: 'RabbitMQ node by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2932,8 +2932,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Memory used'
                         host: 'RabbitMQ node by HTTP'
+                        name: 'RabbitMQ: Memory used'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -2948,8 +2948,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: File descriptors'
                         host: 'RabbitMQ node by HTTP'
+                        name: 'RabbitMQ: File descriptors'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2965,8 +2965,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'RabbitMQ: Sockets'
                         host: 'RabbitMQ node by HTTP'
+                        name: 'RabbitMQ: Sockets'
       valuemaps:
         -
           uuid: e65c3d3e8ea443a281b37c51ca461c26

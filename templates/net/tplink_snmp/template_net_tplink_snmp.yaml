@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:01:06Z'
-  groups:
+  date: '2022-06-07T19:37:35Z'
+  template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -419,7 +419,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1135,8 +1135,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFDESCR}: Network traffic'
                         host: 'TP-LINK SNMP'
+                        name: 'Interface {#IFDESCR}: Network traffic'
       valuemaps:
         -
           uuid: ca6bcc5f345b46ffaa445d38a90ddcae

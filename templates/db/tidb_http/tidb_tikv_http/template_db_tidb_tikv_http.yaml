@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:01:19Z'
-  groups:
+  date: '2022-06-07T19:37:42Z'
+  template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -721,7 +721,7 @@ zabbix_export:
               name: 'TiKV: has been restarted'
               event_name: 'TiKV: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
