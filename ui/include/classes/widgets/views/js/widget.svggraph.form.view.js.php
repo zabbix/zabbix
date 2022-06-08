@@ -94,7 +94,7 @@ window.widget_svggraph_form = new class {
 				jQuery(window).trigger("resize");
 				const dataset = data.section[0];
 
-				if (dataset.dataset.type == '0') {
+				if (dataset.dataset.type == '<?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>') {
 					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
@@ -106,7 +106,7 @@ window.widget_svggraph_form = new class {
 				jQuery(window).trigger("resize");
 				const dataset = data.section[0];
 
-				if (dataset.dataset.type == '0') {
+				if (dataset.dataset.type == '<?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>') {
 					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
@@ -295,12 +295,17 @@ window.widget_svggraph_form = new class {
 
 		jQuery(this.dataset_wrapper).zbx_vertical_accordion("collapseAll");
 
-		const template = (type == 0)
+		const template = (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>)
 			? new Template(jQuery('#dataset-single-item-tmpl').html())
 			: new Template(jQuery('#dataset-pattern-item-tmpl').html());
 
 		jQuery('#data_sets .list-accordion-foot').before(
-			template.evaluate({rowNum: row_numb, color: (type == 0) ? '' : colorPalette.getNextColor()})
+			template.evaluate({
+				rowNum: row_numb,
+				color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>)
+					? ''
+					: colorPalette.getNextColor()
+			})
 		);
 
 		this.overlay_body.scrollTop(Math.max(this.overlay_body.scrollTop(),
@@ -666,7 +671,7 @@ window.widget_svggraph_form = new class {
 		const cloned_dataset = this.dataset_wrapper.querySelector('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]');
 		const cloned_number = cloned_dataset.dataset.set;
 
-		if (dataset_type == 0) {
+		if (dataset_type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) {
 			const list = {
 				object: 'itemid',
 				values: []
