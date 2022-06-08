@@ -53,11 +53,25 @@ class CSvgGraph extends CSvg {
 	private $points = [];
 
 	/**
-	 * Array of metric paths. Where key is metric index from $metrics array.
+	 * Array of stacked graph points data. Calculated from metrics data.
+	 *
+	 * @var array
+	 */
+	private $stacked_points = [];
+
+	/**
+	 * Array of metric paths. Key is metric index from $metrics array.
 	 *
 	 * @var array
 	 */
 	private $paths = [];
+
+	/**
+	 * Array of stacked metric paths. Key is metric index from $metrics array.
+	 *
+	 * @var array
+	 */
+	private $stacked_paths = [];
 
 	private $show_working_time;
 	private $show_percentile_left;
@@ -124,8 +138,6 @@ class CSvgGraph extends CSvg {
 	private $max_yaxis_width = 120;
 
 	private $cell_height_min = 30;
-
-
 
 	/**
 	 * Height for X axis container.
@@ -265,10 +277,12 @@ class CSvgGraph extends CSvg {
 		$this->applyMissingDataFunc();
 		$this->recalculatePoints();
 
+		$this->calculateStackedPoints();
 		$this->calculateDimensions();
 
 		if ($this->canvas_width > 0 && $this->canvas_height > 0) {
 			$this->calculatePaths();
+			$this->calculateStackedPaths();
 
 			$this->drawWorkingTime();
 
@@ -277,6 +291,7 @@ class CSvgGraph extends CSvg {
 			$this->drawXAxis();
 
 			$this->drawMetricsLine();
+			$this->drawMetricsStackedArea();
 			$this->drawMetricsPoint();
 			$this->drawMetricsBar();
 
@@ -352,45 +367,217 @@ class CSvgGraph extends CSvg {
 		}
 	}
 
+	private function calculateStackedPoints(): void {
+		$surface = [];
+
+		foreach ($this->metrics as $index => $metric) {
+			if ($metric['options']['stacked'] != SVG_GRAPH_STACKED_ON || !array_key_exists($index, $this->points)) {
+				continue;
+			}
+
+			if (!array_key_exists($metric['data_set'], $surface)) {
+				$surface[$metric['data_set']] = [
+					'top' => [[$this->time_from, 0], [$this->time_till, 0]],
+					'bottom' => [[$this->time_from, 0], [$this->time_till, 0]]
+				];
+			}
+
+			foreach ($this->points[$index] as $points) {
+				$side_fragments = ['top' => [], 'bottom' => []];
+
+				$side_fragment_points = [];
+				$is_top = reset($points)['avg'] >= 0;
+				$line_break = false;
+				$prev_point = null;
+
+				foreach ($points as $clock => $point) {
+					if ($is_top != $point['avg'] >= 0 && $point['avg'] != 0) {
+						$break_point = [
+							$prev_point[0]
+								+ ($clock - $prev_point[0]) * $prev_point[1] / ($prev_point[1] - $point['avg']),
+							0, false
+						];
+
+						if ($break_point != $prev_point) {
+							$side_fragment_points[] = $break_point;
+						}
+
+						$side_fragments[$is_top ? 'top' : 'bottom'][] = [
+							'points' => $side_fragment_points,
+							'line_cont_start' => $line_break,
+							'line_cont_end' => true
+						];
+
+						$line_break = true;
+
+						$side_fragment_points = [$break_point];
+						$is_top = !$is_top;
+					}
+
+					$prev_point = [$clock, $point['avg'], true];
+					$side_fragment_points[] = $prev_point;
+				}
+
+				$side_fragments[$is_top ? 'top' : 'bottom'][] = [
+					'points' => $side_fragment_points,
+					'line_cont_start' => $line_break,
+					'line_cont_end' => false
+				];
+
+				foreach (['top', 'bottom'] as $side) {
+					foreach ($side_fragments[$side] as $side_fragment) {
+						$this->stacked_points[$index][] = self::calculateStackedData($side_fragment,
+							$surface[$metric['data_set']][$side]
+						);
+					}
+				}
+
+				if (array_key_exists($index, $this->stacked_points)) {
+					usort($this->stacked_points[$index],
+						static function (array $data_1, array $data_2): int {
+							return $data_1['area'][0][0] <=> $data_2['area'][0][0];
+						}
+					);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param array $fragment
+	 * @param array $surface
+	 *
+	 * @return array
+	 */
+	private static function calculateStackedData(array $fragment, array &$surface): array {
+		[
+			'points' => $points,
+			'line_cont_start' => $line_cont_start,
+			'line_cont_end' => $line_cont_end
+		] = $fragment;
+
+		$si = 0;
+
+		while ($si < count($surface) - 1 && $surface[$si + 1][0] <= $points[0][0]) {
+			$si++;
+		}
+
+		$si_start = $si;
+
+		$area = [];
+
+		for ($pi = 0; $pi < count($points); $pi++) {
+			while ($si < count($surface) - 1 && $surface[$si + 1][0] < $points[$pi][0]) {
+				$si++;
+
+				if ($pi > 0) {
+					$area[] = array_merge(self::calculatePointOnLine($points[$pi - 1], $points[$pi], $surface[$si]),
+						[null]
+					);
+				}
+			}
+
+			$point = self::calculatePointOnLine($surface[$si], $surface[$si + 1], $points[$pi]);
+
+			if ($pi == 0 && $points[0][1] != 0) {
+				$area[] = [$point[0], $point[1] - $points[$pi][1], null];
+			}
+
+			$area[] = array_merge($point, $points[$pi][2] !== false ? [$points[$pi][1]] : [null]);
+
+			if ($pi == count($points) - 1 && $points[$pi][1] != 0) {
+				$area[] = [$point[0], $point[1] - $points[$pi][1], null];
+			}
+		}
+
+		$line_from = $line_cont_start || $points[0][1] == 0 ? 0 : 1;
+		$line_to = $line_cont_end || $points[count($points) - 1][1] == 0 ? count($area) - 1 : count($area) - 2;
+
+		$area = array_merge($area, array_reverse(array_splice($surface, $si_start + 1, $si - $si_start, $area)));
+
+		return [
+			'area' => $area,
+			'line_from' => $line_from,
+			'line_to' => $line_to
+		];
+	}
+
+	/**
+	 * @param array $start
+	 * @param array $end
+	 * @param array $at
+	 *
+	 * @return array
+	 */
+	private static function calculatePointOnLine(array $start, array $end, array $at): array {
+		return [$at[0], $start[1] + $at[1] + ($at[0] - $start[0]) / ($end[0] - $start[0]) * ($end[1] - $start[1])];
+	}
+
 	/**
 	 * Calculate minimal and maximum values, canvas size, margins and offsets for graph canvas inside SVG element.
 	 */
 	private function calculateDimensions(): void {
-		foreach ($this->points as $index => $metric_points) {
-			$min_value = null;
-			$max_value = null;
+		foreach ($this->metrics as $index => $metric) {
+			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
+				if (!array_key_exists($index, $this->stacked_points)) {
+					continue;
+				}
 
-			foreach ($metric_points as $points) {
-				foreach ($points as $point) {
-					switch ($this->metrics[$index]['options']['approximation']) {
-						case APPROXIMATION_MIN:
-							$point_min = $point['min'];
-							$point_max = $point['min'];
-							break;
-						case APPROXIMATION_MAX:
-							$point_min = $point['max'];
-							$point_max = $point['max'];
-							break;
-						case APPROXIMATION_ALL:
-							$point_min = $point['min'];
-							$point_max = $point['max'];
-							break;
-						default:
-							$point_min = $point['avg'];
-							$point_max = $point['avg'];
-							break;
-					}
+				$min_value = null;
+				$max_value = null;
 
-					if ($min_value === null || $min_value > $point_min) {
-						$min_value = (float) $point_min;
-					}
-					if ($max_value === null || $max_value < $point_max) {
-						$max_value = (float) $point_max;
+				foreach ($this->stacked_points[$index] as $fragment) {
+					for ($fr_index = $fragment['line_from']; $fr_index <= $fragment['line_to']; $fr_index++) {
+						$point_value = $fragment['area'][$fr_index][1];
+
+						if ($max_value === null || $max_value < $point_value) {
+							$max_value = (float) $point_value;
+						}
+						if ($min_value === null || $min_value > $point_value) {
+							$min_value = (float) $point_value;
+						}
 					}
 				}
 			}
+			elseif (array_key_exists($index, $this->points)) {
+				$min_value = null;
+				$max_value = null;
 
-			if ($this->metrics[$index]['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
+				foreach ($this->points[$index] as $points) {
+					foreach ($points as $point) {
+						switch ($metric['options']['approximation']) {
+							case APPROXIMATION_MIN:
+								$point_min = $point['min'];
+								$point_max = $point['min'];
+								break;
+							case APPROXIMATION_MAX:
+								$point_min = $point['max'];
+								$point_max = $point['max'];
+								break;
+							case APPROXIMATION_ALL:
+								$point_min = $point['min'];
+								$point_max = $point['max'];
+								break;
+							default:
+								$point_min = $point['avg'];
+								$point_max = $point['avg'];
+								break;
+						}
+
+						if ($min_value === null || $min_value > $point_min) {
+							$min_value = (float) $point_min;
+						}
+						if ($max_value === null || $max_value < $point_max) {
+							$max_value = (float) $point_max;
+						}
+					}
+				}
+			}
+			else {
+				continue;
+			}
+
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
 				if ($this->min_value_left === null || $this->min_value_left > $min_value) {
 					$this->min_value_left = $min_value;
 				}
@@ -556,7 +743,7 @@ class CSvgGraph extends CSvg {
 		$y_min = -$y_max;
 
 		foreach ($this->metrics as $index => $metric) {
-			if (!array_key_exists($index, $this->points)) {
+			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON || !array_key_exists($index, $this->points)) {
 				continue;
 			}
 
@@ -588,13 +775,13 @@ class CSvgGraph extends CSvg {
 
 							if ($max_value - $min_value == INF) {
 								$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
-										$max_value / 10 - $value / 10, 1 / ($max_value / 10 - $min_value / 10)
-									]);
+									$max_value / 10 - $value / 10, 1 / ($max_value / 10 - $min_value / 10)
+								]);
 							}
 							else {
 								$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
-										$max_value - $value, 1 / ($max_value - $min_value)
-									]);
+									$max_value - $value, 1 / ($max_value - $min_value)
+								]);
 							}
 
 							if (!$in_range) {
@@ -618,6 +805,73 @@ class CSvgGraph extends CSvg {
 				if ($paths) {
 					$this->paths[$index] = $paths;
 				}
+			}
+		}
+	}
+
+	/**
+	 * Calculate paths for stacked metric elements.
+	 */
+	private function calculateStackedPaths(): void {
+		// Metric having very big values of y outside visible area will fail to render.
+		$y_max = 2 ** 16;
+		$y_min = -$y_max;
+
+		foreach ($this->metrics as $index => $metric) {
+			if ($metric['options']['stacked'] != SVG_GRAPH_STACKED_ON
+					|| !array_key_exists($index, $this->stacked_points)) {
+				continue;
+			}
+
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
+				$min_value = $this->right_y_min;
+				$max_value = $this->right_y_max;
+			}
+			else {
+				$min_value = $this->left_y_min;
+				$max_value = $this->left_y_max;
+			}
+
+			$time_range = ($this->time_till - $this->time_from) ?: 1;
+			$timeshift = $metric['options']['timeshift'];
+
+			foreach ($this->stacked_points[$index] as $fragment_index => $fragment) {
+				$stacked_path = [];
+
+				foreach ($fragment['area'] as $stacked_point) {
+					$x = $this->canvas_x + $this->canvas_width
+						- $this->canvas_width * ($this->time_till - $stacked_point[0] + $timeshift) / $time_range;
+
+					if ($max_value - $min_value == INF) {
+						$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+							$max_value / 10 - $stacked_point[1] / 10, 1 / ($max_value / 10 - $min_value / 10)
+						]);
+					}
+					else {
+						$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+							$max_value - $stacked_point[1], 1 / ($max_value - $min_value)
+						]);
+					}
+
+					$y = min($y_max, max($y_min, $y));
+
+					$stacked_path[] = [
+						(int) ceil($x),
+						(int) ceil($y),
+						$stacked_point[2] !== null
+							? convertUnits([
+								'value' => $stacked_point[2],
+								'units' => $metric['units']
+							])
+							: null
+					];
+				}
+
+				$this->stacked_paths[$index][$fragment_index] = [
+					'path' => $stacked_path,
+					'line_from' => $fragment['line_from'],
+					'line_to' => $fragment['line_to']
+				];
 			}
 		}
 	}
@@ -787,6 +1041,37 @@ class CSvgGraph extends CSvg {
 							[$first_point[0], $y_zero]
 						]);
 					}
+				}
+
+				$metric_paths[] = $metric_path;
+			}
+
+			$this->addItem(new CSvgGraphMetricsLine($metric_paths, $metric));
+		}
+	}
+
+	private function drawMetricsStackedArea(): void {
+		foreach ($this->metrics as $index => $metric) {
+			if (!array_key_exists($index, $this->stacked_points)) {
+				continue;
+			}
+
+			$metric_paths = [];
+
+			foreach ($this->stacked_paths[$index] as $fragment) {
+				$metric_path = ['line' => [], 'fill' => []];
+
+				foreach ($fragment['path'] as $point_index => $point) {
+					// TODO: SVG classes must be able to process nulls as points without labels.
+					if ($point[2] === null) {
+						$point[2] = ' ';
+					}
+
+					if ($point_index >= $fragment['line_from'] && $point_index <= $fragment['line_to']) {
+						$metric_path['line'][] = $point;
+					}
+
+					$metric_path['fill'][] = $point;
 				}
 
 				$metric_paths[] = $metric_path;
