@@ -167,7 +167,7 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
 static void	db_remove_expired_event_suppress_data(int now)
 {
 	DBbegin();
-	DBexecute("delete from event_suppress where suppress_until<%d", now);
+	DBexecute("delete from event_suppress where suppress_until<%d and suppress_until<>0", now);
 	DBcommit();
 }
 

@@ -55,6 +55,11 @@ class testHost extends CAPITest {
 			'discovered_auto_templates' => null,
 			'discovered_auto_and_manual_templates' => null,
 
+			'discovered_no_macros' => null,
+			'discovered_manual_macros' => null,
+			'discovered_auto_macros' => null,
+			'discovered_auto_and_manual_macros' => null,
+
 			// Discovered host to test if items are cleared as well.
 			'discovered_clear' => null,
 
@@ -72,6 +77,23 @@ class testHost extends CAPITest {
 			'api_test_hosts_tpl_with_item' => null
 		],
 		'maintenanceids' => null,
+
+		// Keys must match the macro names. For example discovered_macro_text_a => {$DISCOVERED_MACRO_TEXT_A}
+		'hostmacroids' => [
+			'discovered_macro_text_a' => null,
+			'discovered_macro_secret_a' => null,
+			'discovered_macro_vault_a' => null,
+			'discovered_macro_text_b' => null,
+			'discovered_macro_secret_b' => null,
+			'discovered_macro_vault_b' => null,
+			'manual_macro_text_c' => null,
+			'manual_macro_secret_c' => null,
+			'manual_macro_vault_c' => null,
+			'manual_macro_text_d' => null,
+			'manual_macro_secret_d' => null,
+			'manual_macro_vault_d' => null
+		],
+
 		// Created hosts during host.create test (deleted at the end).
 		'created' => []
 	];
@@ -517,6 +539,84 @@ class testHost extends CAPITest {
 						'templateid' => self::$data['templateids'][ 'api_test_hosts_d_tpl']
 					]
 				]
+			],
+			[
+				'host' => '{#HOST}_no_macros',
+				'ruleid' => $discoveryrules['itemids'][0],
+				'groupLinks' => [
+					[
+						'groupid' => self::$data['hostgroupid']
+					]
+				]
+			],
+			[
+				'host' => '{#HOST}_manual_macros',
+				'ruleid' => $discoveryrules['itemids'][0],
+				'groupLinks' => [
+					[
+						'groupid' => self::$data['hostgroupid']
+					]
+				]
+			],
+			[
+				'host' => '{#HOST}_auto_macros',
+				'ruleid' => $discoveryrules['itemids'][0],
+				'groupLinks' => [
+					[
+						'groupid' => self::$data['hostgroupid']
+					]
+				],
+				'macros' => [
+					[
+						'macro' => '{$DISCOVERED_MACRO_TEXT_A}',
+						'value' => 'discovered_macro_text_value_a',
+						'description' => 'discovered_macro_text_description_a',
+						'type' => ZBX_MACRO_TYPE_TEXT
+					],
+					[
+						'macro' => '{$DISCOVERED_MACRO_SECRET_A}',
+						'value' => 'discovered_macro_secret_value_a',
+						'description' => 'discovered_macro_secret_description_a',
+						'type' => ZBX_MACRO_TYPE_SECRET
+					],
+					[
+						'macro' => '{$DISCOVERED_MACRO_VAULT_A}',
+						'value' => 'path/to:macro',
+						'description' => 'discovered_macro_vault_description_a',
+						'type' => ZBX_MACRO_TYPE_VAULT
+					]
+				]
+			],
+
+			// First three macros are automatic. The rest are manualy added.
+			[
+				'host' => '{#HOST}_auto_and_manual_macros',
+				'ruleid' => $discoveryrules['itemids'][0],
+				'groupLinks' => [
+					[
+						'groupid' => self::$data['hostgroupid']
+					]
+				],
+				'macros' => [
+					[
+						'macro' => '{$DISCOVERED_MACRO_TEXT_B}',
+						'value' => 'discovered_macro_text_value_b',
+						'description' => 'discovered_macro_text_description_b',
+						'type' => ZBX_MACRO_TYPE_TEXT
+					],
+					[
+						'macro' => '{$DISCOVERED_MACRO_SECRET_B}',
+						'value' => 'discovered_macro_secret_value_b',
+						'description' => 'discovered_macro_secret_description_b',
+						'type' => ZBX_MACRO_TYPE_SECRET
+					],
+					[
+						'macro' => '{$DISCOVERED_MACRO_VAULT_B}',
+						'value' => 'path/to:macro',
+						'description' => 'discovered_macro_vault_description_b',
+						'type' => ZBX_MACRO_TYPE_VAULT
+					]
+				]
 			]
 		];
 		$host_prototypes = CDataHelper::call('hostprototype.create', $host_prototypes_data);
@@ -529,6 +629,7 @@ class testHost extends CAPITest {
 			$hosts_data[] = [
 				'host' => str_replace('{#HOST}', 'discovered', $host_prototype['host']),
 				'groups' => $host_prototype['groupLinks'],
+				'macros' => array_key_exists('macros', $host_prototype) ? $host_prototype['macros'] : [],
 				'templates' => array_key_exists('templates', $host_prototype) ? $host_prototype['templates'] : []
 			];
 		}
@@ -541,10 +642,15 @@ class testHost extends CAPITest {
 		self::$data['hostids']['discovered_auto_and_manual_templates'] = $hosts['hostids'][3];
 		self::$data['hostids']['discovered_clear'] = $hosts['hostids'][4];
 		self::$data['hostids']['discovered_limit_selects'] = $hosts['hostids'][5];
+		self::$data['hostids']['discovered_no_macros'] = $hosts['hostids'][6];
+		self::$data['hostids']['discovered_manual_macros'] = $hosts['hostids'][7];
+		self::$data['hostids']['discovered_auto_macros'] = $hosts['hostids'][8];
+		self::$data['hostids']['discovered_auto_and_manual_macros'] = $hosts['hostids'][9];
 
 		$host_discovery = [];
 		$upd_hosts = [];
 		$upd_hosts_templates = [];
+		$upd_hostmacro = [];
 
 		foreach ($host_prototypes_data as $idx => $host_prototype) {
 			$host_discovery[] = [
@@ -569,6 +675,18 @@ class testHost extends CAPITest {
 					];
 				}
 			}
+
+			if (array_key_exists('macros', $host_prototype) && $host_prototype['macros']) {
+				foreach ($host_prototype['macros'] as $macro) {
+					$upd_hostmacro[] = [
+						'values' => ['automatic' => ZBX_USERMACRO_AUTOMATIC],
+						'where' => [
+							'hostid' => $hosts['hostids'][$idx],
+							'macro' => $macro['macro']
+						]
+					];
+				}
+			}
 		}
 
 		$ids = DB::insertBatch('host_discovery', $host_discovery, false);
@@ -580,6 +698,24 @@ class testHost extends CAPITest {
 
 		$res = DB::update('hosts_templates', $upd_hosts_templates);
 		$this->assertSame(true, $res);
+
+		$res = DB::update('hostmacro', $upd_hostmacro);
+		$this->assertSame(true, $res);
+
+		// Add hostmacroid references using the macro name as key: {$MACRO_NAME} => macro_name.
+		foreach ($upd_hostmacro as $hostmacro) {
+			$db_hostmacro = CDBHelper::getRow(
+				'SELECT hm.hostmacroid'.
+				' FROM hostmacro hm'.
+				' WHERE hm.hostid='.zbx_dbstr($hostmacro['where']['hostid']).
+					' AND hm.macro='.zbx_dbstr($hostmacro['where']['macro'])
+			);
+			$key = str_replace('{$', '', $hostmacro['where']['macro']);
+			$key = str_replace('}', '', $key);
+			$key = strtolower($key);
+
+			self::$data['hostmacroids'][$key] = $db_hostmacro['hostmacroid'];
+		}
 
 		/*
 		 * Add few manual templates to discovered hosts to test the template removal. Do not use API at this point.
@@ -621,6 +757,76 @@ class testHost extends CAPITest {
 		$ids = DB::insertBatch('hosts_templates', $hosts_templates_data);
 		$newids = array_fill($nextid, count($hosts_templates_data), true);
 		$this->assertEquals(array_keys($newids), $ids);
+
+		// Add few manual macros to test host.update method.
+		$nextid = CDBHelper::getAll(
+			'SELECT i.nextid'.
+			' FROM ids i'.
+			' WHERE i.table_name='.zbx_dbstr('hostmacro').
+				' AND i.field_name='.zbx_dbstr('hostmacroid').
+			' FOR UPDATE'
+		)[0]['nextid'] + 1;
+		$hostmacro_data = [
+			[
+				'hostid' => self::$data['hostids']['discovered_manual_macros'],
+				'macro' => '{$MANUAL_MACRO_TEXT_C}',
+				'value' => 'manual_macro_text_value_c',
+				'description' => 'manual_macro_text_description_c',
+				'type' => ZBX_MACRO_TYPE_TEXT,
+				'automatic' => ZBX_USERMACRO_MANUAL
+			],
+			[
+				'hostid' => self::$data['hostids']['discovered_manual_macros'],
+				'macro' => '{$MANUAL_MACRO_SECRET_C}',
+				'value' => 'manual_macro_secret_value_c',
+				'description' => 'manual_macro_secret_description_c',
+				'type' => ZBX_MACRO_TYPE_SECRET,
+				'automatic' => ZBX_USERMACRO_MANUAL
+			],
+			[
+				'hostid' => self::$data['hostids']['discovered_manual_macros'],
+				'macro' => '{$MANUAL_MACRO_VAULT_C}',
+				'value' => 'path/to:macro',
+				'description' => 'manual_macro_vault_description_c',
+				'type' => ZBX_MACRO_TYPE_VAULT,
+				'automatic' => ZBX_USERMACRO_MANUAL
+			],
+			[
+				'hostid' => self::$data['hostids']['discovered_auto_and_manual_macros'],
+				'macro' => '{$MANUAL_MACRO_TEXT_D}',
+				'value' => 'manual_macro_text_value_d',
+				'description' => 'manual_macro_text_description_d',
+				'type' => ZBX_MACRO_TYPE_TEXT,
+				'automatic' => ZBX_USERMACRO_MANUAL
+			],
+			[
+				'hostid' => self::$data['hostids']['discovered_auto_and_manual_macros'],
+				'macro' => '{$MANUAL_MACRO_SECRET_D}',
+				'value' => 'manual_macro_secreat_value_d',
+				'description' => 'manual_macro_secret_description_d',
+				'type' => ZBX_MACRO_TYPE_SECRET,
+				'automatic' => ZBX_USERMACRO_MANUAL
+			],
+			[
+				'hostid' => self::$data['hostids']['discovered_auto_and_manual_macros'],
+				'macro' => '{$MANUAL_MACRO_VAULT_D}',
+				'value' => 'path/to:macro',
+				'description' => 'manual_macro_vault_description_d',
+				'type' => ZBX_MACRO_TYPE_VAULT,
+				'automatic' => ZBX_USERMACRO_MANUAL
+			]
+		];
+
+		$ids = DB::insertBatch('hostmacro', $hostmacro_data);
+		$newids = array_fill($nextid, count($hostmacro_data), true);
+		$this->assertEquals(array_keys($newids), $ids);
+
+		self::$data['hostmacroids']['manual_macro_text_c'] = $ids[0];
+		self::$data['hostmacroids']['manual_macro_secret_c'] = $ids[1];
+		self::$data['hostmacroids']['manual_macro_vault_c'] = $ids[2];
+		self::$data['hostmacroids']['manual_macro_text_d'] = $ids[3];
+		self::$data['hostmacroids']['manual_macro_secret_d'] = $ids[4];
+		self::$data['hostmacroids']['manual_macro_vault_d'] = $ids[5];
 	}
 
 	/**
@@ -842,6 +1048,48 @@ class testHost extends CAPITest {
 					'interfaces' => '10'
 				],
 				'expected_error' => 'Incorrect arguments passed to function.'
+			],
+
+			// Test create macros.
+			'Test host.create - macros (automatic)' => [
+				'request' => [
+					'host' => 'API test hosts create fail',
+					'groups' => [
+						[
+							'groupid' => 'ID'
+						]
+					],
+					'macros' => [
+						[
+							'macro' => '{$MANUAL_MACRO_TEXT_NEW_FAIL_ONE}',
+							'value' => 'manual_macro_text_value_new_fail_one',
+							'description' => 'manual_macro_text_description_new_fail_one',
+							'type' => ZBX_MACRO_TYPE_TEXT,
+							'automatic' => ZBX_USERMACRO_AUTOMATIC
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/macros/1": unexpected parameter "automatic".'
+			],
+			'Test host.create - macros (manual)' => [
+				'request' => [
+					'host' => 'API test hosts create fail',
+					'groups' => [
+						[
+							'groupid' => 'ID'
+						]
+					],
+					'macros' => [
+						[
+							'macro' => '{$MANUAL_MACRO_TEXT_NEW_FAIL_TWO}',
+							'value' => 'manual_macro_text_value_new_fail_two',
+							'description' => 'manual_macro_text_description_new_fail_two',
+							'type' => ZBX_MACRO_TYPE_TEXT,
+							'automatic' => ZBX_USERMACRO_MANUAL
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/macros/1": unexpected parameter "automatic".'
 			]
 		];
 	}
@@ -1565,7 +1813,7 @@ class testHost extends CAPITest {
 		}
 		unset($template);
 
-		$hosts_old = $this->store([$request['hostid']]);
+		$hosts_old = $this->backupTemplates([$request['hostid']]);
 
 		// Update templates on hosts.
 		$hosts_upd = $this->call('host.update', $request);
@@ -1583,7 +1831,7 @@ class testHost extends CAPITest {
 			'host.update with templates failed for host "'.$host['host'].'".'
 		);
 
-		$this->revert($hosts_old);
+		$this->restoreTemplates($hosts_old);
 	}
 
 	/**
@@ -2192,7 +2440,7 @@ class testHost extends CAPITest {
 		}
 		unset($template);
 
-		$hosts_old = $this->store($hostids);
+		$hosts_old = $this->backupTemplates($hostids);
 
 		// Update templates on hosts.
 		$hosts_upd = $this->call('host.massupdate', $request);
@@ -2212,7 +2460,7 @@ class testHost extends CAPITest {
 			);
 		}
 
-		$this->revert($hosts_old);
+		$this->restoreTemplates($hosts_old);
 	}
 
 	/**
@@ -2453,7 +2701,7 @@ class testHost extends CAPITest {
 		}
 		unset($template);
 
-		$hosts_old = $this->store($hostids);
+		$hosts_old = $this->backupTemplates($hostids);
 
 		// Add templates on hosts.
 		$hosts_upd = $this->call('host.massadd', $request);
@@ -2473,7 +2721,7 @@ class testHost extends CAPITest {
 			);
 		}
 
-		$this->revert($hosts_old);
+		$this->restoreTemplates($hosts_old);
 	}
 
 	/**
@@ -2595,7 +2843,7 @@ class testHost extends CAPITest {
 		}
 		unset($template);
 
-		$hosts_old = $this->store($request['hostids']);
+		$hosts_old = $this->backupTemplates($request['hostids']);
 
 		// Add templates on hosts.
 		$hosts_upd = $this->call('host.massremove', $request);
@@ -2615,7 +2863,7 @@ class testHost extends CAPITest {
 			);
 		}
 
-		$this->revert($hosts_old);
+		$this->restoreTemplates($hosts_old);
 	}
 
 	/**
@@ -2693,7 +2941,7 @@ class testHost extends CAPITest {
 		}
 		unset($template);
 
-		$hosts_old = $this->store([$host['hostid']]);
+		$hosts_old = $this->backupTemplates([$host['hostid']]);
 
 		// Add/replace templates on host and check if items are inherited on host.
 		$this->call('host.update', $host);
@@ -2703,7 +2951,7 @@ class testHost extends CAPITest {
 		);
 
 		// Then unlink the template from host and check if item still exists on host.
-		$this->revert($hosts_old);
+		$this->restoreTemplates($hosts_old);
 		$item_keys = $this->getItemKeysOnHost($host['hostid']);
 		$this->assertSame($expected_results['unlink']['item_keys'], $item_keys,
 			'Unlinking templates failed: mismatching results on host with ID "'.$host['hostid'].'".'
@@ -2722,7 +2970,7 @@ class testHost extends CAPITest {
 			'selectParentTemplates' => ['templateid'],
 			'hostids' => [$host['hostid']]
 		]);
-		$this->revert($hosts['result'], true);
+		$this->restoreTemplates($hosts['result'], true);
 		$item_keys = $this->getItemKeysOnHost($host['hostid']);
 		$this->assertSame($expected_results['clear']['item_keys'], $item_keys,
 			'Clearing templates failed: mismatching results on host with ID "'.$host['hostid'].'".'
@@ -3010,6 +3258,619 @@ class testHost extends CAPITest {
 	}
 
 	/**
+	 * Data provider for host.get to check macros.
+	 *
+	 * @return array
+	 */
+	public static function getHostGetMacrosData() {
+		return [
+			'Test host.get - host has no macros' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_no_macros'
+					],
+					'selectMacros' => [
+						'macro', 'value', 'description', 'type', 'automatic'
+					]
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_no_macros',
+						'macros' => []
+					]
+				]
+			],
+			'Test host.get - host has manual macros' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_manual_macros'
+					],
+					'selectMacros' => [
+						'macro', 'value', 'description', 'type', 'automatic'
+					]
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_manual_macros',
+						'macros' => [
+							[
+								'macro' => '{$MANUAL_MACRO_TEXT_C}',
+								'value' => 'manual_macro_text_value_c',
+								'description' => 'manual_macro_text_description_c',
+								'type' => (string) ZBX_MACRO_TYPE_TEXT,
+								'automatic' => (string) ZBX_USERMACRO_MANUAL
+							],
+							[
+								'macro' => '{$MANUAL_MACRO_SECRET_C}',
+								'description' => 'manual_macro_secret_description_c',
+								'type' => (string) ZBX_MACRO_TYPE_SECRET,
+								'automatic' => (string) ZBX_USERMACRO_MANUAL
+							],
+							[
+								'macro' => '{$MANUAL_MACRO_VAULT_C}',
+								'value' => 'path/to:macro',
+								'description' => 'manual_macro_vault_description_c',
+								'type' => (string) ZBX_MACRO_TYPE_VAULT,
+								'automatic' => (string) ZBX_USERMACRO_MANUAL
+							]
+						]
+					]
+				]
+			],
+			'Test host.get - host has auto macros' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_auto_macros'
+					],
+					'selectMacros' => [
+						'macro', 'value', 'description', 'type', 'automatic'
+					]
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_auto_macros',
+						'macros' => [
+							[
+								'macro' => '{$DISCOVERED_MACRO_TEXT_A}',
+								'value' => 'discovered_macro_text_value_a',
+								'description' => 'discovered_macro_text_description_a',
+								'type' => (string) ZBX_MACRO_TYPE_TEXT,
+								'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+							],
+							[
+								'macro' => '{$DISCOVERED_MACRO_SECRET_A}',
+								'description' => 'discovered_macro_secret_description_a',
+								'type' => (string) ZBX_MACRO_TYPE_SECRET,
+								'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+							],
+							[
+								'macro' => '{$DISCOVERED_MACRO_VAULT_A}',
+								'value' => 'path/to:macro',
+								'description' => 'discovered_macro_vault_description_a',
+								'type' => (string) ZBX_MACRO_TYPE_VAULT,
+								'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+							]
+						]
+					]
+				]
+			],
+			'Test host.get - host has auto and manual macros' => [
+				'request' => [
+					'output' => ['hostid'],
+					'hostids' => [
+						'discovered_auto_and_manual_macros'
+					],
+					'selectMacros' => [
+						'macro', 'value', 'description', 'type', 'automatic'
+					]
+				],
+				'expected_results' => [
+					[
+						'hostid' => 'discovered_auto_and_manual_macros',
+						'macros' => [
+							[
+								'macro' => '{$DISCOVERED_MACRO_TEXT_B}',
+								'value' => 'discovered_macro_text_value_b',
+								'description' => 'discovered_macro_text_description_b',
+								'type' => (string) ZBX_MACRO_TYPE_TEXT,
+								'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+							],
+							[
+								'macro' => '{$DISCOVERED_MACRO_SECRET_B}',
+								'description' => 'discovered_macro_secret_description_b',
+								'type' => (string) ZBX_MACRO_TYPE_SECRET,
+								'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+							],
+							[
+								'macro' => '{$DISCOVERED_MACRO_VAULT_B}',
+								'value' => 'path/to:macro',
+								'description' => 'discovered_macro_vault_description_b',
+								'type' => (string) ZBX_MACRO_TYPE_VAULT,
+								'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+							],
+							[
+								'macro' => '{$MANUAL_MACRO_TEXT_D}',
+								'value' => 'manual_macro_text_value_d',
+								'description' => 'manual_macro_text_description_d',
+								'type' => (string) ZBX_MACRO_TYPE_TEXT,
+								'automatic' => (string) ZBX_USERMACRO_MANUAL
+							],
+							[
+								'macro' => '{$MANUAL_MACRO_SECRET_D}',
+								'description' => 'manual_macro_secret_description_d',
+								'type' => (string) ZBX_MACRO_TYPE_SECRET,
+								'automatic' => (string) ZBX_USERMACRO_MANUAL
+							],
+							[
+								'macro' => '{$MANUAL_MACRO_VAULT_D}',
+								'value' => 'path/to:macro',
+								'description' => 'manual_macro_vault_description_d',
+								'type' => (string) ZBX_MACRO_TYPE_VAULT,
+								'automatic' => (string) ZBX_USERMACRO_MANUAL
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test host.get to check if hosts have vairous macros and their properties.
+	 *
+	 * @dataProvider getHostGetMacrosData
+	 */
+	public function testHost_GetMacros($request, $expected_results) {
+		// Replace ID placeholder with real ID.
+		foreach ($request['hostids'] as &$hostid) {
+			$hostid = self::$data['hostids'][$hostid];
+		}
+		unset($hostid);
+
+		foreach ($expected_results as &$result) {
+			$result['hostid'] = self::$data['hostids'][$result['hostid']];
+		}
+		unset($result);
+
+		$host = $this->call('host.get', $request);
+
+		// Ignore the order due to MySQL returning macros in different order.
+		$this->assertEqualsCanonicalizing($expected_results, $host['result']);
+	}
+
+	/**
+	 * Data provider for host.update to check how macros are replaced and coverted from automatic to manual.
+	 *
+	 * @return array
+	 */
+	public static function getHostUpdateMacrosDataValid() {
+		return [
+			// Add manual macros to discovered host.
+			'Test host.update - host has no macros' => [
+				'request' => [
+					'hostid' => 'discovered_no_macros',
+					'macros' => [
+						[
+							'macro' => '{$MANUAL_MACRO_TEXT_NEW}',
+							'value' => 'manual_macro_text_value_new',
+							'description' => 'manual_macro_text_description_new',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_SECRET_NEW}',
+							'value' => 'manual_macro_secret_value_new',
+							'description' => 'manual_macro_secret_description_new',
+							'type' => (string) ZBX_MACRO_TYPE_SECRET
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_VAULT_NEW}',
+							'value' => 'path/to:macro',
+							'description' => 'manual_macro_vault_description_new',
+							'type' => (string) ZBX_MACRO_TYPE_VAULT
+						]
+					]
+				],
+				'expected_result' => [
+					'macros' => [
+						[
+							'macro' => '{$MANUAL_MACRO_TEXT_NEW}',
+							'value' => 'manual_macro_text_value_new',
+							'description' => 'manual_macro_text_description_new',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_SECRET_NEW}',
+							'value' => 'manual_macro_secret_value_new',
+							'description' => 'manual_macro_secret_description_new',
+							'type' => (string) ZBX_MACRO_TYPE_SECRET,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_VAULT_NEW}',
+							'value' => 'path/to:macro',
+							'description' => 'manual_macro_vault_description_new',
+							'type' => (string) ZBX_MACRO_TYPE_VAULT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						]
+					]
+				],
+				'expected_error' => null
+			],
+
+			// Replace macros leaving some old, changing and adding new.
+			'Test host.update - host has manual macros' => [
+				'request' => [
+					'hostid' => 'discovered_manual_macros',
+					'macros' => [
+						// Leave macro as is.
+						[
+							'hostmacroid' => 'manual_macro_text_c'
+						],
+						// Change macro name {$MANUAL_MACRO_SECRET_C}.
+						[
+							'hostmacroid' => 'manual_macro_secret_c',
+							'macro' => '{$MANUAL_MACRO_SECRET_C_CHANGED_NAME}',
+						],
+						// Replace macro {$MANUAL_MACRO_VAULT_C} with this one.
+						[
+							'macro' => '{$MANUAL_MACRO_VAULT_C_NEW}',
+							'value' => 'path/to:macro',
+							'description' => 'manual_macro_vault_description_c_new',
+							'type' => (string) ZBX_MACRO_TYPE_VAULT
+						]
+					]
+				],
+				'expected_result' => [
+					'macros' => [
+						[
+							'macro' => '{$MANUAL_MACRO_TEXT_C}',
+							'value' => 'manual_macro_text_value_c',
+							'description' => 'manual_macro_text_description_c',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_SECRET_C_CHANGED_NAME}',
+							'value' => 'manual_macro_secret_value_c',
+							'description' => 'manual_macro_secret_description_c',
+							'type' => (string) ZBX_MACRO_TYPE_SECRET,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_VAULT_C_NEW}',
+							'value' => 'path/to:macro',
+							'description' => 'manual_macro_vault_description_c_new',
+							'type' => (string) ZBX_MACRO_TYPE_VAULT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						]
+					]
+				],
+				'expected_error' => null
+			],
+
+			// Don't change host macros, leave them automatic.
+			'Test host.update - host has auto macros (same)' => [
+				'request' => [
+					'hostid' => 'discovered_auto_macros',
+					'macros' => [
+						[
+							'hostmacroid' => 'discovered_macro_text_a'
+						],
+						[
+							'hostmacroid' => 'discovered_macro_secret_a'
+						],
+						[
+							'hostmacroid' => 'discovered_macro_vault_a'
+						]
+					]
+				],
+				'expected_result' => [
+					'macros' => [
+						[
+							'macro' => '{$DISCOVERED_MACRO_TEXT_A}',
+							'value' => 'discovered_macro_text_value_a',
+							'description' => 'discovered_macro_text_description_a',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+						],
+						[
+							'macro' => '{$DISCOVERED_MACRO_SECRET_A}',
+							'value' => 'discovered_macro_secret_value_a',
+							'description' => 'discovered_macro_secret_description_a',
+							'type' => (string) ZBX_MACRO_TYPE_SECRET,
+							'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+						],
+						[
+							'macro' => '{$DISCOVERED_MACRO_VAULT_A}',
+							'value' => 'path/to:macro',
+							'description' => 'discovered_macro_vault_description_a',
+							'type' => (string) ZBX_MACRO_TYPE_VAULT,
+							'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+						]
+					]
+				],
+				'expected_error' => null
+			],
+
+			// Change host macros from automatic to manual.
+			'Test host.update - host has auto macros (convert)' => [
+				'request' => [
+					'hostid' => 'discovered_auto_macros',
+					'macros' => [
+						// Just convert the macro to manual.
+						[
+							'hostmacroid' => 'discovered_macro_text_a',
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						// Convert macro to manual and change value and description.
+						[
+							'hostmacroid' => 'discovered_macro_secret_a',
+							'value' => 'discovered_macro_secret_value_a_changed',
+							'description' => 'discovered_macro_secret_description_a_changed',
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						// Convert macro to manual and change macro name.
+						[
+							'hostmacroid' => 'discovered_macro_vault_a',
+							'macro' => '{$DISCOVERED_MACRO_VAULT_A_CHANGED}',
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						]
+					]
+				],
+				'expected_result' => [
+					'macros' => [
+						[
+							'macro' => '{$DISCOVERED_MACRO_TEXT_A}',
+							'value' => 'discovered_macro_text_value_a',
+							'description' => 'discovered_macro_text_description_a',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$DISCOVERED_MACRO_SECRET_A}',
+							'value' => 'discovered_macro_secret_value_a_changed',
+							'description' => 'discovered_macro_secret_description_a_changed',
+							'type' => (string) ZBX_MACRO_TYPE_SECRET,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$DISCOVERED_MACRO_VAULT_A_CHANGED}',
+							'value' => 'path/to:macro',
+							'description' => 'discovered_macro_vault_description_a',
+							'type' => (string) ZBX_MACRO_TYPE_VAULT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						]
+					]
+				],
+				'expected_error' => null
+			],
+
+			// Convert automatic macros to manual, leave some orignial, add new.
+			'Test host.update - host has auto and manual macros' => [
+				'request' => [
+					'hostid' => 'discovered_auto_and_manual_macros',
+					'macros' => [
+						[
+							// Converts automatic macro to manual with no changes.
+							'hostmacroid' => 'discovered_macro_text_b',
+						],
+						[
+							// Converts automatic macro to manual with no changes (value is the same).
+							'hostmacroid' => 'discovered_macro_secret_b',
+							'value' => 'discovered_macro_secret_value_b',
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							// Converts automatic macro to manual with new name and description.
+							'hostmacroid' => 'discovered_macro_vault_b',
+							'macro' => '{$DISCOVERED_MACRO_VAULT_B_CHANGED}',
+							'description' => 'discovered_macro_vault_description_b_changed',
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							// No conversion will happen, because it's already manual macro.
+							'hostmacroid' => 'manual_macro_text_d',
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							// No conversion will happen, because it's already manual macro.
+							'hostmacroid' => 'manual_macro_secret_d',
+							'value' => 'manual_macro_secret_value_d',
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							// Change macro name and description. No conversion will happen. Already manual macro.
+							'hostmacroid' => 'manual_macro_vault_d',
+							'macro' => '{$MANUAL_MACRO_VAULT_D_CHANGED}',
+							'description' => 'manual_macro_vault_description_d_changed',
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							// Add new macro. No conversion possible. Already manual macro.
+							'macro' => '{$MANUAL_MACRO_TEXT_E_NEW}',
+							'value' => 'manual_macro_text_value_e_new',
+							'description' => 'manual_macro_text_description_e_new',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT
+						],[
+							// Add new macro and try to add the property. No conversion possible. Already manual macro.
+							'macro' => '{$MANUAL_MACRO_TEXT_F_NEW}',
+							'value' => 'manual_macro_text_value_f_new',
+							'description' => 'manual_macro_text_description_f_new',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						]
+					]
+				],
+				'expected_result' => [
+					'macros' => [
+						[
+							'macro' => '{$DISCOVERED_MACRO_TEXT_B}',
+							'value' => 'discovered_macro_text_value_b',
+							'description' => 'discovered_macro_text_description_b',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+						],
+						[
+							'macro' => '{$DISCOVERED_MACRO_SECRET_B}',
+							'value' => 'discovered_macro_secret_value_b',
+							'description' => 'discovered_macro_secret_description_b',
+							'type' => (string) ZBX_MACRO_TYPE_SECRET,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$DISCOVERED_MACRO_VAULT_B_CHANGED}',
+							'value' => 'path/to:macro',
+							'description' => 'discovered_macro_vault_description_b_changed',
+							'type' => (string) ZBX_MACRO_TYPE_VAULT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_TEXT_D}',
+							'value' => 'manual_macro_text_value_d',
+							'description' => 'manual_macro_text_description_d',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_SECRET_D}',
+							'value' => 'manual_macro_secret_value_d',
+							'description' => 'manual_macro_secret_description_d',
+							'type' => (string) ZBX_MACRO_TYPE_SECRET,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_VAULT_D_CHANGED}',
+							'value' => 'path/to:macro',
+							'description' => 'manual_macro_vault_description_d_changed',
+							'type' => (string) ZBX_MACRO_TYPE_VAULT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_TEXT_E_NEW}',
+							'value' => 'manual_macro_text_value_e_new',
+							'description' => 'manual_macro_text_description_e_new',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						],
+						[
+							'macro' => '{$MANUAL_MACRO_TEXT_F_NEW}',
+							'value' => 'manual_macro_text_value_f_new',
+							'description' => 'manual_macro_text_description_f_new',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_MANUAL
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test host.update - remove automatic and manual macros' => [
+				'request' => [
+					'hostid' => 'discovered_auto_and_manual_macros',
+					'macros' => []
+				],
+				'expected_result' => [
+					'macros' => []
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	public static function getHostUpdateMacrosDataInvalid() {
+		return [
+			'Test host.update - automatic new macro' => [
+				'request' => [
+					'hostid' => 'discovered_no_macros',
+					'macros' => [
+						[
+							'macro' => '{$MANUAL_MACRO_TEXT_NEW}',
+							'value' => 'manual_macro_text_value_new',
+							'description' => 'manual_macro_text_description_new',
+							'type' => (string) ZBX_MACRO_TYPE_TEXT,
+							'automatic' => (string) ZBX_USERMACRO_AUTOMATIC
+						]
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/macros/1/automatic": value must be '.ZBX_USERMACRO_MANUAL.'.'
+			],
+			'Test host.update - change existing automatic macro (missing param)' => [
+				'request' => [
+					'hostid' => 'discovered_auto_macros',
+					'macros' => [
+						[
+							'hostmacroid' => 'discovered_macro_text_a',
+							'macro' => '{$DISCOVERED_MACRO_TEXT_A_NEW}'
+							// Parameter "automatic" is mandatory if something needs to be changed on automatic macro.
+						]
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Not allowed to modify automatic user macro "{$DISCOVERED_MACRO_TEXT_A}".'
+			],
+			'Test host.update - change existing automatic macro (incorrect value)' => [
+				'request' => [
+					'hostid' => 'discovered_auto_macros',
+					'macros' => [
+						[
+							'hostmacroid' => 'discovered_macro_text_a',
+							'macro' => '{$DISCOVERED_MACRO_TEXT_A_NEW}',
+							'automatic' => ZBX_USERMACRO_AUTOMATIC
+						]
+					]
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/1/macros/1/automatic": value must be '.ZBX_USERMACRO_MANUAL.'.'
+			]
+		];
+	}
+
+	/**
+	 * Test host macro update. Check if 'automatic' property is changed for discovered host macros, macros are properly
+	 * updated to new macros etc.
+	 *
+	 * @dataProvider getHostUpdateMacrosDataValid
+	 * @dataProvider getHostUpdateMacrosDataInvalid
+	 */
+	public function testHost_UpdateMacros($request, $expected_result, $expected_error) {
+		// Replace ID placeholders with real IDs.
+		$request['hostid'] = self::$data['hostids'][$request['hostid']];
+
+		foreach ($request['macros'] as &$macro) {
+			if (array_key_exists('hostmacroid', $macro)) {
+				$macro['hostmacroid'] = self::$data['hostmacroids'][$macro['hostmacroid']];
+			}
+		}
+		unset($macro);
+
+		$hosts_old = $this->backupMacros([$request['hostid']]);
+		$hosts_upd = $this->call('host.update', $request, $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertArrayHasKey('hostids', $hosts_upd['result']);
+
+			$db_hosts = $this->getMacros([$request['hostid']]);
+			$db_host = reset($db_hosts);
+
+			foreach ($db_host['macros'] as &$macro) {
+				unset($macro['hostid'], $macro['hostmacroid']);
+			}
+			unset($macro);
+
+			// Ignore the order in which $db_host macros are returned when comparing.
+			$this->assertEqualsCanonicalizing($expected_result['macros'], $db_host['macros'],
+				'host.update with macros failed for host "'.$db_host['host'].'".'
+			);
+
+			$this->restoreMacros($hosts_old);
+		}
+	}
+
+	/**
 	 * Get a list of items keys on host.
 	 *
 	 * @param string $hostid
@@ -3030,49 +3891,219 @@ class testHost extends CAPITest {
 	}
 
 	/**
-	 * Get the original host value.
+	 * Get the original host templates.
 	 *
 	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	private function store(array $hostids) {
+	private function backupTemplates(array $hostids) {
 		// Get data before update.
-		$hosts_old = $this->call('host.get', [
+		$db_hosts = $this->call('host.get', [
 			'output' => ['hostid', 'host'],
 			'selectParentTemplates' => ['templateid'],
 			'hostids' => $hostids
 		]);
 
-		return $hosts_old['result'];
+		return $db_hosts['result'];
 	}
 
 	/**
-	 * Revert hosts back to original state before the update to test other cases like massupdate, massremove etc.
+	 * Get current host macros. Due the host.get selectMacros not returning secret values, use regular DB function.
+	 *
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	private function getMacros(array $hostids) {
+		$db_hosts = CDBHelper::getAll(
+			'SELECT h.host,h.hostid,hm.hostmacroid,hm.macro,hm.value,hm.description,hm.type,hm.automatic'.
+			' FROM hosts h'.
+			' LEFT JOIN hostmacro hm ON hm.hostid=h.hostid'.
+			' WHERE '.dbConditionId('h.hostid', $hostids)
+		);
+
+		$result = [];
+
+		foreach ($db_hosts as $db_host) {
+			if (!array_key_exists($db_host['hostid'], $result)) {
+				$result[$db_host['hostid']] = [
+					'hostid' => $db_host['hostid'],
+					'host' => $db_host['host'],
+					'macros' => []
+				];
+			}
+
+			if ($db_host['hostmacroid'] != 0) {
+				$result[$db_host['hostid']]['macros'][] = [
+					'hostmacroid' => $db_host['hostmacroid'],
+					'hostid' => $db_host['hostid'],
+					'macro' => $db_host['macro'],
+					'value' => $db_host['value'],
+					'description' => $db_host['description'],
+					'type' => $db_host['type'],
+					'automatic' => $db_host['automatic']
+				];
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Get the original host macros before update.
+	 *
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	private function backupMacros(array $hostids) {
+		return $this->getMacros($hostids);
+	}
+
+	/**
+	 * Revert host templates back to original state before the update to test other cases like massupdate, massremove
+	 * and other methods.
 	 *
 	 * @param array  $hosts                       Array of hosts.
 	 * @param string $hosts[]['hostid']           Host ID that will have the data reverted.
 	 * @param string $hosts[]['host']             Host technical name in case of error.
 	 * @param string $hosts[]['parentTemplates']  Array of host original templates.
 	 */
-	private function revert(array $hosts, $clear = false) {
-		foreach ($hosts as &$host) {
+	private function restoreTemplates(array $hosts, $clear = false) {
+		foreach ($hosts as $host) {
+			$name = $host['host'];
+
 			if ($clear) {
 				$host['templates_clear'] = $host['parentTemplates'];
 			}
 			else {
 				$host['templates'] = $host['parentTemplates'];
 			}
-			unset($host['parentTemplates']);
-
-			$name = $host['host'];
-			unset($host['host']);
+			unset($host['host'], $host['parentTemplates']);
 
 			$host_upd = $this->call('host.update', $host);
 
-			$this->assertArrayHasKey('hostids', $host_upd['result'], 'host.update failded for host "'.$name.'"');
+			$this->assertArrayHasKey('hostids', $host_upd['result'], 'host.update failed for host "'.$name.'"');
 		}
-		unset($host);
+	}
+
+	/**
+	 * Revert host macros back to original state before the update. Instead of using @backup that will backup and
+	 * restore all related tables that could take hours, focus only on host macros.
+	 *
+	 * @param array  $hosts                      Array of hosts and their macros.
+	 * @param string $hosts[<hostid>]['host']    Host technical name in case of error.
+	 * @param string $hosts[<hostid>]['hostid']  Host ID.
+	 * @param string $hosts[<hostid>]['macros']  Array of host original macros.
+	 */
+	private function restoreMacros(array $hosts) {
+		$res = true;
+
+		// Records after update has been made. Possibly new macros are stored.
+		$records_current = CDBHelper::getAll(
+			'SELECT hm.hostmacroid,hm.hostid,hm.macro,hm.value,hm.description,hm.type,hm.automatic'.
+			' FROM hostmacro hm'.
+			' WHERE '.dbConditionId('hm.hostid', array_keys($hosts))
+		);
+		// Otherwise if no records exist, they must have been deleted, so in any case old recods need to be restored.
+
+		foreach ($hosts as $host) {
+			$host['macros'] = zbx_toHash($host['macros'], 'hostmacroid');
+			$records_current = zbx_toHash($records_current, 'hostmacroid');
+
+			// Host had macros before. Try to restore them.
+			if ($host['macros']) {
+				$ins_macros = [];
+				$del_macros = [];
+
+				$ins_macros = array_diff_key($host['macros'], $records_current);
+				$del_macros = array_diff_key($records_current, $host['macros']);
+
+				if ($ins_macros) {
+					// Remove old host macro IDs from references that will be re-instertd.
+					foreach (self::$data['hostmacroids'] as $key => $hostmacroid) {
+						foreach ($ins_macros as $macro) {
+							if (bccomp($macro['hostmacroid'], $hostmacroid) == 0) {
+								unset(self::$data['hostmacroids'][$key]);
+							}
+						}
+					}
+
+					foreach ($ins_macros as &$macro) {
+						unset($macro['hostmacroid']);
+					}
+					unset($macro);
+
+					// Prepare the new host macro IDs.
+					$nextid = CDBHelper::getAll(
+						'SELECT i.nextid'.
+						' FROM ids i'.
+						' WHERE i.table_name='.zbx_dbstr('hostmacro').
+							' AND i.field_name='.zbx_dbstr('hostmacroid').
+						' FOR UPDATE'
+					)[0]['nextid'] + 1;
+
+					$ids = DB::insertBatch('hostmacro', $ins_macros);
+					$newids = array_fill($nextid, count($ins_macros), true);
+
+					$this->assertEquals(array_keys($newids), array_values($ids),
+						'host.update with macros failed for host "'.$host['host'].'".'
+					);
+
+					// Again the macro name must match the key.
+					foreach ($ins_macros as $macro) {
+						$db_hostmacro = CDBHelper::getRow(
+							'SELECT hm.hostmacroid'.
+							' FROM hostmacro hm'.
+							' WHERE hm.hostid='.zbx_dbstr($macro['hostid']).
+								' AND hm.macro='.zbx_dbstr($macro['macro'])
+						);
+
+						$key = str_replace('{$', '', $macro['macro']);
+						$key = str_replace('}', '', $key);
+						$key = strtolower($key);
+					}
+
+					// Add macros to references just like in data perparation.
+					self::$data['hostmacroids'][$key] = $db_hostmacro['hostmacroid'];
+				}
+
+				if ($del_macros) {
+					// Delete the macros that were insterted in host.update method.
+					$res = $res && DB::delete('hostmacro', [
+						'hostmacroid' => array_column($del_macros, 'hostmacroid')
+					]);
+
+					// Inserted macros during tests were not added to references. So there is nothing to remove.
+				}
+
+				// Check the old records.
+				foreach ($host['macros'] as $macro) {
+					// If old host macro ID still exists, update it.
+					if (in_array($macro['hostmacroid'], self::$data['hostmacroids'])) {
+						// Update the macro to previous value regardless of what it was before.
+						$hostmacroid = $macro['hostmacroid'];
+						unset($macro['hostmacroid']);
+
+						$res = $res && DB::update('hostmacro', [
+							'values' => $macro,
+							'where' => [
+								'hostmacroid' => $hostmacroid
+							]
+						]);
+					}
+				}
+			}
+			// Host did not have macros, but new were added in host.update method. Remove the added ones.
+			elseif ($records_current) {
+				$res = $res && DB::delete('hostmacro', [
+					'hostmacroid' => array_column($records_current, 'hostmacroid')
+				]);
+			}
+
+			$this->assertSame(true, $res, 'host.update failed for host "'.$host['host'].'"');
+		}
 	}
 
 	/**

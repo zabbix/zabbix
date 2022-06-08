@@ -675,16 +675,8 @@ class CControllerMenuPopup extends CController {
 				if ($events) {
 					$event = $events[0];
 
-					if ($event['r_eventid'] != 0) {
-						$can_be_closed = false;
-					}
-					else {
-						foreach ($event['acknowledges'] as $acknowledge) {
-							if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-								$can_be_closed = false;
-								break;
-							}
-						}
+					if ($can_be_closed) {
+						$can_be_closed = !isEventClosed($event);
 					}
 
 					foreach ($event['urls'] as $url) {
@@ -716,6 +708,7 @@ class CControllerMenuPopup extends CController {
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
 							|| $can_be_closed
+							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 						)
 				);
 			}

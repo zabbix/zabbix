@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:30Z'
-  groups:
+  date: '2022-06-07T19:33:23Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -722,8 +722,6 @@ zabbix_export:
                 MAINT - The server has been disabled or put into maintenance mode.
                 DRAIN - The server has been put into drain mode.
                 no check - Health checks are not enabled for this server.
-              valuemap:
-                name: 'Service state'
               preprocessing:
                 -
                   type: JSONPATH
@@ -932,14 +930,14 @@ zabbix_export:
             key: haproxy.get.nodes
           lld_macro_paths:
             -
+              lld_macro: '{#MODE}'
+              path: $.mode
+            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
-            -
-              lld_macro: '{#MODE}'
-              path: $.mode
           overrides:
             -
               name: 'Discard HTTP status codes'
@@ -1490,14 +1488,14 @@ zabbix_export:
             key: haproxy.get.nodes
           lld_macro_paths:
             -
+              lld_macro: '{#MODE}'
+              path: $.mode
+            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
-            -
-              lld_macro: '{#MODE}'
-              path: $.mode
           overrides:
             -
               name: 'Discard HTTP status codes'
@@ -2179,8 +2177,6 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              valuemap:
-                name: 'Service state'
               preprocessing:
                 -
                   type: JSONPATH
@@ -2404,14 +2400,14 @@ zabbix_export:
             key: haproxy.get.nodes
           lld_macro_paths:
             -
+              lld_macro: '{#MODE}'
+              path: $.mode
+            -
               lld_macro: '{#PXNAME}'
               path: $.pxname
             -
               lld_macro: '{#SVNAME}'
               path: $.svname
-            -
-              lld_macro: '{#MODE}'
-              path: $.mode
           overrides:
             -
               name: 'Discard HTTP status codes'
@@ -2525,8 +2521,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2549,8 +2545,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Backend {#PXNAME} Responses by HTTP code'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: Backend {#PXNAME} Responses by HTTP code'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2573,8 +2569,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Backend {#PXNAME} In/Out traffic'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: Backend {#PXNAME} In/Out traffic'
         -
           uuid: 7c4decb2fefc4cfe9c4a3f8717d710ca
           name: 'HAProxy Frontend performance'
@@ -2602,8 +2598,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2626,8 +2622,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2650,8 +2646,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -2674,8 +2670,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: Frontend {#PXNAME} In/Out traffic'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: Frontend {#PXNAME} In/Out traffic'
         -
           uuid: ebc5a517fa544fada42550059c014c5b
           name: 'HAProxy Server performance'
@@ -2703,8 +2699,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2727,8 +2723,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: {#PXNAME} {#SVNAME} Responses by HTTP code'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: {#PXNAME} {#SVNAME} Responses by HTTP code'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2751,8 +2747,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'HAProxy: {#PXNAME} {#SVNAME} In/Out traffic'
                         host: 'HAProxy by Zabbix agent'
+                        name: 'HAProxy: {#PXNAME} {#SVNAME} In/Out traffic'
       valuemaps:
         -
           uuid: bf2e9463450d4f4899abcac85cde0a92

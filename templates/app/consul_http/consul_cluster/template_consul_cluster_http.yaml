@@ -1,10 +1,14 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-05-17T15:36:33Z'
-  groups:
+  date: '2022-06-07T20:23:01Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
+  host_groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Applications
   templates:
     -
       uuid: 3db29bb6b2b14fa289ba7915264efcdf
@@ -373,7 +377,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Applications
               group_prototypes:
                 -
                   name: 'Consul cluster/{#NODE_DATACENTER}'

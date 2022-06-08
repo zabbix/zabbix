@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20211222';
-$browser-sprite-path: '../img/browser-sprite.png?20211222';
+$sprite-path: '../img/icon-sprite.svg?20220519';
+$browser-sprite-path: '../img/browser-sprite.png?20220519';
 
 @import "utils/mixins";
 
@@ -3393,6 +3393,15 @@ $form-icon-btn: (
 			vertical-align: top;
 		}
 
+		&.macro-textarea-parent {
+			textarea {
+				float: left;
+			}
+			span {
+				margin-left: 10px;
+			}
+		}
+
 		button {
 			line-height: normal;
 		}
@@ -5388,6 +5397,8 @@ a.icon-count {
 .icon-action-message,
 .icon-action-ack,
 .icon-action-unack,
+.icon-action-suppress,
+.icon-action-unsuppress,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -5419,6 +5430,8 @@ a.icon-count {
 	}
 }
 
+.icon-action-suppress,
+.icon-action-unsuppress,
 .icon-invisible {
 	&:link,
 	&:hover,
@@ -5442,6 +5455,8 @@ button {
 	&.icon-action-severity-changed,
 	&.icon-action-message,
 	&.icon-action-ack,
+	&.icon-action-suppress,
+	&.icon-action-unsuppress,
 	&.icon-problem-generated,
 	&.icon-problem-recovery,
 	&.icon-actions-number-gray,
@@ -5506,6 +5521,14 @@ button {
 
 .icon-action-unack::before {
 	background-position: -173px -245px;
+}
+
+.icon-action-suppress::before {
+	background-position: -89px -803px;
+}
+
+.icon-action-unsuppress::before {
+	background-position: -89px -836px;
 }
 
 .icon-invisible::before {

@@ -95,7 +95,7 @@ There are no template links in this template.
 |ZYXEL IES1248-51: High the DSL line attenuation in Port {#SNMPINDEX} |<p>The reductions in amplitude of the downstream and upstream DSL signals.</p> |`min(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}` |WARNING | |
 |ZYXEL IES1248-51: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
 |ZYXEL IES1248-51: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL IES1248-51 SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL IES1248-51: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|ZYXEL IES1248-51: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |ZYXEL IES1248-51: Port {#SNMPINDEX} alarm |<p>The slot reported an error.</p> |`find(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.slot.alarm,,"like","moduleNoDefect")=0` |AVERAGE | |
 |ZYXEL IES1248-51: Temperature {#ZYXEL.TEMP.ID} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL IES1248-51 SNMP/zyxel.ies1248.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
 

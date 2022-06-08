@@ -104,7 +104,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Broker {#JMXBROKERNAME}: Version has been changed |<p>Broker {#JMXBROKERNAME} version has changed. Ack to close.</p> |`last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#1)<>last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion],#2) and length(last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},BrokerVersion]))>0` |INFO |<p>Manual close: YES</p> |
-|Broker {#JMXBROKERNAME}: Broker has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},UptimeMillis])<10m` |INFO |<p>Manual close: YES</p> |
+|Broker {#JMXBROKERNAME}: Broker has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},UptimeMillis])<10m` |INFO |<p>Manual close: YES</p> |
 |Broker {#JMXBROKERNAME}: Memory usage is too high |<p>-</p> |`min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.WARN:"{#JMXBROKERNAME}"}` |AVERAGE |<p>**Depends on**:</p><p>- Broker {#JMXBROKERNAME}: Memory usage is too high</p> |
 |Broker {#JMXBROKERNAME}: Memory usage is too high |<p>-</p> |`min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ}, MemoryPercentUsage],{$ACTIVEMQ.MEM.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.MEM.MAX.HIGH:"{#JMXBROKERNAME}"}` |HIGH | |
 |Broker {#JMXBROKERNAME}: Storage usage is too high |<p>-</p> |`min(/Apache ActiveMQ by JMX/jmx[{#JMXOBJ},StorePercentUsage],{$ACTIVEMQ.STORE.TIME:"{#JMXBROKERNAME}"})>{$ACTIVEMQ.STORE.MAX.WARN:"{#JMXBROKERNAME}"}` |AVERAGE |<p>**Depends on**:</p><p>- Broker {#JMXBROKERNAME}: Storage usage is too high</p> |
