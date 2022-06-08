@@ -271,6 +271,7 @@ window.widget_svggraph_form = new class {
 				items: [
 					{
 						label: <?= json_encode(_('Clone')) ?>,
+						disabled: jQuery('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>').length === 0,
 						clickCallback: () => {
 							widget_svggraph_form.clone();
 						}
@@ -290,7 +291,7 @@ window.widget_svggraph_form = new class {
 	}
 
 	_addDataset(type) {
-		const row_numb = jQuery('#data_sets .list-accordion-item').length;
+		const row_numb = jQuery('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
 
 		jQuery(this.dataset_wrapper).zbx_vertical_accordion("collapseAll");
 
@@ -647,9 +648,6 @@ window.widget_svggraph_form = new class {
 
 	clone() {
 		let dataset_elem = this.dataset_wrapper.querySelector('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]');
-		if (!dataset_elem) {
-			dataset_elem = Array.from(this.dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?> ')).pop();
-		}
 
 		if (!dataset_elem) {
 			return;
