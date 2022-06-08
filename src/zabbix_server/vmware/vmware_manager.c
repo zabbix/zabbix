@@ -22,25 +22,18 @@
 #include "zbxself.h"
 
 
-extern int		CONFIG_VMWARE_FREQUENCY;
-extern int		CONFIG_VMWARE_PERF_FREQUENCY;
-
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-
-extern zbx_vmware_t	*vmware;
+extern int				CONFIG_VMWARE_FREQUENCY;
+extern int				CONFIG_VMWARE_PERF_FREQUENCY;
 
 #define ZBX_VMWARE_CACHE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 
-typedef struct
-{
-	int	updated;
-	int	removed;
-}
-zbx_vmware_jobs_count_t;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
+
+extern zbx_vmware_t			*vmware;
 
 /******************************************************************************
  *                                                                            *
@@ -101,6 +94,7 @@ static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, int time_now)
 
 	zbx_binary_heap_remove_min(&vmw->jobs_queue);
 	job->nextcheck = 0;
+
 unlock:
 	zbx_vmware_unlock();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() queue:%d type:%s", __func__, vmw->jobs_queue.elems_num,
@@ -117,64 +111,42 @@ unlock:
  *             job      - [IN] the job object                                 *
  *             jobs_num - [IN/OUT] the statistics counters                    *
  *                                                                            *
+ * Return value: count of successfully executed jobs                          *
+ *                                                                            *
  ******************************************************************************/
-static void	vmware_job_exec(zbx_vmware_job_t *job, zbx_vmware_jobs_count_t *jobs_num)
+static int	vmware_job_exec(zbx_vmware_job_t *job)
 {
-	int	ret;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s", __func__, vmware_job_type_string(job));
+
+	if (0 != (job->service->state & ZBX_VMWARE_STATE_REMOVING))
+	{
+		job->finished = SUCCEED;
+		goto out;
+	}
+	else if (0 == (job->service->state & ZBX_VMWARE_STATE_READY))
+		goto out;
 
 	switch (job->type)
 	{
 	case ZBX_VMWARE_UPDATE_CONF:
-		if (0 != (job->service->state & ZBX_VMWARE_STATE_REMOVING))
-		{
-			job->finished = SUCCEED;
-			break;
-		}
-
 		ret = zbx_vmware_service_update(job->service);
-		jobs_num->updated += SUCCEED == ret ? 1 : 0;
 		break;
 	case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
-		if (0 != (job->service->state & ZBX_VMWARE_STATE_REMOVING))
-		{
-			job->finished = SUCCEED;
-			break;
-		}
-		else if (0 == (job->service->state & ZBX_VMWARE_STATE_READY))
-			break;
-
 		ret = zbx_vmware_service_update_perf(job->service);
-		jobs_num->updated += SUCCEED == ret ? 1 : 0;
 		break;
 /*	case ZBX_VMWARE_UPDATE_REST_TAGS:
-		if (0 != (job->service->state & ZBX_VMWARE_STATE_REMOVING))
-		{
-			job->finished = SUCCEED;
-			break;
-		}
-		else if (0 == (job->service->state & ZBX_VMWARE_STATE_READY))
-			break;
-
 		ret = vmware_service_update_tags(job->service);
-		jobs_num->updated += SUCCEED == ret ? 1 : 0;
 		break;
-*/	case ZBX_VMWARE_REMOVE_SERVICE:
-		if (1 < job->service->jobs_num)
-			break;
-
-		zbx_vmware_service_remove(job->service);
-		job->service = NULL;
-		job->finished = SUCCEED;
-		jobs_num->removed += 1;
-		break;
-	default:
+*/	default:
 		ret = FAIL;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s ret:%s", __func__, vmware_job_type_string(job),
 			zbx_result_string(ret));
+
+	return SUCCEED == ret ? 1 : 0;
 }
 
 /******************************************************************************
@@ -185,19 +157,36 @@ static void	vmware_job_exec(zbx_vmware_job_t *job, zbx_vmware_jobs_count_t *jobs
  *             job      - [IN] the job object                                 *
  *             time_now - [IN] the current time                               *
  *                                                                            *
+ * Return value: count of removed jobs                                        *
+ *                                                                            *
  ******************************************************************************/
-static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int time_now)
+static int	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int time_now)
 {
 	zbx_binary_heap_elem_t	elem_new = {0, job};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() queue:%d type:%s", __func__, vmw->jobs_queue.elems_num,
 			vmware_job_type_string(job));
 
+	if (time_now - job->service->lastaccess < ZBX_VMWARE_SERVICE_TTL)
+	{
+		zbx_vmware_lock();
+		job->service->state |= ZBX_VMWARE_STATE_REMOVING;
+		zbx_vmware_unlock();
+		job->finished = SUCCEED;
+	}
+
 	if (SUCCEED == job->finished)
 	{
+		zbx_vmware_service_t	*service = job->service;
+
 		zbx_vmware_job_remove(job);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s job removed", __func__, vmware_job_type_string(job));
-		return;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s job removed, service jobs_num:%d", __func__,
+				vmware_job_type_string(job), service->jobs_num);
+
+		if (0 == service->jobs_num)
+			zbx_vmware_service_remove(service);
+
+		return 1;
 	}
 
 	switch (job->type)
@@ -216,34 +205,14 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int ti
 		break;
 	}
 
-
 	zbx_vmware_lock();
 	zbx_binary_heap_insert(&vmw->jobs_queue, &elem_new);
 	zbx_vmware_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s nextcheck:%s", __func__, vmware_job_type_string(job),
 			zbx_time2str(job->nextcheck, NULL));
-}
 
-/******************************************************************************
- *                                                                            *
- * Purpose: check unused services and create job for remove the service       *
- *                                                                            *
- * Parameters: vmw      - [IN] the vmware object                              *
- *             service  - [IN] the service object                             *
- *             time_now - [IN] the current time                               *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_service_ttl_check(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int time_now)
-{
-
-	if (time_now - service->lastaccess < ZBX_VMWARE_SERVICE_TTL)
-		return;
-
-	zbx_vmware_lock();
-	service->state |= ZBX_VMWARE_STATE_REMOVING;
-	zbx_vmware_job_create(vmw, service, ZBX_VMWARE_REMOVE_SERVICE);
-	zbx_vmware_unlock();
+	return 0;
 }
 
 /******************************************************************************
@@ -254,9 +223,8 @@ static void	vmware_service_ttl_check(zbx_vmware_t *vmw, zbx_vmware_service_t *se
 ZBX_THREAD_ENTRY(vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int			time_now;
+	int			time_now, services_updated = 0, services_removed = 0;
 	double			time_stat, time_idle = 0;
-	zbx_vmware_jobs_count_t	serv_num = {0, 0};
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -284,20 +252,19 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 		{
 			zbx_setproctitle("%s #%d [updated %d, removed %d VMware services, idle " ZBX_FS_DBL
 					" sec during " ZBX_FS_DBL " sec]", get_process_type_string(process_type),
-					process_num, serv_num.updated, serv_num.removed,
+					process_num, services_updated, services_removed,
 					time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
-			serv_num.updated = 0;
-			serv_num.removed = 0;
+			services_updated = 0;
+			services_removed = 0;
 		}
 
 		while (NULL != (job = vmware_job_get(vmware, time_now)))
 		{
-			vmware_job_exec(job, &serv_num);
-			vmware_job_schedule(vmware, job, time_now);
-			vmware_service_ttl_check(vmware, job->service, time_now);
+			services_updated += vmware_job_exec(job);
+			services_removed += vmware_job_schedule(vmware, job, time_now);
 		}
 
 		if (zbx_time() - time_now <= JOB_TIMEOUT)

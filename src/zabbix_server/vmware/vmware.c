@@ -8198,9 +8198,7 @@ void	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 {
 	zbx_vmware_lock();
 
-	if (NULL != job->service)
-		job->service->jobs_num -= 1;
-
+	job->service->jobs_num -= 1;
 	__vm_shmem_free_func(job);
 
 	zbx_vmware_unlock();
