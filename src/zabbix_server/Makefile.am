@@ -52,10 +52,10 @@ libzbxserver_a_CFLAGS = \
 zabbix_server_SOURCES = server.c
 
 zabbix_server_LDADD = \
-	alerter/libzbxalerter.a \
 	dbsyncer/libzbxdbsyncer.a \
 	dbconfig/libzbxdbconfig.a \
 	diag/libzbxdiag_server.a \
+	alerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
@@ -73,16 +73,15 @@ zabbix_server_LDADD = \
 	taskmanager/libzbxtaskmanager.a \
 	odbc/libzbxodbc.a \
 	scripts/libzbxscripts.a \
-	preprocessor/libpreprocessor.a \
 	availability/libavailability.a \
 	service/libservice.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
-	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
 	libzbxserver.a \
+	stats/libzbxserver_server.a \
 	ha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -94,6 +93,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
+	preprocessor/libpreprocessor.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
@@ -102,7 +102,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself.a \
 	$(top_builddir)/src/libs/zbxself/libzbxself_server.a \
-	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_builddir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
@@ -115,9 +115,9 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
+	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxhttp/libzbxhttp.a \
-	$(top_builddir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_builddir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_builddir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
@@ -129,11 +129,11 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxdiag/libzbxdiag.a \
 	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_builddir)/src/libs/zbxtrends/libzbxtrends.a \
-	stats/libzbxserver_server.a \
 	$(top_builddir)/src/libs/zbxha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc_server.a \
 	$(top_builddir)/src/libs/zbxrtc/libzbxrtc.a \
+	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxvault/libzbxvault.a \
 	$(top_builddir)/src/libs/zbxcyberark/libzbxcyberark.a \
 	$(top_builddir)/src/libs/zbxhashicorp/libzbxhashicorp.a \
