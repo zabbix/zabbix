@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-08T11:18:49Z'
+  date: '2022-06-08T13:05:34Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1156,8 +1156,8 @@ zabbix_export:
               parameters:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                                        parseInt(value.split('.')[1]) * 100 +
-                                        parseInt(value.split('.')[2])
+                                       parseInt(value.split('.')[1]) * 100 +
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
       tags:
         -
@@ -1905,8 +1905,8 @@ zabbix_export:
               parameters:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                                        parseInt(value.split('.')[1]) * 100 +
-                                        parseInt(value.split('.')[2])
+                                       parseInt(value.split('.')[1]) * 100 +
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version < 30810 ? [{'{#SINGLETON}': ''}] : []);
         -
           uuid: ab89d103c015400fbbeecaaf9bf01400
@@ -2188,8 +2188,8 @@ zabbix_export:
               parameters:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                                        parseInt(value.split('.')[1]) * 100 +
-                                        parseInt(value.split('.')[2])
+                                       parseInt(value.split('.')[1]) * 100 +
+                                       parseInt(value.split('.')[2])
                   return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
         -
           uuid: cc1d85b6045b44b38f588cd9a4c6c62d
