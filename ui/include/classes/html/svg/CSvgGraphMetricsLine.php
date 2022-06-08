@@ -61,7 +61,7 @@ class CSvgGraphMetricsLine extends CSvgGroup {
 			'.'.$item_css_class => [
 				'stroke-opacity' => $this->options['transparency'] * 0.1,
 				'stroke' => $this->options['color'],
-				'stroke-width' => $this->options['width'] * $this->options['approximation'] == APPROXIMATION_ALL ? 2 : 1
+				'stroke-width' => $this->options['width'] * ($this->options['approximation'] == APPROXIMATION_ALL ? 2 : 1)
 			] + ($this->options['type'] == SVG_GRAPH_TYPE_LINE ? ['stroke-linejoin' => 'round'] : []),
 			'.'.$item_css_class.' circle' => [
 				'fill-opacity' => $this->options['transparency'] * 0.1,
@@ -71,7 +71,7 @@ class CSvgGraphMetricsLine extends CSvgGroup {
 			'.'.$item_css_class.' .'.CSvgGraphArea::ZBX_STYLE_CLASS => [
 				'fill-opacity' => $this->options['fill'] * 0.1,
 				'fill' => $this->options['color'],
-				'stroke-opacity' => 0.05
+				'stroke-opacity' => 0
 			],
 			'.'.$item_css_class.' .'.CSvgGraphLine::ZBX_STYLE_LINE_AUXILIARY => [
 				'stroke-width' => $this->options['width'],
