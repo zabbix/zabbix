@@ -863,7 +863,7 @@ class CSvgGraph extends CSvg {
 								'value' => $stacked_point[2],
 								'units' => $metric['units']
 							])
-							: null
+							: ''
 					];
 				}
 
@@ -1062,11 +1062,6 @@ class CSvgGraph extends CSvg {
 				$metric_path = ['line' => [], 'fill' => []];
 
 				foreach ($fragment['path'] as $point_index => $point) {
-					// TODO: SVG classes must be able to process nulls as points without labels.
-					if ($point[2] === null) {
-						$point[2] = ' ';
-					}
-
 					if ($point_index >= $fragment['line_from'] && $point_index <= $fragment['line_to']) {
 						$metric_path['line'][] = $point;
 					}

@@ -362,15 +362,18 @@ jQuery(function() {
 							? direction_string.substr(1).replace(/([ML])\s(\d+)\s(\d+)/g, '$1$2\,$3').split(' ')
 							: direction_string.substr(1).split(' '),
 						index = direction.length,
-						point;
+						point,
+						point_label;
 
 					while (index) {
 						index--;
 						point = direction[index].substr(1).split(',');
-						if (x >= parseInt(point[0])) {
+						point_label = label[data_set === 'line' ? index : Math.ceil(index / 2)];
+
+						if (x >= parseInt(point[0]) && point_label !== '') {
 							px = point[0];
 							py = point[1];
-							pv = label[data_set === 'line' ? index : Math.ceil(index / 2)];
+							pv = point_label;
 							break;
 						}
 					}
