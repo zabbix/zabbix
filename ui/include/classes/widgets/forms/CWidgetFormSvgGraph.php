@@ -51,10 +51,16 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	public function validate($strict = false): array {
 		$errors = parent::validate($strict);
 
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
 		// Percentiles
 		if ($strict && $this->fields['percentile_left']->getValue() == SVG_GRAPH_PERCENTILE_LEFT_ON) {
-			if ($this->fields['percentile_left_value']->getValue() < self::WIDGET_ITEM_PERCENTILE_MIN
-					|| $this->fields['percentile_left_value']->getValue() > self::WIDGET_ITEM_PERCENTILE_MAX) {
+			$percentile_left_value = $number_parser->parse($this->fields['percentile_left_value']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser->calcValue()
+				: null;
+
+			if ($percentile_left_value < self::WIDGET_ITEM_PERCENTILE_MIN
+					|| $percentile_left_value > self::WIDGET_ITEM_PERCENTILE_MAX) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (left)'),
 					_s('value must be between "%1$s" and "%2$s"', self::WIDGET_ITEM_PERCENTILE_MIN,
 						self::WIDGET_ITEM_PERCENTILE_MAX
@@ -64,8 +70,12 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		}
 
 		if ($strict && $this->fields['percentile_right']->getValue() == SVG_GRAPH_PERCENTILE_RIGHT_ON) {
-			if ($this->fields['percentile_right_value']->getValue() < self::WIDGET_ITEM_PERCENTILE_MIN
-					|| $this->fields['percentile_right_value']->getValue() > self::WIDGET_ITEM_PERCENTILE_MAX) {
+			$percentile_right_value = $number_parser->parse($this->fields['percentile_right_value']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser->calcValue()
+				: null;
+
+			if ($percentile_right_value < self::WIDGET_ITEM_PERCENTILE_MIN
+					|| $percentile_right_value > self::WIDGET_ITEM_PERCENTILE_MAX) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (right)'),
 					_s('value must be between "%1$s" and "%2$s"', self::WIDGET_ITEM_PERCENTILE_MIN,
 						self::WIDGET_ITEM_PERCENTILE_MAX
@@ -80,8 +90,6 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 				$this->fields['time_to']->getValue()
 			));
 		}
-
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 		// Validate Min/Max values in Axes tab.
 		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_SHOW) {

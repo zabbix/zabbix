@@ -71,6 +71,15 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
 		$parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+
+		$percentile_left_value = $parser->parse($fields['percentile_left_value']) == CParser::PARSE_SUCCESS
+			? $parser->calcValue()
+			: null;
+
+		$percentile_right_value = $parser->parse($fields['percentile_right_value']) == CParser::PARSE_SUCCESS
+			? $parser->calcValue()
+			: null;
+
 		$lefty_min = $parser->parse($fields['lefty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : null;
 		$lefty_max = $parser->parse($fields['lefty_max']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : null;
 		$righty_min = $parser->parse($fields['righty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : null;
@@ -84,9 +93,9 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'show_simple_triggers' => $fields['simple_triggers'] == SVG_GRAPH_SIMPLE_TRIGGERS_ON,
 				'show_working_time' => $fields['working_time'] == SVG_GRAPH_WORKING_TIME_ON,
 				'show_percentile_left' => $fields['percentile_left'] == SVG_GRAPH_PERCENTILE_LEFT_ON,
-				'percentile_left_value' => $fields['percentile_left_value'],
+				'percentile_left_value' => $percentile_left_value,
 				'show_percentile_right' => $fields['percentile_right'] == SVG_GRAPH_PERCENTILE_RIGHT_ON,
-				'percentile_right_value' => $fields['percentile_right_value']
+				'percentile_right_value' => $percentile_right_value
 			],
 			'time_period' => [
 				'time_from' => $time_from,
