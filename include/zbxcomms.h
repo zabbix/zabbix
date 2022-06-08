@@ -296,14 +296,6 @@ void    zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_act
 void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(void);
 
-/* typedef struct */
-/* { */
-/* 	zbx_config_tls_t	*zbx_config_tls; */
-/* 	zbx_get_program_type_f	zbx_get_program_type_cb_arg; */
-/* } */
-/* zbx_tls_init_child_args_t; */
-
-/*void	zbx_tls_init_child(zbx_tls_init_child_args_t *zbx_tls_init_child_args);*/
 void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb);
 
 void	zbx_tls_free(void);
@@ -323,7 +315,7 @@ zbx_tls_conn_attr_t;
 int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error, char *config_tls_server_cert_issuer,
-				char *config_tls_server_cert_subject);
+		char *config_tls_server_cert_subject);
 unsigned int	zbx_tls_get_psk_usage(void);
 
 /* TLS BLOCK END */
