@@ -21,6 +21,9 @@
 
 class CWidgetFormSvgGraph extends CWidgetForm {
 
+	private const WIDGET_ITEM_PERCENTILE_MIN = 1;
+	private const WIDGET_ITEM_PERCENTILE_MAX = 100;
+
 	public function __construct($data, $templateid) {
 		parent::__construct($data, $templateid, WIDGET_SVG_GRAPH);
 
@@ -47,6 +50,29 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	 */
 	public function validate($strict = false): array {
 		$errors = parent::validate($strict);
+
+		// Percentiles
+		if ($this->fields['percentile_left']->getValue() == SVG_GRAPH_PERCENTILE_LEFT_ON) {
+			if ($this->fields['percentile_left_value']->getValue() < self::WIDGET_ITEM_PERCENTILE_MIN
+					|| $this->fields['percentile_left_value']->getValue() > self::WIDGET_ITEM_PERCENTILE_MAX) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (left)'),
+					_s('value must be between "%1$s" and "%2$s"', self::WIDGET_ITEM_PERCENTILE_MIN,
+						self::WIDGET_ITEM_PERCENTILE_MAX
+					)
+				);
+			}
+		}
+
+		if ($this->fields['percentile_right']->getValue() == SVG_GRAPH_PERCENTILE_RIGHT_ON) {
+			if ($this->fields['percentile_right_value']->getValue() < self::WIDGET_ITEM_PERCENTILE_MIN
+					|| $this->fields['percentile_right_value']->getValue() > self::WIDGET_ITEM_PERCENTILE_MAX) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (right)'),
+					_s('value must be between "%1$s" and "%2$s"', self::WIDGET_ITEM_PERCENTILE_MIN,
+						self::WIDGET_ITEM_PERCENTILE_MAX
+					)
+				);
+			}
+		}
 
 		// Test graph custom time period.
 		if ($this->fields['graph_time']->getValue() == SVG_GRAPH_CUSTOM_TIME) {
