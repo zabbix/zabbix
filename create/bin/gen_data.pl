@@ -296,8 +296,8 @@ sub main
 			elsif ($type eq 'ROW')		{ process_row($line); }
 		}
 	}
-	
-	print "delete from changelog$output{'exec_cmd'}";
+
+	print "DELETE FROM changelog$output{'exec_cmd'}";
 
 	print $output{"after"};
 }
