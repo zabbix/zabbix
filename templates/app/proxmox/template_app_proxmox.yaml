@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-21T13:07:34Z'
-  groups:
+  date: '2022-06-07T20:49:37Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -10,7 +10,7 @@ zabbix_export:
       uuid: 4958b76448d74ff1b6d7d6280449beee
       template: 'Proxmox VE by HTTP'
       name: 'Proxmox VE by HTTP'
-      description: 'Template tooling version used: 0.41'
+      description: 'Template tooling version used: 0.42'
       groups:
         -
           name: Templates/Applications
@@ -527,7 +527,7 @@ zabbix_export:
                   name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME}]: has been restarted'
                   event_name: 'Proxmox: LXC [{#NODE.NAME}/{#LXC.NAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1273,7 +1273,7 @@ zabbix_export:
                   name: 'Proxmox: Node [{#NODE.NAME}]: has been restarted'
                   event_name: 'Proxmox: Node [{#NODE.NAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1780,7 +1780,7 @@ zabbix_export:
                   name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: has been restarted'
                   event_name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME}]: has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1843,23 +1843,6 @@ zabbix_export:
                     host: 'Proxmox VE by HTTP'
                     key: 'proxmox.qemu.cpu[{#QEMU.ID}]'
             -
-              uuid: 391421ce25c74c14abe35723965f3357
-              name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Disk usage'
-              graph_items:
-                -
-                  drawtype: GRADIENT_LINE
-                  color: 1A7C11
-                  item:
-                    host: 'Proxmox VE by HTTP'
-                    key: 'proxmox.qemu.diskwrite[{#QEMU.ID}]'
-                -
-                  sortorder: '1'
-                  drawtype: GRADIENT_LINE
-                  color: 2774A4
-                  item:
-                    host: 'Proxmox VE by HTTP'
-                    key: 'proxmox.qemu.diskread[{#QEMU.ID}]'
-            -
               uuid: 8522e98f30104f67bfdd1aff8b94d280
               name: 'Proxmox: VM [{#NODE.NAME}/{#QEMU.NAME} ({#QEMU.ID})]: Memory usage'
               graph_items:
@@ -1885,7 +1868,20 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.diskwrite[{#QEMU.ID}]'
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Proxmox VE by HTTP'
                     key: 'proxmox.qemu.netin[{#QEMU.ID}]'
+                -
+                  sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 2774A4
+                  item:
+                    host: 'Proxmox VE by HTTP'
+                    key: 'proxmox.qemu.diskread[{#QEMU.ID}]'
                 -
                   sortorder: '1'
                   drawtype: GRADIENT_LINE
