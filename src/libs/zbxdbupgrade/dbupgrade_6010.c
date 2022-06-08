@@ -940,6 +940,33 @@ static int	DBpatch_6010040(void)
 
 	return SUCCEED;
 }
+static int	DBpatch_6010041(void)
+{
+	const ZBX_FIELD	field = {"suppress_until", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_6010042(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("event_suppress", &field);
+}
+
+static int	DBpatch_6010043(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_suppress", 3, &field);
+}
+
+static int	DBpatch_6010044(void)
+{
+	const ZBX_FIELD field = {"parent_taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBmodify_field_type("task_data", &field, NULL);
+}
 #endif
 
 DBPATCH_START(6010)
@@ -986,5 +1013,9 @@ DBPATCH_ADD(6010037, 0, 1)
 DBPATCH_ADD(6010038, 0, 1)
 DBPATCH_ADD(6010039, 0, 1)
 DBPATCH_ADD(6010040, 0, 1)
+DBPATCH_ADD(6010041, 0, 1)
+DBPATCH_ADD(6010042, 0, 1)
+DBPATCH_ADD(6010043, 0, 1)
+DBPATCH_ADD(6010044, 0, 1)
 
 DBPATCH_END()

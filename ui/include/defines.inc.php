@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.2.0rc1');
 define('ZABBIX_API_VERSION',	'6.2.0');
 define('ZABBIX_EXPORT_VERSION',	'6.2');
 
-define('ZABBIX_DB_VERSION',		6010040);
+define('ZABBIX_DB_VERSION',		6010044);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1018,12 +1018,17 @@ define('ZBX_ACKNOWLEDGE_PROBLEM',	1);
 define('ZBX_PROBLEM_SUPPRESSED_FALSE',	0);
 define('ZBX_PROBLEM_SUPPRESSED_TRUE',	1);
 
+define('ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE',	0);
+define('ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE',	1);
+
 define('ZBX_PROBLEM_UPDATE_NONE',			0x00);
 define('ZBX_PROBLEM_UPDATE_CLOSE',			0x01);
 define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',	0x02);
 define('ZBX_PROBLEM_UPDATE_MESSAGE',		0x04);
 define('ZBX_PROBLEM_UPDATE_SEVERITY',		0x08);
 define('ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE',	0x10);
+define('ZBX_PROBLEM_UPDATE_SUPPRESS',	    0x20);
+define('ZBX_PROBLEM_UPDATE_UNSUPPRESS',	    0x40);
 
 define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',		0);
 define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
@@ -1038,8 +1043,12 @@ define('ZBX_TM_TASK_DATA',			7);
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
 
+define('ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS', 'suppress');
+define('ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS', 'unsuppress');
+
 define('ZBX_TM_DATA_TYPE_DIAGINFO',			1);
 define('ZBX_TM_DATA_TYPE_PROXY_HOSTIDS',	2);
+define('ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION', 5);
 define('ZBX_TM_DATA_TYPE_CHECK_NOW',		6);
 
 define('EVENT_SOURCE_TRIGGERS',			0);
@@ -1923,6 +1932,8 @@ define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
 define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
 define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
 define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
+define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
+define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
 define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
 define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');
