@@ -25,7 +25,7 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup profiles
  *
- *  @onBefore prepareDashboardData
+ * @onBefore prepareDashboardData
  */
 class testPageDashboard extends CLegacyWebTest {
 
