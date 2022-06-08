@@ -40,7 +40,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-		$this->setValidationRules(['type' => API_OBJECT, 'fields' => [
+		$this->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 			'dataset_type'			=> ['type' => API_INT32, 'in' => implode(',', [CWidgetHelper::DATASET_TYPE_SINGLE_ITEM, CWidgetHelper::DATASET_TYPE_PATTERN_ITEM])],
 			'hosts'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
 			'items'					=> ['type' => API_STRINGS_UTF8, 'flags' => null],
@@ -158,6 +158,9 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				if (!CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
 					$errors[] = $error;
 				}
+			}
+			else {
+				$validation_rules['type'] = API_OBJECT;
 			}
 
 			foreach ($value as $i => $data) {
