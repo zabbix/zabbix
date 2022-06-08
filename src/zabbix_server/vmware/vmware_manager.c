@@ -29,12 +29,6 @@ extern int				CONFIG_VMWARE_PERF_FREQUENCY;
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
-extern unsigned char			program_type;
-extern ZBX_THREAD_LOCAL int		server_num, process_num;
-
-extern zbx_vmware_t			*vmware;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: return string value of vmware job types                           *
@@ -187,8 +181,12 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int ti
 ZBX_THREAD_ENTRY(vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int			time_now, services_updated = 0, services_removed = 0;
-	double			time_stat, time_idle = 0;
+	extern unsigned char			program_type;
+	extern ZBX_THREAD_LOCAL unsigned char	process_type;
+	extern ZBX_THREAD_LOCAL int		server_num, process_num;
+	extern zbx_vmware_t			*vmware;
+	int					time_now, services_updated = 0, services_removed = 0;
+	double					time_stat, time_idle = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
