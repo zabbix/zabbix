@@ -261,6 +261,16 @@ class CDBHelper {
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
 			$cmd = '';
+			$db_extension = '';
+
+			$sql = 'SELECT db_extension'.
+				' FROM config';
+
+			$res = DBfetch(DBselect($sql));
+
+			if ($res) {
+				$db_extension = $res['db_extension'];
+			}
 
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
@@ -277,6 +287,10 @@ class CDBHelper {
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 
 			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' -d'.$db_name.' -f'.$file;
+
+			if ($db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+				$cmd .= ' 2>/dev/null';
+			}
 
 			exec($cmd, $output, $result_code);
 
@@ -308,23 +322,45 @@ class CDBHelper {
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
 			$cmd = '';
+			$cmd_tdb = '';
+			$db_extension = '';
+			
+			$sql = 'SELECT db_extension'.
+				' FROM config';
+
+			$res = DBfetch(DBselect($sql));
+
+			if ($res) {
+				$db_extension = $res['db_extension'];
+			}
 
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
 			}
 			$server = ($DB['SERVER'] !== '') ? ' -h'.$DB['SERVER'] : '';
 
-			$cmd .= ' pg_restore'.$server;
+			$cmd .= 'pg_restore'.$server;
 
+			$port = '';
 			if ($DB['PORT'] !== '' && $DB['PORT'] != 0) {
-				$cmd .= ' -p'.$DB['PORT'];
+				$port .= ' -p'.$DB['PORT'];
 			}
+			$cmd .= $port;
 
 			$db_name = $DB['DATABASE'];
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 
 			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 --clean -d'.$db_name.' '.$file;
-			exec($cmd, $output, $result_code);
+
+			if ($db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+				$cmd_tdb .= 'psql -U '.$DB['USER'].$server.$port.' -c "SELECT timescaledb_pre_restore();" \\';
+				$cmd_tdb .= $cmd .' 2>/dev/null; \\';
+				$cmd_tdb .= 'psql -U '.$DB['USER'].$server.$port.' -c "SELECT timescaledb_post_restore();" \\';
+				exec($cmd_tdb, $output, $result_code);
+			}
+			else {
+				exec($cmd, $output, $result_code);
+			}
 
 			if ($result_code != 0) {
 				throw new Exception('Failed to restore "'.$file.'".');
