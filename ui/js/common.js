@@ -611,11 +611,11 @@ function addValues(frame, values) {
 			frm_storage = document.getElementById(key);
 		}
 
-		if (jQuery(frm_storage).is('span')) {
-			jQuery(frm_storage).html(values[key]);
+		if (jQuery(frm_storage).is(':input')) {
+			jQuery(frm_storage).val(values[key]).change();
 		}
 		else {
-			jQuery(frm_storage).val(values[key]).change();
+			jQuery(frm_storage).html(values[key]);
 		}
 	}
 }

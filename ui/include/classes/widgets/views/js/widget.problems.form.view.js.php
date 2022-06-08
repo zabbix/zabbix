@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,16 +17,17 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+?>
 
 
-class CSvgText extends CSvgTag {
+window.widget_problems_form = new class {
 
-	public function __construct(string $text, $x = 0, $y = 0) {
-		parent::__construct('text');
+	init({sort_with_enabled_show_timeline}) {
+		document.getElementById('sort_triggers').addEventListener('change', (e) => {
+			const show_timeline = document.getElementById('show_timeline');
 
-		$this
-			->addItem($text)
-			->setAttribute('x', $x)
-			->setAttribute('y', $y);
+			show_timeline.disabled = !sort_with_enabled_show_timeline[e.target.value];
+			show_timeline.checked = !show_timeline.disabled;
+		});
 	}
-}
+};

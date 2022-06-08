@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -19,37 +19,42 @@
 **/
 
 
-class CSvgPath extends CSvgTag {
+class CSvgGraphClipArea extends CSvgTag {
 
-	protected $directions;
-	protected $last_value = 0;
+	private $area_id;
 
-	public function __construct($directions = '') {
-		parent::__construct('path');
+	public function __construct(string $area_id) {
+		parent::__construct('clipPath');
 
-		$this->directions = $directions;
+		$this->area_id = $area_id;
 	}
 
-	public function moveTo($x, $y): self {
-		$this->directions .= ' M'.floor($x).','.ceil($y);
-
-		return $this;
+	public function makeStyles(): array {
+		return [
+			'.'.CSvgGraphArea::ZBX_STYLE_CLASS => [
+				'clip-path' => 'url(#'.$this->area_id.')'
+			],
+			'[data-metric]' => [
+				'clip-path' => 'url(#'.$this->area_id.')'
+			]
+		];
 	}
 
-	public function lineTo($x, $y): self {
-		$this->directions .= ' L'.floor($x).','.ceil($y);
-
-		return $this;
+	protected function draw(): void {
+		$this->addItem(
+			(new CSvgPath(implode(' ', [
+				'M'.$this->x.','.($this->y - 3),
+				'H'.($this->width + $this->x),
+				'V'.($this->height + $this->y),
+				'H'.($this->x)
+			])))
+		);
 	}
 
-	public function closePath(): self {
-		$this->directions .= ' Z';
-
-		return $this;
-	}
-
-	public function toString($destroy = true): string {
-		$this->setAttribute('d', trim($this->directions));
+	public function toString($destroy = true) {
+		$this
+			->setAttribute('id', $this->area_id)
+			->draw();
 
 		return parent::toString($destroy);
 	}

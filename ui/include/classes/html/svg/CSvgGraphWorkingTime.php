@@ -19,37 +19,50 @@
 **/
 
 
-class CSvgPath extends CSvgTag {
+class CSvgGraphWorkingTime extends CSvgGroup {
 
-	protected $directions;
-	protected $last_value = 0;
+	private const ZBX_STYLE_CLASS = 'svg-graph-working-time';
 
-	public function __construct($directions = '') {
-		parent::__construct('path');
+	private $points;
 
-		$this->directions = $directions;
+	private $color;
+
+	public function __construct(array $points) {
+		parent::__construct();
+
+		$this->points = $points;
 	}
 
-	public function moveTo($x, $y): self {
-		$this->directions .= ' M'.floor($x).','.ceil($y);
+	public function setColor(string $color): self {
+		$this->color = $color;
 
 		return $this;
 	}
 
-	public function lineTo($x, $y): self {
-		$this->directions .= ' L'.floor($x).','.ceil($y);
-
-		return $this;
+	public function makeStyles(): array {
+		return [
+			'.'.self::ZBX_STYLE_CLASS => [
+				'fill' => $this->color
+			]
+		];
 	}
 
-	public function closePath(): self {
-		$this->directions .= ' Z';
-
-		return $this;
+	private function draw(): void {
+		for ($i = 0, $count = count($this->points); $i < $count; $i += 2) {
+			if ($this->points[$i] != $this->points[$i + 1]) {
+				$this->addItem([
+					(new CSvgRect($this->points[$i] + $this->x, $this->y, $this->points[$i + 1] - $this->points[$i],
+						$this->height
+					))
+				]);
+			}
+		}
 	}
 
 	public function toString($destroy = true): string {
-		$this->setAttribute('d', trim($this->directions));
+		$this
+			->addClass(self::ZBX_STYLE_CLASS)
+			->draw();
 
 		return parent::toString($destroy);
 	}
