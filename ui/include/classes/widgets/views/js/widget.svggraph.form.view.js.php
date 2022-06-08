@@ -373,6 +373,7 @@ window.widget_svggraph_form = new class {
 			(!on || jQuery("#lefty_units").val() != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>));
 
 		jQuery("#percentile_left").prop("disabled", !on);
+		jQuery("#percentile_left_value").prop("disabled", !on);
 	}
 
 	onRightYChange() {
@@ -389,6 +390,7 @@ window.widget_svggraph_form = new class {
 
 
 		jQuery("#percentile_right").prop("disabled", !on);
+		jQuery("#percentile_right_value").prop("disabled", !on);
 	}
 
 	onGraphConfigChange() {
