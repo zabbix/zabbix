@@ -1188,7 +1188,8 @@ class testHost extends CAPITest {
 					'tags' => [
 						[
 							'tag' => 'b',
-							'value' => 'b'
+							'value' => 'b',
+							'automatic' => '0'
 						]
 					]
 				]
