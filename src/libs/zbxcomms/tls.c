@@ -151,8 +151,8 @@ void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls)
 	zbx_config_tls->CONFIG_TLS_CIPHER_PSK		= NULL;
 	zbx_config_tls->CONFIG_TLS_CIPHER_ALL13		= NULL;
 	zbx_config_tls->CONFIG_TLS_CIPHER_ALL		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CMD13		= NULL;	/* not used in agent, defined for linking with tls.c */
-	zbx_config_tls->CONFIG_TLS_CIPHER_CMD		= NULL;	/* not used in agent, defined for linking with tls.c */
+	zbx_config_tls->CONFIG_TLS_CIPHER_CMD13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CMD		= NULL;
 }
 
 static ZBX_THREAD_LOCAL char		*my_psk_identity	= NULL;
@@ -2254,7 +2254,6 @@ static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, co
 	}
 }
 
-//void	zbx_tls_init_child(zbx_tls_init_child_args_t	*tls_init_child_args)
 void	zbx_tls_init_child(zbx_config_tls_t	*zbx_config_tls, zbx_get_program_type_f	zbx_get_program_type_cb_arg)
 {
 	int			res;
@@ -2427,7 +2426,7 @@ void	zbx_tls_init_child(zbx_config_tls_t	*zbx_config_tls, zbx_get_program_type_f
 	{
 		const char	*priority_str;
 
-		if (NULL == CONFIG_TLS_CIPHER_CERT)
+		if (NULL == zbx_config_tls->CONFIG_TLS_CIPHER_CERT)
 		{
 			/* for GnuTLS 3.1.18 and up */
 			priority_str = "NONE:+VERS-TLS1.2:+ECDHE-RSA:+RSA:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:"
@@ -2438,7 +2437,7 @@ void	zbx_tls_init_child(zbx_config_tls_t	*zbx_config_tls, zbx_get_program_type_f
 		}
 		else
 		{
-			priority_str = CONFIG_TLS_CIPHER_CERT;
+			priority_str = zbx_config_tls->CONFIG_TLS_CIPHER_CERT;
 
 			zbx_gnutls_priority_init_or_exit(&ciphersuites_cert, priority_str,
 					"\"ciphersuites_cert\" with TLSCipherCert or --tls-cipher parameter");
