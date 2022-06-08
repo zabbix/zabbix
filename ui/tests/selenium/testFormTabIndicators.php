@@ -720,7 +720,7 @@ class testFormTabIndicators extends CWebTest {
 
 		// Specify an operation of each type and check indicator value.
 		foreach (['Operations', 'Recovery operations', 'Update operations'] as $operation) {
-			$form->getField($operation)->query('button:Add')->one()->click();
+			$form->getField($operation)->query('button:Add')->one()->waitUntilClickable()->click();
 			$operations_overlay = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 			$operations_overlay->getField('Send to users')->query('button:Add')->one()->click();
 
@@ -739,38 +739,59 @@ class testFormTabIndicators extends CWebTest {
 	}
 
 	public function testFormTabIndicators_CheckUserGroupIndicators() {
+		$data = [
+			[
+				'tab_name' => 'Host permissions',
+				'group_table' => 'group-right-table',
+				'multiselect' => 'new_group_right_groupids_',
+				'segmentedradio' => 'new_group_right_permission',
+				'add_group_table' => 'new-group-right-table',
+				'group_name' => 'Discovered hosts'
+			],
+			[
+				'tab_name' => 'Template permissions',
+				'group_table' => 'templategroup-right-table',
+				'multiselect' => 'new_templategroup_right_groupids_',
+				'segmentedradio' => 'new_templategroup_right_permission',
+				'add_group_table' => 'new-templategroup-right-table',
+				'group_name' => 'Templates/Power'
+			]
+		];
+
 		$this->page->login()->open('zabbix.php?action=usergroup.edit')->waitUntilReady();
-		$permissions_table = $this->query('id:group-right-table')->one();
 		$tag_table = $this->query('id:tag-filter-table')->one();
 
 		// Check status indicator in Permissions tab.
 		$form = $this->query('id:user-group-form')->asForm()->one();
-		$form->selectTab('Permissions');
-		$tab_selector = $form->query('xpath:.//a[text()="Permissions"]')->one();
-		$this->assertTabIndicator($tab_selector, false);
+		foreach ($data as $permissions) {
+			$permissions_table = $this->query('id', $permissions['group_table'])->one();
+			$form->selectTab($permissions['tab_name']);
+			$tab_selector = $form->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($permissions['tab_name']).']')->one();
+			$this->assertTabIndicator($tab_selector, false);
 
-		// Add read permissions to Discovered hosts group and check indicator.
-		$group_selector = $form->query('xpath:.//div[@id="new_group_right_groupids_"]/..')->asMultiselect()->one();
-		$group_selector->fill('Discovered hosts');
-		$permission_level = $form->query('id:new_group_right_permission')->asSegmentedRadio()->one();
-		$permission_level->fill('Read');
-		$add_button = $form->query('id:new-group-right-table')->query('button:Add')->one();
-		$add_button->click();
-		$permissions_table->waitUntilReloaded();
-		$tab_selector->waitUntilReady();
-		$this->assertTabIndicator($tab_selector, true);
+			// Add read permissions to Discovered hosts group and check indicator.
+			$group_selector = $form->query('xpath:.//div[@id="'.$permissions['multiselect'].'"]/..')->asMultiselect()->one();
+			$group_selector->fill($permissions['group_name']);
+			$permission_level = $form->query('id', $permissions['segmentedradio'])->asSegmentedRadio()->one();
+			$permission_level->fill('Read');
+			$add_button = $form->query('id', $permissions['add_group_table'])->query('button:Add')->one();
+			$add_button->click();
+			$permissions_table->waitUntilReloaded();
+			$tab_selector->waitUntilReady();
+			$this->assertTabIndicator($tab_selector, true);
 
-		// Remove read permissions from Discovered hosts group and check indicator.
-		$group_selector->fill('Discovered hosts');
-		$permission_level->fill('None');
-		$add_button->click();
-		$permissions_table->waitUntilReloaded();
-		$tab_selector->waitUntilReady();
-		$this->assertTabIndicator($tab_selector, false);
+			// Remove read permissions from Discovered hosts group and check indicator.
+			$group_selector->fill($permissions['group_name']);
+			$permission_level->fill('None');
+			$add_button->click();
+			$permissions_table->waitUntilReloaded();
+			$tab_selector->waitUntilReady();
+			$this->assertTabIndicator($tab_selector, false);
+		}
 
 		// Check status indicator in Tag filter tab.
-		$form->selectTab('Tag filter');
-		$tab_selector = $form->query('xpath:.//a[text()="Tag filter"]')->one();
+		$form->selectTab('Problem tag filter');
+		$tab_selector = $form->query('xpath:.//a[text()="Problem tag filter"]')->one();
 		$this->assertTabIndicator($tab_selector, false);
 
 		// Add tag filter for Discovered hosts group and check indicator.

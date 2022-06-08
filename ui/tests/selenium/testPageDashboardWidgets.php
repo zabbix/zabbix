@@ -44,7 +44,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->checkLastSelectedWidgetType();
 
 		// Making changes in widget form that are not "Widget type".
-		$form_problems = $dashboard->getWidget('Problems')->edit();
+		$form_problems = $dashboard->getWidget('Current problems')->edit();
 		$this->assertEquals('Problems', $form_problems->getField('Type')->getValue());
 		$data =[
 			'Name' => 'check widget type',

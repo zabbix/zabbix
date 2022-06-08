@@ -153,7 +153,7 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 	}
 
 	if ($groupids) {
-		$groups_allowed = API::HostGroup()->get([
+		$groups_allowed = API::TemplateGroup()->get([
 			'output' => [],
 			'groupids' => $groupids,
 			'editable' => true,
@@ -221,7 +221,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($new_groups) {
-			$new_groupid = API::HostGroup()->create($new_groups);
+			$new_groupid = API::TemplateGroup()->create($new_groups);
 
 			if (!$new_groupid) {
 				throw new Exception();
@@ -553,7 +553,7 @@ if (hasRequest('form')) {
 	if ($data['templateid'] != 0) {
 		$dbTemplates = API::Template()->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectGroups' => API_OUTPUT_EXTEND,
+			'selectTemplateGroups' => ['groupid'],
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectMacros' => API_OUTPUT_EXTEND,
 			'selectTags' => ['tag', 'value'],
@@ -638,7 +638,7 @@ if (hasRequest('form')) {
 
 	if (!hasRequest('form_refresh')) {
 		if ($data['templateid'] != 0) {
-			$groups = zbx_objectValues($data['dbTemplate']['groups'], 'groupid');
+			$groups = array_column($data['dbTemplate']['templategroups'], 'groupid');
 		}
 		else {
 			$groups = getRequest('groupids', []);
@@ -660,7 +660,7 @@ if (hasRequest('form')) {
 
 	// Groups with R and RW permissions.
 	$groups_all = $groupids
-		? API::HostGroup()->get([
+		? API::TemplateGroup()->get([
 			'output' => ['name'],
 			'groupids' => $groupids,
 			'preservekeys' => true
@@ -669,7 +669,7 @@ if (hasRequest('form')) {
 
 	// Groups with RW permissions.
 	$groups_rw = $groupids && (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
-		? API::HostGroup()->get([
+		? API::TemplateGroup()->get([
 			'output' => [],
 			'groupids' => $groupids,
 			'editable' => true,
@@ -793,9 +793,9 @@ else {
 		]), ['templateid' => 'id'])
 		: [];
 
-	// Get host groups.
+	// Get template groups.
 	$filter['groups'] = $filter['groups']
-		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
+		? CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter['groups'],
 			'editable' => true,
@@ -805,7 +805,7 @@ else {
 
 	$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
 	if ($filter_groupids) {
-		$filter_groupids = getSubGroups($filter_groupids);
+		$filter_groupids = getTemplateSubGroups($filter_groupids);
 	}
 
 	// Select templates.

@@ -64,7 +64,8 @@ class CControllerPopupImportCompare extends CController {
 
 	protected function doAction(): void {
 		$rules = [
-			'groups' => ['updateExisting' => false, 'createMissing' => false],
+			'host_groups' => ['updateExisting' => false, 'createMissing' => false],
+			'template_groups' => ['updateExisting' => false, 'createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
 			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -83,7 +84,8 @@ class CControllerPopupImportCompare extends CController {
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
 			case 'template':
-				$rules['groups'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['host_groups'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['template_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => false
@@ -162,7 +164,8 @@ class CControllerPopupImportCompare extends CController {
 			'added' => _('Added')
 		];
 		$names = [
-			'groups' => _('Groups'),
+			'host_groups' => _('Host groups'),
+			'template_groups' => _('Template groups'),
 			'templates' => _('Templates'),
 			'triggers' => _('Triggers'),
 			'graphs' => _('Graphs'),

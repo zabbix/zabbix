@@ -13362,19 +13362,19 @@ static const zbx_um_cache_t	*dc_um_get_cache(const zbx_dc_um_handle_t *um_handle
  *           user macro cache in the configuration cache.                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle)
+void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle)
 {
-	if (NULL == handle->prev && NULL != *handle->cache)
+	if (NULL == um_handle->prev && NULL != *um_handle->cache)
 	{
 		WRLOCK_CACHE;
-		um_cache_release(*handle->cache);
+		um_cache_release(*um_handle->cache);
 		UNLOCK_CACHE;
 
-		*handle->cache = NULL;
+		*um_handle->cache = NULL;
 	}
 
-	dc_um_handle = handle->prev;
-	zbx_free(handle);
+	dc_um_handle = um_handle->prev;
+	zbx_free(um_handle);
 }
 
 /******************************************************************************
