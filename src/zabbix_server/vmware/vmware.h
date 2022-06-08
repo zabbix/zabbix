@@ -447,7 +447,6 @@ typedef struct
 #define ZBX_VMWARE_UPDATE_CONF		1
 #define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
 #define ZBX_VMWARE_UPDATE_REST_TAGS	3
-#define ZBX_VMWARE_REMOVE_SERVICE	4
 	int			type;
 	int			expired;
 	zbx_vmware_service_t	*service;

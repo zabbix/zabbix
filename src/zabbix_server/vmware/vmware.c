@@ -8199,21 +8199,20 @@ void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 {
 	zbx_vmware_service_t	*service = job->service;
+	int			jobs_num = 0;
 
 	zbx_vmware_lock();
 
 	job->service->jobs_num -= 1;
+	jobs_num = job->service->jobs_num;
 	__vm_shmem_free_func(job);
 
 	zbx_vmware_unlock();
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d", __func__, service->jobs_num);
-
-	if (0 == service->jobs_num)
-	{
+	if (0 == jobs_num)
 		zbx_vmware_service_remove(service);
-		return 1;
-	}
 
-	return 0;
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d", __func__, jobs_num);
+
+	return 0 == jobs_num ? 1 : 0;
 }

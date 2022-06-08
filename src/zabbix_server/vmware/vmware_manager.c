@@ -61,7 +61,7 @@ static char	*vmware_job_type_string(zbx_vmware_job_t *job)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: pick the next job from the queue                                  *
+ * Purpose: pick the next job from the queue and service ttl check            *
  *                                                                            *
  * Parameters: vmw      - [IN] the vmware object                              *
  *             time_now - [IN] the current time                               *
@@ -107,11 +107,9 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute task of job and increase the statistics counters          *
+ * Purpose: execute task of job                                               *
  *                                                                            *
- * Parameters: vmw      - [IN] the vmware object                              *
- *             job      - [IN] the job object                                 *
- *             jobs_num - [IN/OUT] the statistics counters                    *
+ * Parameters: job - [IN] the job object                                      *
  *                                                                            *
  * Return value: count of successfully executed jobs                          *
  *                                                                            *
@@ -171,9 +169,6 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int ti
 		job->nextcheck = time_now + ZBX_VMWARE_PERF_UPDATE_PERIOD;
 		break;
 	case ZBX_VMWARE_UPDATE_REST_TAGS:
-		job->nextcheck = time_now + ZBX_VMWARE_CACHE_UPDATE_PERIOD;
-		break;
-	case ZBX_VMWARE_REMOVE_SERVICE:
 		job->nextcheck = time_now + ZBX_VMWARE_CACHE_UPDATE_PERIOD;
 		break;
 	}
