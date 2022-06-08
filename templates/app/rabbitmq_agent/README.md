@@ -9,29 +9,6 @@ Most of the metrics are collected in one go, thanks to Zabbix bulk data collecti
 
   Template `RabbitMQ Cluster` — collects metrics by polling [RabbitMQ management plugin](https://www.rabbitmq.com/management.html) with Zabbix agent.
 
-_setup: |
-  Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
-
-  Create a user to monitor the service:
-
-  ```bash
-  rabbitmqctl add_user zbx_monitor <PASSWORD>
-  rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
-  rabbitmqctl set_user_tags zbx_monitor monitoring
-  ```
-
-  Login and password are also set in macros:
-
-  - {$RABBITMQ.API.USER}
-  - {$RABBITMQ.API.PASSWORD}
-
-  If your cluster consists of several nodes, it is recommended to assign the `cluster` template to a separate balancing host.
-  In the case of a single-node installation, you can assign the `cluster` template to one host with a `node` template.
-
-  If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.CLUSTER_HOST}` macro.
-
-  Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
-
 
 
 This template was tested on:
@@ -42,7 +19,28 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
-Refer to the vendor documentation.
+Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
+
+Create a user to monitor the service:
+
+```bash
+rabbitmqctl add_user zbx_monitor <PASSWORD>
+rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
+rabbitmqctl set_user_tags zbx_monitor monitoring
+```
+
+Login and password are also set in macros:
+
+- {$RABBITMQ.API.USER}
+- {$RABBITMQ.API.PASSWORD}
+
+If your cluster consists of several nodes, it is recommended to assign the `cluster` template to a separate balancing host.
+In the case of a single-node installation, you can assign the `cluster` template to one host with a `node` template.
+
+If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.CLUSTER_HOST}` macro.
+
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
+
 
 ## Zabbix configuration
 

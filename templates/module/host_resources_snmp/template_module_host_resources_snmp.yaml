@@ -903,4 +903,4 @@ zabbix_export:
           color: 1A7C11
           item:
             host: 'HOST-RESOURCES-MIB CPU SNMP'
-            key: system.cpu.util    
+            key: system.cpu.util
