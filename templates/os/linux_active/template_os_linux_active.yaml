@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:33:41Z'
+  date: '2022-06-08T10:14:58Z'
   template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
@@ -19,7 +19,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387225-discussion-thread-for-official-zabbix-template-for-linux
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: 'Templates/Operating systems'
@@ -789,7 +789,7 @@ zabbix_export:
                   tag: scope
                   value: performance
         -
-          uuid: 090fb1a5698e4e7080abf379b377b6f5
+          uuid: 086b2ca542f24b4089a1fc43eeea2f42
           name: 'Active agent availability'
           type: INTERNAL
           key: 'zabbix[host,active_agent,available]'
@@ -811,7 +811,7 @@ zabbix_export:
               value: network
           triggers:
             -
-              uuid: a022259fc3cf454f93bc82cca27391f1
+              uuid: 153cc67416614c13878a6f5655d99b09
               expression: 'min(/Linux by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
               name: 'Zabbix agent: active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -2298,7 +2298,7 @@ zabbix_export:
               value: '826'
               newvalue: 'Vsock monitor header'
         -
-          uuid: d4a5821461a243c9bf320ea58be1af23
+          uuid: c75840508f98402498289c5f99e0d59e
           name: zabbix.host.active_agent.available
           mappings:
             -

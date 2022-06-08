@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:36:40Z'
+  date: '2022-06-08T10:32:31Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -13,7 +13,9 @@ zabbix_export:
       description: |
         Get cluster metrics from RabbitMQ management plugin provided an HTTP-based API using HTTP agent.
         
-        Template tooling version used: 0.41
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
+        
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -1295,7 +1297,7 @@ zabbix_export:
       description: |
         Get node metrics from RabbitMQ management plugin provided an HTTP-based API using HTTP agent.
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications

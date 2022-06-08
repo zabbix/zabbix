@@ -24,8 +24,6 @@ _setup: |
 
   - {$RABBITMQ.API.USER}
   - {$RABBITMQ.API.PASSWORD}
-_zabbix_forum_url: https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
-_template_type: HTTP
 
 
 This template was tested on:
@@ -33,6 +31,8 @@ This template was tested on:
 - RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.7.7, 3.8.5, 3.8.12
 
 ## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Refer to the vendor documentation.
 
@@ -120,6 +120,8 @@ There are no template links in this template.
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
+
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
 
 # RabbitMQ node by HTTP
 

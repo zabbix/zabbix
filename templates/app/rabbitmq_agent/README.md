@@ -32,8 +32,6 @@ _setup: |
 
   Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
 
-_zabbix_forum_url: https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
-_template_type: AGENT
 
 
 This template was tested on:
@@ -41,6 +39,8 @@ This template was tested on:
 - RabbitMQ, version 3.5.7, 3.7.17, 3.7.18, 3.7.7, 3.8.5, 3.8.12
 
 ## Setup
+
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Refer to the vendor documentation.
 
@@ -130,6 +130,8 @@ There are no template links in this template.
 
 Please report any issues with the template at https://support.zabbix.com
 
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
+
 # RabbitMQ node by Zabbix agent
 
 ## Overview
@@ -142,26 +144,6 @@ Most of the metrics are collected in one go, thanks to Zabbix bulk data collecti
 
   It also uses Zabbix agent to collect `RabbitMQ` Linux process stats like CPU usage, memory usage and whether process is running or not.
 
-_setup: |
-  Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
-
-  Create a user to monitor the service:
-
-  ```bash
-  rabbitmqctl add_user zbx_monitor <PASSWORD>
-  rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
-  rabbitmqctl set_user_tags zbx_monitor monitoring
-  ```
-
-  Login and password are also set in macros:
-
-  - {$RABBITMQ.API.USER}
-  - {$RABBITMQ.API.PASSWORD}
-
-  If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.HOST}` macro.
-  Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
-
-_zabbix_forum_url: https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq
 
 
 This template was tested on:
@@ -170,7 +152,24 @@ This template was tested on:
 
 ## Setup
 
-Refer to the vendor documentation.
+Enable the RabbitMQ management plugin. See [RabbitMQ's documentation](https://www.rabbitmq.com/management.html) to enable it.
+
+Create a user to monitor the service:
+
+```bash
+rabbitmqctl add_user zbx_monitor <PASSWORD>
+rabbitmqctl set_permissions  -p / zbx_monitor "" "" ".*"
+rabbitmqctl set_user_tags zbx_monitor monitoring
+```
+
+Login and password are also set in macros:
+
+- {$RABBITMQ.API.USER}
+- {$RABBITMQ.API.PASSWORD}
+
+If you use another API endpoint, then don't forget to change `{$RABBITMQ.API.HOST}` macro.
+Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.2/manual/installation/install_from_packages).
+
 
 ## Zabbix configuration
 
@@ -282,4 +281,6 @@ There are no template links in this template.
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
+
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387226-discussion-thread-for-official-zabbix-template-rabbitmq).
 
