@@ -144,6 +144,9 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 				LIBPCRE2_CFLAGS=`$PKG_CONFIG --cflags libpcre2-8`
 
 				if test "x$enable_static_libs" = "xyes" && test "x$static_linking_support" = "xno"; then
+					if test -z "$libpcre2_dir"; then
+						AC_MSG_ERROR([libpcre2 directory must be given explicitly if static libs are used])
+					fi
 					LIBPCRE2_LIBS="$libpcre2_dir/lib/libpcre2-8.a"
 				else
 					LIBPCRE2_LDFLAGS=`$PKG_CONFIG --libs-only-L libpcre2-8`

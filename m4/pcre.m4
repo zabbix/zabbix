@@ -144,6 +144,9 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 				LIBPCRE_CFLAGS=`$PKG_CONFIG --cflags libpcre`
 
 				if test "x$enable_static_libs" = "xyes" && test "x$static_linking_support" = "xno"; then
+					if test -z "$libpcre_dir"; then
+						AC_MSG_ERROR([libpcre directory must be given explicitly if static libs are used])
+					fi
 					LIBPCRE_LIBS="$libpcre_dir/lib/libpcre.a"
 				else
 					LIBPCRE_LDFLAGS=`$PKG_CONFIG --libs-only-L libpcre`
