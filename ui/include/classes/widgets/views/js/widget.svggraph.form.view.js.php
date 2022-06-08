@@ -467,11 +467,13 @@ window.widget_svggraph_form = new class {
 				}
 				$preview_container.removeClass("is-loading");
 
-				$form.prev(".msg-bad").remove();
 				if ("error" in r) {
+					$form.prev(".msg-bad").remove();
+
 					const message_box = makeMessageBox("bad", r.error.messages, r.error.title);
 					message_box.insertBefore($form);
 				}
+
 				if (typeof r.body !== "undefined") {
 					$preview.html(jQuery(r.body)).attr("unselectable", "on").css("user-select", "none");
 				}
