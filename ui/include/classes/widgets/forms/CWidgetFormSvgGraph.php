@@ -52,7 +52,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$errors = parent::validate($strict);
 
 		// Percentiles
-		if ($this->fields['percentile_left']->getValue() == SVG_GRAPH_PERCENTILE_LEFT_ON) {
+		if ($strict && $this->fields['percentile_left']->getValue() == SVG_GRAPH_PERCENTILE_LEFT_ON) {
 			if ($this->fields['percentile_left_value']->getValue() < self::WIDGET_ITEM_PERCENTILE_MIN
 					|| $this->fields['percentile_left_value']->getValue() > self::WIDGET_ITEM_PERCENTILE_MAX) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (left)'),
@@ -63,7 +63,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			}
 		}
 
-		if ($this->fields['percentile_right']->getValue() == SVG_GRAPH_PERCENTILE_RIGHT_ON) {
+		if ($strict && $this->fields['percentile_right']->getValue() == SVG_GRAPH_PERCENTILE_RIGHT_ON) {
 			if ($this->fields['percentile_right_value']->getValue() < self::WIDGET_ITEM_PERCENTILE_MIN
 					|| $this->fields['percentile_right_value']->getValue() > self::WIDGET_ITEM_PERCENTILE_MAX) {
 				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (right)'),
