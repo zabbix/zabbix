@@ -346,6 +346,7 @@ window.widget_svggraph_form = new class {
 
 		this.updateVariableOrder(jQuery(this.dataset_wrapper), ".<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>", "ds");
 		this.recalculateSortOrder();
+		this.initDataSetSortable();
 	}
 
 	recalculateDataSetAttribute() {
@@ -632,6 +633,7 @@ window.widget_svggraph_form = new class {
 		table_row.remove();
 
 		this.recalculateSortOrder();
+		this.initSingleItemSortable();
 	}
 
 	recalculateSortOrder() {
