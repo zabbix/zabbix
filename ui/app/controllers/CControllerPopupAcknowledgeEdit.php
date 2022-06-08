@@ -144,10 +144,10 @@ class CControllerPopupAcknowledgeEdit extends CController {
 		foreach ($events as $event) {
 			$can_be_closed = true;
 			$can_be_suppressed = true;
-			$can_be_unsuppressed = isEventRecentlySuppressed($event['acknowledges']);
+			$can_be_unsuppressed = false;
 
 			// Only manually suppressed problems can be unsuppressed.
-			if ($data['allowed_suppress'] && $can_be_unsuppressed) {
+			if ($this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
 				foreach ($event['suppression_data'] as $suppression) {
 					if ($suppression['maintenanceid'] == 0) {
 						$can_be_unsuppressed = true;
