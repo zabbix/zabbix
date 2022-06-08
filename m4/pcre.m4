@@ -38,9 +38,10 @@ AC_DEFUN([LIBPCRE_CHECK_CONFIG],
 	# process --with-* flags
 	#
 
-	pcre_help_string="use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files."
-
-	AC_ARG_WITH([libpcre],[If you want to specify libpcre installation directories: AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], ["$pcre_help_string"])], [
+	AC_ARG_WITH([libpcre],[
+If you want to specify libpcre installation directories:
+AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base install directory (DIR), default is to search through a number of common places for the libpcre files.])],
+	[
 		if test "$withval" != "no"; then
 			want_libpcre=yes
 			if test "$withval" != "yes"; then
