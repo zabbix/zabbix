@@ -23,6 +23,11 @@ class CSvg extends CSvgTag {
 
 	public function __construct() {
 		parent::__construct('svg');
+
+		$this
+			->setAttribute('id', str_replace('.', '', uniqid('svg_', true)))
+			->setAttribute('version', '1.1')
+			->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 	}
 
 	/**
@@ -38,15 +43,6 @@ class CSvg extends CSvgTag {
 		$this->setAttribute('height', $height.'px');
 
 		return parent::setSize($width, $height);
-	}
-
-	public function toString($destroy = true): string {
-		$this
-			->setAttribute('id', str_replace('.', '', uniqid('svg_', true)))
-			->setAttribute('version', '1.1')
-			->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-
-		return parent::toString($destroy);
 	}
 
 	protected function startToString(): string {

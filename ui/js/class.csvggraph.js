@@ -674,8 +674,6 @@ jQuery(function() {
 					showSimpleTriggerHintbox(e, graph);
 					showHintbox(e, graph);
 				})
-				// .on('mousemove', {graph}, showSimpleTriggerHintbox)
-				// .on('mousemove', {graph}, showHintbox)
 				.on('mouseleave', function() {
 					destroyHintbox(graph);
 					hideHelper(graph);
