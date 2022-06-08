@@ -174,11 +174,13 @@ class testDashboardGraphWidget extends CWebTest {
 		}
 
 		sleep(2);
+		$form->submit();
+
 		if (array_key_exists('color_error', $data)) {
 			// Check colorpick error message.
 			$this->assertMessage(TEST_BAD, null, $data['color_error']);
 		}
-		$form->submit();
+
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
 				'//button[@class="dialogue-widget-save"]')->waitUntilClickable()->one();
 
