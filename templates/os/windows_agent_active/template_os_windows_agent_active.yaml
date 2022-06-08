@@ -655,7 +655,7 @@ zabbix_export:
               tag: component
               value: cpu
         -
-          uuid: 1ac6ebdb5c98415b94cb44da5feeac7f
+          uuid: 3c1068939adf4d998a942dcb6be23656
           name: 'Active agent availability'
           type: INTERNAL
           key: 'zabbix[host,active_agent,available]'
@@ -677,7 +677,7 @@ zabbix_export:
               value: network
           triggers:
             -
-              uuid: bad86dfaf5274927bce35ad314a2d21a
+              uuid: ce4a95a80cc54353ab0e0d2ae6312930
               expression: 'min(/Windows by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
               name: 'Zabbix agent: active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
@@ -2089,7 +2089,7 @@ zabbix_export:
               value: '255'
               newvalue: 'No such service'
         -
-          uuid: 131de6a1016e43019d7cac2ce76901d4
+          uuid: 6e7949c77d3442849778ff80271211df
           name: zabbix.host.active_agent.available
           mappings:
             -
