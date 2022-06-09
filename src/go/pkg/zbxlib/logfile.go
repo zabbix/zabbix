@@ -207,6 +207,33 @@ static void free_prep_vec(zbx_vector_pre_persistent_lp_t vect)
 	zbx_vector_pre_persistent_destroy(vect);
 	zbx_free(vect);
 }
+
+void	zbx_init_config_tls_t_g_version(zbx_config_tls_t *zbx_config_tls, unsigned int accept, unsigned int connect,
+		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
+		char *ServerCertIssuer, char *ServerCertSubject)
+{
+	zbx_config_tls->configured_tls_connect_mode	= connect;
+	zbx_config_tls->configured_tls_accept_modes	= accept;
+
+	zbx_config_tls->CONFIG_TLS_CONNECT		= NULL;
+	zbx_config_tls->CONFIG_TLS_ACCEPT		= NULL;
+	zbx_config_tls->CONFIG_TLS_CA_FILE		= CAFile;
+	zbx_config_tls->CONFIG_TLS_CRL_FILE		= CRLFile;
+	zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER	= ServerCertIssuer;
+	zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT	= ServerCertSubject;
+	zbx_config_tls->CONFIG_TLS_CERT_FILE		= CertFile;
+	zbx_config_tls->CONFIG_TLS_KEY_FILE		= KeyFile;
+	zbx_config_tls->CONFIG_TLS_PSK_IDENTITY		= PSKIdentity;
+	zbx_config_tls->CONFIG_TLS_PSK_FILE		= PSKKey;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CERT13	= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CERT		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_PSK13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_PSK		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_ALL13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_ALL		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CMD13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CMD		= NULL;
+}
 */
 import "C"
 
@@ -216,6 +243,8 @@ import (
 	"unsafe"
 
 	"zabbix.com/pkg/itemutil"
+	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/tls"
 )
 
 const (
@@ -293,11 +322,30 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 
 	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
 
+	var tlsConfig *tls.Config
+	var err error
+	var ctlsConfig C.zbx_config_tls_t;
+
+	if tlsConfig, err = agent.GetTLSConfig(&agent.Options); err != nil {
+		result := &LogResult{
+			Ts:    time.Now(),
+			Error: err,
+		}
+		item.Results = append(item.Results, result)
+
+		return
+	}
+	C.zbx_init_config_tls_t_g_version(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
+		(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
+		(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
+		(C.CString)(tlsConfig.KeyFile), (C.CString)(tlsConfig.ServerCertIssuer),
+		(C.CString)(tlsConfig.ServerCertSubject));
+
 	var cerrmsg *C.char
 	cprepVec := C.new_prep_vec() // In Agent2 it is always empty vector. Not used but required for linking.
 	ret := C.process_log_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
-		&cmtimeSent, &cerrmsg, cprepVec)
+		&cmtimeSent, &cerrmsg, cprepVec, &ctlsConfig)
 	C.free_prep_vec(cprepVec)
 
 	// add cached results

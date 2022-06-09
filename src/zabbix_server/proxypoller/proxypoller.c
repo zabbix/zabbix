@@ -598,7 +598,7 @@ exit:
 ZBX_THREAD_ENTRY(proxypoller_thread, args)
 {
 	ZBX_THREAD_PROXY_POLLER_ARGS	*proxy_poller_args_in = (ZBX_THREAD_PROXY_POLLER_ARGS *)
-									(((zbx_thread_args_t *)args)->args);
+			(((zbx_thread_args_t *)args)->args);
 
 	int			nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;

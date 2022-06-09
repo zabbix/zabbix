@@ -934,18 +934,14 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	time_t			last_stat_time;
 	unsigned char		poller_type;
 	zbx_ipc_async_socket_t	rtc;
-	//zbx_tls_init_child_args_t	*tls_init_child_args;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	//poller_type = *(unsigned char *)((zbx_thread_args_t *)args)->args;
 	poller_type = *(poller_args_in->poller_type);
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
-
-	//tls_init_child_args = (zbx_tls_init_child_args_t *)((zbx_thread_args_t *)args)->args;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(poller_args_in->zbx_get_program_type_cb_arg()), server_num,

@@ -31,9 +31,6 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern char	*CONFIG_WEBSERVICE_URL;
-/* extern char	*CONFIG_TLS_CA_FILE; */
-/* extern char	*CONFIG_TLS_CERT_FILE; */
-/* extern char	*CONFIG_TLS_KEY_FILE; */
 
 typedef struct
 {
@@ -396,7 +393,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 #define	ZBX_STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 					/* once in STAT_INTERVAL seconds */
 	ZBX_THREAD_REPORT_WRITER_ARGS	*poller_args_in = (ZBX_THREAD_REPORT_WRITER_ARGS *)
-									(((zbx_thread_args_t *)args)->args);
+			(((zbx_thread_args_t *)args)->args);
 
 	pid_t			ppid;
 	char			*error = NULL;

@@ -1346,12 +1346,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		unsigned char			poller_type = 0;
 		ZBX_THREAD_POLLER_ARGS		POLLER_ARGS = {zbx_config_tls, get_program_type, &poller_type};
 		ZBX_THREAD_TRAPPER_ARGS		TRAPPER_ARGS = {zbx_config_tls, get_program_type, listen_sock};
-		ZBX_THREAD_ESCALATOR_ARGS       ESCALATOR_ARGS = {zbx_config_tls, get_program_type};
+		ZBX_THREAD_ESCALATOR_ARGS	ESCALATOR_ARGS = {zbx_config_tls, get_program_type};
 		ZBX_THREAD_PROXY_POLLER_ARGS	PROXY_POLLER_ARGS = {zbx_config_tls, get_program_type};
 		ZBX_THREAD_DISCOVERER_ARGS	DISCOVERER_ARGS = {zbx_config_tls, get_program_type};
 		ZBX_THREAD_REPORT_WRITER_ARGS	REPORT_WRITER_ARGS = {zbx_config_tls->CONFIG_TLS_CA_FILE,
-								zbx_config_tls->CONFIG_TLS_CERT_FILE,
-								zbx_config_tls->CONFIG_TLS_KEY_FILE};
+						zbx_config_tls->CONFIG_TLS_CERT_FILE,
+						zbx_config_tls->CONFIG_TLS_KEY_FILE};
 
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_args.process_type, &thread_args.process_num))
 		{
@@ -1405,21 +1405,15 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_type = ZBX_POLLER_TYPE_NORMAL;
-				/*thread_args.args = &poller_type;*/
-				/* poller_args_in = (ZBX_THREAD_POLLER_ARGS *)zbx_malloc(NULL, */
-				/* 		sizeof(ZBX_THREAD_POLLER_ARGS)); */
-				/* POLLER_ARGS = {zbx_config_tls, get_program_type, &poller_type}; */
 				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
 				poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-				/* thread_args.args = &poller_type; */
 				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:
-				/*thread_args.args = listen_sock;*/
 				thread_args.args = &TRAPPER_ARGS;
 				zbx_thread_start(trapper_thread, &thread_args, &threads[i]);
 				break;
