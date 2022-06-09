@@ -2511,6 +2511,7 @@ Changes for 4.0.42rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.41
