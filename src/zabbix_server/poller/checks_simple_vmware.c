@@ -152,7 +152,6 @@ static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)hv);
 
 	return hv;
-
 }
 
 static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char *uuid)
@@ -4806,7 +4805,6 @@ out:
 	return ret;
 }
 
-#define ALARM_TRUE_FALSE(a) (ZBX_VMWARE_TRUE == a ? "true" : "false")
 int	check_vcenter_alarm_get_common(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result, int entity_type, const char *func_parent)
 {
@@ -4815,43 +4813,82 @@ int	check_vcenter_alarm_get_common(AGENT_REQUEST *request, const char *username,
 	const char		*url, *uuid;
 	struct zbx_json		json_data;
 	zbx_vmware_hv_t		*hv;
+	zbx_vmware_vm_t		*vm;
+	zbx_vmware_datastore_t	*ds;
+	zbx_vmware_cluster_t	*cluster;
 	zbx_vmware_alarm_t	*alarm;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
-	if (2 != request->nparam)
+	if ((ZBX_VMWARE_ENTITY_ANY == entity_type && 1 != request->nparam) || (2 != request->nparam))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 
 	url = get_rparam(request, 0);
-	uuid = get_rparam(request, 1);
 
-	if ('\0' == *uuid)
+	if (ZBX_VMWARE_ENTITY_ANY != entity_type)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		goto out;
+		uuid = get_rparam(request, 1);
+		if ('\0' == *uuid)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
 	}
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-		goto unlock;
-	}
-
 	zbx_vmware_lock();
+
+	switch (entity_type)
+	{
+		case ZBX_VMWARE_ENTITY_HV:
+			if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+				goto unlock;
+			}
+			break;
+
+		case ZBX_VMWARE_ENTITY_VM:
+			if (NULL == (vm = service_vm_get(service, uuid)))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+				goto unlock;
+			}
+			break;
+
+		case ZBX_VMWARE_ENTITY_DATASTORE:
+			if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+				goto unlock;
+			}
+			break;
+
+		case ZBX_VMWARE_ENTITY_CLUSTER:
+			if (NULL == (cluster = cluster_get(&service->data->clusters, uuid)))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown cluster uuid."));
+			}
+			break;
+
+		case ZBX_VMWARE_ENTITY_ANY:
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < hv->alarms.values_num; i++)
+	for (i = 0; i < service->data->alarms.values_num; i++)
 	{
-		alarm = hv->alarms.values[i];
+		alarm = service->data->alarms.values[i];
 
-		if (entity_type != ZBX_VMWARE_ENTITY_ANY && entity_type != alarm->entity_type)
+		if (entity_type != ZBX_VMWARE_ENTITY_ANY && entity_type != alarm->entity_type && uuid != alarm->entity_uuid)
 			continue;
 
 		zbx_json_addobject(&json_data, NULL);
@@ -4860,11 +4897,11 @@ int	check_vcenter_alarm_get_common(AGENT_REQUEST *request, const char *username,
 		zbx_json_addstring(&json_data, "entity_name", alarm->entity_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "system_name", alarm->system_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "description", alarm->description, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "enabled", ALARM_TRUE_FALSE(alarm->enabled), ZBX_JSON_TYPE_INT);
+		zbx_json_addstring(&json_data, "enabled", (1 == alarm->enabled ? "true" : "false"), ZBX_JSON_TYPE_INT);
 		zbx_json_addstring(&json_data, "key", alarm->key, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "time", alarm->time, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "overall_status", alarm->overall_status, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "acknowledged", ALARM_TRUE_FALSE(alarm->acknowledged), ZBX_JSON_TYPE_INT);
+		zbx_json_addstring(&json_data, "acknowledged", (1 == alarm->acknowledged ? "true" : "false"), ZBX_JSON_TYPE_INT);
 		zbx_json_close(&json_data);
 	}
 
@@ -4883,7 +4920,6 @@ out:
 
 	return ret;
 }
-#undef ALARM_TRUE_FALSE
 
 int	check_vcenter_hv_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)

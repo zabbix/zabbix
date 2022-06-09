@@ -218,9 +218,6 @@ zbx_vmware_pnic_t;
 int	vmware_pnic_compare(const void *v1, const void *v2);
 ZBX_PTR_VECTOR_DECL(vmware_pnic, zbx_vmware_pnic_t *)
 
-#define ZBX_VMWARE_FALSE      0
-#define ZBX_VMWARE_TRUE       1
-
 /* hypervisor alarm data */
 typedef struct
 {
@@ -230,6 +227,7 @@ typedef struct
 	char		*description;
 	int		entity_type;
 	char		*entity_name;
+	char		*entity_uuid;
 	char		*overall_status;
 	char		*time;
 	int		enabled;
@@ -284,7 +282,6 @@ typedef struct
 	zbx_vector_vmware_dsname_t	dsnames;
 	zbx_vector_ptr_t		vms;
 	zbx_vector_vmware_pnic_t	pnics;
-	zbx_vector_vmware_alarm_t	alarms;
 }
 zbx_vmware_hv_t;
 
@@ -350,6 +347,7 @@ typedef struct
 	zbx_vector_vmware_datacenter_t		datacenters;
 	zbx_vector_vmware_resourcepool_t	resourcepools;
 	zbx_vector_vmware_dvswitch_t		dvswitches;
+	zbx_vector_vmware_alarm_t		alarms;
 }
 zbx_vmware_data_t;
 
