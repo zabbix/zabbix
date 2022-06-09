@@ -114,7 +114,7 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
  ******************************************************************************/
 static int	get_problem_update_actions(const DB_ACKNOWLEDGE *ack, int actions, const char *tz, char **out)
 {
-	const char	*prefixes[] = {"", ", ", ", ", ", ", ", "};
+	const char	*prefixes[] = {"", ", ", ", ", ", ", ", ", ", ", ", "};
 	char		*buf = NULL;
 	size_t		buf_alloc = 0, buf_offset = 0;
 	int		i, index, flags;
