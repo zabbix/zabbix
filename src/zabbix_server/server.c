@@ -1449,7 +1449,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
 				poller_type = ZBX_POLLER_TYPE_JAVA;
-				thread_args.args = &poller_type;
+				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
@@ -1496,7 +1496,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_HISTORYPOLLER:
 				poller_type = ZBX_POLLER_TYPE_HISTORY;
-				thread_args.args = &poller_type;
+				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AVAILMAN:
@@ -1515,7 +1515,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_type = ZBX_POLLER_TYPE_ODBC;
-				thread_args.args = &poller_type;
+				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 		}

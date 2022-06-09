@@ -1377,6 +1377,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zbx_thread_args_t		thread_args;
 		unsigned char			poller_type;
+		ZBX_THREAD_POLLER_ARGS		POLLER_ARGS = {zbx_config_tls, get_program_type, poller_type};
 		ZBX_THREAD_HEART_ARGS		HEART_ARGS = {zbx_config_tls, get_program_type};
 		ZBX_THREAD_PROXYCONFIG_ARGS	PROXYCONFIG_ARGS = {zbx_config_tls, get_program_type};
 		ZBX_THREAD_DATASENDER_ARGS	DATASENDER_ARGS = {zbx_config_tls, get_program_type};
@@ -1413,12 +1414,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_type = ZBX_POLLER_TYPE_NORMAL;
-				thread_args.args = &poller_type;
+				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
 				poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
-				thread_args.args = &poller_type;
+				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_PINGER:
@@ -1439,7 +1440,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
 				poller_type = ZBX_POLLER_TYPE_JAVA;
-				thread_args.args = &poller_type;
+				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_SNMPTRAPPER:
@@ -1475,7 +1476,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
 				poller_type = ZBX_POLLER_TYPE_ODBC;
-				thread_args.args = &poller_type;
+				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 		}
