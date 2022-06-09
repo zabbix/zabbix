@@ -521,11 +521,6 @@ msgstr ""
 msgid "Ack"
 msgstr "Reconhecido"
 
-#: app/views/monitoring.widget.problems.view.php:78
-msgctxt "compact table header"
-msgid "Ack"
-msgstr "Reconhecido"
-
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Reconhecer"
@@ -685,11 +680,6 @@ msgstr "Ação atualizada"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
-msgid "Actions"
-msgstr "Ações"
-
-#: app/views/monitoring.widget.problems.view.php:79
-msgctxt "compact table header"
 msgid "Actions"
 msgstr "Ações"
 
@@ -6304,11 +6294,6 @@ msgstr "O userid \"%1$s\" está duplicado nos usuários do mapa \"%2$s\"."
 msgid "Duration"
 msgstr "Duração"
 
-#: app/views/monitoring.widget.problems.view.php:77
-msgctxt "compact table header"
-msgid "Duration"
-msgstr "Duração"
-
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
 msgstr "Holandês (nl_NL)"
@@ -7078,11 +7063,6 @@ msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
-msgid "Failed"
-msgstr "Falhou"
-
-#: app/views/monitoring.widget.web.view.php:33
-msgctxt "compact table header"
 msgid "Failed"
 msgstr "Falhou"
 
@@ -8144,12 +8124,6 @@ msgid_plural "Hosts"
 msgstr[0] "Host"
 msgstr[1] "Hosts"
 
-#: app/views/monitoring.widget.problems.view.php:63
-#: app/views/monitoring.widget.problems.view.php:64
-msgctxt "compact table header"
-msgid "Host"
-msgstr "Host"
-
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8237,13 +8211,6 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
-msgid "Host group"
-msgstr "Grupo de hosts"
-
-#: app/views/monitoring.widget.problemhosts.view.php:31
-#: app/views/monitoring.widget.problemsbysv.view.php:40
-#: app/views/monitoring.widget.web.view.php:31
-msgctxt "compact table header"
 msgid "Host group"
 msgstr "Grupo de hosts"
 
@@ -9832,12 +9799,6 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:228
 #: include/views/configuration.triggers.edit.php:430
 #: include/views/configuration.triggers.list.php:200
-msgid "Info"
-msgstr "Informação"
-
-#: app/views/monitoring.widget.problems.view.php:60
-#: app/views/monitoring.widget.problems.view.php:61
-msgctxt "compact table header"
 msgid "Info"
 msgstr "Informação"
 
@@ -13536,11 +13497,6 @@ msgstr "Inativo"
 msgid "Ok"
 msgstr "Ok"
 
-#: app/views/monitoring.widget.web.view.php:32
-msgctxt "compact table header"
-msgid "Ok"
-msgstr "Ok"
-
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13682,11 +13638,6 @@ msgstr "A operação não possui template para operar."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
-msgid "Operational data"
-msgstr ""
-
-#: app/views/monitoring.widget.problems.view.php:75
-msgctxt "compact table header"
 msgid "Operational data"
 msgstr ""
 
@@ -14670,12 +14621,6 @@ msgstr "Nível de acesso"
 msgid "Problem"
 msgstr "Incidente"
 
-#: app/views/monitoring.widget.problems.view.php:67
-#: app/views/monitoring.widget.problems.view.php:68
-msgctxt "compact table header"
-msgid "Problem"
-msgstr "Incidente"
-
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr "Problema criado"
@@ -15048,12 +14993,6 @@ msgstr "Incidentes recentes"
 msgid "Recipient"
 msgstr "Destinatário"
 
-#: app/views/monitoring.widget.actionlog.view.php:41
-#: app/views/monitoring.widget.actionlog.view.php:42
-msgctxt "compact table header"
-msgid "Recipient"
-msgstr "Destinatário"
-
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr ""
@@ -15098,11 +15037,6 @@ msgstr "Operações de recuperação"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
-msgid "Recovery time"
-msgstr "Hora da recuperação"
-
-#: app/views/monitoring.widget.problems.view.php:56
-msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "Hora da recuperação"
 
@@ -16743,12 +16677,6 @@ msgstr ""
 msgid "Severity"
 msgstr "Severidade"
 
-#: app/views/monitoring.widget.problems.view.php:71
-#: app/views/monitoring.widget.problems.view.php:72
-msgctxt "compact table header"
-msgid "Severity"
-msgstr "Severidade"
-
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
 msgid "Severity changed"
@@ -17298,13 +17226,6 @@ msgstr ""
 msgid "Status"
 msgstr "Status"
 
-#: app/views/monitoring.widget.actionlog.view.php:45
-#: app/views/monitoring.widget.actionlog.view.php:46
-#: app/views/monitoring.widget.problems.view.php:59
-msgctxt "compact table header"
-msgid "Status"
-msgstr "Status"
-
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17745,11 +17666,6 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
-msgid "Tags"
-msgstr "Etiquetas"
-
-#: app/views/monitoring.widget.problems.view.php:80
-msgctxt "compact table header"
 msgid "Tags"
 msgstr "Etiquetas"
 
@@ -18292,12 +18208,6 @@ msgstr "Até"
 msgid "Time"
 msgstr "Hora"
 
-#: app/views/monitoring.widget.actionlog.view.php:34
-#: app/views/monitoring.widget.actionlog.view.php:35
-msgctxt "compact table header"
-msgid "Time"
-msgstr "Hora"
-
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr "Hora de um processo ou grupo de processos Zabbix em particular (identificado pelo <type> e <mode>) utilizdo no estado <state> em percentual."
@@ -18415,11 +18325,6 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
-msgid "Total"
-msgstr "Total"
-
-#: app/views/monitoring.widget.problemhosts.view.php:34
-msgctxt "compact table header"
 msgid "Total"
 msgstr "Total"
 
@@ -18929,12 +18834,6 @@ msgstr ""
 msgid "Type"
 msgstr "Tipo"
 
-#: app/views/monitoring.widget.actionlog.view.php:38
-#: app/views/monitoring.widget.actionlog.view.php:39
-msgctxt "compact table header"
-msgid "Type"
-msgstr "Tipo"
-
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "Tipo (visão detalhada)"
@@ -19188,11 +19087,6 @@ msgstr "Unidades"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
-msgid "Unknown"
-msgstr "Desconhecido"
-
-#: app/views/monitoring.widget.web.view.php:34
-msgctxt "compact table header"
 msgid "Unknown"
 msgstr "Desconhecido"
 
@@ -20645,11 +20539,6 @@ msgstr ""
 msgid "With problems"
 msgstr "Com incidentes"
 
-#: app/views/monitoring.widget.problemhosts.view.php:33
-msgctxt "compact table header"
-msgid "With problems"
-msgstr "Com incidentes"
-
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20663,11 +20552,6 @@ msgid "Without data"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
-msgid "Without problems"
-msgstr "Sem incidentes"
-
-#: app/views/monitoring.widget.problemhosts.view.php:32
-msgctxt "compact table header"
 msgid "Without problems"
 msgstr "Sem incidentes"
 
