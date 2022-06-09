@@ -6460,6 +6460,11 @@ z-select,
 		overflow: auto;
 		border: 1px dashed $form-border-color;
 	}
+
+	.toc,
+	.diff {
+		@extend %webkit-scrollbar;
+	}
 }
 
 .list-dashed {
