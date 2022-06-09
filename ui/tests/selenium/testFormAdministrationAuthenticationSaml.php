@@ -391,7 +391,6 @@ class testFormAdministrationAuthenticationSaml extends CWebTest {
 		// Check that SAML settings are disabled by default.
 		if ($check_enabled === true) {
 			foreach($fields as $name => $value){
-				var_dump($name);
 				$this->assertFalse($form->getField($name)->isEnabled());
 			}
 		}
