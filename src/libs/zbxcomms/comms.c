@@ -19,6 +19,32 @@
 
 #include "zbxcomms.h"
 #include "comms.h"
+
+void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls)
+{
+	zbx_config_tls->configured_tls_connect_mode	= ZBX_TCP_SEC_UNENCRYPTED;
+	zbx_config_tls->configured_tls_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
+
+	zbx_config_tls->CONFIG_TLS_CONNECT		= NULL;
+	zbx_config_tls->CONFIG_TLS_ACCEPT		= NULL;
+	zbx_config_tls->CONFIG_TLS_CA_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_CRL_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
+	zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
+	zbx_config_tls->CONFIG_TLS_CERT_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_KEY_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_PSK_IDENTITY		= NULL;
+	zbx_config_tls->CONFIG_TLS_PSK_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CERT13	= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CERT		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_PSK13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_PSK		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_ALL13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_ALL		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CMD13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CMD		= NULL;
+}
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "tls.h"
 #endif
