@@ -277,7 +277,7 @@ $saml_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Sign')),
 		new CFormField(
-			new CList([
+			(new CList([
 				(new CCheckBox('saml_sign_messages'))
 					->setLabel(_('Messages'))
 					->setChecked($data['saml_sign_messages'] == 1)
@@ -303,7 +303,7 @@ $saml_tab = (new CFormGrid())
 					->setChecked($data['saml_sign_logout_responses'] == 1)
 					->setUncheckedValue(0)
 					->setEnabled($data['saml_enabled'])
-			])
+			]))->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 		)
 	])
 	->addItem([
