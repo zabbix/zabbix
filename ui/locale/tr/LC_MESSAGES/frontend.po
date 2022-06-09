@@ -522,6 +522,11 @@ msgstr ""
 msgid "Ack"
 msgstr "Onay"
 
+#: app/views/monitoring.widget.problems.view.php:78
+msgctxt "compact table header"
+msgid "Ack"
+msgstr "Onay"
+
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
 msgstr "Onay"
@@ -681,6 +686,11 @@ msgstr "Eylem güncellendi"
 #: include/views/monitoring.sysmap.list.php:74 jsLoader.php:132
 #: jsLoader.php:163 jsLoader.php:172 jsLoader.php:199 jsLoader.php:213
 #: jsLoader.php:352 tr_events.php:183
+msgid "Actions"
+msgstr "Eylemler"
+
+#: app/views/monitoring.widget.problems.view.php:79
+msgctxt "compact table header"
 msgid "Actions"
 msgstr "Eylemler"
 
@@ -6291,6 +6301,11 @@ msgstr "\"%2$s\" haritası için kullanıcılarda \"%1$s\" userid'si mükerrer."
 msgid "Duration"
 msgstr "Süre"
 
+#: app/views/monitoring.widget.problems.view.php:77
+msgctxt "compact table header"
+msgid "Duration"
+msgstr "Süre"
+
 #: include/locales.inc.php:39
 msgid "Dutch (nl_NL)"
 msgstr "Flemenkçe (nl_NL)"
@@ -7060,6 +7075,11 @@ msgstr ""
 
 #: app/views/monitoring.widget.web.view.php:30 include/actions.inc.php:2139
 #: include/views/administration.auditacts.list.php:90
+msgid "Failed"
+msgstr "Başarısız"
+
+#: app/views/monitoring.widget.web.view.php:33
+msgctxt "compact table header"
 msgid "Failed"
 msgstr "Başarısız"
 
@@ -8121,6 +8141,12 @@ msgid_plural "Hosts"
 msgstr[0] "Ana makine"
 msgstr[1] "Ana makineler"
 
+#: app/views/monitoring.widget.problems.view.php:63
+#: app/views/monitoring.widget.problems.view.php:64
+msgctxt "compact table header"
+msgid "Host"
+msgstr "Ana makine"
+
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
 #, c-format
@@ -8208,6 +8234,13 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:158 jsLoader.php:268
 #: report2.php:400
+msgid "Host group"
+msgstr "Ana makine grubu"
+
+#: app/views/monitoring.widget.problemhosts.view.php:31
+#: app/views/monitoring.widget.problemsbysv.view.php:40
+#: app/views/monitoring.widget.web.view.php:31
+msgctxt "compact table header"
 msgid "Host group"
 msgstr "Ana makine grubu"
 
@@ -9796,6 +9829,12 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:228
 #: include/views/configuration.triggers.edit.php:430
 #: include/views/configuration.triggers.list.php:200
+msgid "Info"
+msgstr "Bilgi"
+
+#: app/views/monitoring.widget.problems.view.php:60
+#: app/views/monitoring.widget.problems.view.php:61
+msgctxt "compact table header"
 msgid "Info"
 msgstr "Bilgi"
 
@@ -13489,6 +13528,11 @@ msgstr "Kapalı"
 msgid "Ok"
 msgstr "Tamam"
 
+#: app/views/monitoring.widget.web.view.php:32
+msgctxt "compact table header"
+msgid "Ok"
+msgstr "Tamam"
+
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
@@ -13630,6 +13674,11 @@ msgstr "İşlem, işlem yapacak şablona sahip değil."
 #: include/views/configuration.trigger.prototype.list.php:65
 #: include/views/configuration.triggers.edit.php:109
 #: include/views/configuration.triggers.list.php:197
+msgid "Operational data"
+msgstr ""
+
+#: app/views/monitoring.widget.problems.view.php:75
+msgctxt "compact table header"
 msgid "Operational data"
 msgstr ""
 
@@ -14613,6 +14662,12 @@ msgstr "Öncelik seviyesi"
 msgid "Problem"
 msgstr "Problem"
 
+#: app/views/monitoring.widget.problems.view.php:67
+#: app/views/monitoring.widget.problems.view.php:68
+msgctxt "compact table header"
+msgid "Problem"
+msgstr "Problem"
+
 #: include/actions.inc.php:2059
 msgid "Problem created"
 msgstr ""
@@ -14985,6 +15040,12 @@ msgstr "Son problemler"
 msgid "Recipient"
 msgstr "Alıcı"
 
+#: app/views/monitoring.widget.actionlog.view.php:41
+#: app/views/monitoring.widget.actionlog.view.php:42
+msgctxt "compact table header"
+msgid "Recipient"
+msgstr "Alıcı"
+
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
 msgstr ""
@@ -15029,6 +15090,11 @@ msgstr "Kurtarma işlemleri"
 #: include/classes/screens/CScreenProblem.php:855
 #: include/classes/screens/CScreenProblem.php:878
 #: include/classes/screens/CScreenProblem.php:1151 include/events.inc.php:286
+msgid "Recovery time"
+msgstr "Kurtarma zamanı"
+
+#: app/views/monitoring.widget.problems.view.php:56
+msgctxt "compact table header"
 msgid "Recovery time"
 msgstr "Kurtarma zamanı"
 
@@ -16669,6 +16735,12 @@ msgstr ""
 msgid "Severity"
 msgstr "Önem Derecesi"
 
+#: app/views/monitoring.widget.problems.view.php:71
+#: app/views/monitoring.widget.problems.view.php:72
+msgctxt "compact table header"
+msgid "Severity"
+msgstr "Önem Derecesi"
+
 #: include/actions.inc.php:1784
 msgctxt "screen reader"
 msgid "Severity changed"
@@ -17219,6 +17291,13 @@ msgstr ""
 msgid "Status"
 msgstr "Durum"
 
+#: app/views/monitoring.widget.actionlog.view.php:45
+#: app/views/monitoring.widget.actionlog.view.php:46
+#: app/views/monitoring.widget.problems.view.php:59
+msgctxt "compact table header"
+msgid "Status"
+msgstr "Durum"
+
 #: app/views/popup.service.edit.php:117
 msgid "Status calculation rule"
 msgstr ""
@@ -17659,6 +17738,11 @@ msgstr ""
 #: include/views/configuration.triggers.list.php:111
 #: include/views/configuration.triggers.list.php:201
 #: include/views/js/monitoring.sysmaps.js.php:235
+msgid "Tags"
+msgstr "Etiketler"
+
+#: app/views/monitoring.widget.problems.view.php:80
+msgctxt "compact table header"
 msgid "Tags"
 msgstr "Etiketler"
 
@@ -18201,6 +18285,12 @@ msgstr "Kadar"
 msgid "Time"
 msgstr "Zaman"
 
+#: app/views/monitoring.widget.actionlog.view.php:34
+#: app/views/monitoring.widget.actionlog.view.php:35
+msgctxt "compact table header"
+msgid "Time"
+msgstr "Zaman"
+
 #: include/classes/data/CItemData.php:1646
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
 msgstr ""
@@ -18318,6 +18408,11 @@ msgstr ""
 #: app/views/monitoring.widget.hostavail.view.php:70
 #: app/views/monitoring.widget.hostavail.view.php:105
 #: app/views/monitoring.widget.problemhosts.view.php:34
+msgid "Total"
+msgstr "Toplam"
+
+#: app/views/monitoring.widget.problemhosts.view.php:34
+msgctxt "compact table header"
 msgid "Total"
 msgstr "Toplam"
 
@@ -18827,6 +18922,12 @@ msgstr ""
 msgid "Type"
 msgstr "Tür"
 
+#: app/views/monitoring.widget.actionlog.view.php:38
+#: app/views/monitoring.widget.actionlog.view.php:39
+msgctxt "compact table header"
+msgid "Type"
+msgstr "Tür"
+
 #: include/hosts.inc.php:104
 msgid "Type (Full details)"
 msgstr "Tür (Bütün detaylar)"
@@ -19080,6 +19181,11 @@ msgstr "Birim"
 #: include/triggers.inc.php:1868 include/users.inc.php:64
 #: include/users.inc.php:87 include/views/configuration.action.edit.php:232
 #: include/views/configuration.triggers.list.php:77
+msgid "Unknown"
+msgstr "Bilinmeyen"
+
+#: app/views/monitoring.widget.web.view.php:34
+msgctxt "compact table header"
 msgid "Unknown"
 msgstr "Bilinmeyen"
 
@@ -20532,6 +20638,11 @@ msgstr ""
 msgid "With problems"
 msgstr "Problemli"
 
+#: app/views/monitoring.widget.problemhosts.view.php:33
+msgctxt "compact table header"
+msgid "With problems"
+msgstr "Problemli"
+
 #: app/views/popup.tophosts.column.edit.php:119
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr ""
@@ -20545,6 +20656,11 @@ msgid "Without data"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
+msgid "Without problems"
+msgstr "Problemsiz"
+
+#: app/views/monitoring.widget.problemhosts.view.php:32
+msgctxt "compact table header"
 msgid "Without problems"
 msgstr "Problemsiz"
 
