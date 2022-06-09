@@ -83,6 +83,8 @@ typedef struct
 	char	*CONFIG_TLS_CIPHER_CMD;	/* not used in agent, server, proxy, config file parameter 'tls-cipher' */
 } zbx_config_tls_t;
 
+void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls);
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #if defined(HAVE_GNUTLS)
@@ -93,8 +95,6 @@ typedef struct
 #	include <openssl/err.h>
 #	include <openssl/rand.h>
 #endif
-
-void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls);
 
 typedef struct
 {

@@ -1209,7 +1209,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	for (i = 0; i < threads_num; i++)
 	{
 		zbx_thread_args_t		*thread_args;
-		//ZBX_THREAD_LISTENER_ARGS	LISTENER_ARGS;
 		ZBX_THREAD_LISTENER_ARGS	LISTENER_ARGS = {&listen_sock, zbx_config_tls, get_program_type};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
@@ -1229,8 +1228,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(collector_thread, thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
-				/* listener_args_in = (ZBX_THREAD_LISTENER_ARGS *)zbx_malloc(NULL, */
-				/* 		sizeof(ZBX_THREAD_LISTENER_ARGS)); */
 				thread_args->args = &LISTENER_ARGS;
 				zbx_thread_start(listener_thread, thread_args, &threads[i]);
 				break;
@@ -1367,10 +1364,8 @@ int	main(int argc, char **argv)
 	/* this is needed to set default hostname in zbx_load_config() */
 	init_metrics();
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
 	zbx_init_config_tls_t(zbx_config_tls);
-#endif
 
 	switch (t.task)
 	{

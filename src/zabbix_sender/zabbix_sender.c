@@ -268,30 +268,6 @@ const char	*help_message[] = {
 	NULL	/* end of text */
 };
 
-/* /\* TLS parameters *\/ */
-/* unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED; */
-/* unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/\* not used in zabbix_sender, just for *\/ */
-/* 									/\* linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CONNECT		= NULL; */
-/* char	*CONFIG_TLS_ACCEPT		= NULL;	/\* not used in zabbix_sender, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CA_FILE		= NULL; */
-/* char	*CONFIG_TLS_CRL_FILE		= NULL; */
-/* char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL; */
-/* char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL; */
-/* char	*CONFIG_TLS_CERT_FILE		= NULL; */
-/* char	*CONFIG_TLS_KEY_FILE		= NULL; */
-/* char	*CONFIG_TLS_PSK_IDENTITY	= NULL; */
-/* char	*CONFIG_TLS_PSK_FILE		= NULL; */
-
-/* char	*CONFIG_TLS_CIPHER_CERT13	= NULL;	/\* parameter 'TLSCipherCert13' from agent config file *\/ */
-/* char	*CONFIG_TLS_CIPHER_CERT		= NULL;	/\* parameter 'TLSCipherCert' from agent config file *\/ */
-/* char	*CONFIG_TLS_CIPHER_PSK13	= NULL;	/\* parameter 'TLSCipherPSK13' from agent config file *\/ */
-/* char	*CONFIG_TLS_CIPHER_PSK		= NULL;	/\* parameter 'TLSCipherPSK' from agent config file *\/ */
-/* char	*CONFIG_TLS_CIPHER_ALL13	= NULL;	/\* not used in zabbix_sender, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CIPHER_ALL		= NULL;	/\* not used in zabbix_sender, just for linking with tls.c *\/ */
-/* char	*CONFIG_TLS_CIPHER_CMD13	= NULL;	/\* parameter '--tls-cipher13' from sender command line *\/ */
-/* char	*CONFIG_TLS_CIPHER_CMD		= NULL;	/\* parameter '--tls-cipher' from sender command line *\/ */
-
 zbx_config_tls_t	*zbx_config_tls = NULL;
 
 int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
@@ -1527,18 +1503,12 @@ int	main(int argc, char **argv)
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = NULL;
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
-	zbx_init_config_tls_t(zbx_config_tls);
-#endif
 	progname = get_program_name(argv[0]);
 
 	parse_commandline(argc, argv);
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
 	zbx_init_config_tls_t(zbx_config_tls);
-#endif
 
 	if (NULL != CONFIG_FILE)
 		zbx_load_config(CONFIG_FILE);

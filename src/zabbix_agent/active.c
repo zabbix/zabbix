@@ -1117,6 +1117,7 @@ static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *age
 	ZBX_UNUSED(process_value_cb);
 	ZBX_UNUSED(lastlogsize_sent);
 	ZBX_UNUSED(error);
+	ZBX_UNUSED(zbx_config_tls);
 
 	return FAIL;
 }

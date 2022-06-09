@@ -36,7 +36,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
-extern unsigned int	configured_tls_connect_mode;
+/* extern unsigned int	configured_tls_connect_mode; */
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002

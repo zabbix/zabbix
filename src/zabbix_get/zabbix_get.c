@@ -321,10 +321,8 @@ int	main(int argc, char **argv)
 #endif
 	progname = get_program_name(argv[0]);
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
 	zbx_init_config_tls_t(zbx_config_tls);
-#endif
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,

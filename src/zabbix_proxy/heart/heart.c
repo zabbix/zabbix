@@ -35,7 +35,6 @@ extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 extern int		CONFIG_TIMEOUT;
-extern unsigned int	configured_tls_connect_mode;
 
 static int	send_heartbeat(zbx_config_tls_t *zbx_config_tls)
 {

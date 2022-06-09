@@ -22,6 +22,31 @@
 
 #include "zbxsysinc.h"
 
+void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls)
+{
+	zbx_config_tls->configured_tls_connect_mode	= ZBX_TCP_SEC_UNENCRYPTED;
+	zbx_config_tls->configured_tls_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
+
+	zbx_config_tls->CONFIG_TLS_CONNECT		= NULL;
+	zbx_config_tls->CONFIG_TLS_ACCEPT		= NULL;
+	zbx_config_tls->CONFIG_TLS_CA_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_CRL_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
+	zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
+	zbx_config_tls->CONFIG_TLS_CERT_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_KEY_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_PSK_IDENTITY		= NULL;
+	zbx_config_tls->CONFIG_TLS_PSK_FILE		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CERT13	= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CERT		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_PSK13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_PSK		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_ALL13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_ALL		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CMD13		= NULL;
+	zbx_config_tls->CONFIG_TLS_CIPHER_CMD		= NULL;
+}
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #include "zbxthreads.h"
@@ -129,31 +154,6 @@ static int	zbx_openssl_init_ssl(int opts, void *settings)
 #endif
 
 static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
-
-void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls)
-{
-	zbx_config_tls->configured_tls_connect_mode	= ZBX_TCP_SEC_UNENCRYPTED;
-	zbx_config_tls->configured_tls_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
-
-	zbx_config_tls->CONFIG_TLS_CONNECT		= NULL;
-	zbx_config_tls->CONFIG_TLS_ACCEPT		= NULL;
-	zbx_config_tls->CONFIG_TLS_CA_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_CRL_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
-	zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
-	zbx_config_tls->CONFIG_TLS_CERT_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_KEY_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_PSK_IDENTITY		= NULL;
-	zbx_config_tls->CONFIG_TLS_PSK_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CERT13	= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CERT		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_PSK13		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_PSK		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_ALL13		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_ALL		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CMD13		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CMD		= NULL;
-}
 
 static ZBX_THREAD_LOCAL char		*my_psk_identity	= NULL;
 static ZBX_THREAD_LOCAL size_t		my_psk_identity_len	= 0;
@@ -710,8 +710,6 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 
 	if (NULL != (zbx_config_tls->CONFIG_TLS_CONNECT))
 	{
-		/* 'configured_tls_connect_mode' is shared between threads on MS Windows */
-
 		if (0 == strcmp((zbx_config_tls->CONFIG_TLS_CONNECT), ZBX_TCP_SEC_UNENCRYPTED_TXT))
 		{
 			zbx_config_tls->configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
