@@ -2256,6 +2256,14 @@ if test "x$DB_CFLAGS" != "x"; then
 	echo "    database:              ${DB_CFLAGS}"
 fi
 
+if test "x$LIBPCRE_CFLAGS" != "x"; then
+	echo "    libpcre:               ${LIBPCRE_CFLAGS}"
+fi
+
+if test "x$LIBPCRE2_CFLAGS" != "x"; then
+	echo "    libpcre2:              ${LIBPCRE2_CFLAGS}"
+fi
+
 if test "x$LIBXML2_CFLAGS" != "x"; then
 	echo "    libXML2:               ${LIBXML2_CFLAGS}"
 fi
