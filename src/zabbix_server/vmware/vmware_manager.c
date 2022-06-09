@@ -128,10 +128,10 @@ static int	vmware_job_exec(zbx_vmware_job_t *job)
 	case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
 		ret = zbx_vmware_service_update_perf(job->service);
 		break;
-/*	case ZBX_VMWARE_UPDATE_REST_TAGS:
-		ret = vmware_service_update_tags(job->service);
+	case ZBX_VMWARE_UPDATE_REST_TAGS:
+		ret = zbx_vmware_service_update_tags(job->service);
 		break;
-*/	default:
+	default:
 		ret = FAIL;
 	}
 out:

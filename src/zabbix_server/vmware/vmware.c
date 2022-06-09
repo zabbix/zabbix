@@ -7783,6 +7783,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
 	service->jobs_num = 0;
+	VMWARE_VECTOR_CREATE(&service->entity_tags, vmware_entity_tags);
 
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
 			NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);

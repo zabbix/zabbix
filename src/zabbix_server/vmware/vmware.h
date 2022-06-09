@@ -372,6 +372,33 @@ typedef struct
 }
 zbx_vmware_cust_query_t;
 
+/* the vmware tags data */
+typedef struct
+{
+	char	*category;
+	char	*tag;
+	char	*tag_description;
+}
+zbx_vmware_tag_t;
+ZBX_PTR_VECTOR_DECL(vmware_tag, zbx_vmware_tag_t *)
+
+/* the vmware tags data for entity (hv, vm etc) */
+typedef struct
+{
+	char	*id;
+	char	*type;
+}
+zbx_vmware_obj_id_t;
+
+typedef struct
+{
+	char			*uuid;
+	zbx_vmware_obj_id_t	*obj_id;
+	zbx_vector_vmware_tag_t	tags;
+}
+zbx_vmware_entity_tags_t;
+ZBX_PTR_VECTOR_DECL(vmware_entity_tags, zbx_vmware_entity_tags_t *)
+
 /* the vmware service data */
 typedef struct
 {
@@ -417,6 +444,9 @@ typedef struct
 
 	/* linked jobs count */
 	int				jobs_num;
+
+	/* the vmware entity (vm, hv etc) and linked tags */
+	zbx_vector_vmware_entity_tags_t	entity_tags;
 }
 zbx_vmware_service_t;
 
@@ -468,6 +498,7 @@ char	*zbx_vmware_get_vm_resourcepool_path(zbx_vector_vmware_resourcepool_t *rp, 
 
 int	zbx_vmware_service_update(zbx_vmware_service_t *service);
 int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service);
+int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service);
 void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
 void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job);
