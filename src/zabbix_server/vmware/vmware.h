@@ -31,13 +31,6 @@
 
 #define ZBX_VMWARE_STATE_MASK		0x0FF
 
-#define ZBX_VMWARE_STATE_UPDATING	0x100
-#define ZBX_VMWARE_STATE_UPDATING_PERF	0x200
-#define ZBX_VMWARE_STATE_REMOVING	0x400
-
-#define ZBX_VMWARE_STATE_BUSY		(ZBX_VMWARE_STATE_UPDATING | ZBX_VMWARE_STATE_UPDATING_PERF \
-							| ZBX_VMWARE_STATE_REMOVING)
-
 /* the vmware performance counter state */
 #define ZBX_VMWARE_COUNTER_NEW		0x00
 #define ZBX_VMWARE_COUNTER_READY	0x01
@@ -393,7 +386,6 @@ typedef struct
 	int				state;
 
 	int				lastcheck;
-	int				lastperfcheck;
 
 	/* The last vmware service access time. If a service is not accessed for a day it is removed */
 	int				lastaccess;

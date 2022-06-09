@@ -7070,7 +7070,7 @@ out:
 	zbx_vmware_lock();
 
 	/* remove UPDATING flag and set READY or FAILED flag */
-	service->state &= ~(ZBX_VMWARE_STATE_MASK | ZBX_VMWARE_STATE_UPDATING);
+	service->state &= ~ZBX_VMWARE_STATE_MASK;
 	service->state |= (SUCCEED == ret) ? ZBX_VMWARE_STATE_READY : ZBX_VMWARE_STATE_FAILED;
 
 	if (0 < data->events.values_num)
@@ -7676,9 +7676,6 @@ out:
 		vmware_entities_shared_clean_stats(&service->entities);
 		vmware_service_copy_perf_data(service, &perfdata);
 	}
-
-	service->state &= ~(ZBX_VMWARE_STATE_UPDATING_PERF);
-	service->lastperfcheck = time(NULL);
 
 	zbx_vmware_unlock();
 
