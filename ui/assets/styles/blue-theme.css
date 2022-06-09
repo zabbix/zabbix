@@ -3904,11 +3904,13 @@ input {
     color: #1f2c33 !important; }
 
 textarea {
+  margin: 0;
+  padding: 4px 5px;
+  overflow: auto;
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
-  padding: 4px 5px;
-  margin: 0;
-  overflow: auto; }
+  line-height: normal;
+  vertical-align: top; }
   textarea[readonly] {
     color: #1f2c33 !important; }
     textarea[readonly]:focus {

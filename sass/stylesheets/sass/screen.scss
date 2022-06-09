@@ -1618,13 +1618,16 @@ input {
 }
 
 textarea {
+	margin: 0;
+	padding: 4px 5px;
+	overflow: auto;
 	font: {
 		family: $font-stack;
 		size: $font-form-size;
 	}
-	padding: 4px 5px;
-	margin: 0;
-	overflow: auto;
+	line-height: normal;
+	vertical-align: top;
+
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
 
