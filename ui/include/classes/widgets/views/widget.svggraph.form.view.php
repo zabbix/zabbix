@@ -67,15 +67,14 @@ $form
 	->addItem($form_list)
 	->addItem($graph_preview)
 	// ->addItem((new CDiv())->addStyle('width: 960px;'))	// TODO: debug
-	->addItem($form_tabs)
-	->addItem(
-		(new CScriptTag('
-			widget_svggraph_form.init('.json_encode([
-				'form_id' => $form->getId(),
-				'form_tabs_id' => $form_tabs->getId()
-			]).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($form_tabs);
+
+$scripts[] = '
+	widget_svggraph_form.init('.json_encode([
+		'form_id' => $form->getId(),
+		'form_tabs_id' => $form_tabs->getId()
+	]).');
+';
 
 return [
 	'form' => $form,
