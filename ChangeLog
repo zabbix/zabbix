@@ -13,6 +13,7 @@ A.F.I...S. [ZBXNEXT-2592] split host groups functionality into host groups and t
 .........T [ZBXNEXT-7632] added template for HPE Primera (vkhaliev)
 ..F....... [ZBXNEXT-7567] implemented saving the state of the default filters in monitoring sections (acikuns)
 .........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
+..FG...... [ZBXNEXT-7732] added metrics for Windows Registry monitoring (dgoloscapov, rdetlavs, wiper)
 
 Bug fixes:
 ........S. [ZBX-20914] fixed wrong calculation of calculated item formulas (akozlovs)
