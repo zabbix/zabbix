@@ -3359,7 +3359,7 @@ class CApiInputValidator {
 
 			// If delay is 0, there must be at least one either flexible or scheduling interval.
 			if ($delay_sec == 0 && !$intervals) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be a zero without custom intervals'));
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be equal to zero without custom intervals set'));
 
 				return false;
 			}

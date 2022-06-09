@@ -59,10 +59,7 @@ class CItemBaseHelper {
 		foreach ($items as $i => $item) {
 			$item = CArrayHelper::renameKeys($item, [
 				'key' => 'key_',
-				'parent_discoveryid' => 'ruleid',
-				'http_authtype' => 'authtype',
-				'http_username' => 'username',
-				'http_password' => 'password'
+				'parent_discoveryid' => 'ruleid'
 			]);
 
 			if (CArrayHelper::getByPath($item, 'trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
@@ -91,6 +88,12 @@ class CItemBaseHelper {
 				$item = prepareScriptItemFormData($item);
 			}
 			elseif ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				$item = CArrayHelper::renameKeys($item, [
+					'http_authtype' => 'authtype',
+					'http_username' => 'username',
+					'http_password' => 'password'
+				]);
+
 				$item = prepareItemHttpAgentFormData($item);
 			}
 
@@ -149,6 +152,12 @@ class CItemBaseHelper {
 				$item = prepareScriptItemFormData($item);
 			}
 			elseif ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+				$item = CArrayHelper::renameKeys($item, [
+					'http_authtype' => 'authtype',
+					'http_username' => 'username',
+					'http_password' => 'password'
+				]);
+
 				$item = prepareItemHttpAgentFormData($item);
 			}
 
@@ -461,28 +470,14 @@ class CItemBaseHelper {
 		return $fields;
 	}
 
-	protected static function getUpdateField(string $field, array $fields, array $item): array {
-		switch ($field) {
-			case 'interfaceid':
-				$fields = self::getInterfaceidExpected($item, $fields);
+	protected static function getUpdateInterfaceidExpected(array $item, array $fields): array {
+		$fields = self::getInterfaceidExpected($item, $fields);
 
-				if (!in_array('intefaceid', $fields) && in_array($item['type'], [
-						ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_DB_MONITOR,
-						ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
-				])) {
-					$fields[] = 'interfaceid';
-				}
-				break;
-
-			case 'username':
-				if (in_array($item['type'], [ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL,
-							ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_CALCULATED,
-							ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
-						]) || ($item['username'] === '' && in_array($item['type'], [ITEM_TYPE_SIMPLE,
-								ITEM_TYPE_DB_MONITOR, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT]))) {
-					$fields[] = 'username';
-				}
-				break;
+		if (!in_array('intefaceid', $fields) && in_array($item['type'], [
+				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_DB_MONITOR,
+				ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
+		])) {
+			$fields[] = 'interfaceid';
 		}
 
 		return $fields;
@@ -503,7 +498,7 @@ class CItemBaseHelper {
 
 			case ITEM_TYPE_EXTERNAL:
 				$fields = ['delay'];
-				return self::getUpdateField('interfaceid', $fields, $item);
+				return self::getUpdateInterfaceidExpected($item, $fields);
 
 			case ITEM_TYPE_HTTPAGENT:
 				$fields = ['url', 'query_fields', 'request_method', 'timeout', 'post_type', 'posts', 'headers',
@@ -529,30 +524,29 @@ class CItemBaseHelper {
 
 			case ITEM_TYPE_IPMI:
 				$fields = ['delay', 'ipmi_sensor'];
-				return self::getUpdateField('interfaceid', $fields, $item);
+				return self::getUpdateInterfaceidExpected($item, $fields);
 
 			case ITEM_TYPE_JMX:
 				$fields =  ['jmx_endpoint', 'username', 'password', 'delay'];
-				return self::getUpdateField('interfaceid', $fields, $item);
+				return self::getUpdateInterfaceidExpected($item, $fields);
 
 			case ITEM_TYPE_SCRIPT:
 				return $fields = ['parameters', 'params', 'timeout', 'delay'];
 
 			case ITEM_TYPE_SIMPLE:
 				$fields = ['username', 'password', 'delay'];
-				return self::getUpdateField('interfaceid', $fields, $item);
+				return self::getUpdateInterfaceidExpected($item, $fields);
 
 			case ITEM_TYPE_SNMP:
 				$fields = ['snmp_oid', 'delay'];
-				return self::getUpdateField('interfaceid', $fields, $item);
+				return self::getUpdateInterfaceidExpected($item, $fields);
 
 			case ITEM_TYPE_SNMPTRAP:
-				return self::getUpdateField('interfaceid', $fields, $item);
+				return self::getUpdateInterfaceidExpected($item, $fields);
 
 			case ITEM_TYPE_SSH:
-				$fields = ['authtype', 'password', 'params', 'delay'];
-				$fields = self::getUpdateField('interfaceid', $fields, $item);
-				$fields = self::getUpdateField('username', $fields, $item);
+				$fields = ['authtype', 'username', 'password', 'params', 'delay'];
+				$fields = self::getUpdateInterfaceidExpected($item, $fields);
 
 				if ($item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
 					$fields[] = 'publickey';
@@ -561,16 +555,15 @@ class CItemBaseHelper {
 				break;
 
 			case ITEM_TYPE_TELNET:
-				$fields = ['password', 'params', 'delay'];
-				$fields = self::getUpdateField('username', $fields, $item);
-				return self::getUpdateField('interfaceid', $fields, $item);
+				$fields = ['username', 'password', 'params', 'delay'];
+				return self::getUpdateInterfaceidExpected($item, $fields);
 
 			case ITEM_TYPE_TRAPPER:
 				return ['trapper_hosts'];
 
 			case ITEM_TYPE_ZABBIX:
 				$fields = ['delay'];
-				return self::getUpdateField('interfaceid', $fields, $item);
+				return self::getUpdateInterfaceidExpected($item, $fields);
 
 			case ITEM_TYPE_ZABBIX_ACTIVE:
 				if (strncmp($item['key_'], 'mqtt.get', 8) !== 0) {

@@ -408,8 +408,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Update interval' => ['Delay' => '0']
 					],
-					'details' => 'Item will not be refreshed. Specified update interval requires having at least '.
-							'one either flexible or scheduling interval.'
+					'details' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals set.'
 				]
 			],
 			[
@@ -423,8 +422,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'Zabbix agent'],
 						'Update interval' => ['Delay' => '86401']
 					],
-					'details' => 'Item will not be refreshed. Update interval should be between 1s and 1d. '.
-							'Also Scheduled/Flexible intervals can be used.'
+					'details' => 'Invalid parameter "/1/delay": value must be one of 0:86400.'
 				]
 			],
 			[
@@ -674,7 +672,6 @@ class testMassUpdateItems extends CWebTest{
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055']
 					],
 					'details' => 'Invalid parameter "/1": the parameter "snmp_oid" is missing.',
-					'interface_text_part' => 'SNMPv3, Context name: zabbix'
 				]
 			],
 			[
