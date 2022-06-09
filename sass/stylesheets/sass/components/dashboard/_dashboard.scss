@@ -1061,6 +1061,15 @@
 	}
 }
 
+.dashboard-widget-form {
+	position: relative;
+
+	.form-field-show-header {
+		position: absolute;
+		right: 5px;
+	}
+}
+
 .wrapper.layout-kioskmode {
 
 	.dashboard-navigation {

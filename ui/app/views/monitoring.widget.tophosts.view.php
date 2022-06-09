@@ -145,7 +145,7 @@ foreach ($data['rows'] as $columns) {
 $output = [
 	'name' => $data['name'],
 	'body' => (new CDiv($table))
-		->addClass('dashboard-grid-widget-tophosts')
+		->addClass('dashboard-widget-tophosts')
 		->toString()
 ];
 

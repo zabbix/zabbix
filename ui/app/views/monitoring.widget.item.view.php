@@ -99,7 +99,7 @@ else {
 
 	$body = (new CDiv(
 		new CLink($rows, $data['url'])
-	))->addClass('dashboard-grid-widget-item');
+	))->addClass('dashboard-widget-item');
 
 	if ($data['bg_color'] !== '') {
 		$body->addStyle('background-color: #'.$data['bg_color']);

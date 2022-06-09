@@ -1,6 +1,6 @@
 // Widget configuration.
 
-form.dashboard-grid-widget-clock {
+form.dashboard-widget-clock {
 	.field-group-date,
 	.field-group-time,
 	.field-group-tzone {
@@ -40,7 +40,7 @@ form.dashboard-grid-widget-clock {
 
 // Widget view.
 
-div.dashboard-grid-widget-clock {
+div.dashboard-widget-clock {
 	&.clock-digital {
 		$line-height: 1.14;
 

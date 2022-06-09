@@ -1,6 +1,6 @@
 // Widget configuration.
 
-form.dashboard-grid-widget-item {
+form.dashboard-widget-item {
 	.field-group-description,
 	.field-group-value,
 	.field-group-time,
@@ -79,7 +79,7 @@ form.dashboard-grid-widget-item {
 
 // Widget view.
 
-div.dashboard-grid-widget-item {
+div.dashboard-widget-item {
 	$line-height: 1.14;
 
 	box-sizing: border-box;
@@ -220,7 +220,7 @@ div.dashboard-grid-widget-item {
 	}
 }
 
-.dashboard-grid-widget-item {
+.dashboard-widget-item {
 	.svg-arrow-up {
 		fill: $arrow-fill-up;
 	}
@@ -237,7 +237,7 @@ div.dashboard-grid-widget-item {
 // Modifications by themes.
 
 @if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
-	div.dashboard-grid-widget-item {
+	div.dashboard-widget-item {
 		a {
 			&:link {
 				border-bottom: none;

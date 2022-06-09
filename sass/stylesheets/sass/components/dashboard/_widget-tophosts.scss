@@ -1,6 +1,6 @@
 // Widget configuration.
 
-form.dashboard-grid-widget-tophosts {
+form.dashboard-widget-tophosts {
 	$width-small: 150px;
 
 	#list_columns .text {
@@ -15,7 +15,7 @@ form.dashboard-grid-widget-tophosts {
 
 // Widget view.
 
-div.dashboard-grid-widget-tophosts {
+div.dashboard-widget-tophosts {
 	$bar-gauge-height: 20px;
 
 	.list-table th.center {

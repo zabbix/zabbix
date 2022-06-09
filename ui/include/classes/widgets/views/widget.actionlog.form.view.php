@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,27 +21,28 @@
 
 /**
  * Action log widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
-// Sort entries by.
-$form_list->addRow(CWidgetHelper::getLabel($fields['sort_triggers']),
-	CWidgetHelper::getSelect($fields['sort_triggers'])
-);
-
-// Show lines.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
-
-$form->addItem($form_list);
+$form_list = (CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+))
+	->addItem([
+		CWidgetHelper::getLabel($fields['sort_triggers']),
+		new CFormField(CWidgetHelper::getSelect($fields['sort_triggers']))
+	])
+	->addItem([
+		CWidgetHelper::getLabel($fields['show_lines']),
+		new CFormField(CWidgetHelper::getIntegerBox($fields['show_lines']))
+	]);
 
 return [
-	'form' => $form
+	'form' => $form->addItem($form_list)
 ];

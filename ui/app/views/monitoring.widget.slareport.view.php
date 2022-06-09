@@ -130,7 +130,7 @@ else {
 
 $output = [
 	'name' => $data['name'],
-	'body' => (new CDiv($report))->addClass('dashboard-grid-widget-slareport')->toString()
+	'body' => (new CDiv($report))->addClass('dashboard-widget-slareport')->toString()
 ];
 
 if ($messages = get_and_clear_messages()) {
