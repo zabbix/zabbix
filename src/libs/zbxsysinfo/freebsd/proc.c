@@ -459,6 +459,11 @@ out:
 #undef ZBX_SSIZE
 }
 
+#ifdef HAVE_LIBJAIL
+	#define MAX_ARGS	5
+#else
+	#define MAX_ARGS	4
+#endif
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args;
@@ -467,8 +472,12 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	size_t			sz;
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
+#ifdef HAVE_LIBJAIL
+	int			jid = FAIL, jail_ok;
+	char			*procjid;
+#endif
 
-	if (4 < request->nparam)
+	if (MAX_ARGS < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -518,6 +527,20 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	proccomm = get_rparam(request, 3);
 
+#ifdef HAVE_LIBJAIL
+	procjid = get_rparam(request, 4);
+
+	if (NULL != procjid && '\0' != *procjid)
+	{
+		jid = jail_getid(procjid);
+		if (-1 == jid)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid jail ID or name."));
+			return SYSINFO_RET_FAIL;
+		}
+	}
+#endif
+
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
 		goto out;
 
@@ -564,6 +587,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		proc_ok = 0;
 		stat_ok = 0;
 		comm_ok = 0;
+		jail_ok = 0;
 
 		if (NULL == procname || '\0' == *procname || 0 == strcmp(procname, proc[i].ZBX_PROC_COMM))
 			proc_ok = 1;
@@ -605,7 +629,10 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			comm_ok = 1;
 
-		if (proc_ok && stat_ok && comm_ok)
+		if (FAIL == jid || proc[i].ZBX_PROC_JID == jid)
+			jail_ok = 1;
+
+		if (proc_ok && stat_ok && comm_ok && jail_ok)
 			proccount++;
 	}
 	zbx_free(proc);
@@ -614,6 +641,7 @@ out:
 
 	return SYSINFO_RET_OK;
 }
+#undef MAX_ARGS
 
 static char	*get_state(struct kinfo_proc *proc)
 {
