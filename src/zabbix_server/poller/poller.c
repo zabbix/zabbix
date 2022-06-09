@@ -938,7 +938,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	poller_type = *(poller_args_in->poller_type);
+	poller_type = (poller_args_in->poller_type);
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;

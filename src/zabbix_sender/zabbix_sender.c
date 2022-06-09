@@ -1527,17 +1527,18 @@ int	main(int argc, char **argv)
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = NULL;
 
-	//zbx_tls_init_child_args_t	tls_init_child_args;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
 	zbx_init_config_tls_t(zbx_config_tls);
 #endif
-	/* tls_init_child_args.zbx_config_tls = zbx_config_tls; */
-	/* tls_init_child_args.zbx_get_program_type_cb_arg = get_program_type; */
-
 	progname = get_program_name(argv[0]);
 
 	parse_commandline(argc, argv);
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
+	zbx_init_config_tls_t(zbx_config_tls);
+#endif
 
 	if (NULL != CONFIG_FILE)
 		zbx_load_config(CONFIG_FILE);
@@ -1598,7 +1599,7 @@ int	main(int argc, char **argv)
 			NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS);
+		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, program_type);
 
 		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->configured_tls_connect_mode)
 		{

@@ -321,6 +321,11 @@ int	main(int argc, char **argv)
 #endif
 	progname = get_program_name(argv[0]);
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
+	zbx_init_config_tls_t(zbx_config_tls);
+#endif
+
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
 			&zbx_optind)))
@@ -503,7 +508,7 @@ int	main(int argc, char **argv)
 			NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS);
+		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, program_type);
 
 		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->configured_tls_connect_mode)
 		{

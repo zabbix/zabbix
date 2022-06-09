@@ -985,7 +985,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		zbx_validate_config_hostnames(&hostnames);
 		zbx_validate_config(task);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS);
+		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, program_type);
 #endif
 	}
 
@@ -1079,11 +1079,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef _WINDOWS
 	DWORD		res;
 #endif
-	//zbx_tls_init_child_args_t	tls_init_child_args;
-
-	//tls_init_child_args.zbx_config_tls = zbx_config_tls;
-	//tls_init_child_args.zbx_get_program_type_cb_arg = get_program_type;
-
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
@@ -1349,11 +1344,6 @@ int	main(int argc, char **argv)
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
-	zbx_init_config_tls_t(zbx_config_tls);
-#endif
-
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
@@ -1376,6 +1366,11 @@ int	main(int argc, char **argv)
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	init_metrics();
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
+	zbx_init_config_tls_t(zbx_config_tls);
+#endif
 
 	switch (t.task)
 	{

@@ -961,9 +961,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_LOAD_MODULE);
-
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
-
 	zbx_set_defaults();
 
 	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
@@ -973,7 +971,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 	zbx_db_validate_config();
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS);
+	zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, program_type);
 #endif
 }
 
@@ -1150,7 +1148,15 @@ int	main(int argc, char **argv)
 	/* required for simple checks */
 	init_metrics();
 
+	printf("AAAAAA");
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
+	zbx_init_config_tls_t(zbx_config_tls);
+#endif
+	printf("AAAAAA 2");
+
 	zbx_load_config(&t);
+	printf("AAAAAA 4");
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1344,7 +1350,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	{
 		zbx_thread_args_t		thread_args;
 		unsigned char			poller_type = 0;
-		ZBX_THREAD_POLLER_ARGS		POLLER_ARGS = {zbx_config_tls, get_program_type, &poller_type};
+		ZBX_THREAD_POLLER_ARGS		POLLER_ARGS = {zbx_config_tls, get_program_type, poller_type};
 		ZBX_THREAD_TRAPPER_ARGS		TRAPPER_ARGS = {zbx_config_tls, get_program_type, listen_sock};
 		ZBX_THREAD_ESCALATOR_ARGS	ESCALATOR_ARGS = {zbx_config_tls, get_program_type};
 		ZBX_THREAD_PROXY_POLLER_ARGS	PROXY_POLLER_ARGS = {zbx_config_tls, get_program_type};
@@ -1728,7 +1734,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-
 	zbx_initialize_events();
 
 	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))

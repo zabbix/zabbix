@@ -681,7 +681,8 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
  *           parameters must match the value of CONFIG_TLS_ACCEPT parameter.  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks, int config_passive_forks)
+void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks, int config_passive_forks,
+		unsigned char program_type)
 {
 	zbx_tls_parameter_not_empty(&(zbx_config_tls->CONFIG_TLS_CONNECT), zbx_config_tls);
 	zbx_tls_parameter_not_empty(&(zbx_config_tls->CONFIG_TLS_ACCEPT), zbx_config_tls);
@@ -768,8 +769,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 				accept_modes_tmp |= ZBX_TCP_SEC_TLS_PSK;
 #else
 				zbx_tls_validation_error(ZBX_TLS_VALIDATION_NO_PSK,
-						&(zbx_config_tls->CONFIG_TLS_ACCEPT), NULL, zbx_config_tls,
-						prograxm_type);
+						&(zbx_config_tls->CONFIG_TLS_ACCEPT), NULL, zbx_config_tls);
 #endif
 			}
 			else
@@ -854,6 +854,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &(zbx_config_tls->CONFIG_TLS_PSK_IDENTITY),
 				&(zbx_config_tls->CONFIG_TLS_PSK_FILE), zbx_config_tls);
 	}
+
 	/* PSK identity must be a valid UTF-8 string (RFC 4279 says Unicode) */
 	if (NULL != zbx_config_tls->CONFIG_TLS_PSK_IDENTITY && SUCCEED !=
 			zbx_is_utf8(zbx_config_tls->CONFIG_TLS_PSK_IDENTITY))
@@ -864,8 +865,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 
 	/* active agentd, active proxy, zabbix_get, and zabbix_sender specific validation */
 
-	if ((0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_active_forks) ||
-			(0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_GET |
+	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_active_forks) ||
+			(0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_GET |
 					ZBX_PROGRAM_TYPE_SENDER))))
 	{
 		/* 'TLSConnect' is the master parameter to be matched by certificate and PSK parameters. */
@@ -899,8 +900,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 
 	/* passive agentd and passive proxy specific validation */
 
-	if ((0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_passive_forks) ||
-			0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_passive_forks) ||
+			0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 	{
 		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
 
@@ -949,7 +950,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	/* For server and proxy 'TLSCipherPSK13' and 'TLSCipherPSK' are optional and do not depend on other */
 	/* TLS parameters. Validate only in case of agent, zabbix_get and sender. */
 
-	if (0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_GET |
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_GET |
 			ZBX_PROGRAM_TYPE_SENDER)))
 	{
 		if (NULL !=  zbx_config_tls->CONFIG_TLS_CIPHER_PSK13 && NULL ==
@@ -973,7 +974,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	/* server and proxy (at least some hosts may be connecting with PSK). */
 	/* 'zabbix_get' and sender do not use these parameters. Validate only in case of agent. */
 
-	if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_AGENTD) && NULL ==
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && NULL ==
 			zbx_config_tls->CONFIG_TLS_CERT_FILE && NULL == zbx_config_tls->CONFIG_TLS_PSK_IDENTITY)
 	{
 		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_ALL13)
@@ -996,7 +997,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	/* Parameters '--tls-cipher13' and '--tls-cipher' can be used only in zabbix_get and sender with */
 	/* certificate or PSK. */
 
-	if (0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)) &&
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)) &&
 			NULL == zbx_config_tls->CONFIG_TLS_CERT_FILE && NULL == zbx_config_tls->CONFIG_TLS_PSK_IDENTITY)
 	{
 		if (NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD13)
@@ -2261,7 +2262,7 @@ void	zbx_tls_init_child(zbx_config_tls_t	*zbx_config_tls, zbx_get_program_type_f
 	sigset_t		mask, orig_mask;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
+	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
 #ifndef _WINDOWS
 	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
@@ -2500,7 +2501,6 @@ void	zbx_tls_init_child(zbx_config_tls_t	*zbx_config_tls, zbx_get_program_type_f
 
 		zbx_log_ciphersuites(__func__, "certificate and PSK", ciphersuites_all);
 	}
-
 #ifndef _WINDOWS
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 #endif
@@ -2562,7 +2562,6 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 	return ret;
 }
 
-//void	zbx_tls_init_child(zbx_tls_init_child_args_t	*tls_init_child_args)
 void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg)
 {
 #define ZBX_CIPHERS_CERT_ECDHE		"EECDH+aRSA+AES128:"
@@ -2610,7 +2609,6 @@ void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f
 	}
 
 	/* set protocol version to TLS 1.2 */
-
 	if (0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
 		method = TLS_client_method();
 	else	/* ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD */
@@ -2916,6 +2914,7 @@ void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f
 
 		zbx_log_ciphersuites(__func__, "certificate", ctx_cert);
 	}
+
 #if defined(HAVE_OPENSSL_WITH_PSK)
 	if (NULL != ctx_psk)
 	{
@@ -3134,6 +3133,7 @@ void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f
 #ifndef _WINDOWS
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 #endif
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return;

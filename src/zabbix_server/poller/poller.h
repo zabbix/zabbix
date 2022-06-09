@@ -27,7 +27,7 @@ typedef struct
 {
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	unsigned char		*poller_type;
+	unsigned char		poller_type;
 }
 ZBX_THREAD_POLLER_ARGS;
 
