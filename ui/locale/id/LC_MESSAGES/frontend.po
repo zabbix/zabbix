@@ -12810,6 +12810,10 @@ msgstr ""
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1668
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr ""

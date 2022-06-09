@@ -1388,7 +1388,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = nu
  *
  * @param string   $number     Valid number in decimal or scientific notation.
  * @param int|null $precision  Max number of significant digits to take into account. Default: ZBX_FLOAT_DIG.
- * @param int|null $decimals   Max number of first non-zero decimals decimals to display. Default: 0.
+ * @param int|null $decimals   Max number of first non-zero decimals to display. Default: 0.
  * @param bool     $exact      Display exactly this number of decimals instead of first non-zeros.
  *
  * Note: $decimals must be less than $precision.
