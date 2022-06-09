@@ -472,9 +472,9 @@ window.widget_svggraph_form = new class {
 				}
 				$preview_container.removeClass("is-loading");
 
-				if ("error" in r) {
-					$form.prev(".msg-bad").remove();
+				$form.prev(".msg-bad").remove();
 
+				if ("error" in r) {
 					const message_box = makeMessageBox("bad", r.error.messages, r.error.title);
 					message_box.insertBefore($form);
 				}
