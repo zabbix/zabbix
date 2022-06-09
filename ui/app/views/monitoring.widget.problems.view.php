@@ -91,7 +91,8 @@ $allowed = [
 	'ui_problems' => $data['allowed_ui_problems'],
 	'add_comments' => $data['allowed_add_comments'],
 	'change_severity' => $data['allowed_change_severity'],
-	'acknowledge' => $data['allowed_acknowledge']
+	'acknowledge' => $data['allowed_acknowledge'],
+	'suppress' => $data['allowed_suppress']
 ];
 
 foreach ($data['data']['problems'] as $eventid => $problem) {
@@ -107,16 +108,8 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		$can_be_closed = false;
 	}
 	else {
-		$in_closing = false;
-
-		foreach ($problem['acknowledges'] as $acknowledge) {
-			if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-				$in_closing = true;
-				$can_be_closed = false;
-				break;
-			}
-		}
-
+		$can_be_closed = !hasEventCloseAction($problem['acknowledges']);
+		$in_closing = !$can_be_closed;
 		$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 		$value_str = $in_closing ? _('CLOSING') : _('PROBLEM');
 		$value_clock = $in_closing ? time() : $problem['clock'];
@@ -178,8 +171,32 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 		}
 	}
 
-	if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
-		$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
+	if (array_key_exists('suppression_data', $problem)) {
+		if (count($problem['suppression_data']) == 1
+				&& $problem['suppression_data'][0]['maintenanceid'] == 0
+				&& isEventRecentlyUnsuppressed($problem['acknowledges'], $unsuppression_action)) {
+			// Show blinking button if the last manual suppression was recently revoked.
+			$user_unsuppressed = array_key_exists($unsuppression_action['userid'], $data['data']['users'])
+				? getUserFullname($data['data']['users'][$unsuppression_action['userid']])
+				: _('Inaccessible user');
+
+			$info_icons[] = (new CSimpleButton())
+				->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
+				->addClass('blink')
+				->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
+		}
+		elseif ($problem['suppression_data']) {
+			$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data'], false);
+		}
+		elseif (isEventRecentlySuppressed($problem['acknowledges'], $suppression_action)) {
+			// Show blinking button if suppression was made but is not yet processed by server.
+			$info_icons[] = makeSuppressedProblemIcon([[
+				'suppress_until' => $suppression_action['suppress_until'],
+				'username' => array_key_exists($suppression_action['userid'], $data['data']['users'])
+					? getUserFullname($data['data']['users'][$suppression_action['userid']])
+					: _('Inaccessible user')
+			]], true);
+		}
 	}
 
 	$opdata = null;
@@ -272,7 +289,7 @@ foreach ($data['data']['problems'] as $eventid => $problem) {
 
 	// Create acknowledge link.
 	$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-			|| $can_be_closed)
+			|| $can_be_closed || $allowed['suppress'])
 		? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 			->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 			->addClass(ZBX_STYLE_LINK_ALT)

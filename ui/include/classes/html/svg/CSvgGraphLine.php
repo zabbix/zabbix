@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,19 +21,24 @@
 
 class CSvgGraphLine extends CSvgPath {
 
+	public const ZBX_STYLE_CLASS = 'svg-graph-line';
+	public const ZBX_STYLE_LINE_AUXILIARY = 'svg-graph-line-auxiliary';
+
 	protected $path;
 
 	protected $itemid;
 	protected $item_name;
 	protected $units;
 	protected $host;
-	protected $options;
-	protected $add_label;
 
-	public function __construct($path, $metric) {
+	protected $add_labels;
+
+	protected $options;
+
+	public function __construct(array $path, array $metric, bool $add_labels = true) {
 		parent::__construct();
 
-		$this->add_label = true;
+		$this->add_labels = $add_labels;
 		$this->path = $path;
 
 		$this->itemid = $metric['itemid'];
@@ -50,32 +55,12 @@ class CSvgGraphLine extends CSvgPath {
 		];
 	}
 
-	public function makeStyles() {
-		$this
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE)
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order']);
-
-		$line_style = ($this->options['type'] == SVG_GRAPH_TYPE_LINE) ? ['stroke-linejoin' => 'round'] : [];
-
-		return [
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE => [
-				'fill' => 'none'
-			],
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_LINE.'-'.$this->itemid.'-'.$this->options['order'] => [
-				'opacity' => $this->options['transparency'] * 0.1,
-				'stroke' => $this->options['color'],
-				'stroke-width' => $this->options['width']
-			] + $line_style
-		];
-	}
-
-	protected function draw() {
-		// drawMetricArea can be called with single data point.
+	protected function draw(): void {
 		if (count($this->path) > 1) {
 			$last_point = [0, 0];
 
-			foreach ($this->path as $i => $point) {
-				if ($i == 0) {
+			foreach ($this->path as $index => $point) {
+				if ($index == 0) {
 					$this->moveTo($point[0], $point[1]);
 				}
 				else {
@@ -89,17 +74,19 @@ class CSvgGraphLine extends CSvgPath {
 		}
 	}
 
-	public function toString($destroy = true) {
-		$this->draw();
+	public function toString($destroy = true): string {
+		if ($this->path) {
+			if ($this->add_labels) {
+				$line_values = '';
 
-		if ($this->add_label && $this->path) {
-			$line_values = '';
+				foreach ($this->path as $point) {
+					$line_values .= ($line_values === '') ? $point[2] : ','.$point[2];
+				}
 
-			foreach ($this->path as $point) {
-				$line_values .= ($line_values === '') ? $point[2] : ','.$point[2];
+				$this->setAttribute('label', $line_values);
 			}
 
-			$this->setAttribute('label', $line_values);
+			$this->draw();
 		}
 
 		return parent::toString($destroy);

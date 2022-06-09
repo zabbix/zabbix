@@ -194,7 +194,7 @@ static void	DCdump_proxies(void)
 		zabbix_log(LOG_LEVEL_TRACE, "hostid:" ZBX_FS_UI64 " location:%u", proxy->hostid, proxy->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  proxy_address:'%s'", proxy->proxy_address);
 		zabbix_log(LOG_LEVEL_TRACE, "  compress:%d", proxy->auto_compress);
-
+		zabbix_log(LOG_LEVEL_TRACE, "  lastaccess:%d", proxy->lastaccess);
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -351,6 +351,8 @@ static void	DCdump_interfaces(void)
 		}
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s", if_msg);
+
+		offset = 0;
 	}
 
 	zbx_free(if_msg);

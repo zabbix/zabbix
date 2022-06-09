@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-10T20:33:50Z'
-  groups:
+  date: '2022-06-07T19:36:59Z'
+  template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -2081,8 +2081,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Arista SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: 1e995dbde06f4d869f2cc4314117c397
           name: 'System performance'
@@ -2102,8 +2102,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU utilization'
                         host: 'Arista SNMP'
+                        name: 'CPU utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -2126,8 +2126,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#MEMNAME}: Memory utilization'
                         host: 'Arista SNMP'
+                        name: '{#MEMNAME}: Memory utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2150,8 +2150,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
                         host: 'Arista SNMP'
+                        name: '{#FSNAME}: Disk space usage'
       valuemaps:
         -
           uuid: 318f3041aea04848a223de86e589c232

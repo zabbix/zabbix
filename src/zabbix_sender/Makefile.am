@@ -27,4 +27,6 @@ zabbix_sender_LDADD = \
 
 zabbix_sender_LDFLAGS = $(SENDER_LDFLAGS)
 
+zabbix_sender_CFLAGS = $(TLS_CFLAGS)
+
 EXTRA_DIST = win32

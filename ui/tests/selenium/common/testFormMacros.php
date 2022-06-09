@@ -513,7 +513,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
 		if ($update) {
 			if ($host_type === 'host') {
-				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
 				$column->query('link', $name)->asPopupButton()->one()->select('Configuration');
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
@@ -531,7 +531,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else {
 			if ($host_type === 'host') {
-				$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
@@ -545,8 +545,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 			}
 
 			$name = $is_prototype ? $data['Name'].' {#KEY}' : $data['Name'];
-			$form->fill([(($host_type === 'template') ? 'Template name' : 'Host name') => $name]);
-			$form->fill(['Groups' => 'Zabbix servers']);
+			$group_name = ($host_type === 'template') ? 'Templates' : 'Zabbix servers';
+			$group_field = ($host_type === 'template') ? 'Template groups' : 'Host groups';
+			$form->fill([
+				(($host_type === 'template') ? 'Template name' : 'Host name') => $name,
+				$group_field => $group_name
+			]);
 		}
 
 		$form->selectTab('Macros');
@@ -696,7 +700,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			$name = 'Host prototype with edited global {#MACRO} '.time();
 			$form->fill(['Host name' => $name]);
-			$form->fill(['Groups' => 'Zabbix servers']);
+			$form->fill(['Host groups' => 'Zabbix servers']);
 		}
 		else {
 			if ($host_type === 'host') {
@@ -710,9 +714,11 @@ abstract class testFormMacros extends CLegacyWebTest {
 			}
 
 			$name = $host_type.' with edited global macro '.time();
+			$group_name = ($host_type === 'template') ? 'Templates' : 'Zabbix servers';
+			$group_field = ($host_type === 'template') ? 'Template groups' : 'Host groups';
 			$form->fill([
 				($host_type === 'template') ? 'Template name' : 'Host name' => $name,
-				'Groups' => 'Zabbix servers'
+				$group_field => $group_name
 			]);
 		}
 		$form->selectTab('Macros');

@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:00Z'
-  groups:
+  date: '2022-06-07T19:33:02Z'
+  template_groups:
     -
       uuid: 1d12408342854fd5a4436dd6d5d1bd4a
       name: Templates/Telephony
@@ -834,7 +834,7 @@ zabbix_export:
               name: 'Asterisk: has been restarted'
               event_name: 'Asterisk: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -868,7 +868,7 @@ zabbix_export:
               name: 'Asterisk: has been reloaded'
               event_name: 'Asterisk: has been reloaded (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -

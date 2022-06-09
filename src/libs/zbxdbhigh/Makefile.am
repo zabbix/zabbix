@@ -24,4 +24,5 @@ libzbxdbhigh_a_SOURCES = \
 	mediatype.c
 
 libzbxdbhigh_a_CFLAGS = \
-	-I$(top_srcdir)/src/zabbix_server/
+	-I$(top_srcdir)/src/zabbix_server/ \
+	$(TLS_CFLAGS)

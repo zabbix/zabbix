@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-05-17T15:36:35Z'
-  groups:
+  date: '2022-06-07T20:23:06Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1525,6 +1525,7 @@ zabbix_export:
               uuid: fa78d269c01548a083085a3a98e5a59b
               expression: 'last(/HashiCorp Consul Node by HTTP/consul.version,#1)<>last(/HashiCorp Consul Node by HTTP/consul.version,#2) and length(last(/HashiCorp Consul Node by HTTP/consul.version))>0'
               name: 'Consul: Version has been changed'
+              event_name: 'Consul: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Consul version has changed. Ack to close.'
               manual_close: 'YES'

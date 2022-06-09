@@ -24,6 +24,8 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
+ * @backup profiles
+ *
  * @dataSource ExecuteNowAction
  */
 class testExecuteNow extends CWebTest {
@@ -191,6 +193,7 @@ class testExecuteNow extends CWebTest {
 		$filter_form->submit();
 		$this->page->waitUntilReady();
 		$table = $this->query('xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']')->asTable()->one();
+		$table->waitUntilReloaded();
 		$this->selectItemsAndExecuteNow($data, $table);
 	}
 

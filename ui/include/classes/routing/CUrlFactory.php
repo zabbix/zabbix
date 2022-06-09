@@ -48,9 +48,6 @@ class CUrlFactory {
 			'remove' => ['hostid'],
 			'add' => ['parent_discoveryid']
 		],
-		'hostgroups.php' => [
-			'remove' => ['groupid']
-		],
 		'httpconf.php' => [
 			'remove' => ['httptestid']
 		],
