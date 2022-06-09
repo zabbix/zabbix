@@ -1308,7 +1308,8 @@ class CWidgetHelper {
 								(new CVar($field_name.'['.$row_num.'][stacked]', '0'))->removeId(),
 								(new CCheckBox($field_name.'['.$row_num.'][stacked]'))
 									->setChecked((bool) $value['stacked'])
-									->setEnabled($value['type'] == SVG_GRAPH_TYPE_LINE)
+									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
+									->onChange('widget_svggraph_form.changeStackedState(this)')
 							])
 						])
 						->addItem([
@@ -1449,10 +1450,13 @@ class CWidgetHelper {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_approximation')
 									->setValue((int) $value['approximation'])
 									->addOptions(CSelect::createOptionsFromArray([
-										APPROXIMATION_ALL =>_('all'),
-										APPROXIMATION_MIN =>_('min'),
-										APPROXIMATION_AVG =>_('avg'),
-										APPROXIMATION_MAX =>_('max')
+										APPROXIMATION_ALL => [
+											'label' => _('all'),
+											'disabled' => ($value['type'] != SVG_GRAPH_TYPE_LINE || (bool) $value['stacked'])
+										],
+										APPROXIMATION_MIN => _('min'),
+										APPROXIMATION_AVG => _('avg'),
+										APPROXIMATION_MAX => _('max')
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)

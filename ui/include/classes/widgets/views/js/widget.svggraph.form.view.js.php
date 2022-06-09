@@ -150,7 +150,7 @@ window.widget_svggraph_form = new class {
 
 		this.rewriteNameLinks();
 
-		document.getElementById('data_sets').addEventListener('click', (e) => {
+		this.dataset_wrapper.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-add-item')) {
 				this._selectItems();
 			}
@@ -730,8 +730,10 @@ window.widget_svggraph_form = new class {
 
 
 	changeDataSetDrawType(obj) {
-		const row_num = obj.id.replace("ds_", "").replace("_type", "");
+		const row_num = this.getDataSetNumber();
 		const approximation_select = document.getElementById('ds_' + row_num + '_approximation');
+
+	console.log(obj);
 
 		switch (jQuery(":checked", jQuery(obj)).val()) {
 			case "<?= SVG_GRAPH_TYPE_POINTS ?>":
@@ -760,7 +762,6 @@ window.widget_svggraph_form = new class {
 				jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
 				jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
 				jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
-				jQuery("#ds_" + row_num + "_stacked").prop("disabled", true);
 
 				approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = true;
 				if (approximation_select.value == <?= APPROXIMATION_ALL ?>) {
@@ -778,11 +779,11 @@ window.widget_svggraph_form = new class {
 				jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", false);
 				jQuery("#ds_" + row_num + "_stacked").prop("disabled", false);
 
-				approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = false;
+				if (!jQuery("#ds_" + row_num + "_stacked").is(':checked')) {
+					approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = false;
+				}
 
-				if (jQuery(":checked", jQuery(obj)).val() == "<?= SVG_GRAPH_TYPE_STAIRCASE ?>") {
-					jQuery("#ds_" + row_num + "_stacked").prop("disabled", true);
-
+				if (obj.querySelector(':checked').value == "<?= SVG_GRAPH_TYPE_STAIRCASE ?>") {
 					approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = true;
 					if (approximation_select.value == <?= APPROXIMATION_ALL ?>) {
 						approximation_select.value = <?= APPROXIMATION_AVG ?>;
@@ -793,12 +794,28 @@ window.widget_svggraph_form = new class {
 	}
 
 	changeDataSetAggregateFunction(obj) {
-		const row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");
+		const row_num = this.getDataSetNumber();
 		const no_aggregation = (jQuery(obj).val() == <?= AGGREGATE_NONE ?>);
 
 		jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);
 		jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);
 		jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);
+	}
+
+	changeStackedState(obj) {
+		const row_num = this.getDataSetNumber();
+		const approximation_select = document.getElementById('ds_' + row_num + '_approximation');
+
+		if (this.dataset_wrapper.querySelector('#ds_' + row_num + '_type :checked').value  == "<?= SVG_GRAPH_TYPE_LINE ?>") {
+			approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = false;
+		}
+
+		if (obj.checked) {
+			approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = true;
+			if (approximation_select.value == <?= APPROXIMATION_ALL ?>) {
+				approximation_select.value = <?= APPROXIMATION_AVG ?>;
+			}
+		}
 	}
 };
 
