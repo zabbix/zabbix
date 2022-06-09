@@ -1148,15 +1148,12 @@ int	main(int argc, char **argv)
 	/* required for simple checks */
 	init_metrics();
 
-	printf("AAAAAA");
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_config_tls = (zbx_config_tls_t *)zbx_malloc(NULL, sizeof(zbx_config_tls_t));
 	zbx_init_config_tls_t(zbx_config_tls);
 #endif
-	printf("AAAAAA 2");
 
 	zbx_load_config(&t);
-	printf("AAAAAA 4");
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
