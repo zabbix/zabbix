@@ -48,7 +48,8 @@ class CItemBaseHelper {
 	 * @param int	$items[<n>][<host_status>]  Relevant if items are to be created.
 	 * @param int	$items[<n>][<flags>]
 	 * @param array|null $db_items  Relevant for updates.
-	 * @param array		$db_items[<n>][<hosts>]  Expected to contain host status.
+	 * @param array	$db_items[<n>][<hosts>]  Expected to contain host status.
+	 * @param array	$db_items[<n>][<tags>]   In case of mass_update_tags operations.
 	 *
 	 * @return array A set of 'cleaned up' items. Empty in case a fatal input (parsing) error has been encountered.
 	 */

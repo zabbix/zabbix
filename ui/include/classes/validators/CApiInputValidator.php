@@ -3366,7 +3366,7 @@ class CApiInputValidator {
 
 			if ($delay_sec < 0 || $delay_sec > SEC_PER_DAY) {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-					_('value must be one of %1$s', implode(':', [0, SEC_PER_DAY]))
+					_s('value must be one of %1$s', implode(':', [0, SEC_PER_DAY]))
 				);
 
 				return false;

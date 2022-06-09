@@ -62,8 +62,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmptrap[{#KEY1}]',
 				'type' => 17,
 				'value_type' => 0,
-				'interfaceid' => self::SNMP2_INTERFACE_ID,
-				'delay' => '3m'
+				'interfaceid' => self::SNMP2_INTERFACE_ID
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -72,8 +71,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'key_' => 'snmptrap[{#KEY2}]',
 				'type' => 17,
 				'value_type' => 1,
-				'interfaceid' => self::SNMP2_INTERFACE_ID,
-				'delay' => '4m'
+				'interfaceid' => self::SNMP2_INTERFACE_ID
 			],
 			[
 				'hostid' => self::HOSTID,
@@ -222,7 +220,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
 				'name' => '17_Script',
-				'key_' => 'script1',
+				'key_' => 'script1[{#KEY}]',
 				'type' => 21,
 				'value_type' => 0,
 				'delay' => '15s',
@@ -233,7 +231,7 @@ class testPageMassUpdateItemPrototypes extends testMassUpdateItems {
 				'hostid' => self::HOSTID,
 				'ruleid' => self::RULEID,
 				'name' => '18_Script',
-				'key_' => 'script2',
+				'key_' => 'script2[{#KEY}]',
 				'type' => 21,
 				'value_type' => 0,
 				'delay' => '14s',

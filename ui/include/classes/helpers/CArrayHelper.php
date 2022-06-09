@@ -103,7 +103,11 @@ class CArrayHelper {
 	 * @return mixed
 	 */
 	public static function getByPath(array $array, $path, $default = null) {
-		$key = is_array($path) ? array_shift($path) : $path;
+		if (!is_array($path)) {
+			$path = [$path];
+		}
+
+		$key = array_shift($path);
 
 		if (!array_key_exists($key, $array)) {
 			return $default;

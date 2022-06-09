@@ -145,7 +145,10 @@ class CControllerPopupMassupdateItem extends CController {
 		$result = false;
 		$is_prototype = (bool) $this->getInput('prototype');
 
-		$input_submitted = array_intersect_key($this->getInputAll(), $this->getInput('visible', []));
+		$input_submitted = array_intersect_key(
+			$this->getInputAll(),
+			array_merge($this->getInput('visible', []), ['mass_update_tags' => true])
+		);
 		$input_submitted = array_fill(0, count($this->db_items), $input_submitted);
 
 		$items = CItemBaseHelper::sanitizeItems($input_submitted, $this->db_items);
@@ -154,6 +157,7 @@ class CControllerPopupMassupdateItem extends CController {
 		if ($items) {
 			// In case user chose unrelated fields, relay the errors.
 			foreach ($items as $i => $item) {
+				unset($input_submitted[$i]['mass_update_tags']);
 				$items[$i] = $item + $input_submitted[$i];
 			}
 
