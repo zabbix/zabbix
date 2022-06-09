@@ -1107,7 +1107,8 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_ptr_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
-		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, char **error)
+		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, char **error,
+		zbx_config_tls_t *zbx_config_tls)
 {
 	ZBX_UNUSED(addrs);
 	ZBX_UNUSED(agent2_result);
@@ -1122,7 +1123,7 @@ static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *age
 #else
 int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		char **error);
+		char **error, zbx_config_tls_t *zbx_config_tls);
 #endif
 
 static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric, char **error,
@@ -1237,7 +1238,7 @@ static void	process_active_checks(zbx_vector_ptr_t *addrs, zbx_config_tls_t *zbx
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 		{
 			ret = process_eventlog_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
-					&error);
+					&error, zbx_config_tls);
 		}
 		else
 			ret = process_common_check(addrs, metric, &error, zbx_config_tls);

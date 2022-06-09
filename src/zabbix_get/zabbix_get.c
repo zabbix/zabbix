@@ -517,6 +517,8 @@ int	main(int argc, char **argv)
 #endif
 			zbx_tls_init_child(zbx_config_tls, get_program_type);
 		}
+#else
+		ZBX_UNUSED(get_program_type);
 #endif
 	}
 #if !defined(_WINDOWS)
