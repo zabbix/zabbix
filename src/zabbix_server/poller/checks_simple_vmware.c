@@ -4888,6 +4888,11 @@ int	check_vcenter_alarm_get_common(AGENT_REQUEST *request, const char *username,
 	{
 		alarm = service->data->alarms.values[i];
 
+		/*
+		 * FIXME: currently for ZBX_VMWARE_ENTITY_ANY scenario this would return all available
+		 * VCs, need additional filter here.
+		 * Also it does not support cluster and datacenter entities at this moment.
+		 */
 		if (entity_type != ZBX_VMWARE_ENTITY_ANY && entity_type != alarm->entity_type && uuid != alarm->entity_uuid)
 			continue;
 

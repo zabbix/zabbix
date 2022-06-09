@@ -3873,10 +3873,11 @@ static void	vmware_service_get_alarms_data(zbx_vmware_service_t *service, CURL *
 			zbx_free(value);
 		}
 
-		if (FAIL == zbx_vector_vmware_alarm_search(alarms, alarm, vmware_alarm_compare_key) &&
+		if (FAIL == zbx_vector_vmware_alarm_bsearch(alarms, alarm, vmware_alarm_compare_key) &&
 				SUCCEED == vmware_service_get_alarm_details(service, easyhandle, alarm, error))
 		{
 			zbx_vector_vmware_alarm_append(alarms, alarm);
+			zbx_vector_vmware_alarm_sort(alarms, vmware_alarm_compare_key);
 		}
 		else
 			vmware_alarm_free(alarm);
