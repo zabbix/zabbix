@@ -1344,8 +1344,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	for (i = 0; i < threads_num; i++)
 	{
 		zbx_thread_args_t		thread_args;
-		unsigned char			poller_type = 0;
-		ZBX_THREAD_POLLER_ARGS		POLLER_ARGS = {zbx_config_tls, get_program_type, poller_type};
+		ZBX_THREAD_POLLER_ARGS		POLLER_ARGS = {zbx_config_tls, get_program_type, ZBX_NO_POLLER};
 		ZBX_THREAD_TRAPPER_ARGS		TRAPPER_ARGS = {zbx_config_tls, get_program_type, listen_sock};
 		ZBX_THREAD_ESCALATOR_ARGS	ESCALATOR_ARGS = {zbx_config_tls, get_program_type};
 		ZBX_THREAD_PROXY_POLLER_ARGS	PROXY_POLLER_ARGS = {zbx_config_tls, get_program_type};
@@ -1405,12 +1404,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_vc_enable();
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
-				poller_type = ZBX_POLLER_TYPE_NORMAL;
+				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_NORMAL;
 				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_UNREACHABLE:
-				poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
+				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_UNREACHABLE;
 				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
@@ -1446,7 +1445,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(escalator_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_JAVAPOLLER:
-				poller_type = ZBX_POLLER_TYPE_JAVA;
+				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_JAVA;
 				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
@@ -1493,7 +1492,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(alert_syncer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HISTORYPOLLER:
-				poller_type = ZBX_POLLER_TYPE_HISTORY;
+				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_HISTORY;
 				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
@@ -1512,7 +1511,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(trigger_housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ODBCPOLLER:
-				poller_type = ZBX_POLLER_TYPE_ODBC;
+				POLLER_ARGS.poller_type = ZBX_POLLER_TYPE_ODBC;
 				thread_args.args = &POLLER_ARGS;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
