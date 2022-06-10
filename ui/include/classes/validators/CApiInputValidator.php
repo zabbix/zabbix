@@ -1197,8 +1197,7 @@ class CApiInputValidator {
 
 				if ($matched_multiple_rule === null) {
 					// For use by developers. Do not translate.
-					$error = 'Incorrect validation rules.';
-
+					$error = 'Incorrect API_MULTIPLE validation rules.';
 					return false;
 				}
 
