@@ -111,7 +111,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 	int		ret;
 	zbx_socket_t	s;
-	//zbx_tls_init_child_args_t	*tls_init_child_args;
 	ZBX_THREAD_LISTENER_ARGS	*init_child_args_in;
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -120,8 +119,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
-
-	//tls_init_child_args = (zbx_tls_init_child_args_t *)((zbx_thread_args_t *)args)->args;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(init_child_args_in->zbx_get_program_type_cb_arg()),

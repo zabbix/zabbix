@@ -681,7 +681,6 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	ZBX_THREAD_SENDVAL_ARGS		*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 	int				ret = FAIL;
 	zbx_socket_t			sock;
-	//zbx_tls_init_child_args_t	*tls_init_child_args;
 #if !defined(_WINDOWS)
 	int			i;
 	zbx_addr_t		*last_addr;

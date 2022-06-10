@@ -36,7 +36,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern zbx_vector_ptr_t	zbx_addrs;
 extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
-/* extern unsigned int	configured_tls_connect_mode; */
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -294,7 +293,7 @@ clean:
 ZBX_THREAD_ENTRY(datasender_thread, args)
 {
 	ZBX_THREAD_DATASENDER_ARGS	*datasender_args_in = (ZBX_THREAD_DATASENDER_ARGS *)
-							(((zbx_thread_args_t *)args)->args);
+			(((zbx_thread_args_t *)args)->args);
 
 	int		records = 0, hist_upload_state = ZBX_PROXY_UPLOAD_ENABLED, more;
 	double		time_start, time_diff = 0.0, time_now;

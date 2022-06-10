@@ -1409,16 +1409,12 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args, *activechks_args_in;
 	time_t				nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0,
 					heartbeat_nextcheck = 0;
-	//zbx_tls_init_child_args_t	*tls_init_child_args;
-
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 	activechks_args_in = (ZBX_THREAD_ACTIVECHK_ARGS *)((((zbx_thread_args_t *)args))->args);
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
-
-	//tls_init_child_args = (zbx_tls_init_child_args_t *)((zbx_thread_args_t *)args)->args;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]",
 			get_program_type_string(activechks_args_in->zbx_get_program_type_cb_arg()),
