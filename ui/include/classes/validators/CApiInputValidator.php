@@ -297,21 +297,7 @@ class CApiInputValidator {
 				return true;
 
 			case API_OBJECT:
-				foreach ($rule['fields'] as $field_name => $field_rule) {
-					if ($data !== null && array_key_exists($field_name, $data)) {
-						$field_rule = self::resolveRuleConditions($field_rule, $data);
-
-						if ($field_rule === null) {
-							return false;
-						}
-
-						$subpath = ($path === '/' ? $path : $path.'/').$field_name;
-						if (!self::validateDataUniqueness($field_rule, $data[$field_name], $subpath, $error)) {
-							return false;
-						}
-					}
-				}
-				return true;
+				return self::validateObjectUniqueness($rule, $data, $path, $error);
 
 			case API_IDS:
 			case API_STRINGS_UTF8:
@@ -324,45 +310,10 @@ class CApiInputValidator {
 				return self::validateObjectsUniqueness($rule, $data, $path, $error);
 		}
 
-		// This message can be untranslated because warn about incorrect validation rules at a development stage.
+		// For use by developers. Do not translate.
 		$error = 'Incorrect validation rules.';
 
 		return false;
-	}
-
-	/**
-	 * Resolve rule conditions like API_MULTIPLE.
-	 *
-	 * @param array $field_rule
-	 * @param array $data
-	 *
-	 * @return array|null
-	 */
-	private static function resolveRuleConditions(array $field_rule, array $data): ?array {
-		while ($field_rule['type'] == API_MULTIPLE) {
-			$matched_rule = null;
-
-			foreach ($field_rule['rules'] as $rule) {
-				if (array_key_exists('else', $rule)
-						|| (is_array($rule['if']) && self::isInRange($data[$rule['if']['field']], $rule['if']['in']))
-						|| ($rule['if'] instanceof Closure && call_user_func($rule['if'], $data))) {
-					$field_rule += ['flags' => 0x00];
-					$rule += ['flags' => 0x00];
-					$rule['flags'] |= $field_rule['flags'] & API_REQUIRED;
-					$matched_rule = $rule + array_intersect_key($field_rule, array_flip(['default', 'default_source']));
-
-					break;
-				}
-			}
-
-			if ($matched_rule === null) {
-				return null;
-			}
-
-			$field_rule = $matched_rule;
-		}
-
-		return $field_rule;
 	}
 
 	/**
@@ -1226,11 +1177,32 @@ class CApiInputValidator {
 
 		// validation of the values type
 		foreach ($rule['fields'] as $field_name => $field_rule) {
-			$field_rule = self::resolveRuleConditions($field_rule, $data);
+			while ($field_rule['type'] == API_MULTIPLE) {
+				$matched_multiple_rule = null;
 
-			if ($field_rule === null) {
-				$error = 'Incorrect validation rules.';
-				return false;
+				foreach ($field_rule['rules'] as $multiple_rule) {
+					if (array_key_exists('else', $multiple_rule)
+							|| (is_array($multiple_rule['if'])
+								&& self::isInRange($data[$multiple_rule['if']['field']], $multiple_rule['if']['in']))
+							|| ($multiple_rule['if'] instanceof Closure
+								&& call_user_func($multiple_rule['if'], $data))) {
+						$field_rule += ['flags' => 0x00];
+						$multiple_rule += ['flags' => 0x00];
+						$multiple_rule['flags'] = ($field_rule['flags'] & API_REQUIRED) | $multiple_rule['flags'];
+						$matched_multiple_rule = $multiple_rule +
+							array_intersect_key($field_rule, array_flip(['default', 'default_source']));
+						break;
+					}
+				}
+
+				if ($matched_multiple_rule === null) {
+					// For use by developers. Do not translate.
+					$error = 'Incorrect validation rules.';
+
+					return false;
+				}
+
+				$field_rule = $matched_multiple_rule;
 			}
 
 			if ($field_rule['type'] === API_UNEXPECTED
@@ -2046,7 +2018,6 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateObjectsUniqueness($rule, ?array $data, $path, &$error) {
-		// $data can be NULL when API_ALLOW_NULL is set
 		if ($data === null) {
 			return true;
 		}
@@ -2097,18 +2068,60 @@ class CApiInputValidator {
 		}
 
 		foreach ($data as $index => $object) {
-			foreach ($rule['fields'] as $field_name => $field_rule) {
-				if (array_key_exists($field_name, $object)) {
-					$field_rule = self::resolveRuleConditions($field_rule, $object);
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
 
-					if ($field_rule === null) {
+			if (!self::validateObjectUniqueness(['fields' => $rule['fields']], $object, $subpath, $error)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Object uniqueness validator.
+	 *
+	 * @param            $rule
+	 * @param array|null $data
+	 * @param            $path
+	 * @param            $error
+	 *
+	 * @return bool
+	 */
+	private static function validateObjectUniqueness($rule, ?array $data, $path, &$error): bool {
+		if ($data === null) {
+			return true;
+		}
+
+		foreach ($rule['fields'] as $field_name => $field_rule) {
+			if (array_key_exists($field_name, $data)) {
+				while ($field_rule['type'] == API_MULTIPLE) {
+					$matched_multiple_rule = null;
+
+					foreach ($field_rule['rules'] as $multiple_rule) {
+						if (array_key_exists('else', $multiple_rule)
+								|| (is_array($multiple_rule['if']) && self::isInRange(
+									$data[$multiple_rule['if']['field']], $multiple_rule['if']['in']))
+								|| ($multiple_rule['if'] instanceof Closure
+									&& call_user_func($multiple_rule['if'], $data))) {
+							$matched_multiple_rule = $multiple_rule;
+							break;
+						}
+					}
+
+					if ($matched_multiple_rule === null) {
+						// For use by developers. Do not translate.
+						$error = 'Incorrect API_MULTIPLE validation rules.';
 						return false;
 					}
 
-					$subpath = ($path === '/' ? $path : $path.'/').($index + 1).'/'.$field_name;
-					if (!self::validateDataUniqueness($field_rule, $object[$field_name], $subpath, $error)) {
-						return false;
-					}
+					$field_rule = $matched_multiple_rule;
+				}
+
+				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
+
+				if (!self::validateDataUniqueness($field_rule, $data[$field_name], $subpath, $error)) {
+					return false;
 				}
 			}
 		}
