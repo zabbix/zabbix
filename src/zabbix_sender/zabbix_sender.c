@@ -690,7 +690,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	zbx_set_sender_signal_handlers();
 #endif
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	if (ZBX_TCP_SEC_UNENCRYPTED != sendval_args->zbx_config_tls->configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_UNENCRYPTED != sendval_args->zbx_config_tls->connect_mode)
 	{
 		/* take TLS data passed from 'main' thread */
 		zbx_tls_take_vars(&sendval_args->tls_vars);
@@ -965,20 +965,20 @@ static void	zbx_load_config(const char *config_file)
 	}
 	zbx_free(cfg_active_hosts);
 
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_connect), cfg_tls_connect);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_ca_file), cfg_tls_ca_file);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_crl_file), cfg_tls_crl_file);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_server_cert_issuer), cfg_tls_server_cert_issuer);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_server_cert_subject), cfg_tls_server_cert_subject);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_cert_file), cfg_tls_cert_file);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_key_file), cfg_tls_key_file);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_psk_identity), cfg_tls_psk_identity);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_psk_file), cfg_tls_psk_file);
+	zbx_fill_from_config_file(&(zbx_config_tls->connect), cfg_tls_connect);
+	zbx_fill_from_config_file(&(zbx_config_tls->ca_file), cfg_tls_ca_file);
+	zbx_fill_from_config_file(&(zbx_config_tls->crl_file), cfg_tls_crl_file);
+	zbx_fill_from_config_file(&(zbx_config_tls->server_cert_issuer), cfg_tls_server_cert_issuer);
+	zbx_fill_from_config_file(&(zbx_config_tls->server_cert_subject), cfg_tls_server_cert_subject);
+	zbx_fill_from_config_file(&(zbx_config_tls->cert_file), cfg_tls_cert_file);
+	zbx_fill_from_config_file(&(zbx_config_tls->key_file), cfg_tls_key_file);
+	zbx_fill_from_config_file(&(zbx_config_tls->psk_identity), cfg_tls_psk_identity);
+	zbx_fill_from_config_file(&(zbx_config_tls->psk_file), cfg_tls_psk_file);
 
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_cipher_cert13), cfg_tls_cipher_cert13);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_cipher_cert), cfg_tls_cipher_cert);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_cipher_psk13), cfg_tls_cipher_psk13);
-	zbx_fill_from_config_file(&(zbx_config_tls->config_tls_cipher_psk), cfg_tls_cipher_psk);
+	zbx_fill_from_config_file(&(zbx_config_tls->cipher_cert13), cfg_tls_cipher_cert13);
+	zbx_fill_from_config_file(&(zbx_config_tls->cipher_cert), cfg_tls_cipher_cert);
+	zbx_fill_from_config_file(&(zbx_config_tls->cipher_psk13), cfg_tls_cipher_psk13);
+	zbx_fill_from_config_file(&(zbx_config_tls->cipher_psk), cfg_tls_cipher_psk);
 }
 
 static void	parse_commandline(int argc, char **argv)
@@ -1078,45 +1078,45 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			case '1':
-				zbx_config_tls->config_tls_connect = zbx_strdup(zbx_config_tls->config_tls_connect,
+				zbx_config_tls->connect = zbx_strdup(zbx_config_tls->connect,
 						zbx_optarg);
 				break;
 			case '2':
-				zbx_config_tls->config_tls_ca_file = zbx_strdup(zbx_config_tls->config_tls_ca_file,
+				zbx_config_tls->ca_file = zbx_strdup(zbx_config_tls->ca_file,
 						zbx_optarg);
 				break;
 			case '3':
-				zbx_config_tls->config_tls_crl_file = zbx_strdup(zbx_config_tls->config_tls_crl_file,
+				zbx_config_tls->crl_file = zbx_strdup(zbx_config_tls->crl_file,
 						zbx_optarg);
 				break;
 			case '4':
-				zbx_config_tls->config_tls_server_cert_issuer =
-						zbx_strdup(zbx_config_tls->config_tls_server_cert_issuer, zbx_optarg);
+				zbx_config_tls->server_cert_issuer =
+						zbx_strdup(zbx_config_tls->server_cert_issuer, zbx_optarg);
 				break;
 			case '5':
-				zbx_config_tls->config_tls_server_cert_subject =
-						zbx_strdup(zbx_config_tls->config_tls_server_cert_subject, zbx_optarg);
+				zbx_config_tls->server_cert_subject =
+						zbx_strdup(zbx_config_tls->server_cert_subject, zbx_optarg);
 				break;
 			case '6':
-				zbx_config_tls->config_tls_cert_file = zbx_strdup(zbx_config_tls->config_tls_cert_file,
+				zbx_config_tls->cert_file = zbx_strdup(zbx_config_tls->cert_file,
 						zbx_optarg);
 				break;
 			case '7':
-				zbx_config_tls->config_tls_key_file = zbx_strdup(zbx_config_tls->config_tls_key_file,
+				zbx_config_tls->key_file = zbx_strdup(zbx_config_tls->key_file,
 						zbx_optarg);
 				break;
 			case '8':
-				zbx_config_tls->config_tls_psk_identity =
-						zbx_strdup(zbx_config_tls->config_tls_psk_identity, zbx_optarg);
+				zbx_config_tls->psk_identity =
+						zbx_strdup(zbx_config_tls->psk_identity, zbx_optarg);
 				break;
 			case '9':
-				zbx_config_tls->config_tls_psk_file = zbx_strdup(zbx_config_tls->config_tls_psk_file,
+				zbx_config_tls->psk_file = zbx_strdup(zbx_config_tls->psk_file,
 						zbx_optarg);
 				break;
 			case 'A':
 #if defined(HAVE_OPENSSL)
-				zbx_config_tls->config_tls_cipher_cmd13 =
-						zbx_strdup(zbx_config_tls->config_tls_cipher_cmd13, zbx_optarg);
+				zbx_config_tls->cipher_cmd13 =
+						zbx_strdup(zbx_config_tls->cipher_cmd13, zbx_optarg);
 #elif defined(HAVE_GNUTLS)
 				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
 						" Zabbix sender was compiled with GnuTLS");
@@ -1124,8 +1124,8 @@ static void	parse_commandline(int argc, char **argv)
 #endif
 				break;
 			case 'B':
-				zbx_config_tls->config_tls_cipher_cmd =
-						zbx_strdup(zbx_config_tls->config_tls_cipher_cmd, zbx_optarg);
+				zbx_config_tls->cipher_cmd =
+						zbx_strdup(zbx_config_tls->cipher_cmd, zbx_optarg);
 				break;
 #else
 			case '1':
@@ -1553,24 +1553,24 @@ int	main(int argc, char **argv)
 	signal(SIGALRM, main_signal_handler);
 	signal(SIGPIPE, main_signal_handler);
 #endif
-	if (NULL != zbx_config_tls->config_tls_connect || NULL != zbx_config_tls->config_tls_ca_file ||
-			NULL != zbx_config_tls->config_tls_crl_file ||
-			NULL != zbx_config_tls->config_tls_server_cert_issuer ||
-			NULL != zbx_config_tls->config_tls_server_cert_subject ||
-			NULL != zbx_config_tls->config_tls_cert_file || NULL != zbx_config_tls->config_tls_key_file ||
-			NULL != zbx_config_tls->config_tls_psk_identity ||
-			NULL != zbx_config_tls->config_tls_psk_file ||
-			NULL != zbx_config_tls->config_tls_cipher_cert13 ||
-			NULL != zbx_config_tls->config_tls_cipher_cert ||
-			NULL != zbx_config_tls->config_tls_cipher_psk13 ||
-			NULL != zbx_config_tls->config_tls_cipher_psk ||
-			NULL != zbx_config_tls->config_tls_cipher_cmd13 ||
-			NULL != zbx_config_tls->config_tls_cipher_cmd)
+	if (NULL != zbx_config_tls->connect || NULL != zbx_config_tls->ca_file ||
+			NULL != zbx_config_tls->crl_file ||
+			NULL != zbx_config_tls->server_cert_issuer ||
+			NULL != zbx_config_tls->server_cert_subject ||
+			NULL != zbx_config_tls->cert_file || NULL != zbx_config_tls->key_file ||
+			NULL != zbx_config_tls->psk_identity ||
+			NULL != zbx_config_tls->psk_file ||
+			NULL != zbx_config_tls->cipher_cert13 ||
+			NULL != zbx_config_tls->cipher_cert ||
+			NULL != zbx_config_tls->cipher_psk13 ||
+			NULL != zbx_config_tls->cipher_psk ||
+			NULL != zbx_config_tls->cipher_cmd13 ||
+			NULL != zbx_config_tls->cipher_cmd)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, program_type);
 
-		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->configured_tls_connect_mode)
+		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 		{
 #if defined(_WINDOWS)
 			zbx_tls_init_parent();
@@ -1588,7 +1588,7 @@ int	main(int argc, char **argv)
 			sizeof(ZBX_THREAD_SENDVAL_ARGS));
 
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 	{
 		/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
 		zbx_tls_pass_vars(&sendval_args->tls_vars);
@@ -1866,7 +1866,7 @@ exit:
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 	{
 		zbx_tls_free();
 #if defined(_WINDOWS)

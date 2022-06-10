@@ -620,34 +620,34 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSConnect", zbx_config_tls->config_tls_connect, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSAccept", zbx_config_tls->config_tls_accept, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCAFile", zbx_config_tls->config_tls_ca_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", zbx_config_tls->config_tls_crl_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", zbx_config_tls->config_tls_server_cert_issuer,
+	err |= (FAIL == check_cfg_feature_str("TLSConnect", zbx_config_tls->connect, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSAccept", zbx_config_tls->accept, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCAFile", zbx_config_tls->ca_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", zbx_config_tls->crl_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", zbx_config_tls->server_cert_issuer,
 			"TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", zbx_config_tls->config_tls_server_cert_subject,
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", zbx_config_tls->server_cert_subject,
 			"TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSCertFile", zbx_config_tls->config_tls_cert_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", zbx_config_tls->config_tls_key_file, "TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", zbx_config_tls->config_tls_psk_identity,
+	err |= (FAIL == check_cfg_feature_str("TLSCertFile", zbx_config_tls->cert_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", zbx_config_tls->key_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", zbx_config_tls->psk_identity,
 			"TLS support"));
-	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", zbx_config_tls->config_tls_psk_file, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", zbx_config_tls->psk_file, "TLS support"));
 #endif
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", zbx_config_tls->config_tls_cipher_cert,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert", zbx_config_tls->cipher_cert,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->config_tls_cipher_psk,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK", zbx_config_tls->cipher_psk,
 			"GnuTLS or OpenSSL"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", zbx_config_tls->config_tls_cipher_all,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll", zbx_config_tls->cipher_all,
 			"GnuTLS or OpenSSL"));
 #endif
 #if !defined(HAVE_OPENSSL)
-	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->config_tls_cipher_cert13,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherCert13", zbx_config_tls->cipher_cert13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->config_tls_cipher_psk13,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherPSK13", zbx_config_tls->cipher_psk13,
 			"OpenSSL 1.1.1 or newer"));
-	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->config_tls_cipher_all13,
+	err |= (FAIL == check_cfg_feature_str("TLSCipherAll13", zbx_config_tls->cipher_all13,
 			"OpenSSL 1.1.1 or newer"));
 #endif
 
@@ -840,37 +840,37 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSConnect",			&(zbx_config_tls->config_tls_connect),	TYPE_STRING,
+		{"TLSConnect",			&(zbx_config_tls->connect),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSAccept",			&(zbx_config_tls->config_tls_accept),	TYPE_STRING_LIST,
+		{"TLSAccept",			&(zbx_config_tls->accept),	TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"TLSCAFile",			&(zbx_config_tls->config_tls_ca_file),	TYPE_STRING,
+		{"TLSCAFile",			&(zbx_config_tls->ca_file),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCRLFile",			&(zbx_config_tls->config_tls_crl_file),	TYPE_STRING,
+		{"TLSCRLFile",			&(zbx_config_tls->crl_file),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertIssuer",	&(zbx_config_tls->config_tls_server_cert_issuer),	TYPE_STRING,
+		{"TLSServerCertIssuer",	&(zbx_config_tls->server_cert_issuer),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSServerCertSubject",	&(zbx_config_tls->config_tls_server_cert_subject),	TYPE_STRING,
+		{"TLSServerCertSubject",	&(zbx_config_tls->server_cert_subject),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCertFile",		&(zbx_config_tls->config_tls_cert_file),		TYPE_STRING,
+		{"TLSCertFile",		&(zbx_config_tls->cert_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSKeyFile",			&(zbx_config_tls->config_tls_key_file),		TYPE_STRING,
+		{"TLSKeyFile",			&(zbx_config_tls->key_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKIdentity",		&(zbx_config_tls->config_tls_psk_identity),	TYPE_STRING,
+		{"TLSPSKIdentity",		&(zbx_config_tls->psk_identity),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&(zbx_config_tls->config_tls_psk_file),		TYPE_STRING,
+		{"TLSPSKFile",			&(zbx_config_tls->psk_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert13",		&(zbx_config_tls->config_tls_cipher_cert13),	TYPE_STRING,
+		{"TLSCipherCert13",		&(zbx_config_tls->cipher_cert13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherCert",		&(zbx_config_tls->config_tls_cipher_cert),	TYPE_STRING,
+		{"TLSCipherCert",		&(zbx_config_tls->cipher_cert),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK13",		&(zbx_config_tls->config_tls_cipher_psk13),	TYPE_STRING,
+		{"TLSCipherPSK13",		&(zbx_config_tls->cipher_psk13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherPSK",		&(zbx_config_tls->config_tls_cipher_psk),	TYPE_STRING,
+		{"TLSCipherPSK",		&(zbx_config_tls->cipher_psk),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll13",		&(zbx_config_tls->config_tls_cipher_all13),	TYPE_STRING,
+		{"TLSCipherAll13",		&(zbx_config_tls->cipher_all13),	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSCipherAll",		&(zbx_config_tls->config_tls_cipher_all),	TYPE_STRING,
+		{"TLSCipherAll",		&(zbx_config_tls->cipher_all),	TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SocketDir",			&CONFIG_SOCKET_PATH,			TYPE_STRING,
 			PARM_OPT,	0,			0},

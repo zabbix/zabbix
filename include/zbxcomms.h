@@ -58,29 +58,29 @@ zbx_buf_type_t;
 
 typedef struct
 {
-	unsigned int	configured_tls_connect_mode; /* not used in server */
-	unsigned int	configured_tls_accept_modes; /* not used in server */
+	unsigned int	connect_mode; /* not used in server */
+	unsigned int	accept_modes; /* not used in server */
 
-	char	*config_tls_connect;
-	char	*config_tls_accept; /* not used in zabbix_sender, zabbix_get */
-	char	*config_tls_ca_file;
-	char	*config_tls_crl_file;
-	char	*config_tls_server_cert_issuer;
-	char	*config_tls_server_cert_subject;
-	char	*config_tls_cert_file;
-	char	*config_tls_key_file;
-	char	*config_tls_psk_identity;
-	char	*config_tls_psk_file;
-	char	*config_tls_cipher_cert13; /* not used in zabbix_get, config file parameter 'TLSCipherCert13' */
-	char	*config_tls_cipher_cert; /* not used in zabbix_get, config file parameter 'TLSCipherCert' */
-	char	*config_tls_cipher_psk13;  /* not used in zabbix_get, config file parameter 'TLSCipherPSK13' */
-	char	*config_tls_cipher_psk;  /* not used in zabbix_get, config file parameter 'TLSCipherPSK' */
-	char	*config_tls_cipher_all13; /* not used in zabbix_sender, zabbix_get, config file parameter */
+	char	*connect;
+	char	*accept; /* not used in zabbix_sender, zabbix_get */
+	char	*ca_file;
+	char	*crl_file;
+	char	*server_cert_issuer;
+	char	*server_cert_subject;
+	char	*cert_file;
+	char	*key_file;
+	char	*psk_identity;
+	char	*psk_file;
+	char	*cipher_cert13; /* not used in zabbix_get, config file parameter 'TLSCipherCert13' */
+	char	*cipher_cert; /* not used in zabbix_get, config file parameter 'TLSCipherCert' */
+	char	*cipher_psk13;  /* not used in zabbix_get, config file parameter 'TLSCipherPSK13' */
+	char	*cipher_psk;  /* not used in zabbix_get, config file parameter 'TLSCipherPSK' */
+	char	*cipher_all13; /* not used in zabbix_sender, zabbix_get, config file parameter */
 					/*'TLSCipherAll13' */
-	char	*config_tls_cipher_all; /* not used in zabbix_sender, zabbix_get, config file parameter */
+	char	*cipher_all; /* not used in zabbix_sender, zabbix_get, config file parameter */
 					/*'TLSCipherAll' */
-	char	*config_tls_cipher_cmd13; /* not used in agent, server, proxy, config file parameter '--tls-cipher13' */
-	char	*config_tls_cipher_cmd;	/* not used in agent, server, proxy, config file parameter 'tls-cipher' */
+	char	*cipher_cmd13; /* not used in agent, server, proxy, config file parameter '--tls-cipher13' */
+	char	*cipher_cmd;	/* not used in agent, server, proxy, config file parameter 'tls-cipher' */
 } zbx_config_tls_t;
 
 void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls);

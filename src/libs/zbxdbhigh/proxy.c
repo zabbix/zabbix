@@ -382,7 +382,7 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 		return FAIL;
 	}
 
-	if (0 == (zbx_config_tls->configured_tls_accept_modes & sock->connection_type))
+	if (0 == (zbx_config_tls->accept_modes & sock->connection_type))
 	{
 		msg = zbx_dsprintf(NULL, "%s over connection of type \"%s\" is not allowed", req,
 				zbx_tcp_connection_type_name(sock->connection_type));
@@ -400,8 +400,8 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		if (SUCCEED == zbx_check_server_issuer_subject(sock, zbx_config_tls->config_tls_server_cert_issuer,
-				zbx_config_tls->config_tls_server_cert_subject, &msg))
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, zbx_config_tls->server_cert_issuer,
+				zbx_config_tls->server_cert_subject, &msg))
 		{
 			return SUCCEED;
 		}

@@ -148,7 +148,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
-		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->configured_tls_accept_modes);
+		ret = zbx_tcp_accept(&s, init_child_args_in->zbx_config_tls->accept_modes);
 		zbx_update_env(zbx_time());
 
 		if (SUCCEED == ret)
@@ -161,8 +161,8 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				if (ZBX_TCP_SEC_TLS_CERT != s.connection_type ||
 						SUCCEED == (ret = zbx_check_server_issuer_subject(&s,
-						init_child_args_in->zbx_config_tls->config_tls_server_cert_issuer,
-						init_child_args_in->zbx_config_tls->config_tls_server_cert_subject,
+						init_child_args_in->zbx_config_tls->server_cert_issuer,
+						init_child_args_in->zbx_config_tls->server_cert_subject,
 						&msg)))
 #endif
 				{
