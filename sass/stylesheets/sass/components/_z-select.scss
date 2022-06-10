@@ -67,8 +67,9 @@ z-select,
 			color: $font-color;
 			text-overflow: ellipsis;
 			word-break: break-word;
-			white-space: pre-wrap;
 			user-select: none;
+			white-space: nowrap;
+			overflow: hidden;
 
 			&.hover {
 				background-color: $action-hover-color;
