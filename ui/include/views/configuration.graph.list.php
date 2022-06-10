@@ -79,7 +79,7 @@ else {
 	}
 
 	// Add filter tab.
-	$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
+	$hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_templates' => true];
 
 	$widget->addItem(
 		(new CFilter())
@@ -90,36 +90,37 @@ else {
 			->addFilterTab(_('Filter'), [
 				(new CFormList())
 					->addRow(
-						(new CLabel(_('Host groups'), 'filter_groups__ms')),
+						new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'),
+							'filter_groups__ms'
+						),
 						(new CMultiSelect([
 							'name' => 'filter_groupids[]',
-							'object_name' => 'hostGroup',
+							'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
 							'data' => $data['filter']['groups'],
 							'popup' => [
 								'parameters' => [
-									'srctbl' => 'host_groups',
+									'srctbl' =>  $data['context'] === 'host' ? 'host_groups' : 'template_groups',
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groupids_',
-									'with_hosts_and_templates' => 1,
-									'editable' => 1,
+									'editable' => true,
 									'enrich_parent_groups' => true
 								] + $hg_ms_params
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 					->addRow(
-						(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hosts__ms')),
+						new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hosts__ms'),
 						(new CMultiSelect([
 							'name' => 'filter_hostids[]',
-							'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+							'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 							'data' => $data['filter']['hosts'],
 							'popup' => [
-								'filter_preselect_fields' => [
-									'hostgroups' => 'filter_groupids_'
-								],
+								'filter_preselect_fields' => $data['context'] === 'host'
+									? ['hostgroups' => 'filter_groupids_']
+									: ['templategroups' => 'filter_groupids_'],
 								'parameters' => [
-									'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 									'srcfld1' => 'hostid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_hostids_',

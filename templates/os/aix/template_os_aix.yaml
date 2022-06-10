@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:53:57Z'
-  groups:
+  date: '2022-06-07T19:33:00Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -851,8 +851,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'AIX by Zabbix agent'
                         name: 'CPU load'
-                        host: 'AIX by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -867,8 +867,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'AIX by Zabbix agent'
                         name: 'CPU jumps'
-                        host: 'AIX by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -883,8 +883,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU utilization'
                         host: 'AIX by Zabbix agent'
+                        name: 'CPU utilization'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -900,8 +900,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'AIX by Zabbix agent'
+                        name: 'Memory usage'
       valuemaps:
         -
           uuid: 4a25a6b3d6e4482ab2a748c79cb55524

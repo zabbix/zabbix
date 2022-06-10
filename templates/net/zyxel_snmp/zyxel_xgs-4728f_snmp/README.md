@@ -114,7 +114,7 @@ There are no template links in this template.
 |ZYXEL XGS-4728F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} |<p>The parameter values are less than the lower threshold</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}` |WARNING | |
 |ZYXEL XGS-4728F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
 |ZYXEL XGS-4728F: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL XGS-4728F SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL XGS-4728F: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|ZYXEL XGS-4728F: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |ZYXEL XGS-4728F: Temperature {#ZYXEL.TEMP.ID} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL XGS-4728F SNMP/zyxel.4728f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
 
 ## Feedback

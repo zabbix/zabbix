@@ -89,7 +89,6 @@ $item_select = (new CPatternSelect([
 			'srctbl' => 'items',
 			'srcfld1' => 'itemid',
 			'real_hosts' => 1,
-			'webitems' => 1,
 			'dstfrm' => $form->getName(),
 			'dstfld1' => 'item'
 		]

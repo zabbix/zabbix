@@ -34,11 +34,11 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
@@ -49,6 +49,7 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \

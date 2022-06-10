@@ -33,18 +33,22 @@ class EntitiesTags {
 		// Create host groups.
 		CDataHelper::call('hostgroup.create', [
 			['name' => 'HostTags'],
-			['name' => 'TemplateTags'],
 			['name' => 'HostPrototypeTags']
 		]);
+		$host_groupids = CDataHelper::getIds('name');
 
-		$groupids = CDataHelper::getIds('name');
+		// Create template group.
+		CDataHelper::call('templategroup.create', [
+			['name' => 'TemplateTags']
+		]);
+		$template_groupids = CDataHelper::getIds('name');
 
 		// Create templates.
 		$templates = CDataHelper::createTemplates([
 			[
 				'host' => 'Template for tags testing',
 				'groups' => [
-					'groupid' => $groupids['TemplateTags']
+					'groupid' => $template_groupids['TemplateTags']
 				],
 				'tags' => [
 					[
@@ -105,7 +109,7 @@ class EntitiesTags {
 			[
 				'host' => '1 template with tags for cloning',
 				'groups' => [
-					'groupid' => $groupids['TemplateTags']
+					'groupid' => $template_groupids['TemplateTags']
 				],
 				'tags' => [
 					[
@@ -124,7 +128,7 @@ class EntitiesTags {
 			[
 				'host' => '2 template with tags for updating',
 				'groups' => [
-					'groupid' => $groupids['TemplateTags']
+					'groupid' => $template_groupids['TemplateTags']
 				],
 				'tags' => [
 					[
@@ -143,7 +147,7 @@ class EntitiesTags {
 			[
 				'host' => '1 template for removing tags',
 				'groups' => [
-					'groupid' => $groupids['TemplateTags']
+					'groupid' => $template_groupids['TemplateTags']
 				],
 				'tags' => [
 					[
@@ -167,7 +171,7 @@ class EntitiesTags {
 				'host' => 'Host for tags testing',
 				'interfaces' => [],
 				'groups' => [
-					'groupid' => $groupids['HostTags']
+					'groupid' => $host_groupids['HostTags']
 				],
 				'status' => HOST_STATUS_MONITORED,
 				'tags' => [
@@ -253,7 +257,7 @@ class EntitiesTags {
 				'host' => 'Host with tags for cloning',
 				'interfaces' => [],
 				'groups' => [
-					'groupid' => $groupids['HostTags']
+					'groupid' => $host_groupids['HostTags']
 				],
 				'status' => HOST_STATUS_MONITORED,
 				'tags' => [
@@ -314,7 +318,7 @@ class EntitiesTags {
 				'host' => 'Host with tags for updating',
 				'interfaces' => [],
 				'groups' => [
-					'groupid' => $groupids['HostTags']
+					'groupid' => $host_groupids['HostTags']
 				],
 				'status' => HOST_STATUS_MONITORED,
 				'tags' => [
@@ -335,7 +339,7 @@ class EntitiesTags {
 				'host' => 'Host for removing tags',
 				'interfaces' => [],
 				'groups' => [
-					'groupid' => $groupids['HostTags']
+					'groupid' => $host_groupids['HostTags']
 				],
 				'status' => HOST_STATUS_MONITORED,
 				'tags' => [
@@ -632,7 +636,7 @@ class EntitiesTags {
 				'ruleid' => $hosts['discoveryruleids']['Host with tags for cloning:trap_discovery'],
 				'host' => '{#HOST} prototype with tags for cloning',
 				'groupLinks' => [
-					['groupid' => $groupids['HostPrototypeTags']]
+					['groupid' => $host_groupids['HostPrototypeTags']]
 				],
 				'tags' => [
 					[
@@ -660,7 +664,7 @@ class EntitiesTags {
 				'ruleid' => $hosts['discoveryruleids']['Host for tags testing:trap_discovery'],
 				'host' => '{#HOST} prototype with tags for updating',
 				'groupLinks' => [
-					['groupid' => $groupids['HostPrototypeTags']]
+					['groupid' => $host_groupids['HostPrototypeTags']]
 				],
 				'tags' => [
 					[
@@ -680,7 +684,7 @@ class EntitiesTags {
 				'ruleid' => $hosts['discoveryruleids']['Host for tags testing:trap_discovery'],
 				'host' => '{#HOST} prototype with for removing tags',
 				'groupLinks' => [
-					['groupid' => $groupids['HostPrototypeTags']]
+					['groupid' => $host_groupids['HostPrototypeTags']]
 				],
 				'tags' => [
 					[
@@ -700,7 +704,7 @@ class EntitiesTags {
 				'ruleid' => $templates['discoveryruleids']['Template for tags testing:template_trap_discovery'],
 				'host' => '{#TEMPLATE} prototype with tags for full cloning',
 				'groupLinks' => [
-					['groupid' => $groupids['HostPrototypeTags']]
+					['groupid' => $host_groupids['HostPrototypeTags']]
 				],
 				'tags' => [
 					[

@@ -341,7 +341,7 @@ class CIntegrationTest extends CAPITest {
 					case self::COMPONENT_SERVER:
 					case self::COMPONENT_PROXY:
 						$line = empty($waitLogLineOverride) ? 'started [trapper #1]' : $waitLogLineOverride;
-						self::waitForLogLineToBePresent($component, $line, false, 5, 1);
+						self::waitForLogLineToBePresent($component, $line, false, 10, 1);
 						break;
 					case self::COMPONENT_AGENT:
 						self::waitForLogLineToBePresent($component, 'started [listener #1]', false, 5, 1);

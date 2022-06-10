@@ -21,11 +21,12 @@
 
 class CSvgText extends CSvgTag {
 
-	public function __construct($x, $y, $text) {
+	public function __construct(string $text, $x = 0, $y = 0) {
 		parent::__construct('text');
 
-		$this->setAttribute('x', $x);
-		$this->setAttribute('y', $y);
-		$this->addItem($text);
+		$this
+			->addItem($text)
+			->setAttribute('x', $x)
+			->setAttribute('y', $y);
 	}
 }

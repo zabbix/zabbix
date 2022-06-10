@@ -40,6 +40,11 @@ import (
 	"zabbix.com/pkg/procfs"
 )
 
+type processUserInfo struct {
+	uid	int64
+	gid	int64
+}
+
 func read2k(filename string) (data []byte, err error) {
 	fd, err := syscall.Open(filename, syscall.O_RDONLY, 0)
 	if err != nil {
@@ -218,12 +223,17 @@ func getProcessState(pid string) (name string, err error) {
 	return "", fmt.Errorf("cannot find process state /proc/%s/status", pid)
 }
 
-func getProcessUserID(pid string) (userid int64, err error) {
+func getProcessUserInfo(pid string) (userinfo processUserInfo, err error) {
 	var fi os.FileInfo
+	userinfo = processUserInfo{}
 	if fi, err = os.Stat("/proc/" + pid); err != nil {
 		return
 	}
-	return int64(fi.Sys().(*syscall.Stat_t).Uid), nil
+	stat := fi.Sys().(*syscall.Stat_t)
+	userinfo.uid = int64(stat.Uid)
+	userinfo.gid = int64(stat.Gid)
+
+	return userinfo, nil
 }
 
 func getProcessCmdline(pid string, flags int) (arg0 string, cmdline string, err error) {
@@ -316,10 +326,13 @@ func getProcesses(flags int) (processes []*procInfo, err error) {
 			}
 		}
 		if flags&procInfoUser != 0 {
-			if info.userid, tmperr = getProcessUserID(entries[0].Name()); tmperr != nil {
+			var pu processUserInfo
+			pu, tmperr = getProcessUserInfo(entries[0].Name())
+			if tmperr != nil {
 				impl.Debugf("cannot get process %s user id: %s", entries[0].Name(), tmperr)
 				continue
 			}
+			info.userid = pu.uid
 		}
 		if flags&procInfoCmdline != 0 {
 			if info.arg0, info.cmdline, tmperr = getProcessCmdline(entries[0].Name(), flags); tmperr != nil {

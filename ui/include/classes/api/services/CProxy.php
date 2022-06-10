@@ -100,6 +100,14 @@ class CProxy extends CApiService {
 		// filter
 		if (is_array($options['filter'])) {
 			$this->dbFilter('hosts h', $options, $sqlParts);
+
+			$rt_filter = array_intersect_key($options['filter'], ['lastaccess' => '']);
+
+			if ($rt_filter && $rt_filter['lastaccess'] !== null) {
+				$this->dbFilter('host_rtdata hr', ['filter' => $rt_filter] + $options,
+					$sqlParts
+				);
+			}
 		}
 
 		// search
@@ -108,12 +116,22 @@ class CProxy extends CApiService {
 		}
 
 		// output
-		if ($options['output'] == API_OUTPUT_EXTEND) {
-			$sqlParts['select']['hostid'] = 'h.hostid';
-			$sqlParts['select']['host'] = 'h.host';
-			$sqlParts['select']['status'] = 'h.status';
-			$sqlParts['select']['lastaccess'] = 'h.lastaccess';
+		$fields = [
+			'proxyid', 'host', 'status', 'description', 'lastaccess', 'tls_connect', 'tls_accept', 'tls_issuer',
+			'tls_subject', 'proxy_address', 'auto_compress'
+		];
+		$options['output'] = ($options['output'] === API_OUTPUT_EXTEND) ? $fields : (array) $options['output'];
+
+		/*
+		 * For internal calls of API method, is possible to get the write-only fields if they were specified in output.
+		 * Specify write-only fields in output only if they will not appear in debug mode.
+		 */
+		if (APP::getMode() !== APP::EXEC_MODE_API) {
+			$fields[] = 'tls_psk_identity';
+			$fields[] = 'tls_psk';
 		}
+
+		$options['output'] = array_intersect($options['output'], $fields);
 
 		// countOutput
 		if ($options['countOutput']) {
@@ -124,22 +142,6 @@ class CProxy extends CApiService {
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
-		}
-
-		/*
-		 * Cleaning the output from write-only properties.
-		 */
-		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = array_diff(array_keys(DB::getSchema($this->tableName())['fields']),
-				['tls_psk_identity', 'tls_psk']
-			);
-		}
-		/*
-		* For internal calls of API method, is possible to get the write-only fields if they were specified in output.
-		* Specify write-only fields in output only if they will not appear in debug mode.
-		*/
-		elseif (is_array($options['output']) && APP::getMode() === APP::EXEC_MODE_API) {
-			$options['output'] = array_diff($options['output'], ['tls_psk_identity', 'tls_psk']);
 		}
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -191,12 +193,15 @@ class CProxy extends CApiService {
 		$this->validateCreate($proxies);
 
 		$proxyids = DB::insert('hosts', $proxies);
+		$host_rtdata = [];
 
 		foreach ($proxies as $index => &$proxy) {
 			$proxy['proxyid'] = $proxyids[$index];
+			$host_rtdata[] = ['hostid' => $proxyids[$index]];
 		}
 		unset($proxy);
 
+		DB::insert('host_rtdata', $host_rtdata, false);
 		self::updateInterfaces($proxies, __FUNCTION__);
 		self::updateHosts($proxies, __FUNCTION__);
 
@@ -368,6 +373,7 @@ class CProxy extends CApiService {
 	public function delete(array $proxyids) {
 		$this->validateDelete($proxyids, $db_proxies);
 
+		DB::delete('host_rtdata', ['hostid' => $proxyids]);
 		DB::delete('interface', ['hostid' => $proxyids]);
 		DB::delete('hosts', ['hostid' => $proxyids]);
 
@@ -479,6 +485,16 @@ class CProxy extends CApiService {
 
 		if (!$options['countOutput'] && $options['selectInterface'] !== null) {
 			$sqlParts = $this->addQuerySelect('h.hostid', $sqlParts);
+		}
+
+		if ((!$options['countOutput'] && $this->outputIsRequested('lastaccess', $options['output'])
+				|| (is_array($options['filter']) && array_key_exists('lastaccess', $options['filter'])))) {
+			$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'host_rtdata', 'using' => 'hostid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		if (!$options['countOutput'] && $this->outputIsRequested('lastaccess', $options['output'])) {
+			$sqlParts = $this->addQuerySelect('hr.lastaccess', $sqlParts);
 		}
 
 		return $sqlParts;

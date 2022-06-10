@@ -116,6 +116,12 @@ void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, cons
 int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error);
 
+/* evaluate simple */
+int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_error_len,
+		zbx_vector_ptr_t *unknown_msgs);
+int	zbx_evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
+double	zbx_evaluate_string_to_double(const char *in);
+
 /* lld macro context */
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
@@ -141,5 +147,4 @@ int	zbx_substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse
 
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error);
-
 #endif

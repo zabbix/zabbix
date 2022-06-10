@@ -49,6 +49,7 @@ DIST_SUBDIRS = \
 	zbxtasks \
 	zbxthreads \
 	zbxtrends \
+	zbxvariant \
 	zbxvault \
 	zbxxml
 
@@ -83,6 +84,7 @@ SERVER_SUBDIRS = \
 	zbxshmem \
 	zbxtasks \
 	zbxtrends \
+	zbxvariant \
 	zbxvault \
 	zbxxml
 else
@@ -114,6 +116,7 @@ PROXY_SUBDIRS = \
 	zbxshmem \
 	zbxtasks \
 	zbxtrends \
+	zbxvariant \
 	zbxvault \
 	zbxxml
 endif
@@ -142,6 +145,7 @@ SUBDIRS = \
 	zbxregexp \
 	zbxsysinfo \
 	zbxthreads \
+	zbxvariant \
 	zbxxml \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \

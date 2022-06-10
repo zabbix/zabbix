@@ -18,7 +18,8 @@ libzbxproxy_a_SOURCES = \
 	proxy_lld.c
 
 libzbxproxy_a_CFLAGS = \
-	-DZABBIX_DAEMON
+	-DZABBIX_DAEMON \
+	$(TLS_CFLAGS)
 
 zabbix_proxy_SOURCES = proxy.c
 
@@ -39,6 +40,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/odbc/libzbxodbc.a \
 	datasender/libzbxdatasender.a \
 	$(top_builddir)/src/zabbix_server/preprocessor/libpreprocessor.a \
+	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
@@ -118,7 +120,8 @@ zabbix_proxy_CFLAGS = \
 	-DDEFAULT_SSL_KEY_LOCATION="\"$(URL_SSL_KEY_LOCATION)\"" \
 	-DDEFAULT_CONFIG_FILE="\"$(PROXY_CONFIG_FILE)\"" \
 	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"$(EXTERNAL_SCRIPTS_PATH)\"" \
-	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\""
+	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \
+	$(TLS_CFLAGS)
 
 install-data-hook:
 	$(MKDIR_P) "$(DESTDIR)$(PROXY_CONFIG_FILE).d"

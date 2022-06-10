@@ -106,7 +106,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Zookeeper: Server mode has changed |<p>Zookeeper node state has changed. Ack to close.</p> |`last(/Zookeeper by HTTP/zookeeper.server_state,#1)<>last(/Zookeeper by HTTP/zookeeper.server_state,#2) and length(last(/Zookeeper by HTTP/zookeeper.server_state))>0` |INFO |<p>Manual close: YES</p> |
-|Zookeeper: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Zookeeper by HTTP/zookeeper.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Zookeeper: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Zookeeper by HTTP/zookeeper.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |Zookeeper: Failed to fetch info data |<p>Zabbix has not received data for items for the last 10 minutes</p> |`nodata(/Zookeeper by HTTP/zookeeper.uptime,10m)=1` |WARNING |<p>Manual close: YES</p> |
 |Zookeeper: Version has changed |<p>Zookeeper version has changed. Ack to close.</p> |`last(/Zookeeper by HTTP/zookeeper.version,#1)<>last(/Zookeeper by HTTP/zookeeper.version,#2) and length(last(/Zookeeper by HTTP/zookeeper.version))>0` |INFO |<p>Manual close: YES</p> |
 |Zookeeper: Too many file descriptors used |<p>Number of file descriptors used more than {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}% of the available number of file descriptors.</p> |`min(/Zookeeper by HTTP/zookeeper.open_file_descriptor_count,5m) * 100 / last(/Zookeeper by HTTP/zookeeper.max_file_descriptor_count) > {$ZOOKEEPER.FILE_DESCRIPTORS.MAX.WARN}` |WARNING | |

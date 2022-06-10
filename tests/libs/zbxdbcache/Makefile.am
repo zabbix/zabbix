@@ -41,6 +41,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a
 
 CACHE_LIBS = \
@@ -60,6 +61,7 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \

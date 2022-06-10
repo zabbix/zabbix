@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 
 #include <tlhelp32.h>
+#include "sddl.h"
 
 #include "zbxsymbols.h"
 #include "log.h"
@@ -41,6 +42,9 @@ typedef struct
 	zbx_uint64_t	threads;
 	zbx_int64_t	handles;
 
+	char		*user;
+	char		*sid;
+
 	double		cputime_user;
 	double		cputime_system;
 	double		page_faults;
@@ -60,16 +64,16 @@ ZBX_PTR_VECTOR_DECL(proc_data_ptr, proc_data_t *)
 ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *)
 
 /* function 'zbx_get_process_username' require 'userName' with size 'MAX_NAME' */
-static int	zbx_get_process_username(HANDLE hProcess, char *userName)
+static int	zbx_get_process_username(HANDLE hProcess, char *userName, char *sid)
 {
 	HANDLE		tok;
 	TOKEN_USER	*ptu = NULL;
 	DWORD		sz = 0, nlen, dlen;
-	wchar_t		name[MAX_NAME], dom[MAX_NAME];
+	wchar_t		name[MAX_NAME], dom[MAX_NAME], *sid_string;
 	int		iUse, res = FAIL;
 
 	/* clean result; */
-	*userName = '\0';
+	*userName = *sid = '\0';
 
 	/* open the processes token */
 	if (0 == OpenProcessToken(hProcess, TOKEN_QUERY, &tok))
@@ -92,6 +96,17 @@ static int	zbx_get_process_username(HANDLE hProcess, char *userName)
 	dlen = MAX_NAME;
 	if (0 == LookupAccountSid(NULL, ptu->User.Sid, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
 		goto lbl_err;
+
+	if (NULL != sid)
+	{
+		if (TRUE == ConvertSidToStringSid(ptu->User.Sid, &sid_string))
+		{
+			zbx_unicode_to_utf8_static(sid_string, sid, MAX_NAME);
+			LocalFree(sid_string);
+		}
+		else
+			goto lbl_err;
+	}
 
 	zbx_unicode_to_utf8_static(name, userName, MAX_NAME);
 
@@ -169,7 +184,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			hProcess = OpenProcess(access, FALSE, pe32.th32ProcessID);
 
-			if (NULL == hProcess || SUCCEED != zbx_get_process_username(hProcess, uname) ||
+			if (NULL == hProcess || SUCCEED != zbx_get_process_username(hProcess, uname, NULL) ||
 					0 != stricmp(uname, userName))
 			{
 				proc_ok = 0;
@@ -458,6 +473,8 @@ int	PROC_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 static void	proc_data_free(proc_data_t *proc_data)
 {
 	zbx_free(proc_data->name);
+	zbx_free(proc_data->user);
+	zbx_free(proc_data->sid);
 	zbx_free(proc_data);
 }
 
@@ -478,7 +495,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	PROCESSENTRY32			pe32;
 	DWORD				access;
 	const OSVERSIONINFOEX		*vi;
-	char				*param, *procName, *userName, *procComm, baseName[MAX_PATH], uname[MAX_NAME];
+	char				*param, *procName, *userName, *procComm, baseName[MAX_PATH], uname[MAX_NAME],
+					sid[MAX_NAME];
 	proc_data_t			*proc_data;
 	zbx_vector_proc_data_ptr_t	proc_data_ctx;
 
@@ -552,6 +570,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	do
 	{
 		HANDLE	hProcess;
+		int	ret_usr;
 
 		zbx_unicode_to_utf8_static(pe32.szExeFile, baseName, MAX_NAME);
 
@@ -561,11 +580,10 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL == (hProcess = OpenProcess(access, FALSE, pe32.th32ProcessID)))
 			continue;
 
-		if (NULL != userName && '\0' != *userName && (SUCCEED != zbx_get_process_username(hProcess, uname) ||
-				0 != stricmp(uname, userName)))
-		{
+		ret_usr = zbx_get_process_username(hProcess, uname, sid);
+
+		if (NULL != userName && '\0' != *userName && (SUCCEED != ret_usr || 0 != stricmp(uname, userName)))
 			goto next;
-		}
 
 		if (ZBX_PROC_MODE_THREAD == zbx_proc_mode)
 		{
@@ -586,6 +604,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 					proc_data->ppid = pe32.th32ParentProcessID;
 					proc_data->name = zbx_strdup(NULL, baseName);
 					proc_data->tid = te32.th32ThreadID;
+					proc_data->sid = zbx_strdup(NULL, SUCCEED == ret_usr ? sid : "-1");
+					proc_data->user = zbx_strdup(NULL, SUCCEED == ret_usr ? uname : "-1");
 
 					zbx_vector_proc_data_ptr_append(&proc_data_ctx, proc_data);
 				}
@@ -605,6 +625,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			proc_data->ppid = pe32.th32ParentProcessID;
 			proc_data->name = zbx_strdup(NULL, baseName);
 			proc_data->threads = pe32.cntThreads;
+			proc_data->sid = zbx_strdup(NULL, SUCCEED == ret_usr ? sid : "-1");
+			proc_data->user = zbx_strdup(NULL, SUCCEED == ret_usr ? uname : "-1");
 
 			if (FALSE != GetProcessHandleCount(hProcess, &handleCount))
 				proc_data->handles = (zbx_uint64_t)handleCount;
@@ -715,7 +737,12 @@ next:
 
 		zbx_json_addstring(&j, "name", proc_data->name, ZBX_JSON_TYPE_STRING);
 
-		if (ZBX_PROC_MODE_SUMMARY == zbx_proc_mode)
+		if (ZBX_PROC_MODE_SUMMARY != zbx_proc_mode)
+		{
+			zbx_json_addstring(&j, "user", proc_data->user, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "sid", proc_data->sid, ZBX_JSON_TYPE_STRING);
+		}
+		else
 			zbx_json_adduint64(&j, "processes", proc_data->processes);
 
 		if (ZBX_PROC_MODE_THREAD != zbx_proc_mode)

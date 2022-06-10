@@ -583,7 +583,6 @@ $item_tab
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
 						'excludeids' => $data['itemid'] != 0 ? [$data['itemid']] : [],
-						'webitems' => true,
 						'normal_only' => true
 					]
 				]
@@ -647,7 +646,7 @@ if ($data['display_interfaces']) {
 	}
 }
 
-// Append SNMP common fields fields.
+// Append SNMP common fields.
 $item_tab->addItem([
 	(new CLabel(_('SNMP OID'), 'snmp_oid'))
 		->setAsteriskMark()

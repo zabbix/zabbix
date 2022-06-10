@@ -18,6 +18,7 @@ libzbxserver_a_SOURCES = \
 	get_host_from_event.h \
 	zabbix_users.c \
 	zabbix_users.h \
-	expression_eval.c
+	calc_checks_eval.c \
+	evaluate_simple.c
 
 libzbxserver_a_CFLAGS = -I$(top_srcdir)/src/libs/zbxdbcache $(LIBXML2_CFLAGS)

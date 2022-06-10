@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-05-16T06:45:30Z'
-  groups:
+  date: '2022-06-07T19:37:58Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -443,7 +443,7 @@ zabbix_export:
             -
               uuid: c5c52f75d4214a68b095e8bf55a6a934
               expression: 'fuzzytime(/Windows by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'System time is out of syn'
+              name: 'System time is out of sync'
               event_name: 'System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
               priority: WARNING
               description: 'The host system time is different from the Zabbix server time.'
@@ -678,11 +678,15 @@ zabbix_export:
           triggers:
             -
               uuid: ce4a95a80cc54353ab0e0d2ae6312930
-              expression: 'max(/Windows by Zabbix agent active/zabbix[host,active_agent,available],5m)=2'
+              expression: 'min(/Windows by Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2'
               name: 'Zabbix agent: active checks are not available'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: c05c8d1be5614ffab1688cc92db32f12
@@ -1619,6 +1623,10 @@ zabbix_export:
           value: 30m
           description: 'No data timeout for active agents. Consider to keep it relatively high.'
         -
+          macro: '{$AGENT.TIMEOUT}'
+          value: 5m
+          description: 'Timeout after which agent is considered unavailable.'
+        -
           macro: '{$CPU.INTERRUPT.CRIT.MAX}'
           value: '50'
           description: 'The critical threshold of the % Interrupt Time counter.'
@@ -1685,7 +1693,7 @@ zabbix_export:
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.NAME.NOT_MATCHES}'
-          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv)$'
+          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         -
           macro: '{$SERVICE.STARTUPNAME.MATCHES}'
@@ -1791,8 +1799,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Windows by Zabbix agent active'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: 234161507ccb4d83b111cb31e0db8ae5
           name: 'System performance'
@@ -1812,8 +1820,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU usage'
                         host: 'Windows by Zabbix agent active'
+                        name: 'CPU usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1828,8 +1836,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: 'perf_counter_en["\System\Processor Queue Length"]'
                         host: 'Windows by Zabbix agent active'
+                        key: 'perf_counter_en["\System\Processor Queue Length"]'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1844,8 +1852,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory utilization'
                         host: 'Windows by Zabbix agent active'
+                        name: 'Memory utilization'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1861,8 +1869,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'Windows by Zabbix agent active'
+                        name: 'Swap usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -1885,8 +1893,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSLABEL}({#FSNAME}): Disk space usage'
                         host: 'Windows by Zabbix agent active'
+                        name: '{#FSLABEL}({#FSNAME}): Disk space usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -1909,8 +1917,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk read/write rates'
                         host: 'Windows by Zabbix agent active'
+                        name: '{#DEVNAME}: Disk read/write rates'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '20'
@@ -1933,8 +1941,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk utilization and queue'
                         host: 'Windows by Zabbix agent active'
+                        name: '{#DEVNAME}: Disk utilization and queue'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '25'
@@ -1957,8 +1965,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Windows by Zabbix agent active'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 224ca38281f04c83844763251505cdce
@@ -2081,6 +2089,19 @@ zabbix_export:
               value: '255'
               newvalue: 'No such service'
         -
+          uuid: 6e7949c77d3442849778ff80271211df
+          name: zabbix.host.active_agent.available
+          mappings:
+            -
+              value: '0'
+              newvalue: unknown
+            -
+              value: '1'
+              newvalue: available
+            -
+              value: '2'
+              newvalue: 'not available'
+        -
           uuid: 9c0c0eb0ed7e495b9d4d487df7af0acd
           name: zabbix.host.available
           mappings:
@@ -2100,19 +2121,6 @@ zabbix_export:
             -
               value: '1'
               newvalue: Up
-        -
-          uuid: 6e7949c77d3442849778ff80271211df
-          name: zabbix.host.active_agent.available
-          mappings:
-            -
-              value: '0'
-              newvalue: unknown
-            -
-              value: '1'
-              newvalue: available
-            -
-              value: '2'
-              newvalue: 'not available'
   triggers:
     -
       uuid: 384393bb344e497382ea10e7fce7fcb3
