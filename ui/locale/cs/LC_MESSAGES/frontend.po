@@ -1,19 +1,20 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2018-09-24 07:57+0300\n"
-"Last-Translator: Lukáš <iam@lukasmaly.net>\n"
+"PO-Revision-Date: 2022-06-09 22:52+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1537768671.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -404,16 +405,16 @@ msgstr "PŘIDEJ PŘEPIS"
 
 #: app/views/administration.user.list.php:114
 msgid "API access"
-msgstr ""
+msgstr "API přístup"
 
 #: app/controllers/CControllerPopupGeneric.php:333
 #: app/views/administration.userrole.edit.php:285
 msgid "API methods"
-msgstr ""
+msgstr "API metody"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "API token"
-msgstr ""
+msgstr "API token"
 
 #: include/classes/api/services/CToken.php:299
 #, c-format
@@ -422,14 +423,14 @@ msgstr ""
 
 #: app/controllers/CControllerTokenCreate.php:98
 msgid "API token added"
-msgstr ""
+msgstr "Byl přidán API token"
 
 #: app/controllers/CControllerTokenDelete.php:61
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "API token byl smazán"
+msgstr[1] "API tokeny smazány"
+msgstr[2] "API tokeny smazány"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
@@ -441,17 +442,17 @@ msgstr[2] ""
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "API token je povolený"
+msgstr[1] "API tokeny jsou povoleny"
+msgstr[2] "API tokeny jsou povoleny"
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
-msgstr ""
+msgstr "API token expiroval."
 
 #: app/controllers/CControllerTokenUpdate.php:114
 msgid "API token updated"
-msgstr ""
+msgstr "API token byl aktualizován"
 
 #: app/controllers/CControllerTokenEdit.php:107
 #: app/controllers/CControllerTokenList.php:193
@@ -469,7 +470,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:397 include/html.inc.php:820
 #: include/html.inc.php:900
 msgid "API tokens"
-msgstr ""
+msgstr "API tokeny"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
@@ -490,22 +491,22 @@ msgstr "Přístup odepřen!"
 #: app/views/administration.user.edit.php:599
 #: app/views/administration.userrole.edit.php:271
 msgid "Access to API"
-msgstr ""
+msgstr "Přístup do API"
 
 #: app/views/administration.user.edit.php:452
 #: app/views/administration.userrole.edit.php:81
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Přístup k UI prvkům"
 
 #: app/views/administration.user.edit.php:628
 #: app/views/administration.userrole.edit.php:320
 msgid "Access to actions"
-msgstr ""
+msgstr "Přístup k akcím"
 
 #: app/views/administration.user.edit.php:570
 #: app/views/administration.userrole.edit.php:222
 msgid "Access to modules"
-msgstr ""
+msgstr "Přístup k modulům"
 
 #: app/views/administration.user.edit.php:474
 #: app/views/administration.userrole.edit.php:134
@@ -526,7 +527,7 @@ msgstr "Přijmout"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Potvrdit problémy"
 
 #: app/views/popup.condition.common.php:684 include/actions.inc.php:2075
 #: include/events.inc.php:196
@@ -621,7 +622,7 @@ msgstr "Akce \"%1$s\" již existuje."
 #: include/classes/api/services/CRole.php:761
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "Akce \"%2$s\" není pro uživatelskou roli \"%1$s\" dovolena."
 
 #: actionconf.php:301
 msgid "Action added"
@@ -873,15 +874,15 @@ msgstr "Přidat podřízený prvek"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
-msgstr ""
+msgstr "Přidat podřízenou službu"
 
 #: app/views/js/popup.service.edit.js.php:401
 msgid "Add child services"
-msgstr ""
+msgstr "Přidat podřízené služby"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "Přidat od"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -889,12 +890,12 @@ msgstr "Přidat hostitele"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Přidat sloupec item"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
 msgid "Add missing"
-msgstr ""
+msgstr "Přidat chybějící"
 
 #: jsLoader.php:205
 msgid "Add multiple maps"
@@ -907,7 +908,7 @@ msgstr "Přidej nový set dat"
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:266
 msgid "Add new interface"
-msgstr ""
+msgstr "Přidat nové rozhraní"
 
 #: include/classes/widgets/CWidgetHelper.php:906
 msgid "Add new override"
@@ -916,15 +917,15 @@ msgstr "Přidej nový přepis"
 #: app/views/js/configuration.dashboard.edit.js.php:202
 #: app/views/js/monitoring.dashboard.view.js.php:290
 msgid "Add page"
-msgstr ""
+msgstr "Přidat stranu"
 
 #: app/views/js/popup.service.edit.js.php:431
 msgid "Add parent services"
-msgstr ""
+msgstr "Přidat nadřazené služby"
 
 #: include/classes/helpers/CRoleHelper.php:461
 msgid "Add problem comments"
-msgstr ""
+msgstr "Přidat komentář k problému"
 
 #: app/views/popup.massupdate.trigger.php:101
 #: include/views/configuration.graph.edit.php:408
@@ -934,11 +935,11 @@ msgstr "Přidat prototyp"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr ""
+msgstr "Přidat naplánovaný report"
 
 #: app/views/js/administration.userrole.edit.js.php:210
 msgid "Add services"
-msgstr ""
+msgstr "Přidat služby"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
@@ -946,7 +947,7 @@ msgstr "Přidat dílčí mapy"
 
 #: app/controllers/CControllerFavouriteDelete.php:69 include/html.inc.php:153
 msgid "Add to favorites"
-msgstr ""
+msgstr "Přidat k oblíbeným"
 
 #: include/actions.inc.php:1033
 msgid "Add to host group"
@@ -958,11 +959,11 @@ msgstr "Přidat do skupin"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "Přidat uživatele"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "Přidat skupinu uživatelů"
 
 #: app/views/js/configuration.dashboard.edit.js.php:198
 #: app/views/js/monitoring.dashboard.view.js.php:286
@@ -973,7 +974,7 @@ msgstr "Přidat widget"
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "Přidáno"
 
 #: jsLoader.php:340
 #, c-format
@@ -983,15 +984,15 @@ msgstr "Přidáno, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Další pravidlo"
 
 #: app/views/popup.service.edit.php:182
 msgid "Additional rules"
-msgstr ""
+msgstr "Další pravidla"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "Adresa"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1005,7 +1006,7 @@ msgstr "Administrace"
 #: app/views/popup.service.edit.php:158
 #: include/classes/widgets/forms/CWidgetFormItem.php:69
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Pokročilá konfigurace"
 
 #: include/views/monitoring.sysmap.edit.php:158
 msgid "Advanced labels"
@@ -1055,21 +1056,21 @@ msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
-msgstr ""
+msgstr "Agregace"
 
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
-msgstr ""
+msgstr "Agregační funkce"
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
 msgid "Aggregation function"
-msgstr ""
+msgstr "Agregační funkce"
 
 #: app/views/popup.tophosts.column.edit.php:139
 #: include/classes/widgets/CWidgetHelper.php:1308
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Agregační interval"
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
@@ -1077,7 +1078,7 @@ msgstr "Poplašná zpráva"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
-msgstr ""
+msgstr "Algoritmus"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1112,7 +1113,7 @@ msgstr "Všechny panely"
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
-msgstr ""
+msgstr "Všechny grafy"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:425
@@ -1144,7 +1145,7 @@ msgstr "Všechny problémy, pokud se jejich hodnoty rovnají tagu"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Všechny služby"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
@@ -1156,7 +1157,7 @@ msgstr "Všechny šablony"
 
 #: app/views/administration.userrole.edit.php:289
 msgid "Allow list"
-msgstr ""
+msgstr "Seznam povolených"
 
 #: app/views/popup.massupdate.trigger.php:60 include/triggers.inc.php:991
 #: include/views/configuration.trigger.prototype.edit.php:526
@@ -1173,7 +1174,7 @@ msgstr "Povolení hosté"
 
 #: app/views/administration.user.edit.php:619
 msgid "Allowed methods"
-msgstr ""
+msgstr "Povolené metody"
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -1316,7 +1317,7 @@ msgstr "Aritmetický"
 #: app/views/popup.tophosts.column.edit.php:150
 #: include/classes/helpers/CServiceHelper.php:148
 msgid "As is"
-msgstr ""
+msgstr "Ponechat stejné"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
@@ -1453,7 +1454,7 @@ msgstr "Audit log"
 
 #: app/views/administration.housekeeping.edit.php:179
 msgid "Audit settings"
-msgstr ""
+msgstr "Nastavení auditu"
 
 #: include/func.inc.php:243
 msgid "Aug"
@@ -1577,7 +1578,7 @@ msgstr "Automatický výběr ikony"
 #: include/classes/helpers/CMediatypeHelper.php:189
 #: include/classes/helpers/CMenuHelper.php:249 include/html.inc.php:890
 msgid "Autoregistration"
-msgstr ""
+msgstr "Automatická registrace"
 
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:35
@@ -1718,7 +1719,7 @@ msgstr "Tělo a záhlaví"
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Tučný"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:780
 #: include/views/js/monitoring.sysmaps.js.php:870
@@ -1747,7 +1748,7 @@ msgstr "Šířka okraje"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "Obě hesla musí být stejná."
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:108
 #: include/classes/widgets/forms/CWidgetFormItem.php:189
@@ -1892,7 +1893,7 @@ msgstr "Zrušit"
 #: app/controllers/CControllerTokenCreate.php:44
 #: app/controllers/CControllerTokenCreate.php:105
 msgid "Cannot add API token"
-msgstr ""
+msgstr "Nelze přidat token API"
 
 #: include/classes/api/services/CGraph.php:517
 #: include/classes/api/services/CGraph.php:531
@@ -2062,7 +2063,7 @@ msgstr ""
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Nelze odstranit"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
@@ -2116,7 +2117,7 @@ msgstr "Není možné se připojit k databázi."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "Nelze převést POST data:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
@@ -2202,9 +2203,9 @@ msgstr ""
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze smazat API token"
+msgstr[1] "Nelze smazat API tokeny"
+msgstr[2] "Nelze smazat API tokeny"
 
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
@@ -2228,12 +2229,11 @@ msgid "Cannot delete assigned user role \"%1$s\"."
 msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "Nelze odstranit korelaci"
-msgstr[1] "Nelze odstranit korelaci"
-msgstr[2] "Nelze odstranit korelaci"
+msgstr[1] "Nelze odstranit korelace"
+msgstr[2] "Nelze odstranit korelace"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
@@ -2249,12 +2249,11 @@ msgid "Cannot delete dependency"
 msgstr "Není možné smazat závislost"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Nelze smazat pravidlo nálezu"
-msgstr[1] "Nelze smazat pravidlo nálezu"
-msgstr[2] "Nelze smazat pravidlo nálezu"
+msgstr[1] "Nelze smazat pravidla nálezu"
+msgstr[2] "Nelze smazat pravidla nálezu"
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
@@ -2406,7 +2405,6 @@ msgid "Cannot delete selected actions"
 msgstr "Není možné smazat označené akce"
 
 #: app/controllers/CControllerServiceDelete.php:78
-#, fuzzy
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Nelze smazat službu"
@@ -2598,9 +2596,9 @@ msgstr "Není možné zobrazit víc jak jednu položku s typem \"Souhrn grafu\".
 #: app/controllers/CControllerTokenEnable.php:66
 msgid "Cannot enable API token"
 msgid_plural "Cannot enable API tokens"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nelze povolit API token"
+msgstr[1] "Nelze povolit API tokeny"
+msgstr[2] "Nelze povolit API tokeny"
 
 #: app/controllers/CControllerSlaEnable.php:88
 msgid "Cannot enable SLA"
@@ -4321,12 +4319,11 @@ msgid "Correlation added"
 msgstr "Korelace přidána"
 
 #: app/controllers/CControllerCorrelationDelete.php:65
-#, fuzzy
 msgid "Correlation deleted"
 msgid_plural "Correlations deleted"
 msgstr[0] "Korelace smazána"
-msgstr[1] "Korelace smazána"
-msgstr[2] "Korelace smazána"
+msgstr[1] "Korelace smazány"
+msgstr[2] "Korelace smazány"
 
 #: app/controllers/CControllerCorrelationDisable.php:72
 msgid "Correlation disabled"
@@ -4384,7 +4381,7 @@ msgstr ""
 #: app/views/administration.token.list.php:105
 #: app/views/administration.user.token.list.php:71
 msgid "Create API token"
-msgstr ""
+msgstr "Vytvořit API token"
 
 #: app/views/sla.list.php:188
 msgid "Create SLA"
@@ -5274,12 +5271,12 @@ msgstr "Smazat skript?"
 #: app/views/administration.token.edit.php:115
 #: app/views/administration.user.token.edit.php:97
 msgid "Delete selected API token?"
-msgstr ""
+msgstr "Smazat vybraný API token?"
 
 #: app/views/administration.token.list.php:201
 #: app/views/administration.user.token.list.php:153
 msgid "Delete selected API tokens?"
-msgstr ""
+msgstr "Smazat vybrané API tokeny?"
 
 #: app/views/js/sla.list.js.php:130 app/views/popup.sla.edit.php:274
 msgid "Delete selected SLA?"
@@ -5641,7 +5638,7 @@ msgstr "Zakázat hostitele sledované přes vybrané proxy?"
 #: app/views/administration.token.list.php:200
 #: app/views/administration.user.token.list.php:152
 msgid "Disable selected API tokens?"
-msgstr ""
+msgstr "Zakázat označené API tokeny?"
 
 #: app/views/js/sla.list.js.php:118
 msgid "Disable selected SLA?"
@@ -5903,12 +5900,11 @@ msgid "Discovery rule created"
 msgstr " Pravidlo nálezu vytvořeno"
 
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
-#, fuzzy
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
-msgstr[0] " Pravidlo nálezu smazáno"
-msgstr[1] " Pravidlo nálezu smazáno"
-msgstr[2] " Pravidlo nálezu smazáno"
+msgstr[0] "Pravidlo nálezu smazáno"
+msgstr[1] "Pravidla nálezu smazána"
+msgstr[2] "Pravidla nálezu smazána"
 
 #: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:767
 msgid "Discovery rule disabled"
@@ -11261,7 +11257,7 @@ msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:466
 msgid "Manage API tokens"
-msgstr ""
+msgstr "Správa API tokenů "
 
 #: include/classes/helpers/CRoleHelper.php:472
 msgid "Manage SLA"
@@ -16199,12 +16195,11 @@ msgid "Service data storage period"
 msgstr ""
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Služba byla smazána"
-msgstr[1] "Služba byla smazána"
-msgstr[2] "Služba byla smazána"
+msgstr[1] "Služby byla smazány"
+msgstr[2] "Služby byla smazány"
 
 #: app/views/administration.userrole.edit.php:144
 #: app/views/administration.userrole.edit.php:185
