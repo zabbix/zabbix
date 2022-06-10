@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-05-31 20:26+0000\n"
+"PO-Revision-Date: 2022-06-04 13:58+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -105,7 +105,7 @@ msgstr "%1$s (année %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - déclenché par le module situé à %2$s."
 
 #: app/partials/monitoring.latest.view.html.php:133
 #, c-format
@@ -508,7 +508,7 @@ msgstr "Action ajoutée"
 #: include/classes/core/ZBase.php:433
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "La classe d'action %1$s doit étendre la classe %2$s."
 
 #: actionconf.php:202
 msgid "Action deleted"
@@ -729,7 +729,7 @@ msgstr "Ajouter"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Ajouter (limite de type de message atteinte)"
 
 #: jsLoader.php:128
 msgid "Add a new widget"
@@ -749,7 +749,7 @@ msgstr "Ajouter hôte"
 
 #: app/partials/massupdate.macros.tab.php:93
 msgid "Add missing"
-msgstr ""
+msgstr "Ajouter les manquants"
 
 #: jsLoader.php:326
 msgid "Add multiple maps"
@@ -761,7 +761,7 @@ msgstr "Ajouter un nouvel ensemble de données"
 
 #: include/views/configuration.host.edit.php:147
 msgid "Add new interface"
-msgstr ""
+msgstr "Ajouter une nouvelle interface"
 
 #: include/classes/widgets/CWidgetHelper.php:738
 msgid "Add new override"
@@ -854,19 +854,19 @@ msgstr "Interfaces de l'agent"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:403
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Vérification de la variante de l'agent. Renvoie 1 - pour agent Zabbix ; 2 - pour agent Zabbix 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1150
 msgid "Aggregate"
-msgstr ""
+msgstr "Agrégat"
 
 #: include/classes/widgets/CWidgetHelper.php:1122
 msgid "Aggregation function"
-msgstr ""
+msgstr "Fonction d'agrégation"
 
 #: include/classes/widgets/CWidgetHelper.php:1141
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Intervalle d'agrégation"
 
 #: include/actions.inc.php:2132
 msgid "Alert message"
@@ -1160,7 +1160,7 @@ msgstr "Format texte"
 #: app/views/administration.authentication.edit.php:206
 #: app/views/administration.authentication.edit.php:240
 msgid "Assertions"
-msgstr ""
+msgstr "Assertions"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1196,7 +1196,7 @@ msgstr "À (heure:minute)"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Au moins une action est obligatoire."
 
 #: include/classes/api/services/CMaintenance.php:279
 #: include/classes/api/services/CMaintenance.php:706
@@ -1213,7 +1213,7 @@ msgstr "Au moins une période de maintenance doit être créée."
 
 #: include/classes/setup/CFrontendSetup.php:259
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "Au moins MySQL, PostgreSQL ou Oracle doit être supporté."
 
 #: include/views/configuration.correlation.edit.php:154
 msgid "At least one operation must be selected."
@@ -1270,7 +1270,7 @@ msgstr "Août"
 
 #: app/views/administration.authentication.edit.php:212
 msgid "AuthN requests"
-msgstr ""
+msgstr "Requêtes AuthN"
 
 #: app/views/administration.authentication.edit.php:254
 #: app/views/administration.authentication.edit.php:263
@@ -2211,7 +2211,7 @@ msgstr "Impossible de supprimer les déclencheurs"
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] "Impossible de supprimer l'utilisateur"
-msgstr[1] ""
+msgstr[1] "Impossible de supprimer les utilisateurs"
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
@@ -2537,8 +2537,8 @@ msgstr "Impossible de lier le modèle."
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de charger le module à : %1$s."
+msgstr[1] "Impossible de charger les modules à : %1$s."
 
 #: include/classes/api/services/CUser.php:1132
 msgid "Cannot logout."
@@ -3096,7 +3096,7 @@ msgstr "Changer"
 
 #: app/views/administration.autoreg.edit.php:80
 msgid "Change PSK"
-msgstr ""
+msgstr "Change PSK"
 
 #: app/views/administration.authentication.edit.php:80
 #: app/views/administration.mediatype.edit.php:137
@@ -3866,7 +3866,7 @@ msgstr "Contrôles du contenu"
 
 #: include/classes/html/widget/CWidget.php:146
 msgid "Content controls: header"
-msgstr ""
+msgstr "Contrôles de contenu : en-tête"
 
 #: include/html.inc.php:338
 msgid "Content menu"
@@ -4391,28 +4391,28 @@ msgstr "Période de stockage des données"
 #: include/classes/setup/CSetupWizard.php:389
 #: include/classes/setup/CSetupWizard.php:528
 msgid "Database TLS CA file"
-msgstr ""
+msgstr "Fichier CA TLS de la base de données"
 
 #: include/classes/setup/CFrontendSetup.php:686
 #: include/classes/setup/CSetupWizard.php:300
 #: include/classes/setup/CSetupWizard.php:395
 #: include/classes/setup/CSetupWizard.php:536
 msgid "Database TLS certificate file"
-msgstr ""
+msgstr "Fichier de certificat TLS de base de données"
 
 #: include/classes/setup/CFrontendSetup.php:690
 msgid "Database TLS certificate files must be read-only"
-msgstr ""
+msgstr "Les fichiers de certificat TLS de la base de données doivent être en lecture seule"
 
 #: include/classes/setup/CSetupWizard.php:312
 #: include/classes/setup/CSetupWizard.php:402
 msgid "Database TLS cipher list"
-msgstr ""
+msgstr "Liste de chiffrement TLS de la base de données"
 
 #: include/classes/setup/CSetupWizard.php:270
 #: include/classes/setup/CSetupWizard.php:385
 msgid "Database TLS encryption"
-msgstr ""
+msgstr "Chiffrement TLS de la base de données"
 
 #: include/classes/setup/CSetupWizard.php:294
 #: include/classes/setup/CSetupWizard.php:392
@@ -4431,7 +4431,7 @@ msgstr "Hôte base de données"
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/setup/CSetupWizard.php:398
 msgid "Database host verification"
-msgstr ""
+msgstr "Vérification de l'hôte de la base de données"
 
 #: include/items.inc.php:95
 msgid "Database monitor"
@@ -5028,7 +5028,7 @@ msgstr "Dimension (colonnes x lignes)"
 
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
-msgstr ""
+msgstr "Répertoire"
 
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:655
@@ -5265,11 +5265,11 @@ msgstr "Découverte des hyperviseurs VMware, <url> - URL du service VMware. Reto
 
 #: include/classes/items/CHelpItems.php:1047
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "Découverte des périphériques de disque de la machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware. Retourne un JSON"
 
 #: include/classes/items/CHelpItems.php:1059
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
-msgstr ""
+msgstr "Découverte des systèmes de fichiers de la machine virtuelle VMware, <url> - URL du service VMware, <uuid> - Nom d'hôte de la machine virtuelle VMware. Renvoie JSON"
 
 #: include/classes/items/CHelpItems.php:971
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
@@ -5975,7 +5975,7 @@ msgstr "Niveau de chiffrement"
 
 #: app/views/popup.itemtestedit.view.php:160
 msgid "End of line sequence"
-msgstr ""
+msgstr "Séquence de fin de ligne"
 
 #: include/locales.inc.php:46
 msgid "English (en_GB)"
@@ -8261,7 +8261,7 @@ msgstr "Hôte associé à la condition d'action incorrect. L'hôte n'existe pas 
 #: include/classes/api/services/CAction.php:1873
 #, c-format
 msgid "Incorrect action operation port \"%1$s\"."
-msgstr ""
+msgstr "Port \"%1$s\" associé à l'action incorrect."
 
 #: include/classes/api/services/CAction.php:1978
 msgid "Incorrect action operation template. Template does not exist or you have no access to this template."
@@ -8432,7 +8432,7 @@ msgstr "Expression personnalisée \"%2$s\" incorrecte pour la règle de découve
 #: include/classes/api/services/CDiscoveryRule.php:1556
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
-msgstr ""
+msgstr "Expression personnalisée \"%2$s\" incorrecte pour la surcharge \"%1$s\" : %3$s."
 
 #: app/controllers/CControllerWidgetClockView.php:72
 msgid "Incorrect data."
@@ -8505,7 +8505,7 @@ msgstr "Macro de condition de filtre incorrect pour la règle de découverte \"%
 #: include/classes/api/services/CDiscoveryRule.php:1591
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
-msgstr ""
+msgstr "Type de condition de filtre incorrect pour la surcharge \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1624
 #: include/classes/api/services/CAction.php:2762
@@ -10560,7 +10560,7 @@ msgstr "La liste est vide"
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:639
 msgid "List of block devices and their type. Returns JSON"
-msgstr ""
+msgstr "Liste les périphériques de bloc et leur type. Renvoie un JSON"
 
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:547
@@ -15095,7 +15095,7 @@ msgstr "L'enregistrer sous \"%1$s\""
 
 #: app/views/administration.module.list.php:34
 msgid "Scan directory"
-msgstr ""
+msgstr "Analyser le répertoire"
 
 #: include/views/configuration.httpconf.edit.php:251
 msgid "Scenario"
@@ -18336,11 +18336,11 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:803
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "Statistiques de lecture du datastore VMware, <url> - URL du service VMware, <datastore> - nom du datastore , <mode> - latence/latence max - moyenne ou maximale"
 
 #: include/classes/items/CHelpItems.php:811
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "Statistiques d'écriture du datastore VMware, <url> - URL du service VMware, <datastore> - nom du datastore , <mode> - latence/latence max - moyenne ou maximale"
 
 #: include/classes/items/CHelpItems.php:819
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
@@ -19438,7 +19438,7 @@ msgstr "une macro de découverte de bas niveau est attendue"
 #: include/classes/validators/CApiInputValidator.php:1323
 #: include/validate.inc.php:194
 msgid "a number has too many fractional digits"
-msgstr ""
+msgstr "un nombre a trop de chiffres après la virgule"
 
 #: include/classes/validators/CApiInputValidator.php:806
 #: include/classes/validators/CApiInputValidator.php:1302
@@ -20364,7 +20364,7 @@ msgstr "pas de donnée"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:397
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
-msgstr ""
+msgstr "nodata() - Aucune donnée reçue pendant la période de temps T (1 - vrai, 0 - faux), Mode (strict - ignorer le délai d'envoi des données du proxy)"
 
 #: include/classes/widgets/CWidgetHelper.php:1118 include/graphs.inc.php:74
 msgid "none"
@@ -20910,7 +20910,7 @@ msgstr "la valeur du deuxième paramètre est trop longue"
 #: include/classes/api/services/CItemGeneral.php:1555
 #, c-format
 msgid "value of third parameter must be one of %1$s"
-msgstr ""
+msgstr "la valeur du troisième paramètre doit être l'une des %1$s"
 
 #: include/actions.inc.php:571 include/actions.inc.php:589
 #: include/actions.inc.php:734 include/actions.inc.php:752
