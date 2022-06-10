@@ -21,6 +21,8 @@
 
 class CSvgLine extends CSvgTag {
 
+	public const ZBX_STYLE_DASHED = 'svg-line-dashed';
+
 	public function __construct($x1, $y1, $x2, $y2) {
 		parent::__construct('line');
 

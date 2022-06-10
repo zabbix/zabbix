@@ -1,10 +1,14 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-15T08:11:32Z'
-  groups:
+  date: '2022-06-07T19:33:38Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
+  host_groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Applications
   templates:
     -
       uuid: f397be2340734d24bc666102fbe184a5
@@ -281,11 +285,11 @@ zabbix_export:
               name: api_endpoint
               value: '{$KUBE.API.ENDPOINT.URL}'
             -
-              name: token
-              value: '{$KUBE.API.TOKEN}'
-            -
               name: endpoint_name
               value: '{$KUBE.NODES.ENDPOINT.NAME}'
+            -
+              name: token
+              value: '{$KUBE.API.TOKEN}'
           tags:
             -
               tag: component
@@ -1445,7 +1449,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Applications
               group_prototypes:
                 -
                   name: 'Kubernetes/Nodes/Role: {#ROLES}'

@@ -21,28 +21,6 @@
 
 class CSvgTag extends CTag {
 
-	const ZBX_STYLE_GRAPH_DASHED = 'svg-graph-dashed';
-
-	const ZBX_STYLE_GRAPH_PROBLEMS = 'svg-graph-problems';
-	const ZBX_STYLE_GRAPH_PROBLEM_BOX = 'svg-graph-problem-box';
-	const ZBX_STYLE_GRAPH_PROBLEM_HANDLE = 'svg-graph-problem-handle';
-	const ZBX_STYLE_GRAPH_PROBLEM_ARROW = 'svg-graph-problem-arrow';
-
-	const ZBX_STYLE_GRAPH_AXIS = 'svg-graph-axis';
-	const ZBX_STYLE_GRAPH_AXIS_LEFT = 'svg-graph-axis-left';
-	const ZBX_STYLE_GRAPH_AXIS_RIGHT = 'svg-graph-axis-right';
-	const ZBX_STYLE_GRAPH_AXIS_BOTTOM = 'svg-graph-axis-bottom';
-
-	const ZBX_STYLE_GRAPH_AREA = 'svg-graph-area';
-	const ZBX_STYLE_GRAPH_GRID = 'svg-graph-grid';
-	const ZBX_STYLE_GRAPH_LINE = 'svg-graph-line';
-	const ZBX_STYLE_GRAPH_POINTS = 'svg-graph-points';
-	const ZBX_STYLE_GRAPH_BAR = 'svg-graph-bar';
-
-	const ZBX_STYLE_GRAPH_LEGEND = 'svg-graph-legend';
-	const ZBX_STYLE_GRAPH_LEGEND_SINGLE_ITEM = 'svg-single-item-graph-legend';
-	const ZBX_STYLE_GRAPH_LEGEND_TWO_ITEMS = 'svg-single-two-items-graph-legend';
-
 	const ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE = 'svg-point-highlight';
 	const ZBX_STYLE_GRAPH_HELPER = 'svg-helper';
 
@@ -60,81 +38,51 @@ class CSvgTag extends CTag {
 		parent::__construct($tag, true);
 	}
 
-	public function makeStyles() {
+	public function makeStyles(): array {
 		return $this->styles;
 	}
 
 	/**
 	 * Add child item with styles.
 	 *
-	 * @param string|array|CSvgTag    Child item.
+	 * @param string|array|CSvgTag  Child item.
 	 *
 	 * @return CSvgTag
 	 */
-	public function addItem($value) {
-		if ($value instanceof CSvgTag) {
-			$this->styles = $value->makeStyles() + $this->styles;
+	public function addItem($value): self {
+		if ($value instanceof self) {
+			$this->styles = array_merge($this->styles, $value->makeStyles());
 		}
 
 		return parent::addItem($value);
 	}
 
 	/**
-	 * Set axis container size.
+	 * Set axis container position.
 	 *
-	 * @param int $width    Axis container width.
-	 * @param int $height   Axis container height.
+	 * @param int $x
+	 * @param int $y
 	 *
 	 * @return CSvgTag
 	 */
-	public function setSize($width, $height) {
-		$this->width = $width;
-		$this->height = $height;
+	public function setPosition(int $x, int $y): self {
+		$this->x = $x;
+		$this->y = $y;
 
 		return $this;
 	}
 
 	/**
-	 * Set axis container position.
+	 * Set axis container size.
 	 *
-	 * @param int $x        Horizontal position of container element.
-	 * @param int $y        Vertical position of container element.
+	 * @param int $width
+	 * @param int $height
 	 *
 	 * @return CSvgTag
 	 */
-	public function setPosition($x, $y) {
-		$this->x = (int) $x;
-		$this->y = (int) $y;
-
-		return $this;
-	}
-
-	public function setFillColor($color) {
-		$this->setAttribute('fill', $color);
-
-		return $this;
-	}
-
-	public function setStrokeColor($color) {
-		$this->setAttribute('stroke', $color);
-
-		return $this;
-	}
-
-	public function setStrokeWidth($width) {
-		$this->setAttribute('stroke-width', $width);
-
-		return $this;
-	}
-
-	public function setFillOpacity($opacity) {
-		$this->setAttribute('fill-opacity', $opacity);
-
-		return $this;
-	}
-
-	public function setStrokeOpacity($opacity) {
-		$this->setAttribute('stroke-opacity', $opacity);
+	public function setSize(int $width, int $height) {
+		$this->width = $width;
+		$this->height = $height;
 
 		return $this;
 	}

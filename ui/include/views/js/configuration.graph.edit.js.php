@@ -533,7 +533,6 @@
 					dstfld1: 'items_' + i + '_itemid',
 					dstfld2: 'items_' + i + '_name',
 					numeric: 1,
-					with_webitems: 1,
 					writeonly: 1
 				};
 

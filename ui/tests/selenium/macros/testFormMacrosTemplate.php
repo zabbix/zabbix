@@ -105,7 +105,7 @@ class testFormMacrosTemplate extends testFormMacros {
 		$response = CDataHelper::call('template.create', [
 				'host' => 'Template for Inherited macros removing',
 				'groups' => [
-					['groupid' => '4']
+					['groupid' => '1']
 				],
 				'macros' => [
 					[

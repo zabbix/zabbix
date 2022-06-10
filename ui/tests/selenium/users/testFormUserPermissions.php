@@ -398,17 +398,23 @@ class testFormUserPermissions extends CWebTest {
 				$this->query('xpath://ul[@id="permissionsFormList"]/li[4]')->one()->getText()
 		);
 		$table = $this->query($table_selector)->asTable()->one();
-		$this->assertEquals(['Host group', 'Permissions'], $table->getHeadersText());
+		$this->assertEquals(['Group', 'Type', 'Permissions'], $table->getHeadersText());
 		$permissions_before = [
 			[
-				'Host group' => 'All groups',
+				'Group' => 'All groups',
+				'Type' => 'Hosts',
+				'Permissions' => 'None'
+			],
+			[
+				'Group' => 'All groups',
+				'Type' => 'Templates',
 				'Permissions' => 'None'
 			]
 		];
 		$this->assertTableData($permissions_before, $table_selector);
 
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid=8')->waitUntilReady();
-		$this->query('link:Permissions')->one()->click();
+		$this->query('link:Host permissions')->one()->click();
 		$permission_table = $this->query('xpath:.//table[@id="new-group-right-table"]')->asTable()->one();
 		$groups = ['Empty group' => 'Deny', 'Discovered hosts' => 'Read', 'Group to check Overview' => 'Read-write'];
 		foreach ($groups as $group => $level) {
@@ -423,20 +429,29 @@ class testFormUserPermissions extends CWebTest {
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
 		$permissions_after = [
 			[
-				'Host group' => 'All groups',
+				'Group' => 'All groups',
+				'Type' => 'Hosts',
 				'Permissions' => 'None'
 			],
 			[
-				'Host group' => 'Discovered hosts',
+				'Group' => 'Discovered hosts',
+				'Type' => 'Hosts',
 				'Permissions' => 'Read'
 			],
 			[
-				'Host group' => 'Empty group',
+				'Group' => 'Empty group',
+				'Type' => 'Hosts',
 				'Permissions' => 'Deny'
 			],
 			[
-				'Host group' => 'Group to check Overview',
+				'Group' => 'Group to check Overview',
+				'Type' => 'Hosts',
 				'Permissions' => 'Read-write'
+			],
+			[
+				'Group' => 'All groups',
+				'Type' => 'Templates',
+				'Permissions' => 'None'
 			]
 		];
 		$this->assertTableData($permissions_after, $table_selector);

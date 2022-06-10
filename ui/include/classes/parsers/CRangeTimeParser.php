@@ -20,7 +20,7 @@
 
 
 /**
- * A parser for time used in the time selector.
+ * A parser for absolute and relative time used in the date-time inputs.
  */
 class CRangeTimeParser extends CParser {
 

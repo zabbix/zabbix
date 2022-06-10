@@ -47,7 +47,8 @@ libzbxserver_a_SOURCES = \
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-I$(top_srcdir)/src/libs/zbxdbcache
+	-I$(top_srcdir)/src/libs/zbxdbcache \
+	$(TLS_CFLAGS)
 
 zabbix_server_SOURCES = server.c
 
@@ -157,7 +158,8 @@ zabbix_server_CFLAGS = \
 	-DDEFAULT_CONFIG_FILE="\"$(SERVER_CONFIG_FILE)\"" \
 	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"$(EXTERNAL_SCRIPTS_PATH)\"" \
 	-DDEFAULT_ALERT_SCRIPTS_PATH="\"$(ALERT_SCRIPTS_PATH)\"" \
-	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\""
+	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \
+	$(TLS_CFLAGS)
 
 install-data-hook:
 	$(MKDIR_P) "$(DESTDIR)$(SERVER_CONFIG_FILE).d"

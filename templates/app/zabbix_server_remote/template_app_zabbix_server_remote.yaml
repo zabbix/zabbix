@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:01:51Z'
-  groups:
+  date: '2022-06-07T19:38:01Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -2058,8 +2058,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Zabbix server performance'
-                        host: 'Remote Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2074,8 +2074,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Zabbix data gathering process busy %'
-                        host: 'Remote Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2090,8 +2090,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Zabbix internal process busy %'
-                        host: 'Remote Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2107,8 +2107,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Remote Zabbix server: Zabbix cache usage, % free'
                         host: 'Remote Zabbix server health'
+                        name: 'Remote Zabbix server: Zabbix cache usage, % free'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -2123,8 +2123,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Remote Zabbix server: Value cache effectiveness'
                         host: 'Remote Zabbix server health'
+                        name: 'Remote Zabbix server: Value cache effectiveness'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2140,8 +2140,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Remote Zabbix server: Zabbix internal queues'
                         host: 'Remote Zabbix server health'
+                        name: 'Remote Zabbix server: Zabbix internal queues'
         -
           uuid: 6b2f06c17f804d97b3ff5a2fb4cae3a0
           name: 'Zabbix server processes'
@@ -2161,8 +2161,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Data handling processes'
-                        host: 'Remote Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2177,8 +2177,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Reporting processes'
-                        host: 'Remote Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2193,8 +2193,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Remote Zabbix server: Internal processes'
                         host: 'Remote Zabbix server health'
+                        name: 'Remote Zabbix server: Internal processes'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2210,8 +2210,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Remote Zabbix server: Data gathering processes'
                         host: 'Remote Zabbix server health'
+                        name: 'Remote Zabbix server: Data gathering processes'
       valuemaps:
         -
           uuid: 25ab0f5c570b4a7e9d15bd41db79fe25

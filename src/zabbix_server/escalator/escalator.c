@@ -649,8 +649,8 @@ static void	add_user_msg(zbx_uint64_t userid, zbx_uint64_t mediatypeid, ZBX_USER
 
 	if (MACRO_EXPAND_YES == expand_macros)
 	{
-		zbx_substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack, service_alarm,
-				service, tz, &subject, macro_type, NULL, 0);
+		zbx_substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
+				service_alarm, service, tz, &subject, macro_type, NULL, 0);
 		zbx_substitute_simple_macros(&actionid, event, r_event, &userid, NULL, NULL, NULL, NULL, ack,
 				service_alarm, service, tz, &message, macro_type, NULL, 0);
 	}
@@ -1471,8 +1471,8 @@ static void	execute_commands(const ZBX_DB_EVENT *event, const ZBX_DB_EVENT *r_ev
 
 			for (i = 0; i < webhook_params.values_num; i++)
 			{
-				if (SUCCEED != zbx_substitute_simple_macros_unmasked(&actionid, event, r_event, NULL, NULL,
-						&host, NULL, NULL, ack, service_alarm, service, default_timezone,
+				if (SUCCEED != zbx_substitute_simple_macros_unmasked(&actionid, event, r_event, NULL,
+						NULL, &host, NULL, NULL, ack, service_alarm, service, default_timezone,
 						(char **)&webhook_params.values[i].second, macro_type, error,
 						sizeof(error)))
 				{
@@ -2497,7 +2497,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 			zbx_escalation_status_string(escalation->status));
 
 	result = DBselect(
-			"select message,userid,clock,action,old_severity,new_severity from acknowledges"
+			"select message,userid,clock,action,old_severity,new_severity,suppress_until from acknowledges"
 			" where acknowledgeid=" ZBX_FS_UI64,
 			escalation->acknowledgeid);
 
@@ -2512,6 +2512,7 @@ static void	escalation_acknowledge(DB_ESCALATION *escalation, const DB_ACTION *a
 		ack.action = atoi(row[3]);
 		ack.old_severity = atoi(row[4]);
 		ack.new_severity = atoi(row[5]);
+		ack.suppress_until = atoi(row[6]);
 
 		escalation_execute_update_operations(event, r_event, action, &ack, NULL, NULL, default_timezone, roles);
 	}

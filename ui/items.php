@@ -37,7 +37,9 @@ $fields = [
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
 	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,
-										IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+										IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
+											COPY_TYPE_TO_TEMPLATE
+										]),
 										'isset({copy})'
 									],
 	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
@@ -472,7 +474,10 @@ else {
 	}
 }
 
-$filter_groupids = getSubGroups(getRequest('filter_groupids', []));
+$ms_groups = [];
+$filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, ['editable' => true],
+	getRequest('context')
+);
 $filter_hostids = getRequest('filter_hostids');
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
@@ -906,29 +911,29 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_itemid')) {
 	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetids');
+			$hostids = getRequest('copy_targetids');
 		}
-		// host groups
+		elseif (getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE_GROUP) {
+			$hostids = array_keys(API::Template()->get([
+				'output' => [],
+				'groupids' => getRequest('copy_targetids'),
+				'editable' => true,
+				'preservekeys' => true
+			]));
+		}
 		else {
-			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetids');
-
-			$db_hosts = DBselect(
-				'SELECT DISTINCT h.hostid'.
-				' FROM hosts h,hosts_groups hg'.
-				' WHERE h.hostid=hg.hostid'.
-					' AND '.dbConditionInt('hg.groupid', $group_ids)
-			);
-			while ($db_host = DBfetch($db_hosts)) {
-				$hosts_ids[] = $db_host['hostid'];
-			}
+			$hostids = array_keys(API::Host()->get([
+				'output' => [],
+				'groupids' => getRequest('copy_targetids'),
+				'editable' => true,
+				'preservekeys' => true
+			]));
 		}
 
 		DBstart();
 
-		$result = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
+		$result = copyItemsToHosts(getRequest('group_itemid'), $hostids);
 		$result = DBend($result);
 
 		$items_count = count(getRequest('group_itemid'));
@@ -1426,13 +1431,7 @@ else {
 	}
 
 	$data['filter_data'] = [
-		'groups' => hasRequest('filter_groupids')
-			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => getRequest('filter_groupids'),
-				'editable' => true
-			]), ['groupid' => 'id'])
-			: [],
+		'groups' => $ms_groups,
 		'hosts' => $host_template_filter,
 		'filter_name' => getRequest('filter_name'),
 		'filter_key' => getRequest('filter_key'),

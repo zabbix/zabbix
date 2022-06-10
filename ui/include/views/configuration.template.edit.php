@@ -145,15 +145,15 @@ $template_tab
 			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items
 	)
-	->addRow((new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Template groups'), 'groups__ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'groups[]',
-			'object_name' => 'hostGroup',
+			'object_name' => 'templateGroup',
 			'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 			'data' => $data['groups_ms'],
 			'popup' => [
 				'parameters' => [
-					'srctbl' => 'host_groups',
+					'srctbl' => 'template_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'groups_',
@@ -192,8 +192,7 @@ $tabs->addTab('macroTab', _('Macros'),
 			->setModern(true)
 		)
 		->addRow(null, new CPartial($tmpl, [
-			'macros' => $data['macros'],
-			'readonly' => $data['readonly']
+			'macros' => $data['macros']
 		]), 'macros_container'),
 	TAB_INDICATOR_MACROS
 );

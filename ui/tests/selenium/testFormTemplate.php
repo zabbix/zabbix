@@ -47,7 +47,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'name' => 'Test Template name',
 					'visible_name' => 'Selenium Test template with visible name',
-					'group' => 'Linux servers',
+					'group' => 'Templates/SAN',
 					'new_group' => 'Selenium new group',
 					'description' => 'template description',
 					'dbCheck' => true,
@@ -109,7 +109,7 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_Create($data) {
 		$this->zbxTestLogin('templates.php?page=1');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Host groups')->select('Templates');
+		$filter->getField('Template groups')->select('Templates');
 		$filter->submit();
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
@@ -122,7 +122,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 		if (array_key_exists('group', $data)) {
 			$this->zbxTestClickButtonMultiselect('groups_');
-			$this->zbxTestLaunchOverlayDialog('Host groups');
+			$this->zbxTestLaunchOverlayDialog('Template groups');
 			$this->zbxTestClickLinkTextWait($data['group']);
 		}
 
@@ -188,7 +188,7 @@ class testFormTemplate extends CLegacyWebTest {
 		if (isset($data['formCheck'])) {
 			$this->zbxTestLogin('templates.php?page=1');
 			$filter->invalidate();
-			$filter->getField('Host groups')->select('Templates');
+			$filter->getField('Template groups')->select('Templates');
 			$filter->submit();
 
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
