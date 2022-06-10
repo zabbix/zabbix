@@ -74,6 +74,7 @@ if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CRE
 $readonly = false;
 if ($is_templated || $discovered_graph) {
 	$readonly = true;
+	$graphForm->addItem((new CVar('readonly', 1))->removeId());
 }
 
 if ($discovered_graph) {
