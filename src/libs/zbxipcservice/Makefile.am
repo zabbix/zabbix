@@ -5,4 +5,6 @@ noinst_LIBRARIES = libzbxipcservice.a
 libzbxipcservice_a_SOURCES = \
 	ipcservice.c
 
-libzbxipcservice_a_CFLAGS = $(LIBEVENT_CFLAGS)
+libzbxipcservice_a_CFLAGS = \
+	$(LIBEVENT_CFLAGS) \
+	$(TLS_CFLAGS)
