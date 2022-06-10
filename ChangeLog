@@ -3,7 +3,7 @@ Changes for 6.2.0rc1
 New features:
 ..F.....S. [ZBXNEXT-721] added temporary suppress problem functionality (dgoloscapov, rdetlavs)
 A.F.....S. [ZBXNEXT-7591] added possibility to add custom tags to hosts created from host prototypes (averza, mprihodko)
-A.F....... [ZBXNEXT-6940] improved vector graph widget (ashubin, rlataria)
+A.F....... [ZBXNEXT-6940] added new features in graph widget: dataset with item list; stacked graphs type; show simple triggers and working time; last known for missing data; percentile lines; configurable approximation; better legend; clone data set (ashubin, rlataria)
 A.F....PS. [ZBXNEXT-7554] added incremental configuration sync for hosts, host tags, items, item tags, item preprocessing, triggers, trigger tags, functions (gcalenko, wiper)
 ....I....T [ZBXNEXT-7596] updated templates and templates.tmpl for 6.2 version (template_groups and host_groups properties) (abiba)
 A.F.....S. [ZBXNEXT-5517] added ability to modify macros of hosts created from host prototypes (asestakovs, miks)
