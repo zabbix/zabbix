@@ -12,15 +12,21 @@
 		grid-template-columns: max-content auto;
 	}
 
+	.fields-group {
+		grid-column: 2 / -1;
+		padding: 5px;
+		border: 1px solid $form-fields-group-border-color;
+	}
+
 	> label {
 		line-height: 24px;
 		text-align: right;
 		word-wrap: break-word;
 	}
 
-	.form-actions,
-	.form-field,
-	.field-fluid {
+	> .form-field,
+	> .field-fluid,
+	.form-actions {
 		grid-column: 2 / -1;
 		text-align: left;
 		line-height: 24px;

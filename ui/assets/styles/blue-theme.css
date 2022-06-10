@@ -662,13 +662,17 @@ footer {
   grid-template-columns: minmax(15%, max-content) auto; }
   .form-grid.label-width-true {
     grid-template-columns: max-content auto; }
+  .form-grid .fields-group {
+    grid-column: 2 / -1;
+    padding: 5px;
+    border: 1px solid #ebeef0; }
   .form-grid > label {
     line-height: 24px;
     text-align: right;
     word-wrap: break-word; }
-  .form-grid .form-actions,
-  .form-grid .form-field,
-  .form-grid .field-fluid {
+  .form-grid > .form-field,
+  .form-grid > .field-fluid,
+  .form-grid .form-actions {
     grid-column: 2 / -1;
     text-align: left;
     line-height: 24px; }
@@ -1472,27 +1476,27 @@ footer {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
-form.dashboard-widget-clock .field-group-date,
-form.dashboard-widget-clock .field-group-time,
-form.dashboard-widget-clock .field-group-tzone {
+form.dashboard-widget-clock .fields-group-date,
+form.dashboard-widget-clock .fields-group-time,
+form.dashboard-widget-clock .fields-group-tzone {
   display: grid;
   grid-template-columns: repeat(3, minmax(60px, max-content) auto);
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-clock .field-group-date label,
-  form.dashboard-widget-clock .field-group-time label,
-  form.dashboard-widget-clock .field-group-tzone label {
+  form.dashboard-widget-clock .fields-group-date label,
+  form.dashboard-widget-clock .fields-group-time label,
+  form.dashboard-widget-clock .fields-group-tzone label {
     text-align: right; }
-  form.dashboard-widget-clock .field-group-date .field-size input,
-  form.dashboard-widget-clock .field-group-time .field-size input,
-  form.dashboard-widget-clock .field-group-tzone .field-size input {
+  form.dashboard-widget-clock .fields-group-date .field-size input,
+  form.dashboard-widget-clock .fields-group-time .field-size input,
+  form.dashboard-widget-clock .fields-group-tzone .field-size input {
     margin-right: 5px; }
-form.dashboard-widget-clock .field-group-time .field-format {
+form.dashboard-widget-clock .fields-group-time .field-format {
   grid-column: 4 / -1; }
-form.dashboard-widget-clock .field-group-tzone .field-format {
+form.dashboard-widget-clock .fields-group-tzone .field-format {
   grid-column: 2 / -1; }
-form.dashboard-widget-clock .field-group-tzone .field-timezone {
+form.dashboard-widget-clock .fields-group-tzone .field-timezone {
   grid-column: 2 / -1; }
 
 div.dashboard-widget-clock.clock-digital {
@@ -1520,60 +1524,60 @@ div.dashboard-widget-clock.clock-digital {
     color: #768d99;
     font-weight: bold; }
 
-form.dashboard-widget-item .field-group-description,
-form.dashboard-widget-item .field-group-value,
-form.dashboard-widget-item .field-group-time,
-form.dashboard-widget-item .field-group-change-indicator {
+form.dashboard-widget-item .fields-group-description,
+form.dashboard-widget-item .fields-group-value,
+form.dashboard-widget-item .fields-group-time,
+form.dashboard-widget-item .fields-group-change-indicator {
   display: grid;
   grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-item .field-group-description label,
-  form.dashboard-widget-item .field-group-value label,
-  form.dashboard-widget-item .field-group-time label,
-  form.dashboard-widget-item .field-group-change-indicator label {
+  form.dashboard-widget-item .fields-group-description label,
+  form.dashboard-widget-item .fields-group-value label,
+  form.dashboard-widget-item .fields-group-time label,
+  form.dashboard-widget-item .fields-group-change-indicator label {
     text-align: right; }
-  form.dashboard-widget-item .field-group-description hr,
-  form.dashboard-widget-item .field-group-value hr,
-  form.dashboard-widget-item .field-group-time hr,
-  form.dashboard-widget-item .field-group-change-indicator hr {
+  form.dashboard-widget-item .fields-group-description hr,
+  form.dashboard-widget-item .fields-group-value hr,
+  form.dashboard-widget-item .fields-group-time hr,
+  form.dashboard-widget-item .fields-group-change-indicator hr {
     grid-column: 1 / -1;
     margin: 0;
     width: 100%;
     border: solid #ebeef0;
     border-width: 1px 0 0 0; }
-  form.dashboard-widget-item .field-group-description .field-fluid,
-  form.dashboard-widget-item .field-group-value .field-fluid,
-  form.dashboard-widget-item .field-group-time .field-fluid,
-  form.dashboard-widget-item .field-group-change-indicator .field-fluid {
+  form.dashboard-widget-item .fields-group-description .field-fluid,
+  form.dashboard-widget-item .fields-group-value .field-fluid,
+  form.dashboard-widget-item .fields-group-time .field-fluid,
+  form.dashboard-widget-item .fields-group-change-indicator .field-fluid {
     grid-column: 2 / -1; }
-  form.dashboard-widget-item .field-group-description .offset-3,
-  form.dashboard-widget-item .field-group-value .offset-3,
-  form.dashboard-widget-item .field-group-time .offset-3,
-  form.dashboard-widget-item .field-group-change-indicator .offset-3 {
+  form.dashboard-widget-item .fields-group-description .offset-3,
+  form.dashboard-widget-item .fields-group-value .offset-3,
+  form.dashboard-widget-item .fields-group-time .offset-3,
+  form.dashboard-widget-item .fields-group-change-indicator .offset-3 {
     grid-column-start: 3; }
-  form.dashboard-widget-item .field-group-description .field-size input,
-  form.dashboard-widget-item .field-group-value .field-size input,
-  form.dashboard-widget-item .field-group-time .field-size input,
-  form.dashboard-widget-item .field-group-change-indicator .field-size input {
+  form.dashboard-widget-item .fields-group-description .field-size input,
+  form.dashboard-widget-item .fields-group-value .field-size input,
+  form.dashboard-widget-item .fields-group-time .field-size input,
+  form.dashboard-widget-item .fields-group-change-indicator .field-size input {
     margin-right: 5px; }
-  form.dashboard-widget-item .field-group-description .form-field,
-  form.dashboard-widget-item .field-group-value .form-field,
-  form.dashboard-widget-item .field-group-time .form-field,
-  form.dashboard-widget-item .field-group-change-indicator .form-field {
+  form.dashboard-widget-item .fields-group-description .form-field,
+  form.dashboard-widget-item .fields-group-value .form-field,
+  form.dashboard-widget-item .fields-group-time .form-field,
+  form.dashboard-widget-item .fields-group-change-indicator .form-field {
     line-height: 24px; }
-form.dashboard-widget-item .field-group-description .form-field:nth-child(1) {
+form.dashboard-widget-item .fields-group-description .form-field:nth-child(1) {
   grid-column: 1 / -1; }
-form.dashboard-widget-item .field-group-value {
+form.dashboard-widget-item .fields-group-value {
   grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
-  form.dashboard-widget-item .field-group-value .units-show {
+  form.dashboard-widget-item .fields-group-value .units-show {
     display: flex; }
-    form.dashboard-widget-item .field-group-value .units-show label[for='units'] {
+    form.dashboard-widget-item .fields-group-value .units-show label[for='units'] {
       width: 100%; }
-form.dashboard-widget-item .field-group-change-indicator {
+form.dashboard-widget-item .fields-group-change-indicator {
   grid-template-columns: repeat(3, max-content 96px); }
-form.dashboard-widget-item .field-group-change-indicator .input-color-picker {
+form.dashboard-widget-item .fields-group-change-indicator .input-color-picker {
   display: block; }
 form.dashboard-widget-item .table-forms .table-forms-td-left label.widget-item-label {
   margin-top: 6px; }

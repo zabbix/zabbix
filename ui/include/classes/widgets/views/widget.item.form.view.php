@@ -89,7 +89,7 @@ $form_list
 			(new CDiv(CWidgetHelper::getColor($fields['desc_color'], true)))->addClass('form-field')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('field-group-description'),
+			->addClass('fields-group-description'),
 		'description-row'
 	)
 	->addRow(
@@ -154,7 +154,7 @@ $form_list
 			(new CDiv(CWidgetHelper::getColor($fields['units_color'], true)))->addClass('form-field')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('field-group-value'),
+			->addClass('fields-group-value'),
 		'value-row'
 	)
 	->addRow(
@@ -178,7 +178,7 @@ $form_list
 			(new CDiv(CWidgetHelper::getColor($fields['time_color'], true)))->addClass('form-field')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('field-group-time'),
+			->addClass('fields-group-time'),
 		'time-row'
 	)
 	->addRow(
@@ -200,7 +200,7 @@ $form_list
 			(new CDiv(CWidgetHelper::getColor($fields['updown_color'], true)))->addClass('form-field')
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('field-group-change-indicator'),
+			->addClass('fields-group-change-indicator'),
 		'change-indicator-row'
 	)
 	->addRow(

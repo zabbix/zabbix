@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -30,132 +30,134 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.clock.form.view.js.php')];
 
-// Time type.
-$form_list->addRow(CWidgetHelper::getLabel($fields['time_type']), CWidgetHelper::getSelect($fields['time_type']));
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+)
+	->addItem([
+		CWidgetHelper::getLabel($fields['time_type']),
+		new CFormField(CWidgetHelper::getSelect($fields['time_type']))
+	]);
 
-// Item.
 if (array_key_exists('itemid', $fields)) {
 	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
 		$form->getName()
 	);
-	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
+
 	$scripts[] = $field_itemid->getPostJS();
+
+	$form_grid->addItem([
+		CWidgetHelper::getMultiselectLabel($fields['itemid']),
+		new CFormField($field_itemid)
+	]);
 }
+
+$form_grid
+	->addItem([
+		CWidgetHelper::getLabel($fields['clock_type']),
+		new CFormField(CWidgetHelper::getRadioButtonList($fields['clock_type']))
+	])
+	->addItem([
+		CWidgetHelper::getLabel($fields['show'])->addClass('js-row-show'),
+		(new CFormField(
+			CWidgetHelper::getCheckBoxList($fields['show'], [
+				WIDGET_CLOCK_SHOW_DATE => _('Date'),
+				WIDGET_CLOCK_SHOW_TIME => _('Time'),
+				WIDGET_CLOCK_SHOW_TIMEZONE => _('Time zone')
+			])
+		))->addClass('js-row-show')
+	])
+	->addItem([
+		CWidgetHelper::getLabel($fields['adv_conf'])->addClass('js-row-adv-conf'),
+		(new CFormField(
+			CWidgetHelper::getCheckBox($fields['adv_conf'])
+		))->addClass('js-row-adv-conf')
+	])
+	->addItem([
+		CWidgetHelper::getLabel($fields['bg_color'])->addClass('js-row-bg-color'),
+		(new CFormField(
+			CWidgetHelper::getColor($fields['bg_color'], true)
+		))->addClass('js-row-bg-color')
+	])
+	->addItem([
+		(new CLabel(_('Date')))->addClass('js-row-date'),
+		(new CFormField(
+			(new CDiv([
+				CWidgetHelper::getLabel($fields['date_size']),
+				(new CFormField([CWidgetHelper::getIntegerBox($fields['date_size']), '%']))->addClass('field-size'),
+
+				CWidgetHelper::getLabel($fields['date_bold']),
+				new CFormField(CWidgetHelper::getCheckBox($fields['date_bold'])),
+
+				CWidgetHelper::getLabel($fields['date_color'])->addClass('offset-3'),
+				new CFormField(CWidgetHelper::getColor($fields['date_color'], true))
+			]))
+				->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+				->addClass('fields-group-date')
+		))->addClass('js-row-date')
+	])
+	->addItem([
+		(new CLabel(_('Time')))->addClass('js-row-time'),
+		(new CFormField(
+			(new CDiv([
+				CWidgetHelper::getLabel($fields['time_size']),
+				(new CFormField([CWidgetHelper::getIntegerBox($fields['time_size']), '%']))->addClass('field-size'),
+
+				CWidgetHelper::getLabel($fields['time_bold']),
+				new CFormField(CWidgetHelper::getCheckBox($fields['time_bold'])),
+
+				CWidgetHelper::getLabel($fields['time_color'])->addClass('offset-3'),
+				new CFormField(CWidgetHelper::getColor($fields['time_color'], true)),
+
+				CWidgetHelper::getLabel($fields['time_sec']),
+				new CFormField(CWidgetHelper::getCheckBox($fields['time_sec'])),
+
+				CWidgetHelper::getLabel($fields['time_format']),
+				(new CFormField(CWidgetHelper::getRadioButtonList($fields['time_format'])))->addClass('field-format')
+			]))
+				->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+				->addClass('fields-group-time')
+		))->addClass('js-row-time')
+	])
+	->addItem([
+		(new CLabel(_('Time zone')))->addClass('js-row-tzone'),
+		(new CFormField(
+			(new CDiv([
+				CWidgetHelper::getLabel($fields['tzone_size']),
+				(new CFormField([CWidgetHelper::getIntegerBox($fields['tzone_size']), '%']))->addClass('field-size'),
+
+				CWidgetHelper::getLabel($fields['tzone_bold']),
+				new CFormField(CWidgetHelper::getCheckBox($fields['tzone_bold'])),
+
+				CWidgetHelper::getLabel($fields['tzone_color'])->addClass('offset-3'),
+				new CFormField(CWidgetHelper::getColor($fields['tzone_color'], true)),
+
+				(CWidgetHelper::getLabel($fields['tzone_timezone']))->addClass('js-row-tzone-timezone'),
+				(new CFormField(CWidgetHelper::getSelect($fields['tzone_timezone'])))
+					->addClass('field-timezone')
+					->addClass('js-row-tzone-timezone'),
+
+				(CWidgetHelper::getLabel($fields['tzone_format']))->addClass('js-row-tzone-format'),
+				(new CFormField(CWidgetHelper::getRadioButtonList($fields['tzone_format'])))
+					->addClass('field-format')
+					->addClass('js-row-tzone-format')
+			]))
+				->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+				->addClass('fields-group-tzone')
+		))->addClass('js-row-tzone')
+	]);
 
 $scripts[] = $fields['tzone_timezone']->getJavascript();
 
-// Clock type
-$form_list
-	->addRow(CWidgetHelper::getLabel($fields['clock_type']),
-		(new CDiv(CWidgetHelper::getRadioButtonList($fields['clock_type'])))->addClass('form-field')
-	)
-	->addRow(
-		CWidgetHelper::getLabel($fields['show']),
-		CWidgetHelper::getCheckBoxList($fields['show'], [
-			WIDGET_CLOCK_SHOW_DATE => _('Date'),
-			WIDGET_CLOCK_SHOW_TIME => _('Time'),
-			WIDGET_CLOCK_SHOW_TIMEZONE => _('Time zone')
-		]),
-		'show-row'
-	)
-	->addRow(
-		CWidgetHelper::getLabel($fields['adv_conf']),
-		CWidgetHelper::getCheckBox($fields['adv_conf']),
-		'adv-conf-row'
-	)
-	->addRow(
-		CWidgetHelper::getLabel($fields['bg_color']),
-		(new CDiv(CWidgetHelper::getColor($fields['bg_color'], true)))->addClass('form-field'),
-		'bg-color-row'
-	)
-	->addRow(
-		(new CLabel(_('Date'))),
-		(new CDiv([
-			CWidgetHelper::getLabel($fields['date_size']),
-			(new CDiv([CWidgetHelper::getIntegerBox($fields['date_size']), '%']))
-				->addClass('form-field')
-				->addClass('field-size'),
-
-			CWidgetHelper::getLabel($fields['date_bold']),
-			(new CDiv(CWidgetHelper::getCheckBox($fields['date_bold'])))->addClass('form-field'),
-
-			CWidgetHelper::getLabel($fields['date_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['date_color'], true)))->addClass('form-field')
-		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('field-group-date'),
-		'date-row'
-	)
-	->addRow(
-		(new CLabel(_('Time'))),
-		(new CDiv([
-			CWidgetHelper::getLabel($fields['time_size']),
-			(new CDiv([CWidgetHelper::getIntegerBox($fields['time_size']), '%']))
-				->addClass('form-field')
-				->addClass('field-size'),
-
-			CWidgetHelper::getLabel($fields['time_bold']),
-			(new CDiv(CWidgetHelper::getCheckBox($fields['time_bold'])))->addClass('form-field'),
-
-			CWidgetHelper::getLabel($fields['time_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['time_color'], true)))->addClass('form-field'),
-
-			CWidgetHelper::getLabel($fields['time_sec']),
-			(new CDiv(CWidgetHelper::getCheckBox($fields['time_sec'])))->addClass('form-field'),
-
-			CWidgetHelper::getLabel($fields['time_format']),
-			(new CDiv(CWidgetHelper::getRadioButtonList($fields['time_format'])))
-				->addClass('form-field')
-				->addClass('field-format')
-		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('field-group-time'),
-		'time-row'
-	)
-	->addRow(
-		(new CLabel(_('Time zone'))),
-		(new CDiv([
-			CWidgetHelper::getLabel($fields['tzone_size']),
-			(new CDiv([CWidgetHelper::getIntegerBox($fields['tzone_size']), '%']))
-				->addClass('form-field')
-				->addClass('field-size'),
-
-			CWidgetHelper::getLabel($fields['tzone_bold']),
-			(new CDiv(CWidgetHelper::getCheckBox($fields['tzone_bold'])))->addClass('form-field'),
-
-			CWidgetHelper::getLabel($fields['tzone_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['tzone_color'], true)))->addClass('form-field'),
-
-			CWidgetHelper::getLabel($fields['tzone_timezone']),
-			(new CDiv(CWidgetHelper::getSelect($fields['tzone_timezone'])))
-				->addClass('form-field')
-				->addClass('field-timezone'),
-
-			CWidgetHelper::getLabel($fields['tzone_format']),
-			(new CDiv(CWidgetHelper::getRadioButtonList($fields['tzone_format'])))
-				->addClass('form-field')
-				->addClass('field-format')
-		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('field-group-tzone'),
-		'tzone-row'
+$form
+	->addItem($form_grid)
+	->addItem(
+		(new CScriptTag('
+			widget_clock_form.init();
+		'))->setOnDocumentReady()
 	);
-
-$form->addItem($form_list);
-
-$form->addItem(
-	(new CScriptTag('
-		widget_clock_form.init();
-	'))->setOnDocumentReady()
-);
 
 return [
 	'form' => $form,

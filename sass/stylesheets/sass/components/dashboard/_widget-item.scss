@@ -1,10 +1,10 @@
 // Widget configuration.
 
 form.dashboard-widget-item {
-	.field-group-description,
-	.field-group-value,
-	.field-group-time,
-	.field-group-change-indicator {
+	.fields-group-description,
+	.fields-group-value,
+	.fields-group-time,
+	.fields-group-change-indicator {
 		display: grid;
 		grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
 		align-items: center;
@@ -42,13 +42,13 @@ form.dashboard-widget-item {
 		}
 	}
 
-	.field-group-description {
+	.fields-group-description {
 		.form-field:nth-child(1) {
 			grid-column: 1 / -1;
 		}
 	}
 
-	.field-group-value {
+	.fields-group-value {
 		grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
 
 		.units-show {
@@ -60,11 +60,11 @@ form.dashboard-widget-item {
 		}
 	}
 
-	.field-group-change-indicator {
+	.fields-group-change-indicator {
 		grid-template-columns: repeat(3, max-content 96px);
 	}
 
-	.field-group-change-indicator .input-color-picker {
+	.fields-group-change-indicator .input-color-picker {
 		display: block;
 	}
 

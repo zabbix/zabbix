@@ -1,9 +1,9 @@
 // Widget configuration.
 
 form.dashboard-widget-clock {
-	.field-group-date,
-	.field-group-time,
-	.field-group-tzone {
+	.fields-group-date,
+	.fields-group-time,
+	.fields-group-tzone {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(60px, max-content) auto);
 		align-items: center;
@@ -21,13 +21,13 @@ form.dashboard-widget-clock {
 		}
 	}
 
-	.field-group-time {
+	.fields-group-time {
 		.field-format {
 			grid-column: 4 / -1;
 		}
 	}
 
-	.field-group-tzone {
+	.fields-group-tzone {
 		.field-format {
 			grid-column: 2 / -1;
 		}
