@@ -400,8 +400,8 @@ int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		if (SUCCEED == zbx_check_server_issuer_subject(sock, zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER,
-				zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT, &msg))
+		if (SUCCEED == zbx_check_server_issuer_subject(sock, zbx_config_tls->config_tls_server_cert_issuer,
+				zbx_config_tls->config_tls_server_cert_subject, &msg))
 		{
 			return SUCCEED;
 		}

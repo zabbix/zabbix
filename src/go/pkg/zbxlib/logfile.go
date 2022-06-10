@@ -215,24 +215,24 @@ void	zbx_init_config_tls_t_g_version(zbx_config_tls_t *zbx_config_tls, unsigned 
 	zbx_config_tls->configured_tls_connect_mode	= connect;
 	zbx_config_tls->configured_tls_accept_modes	= accept;
 
-	zbx_config_tls->CONFIG_TLS_CONNECT		= NULL;
-	zbx_config_tls->CONFIG_TLS_ACCEPT		= NULL;
-	zbx_config_tls->CONFIG_TLS_CA_FILE		= CAFile;
-	zbx_config_tls->CONFIG_TLS_CRL_FILE		= CRLFile;
-	zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER	= ServerCertIssuer;
-	zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT	= ServerCertSubject;
-	zbx_config_tls->CONFIG_TLS_CERT_FILE		= CertFile;
-	zbx_config_tls->CONFIG_TLS_KEY_FILE		= KeyFile;
-	zbx_config_tls->CONFIG_TLS_PSK_IDENTITY		= PSKIdentity;
-	zbx_config_tls->CONFIG_TLS_PSK_FILE		= PSKKey;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CERT13	= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CERT		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_PSK13		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_PSK		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_ALL13		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_ALL		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CMD13		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CMD		= NULL;
+	zbx_config_tls->config_tls_connect		= NULL;
+	zbx_config_tls->config_tls_accept		= NULL;
+	zbx_config_tls->config_tls_ca_file		= CAFile;
+	zbx_config_tls->config_tls_crl_file		= CRLFile;
+	zbx_config_tls->config_tls_server_cert_issuer	= ServerCertIssuer;
+	zbx_config_tls->config_tls_server_cert_subject	= ServerCertSubject;
+	zbx_config_tls->config_tls_cert_file		= CertFile;
+	zbx_config_tls->config_tls_key_file		= KeyFile;
+	zbx_config_tls->config_tls_psk_identity		= PSKIdentity;
+	zbx_config_tls->config_tls_psk_file		= PSKKey;
+	zbx_config_tls->config_tls_cipher_cert13	= NULL;
+	zbx_config_tls->config_tls_cipher_cert		= NULL;
+	zbx_config_tls->config_tls_cipher_psk13		= NULL;
+	zbx_config_tls->config_tls_cipher_psk		= NULL;
+	zbx_config_tls->config_tls_cipher_all13		= NULL;
+	zbx_config_tls->config_tls_cipher_all		= NULL;
+	zbx_config_tls->config_tls_cipher_cmd13		= NULL;
+	zbx_config_tls->config_tls_cipher_cmd		= NULL;
 }
 */
 import "C"

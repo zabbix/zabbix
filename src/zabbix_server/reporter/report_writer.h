@@ -24,9 +24,9 @@
 
 typedef struct
 {
-	char	*CONFIG_TLS_CA_FILE;
-	char	*CONFIG_TLS_CERT_FILE;
-	char	*CONFIG_TLS_KEY_FILE;
+	char	*config_tls_ca_file;
+	char	*config_tls_cert_file;
+	char	*config_tls_key_file;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 }
 ZBX_THREAD_REPORT_WRITER_ARGS;

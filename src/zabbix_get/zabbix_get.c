@@ -246,11 +246,11 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 			break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		case ZBX_TCP_SEC_TLS_CERT:
-			tls_arg1 = zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER;
-			tls_arg2 = zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT;
+			tls_arg1 = zbx_config_tls->config_tls_server_cert_issuer;
+			tls_arg2 = zbx_config_tls->config_tls_server_cert_subject;
 			break;
 		case ZBX_TCP_SEC_TLS_PSK:
-			tls_arg1 = zbx_config_tls->CONFIG_TLS_PSK_IDENTITY;
+			tls_arg1 = zbx_config_tls->config_tls_psk_identity;
 			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
 			break;
 #endif
@@ -371,45 +371,45 @@ int	main(int argc, char **argv)
 				break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			case '1':
-				zbx_config_tls->CONFIG_TLS_CONNECT = zbx_strdup(zbx_config_tls->CONFIG_TLS_CONNECT,
+				zbx_config_tls->config_tls_connect = zbx_strdup(zbx_config_tls->config_tls_connect,
 						zbx_optarg);
 				break;
 			case '2':
-				zbx_config_tls->CONFIG_TLS_CA_FILE = zbx_strdup(zbx_config_tls->CONFIG_TLS_CA_FILE,
+				zbx_config_tls->config_tls_ca_file = zbx_strdup(zbx_config_tls->config_tls_ca_file,
 						zbx_optarg);
 				break;
 			case '3':
-				zbx_config_tls->CONFIG_TLS_CRL_FILE = zbx_strdup(zbx_config_tls->CONFIG_TLS_CRL_FILE,
+				zbx_config_tls->config_tls_crl_file = zbx_strdup(zbx_config_tls->config_tls_crl_file,
 						zbx_optarg);
 				break;
 			case '4':
-				zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER =
-						zbx_strdup(zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER, zbx_optarg);
+				zbx_config_tls->config_tls_server_cert_issuer =
+						zbx_strdup(zbx_config_tls->config_tls_server_cert_issuer, zbx_optarg);
 				break;
 			case '5':
-				zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT =
-						zbx_strdup(zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT, zbx_optarg);
+				zbx_config_tls->config_tls_server_cert_subject =
+						zbx_strdup(zbx_config_tls->config_tls_server_cert_subject, zbx_optarg);
 				break;
 			case '6':
-				zbx_config_tls->CONFIG_TLS_CERT_FILE = zbx_strdup(zbx_config_tls->CONFIG_TLS_CERT_FILE,
+				zbx_config_tls->config_tls_cert_file = zbx_strdup(zbx_config_tls->config_tls_cert_file,
 						zbx_optarg);
 				break;
 			case '7':
-				zbx_config_tls->CONFIG_TLS_KEY_FILE = zbx_strdup(zbx_config_tls->CONFIG_TLS_KEY_FILE,
+				zbx_config_tls->config_tls_key_file = zbx_strdup(zbx_config_tls->config_tls_key_file,
 						zbx_optarg);
 				break;
 			case '8':
-				zbx_config_tls->CONFIG_TLS_PSK_IDENTITY = zbx_strdup(zbx_config_tls->CONFIG_TLS_PSK_IDENTITY,
+				zbx_config_tls->config_tls_psk_identity = zbx_strdup(zbx_config_tls->config_tls_psk_identity,
 						zbx_optarg);
 				break;
 			case '9':
-				zbx_config_tls->CONFIG_TLS_PSK_FILE = zbx_strdup(zbx_config_tls->CONFIG_TLS_PSK_FILE,
+				zbx_config_tls->config_tls_psk_file = zbx_strdup(zbx_config_tls->config_tls_psk_file,
 						zbx_optarg);
 				break;
 			case 'A':
 #if defined(HAVE_OPENSSL)
-				zbx_config_tls->CONFIG_TLS_CIPHER_CMD13 =
-						zbx_strdup(zbx_config_tls->CONFIG_TLS_CIPHER_CMD13, zbx_optarg);
+				zbx_config_tls->config_tls_cipher_cmd13 =
+						zbx_strdup(zbx_config_tls->config_tls_cipher_cmd13, zbx_optarg);
 #elif defined(HAVE_GNUTLS)
 				zbx_error("parameter \"--tls-cipher13\" can be used with OpenSSL 1.1.1 or newer."
 						" zabbix_get was compiled with GnuTLS");
@@ -417,7 +417,7 @@ int	main(int argc, char **argv)
 #endif
 				break;
 			case 'B':
-				zbx_config_tls->CONFIG_TLS_CIPHER_CMD = zbx_strdup(zbx_config_tls->CONFIG_TLS_CIPHER_CMD,
+				zbx_config_tls->config_tls_cipher_cmd = zbx_strdup(zbx_config_tls->config_tls_cipher_cmd,
 						zbx_optarg);
 				break;
 #else
@@ -495,15 +495,15 @@ int	main(int argc, char **argv)
 		goto out;
 	}
 
-	if (NULL != zbx_config_tls->CONFIG_TLS_CONNECT || NULL != zbx_config_tls->CONFIG_TLS_CA_FILE ||
-			NULL != zbx_config_tls->CONFIG_TLS_CRL_FILE ||
-			NULL != zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER ||
-			NULL != zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT ||
-			NULL != zbx_config_tls->CONFIG_TLS_CERT_FILE || NULL != zbx_config_tls->CONFIG_TLS_KEY_FILE ||
-			NULL != zbx_config_tls->CONFIG_TLS_PSK_IDENTITY ||
-			NULL != zbx_config_tls->CONFIG_TLS_PSK_FILE ||
-			NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD13 ||
-			NULL != zbx_config_tls->CONFIG_TLS_CIPHER_CMD)
+	if (NULL != zbx_config_tls->config_tls_connect || NULL != zbx_config_tls->config_tls_ca_file ||
+			NULL != zbx_config_tls->config_tls_crl_file ||
+			NULL != zbx_config_tls->config_tls_server_cert_issuer ||
+			NULL != zbx_config_tls->config_tls_server_cert_subject ||
+			NULL != zbx_config_tls->config_tls_cert_file || NULL != zbx_config_tls->config_tls_key_file ||
+			NULL != zbx_config_tls->config_tls_psk_identity ||
+			NULL != zbx_config_tls->config_tls_psk_file ||
+			NULL != zbx_config_tls->config_tls_cipher_cmd13 ||
+			NULL != zbx_config_tls->config_tls_cipher_cmd)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config(zbx_config_tls, CONFIG_ACTIVE_FORKS, CONFIG_PASSIVE_FORKS, program_type);

@@ -25,24 +25,24 @@ void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls)
 	zbx_config_tls->configured_tls_connect_mode	= ZBX_TCP_SEC_UNENCRYPTED;
 	zbx_config_tls->configured_tls_accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
 
-	zbx_config_tls->CONFIG_TLS_CONNECT		= NULL;
-	zbx_config_tls->CONFIG_TLS_ACCEPT		= NULL;
-	zbx_config_tls->CONFIG_TLS_CA_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_CRL_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
-	zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
-	zbx_config_tls->CONFIG_TLS_CERT_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_KEY_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_PSK_IDENTITY		= NULL;
-	zbx_config_tls->CONFIG_TLS_PSK_FILE		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CERT13	= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CERT		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_PSK13		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_PSK		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_ALL13		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_ALL		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CMD13		= NULL;
-	zbx_config_tls->CONFIG_TLS_CIPHER_CMD		= NULL;
+	zbx_config_tls->config_tls_connect		= NULL;
+	zbx_config_tls->config_tls_accept		= NULL;
+	zbx_config_tls->config_tls_ca_file		= NULL;
+	zbx_config_tls->config_tls_crl_file		= NULL;
+	zbx_config_tls->config_tls_server_cert_issuer	= NULL;
+	zbx_config_tls->config_tls_server_cert_subject	= NULL;
+	zbx_config_tls->config_tls_cert_file		= NULL;
+	zbx_config_tls->config_tls_key_file		= NULL;
+	zbx_config_tls->config_tls_psk_identity		= NULL;
+	zbx_config_tls->config_tls_psk_file		= NULL;
+	zbx_config_tls->config_tls_cipher_cert13	= NULL;
+	zbx_config_tls->config_tls_cipher_cert		= NULL;
+	zbx_config_tls->config_tls_cipher_psk13		= NULL;
+	zbx_config_tls->config_tls_cipher_psk		= NULL;
+	zbx_config_tls->config_tls_cipher_all13		= NULL;
+	zbx_config_tls->config_tls_cipher_all		= NULL;
+	zbx_config_tls->config_tls_cipher_cmd13		= NULL;
+	zbx_config_tls->config_tls_cipher_cmd		= NULL;
 }
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

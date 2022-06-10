@@ -90,8 +90,8 @@ static char	*rw_curl_error(CURLcode err)
  *                                                                            *
  ******************************************************************************/
 static int	rw_get_report(const char *url, const char *cookie, int width, int height, char **report,
-				size_t *report_size, char **error, char *CONFIG_TLS_CA_FILE, char *CONFIG_TLS_CERT_FILE,
-				char *CONFIG_TLS_KEY_FILE)
+				size_t *report_size, char **error, char *config_tls_ca_file, char *config_tls_cert_file,
+				char *config_tls_key_file)
 {
 #if !defined(HAVE_LIBCURL)
 	ZBX_UNUSED(url);
@@ -100,9 +100,9 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 	ZBX_UNUSED(height);
 	ZBX_UNUSED(report);
 	ZBX_UNUSED(report_size);
-	ZBX_UNUSED(CONFIG_TLS_CA_FILE);
-	ZBX_UNUSED(CONFIG_TLS_CERT_FILE);
-	ZBX_UNUSED(CONFIG_TLS_KEY_FILE);
+	ZBX_UNUSED(config_tls_ca_file);
+	ZBX_UNUSED(config_tls_cert_file);
+	ZBX_UNUSED(config_tls_key_file);
 
 	*error = zbx_strdup(NULL, "application compiled without cURL library");
 	return FAIL;
@@ -160,11 +160,11 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 		goto out;
 	}
 
-	if (NULL != CONFIG_TLS_CA_FILE && '\0' != *CONFIG_TLS_CA_FILE)
+	if (NULL != config_tls_ca_file && '\0' != *config_tls_ca_file)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, CONFIG_TLS_CA_FILE)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, CONFIG_TLS_CERT_FILE)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, CONFIG_TLS_KEY_FILE)))
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_tls_ca_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_tls_cert_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls_key_file)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
 					(curl_error = rw_curl_error(err)));
@@ -251,7 +251,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispatch, char **error,
-				char *CONFIG_TLS_CA_FILE, char *CONFIG_TLS_CERT_FILE, char *CONFIG_TLS_KEY_FILE)
+				char *config_tls_ca_file, char *config_tls_cert_file, char *config_tls_key_file)
 {
 	zbx_vector_ptr_pair_t	params;
 	int			i, ret, width, height;
@@ -282,7 +282,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 	}
 
 	if (SUCCEED == (ret = rw_get_report(url, cookie, width, height, &report, &report_size, error,
-			CONFIG_TLS_CA_FILE, CONFIG_TLS_CERT_FILE, CONFIG_TLS_KEY_FILE)))
+			config_tls_ca_file, config_tls_cert_file, config_tls_key_file)))
 	{
 		ret = zbx_alerter_begin_dispatch(dispatch, subject, message, name, "application/pdf", report,
 				report_size, error);
@@ -467,9 +467,9 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 		{
 			case ZBX_IPC_REPORTER_BEGIN_REPORT:
 				if (SUCCEED != (report_status = rw_begin_report(&message, &dispatch, &error,
-						poller_args_in->CONFIG_TLS_CA_FILE,
-						poller_args_in->CONFIG_TLS_CERT_FILE,
-						poller_args_in->CONFIG_TLS_KEY_FILE)))
+						poller_args_in->config_tls_ca_file,
+						poller_args_in->config_tls_cert_file,
+						poller_args_in->config_tls_key_file)))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "failed to begin report dispatch: %s", error);
 				}

@@ -31,9 +31,9 @@
 #include "cfg.h"
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-extern char	*CONFIG_TLS_SERVER_CERT_ISSUER;
-extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
-extern char	*CONFIG_TLS_PSK_IDENTITY;
+extern char	*config_tls_server_cert_issuer;
+extern char	*config_tls_server_cert_subject;
+extern char	*config_tls_psk_identity;
 #endif
 
 static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
@@ -84,11 +84,11 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 			break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		case ZBX_TCP_SEC_TLS_CERT:
-			tls_arg1 = zbx_config_tls->CONFIG_TLS_SERVER_CERT_ISSUER;
-			tls_arg2 = zbx_config_tls->CONFIG_TLS_SERVER_CERT_SUBJECT;
+			tls_arg1 = zbx_config_tls->config_tls_server_cert_issuer;
+			tls_arg2 = zbx_config_tls->config_tls_server_cert_subject;
 			break;
 		case ZBX_TCP_SEC_TLS_PSK:
-			tls_arg1 = zbx_config_tls->CONFIG_TLS_PSK_IDENTITY;
+			tls_arg1 = zbx_config_tls->config_tls_psk_identity;
 			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
 			break;
 #endif
