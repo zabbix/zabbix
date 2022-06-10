@@ -433,8 +433,11 @@ if ($data['parent_discoveryid']) {
 
 // Append tabs to form.
 $graphTab = (new CTabView())
-	->setSelected(0)
 	->addTab('graphTab', ($data['parent_discoveryid'] === null) ? _('Graph') : _('Graph prototype'), $graphFormList);
+
+if (!$data['form_refresh']) {
+	$graphTab->setSelected(0);
+}
 
 /*
  * Preview tab

@@ -337,7 +337,9 @@
 				this.loadItem(item);
 			});
 
-			$('#tabs').on('tabsactivate', (event, ui) => {
+			$('#tabs').tabs();
+
+			$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
 				if (ui.newPanel.attr('id') === 'previewTab') {
 					const $preview_chart = $('#previewChart');
 					const src = new Curl('chart3.php');
