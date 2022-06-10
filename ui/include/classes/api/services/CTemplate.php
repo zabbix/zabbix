@@ -718,17 +718,35 @@ class CTemplate extends CHostGeneral {
 			' FROM hosts_templates ht,hosts_templates htt'.
 			' WHERE ht.hostid=htt.hostid'.
 				' AND ht.templateid!=htt.templateid'.
-				' AND '.dbConditionInt('ht.templateid', $templateids).
-				' AND '.dbConditionInt('htt.templateid', $templateids, true)
+				' AND '.dbConditionId('ht.templateid', $templateids).
+				' AND '.dbConditionId('htt.templateid', $templateids, true)
 		);
 
 		while ($row = DBfetch($result)) {
 			$del_templates[$row['del_templateid']][$row['hostid']][] = $row['templateid'];
 		}
 
+		$del_links_clear = [];
+		$options = [
+			'output' => ['templateid', 'hostid'],
+			'filter' => [
+				'templateid' => $templateids
+			]
+		];
+		$result = DBselect(DB::makeSql('hosts_templates', $options));
+
+		while ($row = DBfetch($result)) {
+			if (!in_array($row['hostid'], $templateids)) {
+				$del_links_clear[$row['templateid']][$row['hostid']] = true;
+			}
+		}
+
 		if ($del_templates) {
-			$this->checkTriggerDependenciesOfUpdTemplates($del_templates);
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
+		}
+
+		if ($del_links_clear) {
+			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
 		}
 	}
 
@@ -1057,10 +1075,10 @@ class CTemplate extends CHostGeneral {
 				}
 
 				if (array_key_exists('templates_link', $data)) {
-					$this->massCheckTemplatesLinks('massupdate', $templateids_link, $db_templates);
+					$this->massCheckTemplatesLinks('massupdate', $templateids_link, $db_templates, $templateids_clear);
 				}
 				else {
-					$this->massCheckTemplatesLinks('massremove', $templateids_clear, $db_templates);
+					$this->massCheckTemplatesLinks('massremove', $templateids_clear, $db_templates, $templateids_clear);
 				}
 			}
 		}
@@ -1144,7 +1162,9 @@ class CTemplate extends CHostGeneral {
 
 			$this->massAddAffectedObjects('templates', $templateids, $db_templates);
 
-			$this->massCheckTemplatesLinks('massremove', $templateids, $db_templates);
+			$this->massCheckTemplatesLinks('massremove', $templateids, $db_templates,
+				array_key_exists('templateids_clear', $data) ? $data['templateids_clear'] : []
+			);
 		}
 	}
 

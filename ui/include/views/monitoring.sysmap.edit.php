@@ -344,7 +344,7 @@ $user_groups = [];
 
 foreach ($data['sysmap']['userGroups'] as $user_group) {
 	$user_groupid = $user_group['usrgrpid'];
-	$user_groups[$user_groupid] = [
+	$user_groups[] = [
 		'usrgrpid' => $user_groupid,
 		'name' => $data['user_groups'][$user_groupid]['name'],
 		'permission' => $user_group['permission']
@@ -381,14 +381,14 @@ $users = [];
 
 foreach ($data['sysmap']['users'] as $user) {
 	$userid = $user['userid'];
-	$users[$userid] = [
+	$users[] = [
 		'id' => $userid,
 		'name' => getUserFullname($data['users'][$userid]),
 		'permission' => $user['permission']
 	];
 }
 
-$js_insert .= 'window.addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
+$js_insert .= 'window.addPopupValues('.json_encode(['object' => 'userid', 'values' => $users]).');';
 
 zbx_add_post_js($js_insert);
 

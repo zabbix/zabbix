@@ -1665,7 +1665,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[queue,<from>,<to>]' => [
-				'description' => _('Number of items in the queue which are delayed by from to to seconds, inclusive.'),
+				'description' => _('Number of items in the queue which are delayed by from to seconds, inclusive.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[rcache,<cache>,<mode>]' => [

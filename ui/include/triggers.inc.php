@@ -93,18 +93,6 @@ function get_trigger_by_triggerid($triggerid) {
 	return false;
 }
 
-function get_hosts_by_triggerid($triggerids) {
-	zbx_value2array($triggerids);
-
-	return DBselect(
-		'SELECT DISTINCT h.*'.
-		' FROM hosts h,functions f,items i'.
-		' WHERE i.itemid=f.itemid'.
-			' AND h.hostid=i.hostid'.
-			' AND '.dbConditionInt('f.triggerid', $triggerids)
-	);
-}
-
 function get_triggers_by_hostid($hostid) {
 	return DBselect(
 		'SELECT DISTINCT t.*'.
@@ -148,27 +136,68 @@ function utf8RawUrlDecode($source) {
 }
 
 /**
- * Copies the given triggers to the given hosts or templates.
+ * Copy the given triggers to the target hosts or templates, taking care of copied trigger dependencies.
  *
- * Without the $src_hostid parameter it will only be able to copy triggers that belong to only one host. If the
- * $src_hostid parameter is not passed, and a trigger has multiple hosts, it will throw an error. If the
- * $src_hostid parameter is passed, the given host will be replaced with the destination host.
+ * If the $src_hostid parameter is passed, the given host will be replaced with the destination host.
+ * Without $src_hostid, only triggers that belong to a single host or template can be copied.
  *
- * This function takes care of copied trigger dependencies.
- * If trigger is copied alongside with trigger on which it depends, then dependencies is replaced directly using new ids,
- * If there is target host within dependency trigger, algorithm will search for potential matching trigger in target host,
- * if matching trigger is found, then id from this trigger is used, if not rise exception,
- * otherwise original dependency will be left.
+ * If a trigger is copied alongside with the trigger which it depends on, then dependencies are replaced directly,
+ * using new IDs.
+ * If the source trigger depends on the trigger from the same host or template, the same trigger-up should exist on the
+ * target host or template.
  *
- *
- * @param array $src_triggerids		Triggers which will be copied to $dst_hostids
- * @param array $dst_hostids		Hosts and templates to whom add triggers. IDs not present in DB (host table)
- *									will be ignored.
- * @param int	$src_hostid			Host ID in which context trigger with multiple hosts will be treated.
+ * @param array       $dst_hostids     Hosts and templates to copy triggers to.
+ *                                     IDs not present in the database will be ignored.
+ * @param string|null $src_hostid      ID of host to use as context for trigger when multiple hosts are involved.
+ * @param array|null  $src_triggerids  Triggers which will be copied to destination host(s).
  *
  * @return bool
  */
-function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) {
+function copyTriggersToHosts(array $dst_hostids, ?string $src_hostid, array $src_triggerids = null): bool {
+	$dst_templates = API::Template()->get([
+		'output' => ['host'],
+		'templateids' => $dst_hostids,
+		'editable' => true,
+		'preservekeys' => true
+	]);
+
+	$_dst_hostids = array_diff($dst_hostids, array_keys($dst_templates));
+
+	$dst_hosts = $_dst_hostids
+		?  API::Host()->get([
+			'output' => ['host', 'status'],
+			'hostids' => $_dst_hostids,
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
+	$dst_hosts = $dst_templates + $dst_hosts;
+
+	if (!$dst_hosts || count($dst_hosts) != count($dst_hostids)) {
+		return false;
+	}
+
+	if ($src_hostid) {
+		$src_hosts = API::Template()->get([
+			'output' => ['host'],
+			'templateids' => $src_hostid
+		]);
+
+		$src_hosts = $src_hosts
+			? $src_hosts
+			: API::Host()->get([
+				'output' => ['host'],
+				'hostids' => $src_hostid
+			]);
+
+		if (!$src_hosts) {
+			return false;
+		}
+
+		$src_host = $src_hosts[0]['host'];
+	}
+
 	$options = [
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
 			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
@@ -176,225 +205,249 @@ function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) 
 		],
 		'selectDependencies' => ['triggerid'],
 		'selectTags' => ['tag', 'value'],
-		'triggerids' => $src_triggerids
+		'preservekeys' => true
 	];
 
-	if ($src_hostid) {
-		$srcHost = API::Host()->get([
-			'output' => ['host'],
-			'hostids' => $src_hostid,
-			'preservekeys' => true,
-			'templated_hosts' => true
-		]);
+	if (!$src_hostid) {
+		$options += ['selectHosts' => ['hostid', 'host']];
+	}
 
-		if (!$srcHost = reset($srcHost)) {
+	if ($src_triggerids) {
+		$options += ['triggerids' => $src_triggerids];
+	}
+	else {
+		$options += [
+			'hostids' => $src_hostid,
+			'inherited' => false,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		];
+	}
+
+	$src_triggers = API::Trigger()->get($options);
+
+	if ($src_triggerids) {
+		if (count($src_triggers) != count($src_triggerids)) {
 			return false;
 		}
 	}
 	else {
-		// Select source trigger first host 'host'.
-		$options['selectHosts'] = ['host'];
+		if (!$src_triggers) {
+			return true;
+		}
 	}
 
-	$dbSrcTriggers = API::Trigger()->get($options);
-
-	$dbSrcTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbSrcTriggers,
+	$src_triggers = CMacrosResolverHelper::resolveTriggerExpressions($src_triggers,
 		['sources' => ['expression', 'recovery_expression']]
 	);
 
-	$dbDstHosts = API::Host()->get([
-		'output' => ['hostid', 'host'],
-		'hostids' => $dst_hostids,
-		'preservekeys' => true,
-		'templated_hosts' => true
-	]);
+	if (!$src_hostid) {
+		foreach ($src_triggers as $src_trigger) {
+			if (count($src_trigger['hosts']) > 1) {
+				error(_s('Cannot copy trigger "%1$s", because it has multiple hosts in the expression.',
+					$src_trigger['description']
+				));
 
-	$newTriggers = [];
-
-	foreach ($dbDstHosts as $dstHost) {
-		// Create each trigger for each host.
-
-		foreach ($dbSrcTriggers as $srcTrigger) {
-			if ($src_hostid) {
-				// Get host 'host' for triggerExpressionReplaceHost().
-
-				$host = $srcHost['host'];
-				$srcTriggerContextHostId = $src_hostid;
-			}
-			else {
-				if (count($srcTrigger['hosts']) > 1) {
-					error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.',
-						$srcTrigger['description'], $srcTrigger['expression']
-					));
-
-					return false;
-				}
-
-				// Use source trigger first host 'host'.
-				$host = $srcTrigger['hosts'][0]['host'];
-				$srcTriggerContextHostId = $srcTrigger['hosts'][0]['hostid'];
-			}
-
-			$srcTrigger['expression'] = triggerExpressionReplaceHost($srcTrigger['expression'], $host,
-				$dstHost['host']
-			);
-
-			if ($srcTrigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-				$srcTrigger['recovery_expression'] = triggerExpressionReplaceHost($srcTrigger['recovery_expression'],
-					$host, $dstHost['host']
-				);
-			}
-
-			// The dependencies must be added after all triggers are created.
-			$result = API::Trigger()->create([[
-				'description' => $srcTrigger['description'],
-				'event_name' => $srcTrigger['event_name'],
-				'opdata' => $srcTrigger['opdata'],
-				'expression' => $srcTrigger['expression'],
-				'url' => $srcTrigger['url'],
-				'status' => $srcTrigger['status'],
-				'priority' => $srcTrigger['priority'],
-				'comments' => $srcTrigger['comments'],
-				'type' => $srcTrigger['type'],
-				'recovery_mode' => $srcTrigger['recovery_mode'],
-				'recovery_expression' => $srcTrigger['recovery_expression'],
-				'correlation_mode' => $srcTrigger['correlation_mode'],
-				'correlation_tag' => $srcTrigger['correlation_tag'],
-				'tags' => $srcTrigger['tags'],
-				'manual_close' => $srcTrigger['manual_close']
-			]]);
-
-			if (!$result) {
 				return false;
 			}
-
-			$newTriggers[$srcTrigger['triggerid']][] = [
-				'newTriggerId' => reset($result['triggerids']),
-				'newTriggerExpression' => $srcTrigger['expression'],
-				'newTriggerHostId' => $dstHost['hostid'],
-				'newTriggerHost' => $dstHost['host'],
-				'srcTriggerContextHostId' => $srcTriggerContextHostId,
-				'srcTriggerContextHost' => $host
-			];
 		}
 	}
 
-	$depids = [];
-	foreach ($dbSrcTriggers as $srcTrigger) {
-		foreach ($srcTrigger['dependencies'] as $depTrigger) {
-			$depids[] = $depTrigger['triggerid'];
+	$dst_triggers = [];
+	$trigger_links = [];
+	$i = 0;
+
+	foreach ($dst_hosts as $dst_hostid => $dst_host) {
+		foreach ($src_triggers as $src_triggerid => $src_trigger) {
+			$dst_trigger = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url', 'status',
+				'priority', 'comments', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode',
+				'correlation_tag', 'manual_close', 'opdata', 'event_name', 'tags'
+			]));
+
+			$_src_host = $src_hostid ? $src_host : $src_trigger['hosts'][0]['host'];
+
+			$dst_trigger['expression'] =
+				triggerExpressionReplaceHost($src_trigger['expression'], $_src_host, $dst_host['host']);
+
+			if ($src_trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+				$dst_trigger['recovery_expression'] =
+					triggerExpressionReplaceHost($src_trigger['recovery_expression'], $_src_host, $dst_host['host']);
+			}
+
+			$dst_triggers[] = $dst_trigger;
+			$trigger_links[$src_triggerid][$dst_hostid] = $i;
+
+			$i++;
 		}
 	}
-	$depTriggers = API::Trigger()->get([
-		'triggerids' => $depids,
-		'output' => ['description', 'expression', 'recovery_mode', 'recovery_expression'],
-		'selectHosts' => ['hostid'],
-		'preservekeys' => true
-	]);
 
-	$depTriggers = CMacrosResolverHelper::resolveTriggerExpressions($depTriggers,
-		['sources' => ['expression', 'recovery_expression']]
-	);
+	$result = API::Trigger()->create($dst_triggers);
 
-	if ($newTriggers) {
-		// Map dependencies to the new trigger IDs and save.
+	if (!$result) {
+		return false;
+	}
 
-		$dependencies = [];
+	$dst_triggerids = $result['triggerids'];
 
-		foreach ($dbSrcTriggers as $srcTrigger) {
-			if ($srcTrigger['dependencies']) {
-				// Get corresponding created triggers.
-				$dst_triggers = $newTriggers[$srcTrigger['triggerid']];
+	$dst_triggers = [];
+	$src_triggerids_up = [];
 
-				foreach ($dst_triggers as $dst_trigger) {
-					foreach ($srcTrigger['dependencies'] as $depTrigger) {
-						/*
-						 * We have added $depTrigger trigger and we know corresponding trigger ID for newly
-						 * created trigger.
-						 */
-						if (array_key_exists($depTrigger['triggerid'], $newTriggers)) {
-							$dst_dep_triggers = $newTriggers[$depTrigger['triggerid']];
+	foreach ($trigger_links as $src_triggerid => $links) {
+		foreach ($links as $dst_hostid => $i) {
+			if (!$src_triggers[$src_triggerid]['dependencies']) {
+				continue;
+			}
 
-							foreach ($dst_dep_triggers as $dst_dep_trigger) {
-								/*
-								 * Dependency is within same host according to $src_hostid parameter or dep trigger has
-								 * single host.
-								 */
-								if ($dst_trigger['srcTriggerContextHostId'] == $dst_dep_trigger['srcTriggerContextHostId']
-										&& $dst_dep_trigger['newTriggerHostId'] == $dst_trigger['newTriggerHostId']) {
-									$depTriggerId = $dst_dep_trigger['newTriggerId'];
-									break;
-								}
-								// Dependency is to trigger from another host.
-								else {
-									$depTriggerId = $depTrigger['triggerid'];
-								}
-							}
-						}
-						// We need to search for $depTrigger trigger if target host is within dependency hosts.
-						elseif (in_array(['hostid' => $dst_trigger['srcTriggerContextHostId']],
-								$depTriggers[$depTrigger['triggerid']]['hosts'])) {
-							// Get all possible $depTrigger matching triggers by description.
-							$targetHostTriggersByDescription = API::Trigger()->get([
-								'hostids' => $dst_trigger['newTriggerHostId'],
-								'output' => ['hosts', 'triggerid', 'expression'],
-								'filter' => ['description' => $depTriggers[$depTrigger['triggerid']]['description']],
-								'preservekeys' => true
-							]);
+			$dst_triggers[$i] = ['triggerid' => $dst_triggerids[$i]];
 
-							$targetHostTriggersByDescription =
-								CMacrosResolverHelper::resolveTriggerExpressions($targetHostTriggersByDescription);
+			foreach ($src_triggers[$src_triggerid]['dependencies'] as $src_trigger_up) {
+				if (array_key_exists($src_trigger_up['triggerid'], $trigger_links)) {
+					$dst_triggers[$i]['dependencies'][] = [
+						'triggerid' => $dst_triggerids[$trigger_links[$src_trigger_up['triggerid']][$dst_hostid]]
+					];
+				}
+				elseif ($src_triggerids) {
+					$src_triggerids_up[$src_trigger_up['triggerid']] = true;
+				}
+				else {
+					$dst_triggers[$i]['dependencies'][] = ['triggerid' => $src_trigger_up['triggerid']];
+				}
+			}
+		}
+	}
 
-							// Compare exploded expressions for exact match.
-							$expr1 = $depTriggers[$depTrigger['triggerid']]['expression'];
-							$depTriggerId = null;
+	if ($src_triggerids_up) {
+		$src_triggers_up = API::Trigger()->get([
+			'output' => ['description', 'expression', 'recovery_mode', 'recovery_expression'],
+			'selectHosts' => ['hostid'],
+			'triggerids' => array_keys($src_triggerids_up),
+			'preservekeys' => true
+		]);
 
-							foreach ($targetHostTriggersByDescription as $potentialTargetTrigger) {
-								$expr2 = triggerExpressionReplaceHost($potentialTargetTrigger['expression'],
-									$dst_trigger['newTriggerHost'], $dst_trigger['srcTriggerContextHost']
-								);
+		$src_triggers_up = CMacrosResolverHelper::resolveTriggerExpressions($src_triggers_up,
+			['sources' => ['expression', 'recovery_expression']]
+		);
 
-								if ($expr2 == $expr1) {
-									// Matching trigger has been found.
-									$depTriggerId = $potentialTargetTrigger['triggerid'];
-									break;
-								}
-							}
+		$src_host_dependencies = [];
 
-							// If matching trigger wasn't found raise exception.
-							if ($depTriggerId === null) {
-								$expr2 = triggerExpressionReplaceHost($expr1, $dst_trigger['srcTriggerContextHost'],
-									$dst_trigger['newTriggerHost']
-								);
+		foreach ($trigger_links as $src_triggerid => $links) {
+			$_src_hostid = $src_hostid ? $src_hostid : $src_triggers[$src_triggerid]['hosts'][0]['hostid'];
 
-								error(_s(
-									'Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
-									$srcTrigger['description'], $dst_trigger['newTriggerExpression'],
-									$depTriggers[$depTrigger['triggerid']]['description'], $expr2
-								));
+			foreach ($links as $dst_hostid => $i) {
+				foreach ($src_triggers[$src_triggerid]['dependencies'] as $src_trigger_up) {
+					if (!array_key_exists($src_trigger_up['triggerid'], $src_triggers_up)) {
+						continue;
+					}
 
-								return false;
-							}
-						}
-						else {
-							// Leave original dependency.
+					$src_hostids_up = array_column($src_triggers_up[$src_trigger_up['triggerid']]['hosts'], 'hostid');
 
-							$depTriggerId = $depTrigger['triggerid'];
-						}
-
-						$dependencies[] = [
-							'triggerid' => $dst_trigger['newTriggerId'],
-							'dependsOnTriggerid' => $depTriggerId
-						];
+					if (in_array($_src_hostid, $src_hostids_up)) {
+						$src_host_dependencies[$src_trigger_up['triggerid']][$src_triggerid] = true;
+					}
+					else {
+						$dst_triggers[$i]['dependencies'][] = ['triggerid' => $src_trigger_up['triggerid']];
 					}
 				}
 			}
 		}
 
-		if ($dependencies) {
-			if (!API::Trigger()->addDependencies($dependencies)) {
+		if ($src_host_dependencies) {
+			$descriptions = array_unique(array_column(array_intersect_key($src_triggers_up, $src_host_dependencies),
+				'description'
+			));
+
+			$dst_host_triggers = API::Trigger()->get([
+				'output' => ['triggerid', 'description', 'expression', 'recovery_expression'],
+				'selectHosts' => ['hostid'],
+				'hostids' => array_keys($dst_hosts),
+				'filter' => ['description' => $descriptions],
+				'preservekeys' => true
+			]);
+
+			if (!$dst_host_triggers) {
+				$src_triggerid_up = key($src_host_dependencies);
+				$src_triggerid = key($src_host_dependencies[$src_triggerid_up]);
+				$dst_hostid = key($trigger_links[$src_triggerid]);
+
+				$error = array_key_exists('status', $dst_hosts[$dst_hostid])
+					? _('Trigger "%1$s" cannot depend on the non-existent trigger "%2$s" on the host "%3$s".')
+					: _('Trigger "%1$s" cannot depend on the non-existent trigger "%2$s" on the template "%3$s".');
+
+				error(sprintf($error, $src_triggers[$src_triggerid]['description'],
+					$src_triggers_up[$src_triggerid_up]['description'], $dst_hosts[$dst_hostid]['host']
+				));
+
 				return false;
 			}
+
+			$dst_host_triggers = CMacrosResolverHelper::resolveTriggerExpressions($dst_host_triggers,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+
+			$dst_host_triggerids = [];
+
+			foreach ($dst_host_triggers as $i => $trigger) {
+				$description = $trigger['description'];
+				$expression = $trigger['expression'];
+				$recovery_expression = $trigger['recovery_expression'];
+
+				if ($src_hostid) {
+					foreach ($trigger['hosts'] as $host) {
+						if (array_key_exists($host['hostid'], $dst_hosts)) {
+							$dst_host_triggerids[$host['hostid']][$description][$expression][$recovery_expression] =
+								$trigger['triggerid'];
+						}
+					}
+				}
+				else {
+					$dst_hostid = $trigger['hosts'][0]['hostid'];
+
+					$dst_host_triggerids[$dst_hostid][$description][$expression][$recovery_expression] =
+						$trigger['triggerid'];
+				}
+			}
+
+			foreach ($src_host_dependencies as $src_triggerid_up => $src_triggerids) {
+				foreach ($src_triggerids as $src_triggerid => $foo) {
+					foreach ($trigger_links[$src_triggerid] as $dst_hostid => $i) {
+						$src_trigger_up = $src_triggers_up[$src_triggerid_up];
+						$_src_host = $src_hostid ? $src_host : $src_trigger['hosts'][0]['host'];
+						$dst_host = $dst_hosts[$dst_hostid]['host'];
+
+						$description = $src_trigger_up['description'];
+						$expression =
+							triggerExpressionReplaceHost($src_trigger_up['expression'], $_src_host, $dst_host);
+						$recovery_expression =
+							triggerExpressionReplaceHost($src_trigger_up['recovery_expression'], $_src_host, $dst_host);
+
+						if (array_key_exists($dst_hostid, $dst_host_triggerids)
+								&& array_key_exists($description, $dst_host_triggerids[$dst_hostid])
+								&& array_key_exists($expression, $dst_host_triggerids[$dst_hostid][$description])
+								&& array_key_exists($recovery_expression, $dst_host_triggerids[$dst_hostid][$description][$expression])) {
+							$dst_triggerid_up =
+								$dst_host_triggerids[$dst_hostid][$description][$expression][$recovery_expression];
+
+							$dst_triggers[$i]['dependencies'][] = ['triggerid' => $dst_triggerid_up];
+						}
+						else {
+							$error = array_key_exists('status', $dst_hosts[$dst_hostid])
+								? _('Trigger "%1$s" cannot depend on the non-existent trigger "%2$s" on the host "%3$s".')
+								: _('Trigger "%1$s" cannot depend on the non-existent trigger "%2$s" on the template "%3$s".');
+
+							error(sprintf($error, $description, $src_trigger_up['description'], $dst_host));
+
+							return false;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if ($dst_triggers) {
+		$result = API::Trigger()->update(array_values($dst_triggers));
+
+		if (!$result) {
+			return false;
 		}
 	}
 
@@ -431,22 +484,6 @@ function triggerExpressionReplaceHost(string $expression, string $src_host, stri
 	}
 
 	return $expression;
-}
-
-function replace_template_dependencies($deps, $hostid) {
-	foreach ($deps as $id => $val) {
-		$sql = 'SELECT t.triggerid'.
-				' FROM triggers t,functions f,items i'.
-				' WHERE t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND t.templateid='.zbx_dbstr($val).
-					' AND i.hostid='.zbx_dbstr($hostid);
-		if ($db_new_dep = DBfetch(DBselect($sql))) {
-			$deps[$id] = $db_new_dep['triggerid'];
-		}
-	}
-
-	return $deps;
 }
 
 /**

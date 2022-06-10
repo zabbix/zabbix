@@ -96,7 +96,14 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 }
 check_fields($fields);
 
-$gitems = getRequest('items', []);
+$gitems = [];
+foreach (getRequest('items', []) as $gitem) {
+	if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+			&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+			&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+		$gitems[] = $gitem;
+	}
+}
 
 $_REQUEST['show_3d'] = getRequest('show_3d', 0);
 $_REQUEST['show_legend'] = getRequest('show_legend', 0);
@@ -624,15 +631,17 @@ elseif (isset($_REQUEST['form'])) {
 			'preservekeys' => true
 		]);
 
-		foreach ($data['items'] as &$item) {
-			$host = reset($items[$item['itemid']]['hosts']);
+		if ($items) {
+			foreach ($data['items'] as &$item) {
+				$host = reset($items[$item['itemid']]['hosts']);
 
-			$item['host'] = $host['name'];
-			$item['hostid'] = $items[$item['itemid']]['hostid'];
-			$item['name'] = $items[$item['itemid']]['name'];
-			$item['flags'] = $items[$item['itemid']]['flags'];
+				$item['host'] = $host['name'];
+				$item['hostid'] = $items[$item['itemid']]['hostid'];
+				$item['name'] = $items[$item['itemid']]['name'];
+				$item['flags'] = $items[$item['itemid']]['flags'];
+			}
+			unset($item);
 		}
-		unset($item);
 	}
 
 	// Set ymin_item_name.
