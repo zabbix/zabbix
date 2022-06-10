@@ -33,6 +33,7 @@
 #include "zbxmutexs.h"
 #include "zbxmodules.h"
 #include "zbxnix.h"
+#include "zbxcomms.h"
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"
@@ -1113,18 +1114,22 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}

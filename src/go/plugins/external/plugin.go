@@ -59,6 +59,7 @@ func (p *Plugin) Register() (response *comms.RegisterResponse, err error) {
 func (p *Plugin) ExecutePlugin() {
 	startLock.Lock()
 	defer startLock.Unlock()
+
 	p.cmd = exec.Command(p.Path, p.Socket, strconv.FormatBool(p.Initial))
 
 	err := p.cmd.Start()

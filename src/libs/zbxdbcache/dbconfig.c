@@ -24,8 +24,7 @@
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "cfg.h"
-#include "zbxhash.h"
-#include "../zbxcrypto/tls_tcp_active.h"
+#include "zbxcrypto.h"
 #include "../zbxkvs/kvs.h"
 #include "../zbxvault/vault.h"
 #include "base64.h"
@@ -3670,20 +3669,12 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
 
-		ZBX_STR2UINT64(itemid, row[0]);
-		ZBX_STR2UINT64(functionid, row[1]);
+		ZBX_STR2UINT64(itemid, row[1]);
+		ZBX_STR2UINT64(functionid, row[0]);
 		ZBX_STR2UINT64(triggerid, row[4]);
 
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
-		{
-			/* Item could have been created after we have selected them in the             */
-			/* previous queries. However, we shall avoid the check for functions being the */
-			/* same as in the trigger expression, because that is somewhat expensive, not  */
-			/* 100% (think functions keeping their functionid, but changing their function */
-			/* or parameters), and even if there is an inconsistency, we can live with it. */
-
 			continue;
-		}
 
 		/* process function information */
 
@@ -5451,7 +5442,9 @@ static void	zbx_dbsync_process_active_avail_diff(zbx_vector_uint64_t *diff)
  ******************************************************************************/
 void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 {
-	int		i, flags;
+	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
+
+	int		i, flags, changelog_num, dberr = ZBX_DB_FAIL;
 	double		sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, idsec, isec, tisec, pisec, tsec, dsec, fsec, expr_sec,
 			csec2, hsec2, hisec2, ifsec2, idsec2, isec2, tisec2, pisec2, tsec2, dsec2, fsec2, expr_sec2,
 			action_sec, action_sec2, action_op_sec, action_op_sec2, action_condition_sec,
@@ -5459,7 +5452,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 			correlation_sec, correlation_sec2, corr_condition_sec, corr_condition_sec2, corr_operation_sec,
 			corr_operation_sec2, hgroups_sec, hgroups_sec2, itempp_sec, itempp_sec2, itemscrp_sec,
 			itemscrp_sec2, total, total2, update_sec, maintenance_sec, maintenance_sec2, item_tag_sec,
-			item_tag_sec2, um_cache_sec, queues_sec;
+			item_tag_sec2, um_cache_sec, queues_sec, changelog_sec;
 
 	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			template_items_sync, prototype_items_sync, item_discovery_sync, triggers_sync, tdep_sync,
@@ -5471,6 +5464,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	double		autoreg_csec, autoreg_csec2;
 	zbx_dbsync_t	autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
+	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
 	zbx_hashset_t			trend_queue;
 	zbx_vector_uint64_t		active_avail_diff;
@@ -5479,30 +5473,34 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	config->sync_start_ts = time(NULL);
 
-	zbx_dbsync_init_env(config);
+	sec = zbx_time();
+	changelog_num = zbx_dbsync_env_prepare(mode);
+	changelog_sec = zbx_time() - sec;
 
 	if (ZBX_DBSYNC_INIT == mode)
 	{
 		zbx_hashset_create(&trend_queue, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		dc_load_trigger_queue(&trend_queue);
 	}
+	else if (ZBX_DBSYNC_STATUS_INITIALIZED != sync_status)
+		changelog_sync_mode = ZBX_DBSYNC_INIT;
 
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
 	zbx_dbsync_init(&autoreg_config_sync, mode);
-	zbx_dbsync_init(&hosts_sync, mode);
+	zbx_dbsync_init(&hosts_sync, changelog_sync_mode);
 	zbx_dbsync_init(&hi_sync, mode);
 	zbx_dbsync_init(&htmpl_sync, mode);
 	zbx_dbsync_init(&gmacro_sync, mode);
 	zbx_dbsync_init(&hmacro_sync, mode);
 	zbx_dbsync_init(&if_sync, mode);
-	zbx_dbsync_init(&items_sync, mode);
+	zbx_dbsync_init(&items_sync, changelog_sync_mode);
 	zbx_dbsync_init(&template_items_sync, mode);
 	zbx_dbsync_init(&prototype_items_sync, mode);
 	zbx_dbsync_init(&item_discovery_sync, mode);
-	zbx_dbsync_init(&triggers_sync, mode);
+	zbx_dbsync_init(&triggers_sync, changelog_sync_mode);
 	zbx_dbsync_init(&tdep_sync, mode);
-	zbx_dbsync_init(&func_sync, mode);
+	zbx_dbsync_init(&func_sync, changelog_sync_mode);
 	zbx_dbsync_init(&expr_sync, mode);
 	zbx_dbsync_init(&action_sync, mode);
 
@@ -5512,15 +5510,15 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_dbsync_init(&action_op_sync, ZBX_DBSYNC_UPDATE);
 
 	zbx_dbsync_init(&action_condition_sync, mode);
-	zbx_dbsync_init(&trigger_tag_sync, mode);
-	zbx_dbsync_init(&item_tag_sync, mode);
-	zbx_dbsync_init(&host_tag_sync, mode);
+	zbx_dbsync_init(&trigger_tag_sync, changelog_sync_mode);
+	zbx_dbsync_init(&item_tag_sync, changelog_sync_mode);
+	zbx_dbsync_init(&host_tag_sync, changelog_sync_mode);
 	zbx_dbsync_init(&correlation_sync, mode);
 	zbx_dbsync_init(&corr_condition_sync, mode);
 	zbx_dbsync_init(&corr_operation_sync, mode);
 	zbx_dbsync_init(&hgroups_sync, mode);
 	zbx_dbsync_init(&hgroup_host_sync, mode);
-	zbx_dbsync_init(&itempp_sync, mode);
+	zbx_dbsync_init(&itempp_sync, changelog_sync_mode);
 	zbx_dbsync_init(&itemscrp_sync, mode);
 
 	zbx_dbsync_init(&maintenance_sync, mode);
@@ -5528,6 +5526,14 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	zbx_dbsync_init(&maintenance_tag_sync, mode);
 	zbx_dbsync_init(&maintenance_group_sync, mode);
 	zbx_dbsync_init(&maintenance_host_sync, mode);
+
+#ifdef HAVE_ORACLE
+	/* With Oracle fetch statements can fail before all data has been fetched. */
+	/* In such cache next sync will need to do full scan rather than just      */
+	/* applying changelog diff. To detect this problem configuration is synced */
+	/* in transaction and error is checked at the end.                         */
+	DBbegin();
+#endif
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_config(&config_sync))
@@ -5761,7 +5767,6 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 	FINISH_SYNC;
 
 	/* sync rest of the data */
-
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_triggers(&triggers_sync))
 		goto out;
@@ -5911,6 +5916,9 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
+				__func__, changelog_sec, changelog_num);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
@@ -6155,6 +6163,8 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() timer queue: %d (%d allocated)", __func__,
 				config->trigger_queue.elems_num, config->trigger_queue.elems_alloc);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : %d", __func__, zbx_dbsync_env_changelog_num());
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() configfree : " ZBX_FS_DBL "%%", __func__,
 				100 * ((double)config_mem->free_size / config_mem->orig_size));
 
@@ -6163,18 +6173,41 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, config_mem);
 	}
+
+	dberr = ZBX_DB_OK;
 out:
 	if (0 == sync_in_progress)
-	{
-		/* non recoverable database error is encountered */
-		THIS_SHOULD_NEVER_HAPPEN;
 		START_SYNC;
-	}
 
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
 	FINISH_SYNC;
+
+#ifdef HAVE_ORACLE
+	if (ZBX_DB_OK == dberr)
+		dberr = DBcommit();
+	else
+		DBrollback();
+#endif
+	switch (dberr)
+	{
+		case ZBX_DB_OK:
+			if (ZBX_DBSYNC_INIT != changelog_sync_mode)
+				zbx_dbsync_env_flush_changelog();
+			else
+				sync_status = ZBX_DBSYNC_STATUS_INITIALIZED;
+			break;
+		case ZBX_DB_FAIL:
+			/* non recoverable database error is encountered */
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
+		case ZBX_DB_DOWN:
+			zabbix_log(LOG_LEVEL_WARNING, "Configuration cache has not been fully initialized because of"
+					" database connection problems. Full database scan will be attempted on next"
+					" sync.");
+			break;
+	}
 
 	if (0 != (update_flags & (ZBX_DBSYNC_UPDATE_HOSTS | ZBX_DBSYNC_UPDATE_ITEMS | ZBX_DBSYNC_UPDATE_MACROS)))
 	{
@@ -6222,7 +6255,7 @@ out:
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
 
-	zbx_dbsync_free_env();
+	zbx_dbsync_env_clear();
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
@@ -6690,6 +6723,8 @@ int	init_configuration_cache(char **error)
 	}
 	else
 		config->session_token = NULL;
+
+	zbx_dbsync_env_init(config);
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
@@ -10011,8 +10046,11 @@ static void	DCconfig_sort_triggers_topologically(void)
 	{
 		trigger = trigdep->trigger;
 
-		if (NULL == trigger || 1 < trigger->topoindex || 0 == trigdep->dependencies.values_num)
+		if (NULL == trigger || ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags || 1 < trigger->topoindex ||
+				0 == trigdep->dependencies.values_num)
+		{
 			continue;
+		}
 
 		DCconfig_sort_triggers_topologically_rec(trigdep, 0);
 	}
@@ -13324,19 +13362,19 @@ static const zbx_um_cache_t	*dc_um_get_cache(const zbx_dc_um_handle_t *um_handle
  *           user macro cache in the configuration cache.                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle)
+void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle)
 {
-	if (NULL == handle->prev && NULL != *handle->cache)
+	if (NULL == um_handle->prev && NULL != *um_handle->cache)
 	{
 		WRLOCK_CACHE;
-		um_cache_release(*handle->cache);
+		um_cache_release(*um_handle->cache);
 		UNLOCK_CACHE;
 
-		*handle->cache = NULL;
+		*um_handle->cache = NULL;
 	}
 
-	dc_um_handle = handle->prev;
-	zbx_free(handle);
+	dc_um_handle = um_handle->prev;
+	zbx_free(um_handle);
 }
 
 /******************************************************************************

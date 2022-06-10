@@ -70,7 +70,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="tag-row-tmpl">
-	<?= renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]) ?>
+	<?= renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['add_post_js' => false]) ?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="custom-intervals-tmpl">
@@ -114,4 +114,3 @@
 		</td>
 	</tr>
 </script>
-

@@ -184,7 +184,8 @@ class CControllerHintboxEventlist extends CController {
 			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 			'allowed_close' => ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 				&& $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-			)
+			),
+			'allowed_suppress' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 		]));
 	}
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,46 +21,21 @@
 
 class CSvgGraphArea extends CSvgGraphLine {
 
-	protected $y_zero;
+	public const ZBX_STYLE_CLASS = 'svg-graph-area';
 
-	public function __construct($path, $metric, $y_zero = 0) {
-		parent::__construct($path, $metric);
+	public function __construct(array $path, array $metric) {
+		parent::__construct($path, $metric, false);
 
-		$this->y_zero = $y_zero;
-		$this->add_label = false;
 		$this->options = $metric['options'] + [
-			'fill' => 5
+			'fill' => CSvgGraph::SVG_GRAPH_DEFAULT_TRANSPARENCY
 		];
 	}
 
-	public function makeStyles() {
-		$this
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA)
-			->addClass(CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order']);
+	protected function draw(): void {
+		$this->addClass(self::ZBX_STYLE_CLASS);
 
-		return [
-			'.'.CSvgTag::ZBX_STYLE_GRAPH_AREA.'-'.$this->itemid.'-'.$this->options['order'] => [
-				'fill-opacity' => $this->options['fill'] * 0.1,
-				'fill' => $this->options['color'],
-				'stroke-opacity' => 0.1,
-				'stroke' => $this->options['color'],
-				'stroke-width' => 2
-			]
-		];
-	}
+		parent::draw();
 
-	protected function draw() {
-		$path = parent::draw();
-
-		if ($this->path) {
-			$first_point = reset($this->path);
-			$last_point = end($this->path);
-			$this
-				->lineTo($last_point[0], $this->y_zero)
-				->lineTo($first_point[0], $this->y_zero)
-				->closePath();
-		}
-
-		return $path;
+		$this->closePath();
 	}
 }

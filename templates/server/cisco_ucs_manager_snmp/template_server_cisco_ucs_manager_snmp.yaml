@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:01:22Z'
-  groups:
+  date: '2022-06-07T19:37:44Z'
+  template_groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -197,7 +197,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -2107,8 +2107,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Cisco UCS Manager SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 8648df22d8be42359900e11ea395a98c

@@ -116,7 +116,7 @@ There are no template links in this template.
 |TiDB: Too few keep alive operations |<p>Indicates whether the TiDB process still exists. If the number of times for tidb_monitor_keep_alive_total increases less than 10 per minute, the TiDB process might already exit and an alert is triggered.</p> |`max(/TiDB by HTTP/tidb.monitor_keep_alive.rate,5m)<{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}` |AVERAGE | |
 |TiDB: Heap memory usage is too high |<p>-</p> |`min(/TiDB by HTTP/tidb.heap_bytes,5m)>{$TIDB.HEAP.USAGE.MAX.WARN}` |WARNING | |
 |TiDB: Current number of open files is too high |<p>Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p> |`min(/TiDB by HTTP/tidb.process_open_fds,5m)/last(/TiDB by HTTP/tidb.process_max_fds)*100>{$TIDB.OPEN.FDS.MAX.WARN}` |WARNING | |
-|TiDB: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/TiDB by HTTP/tidb.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|TiDB: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/TiDB by HTTP/tidb.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |TiDB: Version has changed |<p>TiDB version has changed. Ack to close.</p> |`last(/TiDB by HTTP/tidb.version,#1)<>last(/TiDB by HTTP/tidb.version,#2) and length(last(/TiDB by HTTP/tidb.version))>0` |INFO |<p>Manual close: YES</p> |
 |TiDB: Too many time jump backs |<p>-</p> |`min(/TiDB by HTTP/tidb.monitor_time_jump_back.rate,5m)>{$TIDB.TIME_JUMP_BACK.MAX.WARN}` |WARNING | |
 |TiDB: There are panicked TiDB threads |<p>When a panic occurs, an alert is triggered. The thread is often recovered, otherwise, TiDB will frequently restart.</p> |`last(/TiDB by HTTP/tidb.tidb_server_panic_total.rate)>0` |AVERAGE | |

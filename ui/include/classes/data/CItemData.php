@@ -61,6 +61,8 @@ final class CItemData {
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
+			'registry.data[key,<value name>]',
+			'registry.get[key,<mode>,<name regexp>]',
 			'sensor[device,sensor,<mode>]',
 			'service.info[service,<param>]',
 			'services[<type>,<state>,<exclude>]',
@@ -161,6 +163,8 @@ final class CItemData {
 			'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 			'proc.num[<name>,<user>,<state>,<cmdline>,<zone>]',
 			'proc_info[process,<attribute>,<type>]',
+			'registry.data[key,<value name>]',
+			'registry.get[key,<mode>,<name regexp>]',
 			'sensor[device,sensor,<mode>]',
 			'service.info[service,<param>]',
 			'services[<type>,<state>,<exclude>]',
@@ -278,6 +282,8 @@ final class CItemData {
 			'vmware.hv.uptime[<url>,<uuid>]',
 			'vmware.hv.version[<url>,<uuid>]',
 			'vmware.hv.vm.num[<url>,<uuid>]',
+			'vmware.rp.cpu.usage[<url>,<rpid>]',
+			'vmware.rp.memory[<url>,<rpid>,<mode>]',
 			'vmware.version[<url>]',
 			'vmware.vm.attribute[<url>,<uuid>,<name>]',
 			'vmware.vm.cluster.name[<url>,<uuid>]',
@@ -1007,6 +1013,14 @@ final class CItemData {
 				'description' => _('Various information about specific process(es). Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
+			'registry.data[key,<value name>]' => [
+				'description' => _('Value data for value name in Windows Registry key.'),
+				'value_type' => null
+			],
+			'registry.get[key,<mode>,<name regexp>]' => [
+				'description' => _('List of Windows Registry values or keys located at given key. Returns JSON.'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
 			'sensor[device,sensor,<mode>]' => [
 				'description' => _('Hardware sensor reading. Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
@@ -1423,6 +1437,14 @@ final class CItemData {
 				'description' => _('Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
+			'vmware.rp.cpu.usage[<url>,<rpid>]' => [
+				'description' => _('CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.rp.memory[<url>,<rpid>,<mode>]' => [
+				'description' => _('Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
 			'vmware.version[<url>]' => [
 				'description' => _('VMware service version, <url> - VMware service URL'),
 				'value_type' => ITEM_VALUE_TYPE_STR
@@ -1704,7 +1726,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[queue,<from>,<to>]' => [
-				'description' => _('Number of items in the queue which are delayed by from to to seconds, inclusive.'),
+				'description' => _('Number of items in the queue which are delayed by from to seconds, inclusive.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[rcache,<cache>,<mode>]' => [

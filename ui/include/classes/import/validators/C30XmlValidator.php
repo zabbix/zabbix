@@ -40,7 +40,6 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 * @param array  $data  Import data.
 	 * @param string $path  XML path (for error reporting).
 	 *
-	 * @throws Exception
 	 * @return array        Validator does some manipulation for the incoming data. For example, converts empty tags to
 	 *                      an array, if desired. Converted array is returned.
 	 */
@@ -897,7 +896,6 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|null $parent_data  Data's parent array.
 	 * @param string     $path         XML path.
 	 *
-	 * @throws Exception if the map element is invalid.
 	 * @return mixed
 	 */
 	public function validateMapElement($data, ?array $parent_data, $path) {
@@ -945,7 +943,6 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|null $parent_data  Data's parent array.
 	 * @param string     $path         XML path
 	 *
-	 * @throws Exception if the map element is invalid.
 	 * @return mixed
 	 */
 	public function validateScreenItemResource($data, ?array $parent_data, $path) {
@@ -991,7 +988,6 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|null $parent_data  Data's parent array.
 	 * @param string     $path         XML path.
 	 *
-	 * @throws Exception if the element is invalid.
 	 * @return mixed
 	 */
 	public function validateYMinItem($data, ?array $parent_data, $path) {
@@ -1015,7 +1011,6 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 * @param array|null $parent_data  Data's parent array.
 	 * @param string     $path         XML path.
 	 *
-	 * @throws Exception if the element is invalid.
 	 * @return mixed
 	 */
 	public function validateYMaxItem($data, ?array $parent_data, $path) {

@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:14Z'
-  groups:
+  date: '2022-06-07T19:36:31Z'
+  template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -370,7 +370,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -720,7 +720,7 @@ zabbix_export:
                   name: 'Node {#NODE.NAME}: has been restarted'
                   event_name: 'Node {#NODE.NAME}: has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
