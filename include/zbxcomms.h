@@ -315,8 +315,9 @@ zbx_tls_conn_attr_t;
 
 int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
-int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error, char *config_tls_server_cert_issuer,
-		char *config_tls_server_cert_subject);
+int		zbx_check_server_issuer_subject(const zbx_socket_t *sock, const char *allowed_issuer,
+		const char *allowed_subject, char **error);
+
 unsigned int	zbx_tls_get_psk_usage(void);
 
 /* TLS BLOCK END */

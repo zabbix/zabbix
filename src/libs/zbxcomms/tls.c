@@ -2095,15 +2095,19 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
  *     agent passive checks)                                                  *
  *                                                                            *
  * Parameters:                                                                *
- *     sock  - [IN] certificate to verify                                     *
- *     error - [OUT] dynamically allocated memory with error message          *
+ *     sock            - [IN] connected socket to get certificate from        *
+ *     allowed_issuer  - [IN] certificate must be issued by this CA authority *
+ *                            (can be NULL if not configured)                 *
+ *     allowed_subject - [IN] required certificate subject (can be NULL if    *
+ *                            not configured)                                 *
+ *     error           - [OUT] dynamically allocated memory with error        *
+ *                            message                                         *
  *                                                                            *
- * Return value:                                                              *
- *     SUCCEED or FAIL                                                        *
+ * Return value: SUCCEED (issuer and subject match allowed values) or FAIL    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error, char *config_tls_server_cert_issuer,
-		char *config_tls_server_cert_subject)
+int	zbx_check_server_issuer_subject(const zbx_socket_t *sock, const char *allowed_issuer,
+		const char *allowed_subject, char **error)
 {
 	zbx_tls_conn_attr_t	attr;
 
@@ -2116,14 +2120,14 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error, char *conf
 	}
 
 	/* simplified match, not compliant with RFC 4517, 4518 */
-	if (NULL != config_tls_server_cert_issuer && 0 != strcmp(config_tls_server_cert_issuer, attr.issuer))
+	if (NULL != allowed_issuer && 0 != strcmp(allowed_issuer, attr.issuer))
 	{
 		*error = zbx_dsprintf(*error, "certificate issuer does not match for %s", sock->peer);
 		return FAIL;
 	}
 
 	/* simplified match, not compliant with RFC 4517, 4518 */
-	if (NULL != config_tls_server_cert_subject && 0 != strcmp(config_tls_server_cert_subject, attr.subject))
+	if (NULL != allowed_subject && 0 != strcmp(allowed_subject, attr.subject))
 	{
 		*error = zbx_dsprintf(*error, "certificate subject does not match for %s", sock->peer);
 		return FAIL;
