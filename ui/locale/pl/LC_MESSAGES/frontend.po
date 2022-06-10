@@ -639,6 +639,11 @@ msgstr "Oznacz zdarzenia ROZWIĄZANE"
 msgid "Action"
 msgstr "Akcja"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr "Akcja"
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -1662,6 +1667,11 @@ msgstr "Raport dostępności"
 #: app/views/monitoring.widget.hostavail.view.php:58
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
+msgid "Available"
+msgstr "Dostępny"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
 msgid "Available"
 msgstr "Dostępny"
 
@@ -5183,6 +5193,11 @@ msgstr "Funkcje czasu i daty"
 msgid "Day"
 msgstr "Dzień"
 
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr "Dzień"
+
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
 msgstr "Przedwczoraj"
@@ -6103,6 +6118,11 @@ msgstr "Wykrywanie wirtualnych maszyn VMWare, <url> - URL usługi VMware. Zwraca
 msgid "Discovery rule"
 msgstr "Reguła wykrywania"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr "Reguła wykrywania"
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6327,6 +6347,11 @@ msgstr "Pobranie pliku konfiguracyjnego"
 #: app/views/monitoring.widget.slareport.view.php:100
 #: app/views/slareport.list.php:166
 #: include/classes/screens/CScreenDiscovery.php:120
+msgid "Downtime"
+msgstr "Czas przerwy w pracy"
+
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
 msgid "Downtime"
 msgstr "Czas przerwy w pracy"
 
@@ -6827,6 +6852,11 @@ msgstr "Błąd"
 msgid "Error budget"
 msgstr "Dopuszczalna niedostępność"
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr "Dopuszczalna niedostępność"
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6965,6 +6995,11 @@ msgstr "Wyłączony czas przestoju"
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr "Wyłączone czasy przestoju"
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr "Wyłączone czasy przestoju"
 
@@ -12037,6 +12072,11 @@ msgstr "Ścieżka menu"
 msgid "Message"
 msgstr "Wiadomość"
 
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
+msgid "Message"
+msgstr "Wiadomość"
+
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
 msgstr "Format wiadomości"
@@ -12305,6 +12345,11 @@ msgstr "Stała szerokość"
 msgid "Month"
 msgstr "Miesiąc"
 
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
+msgid "Month"
+msgstr "Miesiąc"
+
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
 #: app/views/popup.maintenance.period.php:78 app/views/popup.sla.edit.php:76
@@ -12563,6 +12608,11 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.list.php:52
 #: include/views/monitoring.sysmap.list.php:71 items.php:46 maintenance.php:40
 #: report2.php:509 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
+msgid "Name"
+msgstr "Nazwa"
+
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
 msgid "Name"
 msgstr "Nazwa"
 
@@ -13359,6 +13409,11 @@ msgstr "Nie autoryzowano."
 #: app/views/monitoring.widget.hostavail.view.php:62
 #: app/views/monitoring.widget.hostavail.view.php:103
 #: include/classes/html/CHostAvailability.php:81
+msgid "Not available"
+msgstr "Niedostępny"
+
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
 msgid "Not available"
 msgstr "Niedostępny"
 
@@ -15019,6 +15074,11 @@ msgstr "Plik klucza publicznego"
 msgid "Quarter"
 msgstr "Kwartał"
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr "Kwartał"
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr "Kwartalnie"
@@ -16030,11 +16090,22 @@ msgstr "SLA z ID \"%1$s\" nie jest dostępne."
 msgid "SLI"
 msgstr "SLI"
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr "SLI"
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr "SLO"
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr "SLO"
 
@@ -16664,6 +16735,11 @@ msgstr "Serwery"
 #: include/classes/helpers/CMediatypeHelper.php:96
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:39
 #: include/classes/widgets/views/js/widget.slareport.form.view.js.php:45
+msgid "Service"
+msgstr "Usługa"
+
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
 msgid "Service"
 msgstr "Usługa"
 
@@ -18488,6 +18564,11 @@ msgstr "Przekroczenie czasu"
 msgid "Timestamp"
 msgstr "Odcisk czasowy"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr "Odcisk czasowy"
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr "Strefa czasowa"
@@ -19584,6 +19665,11 @@ msgstr "Mapy wyższego poziomu"
 msgid "Uptime"
 msgstr "Czas pracy"
 
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
+msgid "Uptime"
+msgstr "Czas pracy"
+
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "Czas działania serwera Zabbix w sekundach."
@@ -20330,6 +20416,11 @@ msgstr "Sprawdzenie"
 msgid "Value"
 msgstr "Wartość"
 
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr "Wartość"
+
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
 #, c-format
@@ -20690,6 +20781,11 @@ msgstr "Środa"
 msgid "Week"
 msgstr "Tydzień"
 
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
+msgid "Week"
+msgstr "Tydzień"
+
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/popup.maintenance.period.php:77 app/views/popup.sla.edit.php:75
@@ -20998,6 +21094,11 @@ msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:122
 #: include/classes/helpers/CSlaHelper.php:62 report4.php:118 report4.php:154
+msgid "Year"
+msgstr "Rok"
+
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
 msgid "Year"
 msgstr "Rok"
 

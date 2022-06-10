@@ -618,6 +618,11 @@ msgstr "אירועים מוכרים שנפתרו"
 msgid "Action"
 msgstr "משימה"
 
+#: app/views/monitoring.widget.actionlog.view.php:37
+msgctxt "compact table header"
+msgid "Action"
+msgstr "משימה"
+
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
@@ -1637,6 +1642,11 @@ msgstr "דוח זמינות"
 #: app/views/monitoring.widget.hostavail.view.php:58
 #: app/views/monitoring.widget.hostavail.view.php:102
 #: include/classes/html/CHostAvailability.php:80
+msgid "Available"
+msgstr "זמין"
+
+#: app/views/monitoring.widget.hostavail.view.php:37
+msgctxt "compact table header"
 msgid "Available"
 msgstr "זמין"
 
@@ -5098,6 +5108,11 @@ msgstr "פונקציות תאריך ושעה"
 msgid "Day"
 msgstr "יום"
 
+#: include/classes/helpers/CSlaHelper.php:68
+msgctxt "compact table header"
+msgid "Day"
+msgstr "יום"
+
 #: include/func.inc.php:2467
 msgid "Day before yesterday"
 msgstr "יום שלפני אתמול"
@@ -6018,6 +6033,11 @@ msgstr "גילוי מכונות וירטואליות של VMware.‏ <url> - כ�
 msgid "Discovery rule"
 msgstr "כלל גילוי"
 
+#: app/views/monitoring.widget.discovery.view.php:33
+msgctxt "compact table header"
+msgid "Discovery rule"
+msgstr "כלל גילוי"
+
 #: include/classes/api/services/CDiscoveryRule.php:60
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -6239,6 +6259,11 @@ msgstr "הורדת קובץ ההגדרות"
 #: app/views/monitoring.widget.slareport.view.php:100
 #: app/views/slareport.list.php:166
 #: include/classes/screens/CScreenDiscovery.php:120
+msgid "Downtime"
+msgstr "זמן אי פעילות"
+
+#: app/views/monitoring.widget.slareport.view.php:100
+msgctxt "compact table header"
 msgid "Downtime"
 msgstr "זמן אי פעילות"
 
@@ -6739,6 +6764,11 @@ msgstr "שגיאה"
 msgid "Error budget"
 msgstr "תקציב שגיאה"
 
+#: app/views/monitoring.widget.slareport.view.php:101
+msgctxt "compact table header"
+msgid "Error budget"
+msgstr "תקציב שגיאה"
+
 #: include/db.inc.php:518
 #, c-format
 msgid "Error in search request for table \"%1$s\"."
@@ -6876,6 +6906,11 @@ msgstr "זמן השבתה מוחרג"
 #: app/views/monitoring.widget.slareport.view.php:102
 #: app/views/popup.sla.edit.php:201 app/views/popup.sla.edit.php:212
 #: app/views/slareport.list.php:168
+msgid "Excluded downtimes"
+msgstr "זמני השבתה מוחרגים"
+
+#: app/views/monitoring.widget.slareport.view.php:102
+msgctxt "compact table header"
 msgid "Excluded downtimes"
 msgstr "זמני השבתה מוחרגים"
 
@@ -11925,6 +11960,11 @@ msgstr "נתיב בתפריט"
 msgid "Message"
 msgstr "הודעה"
 
+#: app/views/monitoring.widget.actionlog.view.php:44
+msgctxt "compact table header"
+msgid "Message"
+msgstr "הודעה"
+
 #: app/views/administration.mediatype.edit.php:207
 msgid "Message format"
 msgstr "מבנה הודעה"
@@ -12188,6 +12228,11 @@ msgstr "רוחב אחיד"
 msgid "Month"
 msgstr "חודש"
 
+#: include/classes/helpers/CSlaHelper.php:70
+msgctxt "compact table header"
+msgid "Month"
+msgstr "חודש"
+
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:51
 #: app/views/popup.maintenance.period.php:78 app/views/popup.sla.edit.php:76
@@ -12446,6 +12491,11 @@ msgstr "NTLM"
 #: include/views/monitoring.sysmap.list.php:52
 #: include/views/monitoring.sysmap.list.php:71 items.php:46 maintenance.php:40
 #: report2.php:509 sysmaps.php:38 trigger_prototypes.php:37 triggers.php:45
+msgid "Name"
+msgstr "שם"
+
+#: app/views/monitoring.widget.plaintext.view.php:49
+msgctxt "compact table header"
 msgid "Name"
 msgstr "שם"
 
@@ -13242,6 +13292,11 @@ msgstr "לא מורשה."
 #: app/views/monitoring.widget.hostavail.view.php:62
 #: app/views/monitoring.widget.hostavail.view.php:103
 #: include/classes/html/CHostAvailability.php:81
+msgid "Not available"
+msgstr "לא זמין"
+
+#: app/views/monitoring.widget.hostavail.view.php:38
+msgctxt "compact table header"
 msgid "Not available"
 msgstr "לא זמין"
 
@@ -14900,6 +14955,11 @@ msgstr "קובץ מפתח ציבורי"
 msgid "Quarter"
 msgstr "רבעון"
 
+#: include/classes/helpers/CSlaHelper.php:71
+msgctxt "compact table header"
+msgid "Quarter"
+msgstr "רבעון"
+
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
 msgstr "רבעוני"
@@ -15907,11 +15967,22 @@ msgstr "ה־SLA עם המזהה „%1$s” אינו זמין."
 msgid "SLI"
 msgstr "SLI"
 
+#: app/views/monitoring.widget.slareport.view.php:98
+msgctxt "compact table header"
+msgid "SLI"
+msgstr "SLI"
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
 #: app/views/monitoring.widget.slareport.view.php:97
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:116 app/views/slareport.list.php:163
+msgid "SLO"
+msgstr "SLO"
+
+#: app/views/monitoring.widget.slareport.view.php:38
+#: app/views/monitoring.widget.slareport.view.php:97
+msgctxt "compact table header"
 msgid "SLO"
 msgstr "SLO"
 
@@ -16537,6 +16608,11 @@ msgstr "שרתים"
 #: include/classes/helpers/CMediatypeHelper.php:96
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:39
 #: include/classes/widgets/views/js/widget.slareport.form.view.js.php:45
+msgid "Service"
+msgstr "שירות"
+
+#: app/views/monitoring.widget.slareport.view.php:37
+msgctxt "compact table header"
 msgid "Service"
 msgstr "שירות"
 
@@ -18357,6 +18433,11 @@ msgstr "תום הזמן"
 msgid "Timestamp"
 msgstr "חותמת זמן"
 
+#: app/views/monitoring.widget.plaintext.view.php:33
+msgctxt "compact table header"
+msgid "Timestamp"
+msgstr "חותמת זמן"
+
 #: app/views/sla.list.php:91
 msgid "Timezone"
 msgstr "אזור זמן"
@@ -19448,6 +19529,11 @@ msgstr "מפות ברמות עליונות"
 msgid "Uptime"
 msgstr "זמן פעילות"
 
+#: app/views/monitoring.widget.slareport.view.php:99
+msgctxt "compact table header"
+msgid "Uptime"
+msgstr "זמן פעילות"
+
 #: include/classes/data/CItemData.php:1686
 msgid "Uptime of Zabbix server process in seconds."
 msgstr "זמן פעילות של שרת ה־Zabbix בשניות."
@@ -20189,6 +20275,11 @@ msgstr "אימות"
 msgid "Value"
 msgstr "ערך"
 
+#: app/views/monitoring.widget.plaintext.view.php:51
+msgctxt "compact table header"
+msgid "Value"
+msgstr "ערך"
+
 #: include/classes/api/services/CMap.php:930
 #: include/classes/api/services/CMap.php:1405
 #, c-format
@@ -20547,6 +20638,11 @@ msgstr "יום רביעי"
 msgid "Week"
 msgstr "שבוע"
 
+#: include/classes/helpers/CSlaHelper.php:69
+msgctxt "compact table header"
+msgid "Week"
+msgstr "שבוע"
+
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
 #: app/views/popup.maintenance.period.php:77 app/views/popup.sla.edit.php:75
@@ -20855,6 +20951,11 @@ msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:122
 #: include/classes/helpers/CSlaHelper.php:62 report4.php:118 report4.php:154
+msgid "Year"
+msgstr "שנה"
+
+#: include/classes/helpers/CSlaHelper.php:72
+msgctxt "compact table header"
 msgid "Year"
 msgstr "שנה"
 
