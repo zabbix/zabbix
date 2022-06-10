@@ -2072,6 +2072,7 @@ Changes for 5.0.25rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-21143] changed API URL in Express.ms media type to a new version (drasihov)
 .........T [ZBX-20875] fixed filter condition for job discovery rule in MSSQL by ODBC template (drasihov)
 .......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
 .........T [ZBX-20985] fixed notifications summary for MS Teams media type (drasihov)
