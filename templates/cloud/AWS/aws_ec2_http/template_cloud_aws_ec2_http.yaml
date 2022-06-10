@@ -1,17 +1,17 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-09T20:36:36Z'
+  date: '2022-06-10T10:37:00Z'
   template_groups:
     -
-      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
-      name: Templates/Applications
+      uuid: c2c162144c2d4c5491c8801193af4945
+      name: Templates/Cloud
   templates:
     -
       uuid: 7af6d68b223a43d4bf8526cc5dc3fe2e
       template: 'AWS EC2 by HTTP'
       name: 'AWS EC2 by HTTP'
       description: |
-        Get AWS EC2 and attached AWS EBS volumes metrics by HTTP agent from CloudWatch API.
+        Get AWS EC2 and attached AWS EBS volumes metrics and uses the script item to make HTTP requests to the CloudWatch API.
         Don't forget to read the README.md for the correct setup of the template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -19,7 +19,7 @@ zabbix_export:
         Template tooling version used: 0.42
       groups:
         -
-          name: Templates/Applications
+          name: Templates/Cloud
       items:
         -
           uuid: 22b61bf7ebba43e8aef544385448d18c
@@ -1486,7 +1486,7 @@ zabbix_export:
               name: 'AWS EC2 Alarms: "{#ALARM_NAME}" has ''Alarm'' state'
               priority: AVERAGE
               description: |
-                Alarm "{#ALARM_NAME}" has 'Alarm' state.
+                Alarm "{#ALARM_NAME}" has 'Alarm' state. 
                 Reason: {ITEM.LASTVALUE2}
               tags:
                 -
@@ -1514,6 +1514,10 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result);
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
         -
           uuid: 6cf7fc98fea44b0789a5aaa837042699
           name: 'Instance Volumes discovery'
@@ -2385,6 +2389,7 @@ zabbix_export:
           description: 'Amazon EC2 Region code.'
         -
           macro: '{$AWS.SECRET.ACCESS.KEY}'
+          type: SECRET_TEXT
           description: 'Secret access key.'
       valuemaps:
         -

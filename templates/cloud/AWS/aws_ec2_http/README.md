@@ -19,13 +19,29 @@ Additional information about metrics and used API methods:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-The template get AWS EC2 and attached AWS EBS volumes metrics by HTTP agent from CloudWatch API.
+The template get AWS EC2 and attached AWS EBS volumes metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
 Create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
 Add the following required permissions to your Zabbix IAM policy in order to collect Amazon EC2 metrics.
-
-`PUT PERMISSIONS HERE`
+The following permissions included in the policy document use wild cards such as List* and Get*. If you require strict policies, use the complete action names as listed and reference the Amazon API documentation for your respective services.
+```json
+{
+    "Version":"2012-10-17",
+    "Statement":[
+        {
+          "Action":[
+              "cloudwatch:Describe*",
+              "cloudwatch:Get*",
+              "cloudwatch:List*",
+              "ec2:Describe*"
+          ],
+          "Effect":"Allow",
+          "Resource":"*"
+        }
+    ]
+  }
+  ```
 
 For more information, see the [EC2 policies](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-iam.html) on the AWS website.
 
@@ -69,7 +85,7 @@ There are no template links in this template.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
-|Instance Alarms discovery |<p>Discovery instance and attached EBS volumes alarms.</p> |DEPENDENT |aws.ec2.alarms.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>**Filter**:</p>AND <p>- {#ALARM_SERVICE_NAMESPACE} MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}`</p><p>- {#ALARM_SERVICE_NAMESPACE} NOT_MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}`</p><p>- {#ALARM_NAME} MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}`</p><p>- {#ALARM_NAME} NOT_MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.ALARM_NAME.NOT_MATCHES}`</p> |
+|Instance Alarms discovery |<p>Discovery instance and attached EBS volumes alarms.</p> |DEPENDENT |aws.ec2.alarms.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p>AND <p>- {#ALARM_SERVICE_NAMESPACE} MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}`</p><p>- {#ALARM_SERVICE_NAMESPACE} NOT_MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}`</p><p>- {#ALARM_NAME} MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}`</p><p>- {#ALARM_NAME} NOT_MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.ALARM_NAME.NOT_MATCHES}`</p> |
 |Instance Volumes discovery |<p>Discovery attached EBS volumes.</p> |DEPENDENT |aws.ec2.volumes.discovery<p>**Preprocessing**:</p><p>- JAVASCRIPT: `The text is too long. Please see the template.`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `3h`</p><p>**Filter**:</p>AND <p>- {#VOLUME_TYPE} MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}`</p><p>- {#VOLUME_TYPE} NOT_MATCHES_REGEX `{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}`</p> |
 
 ## Items collected
@@ -132,12 +148,9 @@ There are no template links in this template.
 |AWS EC2: Failed to get metrics data |<p>-</p> |`length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0` |WARNING | |
 |AWS EC2: Failed to get alarms data |<p>-</p> |`length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0` |WARNING | |
 |AWS EC2: Failed to get volumes info |<p>-</p> |`length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0` |WARNING | |
-|AWS EC2 Alarms: "{#ALARM_NAME}" has 'Alarm' state
- |<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.</p><p>Reason: {ITEM.LASTVALUE2}</p> |`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0` |AVERAGE | |
-|AWS EC2 Alarms: "{#ALARM_NAME}" has 'Insufficient data' state
- |<p>-</p> |`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1` |INFO | |
-|AWS EBS: Volume "{#VOLUME_ID}" has 'error' state
- |<p>-</p> |`last(/AWS EC2 by HTTP/aws.ec2.ebs.status["{#VOLUME_ID}"])=5` |WARNING | |
+|AWS EC2 Alarms: "{#ALARM_NAME}" has 'Alarm' state |<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. </p><p>Reason: {ITEM.LASTVALUE2}</p> |`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0` |AVERAGE | |
+|AWS EC2 Alarms: "{#ALARM_NAME}" has 'Insufficient data' state |<p>-</p> |`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1` |INFO | |
+|AWS EBS: Volume "{#VOLUME_ID}" has 'error' state |<p>-</p> |`last(/AWS EC2 by HTTP/aws.ec2.ebs.status["{#VOLUME_ID}"])=5` |WARNING | |
 
 ## Feedback
 
