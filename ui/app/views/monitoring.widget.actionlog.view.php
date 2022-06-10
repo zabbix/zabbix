@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // indicator of sort field
@@ -33,18 +34,18 @@ $table = (new CTableInfo())
 		($data['sortfield'] === 'clock')
 			? [_x('Time', 'compact table header'), $sort_div]
 			: _x('Time', 'compact table header'),
-		_('Action'),
+		_x('Action', 'compact table header'),
 		($data['sortfield'] === 'mediatypeid')
 			? [_x('Type', 'compact table header'), $sort_div]
 			: _x('Type', 'compact table header'),
 		($data['sortfield'] === 'sendto')
 			? [_x('Recipient', 'compact table header'), $sort_div]
 			: _x('Recipient', 'compact table header'),
-		_('Message'),
+		_x('Message', 'compact table header'),
 		($data['sortfield'] === 'status')
 			? [_x('Status', 'compact table header'), $sort_div]
 			: _x('Status', 'compact table header'),
-		_('Info')
+		_x('Info', 'compact table header')
 	]);
 
 foreach ($data['alerts'] as $alert) {

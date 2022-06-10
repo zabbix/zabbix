@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 if ($data['filter']['show_type'] == WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS) {

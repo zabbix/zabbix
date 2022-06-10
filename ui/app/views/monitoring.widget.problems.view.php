@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // indicator of sort field
@@ -35,7 +36,9 @@ $url_details = $data['allowed_ui_problems']
 $show_timeline = ($data['sortfield'] === 'clock' && $data['fields']['show_timeline']);
 $show_recovery_data = in_array($data['fields']['show'], [TRIGGERS_OPTION_RECENT_PROBLEM, TRIGGERS_OPTION_ALL]);
 
-$header_time = new CColHeader(($data['sortfield'] === 'clock') ? [_('Time'), $sort_div] : _('Time'));
+$header_time = new CColHeader(($data['sortfield'] === 'clock')
+	? [_x('Time', 'compact table header'), $sort_div]
+	: _x('Time', 'compact table header'));
 
 if ($show_timeline) {
 	$header = [
@@ -57,7 +60,7 @@ $table = (new CTableInfo())
 			: null,
 		$show_recovery_data
 			? _x('Status', 'compact table header')
-			: null, _x('Info', 'compact table header'),
+			: null,
 		_x('Info', 'compact table header'),
 		($data['sortfield'] === 'host')
 			? [_x('Host', 'compact table header'), $sort_div]
