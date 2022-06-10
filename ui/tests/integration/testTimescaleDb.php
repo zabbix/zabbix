@@ -130,7 +130,7 @@ class testTimescaleDb extends CIntegrationTest {
 	 */
 	public function getHistoryCount() {
 		global $DB;
-		
+
 		$sql = 'SELECT count(*)'.
 			' FROM history_uint';
 
