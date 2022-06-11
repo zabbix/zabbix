@@ -732,21 +732,30 @@ typedef struct
 	char		*tag;
 	char		*value_orig;
 	char		*value;
+	unsigned char	automatic;
+	unsigned char	automatic_orig;
 #define ZBX_FLAG_DB_TAG_UNSET			__UINT64_C(0x00000000)
 #define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000001)
 #define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000002)
+#define ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC	__UINT64_C(0x00000004)
 #define ZBX_FLAG_DB_TAG_REMOVE			__UINT64_C(0x80000000)
-#define ZBX_FLAG_DB_TAG_UPDATE	(ZBX_FLAG_DB_TAG_UPDATE_TAG | ZBX_FLAG_DB_TAG_UPDATE_VALUE)
+#define ZBX_FLAG_DB_TAG_UPDATE	(ZBX_FLAG_DB_TAG_UPDATE_TAG | ZBX_FLAG_DB_TAG_UPDATE_VALUE|	\
+		ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC)
 	zbx_uint64_t	flags;
 }
 zbx_db_tag_t;
+
+ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
+
+#define ZBX_DB_TAG_NORMAL	0
+#define ZBX_DB_TAG_AUTOMATIC	1
 
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
 void		zbx_db_tag_free(zbx_db_tag_t *tag);
 int		zbx_db_tag_compare_func(const void *d1, const void *d2);
 int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
-ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
+void	zbx_db_tag_merge(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src);
 
 typedef enum
 {
