@@ -107,7 +107,7 @@ ZBX_THREAD_ENTRY(heart_thread, args)
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(heart_args_in->zbx_config_tls, heart_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(heart_args_in->zbx_config_tls);
 #endif
 	last_stat_time = time(NULL);
 

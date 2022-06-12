@@ -952,7 +952,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	scriptitem_es_engine_init();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(poller_args_in->zbx_config_tls, poller_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(poller_args_in->zbx_config_tls);
 #endif
 	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
 	{

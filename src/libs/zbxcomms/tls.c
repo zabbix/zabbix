@@ -150,7 +150,7 @@ static ZBX_THREAD_LOCAL gnutls_psk_server_credentials_t		my_psk_server_creds	= N
 static ZBX_THREAD_LOCAL gnutls_priority_t			ciphersuites_cert	= NULL;
 static ZBX_THREAD_LOCAL gnutls_priority_t			ciphersuites_psk	= NULL;
 static ZBX_THREAD_LOCAL gnutls_priority_t			ciphersuites_all	= NULL;
-static int							init_done 		= 0;
+static int							init_done		= 0;
 #elif defined(HAVE_OPENSSL)
 static ZBX_THREAD_LOCAL const SSL_METHOD	*method			= NULL;
 static ZBX_THREAD_LOCAL SSL_CTX			*ctx_cert		= NULL;
@@ -163,7 +163,7 @@ static ZBX_THREAD_LOCAL size_t			psk_identity_len_for_cb	= 0;
 static ZBX_THREAD_LOCAL char			*psk_for_cb		= NULL;
 static ZBX_THREAD_LOCAL size_t			psk_len_for_cb		= 0;
 #endif
-static int					init_done 		= 0;
+static int					init_done		= 0;
 #ifdef HAVE_OPENSSL_WITH_PSK
 /* variables for capturing PSK identity from server callback function */
 static ZBX_THREAD_LOCAL int			incoming_connection_has_psk = 0;
@@ -525,8 +525,8 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2, zbx
 		else if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_GET))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" value requires \"%s\", but it is not defined",
-					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1,  zbx_config_tls),
-					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param2,  zbx_config_tls));
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1, zbx_config_tls),
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param2, zbx_config_tls));
 		}
 		else
 		{
@@ -546,7 +546,7 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2, zbx
 		else if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_GET))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" value is not a valid UTF-8 string",
-					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1,  zbx_config_tls));
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1, zbx_config_tls));
 		}
 		else
 		{
@@ -560,20 +560,20 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2, zbx
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"%s\" or \"%s\" requires support of encrypted"
 					" connection with PSK but support for PSK was not compiled in",
-					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param1,  zbx_config_tls),
-					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1,  zbx_config_tls));
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param1, zbx_config_tls),
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1, zbx_config_tls));
 		}
 		else if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_GET))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"%s\" requires support of encrypted"
 					" connection with PSK but support for PSK was not compiled in",
-					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1,  zbx_config_tls));
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1, zbx_config_tls));
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "value of parameter \"%s\" requires support of encrypted"
 					" connection with PSK but support for PSK was not compiled in",
-					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param1,  zbx_config_tls));
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param1, zbx_config_tls));
 		}
 	}
 	else
@@ -657,8 +657,10 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
  *                                                                            *
  ******************************************************************************/
 void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active_forks, int config_passive_forks,
-		unsigned char program_type)
+		zbx_get_program_type_f zbx_get_program_type_cb_arg)
 {
+	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
+
 	zbx_tls_parameter_not_empty(&(zbx_config_tls->connect), zbx_config_tls);
 	zbx_tls_parameter_not_empty(&(zbx_config_tls->accept), zbx_config_tls);
 	zbx_tls_parameter_not_empty(&(zbx_config_tls->ca_file), zbx_config_tls);
@@ -838,8 +840,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 
 	/* active agentd, active proxy, zabbix_get, and zabbix_sender specific validation */
 
-	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_active_forks) ||
-			(0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_GET |
+	if ((0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_active_forks) ||
+			(0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_GET |
 					ZBX_PROGRAM_TYPE_SENDER))))
 	{
 		/* 'TLSConnect' is the master parameter to be matched by certificate and PSK parameters. */
@@ -873,8 +875,8 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 
 	/* passive agentd and passive proxy specific validation */
 
-	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_passive_forks) ||
-			0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+	if ((0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_AGENTD) && 0 != config_passive_forks) ||
+			0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 	{
 		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
 
@@ -923,7 +925,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	/* For server and proxy 'TLSCipherPSK13' and 'TLSCipherPSK' are optional and do not depend on other */
 	/* TLS parameters. Validate only in case of agent, zabbix_get and sender. */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_GET |
+	if (0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_GET |
 			ZBX_PROGRAM_TYPE_SENDER)))
 	{
 		if (NULL !=  zbx_config_tls->cipher_psk13 && NULL ==
@@ -947,7 +949,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	/* server and proxy (at least some hosts may be connecting with PSK). */
 	/* 'zabbix_get' and sender do not use these parameters. Validate only in case of agent. */
 
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && NULL ==
+	if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_AGENTD) && NULL ==
 			zbx_config_tls->cert_file && NULL == zbx_config_tls->psk_identity)
 	{
 		if (NULL != zbx_config_tls->cipher_all13)
@@ -970,7 +972,7 @@ void	zbx_tls_validate_config(zbx_config_tls_t *zbx_config_tls, int config_active
 	/* Parameters '--tls-cipher13' and '--tls-cipher' can be used only in zabbix_get and sender with */
 	/* certificate or PSK. */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)) &&
+	if (0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)) &&
 			NULL == zbx_config_tls->cert_file && NULL == zbx_config_tls->psk_identity)
 	{
 		if (NULL != zbx_config_tls->cipher_cmd13)
@@ -2232,14 +2234,19 @@ static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, co
 	}
 }
 
-void	zbx_tls_init_child(zbx_config_tls_t	*zbx_config_tls, zbx_get_program_type_f	zbx_get_program_type_cb_arg)
+void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls)
 {
 	int			res;
 #ifndef _WINDOWS
 	sigset_t		mask, orig_mask;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
+	if (NULL == zbx_get_program_type_cb)
+	{
+		/* validation of zbx_config_tls was not called and program_type was not set */
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
 #ifndef _WINDOWS
 	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
@@ -2305,8 +2312,8 @@ void	zbx_tls_init_child(zbx_config_tls_t	*zbx_config_tls, zbx_get_program_type_f
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CRL file \"%s\": %d: %s", zbx_config_tls->crl_file, res,
-					gnutls_strerror(res));
+			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CRL file \"%s\": %d: %s", zbx_config_tls->crl_file,
+					res, gnutls_strerror(res));
 			zbx_tls_free();
 			exit(EXIT_FAILURE);
 		}
@@ -2539,7 +2546,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 	return ret;
 }
 
-void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg)
+void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls)
 {
 #define ZBX_CIPHERS_CERT_ECDHE		"EECDH+aRSA+AES128:"
 #define ZBX_CIPHERS_CERT		"RSA+aRSA+AES128"
@@ -2564,7 +2571,12 @@ void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls, zbx_get_program_type_f
 	sigset_t	mask, orig_mask;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
+	if (NULL == zbx_get_program_type_cb)
+	{
+		/* validation of zbx_config_tls was not called and program_type was not set */
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
 #ifndef _WINDOWS
 	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
