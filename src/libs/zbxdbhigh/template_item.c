@@ -1818,6 +1818,8 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 	if (0 != deleteids.values_num)
 	{
+		zbx_vector_uint64_sort(&deleteids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_tag where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemtagid", deleteids.values,
