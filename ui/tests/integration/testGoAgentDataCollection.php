@@ -417,7 +417,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				'UnreachablePeriod' => 25,
 				'UnavailableDelay' => 15,
 				'UnreachableDelay' => 5,
-				'DebugLevel=5'
+				'DebugLevel' => 5
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::COMPONENT_AGENT,
@@ -430,7 +430,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX,
 				'AllowKey' => 'system.run[*]',
 				'Plugins.Uptime.Capacity' => '10',
-				'DebugLevel=5'
+				'DebugLevel' => 5
 			]
 		];
 	}
