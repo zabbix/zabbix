@@ -57,8 +57,6 @@ struct _zbx_template_item_preproc_t
 
 ZBX_PTR_VECTOR_IMPL(item_preproc_ptr, zbx_template_item_preproc_t *)
 
-ZBX_PTR_VECTOR_IMPL(item_tag_ptr, zbx_db_tag_t *)
-
 struct _zbx_template_item_param_t
 {
 	zbx_uint64_t	item_parameterid;
@@ -505,8 +503,8 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		zbx_vector_ptr_create(&item->dependent_items);
 		zbx_vector_item_preproc_ptr_create(&item->item_preprocs);
 		zbx_vector_item_preproc_ptr_create(&item->template_preprocs);
-		zbx_vector_item_tag_ptr_create(&item->item_tags);
-		zbx_vector_item_tag_ptr_create(&item->template_tags);
+		zbx_vector_db_tag_ptr_create(&item->item_tags);
+		zbx_vector_db_tag_ptr_create(&item->template_tags);
 		zbx_vector_item_param_ptr_create(&item->item_params);
 		zbx_vector_item_param_ptr_create(&item->template_params);
 		zbx_vector_lld_macro_ptr_create(&item->item_lld_macros);
@@ -1399,16 +1397,16 @@ static void	free_template_item(zbx_template_item_t *item)
 	zbx_vector_ptr_destroy(&item->dependent_items);
 	zbx_vector_item_preproc_ptr_clear_ext(&item->item_preprocs, zbx_item_preproc_free);
 	zbx_vector_item_preproc_ptr_clear_ext(&item->template_preprocs, zbx_item_preproc_free);
-	zbx_vector_item_tag_ptr_clear_ext(&item->item_tags, zbx_db_tag_free);
-	zbx_vector_item_tag_ptr_clear_ext(&item->template_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_clear_ext(&item->item_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_clear_ext(&item->template_tags, zbx_db_tag_free);
 	zbx_vector_item_param_ptr_clear_ext(&item->item_params, zbx_item_params_free);
 	zbx_vector_item_param_ptr_clear_ext(&item->template_params, zbx_item_params_free);
 	zbx_vector_lld_macro_ptr_clear_ext(&item->item_lld_macros, zbx_lld_macros_free);
 	zbx_vector_lld_macro_ptr_clear_ext(&item->template_lld_macros, zbx_lld_macros_free);
 	zbx_vector_item_preproc_ptr_destroy(&item->item_preprocs);
 	zbx_vector_item_preproc_ptr_destroy(&item->template_preprocs);
-	zbx_vector_item_tag_ptr_destroy(&item->item_tags);
-	zbx_vector_item_tag_ptr_destroy(&item->template_tags);
+	zbx_vector_db_tag_ptr_destroy(&item->item_tags);
+	zbx_vector_db_tag_ptr_destroy(&item->template_tags);
 	zbx_vector_item_param_ptr_destroy(&item->item_params);
 	zbx_vector_item_param_ptr_destroy(&item->template_params);
 	zbx_vector_lld_macro_ptr_destroy(&item->item_lld_macros);
@@ -2882,7 +2880,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t			itemid;
-	zbx_db_tag_t			*ptsrc, *ptdst;
+	zbx_db_tag_t			*db_tag;
 	zbx_template_item_t		*item;
 	zbx_hashset_t			items_t;
 	zbx_vector_uint64_t		itemids;
@@ -2926,9 +2924,9 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 			}
 
 			item = (zbx_template_item_t *)items->values[index];
-			ptdst = zbx_db_tag_create(row[2], row[3]);
-			ZBX_STR2UINT64(ptdst->tagid, row[0]);
-			zbx_vector_item_tag_ptr_append(&item->item_tags, ptdst);
+			db_tag = zbx_db_tag_create(row[2], row[3]);
+			ZBX_STR2UINT64(db_tag->tagid, row[0]);
+			zbx_vector_db_tag_ptr_append(&item->item_tags, db_tag);
 		}
 
 		DBfree_result(result);
@@ -2938,7 +2936,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select it.itemtagid,it.itemid,it.tag,it.value"
+			"select it.itemid,it.tag,it.value"
 			" from item_tag it,items ti"
 			" where it.itemid=ti.itemid"
 			" and");
@@ -2950,7 +2948,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	{
 		zbx_template_item_t		item_local, *pitem_local = &item_local, **pitem;
 
-		ZBX_STR2UINT64(item_local.templateid, row[1]);
+		ZBX_STR2UINT64(item_local.templateid, row[0]);
 
 		if (NULL == (pitem = (zbx_template_item_t **)zbx_hashset_search(&items_t, &pitem_local)))
 		{
@@ -2958,70 +2956,16 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 			continue;
 		}
 
-		ptdst = zbx_db_tag_create(row[2], row[3]);
-		ZBX_STR2UINT64(ptdst->tagid, row[0]);
-		zbx_vector_item_tag_ptr_append(&(*pitem)->template_tags, ptdst);
+		db_tag = zbx_db_tag_create(row[1], row[2]);
+		zbx_vector_db_tag_ptr_append(&(*pitem)->template_tags, db_tag);
 	}
 	DBfree_result(result);
 	zbx_free(sql);
 
 	for (i = 0; i < items->values_num; i++)
 	{
-		int	j, tag_num;
-		char	*buffer = NULL;
-
 		item = (zbx_template_item_t *)items->values[i];
-
-		zbx_vector_item_tag_ptr_sort(&item->item_tags, zbx_db_tag_compare_func_template);
-		zbx_vector_item_tag_ptr_sort(&item->template_tags, zbx_db_tag_compare_func_template);
-
-		tag_num = MAX(item->item_tags.values_num, item->template_tags.values_num);
-
-		for (j = 0; j < tag_num; j++)
-		{
-			if (j >= item->item_tags.values_num)
-			{
-				ptsrc = (zbx_db_tag_t *)item->template_tags.values[j];
-				ptdst = zbx_db_tag_create(ptsrc->tag, ptsrc->value);
-				ptdst->tagid = 0;
-				zbx_vector_item_tag_ptr_append(&item->item_tags, ptdst);
-				continue;
-			}
-
-			ptdst = (zbx_db_tag_t *)item->item_tags.values[j];
-
-			if (j >= item->template_tags.values_num)
-			{
-				ptdst->flags |= ZBX_FLAG_DB_TAG_REMOVE;
-				continue;
-			}
-
-			ptsrc = (zbx_db_tag_t *)item->template_tags.values[j];
-
-			buffer = zbx_strdup(buffer, ptsrc->tag);
-
-			if (0 != strcmp(ptdst->tag, buffer))
-			{
-				ptdst->tag_orig = zbx_strdup(NULL, ptdst->tag);
-				zbx_free(ptdst->tag);
-				ptdst->tag = buffer;
-				buffer = NULL;
-				ptdst->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG;
-			}
-
-			buffer = zbx_strdup(buffer, ptsrc->value);
-
-			if (0 != strcmp(ptdst->value, buffer))
-			{
-				ptdst->value_orig = zbx_strdup(NULL, ptdst->value);
-				zbx_free(ptdst->value);
-				ptdst->value = buffer;
-				buffer = NULL;
-				ptdst->flags |= ZBX_FLAG_DB_TAG_UPDATE_VALUE;
-			}
-			else
-				zbx_free(buffer);
-		}
+		zbx_db_tag_merge(&item->item_tags, &item->template_tags);
 	}
 	zbx_hashset_destroy(&items_t);
 	zbx_vector_uint64_destroy(&itemids);
