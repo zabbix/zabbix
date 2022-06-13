@@ -173,7 +173,54 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 					]
 				]
 			],
-			// #8 test with correct LDAP settings and credentials.
+			// #8 test with all available values.
+			[
+				[
+					'ldap_settings' => [
+						'Name' => 'Test Name',
+						'Host' => 'ldap.forumsys.com',
+						'Base DN' => 'dc=example,dc=com',
+						'Search attribute' => 'uid',
+						'Bind DN' => 'test_DN',
+						'Bind password' => 'test_password',
+						'Description' => 'Test description',
+						'Advanced configuration' => true,
+						'StartTLS' => true,
+						'Search filter' => 'filter'
+					],
+					'test_settings' => [
+						'Login' => 'galieleo',
+						'User password' => 'password'
+					],
+					'test_error' => 'Login failed',
+					'test_error_details' => [
+						'Starting TLS failed.'
+					]
+				]
+			],
+			// #9 test with Bind DN and Bind password.
+			[
+				[
+					'ldap_settings' => [
+						'Name' => 'Test Name',
+						'Host' => 'ldap.forumsys.com',
+						'Base DN' => 'dc=example,dc=com',
+						'Search attribute' => 'uid',
+						'Bind DN' => 'test_DN',
+						'Bind password' => 'test_password',
+						'Description' => 'Test description'
+					],
+					'test_settings' => [
+						'Login' => 'galieleo',
+						'User password' => 'password'
+					],
+					'test_error' => 'Login failed',
+					'test_error_details' => [
+						'Cannot bind to LDAP server.'
+					]
+				]
+			],
+			// #10 test with correct LDAP settings and credentials.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -197,11 +244,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 * Test LDAP settings.
 	 */
 	public function testFormAdministrationAuthenticationLdap_Test($data) {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('id:authentication-form')->asForm()->one();
-
-		// Add new LDAP server and it.
-		$form->selectTab('LDAP settings');
+		$form = $this->openLdapForm();
 		$form->query('button:Add')->one()->click();
 		COverlayDialogElement::find()->waitUntilReady()->asForm()->one()->fill($data['ldap_settings']);
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
@@ -225,15 +268,15 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 * Check that remove button works.
 	 */
 	public function testFormAdministrationAuthenticationLdap_Remove() {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('id:authentication-form')->asForm()->one();
-		$form->fill(['Default authentication' => 'Internal']);
-		$form->selectTab('LDAP settings');
+		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 
 		// Add new LDAP server if it is not present.
 		if ($table->getRows()->count() === 0) {
-			$this->ifNoLdap();
+			$this->setLdap([], 'button:Add', true, false);
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+			$form->selectTab('LDAP settings');
 		}
 
 		// Check headers.
@@ -257,16 +300,16 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 * Check default LDAP server change.
 	 */
 	public function testFormAdministrationAuthenticationLdap_Default() {
-		// Navigate to User Group and set LDAP server as Default.
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('id:authentication-form')->asForm()->one();
-		$form->selectTab('LDAP settings');
+		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 
 		// To check default we need at least 2 LDAP servers.
 		for ($i = 0; $i <=1; $i++) {
 			if ($table->getRows()->count() < 2) {
-				$this->ifNoLdap('test_'.$i);
+				$this->setLdap([], 'button:Add', true, false, 'test_'.$i);
+				$form->submit();
+				$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+				$form->selectTab('LDAP settings');
 			}
 			else {
 				break;
@@ -279,17 +322,17 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 			// Check if LDAP server is set as Default.
 			if ($radio->query('name:ldap_default_row_index')->one()->isAttributePresent('checked') === true) {
-				$userdirectoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory WHERE host='.zbx_dbstr($host));
-				$this->assertEquals($userdirectoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$user_directoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory WHERE host='.zbx_dbstr($host));
+				$this->assertEquals($user_directoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
 			}
 			else {
 				// Set another LDAP server as default.
-				$userdirectoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory WHERE host='.zbx_dbstr($host));
-				$this->assertNotEquals($userdirectoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$user_directoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory WHERE host='.zbx_dbstr($host));
+				$this->assertNotEquals($user_directoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
 				$radio->query('name:ldap_default_row_index')->one()->click();
 				$form->submit();
 				$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-				$this->assertEquals($userdirectoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$this->assertEquals($user_directoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
 			}
 		}
 
@@ -417,14 +460,30 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	/**
 	 * @dataProvider getUpdateData
 	 *
-	 *  Update LDAP server settings.
+	 * Update LDAP server settings.
 	 */
 	public function testFormAdministrationAuthenticationLdap_Update($data) {
+		if (CDBHelper::getCount('SELECT * FROM userdirectory') === 0) {
+			$ldap_settings = [
+				'ldap_settings' => [
+					[
+						'Name' => 'test_update',
+						'Host' => 'test_update',
+						'Base DN' => 'test_update',
+						'Search attribute' => 'test_update'
+					]
+				]
+			];
+
+			$this->checkLdap($ldap_settings, 'button:Add');
+			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		}
+
 		if (!array_key_exists('expected', $data)) {
 			$hash_before = CDBHelper::getHash('SELECT * FROM userdirectory');
 		}
 
-		$this->CreateUpdate($data, 'xpath://tbody/tr/td/a');
+		$this->checkLdap($data, 'xpath://tbody/tr/td/a');
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 		if (!array_key_exists('expected', $data)) {
@@ -660,7 +719,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			$this->remove_ldap = false;
 		}
 
-		$this->CreateUpdate($data, 'button:Add');
+		$this->checkLdap($data, 'button:Add');
 
 		// Check error messages.
 		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
@@ -669,8 +728,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 			// Check DB configuration.
 			$sql = 'SELECT name, host, port, base_dn, bind_dn, bind_password, search_attribute FROM'.
 					' userdirectory WHERE name ='.zbx_dbstr($data['db_check']['name']);
-			$result = CDBHelper::getRow($sql);
-			$this->assertEquals($data['db_check'], $result);
+			$this->assertEquals($data['db_check'], CDBHelper::getRow($sql));
 		}
 		else {
 			$this->assertMessage(TEST_BAD, $data['error']);
@@ -681,14 +739,15 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	 * Check that User Group value in table changes after adding LDAP server to any user group.
 	 */
 	public function testFormAdministrationAuthenticationLdap_UserGroups() {
-		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$form = $this->query('id:authentication-form')->asForm()->one();
-		$form->selectTab('LDAP settings');
+		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 
 		// Add new LDAP server if it is not present.
 		if ($table->getRows()->count() === 0) {
-			$this->ifNoLdap();
+			$this->setLdap([], 'button:Add', true, false);
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+			$form->selectTab('LDAP settings');
 		}
 
 		$ldap_name = $this->getTableResult('Name', 'id:ldap-servers');
@@ -698,7 +757,8 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 		// Open existing User group and change it LDAP server.
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid=16')->waitUntilReady();
-		$this->query('id:user-group-form')->asForm()->one()->fill(['LDAP Server' => $ldap_name[0]])->submit();
+		$this->query('name:userdirectoryid')->asDropdown()->one()->fill($ldap_name[0]);
+		$this->query('button:Update')->one()->click();
 
 		// Check that value in table is changed and display that there exists group with LDAP server.
 		$this->page->open('zabbix.php?action=authentication.edit')->waitUntilReady();
@@ -707,53 +767,45 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 		$this->assertFalse($this->query('xpath://button[text()="Remove"][1]')->one()->isEnabled());
 	}
 
-	/**
-	 * Removes all existing LDAP servers.
-	 */
-	private function removeAllLdap() {
+	private function openLdapForm() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->fill(['Default authentication' => 'Internal']);
 		$form->selectTab('LDAP settings');
+
+		return $form;
+	}
+
+	/**
+	 * Removes all existing LDAP servers.
+	 */
+	private function removeAllLdap() {
+		$form = $this->openLdapForm();
 		$form->fill(['Enable LDAP authentication' => false]);
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 		$rows_amount = $table->getRows()->count();
+
 		for ($i = $rows_amount; $i > 0; $i--) {
 			$this->query('xpath://button[text()="Remove"]['.$i.']')->one()->click();
 		}
+
 		$form->submit();
+
 		if ($this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
 	}
 
 	/**
-	 * If no LDAP server present but we need to add at least one.
-	 *
-	 * @param string $name		LDAP server name
-	 */
-	private function ifNoLdap($name = 'atest') {
-		$form = $this->query('id:authentication-form')->asForm()->one();
-		$this->setLdap([
-				[
-					'Name' => $name,
-					'Host' => $name,
-					'Base DN' => $name,
-					'Search attribute' => $name
-				]
-		], 'button:Add', false);
-		$form->submit();
-		$form->selectTab('LDAP settings');
-	}
-
-	/**
 	 * Fill and submit LDAP server settings.
 	 *
-	 * @param strings $ldaps				form parameters to fill
-	 * @param strings $selection			create or update LDAP server
+	 * @param strings $ldaps				form parameters to fill.
+	 * @param strings $selection			create or update LDAP server.
 	 * @param boolean $ldap_configured		enable/Disable LDAP authentication checkbox.
+	 * @param boolean $exists				if no LDAP server present but we need one - set false.
+	 * @param string  $values				simple LDAP server values.
 	 */
-	private function setLdap($ldaps, $selection, $ldap_configured = true) {
+	private function setLdap($ldaps, $selection, $ldap_configured = true, $exists = true, $values = 'atest') {
 		$form = $this->query('id:authentication-form')->asForm()->one();
 
 		// Select LDAP setting tab if it is not selected.
@@ -763,6 +815,18 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 		// Open and fill LDAP settings form.
 		$this->query('id:ldap_configured')->asCheckbox()->one()->set($ldap_configured);
+		if (!$exists) {
+			$ldaps = [
+				[
+					'Name' => $values,
+					'Host' => $values,
+					'Base DN' => $values,
+					'Search attribute' => $values
+				]
+			];
+		}
+
+		// Fill ldap server form.
 		foreach ($ldaps as $ldap) {
 			$form->query($selection)->one()->click();
 			$ldap_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
@@ -773,12 +837,12 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 	/**
 	 * Create or update LDAP server values.
 	 *
-	 * @param type $data		data provider
-	 * @param string $action	click on Add button to create new LDAP server or click on name to update it.
+	 * @param type $data			data provider
+	 * @param string $selection		click on Add button to create new LDAP server or click on name to update it.
 	 */
-	private function CreateUpdate($data, $action) {
+	private function checkLdap($data, $selection) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
-		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
+		$this->page->assertHeader('Authentication');
 		$this->page->assertTitle('Configuration of authentication');
 
 		$form = $this->query('id:authentication-form')->asForm()->one();
@@ -786,7 +850,7 @@ class testFormAdministrationAuthenticationLdap extends CWebTest {
 
 		// Configuration at 'LDAP settings' tab.
 		if (array_key_exists('ldap_settings', $data)) {
-			$this->setLdap($data['ldap_settings'], $action);
+			$this->setLdap($data['ldap_settings'], $selection);
 
 			// Check error message in ldap creation form.
 			if (array_key_exists('ldap_error', $data)) {
