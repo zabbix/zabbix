@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,41 +21,59 @@
 
 /**
  * Plain text widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
+$scripts = [];
 
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
 );
 
 // Items.
 $field_itemids = CWidgetHelper::getItem($fields['itemids'], $data['captions']['ms']['items']['itemids'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemids']), $field_itemids);
-$scripts = [$field_itemids->getPostJS()];
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['itemids']),
+	new CFormField($field_itemids)
+]);
+$scripts[] = $field_itemids->getPostJS();
 
 // Items location.
-$form_list->addRow(CWidgetHelper::getLabel($fields['style']), CWidgetHelper::getRadioButtonList($fields['style']));
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['style']),
+	new CFormField(CWidgetHelper::getRadioButtonList($fields['style']))
+]);
 
 // Show lines.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_lines']), CWidgetHelper::getIntegerBox($fields['show_lines']));
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['show_lines']),
+	new CFormField(CWidgetHelper::getIntegerBox($fields['show_lines']))
+]);
 
 // Show text as HTML.
-$form_list->addRow(CWidgetHelper::getLabel($fields['show_as_html']),
-	CWidgetHelper::getCheckBox($fields['show_as_html'])
-);
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['show_as_html']),
+	new CFormField(CWidgetHelper::getCheckBox($fields['show_as_html']))
+]);
 
 // Dynamic item.
 if ($data['templateid'] === null) {
-	$form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
+	$form_grid->addItem([
+		CWidgetHelper::getLabel($fields['dynamic']),
+		new CFormField(CWidgetHelper::getCheckBox($fields['dynamic']))
+	]);
 }
 
-$form->addItem($form_list);
+$form->addItem($form_grid);
 
 return [
 	'form' => $form,
