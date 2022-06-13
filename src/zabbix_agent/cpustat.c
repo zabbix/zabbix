@@ -161,7 +161,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	cpu_groups = get_cpu_group_num_win32();
 
-	if (pcpus->count <= 64 && cpu_groups == 1)
+	if (64 >= pcpus->count && 1 == cpu_groups)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%d CPUs and 1 processor group, using \"Processor\" counter", pcpus->count);
 
