@@ -120,24 +120,6 @@ zbx_lld_item_param_t;
 #define ZBX_ITEM_TAG_FIELD_TAG		1
 #define ZBX_ITEM_TAG_FIELD_VALUE	2
 
-typedef struct
-{
-	zbx_uint64_t	item_tagid;
-	char		*tag;
-	char		*tag_orig;
-	char		*value;
-	char		*value_orig;
-
-#define ZBX_FLAG_LLD_ITEM_TAG_UNSET				__UINT64_C(0x00)
-#define ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED			__UINT64_C(0x01)
-#define ZBX_FLAG_LLD_ITEM_TAG_UPDATE_TAG			__UINT64_C(0x02)
-#define ZBX_FLAG_LLD_ITEM_TAG_UPDATE_VALUE			__UINT64_C(0x04)
-#define ZBX_FLAG_LLD_ITEM_TAG_UPDATE				\
-		(ZBX_FLAG_LLD_ITEM_TAG_UPDATE_TAG | ZBX_FLAG_LLD_ITEM_TAG_UPDATE_VALUE)
-	zbx_uint64_t	flags;
-}
-zbx_lld_item_tag_t;
-
 /* item index by prototype (parent) id and lld row */
 typedef struct
 {
@@ -206,15 +188,6 @@ static int	lld_item_param_sort_by_name(const void *d1, const void *d2)
 	return 0;
 }
 
-static int	lld_item_tag_sort_by_tag(const void *d1, const void *d2)
-{
-	zbx_lld_item_tag_t	*it1 = *(zbx_lld_item_tag_t **)d1;
-	zbx_lld_item_tag_t	*it2 = *(zbx_lld_item_tag_t **)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(it1->tag, it2->tag);
-	return 0;
-}
-
 static void	lld_item_preproc_free(zbx_lld_item_preproc_t *op)
 {
 	zbx_free(op->params);
@@ -235,17 +208,6 @@ static void	lld_item_param_free(zbx_lld_item_param_t *param)
 	if (0 != (param->flags & ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_VALUE))
 		zbx_free(param->value_orig);
 	zbx_free(param);
-}
-
-static void	lld_item_tag_free(zbx_lld_item_tag_t *tag)
-{
-	zbx_free(tag->tag);
-	if (0 != (tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE_TAG))
-		zbx_free(tag->tag_orig);
-	zbx_free(tag->value);
-	if (0 != (tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE_VALUE))
-		zbx_free(tag->value_orig);
-	zbx_free(tag);
 }
 
 static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
@@ -287,8 +249,8 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 	zbx_vector_ptr_clear_ext(&item_prototype->item_params, (zbx_clean_func_t)lld_item_param_free);
 	zbx_vector_ptr_destroy(&item_prototype->item_params);
 
-	zbx_vector_ptr_clear_ext(&item_prototype->item_tags, (zbx_clean_func_t)lld_item_tag_free);
-	zbx_vector_ptr_destroy(&item_prototype->item_tags);
+	zbx_vector_db_tag_ptr_clear_ext(&item_prototype->item_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&item_prototype->item_tags);
 
 	zbx_free(item_prototype);
 }
@@ -352,8 +314,8 @@ static void	lld_item_free(zbx_lld_item_t *item)
 	zbx_vector_ptr_destroy(&item->preproc_ops);
 	zbx_vector_ptr_clear_ext(&item->item_params, (zbx_clean_func_t)lld_item_param_free);
 	zbx_vector_ptr_destroy(&item->item_params);
-	zbx_vector_ptr_clear_ext(&item->item_tags, (zbx_clean_func_t)lld_item_tag_free);
-	zbx_vector_ptr_destroy(&item->item_tags);
+	zbx_vector_db_tag_ptr_clear_ext(&item->item_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&item->item_tags);
 	zbx_vector_ptr_destroy(&item->dependent_items);
 
 	zbx_vector_db_tag_ptr_destroy(&item->override_tags);
@@ -376,7 +338,6 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 	zbx_lld_item_t			*item, *master;
 	zbx_lld_item_preproc_t		*preproc_op;
 	zbx_lld_item_param_t		*item_param;
-	zbx_lld_item_tag_t		*item_tag;
 	const zbx_lld_item_prototype_t	*item_prototype;
 	zbx_uint64_t			db_valuemapid, db_interfaceid, itemid, master_itemid;
 	zbx_vector_uint64_t		parent_itemids;
@@ -628,7 +589,7 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 		zbx_vector_ptr_create(&item->preproc_ops);
 		zbx_vector_ptr_create(&item->dependent_items);
 		zbx_vector_ptr_create(&item->item_params);
-		zbx_vector_ptr_create(&item->item_tags);
+		zbx_vector_db_tag_ptr_create(&item->item_tags);
 		zbx_vector_db_tag_ptr_create(&item->override_tags);
 
 		zbx_vector_ptr_append(items, item);
@@ -756,6 +717,8 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_db_tag_t	*db_tag;
+
 		ZBX_STR2UINT64(itemid, row[1]);
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(items, &itemid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
@@ -766,14 +729,9 @@ static void	lld_items_get(const zbx_vector_ptr_t *item_prototypes, zbx_vector_pt
 
 		item = (zbx_lld_item_t *)items->values[index];
 
-		item_tag = (zbx_lld_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_tag_t));
-		item_tag->flags = ZBX_FLAG_LLD_ITEM_TAG_UNSET;
-		ZBX_STR2UINT64(item_tag->item_tagid, row[0]);
-		item_tag->tag = zbx_strdup(NULL, row[2]);
-		item_tag->tag_orig = NULL;
-		item_tag->value = zbx_strdup(NULL, row[3]);
-		item_tag->value_orig = NULL;
-		zbx_vector_ptr_append(&item->item_tags, item_tag);
+		db_tag = zbx_db_tag_create(row[2], row[3]);
+		ZBX_STR2UINT64(db_tag->tagid, row[0]);
+		zbx_vector_db_tag_ptr_append(&item->item_tags, db_tag);
 	}
 	DBfree_result(result);
 out:
@@ -1650,7 +1608,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 
 		for (j = 0; j < item->item_tags.values_num; j++)
 		{
-			zbx_lld_item_tag_t	*item_tag = (zbx_lld_item_tag_t *)item->item_tags.values[j], *tag_dup;
+			zbx_db_tag_t	*item_tag = item->item_tags.values[j], *tag_dup;
 			int			k;
 
 			if (SUCCEED != lld_validate_item_tag(item->itemid, ZBX_ITEM_TAG_FIELD_TAG, item_tag->tag,
@@ -1661,13 +1619,13 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 				break;
 			}
 
-			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED))
+			if (0 != (item_tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
 				continue;
 
 			/* check for duplicated tag */
 			for (k = 0; k < j; k++)
 			{
-				tag_dup = (zbx_lld_item_tag_t *)item->item_tags.values[k];
+				tag_dup = item->item_tags.values[k];
 
 				if (0 == strcmp(item_tag->tag, tag_dup->tag) &&
 						0 == strcmp(item_tag->value, tag_dup->value))
@@ -2084,7 +2042,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	zbx_vector_ptr_create(&item->preproc_ops);
 	zbx_vector_ptr_create(&item->dependent_items);
 	zbx_vector_ptr_create(&item->item_params);
-	zbx_vector_ptr_create(&item->item_tags);
+	zbx_vector_db_tag_ptr_create(&item->item_tags);
 
 	if (SUCCEED == ret && ZBX_PROTOTYPE_NO_DISCOVER != discover)
 		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
@@ -2872,13 +2830,13 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
 static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_macro_paths,
 		zbx_vector_ptr_t *items)
 {
-	int				i, j, index, item_tag_num;
+	int				i, j, index;
 	zbx_lld_item_t			*item;
 	zbx_lld_item_prototype_t	*item_proto;
-	zbx_lld_item_tag_t		*itsrc, *itdst;
-	zbx_db_tag_t			*override_tags;
-	char				*buffer = NULL;
-	const char			*name, *value;
+	zbx_vector_db_tag_ptr_t		new_tags;
+	zbx_db_tag_t			*db_tag;
+
+	zbx_vector_db_tag_ptr_create(&new_tags);
 
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -2894,88 +2852,34 @@ static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const z
 			continue;
 		}
 
-		zbx_vector_ptr_sort(&item->item_tags, lld_item_tag_sort_by_tag);
-		zbx_vector_db_tag_ptr_sort(&item->override_tags, zbx_db_tag_compare_func);
-
 		item_proto = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
-		item_tag_num = MAX(item->item_tags.values_num,
-				item_proto->item_tags.values_num + item->override_tags.values_num);
-
-		for (j = 0; j < item_tag_num; j++)
+		for (j = 0; j < item_proto->item_tags.values_num; j++)
 		{
-			if (j < item->item_tags.values_num &&
-					j >= item_proto->item_tags.values_num + item->override_tags.values_num)
-			{
-				itdst = (zbx_lld_item_tag_t *)item->item_tags.values[j];
-				itdst->flags &= ~ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED;
-				continue;
-			}
-
-			if (j >= item_proto->item_tags.values_num)
-			{
-				override_tags = item->override_tags.values[j - item_proto->item_tags.values_num];
-				name = override_tags->tag;
-				value = override_tags->value;
-			}
-			else
-			{
-				itsrc = (zbx_lld_item_tag_t *)item_proto->item_tags.values[j];
-				name = itsrc->tag;
-				value = itsrc->value;
-			}
-
-			if (j >= item->item_tags.values_num)
-			{
-				itdst = (zbx_lld_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_tag_t));
-				itdst->item_tagid = 0;
-				itdst->flags = ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED | ZBX_FLAG_LLD_ITEM_TAG_UPDATE;
-				itdst->tag = zbx_strdup(NULL, name);
-				itdst->tag_orig = NULL;
-				itdst->value = zbx_strdup(NULL, value);
-				itdst->value_orig = NULL;
-
-				substitute_lld_macros(&itdst->tag, &item->lld_row->jp_row,
-						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
-				substitute_lld_macros(&itdst->value, &item->lld_row->jp_row,
-						lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
-
-				zbx_vector_ptr_append(&item->item_tags, itdst);
-				continue;
-			}
-
-			itdst = (zbx_lld_item_tag_t *)item->item_tags.values[j];
-			itdst->flags |= ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED;
-
-			buffer = zbx_strdup(buffer, name);
-			substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
-
-			if (0 != strcmp(itdst->tag, buffer))
-			{
-				itdst->tag_orig = zbx_strdup(NULL, itdst->tag);
-				zbx_free(itdst->tag);
-				itdst->tag = buffer;
-				buffer = NULL;
-				itdst->flags |= ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_NAME;
-			}
-			else
-				zbx_free(buffer);
-
-			buffer = zbx_strdup(buffer, value);
-			substitute_lld_macros(&buffer, &item->lld_row->jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
-
-			if (0 != strcmp(itdst->value, buffer))
-			{
-				itdst->value_orig = zbx_strdup(NULL, itdst->value);
-				zbx_free(itdst->value);
-				itdst->value = buffer;
-				buffer = NULL;
-				itdst->flags |= ZBX_FLAG_LLD_ITEM_PARAM_UPDATE_VALUE;
-			}
-			else
-				zbx_free(buffer);
+			db_tag = zbx_db_tag_create(item_proto->item_tags.values[j]->tag,
+					item_proto->item_tags.values[j]->value);
+			zbx_vector_db_tag_ptr_append(&new_tags, db_tag);
 		}
+
+		for (j = 0; j < item->override_tags.values_num; j++)
+		{
+			db_tag = zbx_db_tag_create(item->override_tags.values[j]->tag,
+					item->override_tags.values[j]->value);
+			zbx_vector_db_tag_ptr_append(&new_tags, db_tag);
+		}
+
+		for (j = 0; j < new_tags.values_num; j++)
+		{
+			substitute_lld_macros(&new_tags.values[j]->tag, &item->lld_row->jp_row, lld_macro_paths,
+					ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&new_tags.values[j]->value, &item->lld_row->jp_row, lld_macro_paths,
+					ZBX_MACRO_ANY, NULL, 0);
+		}
+
+		zbx_db_tag_merge(&item->item_tags, &new_tags);
 	}
+
+	zbx_vector_db_tag_ptr_destroy(&new_tags);
 }
 
 /******************************************************************************
@@ -4101,7 +4005,7 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 {
 	int			ret = SUCCEED, i, j, new_tag_num = 0, update_tag_num = 0, delete_tag_num = 0;
 	zbx_lld_item_t		*item;
-	zbx_lld_item_tag_t	*item_tag;
+	zbx_db_tag_t		*item_tag;
 	zbx_vector_uint64_t	deleteids;
 	zbx_db_insert_t		db_insert;
 	char			*sql = NULL;
@@ -4121,23 +4025,23 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 
 		for (j = 0; j < item->item_tags.values_num; j++)
 		{
-			item_tag = (zbx_lld_item_tag_t *)item->item_tags.values[j];
+			item_tag = item->item_tags.values[j];
 
-			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_DISCOVERED))
+			if (0 != (item_tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
 			{
-				zbx_vector_uint64_append(&deleteids, item_tag->item_tagid);
+				zbx_vector_uint64_append(&deleteids, item_tag->tagid);
 				zbx_audit_item_delete_tag(item->itemid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-						item_tag->item_tagid);
+						item_tag->tagid);
 				continue;
 			}
 
-			if (0 == item_tag->item_tagid)
+			if (0 == item_tag->tagid)
 			{
 				new_tag_num++;
 				continue;
 			}
 
-			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE))
+			if (0 == (item_tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 				continue;
 
 			update_tag_num++;
@@ -4172,16 +4076,16 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		if (0 != (item->flags & ZBX_FLAG_DB_TAG_REMOVE))
 			continue;
 
 		for (j = 0; j < item->item_tags.values_num; j++)
 		{
 			char	delim = ' ';
 
-			item_tag = (zbx_lld_item_tag_t *)item->item_tags.values[j];
+			item_tag = item->item_tags.values[j];
 
-			if (0 == item_tag->item_tagid)
+			if (0 == item_tag->tagid)
 			{
 				zbx_db_insert_add_values(&db_insert, new_tagid, item->itemid, item_tag->tag,
 						item_tag->value);
@@ -4191,14 +4095,14 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 				continue;
 			}
 
-			if (0 == (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE))
+			if (0 == (item_tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 				continue;
 
 			zbx_audit_item_update_json_update_item_tag_create_entry(item->itemid,
-					(int)ZBX_FLAG_DISCOVERY_CREATED, item_tag->item_tagid);
+					(int)ZBX_FLAG_DISCOVERY_CREATED, item_tag->tagid);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update item_tag set");
 
-			if (0 != (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE_TAG))
+			if (0 != (item_tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
 			{
 				char	*tag_esc;
 
@@ -4206,13 +4110,13 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctag='%s'", delim, tag_esc);
 
 				zbx_audit_item_update_json_update_item_tag_tag(item->itemid,
-						(int)ZBX_FLAG_DISCOVERY_CREATED, item_tag->item_tagid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, item_tag->tagid,
 						item_tag->tag_orig, item_tag->tag);
 				zbx_free(tag_esc);
 				delim = ',';
 			}
 
-			if (0 != (item_tag->flags & ZBX_FLAG_LLD_ITEM_TAG_UPDATE_VALUE))
+			if (0 != (item_tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
 			{
 				char	*value_esc;
 
@@ -4220,14 +4124,14 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cvalue='%s'", delim, value_esc);
 
 				zbx_audit_item_update_json_update_item_tag_value(item->itemid,
-						(int)ZBX_FLAG_DISCOVERY_CREATED, item_tag->item_tagid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, item_tag->tagid,
 						item_tag->value_orig, item_tag->value);
 
 				zbx_free(value_esc);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where itemtagid=" ZBX_FS_UI64 ";\n",
-					item_tag->item_tagid);
+					item_tag->tagid);
 
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
@@ -4344,7 +4248,6 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 	zbx_lld_item_prototype_t	*item_prototype;
 	zbx_lld_item_preproc_t		*preproc_op;
 	zbx_lld_item_param_t		*item_param;
-	zbx_lld_item_tag_t		*item_tag;
 	zbx_uint64_t			itemid;
 	int				index, i;
 
@@ -4418,7 +4321,7 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 		zbx_vector_ptr_create(&item_prototype->lld_rows);
 		zbx_vector_ptr_create(&item_prototype->preproc_ops);
 		zbx_vector_ptr_create(&item_prototype->item_params);
-		zbx_vector_ptr_create(&item_prototype->item_tags);
+		zbx_vector_db_tag_ptr_create(&item_prototype->item_tags);
 
 		zbx_vector_ptr_append(item_prototypes, item_prototype);
 	}
@@ -4510,6 +4413,8 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		zbx_db_tag_t	*db_tag;
+
 		ZBX_STR2UINT64(itemid, row[0]);
 
 		if (FAIL == (index = zbx_vector_ptr_bsearch(item_prototypes, &itemid,
@@ -4521,22 +4426,10 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *i
 
 		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[index];
 
-		item_tag = (zbx_lld_item_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_tag_t));
-		item_tag->item_tagid = 0;
-		item_tag->tag = zbx_strdup(NULL, row[1]);
-		item_tag->tag_orig = NULL;
-		item_tag->value = zbx_strdup(NULL, row[2]);
-		item_tag->value_orig = NULL;
-		item_tag->flags = ZBX_FLAG_LLD_ITEM_TAG_UNSET;
-		zbx_vector_ptr_append(&item_prototype->item_tags, item_tag);
+		db_tag = zbx_db_tag_create(row[1], row[2]);
+		zbx_vector_db_tag_ptr_append(&item_prototype->item_tags, db_tag);
 	}
 	DBfree_result(result);
-
-	for (i = 0; i < item_prototypes->values_num; i++)
-	{
-		item_prototype = (zbx_lld_item_prototype_t *)item_prototypes->values[i];
-		zbx_vector_ptr_sort(&item_prototype->item_tags, lld_item_tag_sort_by_tag);
-	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d prototypes", __func__, item_prototypes->values_num);
 }

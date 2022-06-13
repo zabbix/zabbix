@@ -2330,52 +2330,7 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 		zbx_free(value);
 	}
 
-	zbx_vector_db_tag_ptr_sort(&new_tags, zbx_db_tag_compare_func);
-
-	zbx_vector_db_tag_ptr_reserve(&host->tags, (size_t)new_tags.values_num);
-
-	/* update host tags or flag them for removal */
-	for (i = 0; i < host->tags.values_num; i++)
-	{
-		host_tag = (zbx_db_tag_t *)host->tags.values[i];
-		if (i < new_tags.values_num)
-		{
-			proto_tag = (zbx_db_tag_t *)new_tags.values[i];
-
-			if (0 != strcmp(host_tag->tag, proto_tag->tag))
-			{
-				host_tag->tag_orig = zbx_strdup(NULL, host_tag->tag);
-				host_tag->tag = zbx_strdup(host_tag->tag, proto_tag->tag);
-				host_tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG;
-			}
-
-			if (0 != strcmp(host_tag->value, proto_tag->value))
-			{
-				host_tag->value_orig = zbx_strdup(NULL, host_tag->value);
-				host_tag->value = zbx_strdup(host_tag->value, proto_tag->value);
-				host_tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_VALUE;
-			}
-		}
-		else
-			host_tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
-	}
-
-	/* add missing tags */
-	if (i < new_tags.values_num)
-	{
-		int	j;
-
-		/* set uninitialized properties of new tags that will be moved to host */
-		for (j = i; j < new_tags.values_num; j++)
-		{
-			proto_tag = (zbx_db_tag_t *)new_tags.values[j];
-			proto_tag->tagid = 0;
-			proto_tag->flags = 0;
-		}
-
-		zbx_vector_db_tag_ptr_append_array(&host->tags, new_tags.values + i, new_tags.values_num - i);
-		new_tags.values_num = i;
-	}
+	zbx_db_tag_merge(&host->tags, &new_tags);
 
 	zbx_free(tag);
 	zbx_free(value);
