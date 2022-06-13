@@ -132,7 +132,6 @@ class testDashboardCopyWidgets extends CWebTest {
 	private function copyWidgets($start_dashboardid, $widget_name, $new_dashboard = false, $replace = false,
 			$new_page = false, $templated = false) {
 
-		var_dump($widget_name);
 		// Exclude Map navigation tree widget from replacing tests.
 		if ($replace && $widget_name === 'Test copy Map navigation tree') {
 			return;
