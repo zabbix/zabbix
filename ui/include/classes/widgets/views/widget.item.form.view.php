@@ -143,8 +143,8 @@ $form_grid->addItem([
 
 			(new CFormField(
 				CWidgetHelper::getTextBox($fields['units'])
-					->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					->setAttribute('style', '')
+					->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
 
 			CWidgetHelper::getLabel($fields['units_pos']),
