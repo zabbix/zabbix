@@ -416,25 +416,19 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'UnreachablePeriod' => 25,
 				'UnavailableDelay' => 15,
-				'UnreachableDelay' => 5,
-				'DebugLevel' => 5,
-				'LogFileSize' => 0
+				'UnreachableDelay' => 5
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::COMPONENT_AGENT,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'AllowKey' => 'system.run[*]',
-				'DebugLevel' => 5,
-				'LogFileSize' => 0
+				'AllowKey' => 'system.run[*]'
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX,
 				'AllowKey' => 'system.run[*]',
-				'Plugins.Uptime.Capacity' => '10',
-				'DebugLevel' => 5,
-				'LogFileSize' => 0
+				'Plugins.Uptime.Capacity' => '10'
 			]
 		];
 	}
