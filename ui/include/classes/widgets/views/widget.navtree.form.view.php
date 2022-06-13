@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,50 +21,50 @@
 
 /**
  * Map navigation widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
 );
 
-$scripts = [];
-
 // Map widget reference.
-$field = $fields[CWidgetFieldReference::FIELD_NAME];
-$form->addItem((new CVar($field->getName(), $field->getValue()))->removeId());
+$form->addItem(
+	(new CVar($fields[CWidgetFieldReference::FIELD_NAME]->getName(),
+		$fields[CWidgetFieldReference::FIELD_NAME]->getValue()
+	))->removeId()
+);
 
 // Add dynamically created fields navtree.name.<N>, navtree.parent.<N>, navtree.order.<N> and navtree.sysmapid.<N>.
-$field = $fields['navtree'];
-$navtree_items = $field->getValue();
-$field_name = $field->getName();
+foreach ($fields['navtree']->getValue() as $i => $navtree_item) {
+	$form->addItem((new CVar($fields['navtree']->getName().'.name.'.$i, $navtree_item['name']))->removeId());
 
-foreach ($navtree_items as $i => $navtree_item) {
-	$form->addItem((new CVar($field_name.'.name.'.$i, $navtree_item['name']))->removeId());
 	if ($navtree_item['order'] != 1) {
-		$form->addItem((new CVar($field_name.'.order.'.$i, $navtree_item['order']))->removeId());
+		$form->addItem((new CVar($fields['navtree']->getName().'.order.'.$i, $navtree_item['order']))->removeId());
 	}
 	if ($navtree_item['parent'] != 0) {
-		$form->addItem((new CVar($field_name.'.parent.'.$i, $navtree_item['parent']))->removeId());
+		$form->addItem((new CVar($fields['navtree']->getName().'.parent.'.$i, $navtree_item['parent']))->removeId());
 	}
 	if (array_key_exists('sysmapid', $navtree_item)) {
-		$form->addItem((new CVar($field_name.'.sysmapid.'.$i, $navtree_item['sysmapid']))->removeId());
+		$form->addItem((new CVar($fields['navtree']->getName().'.sysmapid.'.$i, $navtree_item['sysmapid']))->removeId());
 	}
 }
 
 // Show unavailable maps
-$form_list->addRow(
+$form_grid->addItem([
 	CWidgetHelper::getLabel($fields['show_unavailable']),
-	CWidgetHelper::getCheckBox($fields['show_unavailable'])
-);
+	new CFormField(CWidgetHelper::getCheckBox($fields['show_unavailable']))
+]);
 
-$form->addItem($form_list);
+$form->addItem($form_grid);
 
 return [
-	'form' => $form,
-	'scripts' => $scripts
+	'form' => $form
 ];
