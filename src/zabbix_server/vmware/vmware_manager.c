@@ -29,6 +29,11 @@ extern int				CONFIG_VMWARE_PERF_FREQUENCY;
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
+extern zbx_vmware_t			*vmware;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: return string value of vmware job types                           *
@@ -38,7 +43,7 @@ extern int				CONFIG_VMWARE_PERF_FREQUENCY;
  * Return value: job type string                                              *
  *                                                                            *
  ******************************************************************************/
-static char	*vmware_job_type_string(zbx_vmware_job_t *job)
+static const char	*vmware_job_type_string(zbx_vmware_job_t *job)
 {
 	switch (job->type)
 	{
@@ -181,12 +186,8 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int ti
 ZBX_THREAD_ENTRY(vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	extern unsigned char			program_type;
-	extern ZBX_THREAD_LOCAL unsigned char	process_type;
-	extern ZBX_THREAD_LOCAL int		server_num, process_num;
-	extern zbx_vmware_t			*vmware;
-	int					time_now, services_updated = 0, services_removed = 0;
-	double					time_stat, time_idle = 0;
+	int	services_updated = 0, services_removed = 0;
+	double	time_now, time_stat, time_idle = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -223,7 +224,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 			services_removed = 0;
 		}
 
-		while (NULL != (job = vmware_job_get(vmware, time_now)))
+		while (NULL != (job = vmware_job_get(vmware, (int)time_now)))
 		{
 			if (SUCCEED == job->expired)
 			{
@@ -232,7 +233,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 			}
 
 			services_updated += vmware_job_exec(job);
-			vmware_job_schedule(vmware, job, time_now);
+			vmware_job_schedule(vmware, job, (int)time_now);
 		}
 
 		if (zbx_time() - time_now <= JOB_TIMEOUT)
