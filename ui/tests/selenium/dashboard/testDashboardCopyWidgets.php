@@ -132,6 +132,7 @@ class testDashboardCopyWidgets extends CWebTest {
 	private function copyWidgets($start_dashboardid, $widget_name, $new_dashboard = false, $replace = false,
 			$new_page = false, $templated = false) {
 
+		var_dump($widget_name);
 		// Exclude Map navigation tree widget from replacing tests.
 		if ($replace && $widget_name === 'Test copy Map navigation tree') {
 			return;
@@ -229,7 +230,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		// Wait until widget is pasted and loading spinner disappeared.
 		sleep(1);
 		$this->query('xpath://div[contains(@class, "is-loading")]')->waitUntilNotPresent();
-		$copied_widget = $dashboard->getWidgets()->last();
+		$copied_widget = $dashboard->getWidgets()->last()->waitUntilReady();
 
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
