@@ -31,7 +31,7 @@ class testPageReportsAuditValues extends CWebTest {
 	public $deleted;
 	public $config_refresh;
 	public $login;
-	
+
 	public $resource_name;
 
 	public function checkAuditValues($resourceid, $action) {
