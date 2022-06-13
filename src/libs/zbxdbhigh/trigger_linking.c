@@ -335,7 +335,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	zbx_vector_uint64_t		triggerids, del_tagids;
 	zbx_vector_trigger_tags_t	triggers_tags;
 	zbx_trigger_tags_t		*trigger_tags = NULL;
-	zbx_uint64_t			triggerid;
+	zbx_uint64_t			triggerid, tagid;
 	zbx_db_tag_t			*db_tag;
 
 
@@ -450,7 +450,10 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	}
 
 	if (0 != insert_num)
+	{
 		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value", NULL);
+		tagid = DBget_maxid_num("trigger_tag", insert_num);
+	}
 
 	if (0 != delete_num)
 	{
@@ -470,14 +473,20 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 			if (0 == db_tag->tagid)
 			{
-				// TODO: audit
-				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), trigger_tags->triggerid,
+				zbx_db_insert_add_values(&db_insert, tagid, trigger_tags->triggerid,
 						db_tag->tag, db_tag->value);
+
+				zbx_audit_trigger_update_json_add_tags_and_values(trigger_tags->triggerid,
+						trigger_tags->flags, tagid, db_tag->tag, db_tag->value);
+
+				tagid++;
 			}
 			else if (0 != (db_tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 			{
-				// TODO: audit
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update trigger_tag set ");
+
+				zbx_audit_trigger_update_json_update_trigger_tag_create_entry(trigger_tags->triggerid,
+						trigger_tags->flags, db_tag->tagid);
 
 				if (0 != (db_tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
 				{
@@ -489,7 +498,10 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 					d = ",";
 					zbx_free(tag_esc);
 
-					// TODO: audit
+					zbx_audit_trigger_update_json_update_tag_tag(trigger_tags->triggerid,
+							trigger_tags->flags, db_tag->tagid, db_tag->tag_orig,
+							db_tag->tag);
+
 				}
 
 				if (0 != (db_tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
@@ -500,7 +512,9 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
 					zbx_free(value_esc);
 
-					// TODO: audit
+					zbx_audit_trigger_update_json_update_tag_value(trigger_tags->triggerid,
+							trigger_tags->flags, db_tag->tagid, db_tag->value_orig,
+							db_tag->value);
 				}
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where triggertagid=" ZBX_FS_UI64
@@ -510,8 +524,10 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 			}
 			else if (0 != (db_tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
 			{
-				// TODO: audit
 				zbx_vector_uint64_append(&del_tagids, db_tag->tagid);
+
+				zbx_audit_trigger_update_json_delete_tags(trigger_tags->triggerid, trigger_tags->flags,
+						db_tag->tagid);
 			}
 		}
 	}
@@ -526,7 +542,6 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	if (0 != insert_num)
 	{
-		zbx_db_insert_autoincrement(&db_insert, "triggertagid");
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
