@@ -1447,6 +1447,66 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate item tags and remove invalid                             *
+ *                                                                            *
+ * Parameters: item  - [IN/OUT] a item with existing tags                     *
+ *             error - [OUT] error information                                *
+ *                                                                            *
+ * Return value: SUCCEED - all tags are valid                                 *
+ *               FAIL    - at least one invalid tag was detected and removed  *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_item_tags_validate(zbx_lld_item_t *item, char **error)
+{
+	int	i, ret = SUCCEED;
+
+	for (i = 0; i < item->item_tags.values_num; i++)
+	{
+		zbx_db_tag_t	*item_tag = item->item_tags.values[i], *tag_dup;
+		int		j;
+
+		if (0 != (item_tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
+			continue;
+
+		if (SUCCEED != lld_validate_item_tag(item->itemid, ZBX_ITEM_TAG_FIELD_TAG, item_tag->tag,
+				error) || SUCCEED != lld_validate_item_tag(item->itemid,
+				ZBX_ITEM_TAG_FIELD_VALUE, item_tag->value, error))
+		{
+			if (SUCCEED != zbx_db_tag_rollback(item_tag))
+			{
+				zbx_db_tag_free(item_tag);
+				zbx_vector_db_tag_ptr_remove_noorder(&item->item_tags, i--);
+			}
+			ret = FAIL;
+			continue;
+		}
+
+		/* check for duplicated tag */
+		for (j = 0; j < i; j++)
+		{
+			tag_dup = item->item_tags.values[j];
+
+			if (0 == strcmp(item_tag->tag, tag_dup->tag) && 0 == strcmp(item_tag->value, tag_dup->value))
+			{
+				*error = zbx_strdcatf(*error, "Cannot create item tag: tag \"%s\","
+					"\"%s\" already exists.\n", item_tag->tag, item_tag->value);
+
+				if (SUCCEED != zbx_db_tag_rollback(item_tag))
+				{
+					zbx_db_tag_free(item_tag);
+					zbx_vector_db_tag_ptr_remove_noorder(&item->item_tags, i--);
+				}
+				ret = FAIL;
+				break;
+			}
+		}
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Parameters: hostid            - [IN] host id                               *
  *             items             - [IN] list of items                         *
  *             item_prototypes   - [IN] the item prototypes                   *
@@ -1608,40 +1668,10 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		for (j = 0; j < item->item_tags.values_num; j++)
-		{
-			zbx_db_tag_t	*item_tag = item->item_tags.values[j], *tag_dup;
-			int			k;
+		if (SUCCEED != lld_item_tags_validate(item, error) && 0 == item->itemid)
+			item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 
-			if (SUCCEED != lld_validate_item_tag(item->itemid, ZBX_ITEM_TAG_FIELD_TAG, item_tag->tag,
-					error) || SUCCEED != lld_validate_item_tag(item->itemid,
-					ZBX_ITEM_TAG_FIELD_VALUE, item_tag->value, error))
-			{
-				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-				break;
-			}
-
-			if (0 != (item_tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
-				continue;
-
-			/* check for duplicated tag */
-			for (k = 0; k < j; k++)
-			{
-				tag_dup = item->item_tags.values[k];
-
-				if (0 == strcmp(item_tag->tag, tag_dup->tag) &&
-						0 == strcmp(item_tag->value, tag_dup->value))
-				{
-					item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-					*error = zbx_strdcatf(*error, "Cannot create item tag: tag \"%s\","
-						"\"%s\" already exists.\n", item_tag->tag, item_tag->value);
-					break;
-				}
-			}
-
-			if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-				break;
-		}
+		zbx_vector_db_tag_ptr_sort(&item->item_tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
 	/* check preprocessing steps for new and updated discovered items */
@@ -4050,7 +4080,10 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 		}
 	}
 
-	if (0 == *host_locked && (0 != update_tag_num || 0 != new_tag_num || 0 != deleteids.values_num))
+	if (0 == update_tag_num && 0 == new_tag_num && 0 == deleteids.values_num)
+		goto out;
+
+	if (0 == *host_locked)
 	{
 		if (SUCCEED != DBlock_hostid(hostid))
 		{

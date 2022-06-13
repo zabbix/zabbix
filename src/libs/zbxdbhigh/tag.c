@@ -188,5 +188,35 @@ void	zbx_db_tag_merge(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src
 	zbx_vector_db_tag_ptr_clear(src);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: roll back tag updates done during merge process                   *
+ *                                                                            *
+ * Return value: SUCCEED - updates were rolled back                           *
+ *               FAIL    - new tag, rollback impossible                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_tag_rollback(zbx_db_tag_t *tag)
+{
+	if (0 == tag->tagid)
+		return FAIL;
 
+	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+	{
+		zbx_free(tag->tag);
+		tag->tag = tag->tag_orig;
+		tag->tag_orig = NULL;
+		tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_TAG);
+	}
+
+	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
+	{
+		zbx_free(tag->value);
+		tag->value = tag->value_orig;
+		tag->value_orig = NULL;
+		tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_VALUE);
+	}
+
+	return SUCCEED;
+}
 
