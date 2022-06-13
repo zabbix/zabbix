@@ -1447,6 +1447,24 @@ static void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter)
 	vmware_shared_strfree(counter->path);
 }
 
+static void	vmware_shared_tag_free(zbx_vmware_tag_t *value)
+{
+	vmware_shared_strfree(value->name);
+	vmware_shared_strfree(value->category);
+	vmware_shared_strfree(value->description);
+	__vm_shmem_free_func(value);
+}
+
+static void	vmware_shared_entity_tags_free(zbx_vmware_entity_tags_t *value)
+{
+
+	zbx_vector_vmware_tag_clear_ext(&value->tags, vmware_shared_tag_free);
+	zbx_vector_vmware_tag_destroy(&value->tags);
+	vmware_shared_strfree(value->uuid);
+	vmware_shared_strfree(value->error);
+	__vm_shmem_free_func(value);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service          *
@@ -1492,6 +1510,10 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 		vmware_counter_shared_clean(counter);
 
 	zbx_hashset_destroy(&service->counters);
+
+	zbx_vector_vmware_entity_tags_clear_ext(&service->data_tags.entity_tags, vmware_shared_entity_tags_free);
+	zbx_vector_vmware_entity_tags_destroy(&service->data_tags.entity_tags);
+	vmware_shared_strfree(service->data_tags.error);
 
 	__vm_shmem_free_func(service);
 
@@ -7783,7 +7805,8 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
 	service->jobs_num = 0;
-	VMWARE_VECTOR_CREATE(&service->entity_tags, vmware_entity_tags);
+	VMWARE_VECTOR_CREATE(&service->data_tags.entity_tags, vmware_entity_tags);
+	service->data_tags.error = NULL;
 
 	zbx_hashset_create_ext(&service->entities, 100, vmware_perf_entity_hash_func,  vmware_perf_entity_compare_func,
 			NULL, __vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
@@ -7798,7 +7821,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	zbx_vector_ptr_append(&vmware->services, service);
 	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_CONF);
 	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_PERFCOUNTERS);
-
+	zbx_vmware_job_create(vmware, service, ZBX_VMWARE_UPDATE_REST_TAGS);
 
 	/* new service does not have any data - return NULL */
 	service = NULL;
@@ -8210,4 +8233,58 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() service jobs_num:%d", __func__, jobs_num);
 
 	return 0 == jobs_num ? 1 : 0;
+}
+
+void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags)
+{
+	zbx_vmware_lock();
+	vmware_shared_strfree(data_tags->error);
+	data_tags->error = vmware_shared_strdup(error);
+	zbx_vmware_unlock();
+}
+
+void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vector_vmware_entity_tags_t *dst)
+{
+	int	i, j;
+
+	zbx_vmware_lock();
+
+	zbx_vector_vmware_entity_tags_clear_ext(dst, vmware_shared_entity_tags_free);
+
+	for (i = 0; i < src->values_num; i++)
+	{
+		zbx_vmware_entity_tags_t	*to_entity, *from_entity = src->values[i];
+
+		to_entity = (zbx_vmware_entity_tags_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_entity_tags_t));
+		VMWARE_VECTOR_CREATE(&to_entity->tags, vmware_tag);
+		to_entity->uuid = vmware_shared_strdup(from_entity->uuid);
+		to_entity->obj_id = NULL;
+
+		if (NULL != from_entity->error)
+		{
+			to_entity->error = vmware_shared_strdup(from_entity->error);
+			continue;
+		}
+		else
+			to_entity->error = NULL;
+
+		for (j = 0; j < from_entity->tags.values_num; j++)
+		{
+			zbx_vmware_tag_t	*to_tag, *from_tag = from_entity->tags.values[j];
+
+			to_tag = (zbx_vmware_tag_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_tag_t));
+			to_tag->name = vmware_shared_strdup(from_tag->name);
+			to_tag->description = vmware_shared_strdup(from_tag->description);
+			to_tag->category = vmware_shared_strdup(from_tag->category);
+			to_tag->id = NULL;
+			zbx_vector_vmware_tag_append(&to_entity->tags, to_tag);
+		}
+
+		zbx_vector_vmware_tag_sort(&to_entity->tags, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		zbx_vector_vmware_entity_tags_append(dst, to_entity);
+	}
+
+	zbx_vector_vmware_entity_tags_sort(dst, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	zbx_vmware_unlock();
 }
