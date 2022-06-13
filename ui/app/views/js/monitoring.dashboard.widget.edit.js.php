@@ -24,7 +24,7 @@ window.widget_form = new class {
 	init() {
 		document.getElementById('type').addEventListener('change', () => ZABBIX.Dashboard.reloadWidgetProperties());
 
-		document.getElementById('widget-dialogue-form').addEventListener("change", (e) => {
+		document.getElementById('widget-dialogue-form').addEventListener('change', (e) => {
 			const is_trimmable = e.target.matches(
 				'input[type="text"]:not([data-no-trim="1"]), textarea:not([data-no-trim="1"])'
 			);

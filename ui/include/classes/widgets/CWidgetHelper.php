@@ -60,7 +60,9 @@ class CWidgetHelper {
 			->setId('type')
 			->setValue($type)
 			->setAttribute('autofocus', 'autofocus')
-			->addOptions(CSelect::createOptionsFromArray(array_diff_key($known_widget_types, $deprecated_widget_types)));
+			->addOptions(CSelect::createOptionsFromArray(
+				array_diff_key($known_widget_types, $deprecated_widget_types))
+			);
 
 		if ($deprecated_widget_types) {
 			$widget_types_select->addOptionGroup(

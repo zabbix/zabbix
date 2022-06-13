@@ -30,10 +30,10 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$form_grid = (CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
 	$data['dialogue']['view_mode'], $data['known_widget_types'],
 	$data['templateid'] === null ? $fields['rf_rate'] : null
-));
+);
 
 // Sort entries by.
 $form_grid->addItem([
