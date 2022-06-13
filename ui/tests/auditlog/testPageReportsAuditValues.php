@@ -29,9 +29,10 @@ class testPageReportsAuditValues extends CWebTest {
 	public $created;
 	public $updated;
 	public $deleted;
-	public $resource_name;
 	public $config_refresh;
 	public $login;
+	
+	public $resource_name;
 
 	public function checkAuditValues($resourceid, $action) {
 		$this->filterAuditLog($this->resource_name, $resourceid, $action);
