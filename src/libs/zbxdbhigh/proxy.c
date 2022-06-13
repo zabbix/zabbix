@@ -355,11 +355,12 @@ int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, ch
  *     send a response if denied.                                             *
  *                                                                            *
  * Parameters:                                                                *
- *     sock          - [IN] connection socket context                         *
- *     send_response - [IN] to send or not to send a response to server.      *
+ *     sock           - [IN] connection socket context                        *
+ *     send_response  - [IN] to send or not to send a response to server.     *
  *                          Value: ZBX_SEND_RESPONSE or                       *
  *                          ZBX_DO_NOT_SEND_RESPONSE                          *
- *     req           - [IN] request, included into error message              *
+ *     req            - [IN] request, included into error message             *
+ *     zbx_config_tls - [IN] configured requirements to allow access          *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - access is allowed                                            *
@@ -367,7 +368,7 @@ int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, ch
  *                                                                            *
  ******************************************************************************/
 int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-					zbx_config_tls_t *zbx_config_tls)
+		const zbx_config_tls_t *zbx_config_tls)
 {
 	char	*msg = NULL;
 

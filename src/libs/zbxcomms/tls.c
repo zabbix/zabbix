@@ -310,8 +310,9 @@ static void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_o
  *     the value of the given parameter comes from                            *
  *                                                                            *
  * Parameters:                                                                *
- *     type  - [IN] type of parameter (file or command line)                  *
- *     param - [IN] address of the global parameter variable                  *
+ *     type           - [IN] type of parameter (file or command line)         *
+ *     param          - [IN] address of the global parameter variable         *
+ *     zbx_config_tls - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
 #define ZBX_TLS_PARAMETER_CONFIG_FILE	0
@@ -401,7 +402,8 @@ static const char	*zbx_tls_parameter_name(int type, char **param, zbx_config_tls
  *     not be empty. Otherwise log error and exit.                            *
  *                                                                            *
  * Parameters:                                                                *
- *     param - [IN] address of the global parameter variable                  *
+ *     param          - [IN] address of the global parameter variable         *
+ *     zbx_config_tls - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_tls_parameter_not_empty(char **param, zbx_config_tls_t *zbx_config_tls)
@@ -450,17 +452,18 @@ static void	zbx_tls_parameter_not_empty(char **param, zbx_config_tls_t *zbx_conf
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose:                                                                   *
- *     Helper function: log error message depending on program type and exit. *
- *                                                                            *
- * Parameters:                                                                *
- *     type   - [IN] type of TLS validation error                             *
- *     param1 - [IN] address of the first global parameter variable           *
- *     param2 - [IN] address of the second global parameter variable (if any) *
- *                                                                            *
- ******************************************************************************/
+/**************************************************************************************
+ *                                                                                    *
+ * Purpose:                                                                           *
+ *     Helper function: log error message depending on program type and exit.         *
+ *                                                                                    *
+ * Parameters:                                                                        *
+ *     type           - [IN] type of TLS validation error                             *
+ *     param1         - [IN] address of the first global parameter variable           *
+ *     param2         - [IN] address of the second global parameter variable (if any) *
+ *     zbx_config_tls - [IN]                                                          *
+ *                                                                                    *
+ **************************************************************************************/
 #define ZBX_TLS_VALIDATION_INVALID	0
 #define ZBX_TLS_VALIDATION_DEPENDENCY	1
 #define ZBX_TLS_VALIDATION_REQUIREMENT	2
@@ -589,10 +592,11 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2, zbx
  *     Helper function: log error message depending on program type and exit  *
  *                                                                            *
  * Parameters:                                                                *
- *     type   - [IN] type of TLS validation error                             *
- *     param1 - [IN] address of the first global parameter variable           *
- *     param2 - [IN] address of the second global parameter variable          *
- *     param3 - [IN] address of the third global parameter variable           *
+ *     type           - [IN] type of TLS validation error                     *
+ *     param1         - [IN] address of the first global parameter variable   *
+ *     param2         - [IN] address of the second global parameter variable  *
+ *     param3         - [IN] address of the third global parameter variable   *
+ *     zbx_config_tls - [IN]                                                  *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_tls_validation_error2(int type, char **param1, char **param2, char **param3,
@@ -637,6 +641,7 @@ static void	zbx_tls_validation_error2(int type, char **param1, char **param2, ch
 /******************************************************************************
  *                                                                            *
  * Purpose: check for allowed combinations of TLS configuration parameters    *
+ *          and also initialize the program_type callback                     *
  *                                                                            *
  * Comments:                                                                  *
  *     Valid combinations:                                                    *
@@ -2903,7 +2908,6 @@ void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls)
 
 		zbx_log_ciphersuites(__func__, "certificate", ctx_cert);
 	}
-
 #if defined(HAVE_OPENSSL_WITH_PSK)
 	if (NULL != ctx_psk)
 	{
@@ -3122,7 +3126,6 @@ void	zbx_tls_init_child(zbx_config_tls_t *zbx_config_tls)
 #ifndef _WINDOWS
 	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 #endif
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return;

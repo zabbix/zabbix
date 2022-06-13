@@ -729,10 +729,12 @@ static int	check_response(char *response)
  *                                                                            *
  * Purpose: Send value stored in the buffer to Zabbix server                  *
  *                                                                            *
- * Parameters: addrs    - [IN] vector with a pair of Zabbix server IP or      *
+ * Parameters:                                                                *
+ *   addrs          - [IN] vector with a pair of Zabbix server IP or          *
  *                             Hostname and port number                       *
- *             prep_vec - [IN/OUT] vector with data for writing into          *
+ *   prep_vec       - [IN/OUT] vector with data for writing into              *
  *                                 persistent files                           *
+ *   zbx_config_tls - [IN]                                                    *
  *                                                                            *
  * Return value: SUCCEED if:                                                  *
  *                    - no need to send data now (buffer empty or has enough  *
@@ -908,27 +910,29 @@ ret:
  *                                                                            *
  * Purpose: Buffer new value or send the whole buffer to the server           *
  *                                                                            *
- * Parameters: addrs       - in C agent - vector with a pair of Zabbix server *
+ * Parameters:                                                                *
+ *   addrs          - in C agent - vector with a pair of Zabbix server        *
  *                           IP or Hostname and port number. In Agent2 it is  *
  *                           not used (NULL).                                 *
- *             agent2_result - NULL in C agent. In Agent2 it is used for      *
+ *   agent2_result  - NULL in C agent. In Agent2 it is used for               *
  *                             passing address of buffer where to store       *
  *                             matching log records. It is here to have the   *
  *                             same function prototype as in Agent2.          *
- *             host        - name of host in Zabbix database                  *
- *             key         - name of metric                                   *
- *             value       - key value or error message why an item became    *
+ *   host           - name of host in Zabbix database                         *
+ *   key            - name of metric                                          *
+ *   value          - key value or error message why an item became           *
  *                           NOTSUPPORTED                                     *
- *             state       - ITEM_STATE_NORMAL or ITEM_STATE_NOTSUPPORTED     *
- *             lastlogsize - size of read logfile                             *
- *             mtime       - time of last file modification                   *
- *             timestamp   - timestamp of read value                          *
- *             source      - name of logged data source                       *
- *             severity    - severity of logged data sources                  *
- *             logeventid  - the application-specific identifier for          *
+ *   state          - ITEM_STATE_NORMAL or ITEM_STATE_NOTSUPPORTED            *
+ *   lastlogsize    - size of read logfile                                    *
+ *   mtime          - time of last file modification                          *
+ *   timestamp      - timestamp of read value                                 *
+ *   source         - name of logged data source                              *
+ *   severity       - severity of logged data sources                         *
+ *   logeventid     - the application-specific identifier for                 *
  *                           the event; used for monitoring of Windows        *
  *                           event logs                                       *
- *             flags       - metric flags                                     *
+ *   flags          - metric flags                                            *
+ *   zbx_config_tls - [IN]                                                    *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *

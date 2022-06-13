@@ -864,6 +864,7 @@ out:
  *                                      the server                            *
  *             error            - [OUT] the error message in the case of      *
  *                                      failure                               *
+ *             zbx_config_tls   - [IN]                                        *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -1390,6 +1391,7 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  *                                      the server                            *
  *             error            - [OUT] the error message in the case of      *
  *                                     failure                                *
+ *             zbx_config_tls   - [IN]                                        *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *

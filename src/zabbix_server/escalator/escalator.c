@@ -3393,7 +3393,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 ZBX_THREAD_ENTRY(escalator_thread, args)
 {
 	ZBX_THREAD_ESCALATOR_ARGS	*escalator_args_in = (ZBX_THREAD_ESCALATOR_ARGS *)
-							(((zbx_thread_args_t *)args)->args);
+			(((zbx_thread_args_t *)args)->args);
 	int		now, nextcheck, sleeptime = -1, escalations_count = 0, old_escalations_count = 0;
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t		last_stat_time;

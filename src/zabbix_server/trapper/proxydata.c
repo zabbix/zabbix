@@ -218,8 +218,9 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *
- * Parameters: sock - [IN] the connection socket                              *
- *             ts   - [IN] the connection timestamp                           *
+ * Parameters: sock           - [IN] the connection socket                    *
+ *             ts             - [IN] the connection timestamp                 *
+ *             zbx_config_tls - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, zbx_config_tls_t *zbx_config_tls)
@@ -346,8 +347,9 @@ out:
  *                                                                            *
  * Purpose: sends 'proxy data' request to server                              *
  *                                                                            *
- * Parameters: sock - [IN] the connection socket                              *
- *             ts   - [IN] the connection timestamp                           *
+ * Parameters: sock           - [IN] the connection socket                    *
+ *             ts             - [IN] the connection timestamp                 *
+ *             zbx_config_tls - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, zbx_config_tls_t *zbx_config_tls)

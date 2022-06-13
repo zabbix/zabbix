@@ -22,12 +22,12 @@
 
 void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls)
 {
-	zbx_config_tls->connect_mode	= ZBX_TCP_SEC_UNENCRYPTED;
-	zbx_config_tls->accept_modes	= ZBX_TCP_SEC_UNENCRYPTED;
+	zbx_config_tls->connect_mode		= ZBX_TCP_SEC_UNENCRYPTED;
+	zbx_config_tls->accept_modes		= ZBX_TCP_SEC_UNENCRYPTED;
 
-	zbx_config_tls->connect		= NULL;
-	zbx_config_tls->accept		= NULL;
-	zbx_config_tls->ca_file		= NULL;
+	zbx_config_tls->connect			= NULL;
+	zbx_config_tls->accept			= NULL;
+	zbx_config_tls->ca_file			= NULL;
 	zbx_config_tls->crl_file		= NULL;
 	zbx_config_tls->server_cert_issuer	= NULL;
 	zbx_config_tls->server_cert_subject	= NULL;
@@ -35,7 +35,7 @@ void	zbx_init_config_tls_t(zbx_config_tls_t *zbx_config_tls)
 	zbx_config_tls->key_file		= NULL;
 	zbx_config_tls->psk_identity		= NULL;
 	zbx_config_tls->psk_file		= NULL;
-	zbx_config_tls->cipher_cert13	= NULL;
+	zbx_config_tls->cipher_cert13		= NULL;
 	zbx_config_tls->cipher_cert		= NULL;
 	zbx_config_tls->cipher_psk13		= NULL;
 	zbx_config_tls->cipher_psk		= NULL;

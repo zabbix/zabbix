@@ -421,7 +421,7 @@ static void	force_config_sync(void)
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
 	ZBX_THREAD_TASKMANAGER_ARGS	*taskmanager_args_in = (ZBX_THREAD_TASKMANAGER_ARGS *)
-							(((zbx_thread_args_t *)args)->args);
+			(((zbx_thread_args_t *)args)->args);
 
 	static int	cleanup_time = 0;
 

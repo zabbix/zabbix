@@ -88,7 +88,7 @@ clean:
 ZBX_THREAD_ENTRY(heart_thread, args)
 {
 	ZBX_THREAD_HEART_ARGS	*heart_args_in = (ZBX_THREAD_HEART_ARGS *)
-							(((zbx_thread_args_t *)args)->args);
+			(((zbx_thread_args_t *)args)->args);
 	int	start, sleeptime = 0, res;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;

@@ -78,12 +78,14 @@ static char	*rw_curl_error(CURLcode err)
  *                                                                            *
  * Purpose: get report from web service                                       *
  *                                                                            *
- * Parameters: url         - [IN] the report url                              *
- *             cookie      - [IN] the authentication cookie                   *
- *             width       - [IN] the report width                            *
- *             height      - [IN] the report height                           *
- *             report      - [OUT] the downloaded report                      *
- *             report_size - [OUT] the report size                            *
+ * Parameters: url                  - [IN] the report url                     *
+ *             cookie               - [IN] the authentication cookie          *
+ *             width                - [IN] the report width                   *
+ *             height               - [IN] the report height                  *
+ *             report               - [OUT] the downloaded report             *
+ *             report_size          - [OUT] the report size                   *
+ *             config_tls_cert_file - [IN]                                    *
+ *             config_tls_key_file  - [IN]                                    *
  *                                                                            *
  * Return value: SUCCEED - the report was downloaded successfully             *
  *               FAIL    - otherwise                                          *
@@ -242,9 +244,12 @@ out:
  *                                                                            *
  * Purpose: to begin report dispatch                                          *
  *                                                                            *
- * Parameters: msg      - [IN] the request message                            *
- *             dispatch - [IN] the alerter dispatch                           *
- *             error    - [OUT] the error message                             *
+ * Parameters: msg                  - [IN] the request message                *
+ *             dispatch             - [IN] the alerter dispatch               *
+ *             error                - [OUT] the error message                 *
+ *             config_tls_ca_file   - [IN]                                    *
+ *             config_tls_cert_file - [IN]                                    *
+ *             config_tls_key_file  - [IN]                                    *
  *                                                                            *
  * Return value: SUCCEED - the report was started successfully                *
  *               FAIL    - otherwise                                          *

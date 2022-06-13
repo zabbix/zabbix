@@ -2399,6 +2399,7 @@ out:
  *                                persistent files                            *
  *     err_msg         - [IN/OUT] error message why an item became            *
  *                       NOTSUPPORTED                                         *
+ *     zbx_config_tls  - [IN]                                                 *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -3266,6 +3267,7 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     persistent_file_name - [IN] name of file for saving persistent data    *
  *     prep_vec         - [IN/OUT] vector with data for writing into          *
  *                                 persistent files                           *
+ *     zbx_config_tls   - [IN]                                                *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *

@@ -39,7 +39,7 @@ extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-						zbx_config_tls_t *zbx_config_tls)
+		zbx_config_tls_t *zbx_config_tls)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -150,7 +150,7 @@ out:
 ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 {
 	ZBX_THREAD_PROXYCONFIG_ARGS	*proxyconfig_args_in = (ZBX_THREAD_PROXYCONFIG_ARGS *)
-							(((zbx_thread_args_t *)args)->args);
+			(((zbx_thread_args_t *)args)->args);
 	size_t			data_size;
 	double			sec;
 	zbx_ipc_async_socket_t	rtc;
