@@ -21,49 +21,56 @@
 
 /**
  * Map widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [];
-$jq_templates = [];
+
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+);
 
 // Host groups.
-$field_groupids = CWidgetHelper::getGroup($fields['groupids'],
-	$data['captions']['ms']['groups']['groupids'],
+$field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['ms']['groups']['groupids'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['groupids']),
+	new CFormField($field_groupids)
+]);
 $scripts[] = $field_groupids->getPostJS();
 
 // Hosts.
-$field_hostids = CWidgetHelper::getHost($fields['hostids'],
-	$data['captions']['ms']['hosts']['hostids'],
+$field_hostids = CWidgetHelper::getHost($fields['hostids'], $data['captions']['ms']['hosts']['hostids'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['hostids']),
+	new CFormField($field_hostids)
+]);
 $scripts[] = $field_hostids->getPostJS();
 
 // Tags.
-$form_list->addRow(
-	CWidgetHelper::getLabel($fields['evaltype']),
-	CWidgetHelper::getRadioButtonList($fields['evaltype'])
-);
-
-// Tags filter list.
-$form_list->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
+$form_grid
+	->addItem([
+		CWidgetHelper::getLabel($fields['evaltype']),
+		new CFormField(CWidgetHelper::getRadioButtonList($fields['evaltype']))
+	])
+	->addItem(
+		new CFormField(CWidgetHelper::getTags($fields['tags']))
+	);
 $scripts[] = $fields['tags']->getJavascript();
 $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
-// Default view.
-$form_list->addRow(
+// Initial view.
+$form_grid->addItem([
 	CWidgetHelper::getLabel($fields['default_view'], null, [
 		_('Comma separated center coordinates and zoom level to display when the widget is initially loaded.'),
 		BR(),
@@ -77,10 +84,10 @@ $form_list->addRow(
 		BR(),
 		_('Initial view is ignored if the default view is set.')
 	]),
-	CWidgetHelper::getLatLngZoomBox($fields['default_view'])
-);
+	new CFormField(CWidgetHelper::getLatLngZoomBox($fields['default_view']))
+]);
 
-$form->addItem($form_list);
+$form->addItem($form_grid);
 
 return [
 	'form' => $form,
