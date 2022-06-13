@@ -164,19 +164,6 @@ class CWidgetHelper {
 	}
 
 	/**
-	* Add Columns and Rows fields to the form of iterator.
-	*
-	* @param CFormList $form_list
-	* @param CWidgetFieldIntegerBox $field_columns
-	* @param CWidgetFieldIntegerBox $field_rows
-	*/
-	public static function addIteratorFields($form_list, $field_columns, $field_rows) {
-		$form_list
-			->addRow(self::getLabel($field_columns), self::getIntegerBox($field_columns))
-			->addRow(self::getLabel($field_rows), self::getIntegerBox($field_rows));
-	}
-
-	/**
 	 * Creates label linked to the field.
 	 *
 	 * @param CWidgetField $field
