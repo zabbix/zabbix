@@ -105,11 +105,22 @@ class CDashboardElement extends CElement {
 		$controls = $this->getControls();
 
 		if (!$controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
-			$controls->query('id:dashboard-edit')->one()->click();
-			$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilVisible();
-		}
+			// Click can sometimes fail so we have to retry this operation.
+			for ($i = 0; $i < 2; $i++) {
+				$controls->query('id:dashboard-edit')->one()->click();
 
-		return $this;
+				try {
+					$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilVisible();
+
+					return $this;
+				}
+				catch (\Exception $e) {
+					if ($i === 1) {
+						throw $e;
+					}
+				}
+			}
+		}
 	}
 
 	/**
