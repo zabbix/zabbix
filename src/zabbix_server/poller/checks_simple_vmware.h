@@ -202,6 +202,8 @@ int	check_vcenter_vm_storage_unshared(AGENT_REQUEST *request, const char *userna
 		AGENT_RESULT *result);
 int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_storage_readoio(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_storage_writeoio(AGENT_REQUEST *request, const char *username, const char *password,

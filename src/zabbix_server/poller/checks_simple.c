@@ -130,6 +130,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.storage.committed", VMCHECK_FUNC(check_vcenter_vm_storage_committed)},
 	{"vm.storage.unshared", VMCHECK_FUNC(check_vcenter_vm_storage_unshared)},
 	{"vm.storage.uncommitted", VMCHECK_FUNC(check_vcenter_vm_storage_uncommitted)},
+	{"vm.tags.get", VMCHECK_FUNC(check_vcenter_vm_tags_get)},
 	{"vm.storage.readoio", VMCHECK_FUNC(check_vcenter_vm_storage_readoio)},
 	{"vm.storage.writeoio", VMCHECK_FUNC(check_vcenter_vm_storage_writeoio)},
 	{"vm.storage.totalwritelatency", VMCHECK_FUNC(check_vcenter_vm_storage_totalwritelatency)},

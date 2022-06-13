@@ -4047,6 +4047,84 @@ int	check_vcenter_vm_storage_uncommitted(AGENT_REQUEST *request, const char *use
 	return ret;
 }
 
+int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_vm_t			*vm = NULL;
+	int				i, ret = SYSINFO_RET_FAIL;
+	const char			*url, *uuid;
+	zbx_vmware_entity_tags_t	entity_cmp;
+	zbx_vector_vmware_tag_t		*tags;
+	struct zbx_json			json_data;
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	uuid = get_rparam(request, 1);
+
+	if ('\0' == *uuid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
+		goto unlock;
+	}
+
+	entity_cmp.uuid = vm->uuid;
+
+	if (FAIL == (i = zbx_vector_vmware_entity_tags_search(&service->data_tags.entity_tags, &entity_cmp,
+			ZBX_DEFAULT_STR_COMPARE_FUNC)))
+	{
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+
+	tags = &service->data_tags.entity_tags.values[i]->tags;
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+
+	for (i = 0; i < tags->values_num; i++)
+	{
+		zbx_vmware_tag_t	*tag = tags->values[i];
+
+		zbx_json_addobject(&json_data, NULL);
+		zbx_json_addstring(&json_data, "name", tag->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "description", tag->description, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "category", tag->category, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json_data);
+	}
+
+	zbx_json_close(&json_data);
+	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
 int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
