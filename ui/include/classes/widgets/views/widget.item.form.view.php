@@ -30,23 +30,27 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.item.form.view.js.php')];
 
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+);
+
+// Item.
 $field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['itemid']),
+	new CFormField($field_itemid)
+]);
 $scripts[] = $field_itemid->getPostJS();
 
-$form_list
-	->addRow(
-		CWidgetHelper::getLabel($fields['show']),
+// Show.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['show']),
+	new CFormField(
 		CWidgetHelper::getCheckBoxList($fields['show'], [
 			WIDGET_ITEM_SHOW_DESCRIPTION => _('Description'),
 			WIDGET_ITEM_SHOW_VALUE => _('Value'),
@@ -54,76 +58,82 @@ $form_list
 			WIDGET_ITEM_SHOW_CHANGE_INDICATOR => _('Change indicator')
 		], [ZBX_STYLE_COLUMNS, ZBX_STYLE_COLUMNS_2])
 	)
-	->addRow(CWidgetHelper::getLabel($fields['adv_conf']), CWidgetHelper::getCheckBox($fields['adv_conf']))
-	->addRow(
-		CWidgetHelper::getLabel($fields['description'], ZBX_STYLE_WIDGET_ITEM_LABEL, [
-			_('Supported macros:'),
-			(new CList([
-				'{HOST.*}',
-				'{ITEM.*}',
-				'{INVENTORY.*}',
-				_('User macros')
-			]))->addClass(ZBX_STYLE_LIST_DASHED)
-		]),
+]);
+
+// Advanced configuration.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['adv_conf']),
+	new  CFormField(CWidgetHelper::getCheckBox($fields['adv_conf']))
+]);
+
+// Description.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['description'], ZBX_STYLE_WIDGET_ITEM_LABEL, [
+		_('Supported macros:'),
+		(new CList([
+			'{HOST.*}',
+			'{ITEM.*}',
+			'{INVENTORY.*}',
+			_('User macros')
+		]))->addClass(ZBX_STYLE_LIST_DASHED)
+	])->addClass('js-row-description'),
+	(new CFormField(
 		(new CDiv([
-			(new CDiv(
+			new CFormField(
 				CWidgetHelper::getTextArea($fields['description'])
 					->setAttribute('maxlength', DB::getFieldLength('widget_field', 'value_str'))
-			))->addClass('form-field'),
+			),
 
 			CWidgetHelper::getLabel($fields['desc_h_pos']),
-			(new CDiv(CWidgetHelper::getRadioButtonList($fields['desc_h_pos'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getRadioButtonList($fields['desc_h_pos'])),
 
 			CWidgetHelper::getLabel($fields['desc_size']),
-			(new CDiv([CWidgetHelper::getIntegerBox($fields['desc_size']), '%']))
-				->addClass('form-field')
-				->addClass('field-size'),
+			(new CFormField([CWidgetHelper::getIntegerBox($fields['desc_size']), '%']))->addClass('field-size'),
 
 			CWidgetHelper::getLabel($fields['desc_v_pos']),
-			(new CDiv(CWidgetHelper::getRadioButtonList($fields['desc_v_pos'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getRadioButtonList($fields['desc_v_pos'])),
 
 			CWidgetHelper::getLabel($fields['desc_bold']),
-			(new CDiv(CWidgetHelper::getCheckBox($fields['desc_bold'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getCheckBox($fields['desc_bold'])),
 
 			CWidgetHelper::getLabel($fields['desc_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['desc_color'], true)))->addClass('form-field')
+			new CFormField(CWidgetHelper::getColor($fields['desc_color'], true))
 		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('fields-group-description'),
-		'description-row'
-	)
-	->addRow(
-		(new CLabel(_('Value')))->addClass(ZBX_STYLE_WIDGET_ITEM_LABEL),
+			->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+			->addClass('fields-group-description')
+	))->addClass('js-row-description')
+]);
+
+// Value.
+$form_grid->addItem([
+	(new CLabel(_('Value')))
+		->addClass(ZBX_STYLE_WIDGET_ITEM_LABEL)
+		->addClass('js-row-value'),
+	(new CFormField(
 		(new CDiv([
 			CWidgetHelper::getLabel($fields['decimal_places']),
-			(new CDiv(CWidgetHelper::getIntegerBox($fields['decimal_places'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getIntegerBox($fields['decimal_places'])),
 
 			CWidgetHelper::getLabel($fields['decimal_size']),
-			(new CDiv([CWidgetHelper::getIntegerBox($fields['decimal_size']), '%']))
-				->addClass('form-field')
-				->addClass('field-size'),
+			(new CFormField([CWidgetHelper::getIntegerBox($fields['decimal_size']), '%']))->addClass('field-size'),
 
-			// Divide decimals and value.
 			new CTag('hr'),
 
 			CWidgetHelper::getLabel($fields['value_h_pos']),
-			(new CDiv(CWidgetHelper::getRadioButtonList($fields['value_h_pos'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getRadioButtonList($fields['value_h_pos'])),
 
 			CWidgetHelper::getLabel($fields['value_size']),
-			(new CDiv([CWidgetHelper::getIntegerBox($fields['value_size']), '%']))
-				->addClass('form-field')
-				->addClass('field-size'),
+			(new CFormField([CWidgetHelper::getIntegerBox($fields['value_size']), '%']))->addClass('field-size'),
 
 			CWidgetHelper::getLabel($fields['value_v_pos']),
-			(new CDiv(CWidgetHelper::getRadioButtonList($fields['value_v_pos'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getRadioButtonList($fields['value_v_pos'])),
 
 			CWidgetHelper::getLabel($fields['value_bold']),
-			(new CDiv(CWidgetHelper::getCheckBox($fields['value_bold'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getCheckBox($fields['value_bold'])),
 
 			CWidgetHelper::getLabel($fields['value_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['value_color'], true)))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getColor($fields['value_color'], true)),
 
-			// Divide value and units.
 			new CTag('hr'),
 
 			(new CDiv([
@@ -131,96 +141,104 @@ $form_list
 				CWidgetHelper::getLabel($fields['units'])
 			]))->addClass('units-show'),
 
-			(new CDiv(
+			(new CFormField(
 				CWidgetHelper::getTextBox($fields['units'])
-					->setAttribute('style', '')
 					->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
-			))
-				->addClass('form-field')
-				->addClass('field-fluid'),
+					->setAttribute('style', '')
+			))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
 
 			CWidgetHelper::getLabel($fields['units_pos']),
-			(new CDiv(CWidgetHelper::getSelect($fields['units_pos'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getSelect($fields['units_pos'])),
 
 			CWidgetHelper::getLabel($fields['units_size']),
-			(new CDiv([CWidgetHelper::getIntegerBox($fields['units_size']), '%']))
-				->addClass('form-field')
-				->addClass('field-size'),
+			(new CFormField([CWidgetHelper::getIntegerBox($fields['units_size']), '%']))->addClass('field-size'),
 
 			CWidgetHelper::getLabel($fields['units_bold'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getCheckBox($fields['units_bold'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getCheckBox($fields['units_bold'])),
 
 			CWidgetHelper::getLabel($fields['units_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['units_color'], true)))->addClass('form-field')
+			new CFormField(CWidgetHelper::getColor($fields['units_color'], true))
 		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('fields-group-value'),
-		'value-row'
-	)
-	->addRow(
-		(new CLabel(_('Time')))->addCLass(ZBX_STYLE_WIDGET_ITEM_LABEL),
+			->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+			->addClass('fields-group-value')
+	))->addClass('js-row-value')
+]);
+
+// Time.
+$form_grid->addItem([
+	(new CLabel(_('Time')))
+		->addCLass(ZBX_STYLE_WIDGET_ITEM_LABEL)
+		->addClass('js-row-time'),
+	(new CFormField(
 		(new CDiv([
 			CWidgetHelper::getLabel($fields['time_h_pos']),
-			(new CDiv(CWidgetHelper::getRadioButtonList($fields['time_h_pos'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getRadioButtonList($fields['time_h_pos'])),
 
 			CWidgetHelper::getLabel($fields['time_size']),
-			(new CDiv([CWidgetHelper::getIntegerBox($fields['time_size']), '%']))
-				->addClass('form-field')
-				->addClass('field-size'),
+			(new CFormField([CWidgetHelper::getIntegerBox($fields['time_size']), '%']))->addClass('field-size'),
 
 			CWidgetHelper::getLabel($fields['time_v_pos']),
-			(new CDiv(CWidgetHelper::getRadioButtonList($fields['time_v_pos'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getRadioButtonList($fields['time_v_pos'])),
 
 			CWidgetHelper::getLabel($fields['time_bold']),
-			(new CDiv(CWidgetHelper::getCheckBox($fields['time_bold'])))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getCheckBox($fields['time_bold'])),
 
 			CWidgetHelper::getLabel($fields['time_color'])->addClass('offset-3'),
-			(new CDiv(CWidgetHelper::getColor($fields['time_color'], true)))->addClass('form-field')
+			new CFormField(CWidgetHelper::getColor($fields['time_color'], true))
 		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('fields-group-time'),
-		'time-row'
-	)
-	->addRow(
-		(new CLabel(_('Change indicator')))->addClass(ZBX_STYLE_WIDGET_ITEM_LABEL),
+			->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+			->addClass('fields-group-time')
+	))->addClass('js-row-time')
+]);
+
+// Change indicator.
+$form_grid->addItem([
+	(new CLabel(_('Change indicator')))
+		->addClass(ZBX_STYLE_WIDGET_ITEM_LABEL)
+		->addClass('js-row-change-indicator'),
+	(new CFormField(
 		(new CDiv([
 			(new CSvgArrow(['up' => true, 'fill_color' => $fields['up_color']->getValue()]))
 				->setId('change-indicator-up')
 				->setSize(14, 20),
-			(new CDiv(CWidgetHelper::getColor($fields['up_color'], true)))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getColor($fields['up_color'], true)),
 
 			(new CSvgArrow(['down' => true, 'fill_color' => $fields['down_color']->getValue()]))
 				->setId('change-indicator-down')
 				->setSize(14, 20),
-			(new CDiv(CWidgetHelper::getColor($fields['down_color'], true)))->addClass('form-field'),
+			new CFormField(CWidgetHelper::getColor($fields['down_color'], true)),
 
 			(new CSvgArrow(['up' => true, 'down' => true, 'fill_color' => $fields['updown_color']->getValue()]))
 				->setId('change-indicator-updown')
 				->setSize(14, 20),
-			(new CDiv(CWidgetHelper::getColor($fields['updown_color'], true)))->addClass('form-field')
+			new CFormField(CWidgetHelper::getColor($fields['updown_color'], true))
 		]))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addClass('fields-group-change-indicator'),
-		'change-indicator-row'
-	)
-	->addRow(
-		CWidgetHelper::getLabel($fields['bg_color']),
-		(new CDiv(CWidgetHelper::getColor($fields['bg_color'], true)))->addClass('form-field'),
-		'bg-color-row'
-	);
+			->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP)
+			->addClass('fields-group-change-indicator')
+	))->addClass('js-row-change-indicator')
+]);
+
+// Background color.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['bg_color'])->addClass('js-row-bg-color'),
+	(new CFormField(CWidgetHelper::getColor($fields['bg_color'], true)))->addClass('js-row-bg-color')
+]);
 
 // Dynamic item.
 if ($data['templateid'] === null) {
-	$form_list->addRow(CWidgetHelper::getLabel($fields['dynamic']), CWidgetHelper::getCheckBox($fields['dynamic']));
+	$form_grid->addItem([
+		CWidgetHelper::getLabel($fields['dynamic']),
+		new CFormField(CWidgetHelper::getCheckBox($fields['dynamic']))
+	]);
 }
 
-$form->addItem($form_list);
-
-$form->addItem(
-	(new CScriptTag('
-		widget_item_form.init();
-	'))->setOnDocumentReady()
-);
+$form
+	->addItem($form_grid)
+	->addItem(
+		(new CScriptTag('
+			widget_item_form.init();
+		'))->setOnDocumentReady()
+	);
 
 return [
 	'form' => $form,

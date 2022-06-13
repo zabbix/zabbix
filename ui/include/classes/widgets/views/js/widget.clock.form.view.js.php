@@ -50,8 +50,6 @@ window.widget_clock_form = new class {
 			checkbox.addEventListener('change', () => this.updateForm());
 		}
 
-		this.advanced_configuration.addEventListener('change', () => this.updateForm());
-
 		const show = [this.show_date, this.show_time, this.show_tzone];
 
 		for (const checkbox of show) {
@@ -64,6 +62,8 @@ window.widget_clock_form = new class {
 				}
 			});
 		}
+
+		this.advanced_configuration.addEventListener('change', () => this.updateForm());
 
 		this.updateForm();
 	}
