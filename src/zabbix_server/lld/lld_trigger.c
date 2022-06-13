@@ -3044,7 +3044,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 					d = ",";
 
 					zbx_audit_trigger_update_json_update_tag_tag(trigger->triggerid,
-							tag->triggertagid, tag->tag_orig, tag->tag);
+							ZBX_FLAG_DISCOVERY_CREATED, tag->triggertagid, tag->tag_orig,
+							tag->tag);
 				}
 
 				if (0 != (tag->flags & ZBX_FLAG_LLD_TAG_UPDATE_VALUE))
@@ -3054,7 +3055,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 					zbx_free(value_esc);
 
 					zbx_audit_trigger_update_json_update_tag_value(trigger->triggerid,
-							tag->triggertagid, tag->value_orig, tag->value);
+							ZBX_FLAG_DISCOVERY_CREATED, tag->triggertagid, tag->value_orig,
+							tag->value);
 				}
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
