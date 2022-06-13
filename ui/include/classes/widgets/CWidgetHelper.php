@@ -26,6 +26,8 @@ class CWidgetHelper {
 
 	/**
 	 * Create CForm for widget configuration form.
+	 *
+	 * @return CForm
 	 */
 	public static function createForm(): CForm {
 		return (new CForm('post'))
@@ -48,8 +50,8 @@ class CWidgetHelper {
 	 */
 	public static function createFormGrid(string $name, string $type, int $view_mode, array $known_widget_types,
 			?CWidgetFieldSelect $field_rf_rate): CFormGrid {
-		$deprecated_widget_types = array_intersect_key(
-			$known_widget_types,
+
+		$deprecated_widget_types = array_intersect_key($known_widget_types,
 			array_flip(CWidgetConfig::DEPRECATED_WIDGETS)
 		);
 

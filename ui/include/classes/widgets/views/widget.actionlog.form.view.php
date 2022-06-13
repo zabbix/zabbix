@@ -33,15 +33,19 @@ $form = CWidgetHelper::createForm();
 $form_grid = (CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
 	$data['dialogue']['view_mode'], $data['known_widget_types'],
 	$data['templateid'] === null ? $fields['rf_rate'] : null
-))
-	->addItem([
-		CWidgetHelper::getLabel($fields['sort_triggers']),
-		new CFormField(CWidgetHelper::getSelect($fields['sort_triggers']))
-	])
-	->addItem([
-		CWidgetHelper::getLabel($fields['show_lines']),
-		new CFormField(CWidgetHelper::getIntegerBox($fields['show_lines']))
-	]);
+));
+
+// Sort entries by.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['sort_triggers']),
+	new CFormField(CWidgetHelper::getSelect($fields['sort_triggers']))
+]);
+
+// Show lines.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['show_lines']),
+	new CFormField(CWidgetHelper::getIntegerBox($fields['show_lines']))
+]);
 
 $form->addItem($form_grid);
 
