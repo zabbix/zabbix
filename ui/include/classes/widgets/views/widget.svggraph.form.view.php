@@ -30,18 +30,19 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.svggraph.form.view.js.php')];
 $jq_templates = [];
 
+$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+);
+
 $graph_preview = (new CDiv())
 	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)
-	->addItem((new CDiv())->setId('svg-graph-preview'));
+	->addItem(
+		(new CDiv())->setId('svg-graph-preview')
+	);
 
 $form_tabs = (new CTabView())
 	->addTab('data_set',  _('Data set'), getDatasetTab($fields, $jq_templates, $form->getName()),
@@ -59,7 +60,6 @@ $form_tabs = (new CTabView())
 	)
 	->addClass('graph-widget-config-tabs')
 	->setSelected(0);
-
 $scripts[] = $form_tabs->makeJavascript();
 
 $form
