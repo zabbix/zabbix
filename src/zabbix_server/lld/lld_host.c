@@ -2304,7 +2304,7 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 		const zbx_vector_ptr_t *lld_macros, char **info)
 {
 	int			i;
-	zbx_db_tag_t		*host_tag, *proto_tag;
+	zbx_db_tag_t		*proto_tag;
 	zbx_vector_db_tag_ptr_t	new_tags;
 	char			*tag = NULL, *value = NULL;
 
