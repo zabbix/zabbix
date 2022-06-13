@@ -132,15 +132,15 @@ static void	es_free(void *udata, void *ptr)
  ******************************************************************************/
 static int	utf8_decode_3byte_sequence(const char *ptr, zbx_uint32_t *out)
 {
-	*out = ((unsigned char)*ptr++ & 0xF) << 12;
+	*out = ((unsigned char)*ptr++ & 0xFu) << 12;
 	if (0x80 != (*ptr & 0xC0))
 		return FAIL;
 
-	*out |= ((unsigned char)*ptr++ & 0x3F) << 6;
+	*out |= ((unsigned char)*ptr++ & 0x3Fu) << 6;
 	if (0x80 != (*ptr & 0xC0))
 		return FAIL;
 
-	*out |= ((unsigned char)*ptr & 0x3F);
+	*out |= ((unsigned char)*ptr & 0x3Fu);
 
 	return SUCCEED;
 }
@@ -208,10 +208,10 @@ int	es_duktape_string_decode(const char *duk_str, char **out_str)
 				goto fail;
 
 			u = 0x10000 + ((((zbx_uint32_t)c1 & 0x3ff) << 10) | (c2 & 0x3ff));
-			*out++ = 0xf0 |  u >> 18;
-			*out++ = 0x80 | (u >> 12 & 0x3f);
-			*out++ = 0x80 | (u >> 6 & 0x3f);
-			*out++ = 0x80 | (u & 0x3f);
+			*out++ = (char)(0xf0 |  u >> 18);
+			*out++ = (char)(0x80 | (u >> 12 & 0x3f));
+			*out++ = (char)(0x80 | (u >> 6 & 0x3f));
+			*out++ = (char)(0x80 | (u & 0x3f));
 			in += 3;
 			continue;
 		}
