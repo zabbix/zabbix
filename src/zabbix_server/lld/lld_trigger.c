@@ -2272,7 +2272,7 @@ static int	lld_validate_trigger_tag_field(zbx_db_tag_t *tag, const char *field, 
 
 static int	lld_trigger_tags_validate(zbx_lld_trigger_t *trigger, char **error)
 {
-	int	i, j;
+	int	i, j, ret = SUCCEED;
 
 	for (i = 0; i < trigger->tags.values_num; i++)
 	{
@@ -2282,15 +2282,18 @@ static int	lld_trigger_tags_validate(zbx_lld_trigger_t *trigger, char **error)
 			continue;
 
 		if (SUCCEED != lld_validate_trigger_tag_field(tag, tag->tag, ZBX_FLAG_DB_TAG_UPDATE_TAG,
-				TAG_NAME_LEN, error))
-		{
-			return FAIL;
-		}
-
-		if (SUCCEED != lld_validate_trigger_tag_field(tag, tag->value, ZBX_FLAG_DB_TAG_UPDATE_VALUE,
+				TAG_NAME_LEN, error) ||
+				SUCCEED != lld_validate_trigger_tag_field(tag, tag->value, ZBX_FLAG_DB_TAG_UPDATE_VALUE,
 				TAG_VALUE_LEN, error))
 		{
-			return FAIL;
+			if (SUCCEED != zbx_db_tag_rollback(tag))
+			{
+				zbx_db_tag_free(tag);
+				zbx_vector_db_tag_ptr_remove_noorder(&trigger->tags, i--);
+			}
+
+			ret = FAIL;
+			continue;
 		}
 
 		/* check for duplicated tag,values pairs */
@@ -2302,12 +2305,20 @@ static int	lld_trigger_tags_validate(zbx_lld_trigger_t *trigger, char **error)
 			{
 				*error = zbx_strdcatf(*error, "Cannot create trigger tag: tag \"%s\","
 					"\"%s\" already exists.\n", tag->tag, tag->value);
-				return FAIL;
+
+				if (SUCCEED != zbx_db_tag_rollback(tag))
+				{
+					zbx_db_tag_free(tag);
+					zbx_vector_db_tag_ptr_remove_noorder(&trigger->tags, i--);
+				}
+
+				ret = FAIL;
+				break;
 			}
 		}
 	}
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -2327,7 +2338,7 @@ static void	lld_triggers_tags_validate(zbx_vector_ptr_t *triggers, char **error)
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		if (SUCCEED != lld_trigger_tags_validate(trigger, error))
+		if (SUCCEED != lld_trigger_tags_validate(trigger, error) && 0 == trigger->triggerid)
 			trigger->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
 	}
 }
