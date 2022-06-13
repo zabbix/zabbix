@@ -77,6 +77,16 @@ int	zbx_db_tag_compare_func_template(const void *d1, const void *d2)
 	return 0;
 }
 
+static void	db_tag_merge_automatic(zbx_db_tag_t *dst, zbx_db_tag_t *src)
+{
+	if (dst->automatic == src->automatic)
+		return;
+
+	dst->automatic_orig = dst->automatic;
+	dst->automatic = src->automatic;
+	dst->flags |= ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: merge new tags into existing                                      *
@@ -111,12 +121,14 @@ void	zbx_db_tag_merge(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src
 
 		if (j != src->values_num)
 		{
+			db_tag_merge_automatic(dst->values[i], src->values[j]);
 			zbx_db_tag_free(src->values[j]);
 			zbx_vector_db_tag_ptr_remove_noorder(src, j);
 			continue;
 		}
 
-		dst->values[i]->flags = ZBX_FLAG_DB_TAG_REMOVE;
+		if (ZBX_DB_TAG_AUTOMATIC == dst->values[i]->automatic)
+			dst->values[i]->flags = ZBX_FLAG_DB_TAG_REMOVE;
 	}
 
 	if (0 == src->values_num)
@@ -136,6 +148,8 @@ void	zbx_db_tag_merge(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src
 
 		if (j != src->values_num)
 		{
+			db_tag_merge_automatic(dst->values[i], src->values[j]);
+
 			dst->values[i]->value_orig = dst->values[i]->value;
 			dst->values[i]->value = src->values[j]->value;
 			dst->values[i]->flags = ZBX_FLAG_DB_TAG_UPDATE_VALUE;
@@ -154,6 +168,8 @@ void	zbx_db_tag_merge(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src
 	{
 		if (ZBX_FLAG_DB_TAG_REMOVE != dst->values[i]->flags)
 			continue;
+
+		db_tag_merge_automatic(dst->values[i], src->values[j]);
 
 		dst->values[i]->tag_orig = dst->values[i]->tag;
 		dst->values[i]->value_orig = dst->values[i]->value;

@@ -732,8 +732,8 @@ typedef struct
 	char		*tag;
 	char		*value_orig;
 	char		*value;
-	unsigned char	automatic;
-	unsigned char	automatic_orig;
+	int		automatic;
+	int		automatic_orig;
 #define ZBX_FLAG_DB_TAG_UNSET			__UINT64_C(0x00000000)
 #define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000001)
 #define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000002)
