@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -22,67 +22,77 @@
 /**
  * SLA report widget form view.
  *
- * @var $data array
+ * @var CView $this
+ * @var array $data
  */
 
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.slareport.form.view.js.php')];
+
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+);
 
 // SLA.
 $field_slaid = CWidgetHelper::getSla($fields['slaid'], $data['captions']['ms']['slas']['slaid'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['slaid']), $field_slaid);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['slaid']),
+	new CFormField($field_slaid)
+]);
 $scripts[] = $field_slaid->getPostJS();
 
 // Services.
 $field_serviceid = CWidgetHelper::getService($fields['serviceid'], $data['captions']['ms']['services']['serviceid'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['serviceid']), $field_serviceid);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['serviceid']),
+	new CFormField($field_serviceid)
+]);
 $scripts[] = $field_serviceid->getPostJS();
 
 // Show periods.
-$form_list->addRow(
+$form_grid->addItem([
 	CWidgetHelper::getLabel($fields['show_periods']),
-	CWidgetHelper::getIntegerBox($fields['show_periods'])
-);
+	new CFormField(CWidgetHelper::getIntegerBox($fields['show_periods']))
+]);
 
 // Date from.
-$form_list->addRow(
+$form_grid->addItem([
 	CWidgetHelper::getLabel($fields['date_from']),
-	CWidgetHelper::getDatePicker($fields['date_from'])
-		->setDateFormat(ZBX_DATE)
-		->setPlaceholder(_('YYYY-MM-DD'))
-);
+	new CFormField(
+		CWidgetHelper::getDatePicker($fields['date_from'])
+			->setDateFormat(ZBX_DATE)
+			->setPlaceholder(_('YYYY-MM-DD'))
+	)
+]);
 
 // Date to.
-$form_list->addRow(
+$form_grid->addItem([
 	CWidgetHelper::getLabel($fields['date_to']),
-	CWidgetHelper::getDatePicker($fields['date_to'])
-		->setDateFormat(ZBX_DATE)
-		->setPlaceholder(_('YYYY-MM-DD'))
-);
+	new CFormField(
+		CWidgetHelper::getDatePicker($fields['date_to'])
+			->setDateFormat(ZBX_DATE)
+			->setPlaceholder(_('YYYY-MM-DD'))
+	)
+]);
 
-$form->addItem($form_list);
-
-$form->addItem(
-	(new CScriptTag('
-		widget_slareport_form.init('.json_encode([
-			'serviceid_field_id' => $fields['serviceid']->getName(),
-			'serviceid_multiple' => $fields['serviceid']->isMultiple()
-		]).');
-	'))->setOnDocumentReady()
-);
+$form
+	->addItem($form_grid)
+	->addItem(
+		(new CScriptTag('
+			widget_slareport_form.init('.json_encode([
+				'serviceid_field_id' => $fields['serviceid']->getName(),
+				'serviceid_multiple' => $fields['serviceid']->isMultiple()
+			]).');
+		'))->setOnDocumentReady()
+	);
 
 return [
 	'form' => $form,
