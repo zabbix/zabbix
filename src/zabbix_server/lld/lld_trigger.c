@@ -800,20 +800,6 @@ static void	lld_tags_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_
 
 	DBfree_result(result);
 
-	for (i = 0; i < trigger_prototypes->values_num; i++)
-	{
-		trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes->values[i];
-
-		zbx_vector_db_tag_ptr_sort(&trigger_prototype->tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	}
-
-	for (i = 0; i < triggers->values_num; i++)
-	{
-		trigger = (zbx_lld_trigger_t *)triggers->values[i];
-
-		zbx_vector_db_tag_ptr_sort(&trigger->tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	}
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
