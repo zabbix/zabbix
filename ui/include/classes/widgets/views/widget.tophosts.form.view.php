@@ -20,13 +20,12 @@
 
 
 /**
+ * Data overview widget form view.
+ *
  * @var CView $this
  * @var array $data
  */
 
-/**
- * Data overview widget form view.
- */
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
