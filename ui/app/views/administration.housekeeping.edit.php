@@ -220,7 +220,7 @@ $house_keeper_tab = (new CFormList())
 					DB::getFieldLength('config', 'compress_older')
 				))
 					->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-					->setEnabled($data['compression_status'] == 1)
+					->setEnabled($data['compression_status'] == 1 && $data['compression_availability'])
 					->setAriaRequired()
 			);
 	}
