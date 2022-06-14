@@ -37,7 +37,7 @@ $form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dia
 	$data['templateid'] === null ? $fields['rf_rate'] : null
 );
 
-// Host groups
+// Host groups.
 $field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['ms']['groups']['groupids'],
 	$form->getName()
 );
