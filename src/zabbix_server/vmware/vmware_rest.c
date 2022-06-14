@@ -76,8 +76,8 @@ ZBX_PTR_VECTOR_IMPL(vmware_tag, zbx_vmware_tag_t *)
  ******************************************************************************/
 static int	zbx_vmware_tag_id_compare(const void *p1, const void *p2)
 {
-	const zbx_vmware_tag_t	*v1 = (const zbx_vmware_tag_t *)p1;
-	const zbx_vmware_tag_t	*v2 = (const zbx_vmware_tag_t *)p2;
+	const zbx_vmware_tag_t	*v1 = *(const zbx_vmware_tag_t * const *)p1;
+	const zbx_vmware_tag_t	*v2 = *(const zbx_vmware_tag_t * const *)p2;
 
 	return strcmp(v1->id, v2->id);
 }
@@ -131,7 +131,9 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 	int			i;
 	zbx_hashset_iter_t	iter;
 	zbx_vmware_hv_t		*hv;
-	zbx_vmware_vm_t		*vm;
+	zbx_vmware_vm_index_t	*vmi;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_iter_reset(&data->hvs, &iter);
 	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
@@ -141,10 +143,10 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 	}
 
 	zbx_hashset_iter_reset(&data->vms_index, &iter);
-	while (NULL != (vm = (zbx_vmware_vm_t *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (vmi = (zbx_vmware_vm_index_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_vector_vmware_entity_tags_append(entity_tags,
-				vmware_entity_tag_create(ZBX_VMWARE_SOAP_VM, vm->id, vm->uuid));
+				vmware_entity_tag_create(ZBX_VMWARE_SOAP_VM, vmi->vm->id, vmi->vm->uuid));
 	}
 
 	for (i = 0; i < data->datastores.values_num; i++)
@@ -154,6 +156,9 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 		zbx_vector_vmware_entity_tags_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_DS, ds->id, ds->uuid));
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity tags:%d", __func__, entity_tags->values_num);
+
 }
 
 static int	vmware_curl_init(const char *url, CURL **easyhandle, ZBX_HTTPPAGE *page, struct curl_slist **headers,
@@ -166,6 +171,8 @@ static int	vmware_curl_init(const char *url, CURL **easyhandle, ZBX_HTTPPAGE *pa
 	int		url_sz, ret = FAIL;
 	CURLcode	err;
 	CURLoption	opt;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	page->alloc = 0;
 
@@ -181,33 +188,36 @@ static int	vmware_curl_init(const char *url, CURL **easyhandle, ZBX_HTTPPAGE *pa
 	zbx_rtrim(page->url, "/");
 	url_sz = strlen(page->url);
 
-	if (url_sz < 5 || 0 != strcmp(&page->url[url_sz - 5], "/sdk"))
+	if (url_sz < 5 || 0 != strcmp(&page->url[url_sz - 4], "/sdk"))
 	{
 		*error = zbx_strdup(*error, "cannot initialize rest service url");
 		goto out;
 	}
 
-	strscpy(&page->url[url_sz - 4], "api");
+	strscpy(&page->url[url_sz - 3], "api");
 	*headers = curl_slist_append(*headers, ZBX_XML_HEADER1);
 	*headers = curl_slist_append(*headers, ZBX_XML_HEADER2);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, *headers)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEDATA, page)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PRIVATE, page)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HEADERFUNCTION, curl_header_cb)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT,
+	if (CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_HTTPHEADER, *headers)) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_COOKIEFILE, "")) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_FOLLOWLOCATION, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_WRITEFUNCTION, curl_write_cb)) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_WRITEDATA, page)) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_PRIVATE, page)) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_HEADERFUNCTION, curl_header_cb)) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_TIMEOUT,
 					(long)CONFIG_VMWARE_TIMEOUT)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
-		goto out;
 	}
+	else
+		ret = SUCCEED;
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
 	return ret;
 
 #	undef INIT_PERF_REST_SIZE
@@ -217,9 +227,8 @@ out:
 
 static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp, char **error)
 {
-	struct zbx_json_parse	jp_loc;
-	char			err_type[VMWARE_SHORT_STR_LEN];
-	char			err_msg[VMWARE_SHORT_STR_LEN];
+	struct zbx_json_parse	jp_loc, jp_data;
+	char			err[VMWARE_SHORT_STR_LEN];
 
 	if (NULL == jp)
 		jp = &jp_loc;
@@ -230,29 +239,52 @@ static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp
 		return FAIL;
 	}
 
-	if (FAIL == zbx_json_value_by_name(jp, "error_type", err_type, sizeof(err_type), NULL))
-		return SUCCEED;
+	if (SUCCEED == zbx_json_value_by_name(jp, "error_type", err, sizeof(err), NULL))
+	{
+		char	err_msg[VMWARE_SHORT_STR_LEN];
 
+		if (FAIL == zbx_json_value_by_name(jp, "default_message", err_msg, sizeof(err_msg), NULL))
+			err_msg[0] = '\0';
 
-	if (FAIL == zbx_json_value_by_name(jp, "default_message", err_msg, sizeof(err_msg), NULL))
-		err_msg[0] = '\0';
+		*error = zbx_dsprintf(*error, "%s:%s", err, err_msg);
 
-	*error = zbx_dsprintf(*error, "%s:%s", err_type, err_msg);
+		return FAIL;
+	}
 
-	return FAIL;
+	if (SUCCEED == zbx_json_brackets_by_name(jp, "error", &jp_data))
+	{
+		char	err_data[VMWARE_SHORT_STR_LEN];
+
+		if (FAIL == zbx_json_value_by_name(&jp_data, "message", err, sizeof(err), NULL))
+		{
+			*error = zbx_dsprintf(*error, "error:%.*s", (int)(jp_data.end - jp_data.start), jp_data.start);
+			return FAIL;
+		}
+
+		if (FAIL == zbx_json_value_by_name(&jp_data, "data", err_data, sizeof(err_data), NULL))
+			err_data[0] = '\0';
+
+		*error = zbx_dsprintf(*error, "%s:%s", err, err_data);
+
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
-static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
-		 struct curl_slist **headers, char **error)
+static int	vmware_service_rest_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
+		struct curl_slist *headers, ZBX_HTTPPAGE *page, char **error)
 {
 	int		ret = FAIL;
 	char		tmp[VMWARE_SHORT_STR_LEN];
 	CURLcode	err;
 	CURLoption	opt;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
+
 	zbx_snprintf(tmp, sizeof(tmp),"%s/session", page->url);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPGET, 1L)) ||
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, tmp)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_USERNAME, service->username)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PASSWORD, service->password)))
@@ -269,19 +301,21 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 		goto out;
 	}
 
-	if (FAIL == vmware_rest_response_open(page->data, NULL, error))
+	if ('"' != page->data[0] && FAIL == vmware_rest_response_open(page->data, NULL, error))
 		goto out;
 
 	zbx_ltrim(page->data, "\"");
 	zbx_rtrim(page->data, "\"");
 	zbx_snprintf(tmp, sizeof(tmp),"vmware-api-session-id: %s", page->data);
-	*headers = curl_slist_append(*headers, tmp);
+	headers = curl_slist_append(headers, tmp);
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, *headers)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, headers)))
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 	else
 		ret = SUCCEED;
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -313,6 +347,9 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
 	}
 
 	zbx_snprintf(url, sizeof(url),"%s%s", page->url, url_suffix);
+
+	if (NULL != fn_parent)
+		zabbix_log(LOG_LEVEL_TRACE, "%s() request url:%s", fn_parent, url);
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, url)))
 	{
@@ -413,7 +450,9 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 	zbx_vmware_key_value_t	cat_cmp;
 	zbx_vmware_tag_t	*tag;
 
-	if (FAIL == vmware_rest_get(__func__, easyhandle, "/api/cis/tagging/name/", tag_id, &jp, error))
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() tag_id:%s", __func__, tag_id);
+
+	if (FAIL == vmware_rest_get(__func__, easyhandle, "/cis/tagging/tag/", tag_id, &jp, error))
 		return FAIL;
 
 	if (FAIL == zbx_json_value_by_name(&jp, "name", name, sizeof(name), NULL))
@@ -441,7 +480,7 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 		zbx_vmware_key_value_t	*category;
 		char			value[MAX_STRING_LEN];
 
-		if (FAIL == vmware_rest_get(__func__, easyhandle, "/api/cis/tagging/category/urn/", cid, &jp, error))
+		if (FAIL == vmware_rest_get(__func__, easyhandle, "/cis/tagging/category/", cid, &jp, error))
 			return FAIL;
 
 		if (FAIL == zbx_json_value_by_name(&jp, "name", value, sizeof(value), NULL))
@@ -478,6 +517,9 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 		return FAIL;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() tag name:'%s' description:'%s' category:'%s'", __func__,
+			tags->values[i]->name, tags->values[i]->description, tags->values[i]->category);
+
 	return i;
 }
 
@@ -485,9 +527,11 @@ static int	vmware_tags_get(zbx_vmware_entity_tags_t *entity_tags, zbx_vector_vmw
 		zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
 {
 	struct zbx_json_parse	jp;
-	const char		*p;
+	const char		*p = NULL;
 	int			found_tags = 0;
 	char			tag_id[VMWARE_SHORT_STR_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() obj_id:%s", __func__, entity_tags->obj_id->id);
 
 	if (FAIL == vmware_tags_linked_id_get(entity_tags->obj_id, easyhandle, &jp, &entity_tags->error))
 		goto out;
@@ -508,11 +552,15 @@ static int	vmware_tags_get(zbx_vmware_entity_tags_t *entity_tags, zbx_vector_vmw
 		tag->name = zbx_strdup(NULL, tags->values[i]->name);
 		tag->description = zbx_strdup(NULL, tags->values[i]->description);
 		tag->category = zbx_strdup(NULL, tags->values[i]->category);
+		tag->id = NULL;
 		zbx_vector_vmware_tag_append(&entity_tags->tags, tag);
+		found_tags++;
 	}
 
 	zbx_vector_vmware_tag_sort(&entity_tags->tags, ZBX_DEFAULT_STR_COMPARE_FUNC);
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found tags:%d", __func__, found_tags);
+
 	return found_tags;
 }
 
@@ -534,7 +582,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 	static ZBX_HTTPPAGE		page;
 	char				*error = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_vmware_tag_create(&tags);
 	zbx_vector_vmware_key_value_create(&categories);
@@ -546,7 +594,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 
 	if (0 != entity_tags.values_num && (
 			SUCCEED != vmware_curl_init(service->url, &easyhandle, &page, &headers, &error) ||
-			SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &headers, &error)))
+			SUCCEED != vmware_service_rest_authenticate(service, easyhandle, headers, &page, &error)))
 	{
 		goto clean;
 	}
@@ -556,8 +604,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 		found_tags += vmware_tags_get(entity_tags.values[i], &tags, &categories, easyhandle);
 	}
 
-	if (0 != found_tags)
-		zbx_vmware_shared_tags_replace(&entity_tags, &service->data_tags.entity_tags);
+	zbx_vmware_shared_tags_replace(&entity_tags, &service->data_tags.entity_tags);
 
 	ret = SUCCEED;
 clean:
@@ -573,6 +620,12 @@ clean:
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 	zbx_free(page.data);
+
+	if (FAIL == ret)
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, error);
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s tags:%d", __func__, zbx_result_string(ret), found_tags);
+
 	zbx_str_free(error);
 
 	return ret;

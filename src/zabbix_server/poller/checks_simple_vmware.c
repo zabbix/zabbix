@@ -4135,6 +4135,9 @@ int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, cons
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	vmware_tags_json(&service->data_tags.entity_tags, vm->uuid, &json_data);
 	zbx_json_close(&json_data);
+	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+	zbx_json_free(&json_data);
+
 	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
