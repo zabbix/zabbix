@@ -71,7 +71,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_tag, zbx_vmware_tag_t *)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort zbx_vmware_tag_t vector by name          *
+ * Purpose: sorting function to sort zbx_vmware_tag_t vector by id            *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_vmware_tag_id_compare(const void *p1, const void *p2)
@@ -80,6 +80,19 @@ static int	zbx_vmware_tag_id_compare(const void *p1, const void *p2)
 	const zbx_vmware_tag_t	*v2 = *(const zbx_vmware_tag_t * const *)p2;
 
 	return strcmp(v1->id, v2->id);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sorting function to sort zbx_vmware_tag_t vector by name          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_vmware_tag_name_compare(const void *p1, const void *p2)
+{
+	const zbx_vmware_tag_t	*v1 = *(const zbx_vmware_tag_t * const *)p1;
+	const zbx_vmware_tag_t	*v2 = *(const zbx_vmware_tag_t * const *)p2;
+
+	return strcmp(v1->name, v2->name);
 }
 
 static void	vmware_tag_free(zbx_vmware_tag_t *value)
@@ -430,15 +443,28 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
 	return vmware_http_request(fn_parent, easyhandle, url_suffix, jp, error);
 }
 
-static int	vmware_tags_linked_id_get(zbx_vmware_obj_id_t *obj_id, CURL *easyhandle, struct zbx_json_parse *jp,
+static int	vmware_tags_linked_id(zbx_vmware_obj_id_t *obj_id, CURL *easyhandle, zbx_vector_str_t *ids,
 		char **error)
 {
-	char	req[VMWARE_SHORT_STR_LEN];
+	int			ret = FAIL;
+	char			tmp[VMWARE_SHORT_STR_LEN];
+	const char		*p = NULL;
+	struct zbx_json_parse	jp;
 
-	zbx_snprintf(req, sizeof(req),"{\"object_id\":{\"id\":\"%s\",\"type\":\"%s\"}}", obj_id->id, obj_id->type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() obj_id:%s", __func__, obj_id->id);
 
-	return vmware_rest_post(__func__, easyhandle, "/cis/tagging/tag-association?action=list-attached-tags",
-			req, jp, error);
+	zbx_snprintf(tmp, sizeof(tmp),"{\"object_id\":{\"id\":\"%s\",\"type\":\"%s\"}}", obj_id->id, obj_id->type);
+
+	if (SUCCEED == (ret = vmware_rest_post(__func__, easyhandle,
+			"/cis/tagging/tag-association?action=list-attached-tags", tmp, &jp, error)))
+	{
+		while (NULL != (p = zbx_json_next_value(&jp, p, tmp, sizeof(tmp), NULL)))
+			zbx_vector_str_append(ids, zbx_strdup(NULL, tmp));
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ids:%d", __func__, ids->values_num);
+
+	return ret;
 }
 
 static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vector_vmware_tag_t *tags,
@@ -526,39 +552,42 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 static int	vmware_tags_get(zbx_vmware_entity_tags_t *entity_tags, zbx_vector_vmware_tag_t *tags,
 		zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
 {
-	struct zbx_json_parse	jp;
-	const char		*p = NULL;
-	int			found_tags = 0;
-	char			tag_id[VMWARE_SHORT_STR_LEN];
+	int			i, found_tags = 0;
+	zbx_vector_str_t	tag_ids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() obj_id:%s", __func__, entity_tags->obj_id->id);
 
-	if (FAIL == vmware_tags_linked_id_get(entity_tags->obj_id, easyhandle, &jp, &entity_tags->error))
+	zbx_vector_str_create(&tag_ids);
+
+	if (FAIL == vmware_tags_linked_id(entity_tags->obj_id, easyhandle, &tag_ids, &entity_tags->error))
 		goto out;
 
-	while (NULL != (p = zbx_json_next_value(&jp, p, tag_id, sizeof(tag_id), NULL)))
+	for (i = 0; i < tag_ids.values_num; i++)
 	{
-		int			i;
-		zbx_vmware_tag_t	*tag, cmp = {.id = tag_id};
+		int			j;
+		zbx_vmware_tag_t	*tag, cmp = {.id = tag_ids.values[i]};
 
-		if (FAIL == (i = zbx_vector_vmware_tag_bsearch(tags, &cmp, zbx_vmware_tag_id_compare))
-				&& FAIL == (i = vmware_vectors_update(tag_id, easyhandle, tags, categories,
+		if (FAIL == (j = zbx_vector_vmware_tag_bsearch(tags, &cmp, zbx_vmware_tag_id_compare)) &&
+				FAIL == (j = vmware_vectors_update(tag_ids.values[i], easyhandle, tags, categories,
 				&entity_tags->error)))
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() skip tag_id:%s", __func__, tag_ids.values[i]);
 			continue;
 		}
 
 		tag = (zbx_vmware_tag_t *) zbx_malloc(NULL, sizeof(zbx_vmware_tag_t));
-		tag->name = zbx_strdup(NULL, tags->values[i]->name);
-		tag->description = zbx_strdup(NULL, tags->values[i]->description);
-		tag->category = zbx_strdup(NULL, tags->values[i]->category);
+		tag->name = zbx_strdup(NULL, tags->values[j]->name);
+		tag->description = zbx_strdup(NULL, tags->values[j]->description);
+		tag->category = zbx_strdup(NULL, tags->values[j]->category);
 		tag->id = NULL;
 		zbx_vector_vmware_tag_append(&entity_tags->tags, tag);
 		found_tags++;
 	}
 
-	zbx_vector_vmware_tag_sort(&entity_tags->tags, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	zbx_vector_vmware_tag_sort(&entity_tags->tags, zbx_vmware_tag_name_compare);
 out:
+	zbx_vector_str_clear_ext(&tag_ids, zbx_str_free);
+	zbx_vector_str_destroy(&tag_ids);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found tags:%d", __func__, found_tags);
 
 	return found_tags;

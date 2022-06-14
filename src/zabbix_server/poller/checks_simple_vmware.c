@@ -3613,7 +3613,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_close(&json_data);
 			zbx_json_addarray(&json_data, "tags");
 
-			if (NULL != service->data_tags.error)
+			if (NULL == service->data_tags.error)
 				vmware_tags_json(&service->data_tags.entity_tags, vm->uuid, &json_data);
 
 			zbx_json_close(&json_data);
