@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-14T12:31:47Z'
+  date: '2022-06-14T13:06:15Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -1389,7 +1389,7 @@ zabbix_export:
               name: 'AWS EC2: Instance status check failed'
               priority: AVERAGE
               description: |
-                These check detect problems that require your involvement to repair.
+                These checks detect problems that require your involvement to repair.
                 The following are examples of problems that can cause instance status checks to fail:
                 
                 Failed system status checks
@@ -1820,7 +1820,7 @@ zabbix_export:
                   value: '{#VOLUME_ID}'
               trigger_prototypes:
                 -
-                  uuid: 0c336aafb511455d93a84f42059ee12b
+                  uuid: 2d4de438bdaa49b2930496ce6ddbe52d
                   expression: 'last(/AWS EC2 by HTTP/aws.ec2.ebs.status["{#VOLUME_ID}"])=5'
                   name: 'AWS EBS: Volume "{#VOLUME_ID}" has ''error'' state'
                   priority: WARNING
@@ -1861,7 +1861,7 @@ zabbix_export:
                   value: '{#VOLUME_ID}'
               trigger_prototypes:
                 -
-                  uuid: eb3129f1668549ca974893f7f1838bb8
+                  uuid: 9b2f5687020c4a5987c1b1b35a57d8b9
                   expression: 'max(/AWS EC2 by HTTP/aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"],5m)<{$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}'
                   name: 'AWS EBS: Burst balance is too low'
                   event_name: 'AWS EBS: Burst balance is too low (less {$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}% for 5m)'
