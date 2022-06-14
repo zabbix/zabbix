@@ -966,24 +966,48 @@ function makeMaintenanceIcon($type, $name, $description) {
  * @param array  $icon_data
  * @param string $icon_data[]['suppress_until']    Time until the problem is suppressed.
  * @param string $icon_data[]['maintenance_name']  Name of the maintenance.
+ * @param string $icon_data[]['username']          User who created manual suppression.
+ * @param bool   $blink                            Add 'blink' CSS class for jqBlink.
  *
  * @return CLink
  */
-function makeSuppressedProblemIcon(array $icon_data) {
-	$suppress_until = max(zbx_objectValues($icon_data, 'suppress_until'));
+function makeSuppressedProblemIcon(array $icon_data, bool $blink = false) {
+	$suppress_until_values = array_column($icon_data, 'suppress_until');
+
+	if (in_array(ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE, $suppress_until_values)) {
+		$suppressed_till = _s('Indefinitely');
+	}
+	else {
+		$max_value = max($suppress_until_values);
+		$suppressed_till = $max_value < strtotime('tomorrow')
+			? zbx_date2str(TIME_FORMAT, $max_value)
+			: zbx_date2str(DATE_TIME_FORMAT, $max_value);
+	}
 
 	CArrayHelper::sort($icon_data, ['maintenance_name']);
-	$maintenance_names = implode(', ', zbx_objectValues($icon_data, 'maintenance_name'));
 
-	return (new CLink())
-		->addClass(ZBX_STYLE_ICON_INVISIBLE)
+	$maintenance_names = [];
+	$username = '';
+
+	foreach ($icon_data as $suppression) {
+		if (array_key_exists('maintenance_name', $suppression)) {
+			$maintenance_names[] = $suppression['maintenance_name'];
+		}
+		else {
+			$username = $suppression['username'];
+		}
+	}
+
+	$maintenances = implode(',', $maintenance_names);
+
+	return (new CSimpleButton())
+		->addClass(ZBX_STYLE_ACTION_ICON_SUPPRESS)
+		->addClass($blink ? 'blink' : null)
 		->setHint(
-			_s('Suppressed till: %1$s', ($suppress_until < strtotime('tomorrow'))
-				? zbx_date2str(TIME_FORMAT, $suppress_until)
-				: zbx_date2str(DATE_TIME_FORMAT, $suppress_until)
-			).
+			_s('Suppressed till: %1$s', $suppressed_till).
 			"\n".
-			_s('Maintenance: %1$s', $maintenance_names)
+			($username !== '' ? _s('Manually by: %1$s', $username)."\n" : '').
+			($maintenances !== '' ? _s('Maintenance: %1$s', $maintenances)."\n" : '')
 		);
 }
 

@@ -327,7 +327,8 @@ $translate_strings = [
 	],
 	'hostmacrosmanager.js' => [
 		'Change' => _x('Change', 'verb'),
-		'Remove' => _('Remove')
+		'Remove' => _('Remove'),
+		'Revert' => _('Revert')
 	],
 	'multilineinput.js' => [
 		'S_N_CHAR_COUNT' => _('%1$s characters'),

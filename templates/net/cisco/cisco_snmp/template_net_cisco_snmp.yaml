@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:00:16Z'
-  groups:
+  date: '2022-06-07T19:37:08Z'
+  template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -422,7 +422,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -632,7 +632,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}])/(last(//vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}])+last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]))*100'
-              description: 'Memory utilization in %'
+              description: 'Memory utilization in %.'
               tags:
                 -
                   tag: component
@@ -1354,7 +1354,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -1622,7 +1622,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}])/(last(//vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}])+last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]))*100'
-              description: 'Memory utilization in %'
+              description: 'Memory utilization in %.'
               tags:
                 -
                   tag: component
@@ -2558,8 +2558,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Cisco IOS SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: fb67666002524322b1b9ae9ed1611be5
@@ -3889,7 +3889,7 @@ zabbix_export:
               name: 'has been restarted'
               event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -4161,7 +4161,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}])/(last(//vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}])+last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]))*100'
-              description: 'Memory utilization in %'
+              description: 'Memory utilization in %.'
               tags:
                 -
                   tag: component
@@ -5005,8 +5005,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Cisco IOS versions 12.0_3_T-12.2_3.5 SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: d811f4c78e8246f6a3ed1e903ade574d

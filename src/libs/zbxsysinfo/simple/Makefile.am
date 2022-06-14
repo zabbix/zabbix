@@ -8,4 +8,6 @@ libsimplesysinfo_a_SOURCES = \
 	simple.c \
 	simple.h
 
-libsimplesysinfo_a_CFLAGS = $(LDAP_CPPFLAGS)
+libsimplesysinfo_a_CFLAGS = \
+	$(LDAP_CPPFLAGS) \
+	$(TLS_CFLAGS)

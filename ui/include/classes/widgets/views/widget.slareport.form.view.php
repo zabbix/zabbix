@@ -77,7 +77,7 @@ $form->addItem($form_list);
 
 $form->addItem(
 	(new CScriptTag('
-		widget_slareport.init('.json_encode([
+		widget_slareport_form.init('.json_encode([
 			'serviceid_field_id' => $fields['serviceid']->getName(),
 			'serviceid_multiple' => $fields['serviceid']->isMultiple()
 		]).');

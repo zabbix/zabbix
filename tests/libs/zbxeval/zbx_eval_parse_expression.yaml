@@ -316,6 +316,23 @@ in:
   expression: '{$MACRO}x'
 out:
   result: FAIL
+---
+test case: Succeed '1-1'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR_NUM,ZBX_EVAL_PARSE_COMPOUND_CONST]
+  expression: '1-1'
+out:
+  stack:
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1'
+    opt: 0
+  - type: ZBX_EVAL_TOKEN_VAR_NUM
+    token: '1'
+    opt: 0
+  - type: ZBX_EVAL_TOKEN_OP_SUB
+    token: '-'
+    opt: 0
+  result: SUCCEED
 --- # LLD macros
 test case: Succeed '{#LLD}'
 in:

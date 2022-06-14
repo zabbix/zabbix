@@ -42,7 +42,7 @@ window.host_edit_popup = {
 	submit() {
 		this.removePopupMessages();
 
-		const fields = host_edit.preprocessFormFields(getFormFields(this.form));
+		const fields = host_edit.preprocessFormFields(getFormFields(this.form), false);
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
 		fetch(curl.getUrl(), {
@@ -81,7 +81,7 @@ window.host_edit_popup = {
 
 	clone() {
 		this.overlay.setLoading();
-		const parameters = host_edit.preprocessFormFields(getFormFields(this.form));
+		const parameters = host_edit.preprocessFormFields(getFormFields(this.form), true);
 		delete parameters.sid;
 		parameters.clone = 1;
 
@@ -94,7 +94,7 @@ window.host_edit_popup = {
 
 	fullClone() {
 		this.overlay.setLoading();
-		const parameters = host_edit.preprocessFormFields(getFormFields(this.form));
+		const parameters = host_edit.preprocessFormFields(getFormFields(this.form), true);
 		delete parameters.sid;
 		parameters.full_clone = 1;
 

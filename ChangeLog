@@ -1,8 +1,32 @@
 Changes for 6.2.0rc1
 
 New features:
+..F.....S. [ZBXNEXT-721] added temporary suppress problem functionality (dgoloscapov, rdetlavs)
+A.F.....S. [ZBXNEXT-7591] added possibility to add custom tags to hosts created from host prototypes (averza, mprihodko)
+A.F....... [ZBXNEXT-6940] added new features in graph widget: dataset with item list; stacked graphs type; show simple triggers and working time; last known for missing data; percentile lines; configurable approximation; better legend; clone data set (ashubin, rlataria)
+A.F....PS. [ZBXNEXT-7554] added incremental configuration sync for hosts, host tags, items, item tags, item preprocessing, triggers, trigger tags, functions (gcalenko, wiper)
+....I....T [ZBXNEXT-7596] updated templates and templates.tmpl for 6.2 version (template_groups and host_groups properties) (abiba)
+A.F.....S. [ZBXNEXT-5517] added ability to modify macros of hosts created from host prototypes (asestakovs, miks)
+....I..... [ZBXNEXT-7669] implemented new design for Global view dashboard (dpetra)
+...G.....T [ZBXNEXT-6891] removed MongoDB implementation, updated template to work with new plugin (esneiders, ychukina)
+A.F.I...S. [ZBXNEXT-2592] split host groups functionality into host groups and template groups (epulke, Ivo, MVekslers, Sasha, ssimonenko, vmurzins)
+.........T [ZBXNEXT-7632] added template for HPE Primera (vkhaliev)
+..F....... [ZBXNEXT-7567] implemented saving the state of the default filters in monitoring sections (acikuns)
+.........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
+..FG...... [ZBXNEXT-7732] added metrics for Windows Registry monitoring (dgoloscapov, rdetlavs, wiper)
 
 Bug fixes:
+........S. [ZBX-20914] fixed wrong calculation of calculated item formulas (akozlovs)
+..F....... [ZBX-20565] fixed visibility of placeholder text in host prototype edit form (kkuzmina)
+.........T [ZBX-20875] fixed filter condition for job discovery rule in MSSQL by ODBC template (drasihov)
+.........T [ZBX-21146] fixed item key in NTP service template (drasihov)
+.......PS. [ZBX-21137] fixed VMware collector crash related to datastore state disconnected from all HVs (MVekslers)
+.........T [ZBX-20985] fixed notifications summary for MS Teams media type (drasihov)
+.........T [ZBX-20628] removed system metrics from PFSense template (vkhaliev)
+.........T [ZBX-21136] fixed value type for checksum of /etc/passwd item in FreeBSD template (vkhaliev)
+.........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.2.0beta3
@@ -118,8 +142,23 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.6rc1
 
 New features:
+...G.....T [ZBXNEXT-6891] removed mongodb implementation, updated template to work with new plugin (esneiders, ychukina)
+.........T [ZBXNEXT-7632] added template for HPE Primera (vkhaliev)
+.........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
 
 Bug fixes:
+.........T [ZBX-21143] changed API URL in Express.ms media type to a new version (drasihov)
+........S. [ZBX-20914] fixed wrong calculation of calculated item formulas (akozlovs)
+.........T [ZBX-20875] fixed filter condition for job discovery rule in MSSQL by ODBC template (drasihov)
+.........T [ZBX-21146] fixed item key in NTP service template (drasihov)
+..F....... [ZBX-20565] fixed visibility of placeholder text in host prototype edit form (kkuzmina)
+.........T [ZBX-20985] fixed notifications summary for MS Teams media type (drasihov)
+.......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
+.........T [ZBX-20628] removed system metrics from PFSense template (vkhaliev)
+.........T [ZBX-21136] fixed value type for checksum of /etc/passwd item in FreeBSD template (vkhaliev)
+.........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.5
@@ -229,7 +268,7 @@ New features:
 A.F....... [ZBXNEXT-7478] fixed optional parameters before required issue (acikuns, ashubin)
 
 Bug fixes:
-A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
+..F....... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
 A.F.....S. [ZBX-20650] fixed performance issue with importing templates and hosts (Sasha)
 .......... [ZBX-20747] fixed service algorithm update in 6.0 database upgrade patch (wiper)
 A.F....... [ZBX-19118] made Host interface field non-required for HTTP agent items (jfreibergs)
@@ -2034,6 +2073,13 @@ Changes for 5.0.25rc1
 New features:
 
 Bug fixes:
+.........T [ZBX-21143] changed API URL in Express.ms media type to a new version (drasihov)
+.........T [ZBX-20875] fixed filter condition for job discovery rule in MSSQL by ODBC template (drasihov)
+.......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
+.........T [ZBX-20985] fixed notifications summary for MS Teams media type (drasihov)
+.........T [ZBX-20628] removed system metrics from PFSense template (vkhaliev)
+.........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.24
@@ -2098,7 +2144,7 @@ A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for PHP8 (acikuns
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
-A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
+..F....... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
 .......PS. [ZBX-20518] fixed lastaccess update during proxy throttling (dgoloscapov)
 ...G...... [ZBX-20634] fixed handling of multiline FTP response (ssimonenko)
 ...G...... [ZBX-20528] fixed issue with pgsql.custom.query JSON response failing for Zabbix agent 2 (esneiders)
@@ -4541,6 +4587,7 @@ Changes for 4.0.42rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.41

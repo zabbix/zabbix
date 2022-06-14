@@ -82,7 +82,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter_groupids,
 			'hostids' => $filter_hostids,
-			'monitored_hosts' => true,
+			'with_monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 
@@ -101,7 +101,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 		// Get hosts.
 		$hosts = API::Host()->get([
 			'output' => ['hostid', 'name', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
-			'selectGroups' => ['groupid'],
+			'selectHostGroups' => ['groupid'],
 			'groupids' => array_keys($groups),
 			'hostids' => $filter_hostids,
 			'filter' => [
@@ -126,7 +126,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 
 		// Add default values for each host group and count hosts inside.
 		foreach ($hosts as $host) {
-			foreach ($host['groups'] as $group) {
+			foreach ($host['hostgroups'] as $group) {
 				if (array_key_exists($group['groupid'], $groups)) {
 					$groups[$group['groupid']]['hosts_total_count']++;
 				}
@@ -176,7 +176,7 @@ class CControllerWidgetProblemHostsView extends CControllerWidget {
 				$hosts_data[$host['hostid']]['severities'][$problem['severity']]++;
 
 				// Propagate problem to all host groups in which host is added.
-				foreach ($host['groups'] as $group) {
+				foreach ($host['hostgroups'] as $group) {
 					$groupid = $group['groupid'];
 
 					if (!array_key_exists($groupid, $groups)) {
