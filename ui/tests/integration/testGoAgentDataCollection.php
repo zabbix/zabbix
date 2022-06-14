@@ -29,7 +29,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 	const COMPARE_AVERAGE = 0;
 	const COMPARE_LAST = 1;
-	const OFFSET_MAX = 10;
+	const OFFSET_MAX = 20;
 
 	private static $hostids = [];
 	private static $itemids = [];
@@ -448,7 +448,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		}
 
 		// Delay to ensure that all metrics were collected.
-		sleep(90);
+		sleep(110);
 	}
 
 	/**
@@ -553,9 +553,10 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
+				$diff_values = [];
+
 				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
 					$value = [];
-					$diff_values = [];
 
 					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
 						// Calculate offset between Agent and Agent2 result arrays
@@ -579,19 +580,27 @@ class testGoAgentDataCollection extends CIntegrationTest {
 					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
 						$a = $value[self::COMPONENT_AGENT][$i];
 						$b = $value[self::COMPONENT_AGENT2][$i];
-						$diff_values[$i] = abs(abs($a) - abs($b));
+						$diff_values[$i] = abs($a - $b);
 					}
 					$offset = array_search(min($diff_values), $diff_values);
 
 					$a = $value[self::COMPONENT_AGENT][$offset];
 					$b = $value[self::COMPONENT_AGENT2][$offset];
+
+					$diff = abs($a - $b);
 				}
 				else {
-					$a = end($values[self::COMPONENT_AGENT]);
-					$b = end($values[self::COMPONENT_AGENT2]);
+					$records = count($values[self::COMPONENT_AGENT]);
+					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+						$slice = array_slice($values[self::COMPONENT_AGENT], 0, $records - $i);
+						$a = end($slice);
+						$b = end($values[self::COMPONENT_AGENT2]);
+						$diff_values[$i] = abs($a - $b);
+					}
+
+					$diff = min($diff_values);
 				}
 
-				$diff = abs(abs($a) - abs($b));
 				$this->assertTrue($diff < $item['threshold'], 'Difference for '.$item['key'].
 						' is more than defined threshold '.$diff.' > '.$item['threshold']
 				);
