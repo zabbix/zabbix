@@ -1882,7 +1882,7 @@ static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_pro
 				NULL, 0);
 	}
 
-	zbx_db_tag_merge(&trigger->tags, &new_tags);
+	zbx_merge_tags(&trigger->tags, &new_tags);
 	zbx_vector_db_tag_ptr_destroy(&new_tags);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

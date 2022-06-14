@@ -2967,7 +2967,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_template_item_t *)items->values[i];
-		zbx_db_tag_merge(&item->item_tags, &item->template_tags);
+		zbx_merge_tags(&item->item_tags, &item->template_tags);
 	}
 	zbx_hashset_destroy(&items_t);
 	zbx_vector_uint64_destroy(&itemids);

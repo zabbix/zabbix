@@ -2906,7 +2906,7 @@ static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const z
 					ZBX_MACRO_ANY, NULL, 0);
 		}
 
-		zbx_db_tag_merge(&item->item_tags, &new_tags);
+		zbx_merge_tags(&item->item_tags, &new_tags);
 	}
 
 	zbx_vector_db_tag_ptr_destroy(&new_tags);
