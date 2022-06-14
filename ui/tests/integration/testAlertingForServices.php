@@ -38,14 +38,13 @@ class testAlertingForServices extends CIntegrationTest {
 	private static $serviceid;
 	private static $actionid;
 	private static $triggerid;
-	private static $itemid;
 	private static $problem_tags;
 
 	private function createServiceWithProblemTags($name, $problem_tags) {
 		$response = $this->call('service.create', [
 			'name' => $name,
-			'algorithm' => 1,
-			'goodsla' => 99.0,
+			'algorithm' => ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL,
+			'sortorder' => 1,
 			'problem_tags' => $problem_tags
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
@@ -91,7 +90,6 @@ class testAlertingForServices extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
-		self::$itemid = $response['result']['itemids'][0];
 
 		// Create trigger
 		$response = $this->call('trigger.create', [
@@ -137,10 +135,9 @@ class testAlertingForServices extends CIntegrationTest {
 				'evaltype' => 0,
 				'conditions' => [
 					[
-						'conditiontype' => 27,
+						'conditiontype' => CONDITION_TYPE_SERVICE,
 						'operator' => 0,
-						'value' => self::$serviceid,
-						'value2' => ''
+						'value' => self::$serviceid
 					]
 				]
 			],
@@ -149,7 +146,6 @@ class testAlertingForServices extends CIntegrationTest {
 					'esc_period' => 0,
 					'esc_step_from' => 1,
 					'esc_step_to' => 1,
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -162,7 +158,6 @@ class testAlertingForServices extends CIntegrationTest {
 			],
 			'recovery_operations' => [
 				[
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -175,7 +170,6 @@ class testAlertingForServices extends CIntegrationTest {
 			],
 			'update_operations' => [
 				[
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -217,49 +211,41 @@ class testAlertingForServices extends CIntegrationTest {
 	public function testAlertingForServices_checkServiceStatusChange() {
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
-
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'output' => 'extend',
 			'actionsids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE
-		]
-		);
+		], 25, 2);
 		$this->assertCount(1, $response['result']);
 		$this->assertEquals('Problem', $response['result'][0]['message']);
 		$this->assertEquals('Problem', $response['result'][0]['subject']);
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
-		// Alert will not be created when severity is updated
-		$response = $this->call('event.get', [
+		$response = $this->callUntilDataIsPresent('event.get', [
 			'objectids' => self::$triggerid,
-		]
-		);
+		], 25, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$eventid = $response['result'][0]['eventid'];
 
 		$response = $this->call('event.acknowledge', [
 			'eventids' => $eventid,
-			'action' => 8,
+			'action' => ZBX_PROBLEM_UPDATE_SEVERITY,
 			'message' => 'disaster',
 			'severity' => TRIGGER_SEVERITY_DISASTER
-		]
-		);
+		]);
 		$this->assertArrayHasKey('eventids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['eventids']);
 
-		sleep(3);
+		sleep(12);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'output' => 'extend',
 			'actionsids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE
-		]
-		);
-		$this->assertCount(1, $response['result']);
+		], 25, 2);
+		$this->assertCount(2, $response['result']);
 
 		// Check if new problem event was added
 		$response = $this->call('problem.get', [
@@ -278,32 +264,27 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'output' => 'extend',
 			'actionsids' => self::$actionid,
 			'eventsource' => EVENT_SOURCE_SERVICE,
 			'eventobject' => EVENT_OBJECT_SERVICE,
 			'sortfield' => 'alertid'
-			]
-		);
-		$this->assertCount(2, $response['result']);
-		$this->assertEquals('Recovery', $response['result'][1]['message']);
-		$this->assertEquals('Recovery', $response['result'][1]['subject']);
-		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
-
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In zbx_process_events()', true, 20);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_process_events()', true);
+		], 25, 3);
+		$this->assertCount(3, $response['result']);
+		$this->assertEquals('Recovery', $response['result'][2]['message']);
+		$this->assertEquals('Recovery', $response['result'][2]['subject']);
+		$this->assertNotEquals(0, $response['result'][2]['p_eventid']);
 
 		// Check recovery event
-		$response = $this->call('event.get', [
+		$response = $this->callUntilDataIsPresent('event.get', [
 			'output' => 'extend',
 			'source' => EVENT_SOURCE_SERVICE,
 			'object' => EVENT_OBJECT_SERVICE,
 			'value' => 0
-		]
-		);
+		], 25, 3);
 		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertEquals(TRIGGER_SEVERITY_NOT_CLASSIFIED, $response['result'][0]['severity']);
+		$this->assertEquals(ZBX_SEVERITY_OK, $response['result'][0]['severity']);
 		$expected_eventname = 'Status of service "' . self::SERVICENAME . '" changed to OK';
 		$this->assertEquals($expected_eventname, $response['result'][0]['name']);
 
@@ -327,7 +308,6 @@ class testAlertingForServices extends CIntegrationTest {
 					'esc_period' => 0,
 					'esc_step_from' => 1,
 					'esc_step_to' => 1,
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -342,14 +322,8 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['actionids']);
 
-		$response = $this->call('alert.get', [
-			'output' => 'extend',
-			'actionsids' => self::$actionid,
-			'eventsource' => EVENT_SOURCE_SERVICE,
-			'eventobject' => EVENT_OBJECT_SERVICE
-		]);
-
 		$this->reloadConfigurationCache();
+
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
@@ -389,7 +363,6 @@ class testAlertingForServices extends CIntegrationTest {
 					'esc_period' => 0,
 					'esc_step_from' => 1,
 					'esc_step_to' => 1,
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -403,7 +376,6 @@ class testAlertingForServices extends CIntegrationTest {
 					'esc_period' => 0,
 					'esc_step_from' => 2,
 					'esc_step_to' => 2,
-					'evaltype' => 0,
 					'operationtype' => OPERATION_TYPE_MESSAGE,
 					'opmessage' => [
 						'default_msg' => 0,
@@ -421,6 +393,7 @@ class testAlertingForServices extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
+
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true);
 
@@ -502,13 +475,10 @@ class testAlertingForServices extends CIntegrationTest {
 
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In db_update_services()', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_update_services()', true);
-
-		$response = $this->call('service.get', [
+		$response = $this->callUntilDataIsPresent('service.get', [
 			'output' => 'extend',
 			'serviceids' => self::$serviceid
-		]);
+		], 25, 3);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('status', $response['result'][0]);
 		$this->assertEquals(TRIGGER_SEVERITY_DISASTER, $response['result'][0]['status']);
