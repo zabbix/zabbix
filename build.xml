@@ -196,7 +196,7 @@
 		</exec>
 	</target>
 
-	<target name="create-db-timescale" depends="create-db-postgresql">
+	<target name="create-db-tsdb" depends="create-db-postgresql">
 		<!-- Create PostgreSQL database -->
 		<exec executable="psql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
@@ -282,7 +282,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-timescale" depends="create-configs,init-integration,make-binaries-postgresql,create-db-timescale,init-proxy-postgresql">
+	<target name="init-integration-tsdb" depends="create-configs,init-integration,make-binaries-postgresql,create-db-tsdb,init-proxy-postgresql">
 	</target>
 
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
@@ -447,10 +447,10 @@
 	<target name="build-api-postgresql" depends="init-api-postgresql,test-api"/>
 	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>
 	<target name="build-integration-postgresql" depends="init-integration-postgresql,test-integration"/>
-	<target name="build-integration-timescale" depends="init-integration-timescale,test-integration"/>
+	<target name="build-integration-tsdb" depends="init-integration-tsdb,test-integration"/>
 	<target name="build-dast-mysql" depends="init-dast-mysql"/>
 	<target name="build-dast-postgresql" depends="init-dast-postgresql"/>
 
 	<!-- Default target -->
-	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql,build-integration-timescale"/>
+	<target name="build" depends="build-phpunit,build-mysql,build-postgresql,build-integration-mysql,build-integration-postgresql,build-integration-tsdb"/>
 </project>
