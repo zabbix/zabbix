@@ -83,8 +83,6 @@ zbx_graph_item_type;
 #	define TRIGGER_COMMENTS_LEN	65535
 #endif
 #define TRIGGER_EVENT_NAME_LEN		2048
-#define TAG_NAME_LEN			255
-#define TAG_VALUE_LEN			255
 
 #define GROUP_NAME_LEN			255
 
@@ -175,8 +173,6 @@ zbx_graph_item_type;
 
 #define ITEM_PARAMETER_NAME_LEN		255
 #define ITEM_PARAMETER_VALUE_LEN	2048
-
-#define ITEM_TAG_FIELD_LEN		255
 
 /* common tag/value field lengths for all tags */
 #define TAG_NAME_LEN			255
@@ -907,7 +903,6 @@ int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
 void	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src);
 int	zbx_validate_tags(zbx_vector_db_tag_ptr_t *tags, const char *owner, char **error);
-int	zbx_db_tag_rollback(zbx_db_tag_t *tag);
 
 typedef enum
 {

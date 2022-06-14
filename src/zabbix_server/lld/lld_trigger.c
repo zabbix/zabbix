@@ -2240,86 +2240,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	lld_validate_trigger_tag_field(zbx_db_tag_t *tag, const char *field, zbx_uint64_t flag,
-		size_t field_len, char **error)
-{
-	size_t	len;
-
-	/* only new trigger tags or tags with changed data will be validated */
-	if (0 != tag->tagid && 0 == (tag->flags & flag))
-		return SUCCEED;
-
-	if (SUCCEED != zbx_is_utf8(field))
-	{
-		char	*field_utf8;
-
-		field_utf8 = zbx_strdup(NULL, field);
-		zbx_replace_invalid_utf8(field_utf8);
-		*error = zbx_strdcatf(*error, "Cannot create trigger tag: value \"%s\" has invalid UTF-8 sequence.\n",
-				field_utf8);
-		zbx_free(field_utf8);
-	}
-	else if ((len = zbx_strlen_utf8(field)) > field_len)
-		*error = zbx_strdcatf(*error, "Cannot create trigger tag: value \"%s\" is too long.\n", field);
-	else if (0 != (flag & ZBX_FLAG_DB_TAG_UPDATE_TAG) && 0 == len)
-		*error = zbx_strdcatf(*error, "Cannot create trigger tag: empty tag name.\n");
-	else
-		return SUCCEED;
-
-	return FAIL;
-}
-
-static int	lld_trigger_tags_validate(zbx_lld_trigger_t *trigger, char **error)
-{
-	int	i, j, ret = SUCCEED;
-
-	for (i = 0; i < trigger->tags.values_num; i++)
-	{
-		zbx_db_tag_t	*tag = trigger->tags.values[i];
-
-		if (0 != (tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
-			continue;
-
-		if (SUCCEED != lld_validate_trigger_tag_field(tag, tag->tag, ZBX_FLAG_DB_TAG_UPDATE_TAG,
-				TAG_NAME_LEN, error) ||
-				SUCCEED != lld_validate_trigger_tag_field(tag, tag->value, ZBX_FLAG_DB_TAG_UPDATE_VALUE,
-				TAG_VALUE_LEN, error))
-		{
-			if (SUCCEED != zbx_db_tag_rollback(tag))
-			{
-				zbx_db_tag_free(tag);
-				zbx_vector_db_tag_ptr_remove_noorder(&trigger->tags, i--);
-			}
-
-			ret = FAIL;
-			continue;
-		}
-
-		/* check for duplicated tag,values pairs */
-		for (j = 0; j < i; j++)
-		{
-			zbx_db_tag_t	*tag_tmp = trigger->tags.values[j];
-
-			if (0 == strcmp(tag->tag, tag_tmp->tag) && 0 == strcmp(tag->value, tag_tmp->value))
-			{
-				*error = zbx_strdcatf(*error, "Cannot create trigger tag: tag \"%s\","
-					"\"%s\" already exists.\n", tag->tag, tag->value);
-
-				if (SUCCEED != zbx_db_tag_rollback(tag))
-				{
-					zbx_db_tag_free(tag);
-					zbx_vector_db_tag_ptr_remove_noorder(&trigger->tags, i--);
-				}
-
-				ret = FAIL;
-				break;
-			}
-		}
-	}
-
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: validate created or updated trigger tags                          *
@@ -2337,7 +2257,7 @@ static void	lld_triggers_tags_validate(zbx_vector_ptr_t *triggers, char **error)
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		if (SUCCEED != lld_trigger_tags_validate(trigger, error) && 0 == trigger->triggerid)
+		if (SUCCEED != zbx_validate_tags(&trigger->tags, "trigger", error) && 0 == trigger->triggerid)
 			trigger->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
 	}
 }
