@@ -76,41 +76,34 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 	#
 
 	if test "$1" != "flags-only"; then
-		#
-		# try using pkg-config if available
-		#
-
 		AC_REQUIRE([PKG_PROG_PKG_CONFIG])
 		m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG()], [:])
 
 		if test -n "$PKG_CONFIG"; then
+			#
+			# got pkg-config, use that
+			#
+
 			m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
 
-			if test -n "$libpcre2_dir"; then
-				export PKG_CONFIG_LIBDIR="$libpcre2_dir/lib/pkgconfig"
-			elif test -n "$libpcre2_lib_dir"; then
+			if test -n "$libpcre2_lib_dir"; then
 				export PKG_CONFIG_LIBDIR="$libpcre2_lib_dir/pkgconfig"
+			elif test -n "$libpcre2_dir"; then
+				export PKG_CONFIG_LIBDIR="$libpcre2_dir/lib/pkgconfig"
 			fi
 
-			if test -n "$libpcre2_dir"; then
-				AC_RUN_LOG([$PKG_CONFIG --exists --print-errors libpcre2-8]) || {
-					AC_MSG_ERROR([cannot find libpcre2 pkg-config package in $libpcre2_dir/lib/pkgconfig])
-				}
-			fi
+			AC_RUN_LOG([$PKG_CONFIG --exists --print-errors libpcre2-8]) || {
+				AC_MSG_ERROR([cannot find pkg-config package for libpcre2])
+			}
 
-			if test -z "$libpcre2_include_dir"; then
+			if test -n "$libpcre2_include_dir"; then
+				LIBPCRE2_CFLAGS="-I$libpcre2_include_dir"
+			else
 				LIBPCRE2_CFLAGS=`$PKG_CONFIG --cflags libpcre2-8`
 			fi
 
-			if test "x$enable_static_libs" = "xyes" && test "x$static_linking_support" = "xno"; then
-				if test -z "$libpcre2_dir"; then
-					AC_MSG_ERROR([libpcre2 directory must be given explicitly if static libs are used])
-				fi
-				LIBPCRE2_LIBS="$libpcre2_dir/lib/libpcre2-8.a"
-			else
-				LIBPCRE2_LDFLAGS=`$PKG_CONFIG --libs-only-L libpcre2-8`
-				LIBPCRE2_LIBS=`$PKG_CONFIG --libs-only-l libpcre2-8`
-			fi
+			LIBPCRE2_LDFLAGS=`$PKG_CONFIG --libs-only-L libpcre2-8`
+			LIBPCRE2_LIBS=`$PKG_CONFIG --libs-only-l libpcre2-8`
 
 			unset PKG_CONFIG_LIBDIR
 
@@ -124,67 +117,115 @@ AC_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 
 			LIBPCRE2_LIBS="-lpcre2-8"
 
-			if test -n "$libpcre2_lib_dir"; then
-				LIBPCRE2_LDFLAGS="-L$libpcre2_lib_dir"
-				found_libpcre2="yes"
-			elif test -n "$libpcre2_dir"; then
-				if ! test -d "$libpcre2_dir/include"; then
-					AC_MSG_ERROR([cannot find "$libpcre2_dir/include" directory])
-				fi
+			if test -n "$libpcre2_dir"; then
+				#
+				# directories are given explicitly
+				#
 
-				if test -z "$libpcre2_include_dir"; then
-					if ! test -f "$libpcre2_dir/include/pcre2.h"; then
-						AC_MSG_ERROR([cannot find "$libpcre2_dir/include/pcre2.h" file])
+				if test -n "$libpcre2_include_dir"; then
+					LIBPCRE2_CFLAGS="-I$libpcre2_include_dir"
+				else
+					if test -f "$libpcre2_dir/include/pcre2.h"; then
+						LIBPCRE2_CFLAGS="-I$libpcre2_dir/include"
+					else
+						AC_MSG_ERROR([cannot find $libpcre2_dir/include/pcre2.h])
 					fi
 				fi
 
-				if ! test -d "$libpcre2_dir/lib"; then
-					AC_MSG_ERROR([cannot find "$libpcre2_dir/lib" directory])
-				fi
-
-				LIBPCRE2_CFLAGS="-I$libpcre2_dir/include"
-				LIBPCRE2_LDFLAGS="-L$libpcre2_dir/lib"
-
-				found_libpcre2="yes"
-			elif test -f /usr/include/pcre2.h; then
-				found_libpcre2="yes"
-			elif test -f /usr/local/include/pcre2.h; then
-				LIBPCRE2_CFLAGS="-I/usr/local/include"
-				LIBPCRE2_LDFLAGS="-L/usr/local/lib"
-
-				found_libpcre2="yes"
-			elif test -f /usr/pkg/include/pcre2.h; then
-				LIBPCRE2_CFLAGS="-I/usr/pkg/include"
-				LIBPCRE2_LDFLAGS="-L/usr/pkg/lib"
-				LIBPCRE2_LDFLAGS="$LIBPCRE2_LDFLAGS -Wl,-R/usr/pkg/lib"
-
-				found_libpcre2="yes"
-			elif test -f /opt/csw/include/pcre2.h; then
-				LIBPCRE2_CFLAGS="-I/opt/csw/include"
-				LIBPCRE2_LDFLAGS="-L/opt/csw/lib"
-
-				if $(echo "$CFLAGS"|grep -q -- "-m64") ; then
-					LIBPCRE2_LDFLAGS="$LIBPCRE2_LDFLAGS/64 -Wl,-R/opt/csw/lib/64"
+				if test -n "$libpcre2_lib_dir"; then
+					LIBPCRE2_LDFLAGS="-L$libpcre2_lib_dir"
 				else
-					LIBPCRE2_LDFLAGS="$LIBPCRE2_LDFLAGS -Wl,-R/opt/csw/lib"
+					if test -d "$libpcre2_dir/lib"; then
+						LIBPCRE2_LDFLAGS="-L$libpcre2_dir/lib"
+					else
+						AC_MSG_ERROR([cannot find $libpcre2_dir/lib])
+					fi
 				fi
+
+				found_libpcre2="yes"
+			elif test -n "$libpcre2_include_dir"; then
+				LIBPCRE2_CFLAGS="-I$libpcre2_include_dir"
+
+				if test -n "$libpcre2_lib_dir"; then
+					LIBPCRE2_LDFLAGS="-L$libpcre2_lib_dir"
+				fi
+
+				found_libpcre2="yes"
+			elif test -n "$libpcre2_lib_dir"; then
+				LIBPCRE2_LDFLAGS="-L$libpcre2_lib_dir"
 
 				found_libpcre2="yes"
 			else
-				found_libpcre2="no"
+				#
+				# search default directories
+				#
+
+				if test -f /usr/include/pcre2.h; then
+					found_libpcre2="yes"
+				elif test -f /usr/local/include/pcre2.h; then
+					LIBPCRE2_CFLAGS="-I/usr/local/include"
+					LIBPCRE2_LDFLAGS="-L/usr/local/lib"
+
+					found_libpcre2="yes"
+				elif test -f /usr/pkg/include/pcre2.h; then
+					LIBPCRE2_CFLAGS="-I/usr/pkg/include"
+					LIBPCRE2_LDFLAGS="-L/usr/pkg/lib"
+					LIBPCRE2_LDFLAGS="$LIBPCRE2_LDFLAGS -Wl,-R/usr/pkg/lib"
+
+					found_libpcre2="yes"
+				elif test -f /opt/csw/include/pcre2.h; then
+					LIBPCRE2_CFLAGS="-I/opt/csw/include"
+					LIBPCRE2_LDFLAGS="-L/opt/csw/lib"
+
+					if $(echo "$CFLAGS"|grep -q -- "-m64") ; then
+						LIBPCRE2_LDFLAGS="$LIBPCRE2_LDFLAGS/64 -Wl,-R/opt/csw/lib/64"
+					else
+						LIBPCRE2_LDFLAGS="$LIBPCRE2_LDFLAGS -Wl,-R/opt/csw/lib"
+					fi
+
+					found_libpcre2="yes"
+				else
+					found_libpcre2="no"
+				fi
 			fi
 		fi
 
-		if test -n "$libpcre2_include_dir"; then
-			LIBPCRE2_CFLAGS="-I$libpcre2_include_dir"
-		fi
+
+		#
+		# process --enable-static and --enable_static-libs flags
+		#
 
 		if test "x$enable_static" = "xyes"; then
 			LIBPCRE2_LIBS=" $LIBPCRE2_LIBS -lpthread"
-		elif test "x$enable_static_libs" = "xyes" && test "x$static_linking_support" != "xno"; then
-			LIBPCRE2_LIBS="$LIBPCRE2_LDFLAGS ${static_linking_support}static $LIBPCRE2_LIBS ${static_linking_support}dynamic"
-			LIBPCRE2_LDFLAGS=""
+		elif test "x$enable_static_libs" = "xyes"; then
+			if test "x$static_linking_support" == "xno"; then
+				AC_MSG_WARN([compiler has no direct suppor for static linkage])
+
+				if test -n "$libpcre2_lib_dir"; then
+					if test -f "$libpcre2_lib_dir/libpcre2-8.a"; then
+						LIBPCRE2_LIBS="$libpcre2_lib_dir/libpcre2-8.a"
+					else
+						AC_MSG_ERROR([cannot find $libpcre2_lib_dir/libpcre2-8.a])
+					fi
+				elif test -n "$libpcre2_dir"; then
+					if test -f "$libpcre2_dir/lib/libpcre2-8.a"; then
+						LIBPCRE2_LIBS="$libpcre2_dir/lib/libpcre2-8.a"
+					else
+						AC_MSG_ERROR([cannot find $libpcre2_dir/lib/libpcre2-8.a])
+					fi
+				else
+					AC_MSG_ERROR([libpcre2 directory must be given explicitly in this case])
+				fi
+			else
+				LIBPCRE2_LIBS="$LIBPCRE2_LDFLAGS ${static_linking_support}static $LIBPCRE2_LIBS ${static_linking_support}dynamic"
+				LIBPCRE2_LDFLAGS=""
+			fi
 		fi
+
+
+		#
+		# try building with pcre2
+		#
 
 		AC_MSG_CHECKING([for libpcre2 support])
 

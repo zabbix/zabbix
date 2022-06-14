@@ -3,7 +3,7 @@
 #
 # Checks for pcre.
 #
-# This macro #defines HAVE_PCRE2_H if required header files are
+# This macro #defines HAVE_PCRE_H if required header files are
 # found, and sets @LIBPCRE_LDFLAGS@ and @LIBPCRE_CFLAGS@ to the necessary
 # values.
 #
@@ -75,41 +75,34 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 	#
 
 	if test "$1" != "flags-only"; then
-		#
-		# try using pkg-config if available
-		#
-
 		AC_REQUIRE([PKG_PROG_PKG_CONFIG])
 		m4_ifdef([PKG_PROG_PKG_CONFIG], [PKG_PROG_PKG_CONFIG()], [:])
 
 		if test -n "$PKG_CONFIG"; then
+			#
+			# got pkg-config, use that
+			#
+
 			m4_pattern_allow([^PKG_CONFIG_LIBDIR$])
 
-			if test -n "$libpcre_dir"; then
-				export PKG_CONFIG_LIBDIR="$libpcre_dir/lib/pkgconfig"
-			elif test -n "$libpcre_lib_dir"; then
+			if test -n "$libpcre_lib_dir"; then
 				export PKG_CONFIG_LIBDIR="$libpcre_lib_dir/pkgconfig"
+			elif test -n "$libpcre_dir"; then
+				export PKG_CONFIG_LIBDIR="$libpcre_dir/lib/pkgconfig"
 			fi
 
-			if test -n "$libpcre_dir"; then
-				AC_RUN_LOG([$PKG_CONFIG --exists --print-errors libpcre]) || {
-					AC_MSG_ERROR([cannot find libpcre pkg-config package in $libpcre_dir/lib/pkgconfig])
-				}
-			fi
+			AC_RUN_LOG([$PKG_CONFIG --exists --print-errors libpcre]) || {
+				AC_MSG_ERROR([cannot find pkg-config package for libpcre])
+			}
 
-			if test -z "$libpcre_include_dir"; then
+			if test -n "$libpcre_include_dir"; then
+				LIBPCRE_CFLAGS="-I$libpcre_include_dir"
+			else
 				LIBPCRE_CFLAGS=`$PKG_CONFIG --cflags libpcre`
 			fi
 
-			if test "x$enable_static_libs" = "xyes" && test "x$static_linking_support" = "xno"; then
-				if test -z "$libpcre_dir"; then
-					AC_MSG_ERROR([libpcre directory must be given explicitly if static libs are used])
-				fi
-				LIBPCRE_LIBS="$libpcre_dir/lib/libpcre.a"
-			else
-				LIBPCRE_LDFLAGS=`$PKG_CONFIG --libs-only-L libpcre`
-				LIBPCRE_LIBS=`$PKG_CONFIG --libs-only-l libpcre`
-			fi
+			LIBPCRE_LDFLAGS=`$PKG_CONFIG --libs-only-L libpcre`
+			LIBPCRE_LIBS=`$PKG_CONFIG --libs-only-l libpcre`
 
 			unset PKG_CONFIG_LIBDIR
 
@@ -123,67 +116,115 @@ AC_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 
 			LIBPCRE_LIBS="-lpcre"
 
-			if test -n "$libpcre_lib_dir"; then
-				LIBPCRE_LDFLAGS="-L$libpcre_lib_dir"
-				found_libpcre="yes"
-			elif test -n "$libpcre_dir"; then
-				if ! test -d "$libpcre_dir/include"; then
-					AC_MSG_ERROR([cannot find "$libpcre_dir/include" directory])
-				fi
+			if test -n "$libpcre_dir"; then
+				#
+				# directories are given explicitly
+				#
 
-				if test -z "$libpcre_include_dir"; then
-					if ! test -f "$libpcre_dir/include/pcre.h"; then
-						AC_MSG_ERROR([cannot find "$libpcre_dir/include/pcre.h" file])
+				if test -n "$libpcre_include_dir"; then
+					LIBPCRE_CFLAGS="-I$libpcre_include_dir"
+				else
+					if test -f "$libpcre_dir/include/pcre.h"; then
+						LIBPCRE_CFLAGS="-I$libpcre_dir/include"
+					else
+						AC_MSG_ERROR([cannot find $libpcre_dir/include/pcre.h])
 					fi
 				fi
 
-				if ! test -d "$libpcre_dir/lib"; then
-					AC_MSG_ERROR([cannot find "$libpcre_dir/lib" directory])
-				fi
-
-				LIBPCRE_CFLAGS="-I$libpcre_dir/include"
-				LIBPCRE_LDFLAGS="-L$libpcre_dir/lib"
-
-				found_libpcre="yes"
-			elif test -f /usr/include/pcre.h; then
-				found_libpcre="yes"
-			elif test -f /usr/local/include/pcre.h; then
-				LIBPCRE_CFLAGS="-I/usr/local/include"
-				LIBPCRE_LDFLAGS="-L/usr/local/lib"
-
-				found_libpcre="yes"
-			elif test -f /usr/pkg/include/pcre.h; then
-				LIBPCRE_CFLAGS="-I/usr/pkg/include"
-				LIBPCRE_LDFLAGS="-L/usr/pkg/lib"
-				LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS -Wl,-R/usr/pkg/lib"
-
-				found_libpcre="yes"
-			elif test -f /opt/csw/include/pcre.h; then
-				LIBPCRE_CFLAGS="-I/opt/csw/include"
-				LIBPCRE_LDFLAGS="-L/opt/csw/lib"
-
-				if $(echo "$CFLAGS"|grep -q -- "-m64") ; then
-					LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS/64 -Wl,-R/opt/csw/lib/64"
+				if test -n "$libpcre_lib_dir"; then
+					LIBPCRE_LDFLAGS="-L$libpcre_lib_dir"
 				else
-					LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS -Wl,-R/opt/csw/lib"
+					if test -d "$libpcre_dir/lib"; then
+						LIBPCRE_LDFLAGS="-L$libpcre_dir/lib"
+					else
+						AC_MSG_ERROR([cannot find $libpcre_dir/lib])
+					fi
 				fi
+
+				found_libpcre="yes"
+			elif test -n "$libpcre_include_dir"; then
+				LIBPCRE_CFLAGS="-I$libpcre_include_dir"
+
+				if test -n "$libpcre_lib_dir"; then
+					LIBPCRE_LDFLAGS="-L$libpcre_lib_dir"
+				fi
+
+				found_libpcre="yes"
+			elif test -n "$libpcre_lib_dir"; then
+				LIBPCRE_LDFLAGS="-L$libpcre_lib_dir"
 
 				found_libpcre="yes"
 			else
-				found_libpcre="no"
+				#
+				# search default directories
+				#
+
+				if test -f /usr/include/pcre.h; then
+					found_libpcre="yes"
+				elif test -f /usr/local/include/pcre.h; then
+					LIBPCRE_CFLAGS="-I/usr/local/include"
+					LIBPCRE_LDFLAGS="-L/usr/local/lib"
+
+					found_libpcre="yes"
+				elif test -f /usr/pkg/include/pcre.h; then
+					LIBPCRE_CFLAGS="-I/usr/pkg/include"
+					LIBPCRE_LDFLAGS="-L/usr/pkg/lib"
+					LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS -Wl,-R/usr/pkg/lib"
+
+					found_libpcre="yes"
+				elif test -f /opt/csw/include/pcre.h; then
+					LIBPCRE_CFLAGS="-I/opt/csw/include"
+					LIBPCRE_LDFLAGS="-L/opt/csw/lib"
+
+					if $(echo "$CFLAGS"|grep -q -- "-m64") ; then
+						LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS/64 -Wl,-R/opt/csw/lib/64"
+					else
+						LIBPCRE_LDFLAGS="$LIBPCRE_LDFLAGS -Wl,-R/opt/csw/lib"
+					fi
+
+					found_libpcre="yes"
+				else
+					found_libpcre="no"
+				fi
 			fi
 		fi
 
-		if test -n "$libpcre_include_dir"; then
-			LIBPCRE_CFLAGS="-I$libpcre_include_dir"
-		fi
+
+		#
+		# process --enable-static and --enable_static-libs flags
+		#
 
 		if test "x$enable_static" = "xyes"; then
 			LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
-		elif test "x$enable_static_libs" = "xyes" && test "x$static_linking_support" != "xno"; then
-			LIBPCRE_LIBS="$LIBPCRE_LDFLAGS ${static_linking_support}static $LIBPCRE_LIBS ${static_linking_support}dynamic"
-			LIBPCRE_LDFLAGS=""
+		elif test "x$enable_static_libs" = "xyes"; then
+			if test "x$static_linking_support" == "xno"; then
+				AC_MSG_WARN([compiler has no direct suppor for static linkage])
+
+				if test -n "$libpcre_lib_dir"; then
+					if test -f "$libpcre_lib_dir/libpcre.a"; then
+						LIBPCRE_LIBS="$libpcre_lib_dir/libpcre.a"
+					else
+						AC_MSG_ERROR([cannot find $libpcre_lib_dir/libpcre.a])
+					fi
+				elif test -n "$libpcre_dir"; then
+					if test -f "$libpcre_dir/lib/libpcre.a"; then
+						LIBPCRE_LIBS="$libpcre_dir/lib/libpcre.a"
+					else
+						AC_MSG_ERROR([cannot find $libpcre_dir/lib/libpcre.a])
+					fi
+				else
+					AC_MSG_ERROR([libpcre directory must be given explicitly in this case])
+				fi
+			else
+				LIBPCRE_LIBS="$LIBPCRE_LDFLAGS ${static_linking_support}static $LIBPCRE_LIBS ${static_linking_support}dynamic"
+				LIBPCRE_LDFLAGS=""
+			fi
 		fi
+
+
+		#
+		# try building with pcre
+		#
 
 		AC_MSG_CHECKING([for libpcre support])
 

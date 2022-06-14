@@ -1916,6 +1916,10 @@ else
 
 	LIBPCRE2_CHECK_CONFIG([mandatory])
 
+	if test "x$found_libpcre2" != "xyes"; then
+	    AC_MSG_ERROR([unable to use libpcre2 (libpcre2 check failed)])
+	fi
+
 	CFLAGS="$CFLAGS $LIBPCRE2_CFLAGS"
 	LDFLAGS="$LDFLAGS $LIBPCRE2_LDFLAGS"
 	if test "x$ARCH" = "xosx"; then
@@ -1926,6 +1930,10 @@ else
 
 	AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
 	have_pcre2=1
+fi
+
+if test "x$have_pcre" != "x1" && test "x$have_pcre2" != "x1"; then
+    AC_MSG_ERROR([cannot build with libpcre or libpcre2])
 fi
 fi
 
