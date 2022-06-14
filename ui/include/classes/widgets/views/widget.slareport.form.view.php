@@ -47,7 +47,7 @@ $form_grid->addItem([
 ]);
 $scripts[] = $field_slaid->getPostJS();
 
-// Services.
+// Service.
 $field_serviceid = CWidgetHelper::getService($fields['serviceid'], $data['captions']['ms']['services']['serviceid'],
 	$form->getName()
 );
@@ -63,7 +63,7 @@ $form_grid->addItem([
 	new CFormField(CWidgetHelper::getIntegerBox($fields['show_periods']))
 ]);
 
-// Date from.
+// From.
 $form_grid->addItem([
 	CWidgetHelper::getLabel($fields['date_from']),
 	new CFormField(
@@ -73,7 +73,7 @@ $form_grid->addItem([
 	)
 ]);
 
-// Date to.
+// To.
 $form_grid->addItem([
 	CWidgetHelper::getLabel($fields['date_to']),
 	new CFormField(
