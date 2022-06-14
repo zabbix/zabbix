@@ -37,6 +37,8 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_datastore_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_datastore_read(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, const char *password,

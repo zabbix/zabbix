@@ -48,6 +48,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"version", VMCHECK_FUNC(check_vcenter_version)},
 	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
 	{"datastore.discovery", VMCHECK_FUNC(check_vcenter_datastore_discovery)},
+	{"datastore.tags.get", VMCHECK_FUNC(check_vcenter_datastore_tags_get)},
 	{"datastore.read", VMCHECK_FUNC(check_vcenter_datastore_read)},
 	{"datastore.size", VMCHECK_FUNC(check_vcenter_datastore_size)},
 	{"datastore.write", VMCHECK_FUNC(check_vcenter_datastore_write)},
