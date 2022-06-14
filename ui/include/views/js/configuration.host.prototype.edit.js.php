@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,13 +27,27 @@
 <script type="text/x-jquery-tmpl" id="groupPrototypeRow">
 	<tr class="form_row">
 		<td>
-			<input name="group_prototypes[#{i}][name]" type="text" value="#{name}" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" placeholder="{#MACRO}" maxlength="255" />
+			<input name="group_prototypes[#{i}][name]" type="text" value="#{name}" style="width: 448px"
+				placeholder="{#MACRO}" maxlength="255" />
 		</td>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
-			<button class="<?= ZBX_STYLE_BTN_LINK ?> group-prototype-remove" type="button" name="remove"><?= _('Remove') ?></button>
-			<input type="hidden" name="group_prototypes[#{i}][group_prototypeid]" value="#{group_prototypeid}" />
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> group-prototype-remove" type="button" name="remove">
+				<?= _('Remove') ?>
+			</button>
 		</td>
 	</tr>
+</script>
+
+<script type="text/x-jquery-tmpl" id="host-interface-row-tmpl">
+	<?= (new CPartial('configuration.host.interface.row'))->getOutput() ?>
+</script>
+
+<script>
+	const view = {
+		editHost(e, hostid) {
+			return;
+		}
+	}
 </script>
 
 <script type="text/javascript">
@@ -72,19 +86,25 @@
 		}
 
 		initInherit() {
-			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces);
+			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
+			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces,
+				host_interface_row_tmpl
+			);
 			hostInterfaceManagerInherit.setAllowEmptyMessage(!this._data.parent_is_template);
 			hostInterfaceManagerInherit.render();
-			HostInterfaceManager.makeReadonly();
+			hostInterfaceManagerInherit.makeReadonly();
 		}
 
 		initCustom() {
+			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
 			// This is in global space, as Add functions uses it.
-			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces);
+			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces,
+				host_interface_row_tmpl
+			);
 			hostInterfaceManager.render();
 
 			if (this._data.is_templated) {
-				HostInterfaceManager.makeReadonly();
+				hostInterfaceManager.makeReadonly();
 			}
 		}
 
@@ -154,15 +174,17 @@
 	}
 
 	jQuery(function() {
+		'use strict';
+
 		const interface_source_switcher = new InterfaceSourceSwitcher(
 			document.getElementById('interfaces-table'),
 			document.getElementById('custom_interfaces'),
 			document.getElementById('interface-add'),
 			<?= json_encode([
-				'parent_is_template' => $parentHost['status'] == HOST_STATUS_TEMPLATE,
-				'is_templated' => $hostPrototype['templateid'] != 0,
-				'inherited_interfaces' => array_values($parentHost['interfaces']),
-				'custom_interfaces' => array_values($hostPrototype['interfaces'])
+				'parent_is_template' => $data['parent_host']['status'] == HOST_STATUS_TEMPLATE,
+				'is_templated' => $data['host_prototype']['templateid'] != 0,
+				'inherited_interfaces' => array_values($data['parent_host']['interfaces']),
+				'custom_interfaces' => array_values($data['host_prototype']['interfaces'])
 			]) ?>
 		);
 
@@ -176,19 +198,66 @@
 			jQuery(this).closest('.form_row').remove();
 		});
 
-		<?php if (!$hostPrototype['groupPrototypes']): ?>
-			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
+		<?php if (!$data['host_prototype']['groupPrototypes']): ?>
+			addGroupPrototypeRow({'name': ''});
 		<?php endif ?>
-		<?php foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype): ?>
-			addGroupPrototypeRow(<?= json_encode([
-				'name' => $groupPrototype['name'],
-				'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
-			]) ?>);
+		<?php foreach ($data['host_prototype']['groupPrototypes'] as $i => $groupPrototype): ?>
+			addGroupPrototypeRow(<?= json_encode(['name' => $groupPrototype['name']]) ?>);
 		<?php endforeach ?>
 
-		<?php if ($hostPrototype['templateid']): ?>
+		<?php if ($data['host_prototype']['templateid']): ?>
 			jQuery('#tbl_group_prototypes').find('input').prop('readonly', true);
 			jQuery('#tbl_group_prototypes').find('button').prop('disabled', true);
 		<?php endif ?>
+
+		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+			jQuery('#tls_issuer, #tls_subject').closest('li').toggle(jQuery('#tls_in_cert').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>);
+
+			jQuery('#tls_psk, #tls_psk_identity, .tls_psk').closest('li').toggle(jQuery('#tls_in_psk').is(':checked')
+					|| jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>);
+		});
+
+		jQuery('input[name=inventory_mode]').click(function() {
+			// Action depending on which button was clicked.
+			const $inventory_fields = jQuery('#inventorylist :input:gt(2)');
+
+			switch (this.value) {
+				case '<?= HOST_INVENTORY_DISABLED ?>':
+					$inventory_fields.prop('disabled', true);
+					jQuery('.populating_item').hide();
+					break;
+				case '<?= HOST_INVENTORY_MANUAL ?>':
+					$inventory_fields.prop('disabled', false);
+					jQuery('.populating_item').hide();
+					break;
+				case '<?= HOST_INVENTORY_AUTOMATIC ?>':
+					$inventory_fields.prop('disabled', false);
+					$inventory_fields.filter('.linked_to_item').prop('disabled', true);
+					jQuery('.populating_item').show();
+					break;
+			}
+		});
+
+		// Refresh field visibility on document load.
+		let tls_accept = jQuery('#tls_accept').val();
+
+		if ((tls_accept & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
+			jQuery('#tls_in_none').prop('checked', true);
+		}
+		if ((tls_accept & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
+			jQuery('#tls_in_psk').prop('checked', true);
+		}
+		if ((tls_accept & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
+			jQuery('#tls_in_cert').prop('checked', true);
+		}
+
+		jQuery('input[name=tls_connect]').trigger('change');
+
+		jQuery('#host')
+			.on('input keydown paste', function () {
+				$('#name').attr('placeholder', $(this).val());
+			})
+			.trigger('input');
 	});
 </script>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ class CConfigFile {
 		if (!file_exists($this->configFile)) {
 			self::exception('Config file does not exist.', self::CONFIG_NOT_FOUND);
 		}
+
 		if (!is_readable($this->configFile)) {
 			self::exception('Permission denied.');
 		}
@@ -156,9 +157,11 @@ class CConfigFile {
 		if (isset($ZBX_SERVER)) {
 			$this->config['ZBX_SERVER'] = $ZBX_SERVER;
 		}
+
 		if (isset($ZBX_SERVER_PORT)) {
 			$this->config['ZBX_SERVER_PORT'] = $ZBX_SERVER_PORT;
 		}
+
 		if (isset($ZBX_SERVER_NAME)) {
 			$this->config['ZBX_SERVER_NAME'] = $ZBX_SERVER_NAME;
 		}
@@ -299,8 +302,10 @@ $DB[\'VAULT_TOKEN\']		= \''.addcslashes($this->config['DB']['VAULT_TOKEN'], "'\\
 // For upgraded installations, please read database upgrade notes before enabling this option.
 $DB[\'DOUBLE_IEEE754\']	= '.($this->config['DB']['DOUBLE_IEEE754'] ? 'true' : 'false').';
 
-$ZBX_SERVER				= \''.addcslashes($this->config['ZBX_SERVER'], "'\\").'\';
-$ZBX_SERVER_PORT		= \''.addcslashes($this->config['ZBX_SERVER_PORT'], "'\\").'\';
+// Uncomment and set to desired values to override Zabbix hostname/IP and port.
+// $ZBX_SERVER			= \'\';
+// $ZBX_SERVER_PORT		= \'\';
+
 $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
@@ -343,8 +348,8 @@ $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 			'VAULT_DB_PATH' => '',
 			'VAULT_TOKEN' => ''
 		];
-		$this->config['ZBX_SERVER'] = 'localhost';
-		$this->config['ZBX_SERVER_PORT'] = '10051';
+		$this->config['ZBX_SERVER'] = null;
+		$this->config['ZBX_SERVER_PORT'] = null;
 		$this->config['ZBX_SERVER_NAME'] = '';
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;

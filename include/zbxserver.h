@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,12 +20,8 @@
 #ifndef ZABBIX_ZBXSERVER_H
 #define ZABBIX_ZBXSERVER_H
 
-#include "common.h"
-#include "db.h"
 #include "dbcache.h"
-#include "zbxjson.h"
 #include "zbxvariant.h"
-#include "zbxeval.h"
 
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
 #define MACRO_TYPE_MESSAGE_RECOVERY	0x00000002
@@ -55,14 +51,13 @@
 #define MACRO_TYPE_SCRIPT_NORMAL	0x08000000
 #define MACRO_TYPE_SCRIPT_RECOVERY	0x10000000
 #define MACRO_TYPE_REPORT		0x20000000
+#define MACRO_TYPE_QUERY_FILTER		0x40000000
 
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
-int	evaluate_function(char **value, DC_ITEM *item, const char *function, const char *parameter,
-		const zbx_timespec_t *ts, char **error);
 int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error);
 
@@ -117,6 +112,7 @@ zbx_expression_eval_t;
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx);
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);
 void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const DC_ITEM *item);
+void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const DC_ITEM *item);
 void	zbx_expression_eval_resolve_trigger_hosts(zbx_expression_eval_t *eval, const DB_TRIGGER *trigger);
 int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_t *ts, zbx_variant_t *value,
 		char **error);
@@ -124,8 +120,6 @@ int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_
 /* lld macro context */
 #define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
-#define ZBX_MACRO_XML		(ZBX_MACRO_ANY | ZBX_TOKEN_XML)
-#define ZBX_MACRO_SIMPLE	(ZBX_MACRO_ANY | ZBX_TOKEN_SIMPLE_MACRO)
 #define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
 
 int	substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
@@ -142,7 +136,6 @@ int	substitute_macros_xml(char **data, const DC_ITEM *item, const struct zbx_jso
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	substitute_macros_xml_unmasked(char **data, const DC_ITEM *item, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
-void	zbx_substitute_item_name_macros(DC_ITEM *dc_item, const char *name, char **replace_to);
 int	substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	xml_xpath_check(const char *xpath, char *error, size_t errlen);

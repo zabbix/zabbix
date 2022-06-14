@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
  */
 
 $this->includeJsFile('administration.proxy.edit.js.php');
-$this->addJsFile('class.tab-indicators.js');
 
 $widget = (new CWidget())->setTitle(_('Proxies'));
 
@@ -41,10 +40,6 @@ $proxyForm = (new CForm())
 	->addVar('tls_accept', $data['tls_accept'])
 	->addVar('psk_edit_mode', $data['psk_edit_mode'])
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE);
-
-if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interfaceid', $data)) {
-	$proxyForm->addVar('interfaceid', $data['interfaceid']);
-}
 
 if (array_key_exists('clone_proxyid', $data)) {
 	$proxyForm->addVar('clone_proxyid', $data['clone_proxyid']);

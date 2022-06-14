@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
@@ -27,15 +27,15 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
  */
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Linux by Zabbix agent';
+	public $templateName = 'Huawei OceanStor 5300 V5 SNMP';
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	public static function allTemplates() {
-		// TODO: remove 'AND name NOT LIKE "%Cisco Catalyst%"' and change to single quotes after fix ZBX-19356
-		return CDBHelper::getRandomizedDataProvider("SELECT * FROM hosts WHERE status IN (".HOST_STATUS_TEMPLATE.")".
-				" AND name NOT LIKE '%Cisco Catalyst%' AND name NOT LIKE '%Mellanox%'", 25);
+		return CDBHelper::getRandomizedDataProvider(
+			'SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_TEMPLATE.')', 25
+		);
 	}
 
 	public function testPageTemplates_CheckLayout() {
@@ -43,7 +43,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Host groups')->select('Templates');
+		$filter->getField('Host groups')->select('Templates/SAN');
 		$filter->submit();
 		$this->zbxTestTextPresent($this->templateName);
 
@@ -87,15 +87,13 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
 
-		// Check if template name present on page, if not, check on next page.
-		for ($i = 0; $i < 2; $i++) {
-			if ($this->query('link', $name)->one(false)->isValid() === true) {
-				break;
-			}
-			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
-			$this->zbxTestWaitForPageToLoad();
-		}
-		$this->zbxTestClickLinkTextWait($name);
+		// Filter necessary Template name.
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Name')->query('link', $name)->one()->click();
+
 		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('All templates');
 		$this->zbxTestClickWait('update');
@@ -113,26 +111,24 @@ class testPageTemplates extends CLegacyWebTest {
 	public function testPageTemplates_FilterTemplateByName() {
 		$this->zbxTestLogin('templates.php');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->getField('Host groups')->select('Templates');
+		$filter->getField('Host groups')->select('Templates/SAN');
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 2 of 2 found']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
 		$this->zbxTestLogin('templates.php');
 		$this->query('button:Reset')->one()->click();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Linked templates')->fill([
-				'values' => 'ICMP Ping',
+				'values' => 'Template ZBX6663 Second',
 				'context' => 'Templates'
 		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Generic SNMP']");
+		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template ZBX6663 Second']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
 

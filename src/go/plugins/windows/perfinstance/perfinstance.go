@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package perfinstance
@@ -8,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/pdh"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/win32"
 )
 

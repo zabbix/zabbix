@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('class.cviewswitcher.js');
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Discovery rules'));

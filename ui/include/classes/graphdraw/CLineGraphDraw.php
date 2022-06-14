@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->intervals = [];
 		$this->power = [];
+		$this->is_binary = [];
 
 		$this->drawItemsLegend = false; // draw items legend
 		$this->drawExLegend = false; // draw percentile and triggers legend
@@ -179,9 +180,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * @return array
 	 */
 	private function getVerticalScalesInUse() {
-		return array_keys(array_filter($this->yaxis, function($value) {
-			return $value;
-		}));
+		return array_keys(array_filter($this->yaxis));
 	}
 
 	protected function selectData() {
@@ -423,7 +422,7 @@ class CLineGraphDraw extends CGraphDraw {
 			return;
 		}
 
-		$number_parser = new CNumberParser(['with_suffix' => true]);
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 		$max = 3;
 		$cnt = 0;
@@ -468,7 +467,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->triggers[] = [
 					'yaxisside' => $item['yaxisside'],
 					'val' => $number_parser->calcValue(),
-					'color' => getSeverityColor($trigger['priority']),
+					'color' => CSeverityHelper::getColor((int) $trigger['priority']),
 					'description' => _('Trigger').NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger),
 					'constant' => '['.$matches['operator'].' '.$matches['constant'].']'
 				];
@@ -899,7 +898,7 @@ class CLineGraphDraw extends CGraphDraw {
 	 * Draw main period label in black color with 7px font size under X axis and a 1px dashed gray vertical line
 	 * according to that label.
 	 *
-	 * @param strimg $value     Readable timestamp.
+	 * @param string $value     Readable timestamp.
 	 * @param int    $position  Position on X axis.
 	 */
 	private function drawSubPeriod($value, $position) {
@@ -1131,29 +1130,20 @@ class CLineGraphDraw extends CGraphDraw {
 		foreach ($this->getVerticalScalesInUse() as $side_index => $side) {
 			$units = null;
 			$units_long = '';
-			$is_binary = false;
 
-			for ($i = 0; $i < $this->num; $i++) {
-				if ($this->items[$i]['yaxisside'] == $side) {
-					if ($this->items[$i]['units'] === 'B' || $this->items[$i]['units'] === 'Bps') {
-						$is_binary = true;
-					}
-
+			foreach ($this->items as $item) {
+				if ($item['yaxisside'] == $side) {
 					if ($units === null) {
-						$units = $this->items[$i]['units'];
+						$units = $item['units'];
 					}
-					elseif ($this->items[$i]['units'] !== $units) {
+					elseif ($item['units'] !== $units) {
 						$units = '';
 					}
 
-					if ($this->items[$i]['units_long'] !== '') {
-						$units_long = $this->items[$i]['units_long'];
+					if ($item['units_long'] !== '') {
+						$units_long = $item['units_long'];
 					}
 				}
-			}
-
-			if ($units === null || $units === false) {
-				$units = '';
 			}
 
 			if ($units_long !== '') {
@@ -1179,7 +1169,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
 				$this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED, $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED,
-				$this->intervals[$side], $units, $is_binary, $this->power[$side], 8
+				$this->intervals[$side], $units, $this->is_binary[$side], $this->power[$side], 10
 			);
 
 			$line_color = $this->getColor($this->graphtheme['gridcolor'], 0);
@@ -1415,8 +1405,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 			// caption
 			$itemCaption = $this->itemsHost
-				? $this->items[$i]['name_expanded']
-				: $this->items[$i]['hostname'].NAME_DELIMITER.$this->items[$i]['name_expanded'];
+				? $this->items[$i]['name']
+				: $this->items[$i]['hostname'].NAME_DELIMITER.$this->items[$i]['name'];
 
 			// draw legend of an item with data
 			$data = array_key_exists($this->items[$i]['itemid'], $this->data)
@@ -1756,19 +1746,6 @@ class CLineGraphDraw extends CGraphDraw {
 				zbx_imagealine($this->im, $x1, $y1, $x2, $y2, $avg_color, $style);
 				break;
 
-			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
-				$a[0] = $x1;
-				$a[1] = $y1;
-				$a[2] = $x1;
-				$a[3] = $y1_shift;
-				$a[4] = $x2;
-				$a[5] = $y2_shift;
-				$a[6] = $x2;
-				$a[7] = $y2;
-
-				imagefilledpolygon($this->im, $a, 4, $avg_color);
-				break;
-
 			case GRAPH_ITEM_DRAWTYPE_DOT:
 				imagefilledrectangle($this->im, $x1 - 1, $y1 - 1, $x1, $y1, $avg_color);
 				break;
@@ -1790,44 +1767,66 @@ class CLineGraphDraw extends CGraphDraw {
 				break;
 
 			case GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE:
-				imageLine($this->im, $x1, $y1, $x2, $y2, $avg_color); // draw the initial line
-				imageLine($this->im, $x1, $y1 - 1, $x2, $y2 - 1, $avg_color);
+			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
+				/*
+				 * Graphs should be at least 50px in height in order to visually see the gradient. Though 51px would not
+				 * make any difference either. If graph height is too small to see gradient, use standard solid color
+				 * filling function instead.
+				 */
+				if ($drawtype == GRAPH_ITEM_DRAWTYPE_FILLED_REGION
+						|| ($drawtype == GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE && $this->sizeY <= 50)) {
+					$a[0] = $x1;
+					$a[1] = $y1;
+					$a[2] = $x1;
+					$a[3] = $y1_shift;
+					$a[4] = $x2;
+					$a[5] = $y2_shift;
+					$a[6] = $x2;
+					$a[7] = $y2;
 
-				$bitmask = 255;
-				$blue = $avg_color & $bitmask;
+					imagefilledpolygon($this->im, $a, 4, $avg_color);
+				}
+				else {
+					imageLine($this->im, $x1, $y1, $x2, $y2, $avg_color); // draw the initial line
+					imageLine($this->im, $x1, $y1 - 1, $x2, $y2 - 1, $avg_color);
 
-				// $blue_diff = 255 - $blue;
-				$bitmask = $bitmask << 8;
-				$green = ($avg_color & $bitmask) >> 8;
+					$bitmask = 255;
+					$blue = $avg_color & $bitmask;
 
-				// $green_diff = 255 - $green;
-				$bitmask = $bitmask << 8;
-				$red = ($avg_color & $bitmask) >> 16;
-				// $red_diff = 255 - $red;
+					// $blue_diff = 255 - $blue;
+					$bitmask = $bitmask << 8;
+					$green = ($avg_color & $bitmask) >> 8;
 
-				// note: though gradients on the chart looks ok, the formula used is completely incorrect
-				// if you plan to fix something here, it would be better to start from scratch
-				$maxAlpha = 110;
-				$startAlpha = 50;
-				$alphaRatio = $maxAlpha / ($this->sizeY - $startAlpha);
+					// $green_diff = 255 - $green;
+					$bitmask = $bitmask << 8;
+					$red = ($avg_color & $bitmask) >> 16;
+					// $red_diff = 255 - $red;
 
-				$diffX = $x1 - $x2;
-				for ($i = 0; $i <= $diffX; $i++) {
-					$Yincr = ($diffX > 0) ? (abs($y2 - $y1) / $diffX) : 0;
+					// note: though gradients on the chart looks ok, the formula used is completely incorrect
+					// if you plan to fix something here, it would be better to start from scratch
+					$maxAlpha = 110;
+					$startAlpha = 50;
 
-					$gy = ($y1 > $y2) ? ($y2 + $Yincr * $i) : ($y2 - $Yincr * $i);
-					$steps = $this->sizeY + $this->shiftY - $gy + 1;
+					$alphaRatio = $maxAlpha / ($this->sizeY - $startAlpha);
 
-					for ($j = 0; $j < $steps; $j++) {
-						if (($gy + $j) < ($this->shiftY + $startAlpha)) {
-							$alpha = 0;
+					$diffX = $x1 - $x2;
+					for ($i = 0; $i <= $diffX; $i++) {
+						$Yincr = ($diffX > 0) ? (abs($y2 - $y1) / $diffX) : 0;
+
+						$gy = ($y1 > $y2) ? ($y2 + $Yincr * $i) : ($y2 - $Yincr * $i);
+						$steps = $this->sizeY + $this->shiftY - $gy + 1;
+
+						for ($j = 0; $j < $steps; $j++) {
+							if (($gy + $j) < ($this->shiftY + $startAlpha)) {
+								$alpha = 0;
+							}
+							else {
+								$alpha = 127 - abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
+							}
+
+							$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
+							imagesetpixel($this->im, $x2 + $i, $gy + $j, $color);
 						}
-						else {
-							$alpha = 127 - abs(127 - ($alphaRatio * ($gy + $j - $this->shiftY - $startAlpha)));
-						}
-
-						$color = imagecolorexactalpha($this->im, $red, $green, $blue, $alpha);
-						imagesetpixel($this->im, $x2 + $i, $gy + $j, $color);
 					}
 				}
 				break;
@@ -1841,7 +1840,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$rows_min = (int) max(1, floor($this->sizeY / $this->cell_height_min / 1.5));
 		$rows_max = (int) max(1, floor($this->sizeY / $this->cell_height_min));
 
-		foreach ($this->getVerticalScalesInUse() as $side_index => $side) {
+		foreach ($this->getVerticalScalesInUse() as $side) {
 			$min = $this->calculateMinY($side);
 			$max = $this->calculateMaxY($side);
 
@@ -1858,15 +1857,18 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			$is_binary = false;
+			$calc_power = false;
 
 			foreach ($this->items as $item) {
-				if ($side == $item['yaxisside'] && in_array($item['units'], ['B', 'Bps'])) {
-					$is_binary = true;
-					break;
+				if ($item['yaxisside'] == $side) {
+					$is_binary = $is_binary || in_array($item['units'], ['B', 'Bps']);
+					$calc_power = $calc_power || $item['units'] === '' || $item['units'][0] !== '!';
 				}
 			}
 
-			$result = calculateGraphScaleExtremes($min, $max, $is_binary, $calc_min, $calc_max, $rows_min, $rows_max);
+			$result = calculateGraphScaleExtremes($min, $max, $is_binary, $calc_power, $calc_min, $calc_max, $rows_min,
+				$rows_max
+			);
 
 			if ($result === null) {
 				show_error_message(_('Y axis MAX value must be greater than Y axis MIN value.'));
@@ -1880,13 +1882,15 @@ class CLineGraphDraw extends CGraphDraw {
 				'power' => $this->power[$side]
 			] = $result;
 
+			$this->is_binary[$side] = $is_binary;
+
 			if ($calc_min && $calc_max) {
 				$rows_min = $rows_max = $result['rows'];
 			}
 		}
 	}
 
-	private function calcDimentions() {
+	private function calcDimensions() {
 		$this->shiftXleft = $this->yaxis[GRAPH_YAXIS_SIDE_LEFT] ? 85 : 30;
 		$this->shiftXright = $this->yaxis[GRAPH_YAXIS_SIDE_RIGHT] ? 85 : 30;
 
@@ -2006,11 +2010,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$graph_item['delay'] = $master_item['delay'];
 			}
 
-			$graph_items = CMacrosResolverHelper::resolveItemNames([$graph_item]);
-			$graph_items = CMacrosResolverHelper::resolveTimeUnitMacros($graph_items, ['delay']);
-			$graph_item = reset($graph_items);
-
-			$graph_item['name'] = $graph_item['name_expanded'];
+			$graph_item = CMacrosResolverHelper::resolveTimeUnitMacros([$graph_item], ['delay'])[0];
 
 			$update_interval_parser->parse($graph_item['delay']);
 			$graph_item['delay'] = getItemDelay($update_interval_parser->getDelay(),
@@ -2038,7 +2038,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->calculateTopPadding();
 		$this->selectTriggers();
-		$this->calcDimentions();
+		$this->calcDimensions();
 
 		if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
 				&& @imagecreatetruecolor(1, 1)
@@ -2066,10 +2066,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->expandItems();
 		$this->selectTriggers();
-		$this->calcDimentions();
+		$this->calcDimensions();
 
 		$this->selectData();
-		if (hasErrorMesssages()) {
+		if (hasErrorMessages()) {
 			show_messages();
 		}
 
@@ -2112,24 +2112,13 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$data = &$this->data[$this->items[$item]['itemid']];
 
-			if ($this->type == GRAPH_TYPE_STACKED) {
-				$drawtype = $this->items[$item]['drawtype'];
-				$max_color = $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
-				$avg_color = $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
-				$min_color = $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
-				$minmax_color = $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
+			$drawtype = $this->items[$item]['drawtype'];
+			$max_color = $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
+			$avg_color = $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
+			$min_color = $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
+			$minmax_color = $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
 
-				$calc_fnc = $this->items[$item]['calc_fnc'];
-			}
-			else {
-				$drawtype = $this->items[$item]['drawtype'];
-				$max_color = $this->getColor('ValueMax', GRAPH_STACKED_ALFA);
-				$avg_color = $this->getColor($this->items[$item]['color'], GRAPH_STACKED_ALFA);
-				$min_color = $this->getColor('ValueMin', GRAPH_STACKED_ALFA);
-				$minmax_color = $this->getColor('ValueMinMax', GRAPH_STACKED_ALFA);
-
-				$calc_fnc = $this->items[$item]['calc_fnc'];
-			}
+			$calc_fnc = $this->items[$item]['calc_fnc'];
 
 			// for each X
 			$prevDraw = true;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,26 +43,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'url' => 'zabbix.php?action=problem.view',
 				'title' =>	'Problems',
 				'header' =>	'Problems',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'overview.php',
-				'title' =>	'Overview [refreshed every 30 sec.]',
-				'header' =>	'Trigger overview',
-				'users' => [
-					'guest' => true,
-					'user-zabbix' => true,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'overview.php?form_refresh=1&groupid=0&type=0&view_style=0',
-				'title' =>	'Overview [refreshed every 30 sec.]',
-				'header' =>	'Trigger overview',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
@@ -120,7 +100,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_search_type=0&filter_graphids%5B%5D=523&filter_set=1',
+				'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D=10084&filter_show=1&filter_set=1',
 				'title' =>	'Custom graphs',
 				'no_permissions_to_object' => true,
 				'users' => [
@@ -308,7 +288,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'hosts.php',
+				'url' => self::HOST_LIST_PAGE,
 				'title' =>	'Configuration of hosts',
 				'header' => 'Hosts',
 				'users' => [
@@ -318,9 +298,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'hosts.php?groupid=0&form=Create+host',
-				'title' =>	'Configuration of hosts',
-				'header' => 'Hosts',
+				'url' => 'zabbix.php?action=host.edit',
+				'title' =>	'Configuration of host',
+				'header' => 'New host',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

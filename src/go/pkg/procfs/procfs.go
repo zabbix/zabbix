@@ -1,8 +1,9 @@
+//go:build linux
 // +build linux
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +39,7 @@ const (
 )
 
 // GetMemory reads /proc/meminfo file and returns and returns the value in bytes for the
-// specific memory type. Returns an error if the value was not found, or if theres is an issue
+// specific memory type. Returns an error if the value was not found, or if there is an issue
 // with reading the file or parsing the value.
 func GetMemory(memType string) (mem uint64, err error) {
 	meminfo, err := ReadAll("/proc/meminfo")
@@ -89,7 +90,7 @@ func ReadAll(filename string) (data []byte, err error) {
 
 // ByteFromProcFileData returns the value in bytes of the provided value name from the provided
 // process file data. Returns true if the value is found, and false if it is not or if there is an
-// error. Returns an error if the theres is an issue with parsing values.
+// error. Returns an error if there is an issue with parsing values.
 func ByteFromProcFileData(data []byte, valueName string) (uint64, bool, error) {
 	for _, line := range strings.Split(string(data), "\n") {
 		i := strings.Index(line, ":")

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-require_once dirname(__FILE__).'/../../include/regexp.inc.php';
 
 class CControllerRegExList extends CController {
 
@@ -41,34 +39,15 @@ class CControllerRegExList extends CController {
 
 	protected function doAction() {
 		$data = [
-			'regexes'  => [],
-			'db_exps'  => [],
-			'uncheck'  => $this->hasInput('uncheck')
+			'regexs' => API::Regexp()->get([
+				'output' => ['regexpid', 'name'],
+				'selectExpressions' => ['expression', 'expression_type'],
+				'preservekeys' => true
+			]),
+			'uncheck' => $this->hasInput('uncheck')
 		];
 
-		$db_regex = DBselect('SELECT re.* FROM regexps re');
-
-		while ($regex = DBfetch($db_regex)) {
-			$regex['expressions'] = [];
-			$data['regexes'][$regex['regexpid']] = $regex;
-		}
-
-		order_result($data['regexes'], 'name');
-
-		$db_expressions = DBselect(
-			'SELECT e.*'.
-			' FROM expressions e'.
-			' WHERE '.dbConditionInt('e.regexpid', array_keys($data['regexes'])).
-			' ORDER BY e.expression_type'
-		);
-
-		while ($expr = DBfetch($db_expressions)) {
-			$data['db_exps'][] = [
-				'regexid' => $expr['regexpid'],
-				'expression' => $expr['expression'],
-				'expression_type' => $expr['expression_type']
-			];
-		}
+		order_result($data['regexs'], 'name');
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of regular expressions'));

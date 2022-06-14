@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,19 +24,20 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="row_expr">
+<script type="text/x-jquery-tmpl" id="row-expression-tmpl">
 	<?= (new CRow([
 			(new CSelect('expressions[#{rowNum}][expression_type]'))
 				->addClass('js-expression-type-select')
 				->setId('expressions_#{rowNum}_expression_type')
-				->addOptions(CSelect::createOptionsFromArray(expression_type2str())),
+				->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expression_type2str())),
 			(new CTextBox('expressions[#{rowNum}][expression]', '', false, 255))
 				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setAriaRequired(),
 			(new CSelect('expressions[#{rowNum}][exp_delimiter]'))
-				->addOptions(CSelect::createOptionsFromArray(expressionDelimiters()))
+				->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expressionDelimiters()))
 				->setId('expressions_#{rowNum}_exp_delimiter')
 				->addClass('js-expression-delimiter-select')
+				->setDisabled(true)
 				->addStyle('display: none;'),
 			new CCheckBox('expressions[#{rowNum}][case_sensitive]'),
 			(new CCol(
@@ -51,7 +52,7 @@
 	?>
 </script>
 
-<script type="text/x-jquery-tmpl" id="testTableRow">
+<script type="text/x-jquery-tmpl" id="test-table-row-tmpl">
 	<?= (new CRow([
 			'#{type}', '#{expression}', (new CSpan('#{result}'))->addClass('#{resultClass}')
 		]))
@@ -60,7 +61,7 @@
 	?>
 </script>
 
-<script type="text/x-jquery-tmpl" id="testCombinedTableRow">
+<script type="text/x-jquery-tmpl" id="test-combined-table-row-tmpl">
 	<?= (new CRow([
 			(new CCol(_('Combined result')))->setColspan(2), (new CSpan('#{result}'))->addClass('#{resultClass}')
 		]))
@@ -81,13 +82,13 @@
 			 * Template for expression row of testing results table.
 			 * @type {String}
 			 */
-			testTableRowTpl: new Template($('#testTableRow').html()),
+			testTableRowTpl: new Template($('#test-table-row-tmpl').html()),
 
 			/**
 			 * Template for combined result row in testing results table.
 			 * @type {String}
 			 */
-			testCombinedTableRowTpl: new Template($('#testCombinedTableRow').html()),
+			testCombinedTableRowTpl: new Template($('#test-combined-table-row-tmpl').html()),
 
 			/**
 			 * Send all expressions data to server with test string.
@@ -231,12 +232,13 @@
 
 		$('#tbl_expr')
 			.dynamicRows({
-				template: '#row_expr'
+				template: '#row-expression-tmpl'
 			})
 			.on('change', '.js-expression-type-select', (e) => {
 				$(e.target)
 					.closest('[data-index]')
 					.find('.js-expression-delimiter-select')
+					.prop('disabled', e.target.value !== '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>')
 					.toggle(e.target.value === '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>');
 			});
 

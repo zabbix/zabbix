@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -305,6 +305,7 @@ ZABBIX.apps.map = (function($) {
 							favobj: 'sysmap',
 							action: 'expand',
 							sysmapid: this.sysmapid,
+							name: this.data.name,
 							source: JSON.stringify(post)
 						},
 						success: function(data) {
@@ -383,12 +384,6 @@ ZABBIX.apps.map = (function($) {
 					}, this);
 
 					shape['text'] = this.shapes[key].getLabel();
-
-					if (this.data.expand_macros === '1' && typeof(shape['text']) === 'string' && shape['text'] !== '') {
-						// Additional macro that is supported in shapes is {MAP.NAME}
-						shape['text'] = shape['text'].replace(/\{MAP\.NAME\}/g, this.data.name);
-					}
-
 					shapes.push(shape);
 				}, this);
 
@@ -982,7 +977,7 @@ ZABBIX.apps.map = (function($) {
 			 * @return {object}
 			 */
 			dragGroupPlaceholder: function() {
-				return $('<div/>').css({
+				return $('<div>').css({
 					width: $(this.domNode).width(),
 					height: $(this.domNode).height()
 				});
@@ -1151,7 +1146,6 @@ ZABBIX.apps.map = (function($) {
 
 						default:
 							throw 'Unsupported element type found in copy buffer!';
-							break;
 					}
 
 					if (element) {
@@ -1704,9 +1698,8 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.shapes[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>', {
-					style: 'position: absolute; z-index: 1;\
-						background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
+			this.domNode = $('<div>', {
+					style: 'position: absolute; z-index: 1; background: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7") 0 0 repeat',
 				})
 				.appendTo(this.sysmap.container)
 				.addClass('cursor-pointer sysmap_shape')
@@ -2210,7 +2203,7 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.selements[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>', {style: 'position: absolute; z-index: 100'})
+			this.domNode = $('<div>', {style: 'position: absolute; z-index: 100'})
 				.appendTo(this.sysmap.container)
 				.addClass('cursor-pointer sysmap_element')
 				.attr('data-id', this.id)
@@ -3342,8 +3335,7 @@ ZABBIX.apps.map = (function($) {
 					element,
 					elementTypeText,
 					i,
-					ln,
-					name;
+					ln;
 
 				$('#massList tbody').empty();
 
@@ -3410,7 +3402,7 @@ ZABBIX.apps.map = (function($) {
 			this.triggerids = {};
 			this.domNode = $(new Template($('#mapShapeFormTpl').html()).evaluate()).appendTo(formContainer);
 
-			this.domNode.find('.input-color-picker input').colorpicker();
+			this.domNode.find('.color-picker input').colorpicker();
 		}
 
 		ShapeForm.prototype = {
@@ -3444,7 +3436,7 @@ ZABBIX.apps.map = (function($) {
 					$('[name=' + field + ']', this.domNode).val([shape[field]]);
 				}
 
-				$('.input-color-picker input', this.domNode).change();
+				$('.color-picker input', this.domNode).change();
 				$('#border_type').change();
 
 				$('#last_shape_type').val(shape.type);
@@ -3529,7 +3521,7 @@ ZABBIX.apps.map = (function($) {
 			this.triggerids = {};
 			this.domNode = $(new Template($('#mapMassShapeFormTpl').html()).evaluate()).appendTo(formContainer);
 
-			this.domNode.find('.input-color-picker input').colorpicker();
+			this.domNode.find('.color-picker input').colorpicker();
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
@@ -3564,7 +3556,7 @@ ZABBIX.apps.map = (function($) {
 				this.active = false;
 				$(':checkbox', this.domNode).prop('checked', false).prop("disabled", false);
 				$('textarea, input[type=text]', this.domNode).val('');
-				$('.input-color-picker input', this.domNode).change();
+				$('.color-picker input', this.domNode).change();
 				this.actionProcessor.process();
 			},
 
@@ -3601,7 +3593,7 @@ ZABBIX.apps.map = (function($) {
 			this.triggerids = {};
 			this.domNode = $(new Template($('#linkFormTpl').html()).evaluate()).appendTo(formContainer);
 
-			this.domNode.find('.input-color-picker input').colorpicker();
+			this.domNode.find('.color-picker input').colorpicker();
 		}
 
 		LinkForm.prototype = {
@@ -3782,8 +3774,8 @@ ZABBIX.apps.map = (function($) {
 						.val(triggers[linkTrigger].drawtype);
 				}
 
-				table.find('.input-color-picker input').colorpicker();
-				$('.input-color-picker input', this.domNode).change();
+				table.find('.color-picker input').colorpicker();
+				$('.color-picker input', this.domNode).change();
 			},
 
 			/**
@@ -3819,8 +3811,8 @@ ZABBIX.apps.map = (function($) {
 					$(tpl.evaluate(linkTrigger)).appendTo(table);
 				}
 
-				table.find('.input-color-picker input').colorpicker();
-				$('.input-color-picker input', this.domNode).change();
+				table.find('.color-picker input').colorpicker();
+				$('.color-picker input', this.domNode).change();
 			},
 
 			/**
@@ -4012,7 +4004,7 @@ jQuery(function ($) {
 	 * new top and left position must be calculated. If the overlay dialogue is opened for the first time, position is
 	 * set depending on map size and canvas top position. This makes map more visible at first. In case popup window is
 	 * dragged outside visible view port or window is resized, popup will again be repositioned so it doesn't go outside
-	 * the viewport. In case the popup is too large, position it with a small margin depenging on whether is too long
+	 * the viewport. In case the popup is too large, position it with a small margin depending on whether is too long
 	 * or too wide.
 	 */
 	$.fn.positionOverlayDialogue = function () {

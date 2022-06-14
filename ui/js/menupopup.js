@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,11 +102,11 @@ function getMenuPopupHistory(options) {
  * @param {bool}   options['allowed_ui_problems']     Whether user has access to problems page.
  * @param {bool}   options['allowed_ui_hosts']        Whether user has access to monitoring hosts pages.
  * @param {bool}   options['allowed_ui_conf_hosts']   Whether user has access to configuration hosts page.
- * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
+ * @param {Node}   trigger_element                    UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupHost(options, trigger_elmnt) {
+function getMenuPopupHost(options, trigger_element) {
 	var sections = [];
 
 	// go to section
@@ -139,11 +139,11 @@ function getMenuPopupHost(options, trigger_elmnt) {
 		var url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'latest.view');
 		if (typeof options.tags !== 'undefined') {
-			url.setArgument('filter_tags', options.tags);
-			url.setArgument('filter_evaltype', options.evaltype);
+			url.setArgument('tags', options.tags);
+			url.setArgument('evaltype', options.evaltype);
 		}
-		url.setArgument('filter_hostids[]', options.hostid);
-		url.setArgument('filter_set', '1');
+		url.setArgument('filter_name', '');
+		url.setArgument('hostids[]', options.hostid);
 		latest_data.url = url.getUrl();
 
 		if (!options.showTriggers) {
@@ -175,8 +175,6 @@ function getMenuPopupHost(options, trigger_elmnt) {
 			var graphs_url = new Curl('zabbix.php', false);
 
 			graphs_url.setArgument('action', 'charts.view')
-			graphs_url.setArgument('view_as', 'showgraph'); // HISTORY_GRAPH
-			graphs_url.setArgument('filter_search_type', '0'); // ZBX_SEARCH_TYPE_STRICT
 			graphs_url.setArgument('filter_hostids[]', options.hostid);
 			graphs_url.setArgument('filter_set', '1');
 			graphs.url = graphs_url.getUrl();
@@ -226,17 +224,22 @@ function getMenuPopupHost(options, trigger_elmnt) {
 
 		if (options.allowed_ui_conf_hosts) {
 			var config = {
-				label: t('Configuration')
+				label: t('Configuration'),
+				disabled: !options.isWriteable
 			};
 
 			if (options.isWriteable) {
-				var config_url = new Curl('hosts.php', false);
-				config_url.setArgument('form', 'update');
+				const config_url = new Curl('zabbix.php', false);
+				config_url.setArgument('action', 'host.edit');
 				config_url.setArgument('hostid', options.hostid);
 				config.url = config_url.getUrl();
-			}
-			else {
-				config.disabled = true;
+
+				config.clickCallback = function (e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+					view.editHost(options.hostid);
+				};
 			}
 
 			items.push(config);
@@ -262,7 +265,7 @@ function getMenuPopupHost(options, trigger_elmnt) {
 	if (typeof options.scripts !== 'undefined') {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, trigger_elmnt, options.hostid)
+			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid)
 		});
 	}
 
@@ -463,15 +466,13 @@ function getMenuPopupMapElementImage(options) {
  * @param {bool}   options['can_edit_dashboards']
  * @param {bool}   options['can_view_reports']
  * @param {bool}   options['can_create_reports']
- * @param {object} trigger_elmnt                   UI element which triggered opening of overlay dialogue.
+ * @param {object} trigger_element                   UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupDashboard(options, trigger_elmnt) {
+function getMenuPopupDashboard(options, trigger_element) {
 	const sections = [];
-	const popup_options = {
-		dashboardid: options.dashboardid
-	};
+	const parameters = {dashboardid: options.dashboardid};
 
 	// Dashboard actions.
 	if (options.can_edit_dashboards) {
@@ -495,7 +496,11 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 					clickCallback: function () {
 						jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-						PopUp('dashboard.share.edit', popup_options, 'dashboard_share', trigger_elmnt);
+						PopUp('popup.dashboard.share.edit', parameters, {
+							dialogueid: 'dashboard_share_edit',
+							dialogue_class: 'modal-popup-generic',
+							trigger_element
+						});
 					},
 					disabled: !options.editable
 				},
@@ -532,7 +537,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					PopUp('popup.scheduledreport.list', popup_options, null, trigger_elmnt);
+					PopUp('popup.scheduledreport.list', parameters, {trigger_element});
 				},
 				disabled: !options.has_related_reports
 			}
@@ -544,7 +549,7 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
 				clickCallback: function () {
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-					PopUp('popup.scheduledreport.edit', popup_options, null, trigger_elmnt);
+					PopUp('popup.scheduledreport.edit', parameters, {trigger_element});
 				}
 			});
 		}
@@ -570,11 +575,11 @@ function getMenuPopupDashboard(options, trigger_elmnt) {
  * @param {object} options['configuration']           Link to trigger configuration page (optional).
  * @param {bool}   options['showEvents']              Show Problems item enabled. Default: false.
  * @param {string} options['url']                     Trigger URL link (optional).
- * @param {object} trigger_elmnt                      UI element which triggered opening of overlay dialogue.
+ * @param {object} trigger_element                      UI element which triggered opening of overlay dialogue.
  *
  * @return array
  */
-function getMenuPopupTrigger(options, trigger_elmnt) {
+function getMenuPopupTrigger(options, trigger_element) {
 	var sections = [],
 		items = [];
 
@@ -606,7 +611,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 			clickCallback: function() {
 				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
 
-				acknowledgePopUp({eventids: [options.eventid]}, trigger_elmnt);
+				acknowledgePopUp({eventids: [options.eventid]}, trigger_element);
 			}
 		};
 	}
@@ -665,7 +670,7 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 	if (typeof options.scripts !== 'undefined') {
 		sections.push({
 			label: t('Scripts'),
-			items: getMenuPopupScriptData(options.scripts, trigger_elmnt, null, options.eventid)
+			items: getMenuPopupScriptData(options.scripts, trigger_element, null, options.eventid)
 		});
 	}
 
@@ -673,68 +678,153 @@ function getMenuPopupTrigger(options, trigger_elmnt) {
 }
 
 /**
- * Get menu popup trigger log section data.
+ * Get menu popup latest data item log section data.
  *
  * @param string options['itemid']
  * @param string options['hostid']
- * @param string options['name']
- * @param bool   options['show_triggers']             (optional) Show trigger menus.
- * @param array  options['triggers']                  (optional)
- * @param string options['triggers'][n]['triggerid']
- * @param string options['triggers'][n]['name']
- * @param string options['context']                   Additional parameter in URL to identify main section.
- * @param {object} trigger_elmnt                      UI element that was clicked to open overlay dialogue.
+ * @param bool   options['showGraph']                   Link to Monitoring->Items->Graphs page.
+ * @param bool   options['history']                     Is history available.
+ * @param bool   options['trends']                      Are trends available.
+ * @param bool   options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
+ * @param bool   options['isWriteable']                 Whether user has read and write access to host and its items.
  *
  * @return array
  */
-function getMenuPopupItem(options, trigger_elmnt) {
-	var items = [];
+function getMenuPopupItem(options) {
+	const items = [];
+	let url;
 
-	if (typeof options.show_triggers !== 'undefined' && options.show_triggers) {
-		// create
-		items.push({
-			label: t('Create trigger'),
-			clickCallback: function() {
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+	url = new Curl('history.php', false);
+	url.setArgument('action', 'showgraph');
+	url.setArgument('itemids[]', options.itemid);
 
-				return PopUp('popup.triggerwizard', {
-					itemid: options.itemid
-				}, null, trigger_elmnt);
-			}
-		});
+	items.push({
+		label: t('Graph'),
+		url: url.getUrl(),
+		disabled: !options.showGraph
+	});
 
-		var edit_trigger = {
-			label: t('Edit trigger')
-		};
+	url = new Curl('history.php', false);
+	url.setArgument('action', 'showvalues');
+	url.setArgument('itemids[]', options.itemid);
 
-		// edit
-		if (options.triggers.length > 0) {
-			var triggers = [];
-
-			jQuery.each(options.triggers, function(i, trigger) {
-				triggers.push({
-					label: trigger.name,
-					clickCallback: function() {
-						jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
-
-						return PopUp('popup.triggerwizard', {
-							itemid: options.itemid,
-							triggerid: trigger.triggerid
-						}, null, trigger_elmnt);
-					}
-				});
-			});
-
-			edit_trigger.items = triggers;
-		}
-		else {
-			edit_trigger.disabled = true;
-		}
-
-		items.push(edit_trigger);
+	const values = {
+		label: t('Values'),
+		url: url.getUrl()
 	}
 
-	var url = new Curl('items.php', false);
+	url = new Curl('history.php', false);
+	url.setArgument('action', 'showlatest');
+	url.setArgument('itemids[]', options.itemid);
+
+	const latest = {
+		label: t('500 latest values'),
+		url: url.getUrl()
+	}
+
+	if (!options.history && !options.trends) {
+		values.disabled = true;
+		latest.disabled = true;
+	}
+
+	items.push(values);
+	items.push(latest);
+
+	if (options.allowed_ui_conf_hosts) {
+		const config = {
+			label: t('Configuration'),
+			disabled: !options.isWriteable
+		};
+
+		if (options.isWriteable) {
+			url = new Curl('items.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('hostid', options.hostid);
+			url.setArgument('itemid', options.itemid);
+			url.setArgument('context', 'host');
+
+			config.url = url.getUrl();
+		}
+
+		items.push(config);
+	}
+
+	return [{
+		label: t('Item'),
+		items: items
+	}];
+}
+
+/**
+ * Get menu popup item log section data.
+ *
+ * @param string options['backurl']                   Url from where the popup menu was called.
+ * @param string options['itemid']
+ * @param string options['hostid']
+ * @param string options['host']                      Host name.
+ * @param string options['name']
+ * @param string options['key']                       Item key.
+ * @param array  options['triggers']                  (optional)
+ * @param string options['triggers'][n]['triggerid']
+ * @param string options['triggers'][n]['name']
+ * @param bool   options['allowed_ui_latest_data']    Whether user has access to latest data page.
+ * @param string options['context']                   Additional parameter in URL to identify main section.
+ *
+ * @return array
+ */
+function getMenuPopupItemConfiguration(options) {
+	const items = [];
+	let url;
+
+	if (options.context === 'host' && options.allowed_ui_latest_data) {
+		url = new Curl('zabbix.php', false);
+		url.setArgument('action', 'latest.view');
+		url.setArgument('hostids[]', options.hostid);
+		url.setArgument('name', options.name);
+		url.setArgument('filter_name', '');
+
+		items.push({
+			label: t('Latest data'),
+			url: url.getUrl()
+		});
+	}
+
+	url = new Curl('triggers.php', false);
+	url.setArgument('form', 'create');
+	url.setArgument('hostid', options.hostid);
+	url.setArgument('description', options.name);
+	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
+	url.setArgument('context', options.context);
+	url.setArgument('backurl', options.backurl);
+
+	items.push({
+		label: t('Create trigger'),
+		url: url.getUrl()
+	});
+
+	if (options.triggers.length > 0) {
+		const triggers = [];
+
+		jQuery.each(options.triggers, function (i, trigger) {
+			url = new Curl('triggers.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('triggerid', trigger.triggerid);
+			url.setArgument('context', options.context);
+			url.setArgument('backurl', options.backurl);
+
+			triggers.push({
+				label: trigger.name,
+				url: url.getUrl()
+			});
+		});
+
+		items.push({
+			label: t('Triggers'),
+			items: triggers
+		})
+	}
+
+	url = new Curl('items.php', false);
 	url.setArgument('form', 'create');
 	url.setArgument('hostid', options.hostid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
@@ -753,6 +843,7 @@ function getMenuPopupItem(options, trigger_elmnt) {
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
 	url.setArgument('master_itemid', options.itemid);
 	url.setArgument('context', options.context);
+	url.setArgument('backurl', options.backurl);
 
 	items.push({
 		label: t('Create dependent discovery rule'),
@@ -769,28 +860,74 @@ function getMenuPopupItem(options, trigger_elmnt) {
 /**
  * Get menu structure for item prototypess.
  *
- * @param array options['name']
- * @param array options['itemid']
- * @param array options['parent_discoveryid']
- * @param string options['context']                   Additional parameter in URL to identify main section.
+ * @param array  options['name']
+ * @param string options['backurl']                             Url from where the popup menu was called.
+ * @param array  options['key']                                 Item prototype key.
+ * @param array  options['host']                                Host name.
+ * @param array  options['itemid']
+ * @param array  options['trigger_prototypes']                  (optional)
+ * @param string options['trigger_prototypes'][n]['triggerid']
+ * @param string options['trigger_prototypes'][n]['name']
+ * @param array  options['parent_discoveryid']
+ * @param string options['context']                             Additional parameter in URL to identify main section.
  *
  * @return array
  */
-function getMenuPopupItemPrototype(options) {
-	var url = new Curl('disc_prototypes.php', false);
+function getMenuPopupItemPrototypeConfiguration(options) {
+	const items = [];
+	let url;
 
+	url = new Curl('trigger_prototypes.php', false);
+	url.setArgument('parent_discoveryid', options.parent_discoveryid);
+	url.setArgument('form', 'create');
+	url.setArgument('description', options.name);
+	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
+	url.setArgument('context', options.context);
+	url.setArgument('backurl', options.backurl);
+
+	items.push({
+		label: t('Create trigger prototype'),
+		url: url.getUrl()
+	});
+
+	if (options.trigger_prototypes.length > 0) {
+		const trigger_prototypes = [];
+
+		jQuery.each(options.trigger_prototypes, function (i, trigger) {
+			url = new Curl('trigger_prototypes.php', false);
+			url.setArgument('form', 'update');
+			url.setArgument('parent_discoveryid', options.parent_discoveryid);
+			url.setArgument('triggerid', trigger.triggerid)
+			url.setArgument('context', options.context);
+			url.setArgument('backurl', options.backurl);
+
+			trigger_prototypes.push({
+				label: trigger.name,
+				url: url.getUrl()
+			});
+		});
+
+		items.push({
+			label: t('Trigger prototypes'),
+			items: trigger_prototypes
+		});
+	}
+
+	url = new Curl('disc_prototypes.php', false);
 	url.setArgument('form', 'create');
 	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
 	url.setArgument('master_itemid', options.itemid);
 	url.setArgument('context', options.context);
 
+	items.push({
+		label: t('Create dependent item'),
+		url: url.getUrl()
+	});
+
 	return [{
 		label: options.name,
-		items: [{
-			label: t('Create dependent item'),
-			url: url.getUrl()
-		}]
+		items: items
 	}];
 }
 
@@ -939,13 +1076,13 @@ function getMenuPopupTriggerMacro(options) {
  * Build script menu tree.
  *
  * @param array scripts           Script names amd nenu paths.
- * @param {object} trigger_elmnt  UI element which triggered opening of overlay dialogue.
+ * @param {Node} trigger_element  UI element which triggered opening of overlay dialogue.
  * @param array hostid            Host ID.
  * @param array eventid           Event ID.
  *
  * @returns array
  */
-function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
+function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
 	var tree = {};
 
 	var appendTreeItem = function(tree, name, items, params) {
@@ -1017,7 +1154,7 @@ function getMenuPopupScriptData(scripts, trigger_elmnt, hostid, eventid) {
 		return items;
 	};
 
-	return getMenuPopupScriptItems(tree, trigger_elmnt);
+	return getMenuPopupScriptItems(tree, trigger_element);
 }
 
 jQuery(function($) {

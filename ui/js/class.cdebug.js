@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,11 +28,11 @@ var jsDump;
 
 	function quote(str) {
 		return '"' + str.toString().replace(/"/g, '\\"') + '"';
-	};
+	}
 
 	function literal(o) {
 		return o + '';
-	};
+	}
 
 	function join(pre, arr, post) {
 		var s = jsDump.separator(),
@@ -47,7 +47,7 @@ var jsDump;
 		}
 
 		return [pre, inner + arr, base + post].join(s);
-	};
+	}
 
 	function array(arr) {
 		var i = arr.length, ret = Array(i);
@@ -59,7 +59,7 @@ var jsDump;
 		this.down();
 
 		return join('[', ret, ']');
-	};
+	}
 
 	jsDump = {
 		quote: quote,

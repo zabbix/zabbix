@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -226,12 +226,12 @@ class DB {
 	 *
 	 * @static
 	 *
-	 * @param string $tableName
+	 * @param string $table_name
 	 *
-	 * @return string|array
+	 * @return string
 	 */
-	protected static function getPk($tableName) {
-		$schema = self::getSchema($tableName);
+	public static function getPk(string $table_name): string {
+		$schema = self::getSchema($table_name);
 
 		return $schema['key'];
 	}
@@ -392,6 +392,7 @@ class DB {
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_ID:
 					case self::FIELD_TYPE_UINT:
 						if (!zbx_ctype_digit($values[$field])) {
@@ -399,18 +400,21 @@ class DB {
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_INT:
 						if (!zbx_is_int($values[$field])) {
 							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for int field "%2$s".', $values[$field], $field));
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_FLOAT:
 						if (!is_numeric($values[$field])) {
 							self::exception(self::DBEXECUTE_ERROR, _s('Incorrect value "%1$s" for float field "%2$s".', $values[$field], $field));
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_TEXT:
 						if ($DB['TYPE'] == ZBX_DB_ORACLE) {
 							$length = mb_strlen($values[$field]);
@@ -422,6 +426,7 @@ class DB {
 						}
 						$values[$field] = zbx_dbstr($values[$field]);
 						break;
+
 					case self::FIELD_TYPE_NCLOB:
 						// Using strlen because 4000 bytes is largest possible string literal in oracle query.
 						if ($DB['TYPE'] == ZBX_DB_ORACLE && strlen($values[$field]) > ORACLE_MAX_STRING_SIZE) {
@@ -432,6 +437,21 @@ class DB {
 							$values[$field] = zbx_dbstr($values[$field]);
 						}
 						break;
+
+					case self::FIELD_TYPE_BLOB:
+						switch ($DB['TYPE']) {
+							case ZBX_DB_MYSQL:
+								$values[$field] = zbx_dbstr($values[$field]);
+								break;
+
+							case ZBX_DB_POSTGRESQL:
+								$values[$field] = "'".pg_escape_bytea($DB['DB'], $values[$field])."'";
+								break;
+
+							case ZBX_DB_ORACLE:
+								// Do nothing; Check CImage.php to see how to update BLOB data with ORACLE DB.
+								break;
+						}
 				}
 			}
 		}
@@ -532,12 +552,21 @@ class DB {
 
 		$mandatory_fields = [];
 
-		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
-			foreach ($table_schema['fields'] as $name => $field) {
-				if ($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB) {
-					$mandatory_fields += [$name => $field['default']];
+		switch ($DB['TYPE']) {
+			case ZBX_DB_MYSQL:
+				foreach ($table_schema['fields'] as $name => $field) {
+					if ($field['type'] == self::FIELD_TYPE_TEXT || $field['type'] == self::FIELD_TYPE_NCLOB) {
+						$mandatory_fields += [$name => $field['default']];
+					}
 				}
-			}
+				break;
+
+			case ZBX_DB_ORACLE:
+				foreach ($table_schema['fields'] as $name => $field) {
+					if ($field['type'] == self::FIELD_TYPE_BLOB) {
+						$mandatory_fields += [$name => 'EMPTY_BLOB()'];
+					}
+				}
 		}
 
 		return $mandatory_fields;
@@ -563,14 +592,14 @@ class DB {
 			switch ($table_schema['fields'][$table_schema['key']]['type']) {
 				case DB::FIELD_TYPE_ID:
 					$resultids[$key] = $id;
-					$row[$table_schema['key']] = $id;
+					$row = [$table_schema['key'] => $id] + $row;
 					$id = bcadd($id, 1, 0);
 					break;
 
 				case DB::FIELD_TYPE_CUID:
 					$id = CCuid::generate();
 					$resultids[$key] = $id;
-					$row[$table_schema['key']] = $id;
+					$row = [$table_schema['key'] => $id] + $row;
 					break;
 			}
 		}
@@ -997,20 +1026,25 @@ class DB {
 	 * @return array
 	 */
 	public static function select($table_name, array $options, $table_alias = null) {
+		$db_result = DBSelect(self::makeSql($table_name, $options, $table_alias), $options['limit']);
+
+		if ($options['countOutput']) {
+			return DBfetch($db_result)['rowscount'];
+		}
+
 		$result = [];
 		$field_names = array_flip($options['output']);
-		$db_result = DBSelect(self::makeSql($table_name, $options, $table_alias), $options['limit']);
 
 		if ($options['preservekeys']) {
 			$pk = self::getPk($table_name);
 
 			while ($db_row = DBfetch($db_result)) {
-				$result[$db_row[$pk]] = $options['countOutput'] ? $db_row : array_intersect_key($db_row, $field_names);
+				$result[$db_row[$pk]] = array_intersect_key($db_row, $field_names);
 			}
 		}
 		else {
 			while ($db_row = DBfetch($db_result)) {
-				$result[] = $options['countOutput'] ? $db_row : array_intersect_key($db_row, $field_names);
+				$result[] = array_intersect_key($db_row, $field_names);
 			}
 		}
 
@@ -1076,15 +1110,16 @@ class DB {
 	/**
 	 * Modifies the SQL parts to implement all of the output related options.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
+	 * @throws APIException
+	 * @throws DBException
 	 * @return array
 	 */
-	private static function applyQueryOutputOptions($table_name, array $options, $table_alias = null,
-			array $sql_parts) {
+	private static function applyQueryOutputOptions($table_name, array $options, $table_alias, array $sql_parts) {
 		if ($options['countOutput']) {
 			$sql_parts['select'][] = 'COUNT('.self::fieldId('*', $table_alias).') AS rowscount';
 		}
@@ -1110,17 +1145,17 @@ class DB {
 	}
 
 	/**
-	 * Modifies the SQL parts to implement all of the filter related options.
+	 * Modifies the SQL parts to implement all the filter related options.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
+	 * @throws APIException
 	 * @return array
 	 */
-	private static function applyQueryFilterOptions($table_name, array $options, $table_alias = null,
-			array $sql_parts) {
+	private static function applyQueryFilterOptions($table_name, array $options, $table_alias, array $sql_parts) {
 		$table_schema = self::getSchema($table_name);
 		$pk = self::getPk($table_name);
 		$pk_option = $pk.'s';
@@ -1160,18 +1195,19 @@ class DB {
 	/**
 	 * Modifies the SQL parts to implement all of the search related options.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param array  $options['search']
-	 * @param bool   $options['startSearch']
-	 * @param bool   $options['searchByAny']
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param array       $options['search']
+	 * @param bool        $options['startSearch']
+	 * @param bool        $options['searchByAny']
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
+	 * @throws APIException
+	 * @throws DBException
 	 * @return array
 	 */
-	private static function applyQuerySearchOptions($table_name, array $options, $table_alias = null,
-			array $sql_parts) {
+	private static function applyQuerySearchOptions($table_name, array $options, $table_alias, array $sql_parts) {
 		global $DB;
 
 		$table_schema = DB::getSchema($table_name);
@@ -1233,14 +1269,16 @@ class DB {
 	/**
 	 * Apply filter conditions to sql built query.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
-	 * @return bool
+	 * @throws APIException
+	 * @throws DBException
+	 * @return array
 	 */
-	private static function dbFilter($table_name, $options, $table_alias = null, $sql_parts) {
+	private static function dbFilter($table_name, $options, $table_alias, $sql_parts) {
 		$table_schema = self::getSchema($table_name);
 		$filter = [];
 
@@ -1292,14 +1330,16 @@ class DB {
 	/**
 	 * Modifies the SQL parts to implement all of the sorting related options.
 	 *
-	 * @param string $table_name
-	 * @param array  $options
-	 * @param string $table_alias
-	 * @param array  $sql_parts
+	 * @param string      $table_name
+	 * @param array       $options
+	 * @param string|null $table_alias
+	 * @param array       $sql_parts
 	 *
+	 * @throws APIException
+	 * @throws DBException
 	 * @return array
 	 */
-	private static function applyQuerySortOptions($table_name, array $options, $table_alias = null, array $sql_parts) {
+	private static function applyQuerySortOptions($table_name, array $options, $table_alias, array $sql_parts) {
 		$table_schema = self::getSchema($table_name);
 
 		foreach ($options['sortfield'] as $index => $field_name) {

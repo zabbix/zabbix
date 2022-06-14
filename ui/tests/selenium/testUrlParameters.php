@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,51 +126,72 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Configuration of hosts',
+				'title' => 'Configuration of host',
 				'check_server_name' => true,
-				'server_name_on_page' => true,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'hosts.php?form=update&hostid=10084',
-						'text_present' => 'Hosts'
+						'url' => 'zabbix.php?action=host.edit&hostid=10084',
+						'text_present' => 'Host'
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=9999999',
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid=9999999',
+						'text_not_present' => 'Host',
+						'access_denied' => true,
 						'text_present' => [
-							'No permissions to referred object or it does not exist!'
+							'You are logged in as "Admin". You have no permissions to access this page.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'Fatal error, please report to the Zabbix team',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+
+					[
+						'url' => 'zabbix.php?action=host.edit&hostid=abc',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
+						'text_present' => [
+							'Incorrect value "abc" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid: abc'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=abc',
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid= ',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "hostid" is not integer.'
+							'Incorrect value "" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid:'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=',
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid=-1',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "hostid" is not integer.'
+							'Incorrect value "-1" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid: -1'
 						]
 					],
 					[
-						'url' => 'hosts.php?form=update&hostid=-1',
-						'text_not_present' => 'Hosts',
+						'url' => 'zabbix.php?action=host.edit&hostid=',
+						'text_not_present' => 'Host',
+						'fatal_error' => true,
 						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "hostid" field.'
-						]
-					],
-					[
-						'url' => 'hosts.php?form=update',
-						'text_not_present' => 'Hosts',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "hostid" is mandatory.'
+							'Incorrect value "" for "hostid" field.',
+							'Controller: host.edit',
+							'action: host.edit',
+							'hostid:'
 						]
 					]
 				]
@@ -382,41 +403,6 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Overview [refreshed every 30 sec.]',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'overview.php?groupid=4&type=0',
-						'text_present' => 'Overview'
-					],
-					[
-						'url' => 'overview.php?groupid=abc&type=abc',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "type" is not integer.'
-						]
-					],
-					[
-						'url' => 'overview.php?groupid=&type=',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "type" is not integer.'
-						]
-					],
-					[
-						'url' => 'overview.php?groupid=-1&type=-1',
-						'text_not_present' => 'Overview',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "type" field.'
-						]
-					]
-				]
-			],
-			[
 				'title' => 'Details of web scenario',
 				'check_server_name' => true,
 				'server_name_on_page' => true,
@@ -472,45 +458,45 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=4&filter_hostids[]=50009',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=4&hostids[]=50009',
 						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=9999999&filter_hostids[]=50009',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=9999999&hostids[]=50009',
 						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=4&filter_hostids[]=9999999',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=4&hostids[]=9999999',
 						'text_present' => 'Latest data'
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=abc&filter_hostids[]=abc',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=abc&hostids[]=abc',
 						'text_not_present' => 'Latest data',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_groupids" field.',
-							'Incorrect value for "filter_hostids" field.'
+							'Incorrect value for "groupids" field.',
+							'Incorrect value for "hostids" field.'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=&filter_hostids[]=',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=&hostids[]=',
 						'text_not_present' => 'Latest data',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_groupids" field.',
-							'Incorrect value for "filter_hostids" field.'
+							'Incorrect value for "groupids" field.',
+							'Incorrect value for "hostids" field.'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=latest.view&filter_groupids[]=-1&filter_hostids[]=-1',
+						'url' => 'zabbix.php?action=latest.view&groupids[]=-1&hostids[]=-1',
 						'text_not_present' => 'Latest data',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_groupids" field.',
-							'Incorrect value for "filter_hostids" field.'
+							'Incorrect value for "groupids" field.',
+							'Incorrect value for "hostids" field.'
 						]
 					],
 					[
@@ -592,65 +578,68 @@ class testUrlParameters extends CLegacyWebTest {
 				'server_name_on_page' => false,
 				'test_cases' => [
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=524&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=66666&filter_show=2&filter_set=1',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=524&'.
-								'filter_graphids%5B%5D=700018&filter_set=1',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!',
-							'Host to check graph 1: Check graph 1'
-						]
-					],
-					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_hostids%5B%5D=666666&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=99012&filter_hostids%5B%5D=66666&'.
+								'filter_show=1&filter_set=1',
 						'text_present' => [
 							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_hostids%5B%5D=50011&'.
-						'filter_graphids%5B%5D=524&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=50011&filter_hostids%5B%5D=66666&'.
+						'filter_name=2_item&filter_show=0&filter_set=1',
 						'text_present' => [
-							'No permissions to referred object or it does not exist!',
-							'1_Host_to_check_Monitoring_Overview'
+							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=abc&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D=abc&filter_show=1&filter_set=1',
 						'text_not_present' => 'Graphs',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_graphids" field.'
+							'Incorrect value for "filter_hostids" field.'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=&filter_set=1',
+						'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D=-1&filter_show=1&filter_set=1',
 						'text_not_present' => 'Graphs',
 						'fatal_error' => true,
 						'text_present' => [
 							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_graphids" field.'
+							'Incorrect value for "filter_hostids" field.'
+						]
+					]
+				]
+			],
+			[
+				'title' => 'History [refreshed every 30 sec.]',
+				'check_server_name' => true,
+				'server_name_on_page' => false,
+				'test_cases' => [
+					[
+						'url' => 'history.php?action=showgraph&itemids%5B%5D=66666',
+						'text_present' => [
+							'No permissions to referred object or it does not exist!'
 						]
 					],
 					[
-						'url' => 'zabbix.php?view_as=showgraph&action=charts.view&filter_graphids%5B%5D=-1&filter_set=1',
-						'text_not_present' => 'Graphs',
-						'fatal_error' => true,
+						'url' => 'history.php?action=showgraph&itemids%5B%5D=',
 						'text_present' => [
-							'Fatal error, please report to the Zabbix team',
-							'Incorrect value for "filter_graphids" field.'
+							'Zabbix has received an incorrect request.',
+							'Field "itemids" is not integer.'
 						]
 					],
 					[
-						'url' => 'zabbix.php?action=charts.view&filter_set=1',
+						'url' => 'history.php?action=showgraph&itemids%5B%5D=abc',
 						'text_present' => [
-							'Graphs',
-							'Specify host to see the graphs.'
+							'Zabbix has received an incorrect request.',
+							'Field "itemids" is not integer.'
 						]
 					]
 				]

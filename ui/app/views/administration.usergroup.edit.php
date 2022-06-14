@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
  */
 
 $this->includeJsFile('administration.usergroup.edit.js.php');
-$this->addJsFile('class.tab-indicators.js');
 
 $widget = (new CWidget())->setTitle(_('User groups'));
 
@@ -242,5 +241,3 @@ else {
 $form->addItem($tabs);
 $widget->addItem($form);
 $widget->show();
-
-$this->addJsFile('multiselect.js');

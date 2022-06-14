@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "discovery.h"
+
 #include "common.h"
-#include "db.h"
 #include "log.h"
 #include "events.h"
-#include "discovery.h"
 
 static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {
@@ -68,8 +68,6 @@ static DB_RESULT	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, const char
 
 /******************************************************************************
  *                                                                            *
- * Function: discovery_separate_host                                          *
- *                                                                            *
  * Purpose: separate multiple-IP hosts                                        *
  *                                                                            *
  * Parameters: host ip address                                                *
@@ -78,7 +76,6 @@ static DB_RESULT	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, const char
 static void	discovery_separate_host(const DB_DRULE *drule, DB_DHOST *dhost, const char *ip)
 {
 	DB_RESULT	result;
-	DB_ROW		row;
 	char		*ip_esc, *sql = NULL;
 	zbx_uint64_t	dhostid;
 
@@ -95,7 +92,7 @@ static void	discovery_separate_host(const DB_DRULE *drule, DB_DHOST *dhost, cons
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)))
+	if (NULL != DBfetch(result))
 	{
 		dhostid = DBget_maxid("dhosts");
 
@@ -123,8 +120,6 @@ static void	discovery_separate_host(const DB_DRULE *drule, DB_DHOST *dhost, cons
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: discovery_register_host                                          *
  *                                                                            *
  * Purpose: register host if one does not exist                               *
  *                                                                            *
@@ -195,8 +190,6 @@ static void	discovery_register_host(const DB_DRULE *drule, zbx_uint64_t dcheckid
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: discovery_register_service                                       *
  *                                                                            *
  * Purpose: register service if one does not exist                            *
  *                                                                            *
@@ -288,8 +281,6 @@ static void	discovery_register_service(zbx_uint64_t dcheckid, DB_DHOST *dhost, D
 
 /******************************************************************************
  *                                                                            *
- * Function: discovery_update_dservice                                        *
- *                                                                            *
  * Purpose: update discovered service details                                 *
  *                                                                            *
  ******************************************************************************/
@@ -308,8 +299,6 @@ static void	discovery_update_dservice(zbx_uint64_t dserviceid, int status, int l
 
 /******************************************************************************
  *                                                                            *
- * Function: discovery_update_dservice_value                                  *
- *                                                                            *
  * Purpose: update discovered service details                                 *
  *                                                                            *
  ******************************************************************************/
@@ -326,8 +315,6 @@ static void	discovery_update_dservice_value(zbx_uint64_t dserviceid, const char 
 
 /******************************************************************************
  *                                                                            *
- * Function: discovery_update_dhost                                           *
- *                                                                            *
  * Purpose: update discovered host details                                    *
  *                                                                            *
  ******************************************************************************/
@@ -338,8 +325,6 @@ static void	discovery_update_dhost(const DB_DHOST *dhost)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: discovery_update_service_status                                  *
  *                                                                            *
  * Purpose: process and update the new service status                         *
  *                                                                            *
@@ -402,8 +387,6 @@ static void	discovery_update_service_status(DB_DHOST *dhost, const DB_DSERVICE *
 
 /******************************************************************************
  *                                                                            *
- * Function: discovery_update_host_status                                     *
- *                                                                            *
  * Purpose: update new host status                                            *
  *                                                                            *
  ******************************************************************************/
@@ -449,8 +432,6 @@ static void	discovery_update_host_status(DB_DHOST *dhost, int status, int now)
 
 /******************************************************************************
  *                                                                            *
- * Function: discovery_update_host                                            *
- *                                                                            *
  * Purpose: process new host status                                           *
  *                                                                            *
  * Parameters: host - host info                                               *
@@ -467,8 +448,6 @@ void	discovery_update_host(DB_DHOST *dhost, int status, int now)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: discovery_update_service                                         *
  *                                                                            *
  * Purpose: process new service status                                        *
  *                                                                            *

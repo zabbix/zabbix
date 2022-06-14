@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,20 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "report_writer.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxipcservice.h"
-#include "zbxserialize.h"
 #include "zbxjson.h"
 #include "zbxalert.h"
-#include "db.h"
-#include "report_writer.h"
 #include "report_protocol.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 extern char	*CONFIG_WEBSERVICE_URL;
 extern char	*CONFIG_TLS_CA_FILE;
@@ -80,8 +78,6 @@ static char	*rw_curl_error(CURLcode err)
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: rw_get_report                                                    *
  *                                                                            *
  * Purpose: get report from web service                                       *
  *                                                                            *
@@ -155,7 +151,8 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, CONFIG_WEBSERVICE_URL)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, j.buffer)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt,
 				(curl_error = rw_curl_error(err)));
@@ -173,7 +170,6 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 			goto out;
 		}
 	}
-
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
@@ -243,11 +239,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_begin_report                                                  *
+ * Purpose: to begin report dispatch                                          *
  *                                                                            *
- * Purpose: begin report dispatch                                             *
- *                                                                            *
- * Parameters: msg      - [IN] the begin report request message               *
+ * Parameters: msg      - [IN] the request message                            *
  *             dispatch - [IN] the alerter dispatch                           *
  *             error    - [OUT] the error message                             *
  *                                                                            *
@@ -306,11 +300,9 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_send_report                                                   *
- *                                                                            *
  * Purpose: send report to the recipients using specified media type          *
  *                                                                            *
- * Parameters: msg      - [IN] the send report request message                *
+ * Parameters: msg      - [IN] the request message                            *
  *             dispatch - [IN] the alerter dispatch                           *
  *             error    - [OUT] the error message                             *
  *                                                                            *
@@ -348,8 +340,6 @@ static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispat
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_end_report                                                    *
- *                                                                            *
  * Purpose: finish report dispatch                                            *
  *                                                                            *
  * Parameters: dispatch - [IN] the alerter dispatch                           *
@@ -374,8 +364,6 @@ static int	rw_end_report(zbx_alerter_dispatch_t *dispatch, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: rw_send_result                                                   *
- *                                                                            *
  * Purpose: send report result back to manager                                *
  *                                                                            *
  * Parameters: socket - [IN] the report manager IPC socket                    *
@@ -397,11 +385,6 @@ static void	rw_send_result(zbx_ipc_socket_t *socket, zbx_alerter_dispatch_t *dis
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: report_writer_thread                                             *
- *                                                                            *
- ******************************************************************************/
 ZBX_THREAD_ENTRY(report_writer_thread, args)
 {
 #define	ZBX_STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -413,7 +396,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	zbx_ipc_message_t	message;
 	zbx_alerter_dispatch_t	dispatch = {0};
 	int			report_status = FAIL, started_num = 0, sent_num = 0, finished_num = 0;
-	double			time_now, time_stat, time_idle = 0, time_wake;
+	double			time_now, time_stat, time_wake, time_idle = 0;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -472,7 +455,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 
 		time_wake = zbx_time();
 		zbx_update_env(time_wake);
-		time_idle += time_wake = time_now;
+		time_idle += time_wake - time_now;
 
 		switch (message.code)
 		{

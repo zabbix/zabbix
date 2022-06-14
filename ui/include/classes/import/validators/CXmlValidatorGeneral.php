@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,8 +117,6 @@ abstract class CXmlValidatorGeneral {
 	 * @param array        $rules  Validation rules.
 	 * @param array|string $data   Import data.
 	 * @param string       $path   XML path (for error reporting).
-	 *
-	 * @throws Exception if $data does not correspond to validation rules.
 	 *
 	 * @return mixed  Validator does some manipulations for the incoming data. For example, converts empty tags to an
 	 *                array, if desired. Converted data is returned.

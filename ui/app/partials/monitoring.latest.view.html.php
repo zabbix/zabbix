@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 $form = (new CForm('GET', 'history.php'))
@@ -43,6 +44,27 @@ $col_name = make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['s
 $simple_interval_parser = new CSimpleIntervalParser();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
+if ($data['filter']['show_tags'] == SHOW_TAGS_NONE) {
+	$tags_header = null;
+}
+else {
+	$tags_header = new CColHeader(_('Tags'));
+
+	switch ($data['filter']['show_tags']) {
+		case SHOW_TAGS_1:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_1);
+			break;
+
+		case SHOW_TAGS_2:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_2);
+			break;
+
+		case SHOW_TAGS_3:
+			$tags_header->addClass(ZBX_STYLE_COLUMN_TAGS_3);
+			break;
+	}
+}
+
 if ($data['filter']['show_details']) {
 	$table->setHeader([
 		$col_check_all->addStyle('width: 15px;'),
@@ -55,7 +77,7 @@ if ($data['filter']['show_details']) {
 		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
+		$tags_header,
 		(new CColHeader())->addStyle('width: 6%'),
 		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
@@ -68,8 +90,9 @@ else {
 		(new CColHeader(_('Last check')))->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun')))->addStyle('width: 10%'),
-		(new CColHeader(_('Tags')))->addClass(ZBX_STYLE_COLUMN_TAGS_3),
-		(new CColHeader())->addStyle('width: 6%')
+		$tags_header,
+		(new CColHeader())->addStyle('width: 6%'),
+		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
 }
 
@@ -80,9 +103,10 @@ foreach ($data['items'] as $itemid => $item) {
 	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$item_name = (new CDiv([
-		(new CSpan($item['name_expanded']))->addClass('label'),
-		($item['description'] !== '') ? makeDescriptionIcon($item['description']) : null
-	]))->addClass('action-container');
+		(new CLinkAction($item['name']))
+			->setMenuPopup(CMenuPopupHelper::getItem(['itemid' => $itemid])),
+		($item['description_expanded'] !== '') ? makeDescriptionIcon($item['description_expanded']) : null
+	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
 
 	// Row history data preparation.
 	$last_history = array_key_exists($itemid, $data['history'])
@@ -91,8 +115,18 @@ foreach ($data['items'] as $itemid => $item) {
 
 	if ($last_history) {
 		$prev_history = (count($data['history'][$itemid]) > 1) ? $data['history'][$itemid][1] : null;
-		$last_check = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']);
-		$last_value = formatHistoryValue($last_history['value'], $item, false);
+
+		$last_check = (new CSpan(zbx_date2age($last_history['clock'])))
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']), '', true, '', 0);
+
+		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->setHint(
+				(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
+				'', true, '', 0
+			);
+
 		$change = '';
 
 		if ($prev_history && in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
@@ -161,22 +195,37 @@ foreach ($data['items'] as $itemid => $item) {
 	}
 
 	$host = $data['hosts'][$item['hostid']];
-	$host_name = (new CLinkAction($host['name']))
-		->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
-		->setMenuPopup(CMenuPopupHelper::getHost($item['hostid']));
+
+	$maintenance_icon = '';
+
+	if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+		if (array_key_exists($host['maintenanceid'], $data['maintenances'])) {
+			$maintenance = $data['maintenances'][$host['maintenanceid']];
+			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'], $maintenance['name'],
+				$maintenance['description']
+			);
+		}
+		else {
+			$maintenance_icon = makeMaintenanceIcon($host['maintenance_type'],
+				_('Inaccessible maintenance'), ''
+			);
+		}
+	}
+
+	$host_name_container = (new CDiv([
+		(new CLinkAction($host['name']))
+			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
+			->setMenuPopup(CMenuPopupHelper::getHost($item['hostid'])),
+		$maintenance_icon
+	]))->addClass(ZBX_STYLE_ACTION_CONTAINER);
+
+	$item_icons = [];
+	if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
+		$item_icons[] = makeErrorIcon($item['error']);
+	}
 
 	if ($data['filter']['show_details']) {
-
-		$item_config_url = (new CUrl('items.php'))
-			->setArgument('form', 'update')
-			->setArgument('itemid', $itemid)
-			->setArgument('context', 'host');
-
-		$item_key = ($item['type'] == ITEM_TYPE_HTTPTEST)
-			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
-			: (new CLink($item['key_expanded'], $item_config_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREEN);
+		$item_key = (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN);
 
 		if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
 				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) === 0)) {
@@ -193,14 +242,9 @@ foreach ($data['items'] as $itemid => $item) {
 			$item_delay = (new CSpan($item['delay']))->addClass(ZBX_STYLE_RED);
 		}
 
-		$item_icons = [];
-		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$item_icons[] = makeErrorIcon($item['error']);
-		}
-
 		$table_row = new CRow([
 			$checkbox,
-			$host_name,
+			$host_name_container,
 			(new CCol([$item_name, $item_key]))->addClass($state_css),
 			(new CCol($item_delay))->addClass($state_css),
 			(new CCol($item_history))->addClass($state_css),
@@ -209,7 +253,7 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			$data['tags'][$itemid],
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
 		]);
@@ -217,13 +261,14 @@ foreach ($data['items'] as $itemid => $item) {
 	else {
 		$table_row = new CRow([
 			$checkbox,
-			$host_name,
+			$host_name_container,
 			(new CCol($item_name))->addClass($state_css),
 			(new CCol($last_check))->addClass($state_css),
 			(new CCol($last_value))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
-			$data['tags'][$itemid],
-			$actions
+			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
+			$actions,
+			makeInformationList($item_icons)
 		]);
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,8 @@ typedef enum
 	ZBX_MOCK_NOT_ENOUGH_MEMORY,
 	ZBX_MOCK_NOT_A_BINARY,
 	ZBX_MOCK_NOT_AN_UINT64,
-	ZBX_MOCK_NOT_A_FLOAT
+	ZBX_MOCK_NOT_A_FLOAT,
+	ZBX_MOCK_NOT_AN_INT
 }
 zbx_mock_error_t;
 
@@ -64,6 +65,7 @@ zbx_mock_error_t	zbx_mock_parameter(const char *path, zbx_mock_handle_t *paramet
 zbx_mock_error_t	zbx_mock_parameter_exists(const char *path);
 zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value);
 zbx_mock_error_t	zbx_mock_float(zbx_mock_handle_t object, double *value);
+zbx_mock_error_t	zbx_mock_int(zbx_mock_handle_t object, int *value);
 
 /* date/time support */
 #define ZBX_MOCK_TIMESTAMP_MAX_LEN	37

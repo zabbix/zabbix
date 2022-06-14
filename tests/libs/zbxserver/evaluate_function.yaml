@@ -2100,6 +2100,33 @@ out:
   return: SUCCEED
   value: 34.751499
 ---
+test case: Evaluate stddevpop(6m) FLOAT 135.190000
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000000 +00:00
+    - value: 135.190000
+      ts: 2021-03-27 10:02:00.000000000 +00:00
+    - value: 122.200000
+      ts: 2021-03-27 10:03:00.000000000 +00:00
+    - value: 66.700000
+      ts: 2021-03-27 10:04:00.000000000 +00:00
+    - value: 58.990000
+      ts: 2021-03-27 10:05:00.000000000 +00:00
+    - value: 40.000000
+      ts: 2021-03-27 10:06:00.000000000 +00:00
+    - value: 47.420000
+      ts: 2021-03-27 10:07:00.000000000 +00:00
+  time: 2021-03-27 10:07:00.000000000 +00:00
+  function: stddevpop
+  params: 6m
+out:
+  return: SUCCEED
+  value: 36.723065
+---
 test case: Evaluate stddevpop(6m) UINT64 26, 12, 16, 56, 112, 24
 in:
   history:
@@ -3466,4 +3493,645 @@ in:
 out:
   return: FAIL
   value:
+---
+test case: Evaluate rate(), with DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.000000000 +00:00
+  function: rate
+  params: '2'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate(), with UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.000000000 +00:00
+  function: rate
+  params: '2'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate() extrapolation, with DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '3'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate() extrapolation, with UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '3'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate() with reset and DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+  time: 2021-03-27 10:01:04.000000000 +00:00
+  function: rate
+  params: '4'
+out:
+  return: SUCCEED
+  value: 1
+
+---
+test case: Evaluate rate() with reset and UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 3
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+  time: 2021-03-27 10:01:04.000000000 +00:00
+  function: rate
+  params: '4'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate rate() extrapolation without change UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '3'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate rate() extrapolation without change DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '3'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate rate() without DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+  time: 2021-03-27 10:01:04.500000000 +00:00
+  function: rate
+  params: '1'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate rate() without 2 DOUBLE backet
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.500000000 +00:00
+  function: rate
+  params: '1'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate rate() with STR data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: 1
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 2
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+  time: 2021-03-27 10:01:02.000000000 +00:00
+  function: rate
+  params: '2'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate rate() with negative reset
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 11
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 1
+      ts: 2021-03-27 10:01:01.000000000 +00:00
+  time: 2021-03-27 10:01:01.000000000 +00:00
+  function: rate
+  params: '1'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate default all changecount() with UINT64 data (all values different)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 64
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 24
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 69
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 32
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 96
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate default all changecount() with UINT64 data (some adjacent values are equal)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 97
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 35
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 35
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 29
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 29
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate inc changecount() with UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 21
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 34
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 73
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 55
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 46
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5,"inc"'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate dec changecount() with UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 7
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 92
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 67
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 96
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 44
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5,"dec"'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate explicit all changecount() with UINT64 data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 55
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 93
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 76
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 76
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 33
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5,"all"'
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate default all changecount() with DOUBLE data and time period
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.000005
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.000001
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.000007
+      ts: 2021-03-27 10:08:03.000000000 +00:00
+    - value: 0.000004
+      ts: 2021-03-27 10:09:04.000000000 +00:00
+    - value: 0.000002
+      ts: 2021-03-27 10:10:05.000000000 +00:00
+  time: 2021-03-27 10:10:05.000000000 +00:00
+  function: changecount
+  params: '5m'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate explicit all changecount() with DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.0001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.0011
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.0011
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.0002
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.0005
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5,"all"'
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate inc changecount() with DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.0001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.0002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.0003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.0004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.0004
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5,"inc"'
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Evaluate dec changecount() with DOUBLE data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.00001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.00002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.00004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5,"dec"'
+out:
+  return: SUCCEED
+  value: 1
+---
+test case: Evaluate changecount() with STR data (all valus are different)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: abc
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: def
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: ghi
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: jkl
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: mno
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5'
+out:
+  return: SUCCEED
+  value: 4
+---
+test case: Evaluate changecount() with STR data (some adjacent values are same)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_STR
+    data:
+    - value: abc
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: abc
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: ghi
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: ghi
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: mno
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate changecount() with TEXT data (some adjacent values are same)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_TEXT
+    data:
+    - value: llgucwmznmykyfvfdtoexhqedpdjnlmentkjbmkkxtlkqvxfirozlohrtagakrmtiosiaftyqvksmeaacpgsthqvprtxgkazkpueusrldcnidlguhlwynedvlokmhgowfhgvffgoklbunjfgakrnmpejixhbmwfsornmunqyvmlaabhiaiqgtureptxqhhmcbhgphvnqzrsdkujodhmoprswdiofuyqzzagopedlgxuuysucqmzqvctaolygqtxgemol
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: llgucwmznmykyfvfdtoexhqedpdjnlmentkjbmkkxtlkqvxfirozlohrtagakrmtiosiaftyqvksmeaacpgsthqvprtxgkazkpueusrldcnidlguhlwynedvlokmhgowfhgvffgoklbunjfgakrnmpejixhbmwfsornmunqyvmlaabhiaiqgtureptxqhhmcbhgphvnqzrsdkujodhmoprswdiofuyqzzagopedlgxuuysucqmzqvctaolygqtxgemol
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: llgucwmznmykyfvfdtoexhqedpdjnlmentkjbmkkxtlkqvxfirozlohrtagakrmtiosiaftyqvksmeaacpgsthqvprtxgkazkpueusrldcnidlguhlwynedvlokmhgowfhgvffgoklbunjfgakrnmpejixhbmwfsornmunqyvmlaabhiaiqgtureptxqhhmcbhgphvnqzrsdkujodhmoprswdiofuyqzzagopedlgxuuysucqmzqvctaolygqtxgemol
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: enomgtjipnfhdrypmeegwyswqyfkbdrecxmcwzyellribxnciorcjpdhdmjnbohvgyccasnvmdboomrlliwepwpnugobqhlfsplwcnckhrhkasgncitekpubaiirzifwxsbmipsfjxiewahmjshwvcpbyxxzsgkbiyjefpwordfjmybcaktybbnaeumkbbvbklecxccbrhflprnfyrmacoaweeviljgcaxqajqgdsluokbwgyqktrduxatuotajofmuh
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: llgucwmznmykyfvfdtoexhqedpdjnlmentkjbmkkxtlkqvxfirozlohrtagakrmtiosiaftyqvksmeaacpgsthqvprtxgkazkpueusrldcnidlguhlwynedvlokmhgowfhgvffgoklbunjfgakrnmpejixhbmwfsornmunqyvmlaabhiaiqgtureptxqhhmcbhgphvnqzrsdkujodhmoprswdiofuyqzzagopedlgxuuysucqmzqvctaolygqtxgemol
+      ts: 2021-03-27 10:01:05.000000000 +00:00
+  time: 2021-03-27 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5'
+out:
+  return: SUCCEED
+  value: 2
+---
+test case: Evaluate changecount() with LOG data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+    - value: abc
+      source:
+      logeventid: 2
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:30.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: changecount
+  params: '11m'
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate changecount() with not enough data
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_LOG
+    data:
+    - value: abc
+      source:
+      logeventid: 1
+      severity: 1
+      timestamp: 2
+      ts: 2017-01-10 10:00:00.000000000 +00:00
+  time: 2017-01-10 10:10:00.000000000 +00:00
+  function: changecount
+  params: '11m'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate changecount() with wrong count of arguments
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.00001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.00002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.00004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.00003
+      ts: 2017-01-10 10:01:05.000000000 +00:00
+  time: 2017-01-10 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#5,"inc","strict"'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate changecount() without arguments
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.00001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.00002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.00004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.00003
+      ts: 2017-01-10 10:01:05.000000000 +00:00
+  time: 2017-01-10 10:01:05.000000000 +00:00
+  function: changecount
+  params: ''
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate changecount() with wrong first argument
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.00001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.00002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.00004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.00003
+      ts: 2017-01-10 10:01:05.000000000 +00:00
+  time: 2017-01-10 10:01:05.000000000 +00:00
+  function: changecount
+  params: '"inc"'
+out:
+  return: FAIL
+  value: 0
+---
+test case: Evaluate changecount() with wrong second argument
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: 0.00001
+      ts: 2021-03-27 10:01:00.000000001 +00:00
+    - value: 0.00002
+      ts: 2021-03-27 10:01:02.000000000 +00:00
+    - value: 0.00003
+      ts: 2021-03-27 10:01:03.000000000 +00:00
+    - value: 0.00004
+      ts: 2021-03-27 10:01:04.000000000 +00:00
+    - value: 0.00003
+      ts: 2017-01-10 10:01:05.000000000 +00:00
+  time: 2017-01-10 10:01:05.000000000 +00:00
+  function: changecount
+  params: '#20,"strict"'
+out:
+  return: FAIL
+  value: 0
 ...

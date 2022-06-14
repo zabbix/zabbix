@@ -100,6 +100,7 @@ $menu-main-icons: (
 	dashboard: -600px -664px,
 	problems: -600px -688px,
 	monitoring: -600px -712px,
+	services: -600px -832px,
 	inventory: -600px -736px,
 	reports: -600px -760px,
 	configuration: -600px -784px,
@@ -108,7 +109,7 @@ $menu-main-icons: (
 
 $menu-user-icons: (
 	support: -247px -84px,
-	share: -168px -84px,
+	integrations: -168px -84px,
 	help: -168px -48px,
 	guest: -247px -192px,
 	profile: -168px -120px,
@@ -172,6 +173,7 @@ $msg-warning-border-color: #ffb319;
 $btn-font-color: #333333;
 $btn-bg-color: #e0e0e0;
 $btn-border-color: #333333;
+$btn-border-focus-color: #ffffff;
 
 $btn-alt-font-color: #ffffff;
 $btn-alt-bg-color: transparent;
@@ -232,6 +234,14 @@ $toc-title-color: #000000;
 $toc-title-bg-color: #dddddd;
 $diff-added-bg-color: transparent;
 $diff-removed-bg-color: transparent;
+
+// Text
+$text-placeholder-color: #000000;
+
+// Change indicators.
+$arrow-fill-up: #FFFFFF;
+$arrow-fill-down: #FFFFFF;
+$arrow-fill-up-down: #FFFFFF;
 
 // Important! @import string should come after variables.
 @import 'screen.scss';
@@ -440,41 +450,39 @@ $diff-removed-bg-color: transparent;
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -357px -802px,
-	depend-up: url($sprite-path) no-repeat -361px -729px,
-	depend-down: url($sprite-path) no-repeat -361px -765px,
-	ackn: url($sprite-path) no-repeat -357px -693px
+	maintenance: -359px -803px,
+	depend-up: -359px -731px,
+	depend-down: -359px -766px,
+	ackn: -357px -693px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
-		margin: 0 18px 0 0;
 		&::before {
-			background: $bgimage;
-			@extend %var-icons;
+			background-position: $bgimage;
 		}
 	}
 }
 
 $form-icon-btn: (
 	cal: url($sprite-path) no-repeat -354px -834px,
-	wzrd-action: url($sprite-path) no-repeat -317px -617px
+	wizard-action: url($sprite-path) no-repeat -317px -617px
 );
 
 // Dynamically generated classes:
 //  .icon-cal
-//  .icon-wzrd-action
+//  .icon-wizard-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
 		@extend %form-icon-btn;
 
-		@if $form-icon-btn == 'wzrd-action' {
+		@if $form-icon-btn == 'wizard-action' {
 			margin-top: -16px;
 		}
 	}
@@ -655,6 +663,7 @@ button {
 }
 
 .radio-list-control {
+	.normal-bg,
 	.average-bg,
 	.disaster-bg,
 	.high-bg,
@@ -923,11 +932,15 @@ a.link-action {
 				}
 			}
 
-			.icon-maint::before {
-				background-position: -360px -804px;
+			.icon-depend-up::before {
+				background-position: -361px -731px,
 			}
 
-			.icon-wzrd-action {
+			.icon-depend-down::before {
+				background-position: -361px -767px
+			}
+
+			.icon-wizard-action {
 				background: transparent url($sprite-path) no-repeat -318px -624px;
 			}
 		}
@@ -1103,10 +1116,6 @@ td.log-disaster-bg {
 	margin: 0 0 0 -42px;
 }
 
-.notif-indic-container {
-	margin: 0 0 0 -42px;
-}
-
 td.inactive-bg {
 	padding-left: 42px !important;
 	color: $font-color;
@@ -1200,6 +1209,12 @@ td.inactive-bg {
 
 // Time selection.
 .ui-tabs-nav {
+	.btn-info {
+		&::after {
+			background-position: -279px -621px;
+		}
+	}
+
 	.btn-time {
 		&::after {
 			background-position: -246px -583px;
@@ -1241,6 +1256,12 @@ td.inactive-bg {
 	}
 
 	.ui-tabs-active {
+		.btn-info {
+			&::after {
+				background-position: -431px -621px;
+			}
+		}
+
 		.btn-time {
 			&::after {
 				background-position: -87px -583px;
@@ -1387,6 +1408,13 @@ td.inactive-bg {
 	}
 }
 
+.problem-icon-link {
+	&:focus {
+		box-shadow: 0 0 0 2px $blue;
+	}
+}
+
+.problem-icon-link,
 .problem-icon-list {
 	.problem-icon-list-item {
 		background: transparent;
@@ -1495,14 +1523,14 @@ td.inactive-bg {
 
 .filter-container.tabfilter-container {
 
-	.selected.expanded .icon-home::before {
+	.selected.expanded .icon-filter::before {
 		// white icon
-		background: url($sprite-path) no-repeat -433px -510px;
+		background: url($sprite-path) no-repeat -87px -547px;
 	}
 
-	.icon-home::before {
+	.icon-filter::before {
 		// black icon
-		background: url($sprite-path) no-repeat -281px -510px;
+		background: url($sprite-path) no-repeat -246px -547px;
 	}
 
 	.tabfilter-item-label {

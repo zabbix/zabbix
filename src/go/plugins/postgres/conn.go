@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,13 +31,13 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/jackc/pgx/v4/stdlib"
 	"github.com/omeid/go-yarn"
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/tlsconfig"
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const MinSupportedPGVersion = 100000
@@ -58,6 +58,7 @@ type PGConn struct {
 	lastTimeAccess time.Time
 	version        int
 	queryStorage   *yarn.Yarn
+	address        string
 }
 
 var errorQueryNotFound = "query %q not found"
@@ -73,7 +74,7 @@ func (conn *PGConn) Query(ctx context.Context, query string, args ...interface{}
 	return
 }
 
-// QueryByName executes a query from queryStorage by its name and returns a singe row.
+// QueryByName executes a query from queryStorage by its name and returns a single row.
 func (conn *PGConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
@@ -95,7 +96,7 @@ func (conn *PGConn) QueryRow(ctx context.Context, query string, args ...interfac
 	return
 }
 
-// QueryRowByName executes a query from queryStorage by its name and returns a singe row.
+// QueryRowByName executes a query from queryStorage by its name and returns a single row.
 func (conn *PGConn) QueryRowByName(ctx context.Context, queryName string, args ...interface{}) (row *sql.Row, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
@@ -127,7 +128,7 @@ func (conn *PGConn) updateAccessTime() {
 type ConnManager struct {
 	sync.Mutex
 	connMutex      sync.Mutex
-	connections    map[uri.URI]*PGConn
+	connections    map[string]*PGConn
 	keepAlive      time.Duration
 	connectTimeout time.Duration
 	callTimeout    time.Duration
@@ -141,7 +142,7 @@ func NewConnManager(keepAlive, connectTimeout, callTimeout,
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
-		connections:    make(map[uri.URI]*PGConn),
+		connections:    make(map[string]*PGConn),
 		keepAlive:      keepAlive,
 		connectTimeout: connectTimeout,
 		callTimeout:    callTimeout,
@@ -163,7 +164,7 @@ func (c *ConnManager) closeUnused() {
 		if time.Since(conn.lastTimeAccess) > c.keepAlive {
 			conn.client.Close()
 			delete(c.connections, uri)
-			log.Debugf("[%s] Closed unused connection: %s", pluginName, uri.Addr())
+			log.Debugf("[%s] Closed unused connection: %s", pluginName, conn.address)
 		}
 	}
 }
@@ -200,7 +201,7 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, e
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if _, ok := c.connections[uri]; ok {
+	if _, ok := c.connections[uri.NoQueryString()]; ok {
 		// Should never happen.
 		panic("connection already exists")
 	}
@@ -248,18 +249,19 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*PGConn, e
 		return nil, fmt.Errorf("postgres version %d is not supported", serverVersion)
 	}
 
-	c.connections[uri] = &PGConn{
+	c.connections[uri.NoQueryString()] = &PGConn{
 		client:         client,
 		callTimeout:    c.callTimeout,
 		version:        serverVersion,
 		lastTimeAccess: time.Now(),
 		ctx:            ctx,
 		queryStorage:   &c.queryStorage,
+		address:        uri.Addr(),
 	}
 
 	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())
 
-	return c.connections[uri], nil
+	return c.connections[uri.NoQueryString()], nil
 }
 
 func createTLSClient(dsn string, timeout time.Duration, details tlsconfig.Details) (*sql.DB, error) {
@@ -304,7 +306,7 @@ func (c *ConnManager) get(uri uri.URI) *PGConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
-	if conn, ok := c.connections[uri]; ok {
+	if conn, ok := c.connections[uri.NoQueryString()]; ok {
 		conn.updateAccessTime()
 		return conn
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  */
 class testPageMonitoringHosts extends CWebTest {
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	/**
@@ -46,8 +46,8 @@ class testPageMonitoringHosts extends CWebTest {
 		// Checking Title, Header and Column names.
 		$this->page->assertTitle('Hosts');
 		$this->page->assertHeader('Hosts');
-		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Problems', 'Status', 'Latest data', 'Problems',
-			'Graphs', 'Dashboards', 'Web'];
+		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Status', 'Latest data', 'Problems','Graphs',
+				'Dashboards', 'Web'];
 		$this->assertSame($headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
 
 		// Check filter collapse/expand.
@@ -781,7 +781,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?port=10051&action=host.view&groupids%5B%5D=4');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
-		$this->setFilterSelector('id:tags_0');
+		$this->setTagSelector('id:tags_0');
 		$this->setTags($data['tag_options']['tags']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
@@ -886,9 +886,10 @@ class testPageMonitoringHosts extends CWebTest {
 			case 'Dynamic widgets H1':
 			case 'Host ZBX6663':
 			case 'Available host':
-				$field = ($data['name'] == 'Dynamic widgets H1') ? 'Host' : 'Hosts';
 				$this->selectLink($data['name'], $data['link_name'], $data['page_header']);
-				$form->checkValue([$field => $data['name']]);
+				$this->page->waitUntilReady();
+				$filter_form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+				$filter_form->checkValue(['Hosts' => $data['name']]);
 				$this->query('button:Reset')->one()->click();
 				break;
 			case 'ЗАББИКС Сервер':
@@ -1014,6 +1015,53 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check number of problems displayed on Hosts and Problems page.
+	 */
+	public function testPageMonitoringHosts_CountProblems() {
+		$this->page->login();
+		$hosts_names = ['1_Host_to_check_Monitoring_Overview', 'ЗАББИКС Сервер', 'Host for tag permissions', 'Empty host'];
+		foreach ($hosts_names as $host) {
+			$this->page->open('zabbix.php?action=host.view&name='.$host)->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one();
+
+			// Get number of problems displayed on icon and it severity level.
+			if ($host !== 'Empty host') {
+				$icons = $table->query('xpath:.//*[contains(@class, "problem-icon-list-item")]')->all();
+				$results = [];
+
+				foreach ($icons as $icon) {
+					$amount = $icon->getText();
+					$severity = $icon->getAttribute('title');
+					$results[$severity] = $amount;
+				}
+			}
+			else {
+				$this->assertEquals('Problems', $table->getRow(0)->getColumn('Problems')->getText());
+			}
+
+			// Navigate to Problems page from Hosts.
+			$table->getRow(0)->getColumn('Problems')->query('xpath:.//a')->one()->click();
+			$this->page->waitUntilReady();
+			$this->page->assertTitle('Problems');
+			$this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one()->checkValue(['Hosts' => $host]);
+
+			// Count problems of each severity and compare it with problems count from Hosts page.
+			if ($host !== 'Empty host') {
+				foreach ($results as $severity => $count) {
+					$problem_count = $table->query('xpath:.//td[contains(@class, "-bg") and text()="'.$severity.'"]')
+							->all()->count();
+					$this->assertEquals(strval($problem_count), $count);
+				}
+			}
+
+			// Check that table is empty and No data found displayed.
+			else {
+				$this->assertTableData();
+			}
+		}
+	}
+
 	public function prepareUpdateData() {
 		$response = CDataHelper::call('host.update', ['hostid' => '99013', 'status' => 1]);
 		$this->assertArrayHasKey('hostids', $response);
@@ -1040,39 +1088,6 @@ class testPageMonitoringHosts extends CWebTest {
 	}
 
 	/**
-	 * Сount problems amount from first column and compare with displayed problems from another Problems column.
-	 */
-	public function testPageMonitoringHosts_CountProblems() {
-		$this->page->login()->open('zabbix.php?action=host.view&filter_rst=1')->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$hosts = [
-			'1_Host_to_check_Monitoring_Overview',
-			'3_Host_to_check_Monitoring_Overview',
-			'4_Host_to_check_Monitoring_Overview',
-			'Host for tag permissions',
-			'Host for triggers filtering',
-			'ЗАББИКС Сервер'
-		];
-		foreach ($hosts as $host) {
-			$form->fill(['Name' => $host]);
-			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
-
-			$row = $table->findRow('Name', $host);
-			$icons = $row->query('xpath://td/div[@class="problem-icon-list"]/span')->all();
-			$result = 0;
-			foreach ($icons as $icon) {
-				$result += intval($icon->getText());
-			}
-
-			// Getting problems amount from second Problems column and then comparing with summarized first column.
-			$problems = $row->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
-			$this->assertEquals((int)$problems, $result);
-		}
-	}
-
-	/**
 	 * Clicking on link from the table and then checking page header
 	 *
 	 * @param string $host_name		Host name
@@ -1081,7 +1096,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	private function selectLink($host_name, $column, $page_header) {
 		$this->page->waitUntilReady();
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', $host_name)->getColumn($column)->click();
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', $host_name)->query('link', $column)->one()->click();
 		$this->page->waitUntilReady();
 		if ($page_header !== null) {
 			$this->page->assertHeader($page_header);
@@ -1092,6 +1107,69 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 		if ($host_name === 'ЗАББИКС Сервер' && $column === 'Dashboards') {
 			$this->assertEquals('ЗАББИКС Сервер', $this->query('xpath://ul[@class="breadcrumbs"]/li[2]')->one()->getText());
+		}
+	}
+
+	public static function getCheckCountersData() {
+		return [
+			[
+				[
+					'host' => 'Host ZBX6663',
+					'counters' => [
+						[
+							'column' => 'Latest data',
+							'counter' => 14
+						],
+						[
+							'column' => 'Problems',
+							'counter' => null
+						],
+						[
+							'column' => 'Graphs',
+							'counter' => 2
+						],
+						[
+							'column' => 'Web',
+							'counter' => 2
+						]
+					]
+				]
+			],
+			[
+				[
+					'host' => 'ЗАББИКС Сервер',
+					'counters' => [
+						[
+							'column' => 'Dashboards',
+							'counter' => 4
+						],
+						[
+							'column' => 'Problems',
+							'counter' => "1\n5"
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getCheckCountersData
+	 */
+	public function testPageMonitoringHosts_CheckCounters($data) {
+		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
+		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['host']);
+
+		foreach ($data['counters'] as $counter) {
+			if ($counter['column'] === 'Problems') {
+				$text = ($counter['counter'] === null) ? $counter['column'] : $counter['counter'];
+				$this->assertEquals($text, $row->getColumn($counter['column'])->getText());
+			}
+			else {
+				$this->assertEquals($counter['column'].' '.$counter['counter'],
+						$row->getColumn($counter['column'])->getText()
+				);
+			}
 		}
 	}
 }

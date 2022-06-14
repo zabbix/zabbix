@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,10 +18,12 @@
 **/
 
 #include "lld.h"
-#include "db.h"
+
 #include "log.h"
-#include "zbxalgo.h"
 #include "zbxserver.h"
+
+#include "../../libs/zbxaudit/audit.h"
+#include "../../libs/zbxaudit/audit_trigger.h"
 
 typedef struct
 {
@@ -101,7 +103,12 @@ typedef struct
 	int			lastcheck;
 	int			ts_delete;
 	unsigned char		status;
+	unsigned char		priority_orig;
 	unsigned char		priority;
+	unsigned char		manual_close_orig;
+	unsigned char		correlation_mode_orig;
+	unsigned char		recovery_mode_orig;
+	unsigned char		type_orig;
 }
 zbx_lld_trigger_t;
 
@@ -117,13 +124,7 @@ typedef struct
 	char		*parameter_orig;
 #define ZBX_FLAG_LLD_FUNCTION_UNSET			__UINT64_C(0x00)
 #define ZBX_FLAG_LLD_FUNCTION_DISCOVERED		__UINT64_C(0x01)
-#define ZBX_FLAG_LLD_FUNCTION_UPDATE_ITEMID		__UINT64_C(0x02)
-#define ZBX_FLAG_LLD_FUNCTION_UPDATE_FUNCTION		__UINT64_C(0x04)
-#define ZBX_FLAG_LLD_FUNCTION_UPDATE_PARAMETER		__UINT64_C(0x08)
-#define ZBX_FLAG_LLD_FUNCTION_UPDATE								\
-		(ZBX_FLAG_LLD_FUNCTION_UPDATE_ITEMID | ZBX_FLAG_LLD_FUNCTION_UPDATE_FUNCTION |	\
-		ZBX_FLAG_LLD_FUNCTION_UPDATE_PARAMETER)
-#define ZBX_FLAG_LLD_FUNCTION_DELETE			__UINT64_C(0x10)
+#define ZBX_FLAG_LLD_FUNCTION_DELETE			__UINT64_C(0x02)
 	zbx_uint64_t	flags;
 }
 zbx_lld_function_t;
@@ -143,7 +144,9 @@ zbx_lld_dependency_t;
 typedef struct
 {
 	zbx_uint64_t	triggertagid;
+	char		*tag_orig;
 	char		*tag;
+	char		*value_orig;
 	char		*value;
 #define ZBX_FLAG_LLD_TAG_UNSET				__UINT64_C(0x00)
 #define ZBX_FLAG_LLD_TAG_DISCOVERED			__UINT64_C(0x01)
@@ -186,7 +189,7 @@ typedef struct
 #define ZBX_LLD_TRIGGER_DEPENDENCY_NEW		1
 #define ZBX_LLD_TRIGGER_DEPENDENCY_DELETE	2
 
-	/* flags used to mark dependencies when trigger reference is use to store dependency links */
+	/* flags used to mark dependencies when trigger reference is used to store dependency links */
 	int			flags;
 }
 zbx_lld_trigger_ref_t;
@@ -220,11 +223,12 @@ typedef struct
 }
 zbx_lld_trigger_node_iter_t;
 
-
 static void	lld_tag_free(zbx_lld_tag_t *tag)
 {
 	zbx_free(tag->tag);
+	zbx_free(tag->tag_orig);
 	zbx_free(tag->value);
+	zbx_free(tag->value_orig);
 	zbx_free(tag);
 }
 
@@ -295,8 +299,6 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_prototypes_get                                       *
- *                                                                            *
  * Purpose: retrieve trigger prototypes which are inherited from the          *
  *          discovery rule                                                    *
  *                                                                            *
@@ -312,14 +314,16 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 	char				*errmsg = NULL;
 
 	result = DBselect(
-			"select distinct t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
+			"select t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
 				"t.url,t.recovery_expression,t.recovery_mode,t.correlation_mode,t.correlation_tag,"
 				"t.manual_close,t.opdata,t.discover,t.event_name"
-			" from triggers t,functions f,items i,item_discovery id"
-			" where t.triggerid=f.triggerid"
-				" and f.itemid=i.itemid"
-				" and i.itemid=id.itemid"
-				" and id.parent_itemid=" ZBX_FS_UI64,
+			" from triggers t"
+			" where t.triggerid in (select distinct tg.triggerid"
+				" from triggers tg,functions f,items i,item_discovery id"
+				" where tg.triggerid=f.triggerid"
+					" and f.itemid=i.itemid"
+					" and i.itemid=id.itemid"
+					" and id.parent_itemid=" ZBX_FS_UI64 ")",
 			lld_ruleid);
 
 	/* run through trigger prototypes */
@@ -381,8 +385,6 @@ static void	lld_trigger_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_triggers_get                                                 *
- *                                                                            *
  * Purpose: retrieve triggers which were created by the specified trigger     *
  *          prototypes                                                        *
  *                                                                            *
@@ -402,7 +404,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&parent_triggerids);
-	zbx_vector_uint64_reserve(&parent_triggerids, trigger_prototypes->values_num);
+	zbx_vector_uint64_reserve(&parent_triggerids, (size_t)trigger_prototypes->values_num);
 
 	for (i = 0; i < trigger_prototypes->values_num; i++)
 	{
@@ -437,6 +439,7 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		const zbx_lld_trigger_prototype_t	*trigger_prototype;
 		zbx_lld_trigger_t			*trigger;
 		int					index;
+		unsigned char				uc;
 
 		ZBX_STR2UINT64(parent_triggerid, row[0]);
 
@@ -459,22 +462,39 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		trigger->expression_orig = NULL;
 		trigger->recovery_expression = zbx_strdup(NULL, row[8]);
 		trigger->recovery_expression_orig = NULL;
+		trigger->type_orig = 0;
 
 		trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
-		if ((unsigned char)atoi(row[4]) != trigger_prototype->type)
+		if (trigger_prototype->type != (uc = (unsigned char)atoi(row[4])))
+		{
+			trigger->type_orig = uc;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_TYPE;
+		}
 
 		trigger->priority = (unsigned char)atoi(row[5]);
+		trigger->priority_orig = trigger->priority;
+		trigger->manual_close_orig = 0;
+		trigger->correlation_mode_orig = 0;
+		trigger->recovery_mode_orig = 0;
 
-		if ((unsigned char)atoi(row[9]) != trigger_prototype->recovery_mode)
+		if (trigger_prototype->recovery_mode != (uc = (unsigned char)atoi(row[9])))
+		{
+			trigger->recovery_mode_orig = uc;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE;
+		}
 
-		if ((unsigned char)atoi(row[10]) != trigger_prototype->correlation_mode)
+		if (trigger_prototype->correlation_mode != (uc = (unsigned char)atoi(row[10])))
+		{
+			trigger->correlation_mode_orig = uc;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_MODE;
+		}
 
-		if ((unsigned char)atoi(row[12]) != trigger_prototype->manual_close)
+		if (trigger_prototype->manual_close != (uc = (unsigned char)atoi(row[12])))
+		{
+			trigger->manual_close_orig = uc;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_MANUAL_CLOSE;
+		}
 
 		trigger->comments = zbx_strdup(NULL, row[6]);
 		trigger->comments_orig = NULL;
@@ -505,8 +525,6 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_functions_get                                                *
  *                                                                            *
  * Purpose: retrieve functions which are used by all triggers in the host of  *
  *          the trigger prototype                                             *
@@ -627,8 +645,6 @@ static void	lld_functions_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_p
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_dependencies_get                                             *
- *                                                                            *
  * Purpose: retrieve trigger dependencies                                     *
  *                                                                            *
  ******************************************************************************/
@@ -731,23 +747,19 @@ static void	lld_dependencies_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vecto
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_tags_get                                                     *
- *                                                                            *
  * Purpose: retrieve trigger tags                                             *
  *                                                                            *
  ******************************************************************************/
-static void	lld_tags_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
+static void	lld_tags_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
 {
 	DB_RESULT			result;
 	DB_ROW				row;
 	zbx_vector_uint64_t		triggerids;
-	int				i, index;
+	int				i;
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	zbx_lld_trigger_t		*trigger;
-	zbx_lld_tag_t			*tag;
 	char				*sql = NULL;
 	size_t				sql_alloc = 256, sql_offset = 0;
-	zbx_uint64_t			triggerid;
 
 	zbx_vector_uint64_create(&triggerids);
 
@@ -784,12 +796,16 @@ static void	lld_tags_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t 
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		tag = (zbx_lld_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_tag_t));
+		int		index;
+		zbx_uint64_t	triggerid;
+		zbx_lld_tag_t	*tag = (zbx_lld_tag_t *)zbx_malloc(NULL, sizeof(zbx_lld_tag_t));
 
 		ZBX_STR2UINT64(tag->triggertagid, row[0]);
 		ZBX_STR2UINT64(triggerid, row[1]);
 		tag->tag = zbx_strdup(NULL, row[2]);
+		tag->tag_orig = NULL;
 		tag->value = zbx_strdup(NULL, row[3]);
+		tag->value_orig = NULL;
 		tag->flags = ZBX_FLAG_LLD_DEPENDENCY_UNSET;
 
 		if (FAIL != (index = zbx_vector_ptr_bsearch(trigger_prototypes, &triggerid,
@@ -809,10 +825,10 @@ static void	lld_tags_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t 
 		else
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			zbx_ptr_free(tag);
+			lld_tag_free(tag);
 		}
-
 	}
+
 	DBfree_result(result);
 
 	for (i = 0; i < trigger_prototypes->values_num; i++)
@@ -834,8 +850,6 @@ static void	lld_tags_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_items_get                                                    *
- *                                                                            *
  * Purpose: returns the list of items which are related to the trigger        *
  *          prototypes                                                        *
  *                                                                            *
@@ -856,7 +870,7 @@ static void	lld_items_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&parent_triggerids);
-	zbx_vector_uint64_reserve(&parent_triggerids, trigger_prototypes->values_num);
+	zbx_vector_uint64_reserve(&parent_triggerids, (size_t)trigger_prototypes->values_num);
 
 	for (i = 0; i < trigger_prototypes->values_num; i++)
 	{
@@ -900,8 +914,6 @@ static void	lld_items_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_get                                                  *
- *                                                                            *
  * Purpose: finds already existing trigger, using an item prototype and items *
  *          already created by it                                             *
  *                                                                            *
@@ -929,8 +941,6 @@ static zbx_lld_trigger_t	*lld_trigger_get(zbx_uint64_t parent_triggerid, zbx_has
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_eval_expression_index_functions                              *
  *                                                                            *
  * Purpose: set indexes for functionid tokens {<functionid>} from the         *
  *          specified function vector                                         *
@@ -961,15 +971,13 @@ static void	lld_eval_expression_index_functions(zbx_eval_context_t *ctx, zbx_vec
 		{
 			function = (zbx_lld_function_t *)functions->values[index];
 
-			function->index = index + 1;
+			function->index = (zbx_uint64_t)(index + 1);
 			zbx_variant_set_ui64(&token->value, function->index);
 		}
 	}
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_eval_expression_simplify                                     *
  *                                                                            *
  * Purpose: simplify parsed expression by replacing {<functionid>} with       *
  *          {<function index>}                                                *
@@ -997,8 +1005,6 @@ static void	lld_eval_expression_simplify(zbx_eval_context_t *ctx, char **express
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_trigger_expression_simplify                                  *
  *                                                                            *
  * Purpose: simplify trigger expression by replacing {<functionid>} with      *
  *          {<function index>}                                                *
@@ -1033,8 +1039,6 @@ static void	lld_trigger_expression_simplify(const zbx_lld_trigger_t *trigger, ch
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_eval_expression_expand                                       *
  *                                                                            *
  * Purpose: expand parsed expression function indexes with function strings   *
  *          in format itemid:func(params)                                     *
@@ -1071,6 +1075,9 @@ static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vecto
 		{
 			const zbx_lld_function_t	*function = (zbx_lld_function_t *)functions->values[j];
 
+			if (0 != (ZBX_FLAG_LLD_FUNCTION_DELETE & function->flags))
+				continue;
+
 			if (function->index == index)
 			{
 				char	*value;
@@ -1092,8 +1099,6 @@ static char	*lld_eval_expression_expand(zbx_eval_context_t *ctx, const zbx_vecto
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_trigger_expression_expand                                    *
  *                                                                            *
  * Purpose: expand trigger expression function indexes with function strings  *
  *          in format itemid:func(params)                                     *
@@ -1128,8 +1133,6 @@ static char	*lld_trigger_expression_expand(const zbx_lld_trigger_t *trigger, con
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_trigger_expression_simplify_and_expand                       *
  *                                                                            *
  * Purpose: set function indexes and expand them to function strings in       *
  *          format itemid:func(params)                                        *
@@ -1193,7 +1196,7 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 		zbx_uint64_t itemid, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros,
 		char **error)
 {
-	int			i, ret;
+	int			i, ret, function_found = 0;
 	zbx_lld_function_t	*function = NULL;
 	char			*proto_parameter = NULL;
 
@@ -1205,13 +1208,18 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 			continue;
 
 		if (function->index == function_proto->index)
+		{
+			function_found = 1;
 			break;
+		}
 	}
 
 	if (FAIL == (ret = lld_parameter_make(function_proto->parameter, &proto_parameter, jp_row, lld_macros, error)))
 		goto clean;
 
-	if (i == functions->values_num)
+	if (0 == function_found || function->itemid != itemid ||
+			0 != strcmp(function->function, function_proto->function) ||
+			0 != strcmp(function->parameter, proto_parameter))
 	{
 		function = (zbx_lld_function_t *)zbx_malloc(NULL, sizeof(zbx_lld_function_t));
 
@@ -1229,31 +1237,7 @@ static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vecto
 		zbx_vector_ptr_append(functions, function);
 	}
 	else
-	{
-		if (function->itemid != itemid)
-		{
-			function->itemid_orig = function->itemid;
-			function->itemid = itemid;
-			function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_ITEMID;
-		}
-
-		if (0 != strcmp(function->function, function_proto->function))
-		{
-			function->function_orig = function->function;
-			function->function = zbx_strdup(NULL, function_proto->function);
-			function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_FUNCTION;
-		}
-
-		if (0 != strcmp(function->parameter, proto_parameter))
-		{
-			function->parameter_orig = function->parameter;
-			function->parameter = proto_parameter;
-			proto_parameter = NULL;
-			function->flags |= ZBX_FLAG_LLD_FUNCTION_UPDATE_PARAMETER;
-		}
-
-		function->flags |= ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
-	}
+		function->flags = ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
 clean:
 	zbx_free(proto_parameter);
 
@@ -1328,8 +1312,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_eval_get_expanded_expression                                 *
- *                                                                            *
  * Purpose: return copy of the expression with expanded LLD macros            *
  *                                                                            *
  ******************************************************************************/
@@ -1382,8 +1364,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_make                                                 *
- *                                                                            *
  * Purpose: create a trigger based on lld rule and add it to the list         *
  *                                                                            *
  ******************************************************************************/
@@ -1397,6 +1377,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	const char			*operation_msg;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
 	unsigned char			discover;
+	int				func_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1588,6 +1569,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		zbx_vector_ptr_append(triggers, trigger);
 	}
 
+	func_num = trigger->functions.values_num;
 	if (SUCCEED != lld_functions_make(&trigger_prototype->functions, &trigger->functions, items,
 			&lld_row->item_links, jp_row, lld_macros, &err_msg))
 	{
@@ -1597,6 +1579,26 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 			zbx_free(err_msg);
 		}
 		goto out;
+	}
+
+	/* functions are recreated instead of being updated */
+	if (func_num != trigger->functions.values_num)
+	{
+		if (NULL != expression)
+		{
+			trigger->expression_orig = trigger->expression;
+			trigger->expression = expression;
+			expression = NULL;
+			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION;
+		}
+
+		if (NULL != recovery_expression)
+		{
+			trigger->recovery_expression_orig = trigger->recovery_expression;
+			trigger->recovery_expression = recovery_expression;
+			recovery_expression = NULL;
+			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION;
+		}
 	}
 
 	trigger->flags |= ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
@@ -1610,7 +1612,7 @@ out:
 
 static zbx_hash_t	items_triggers_hash_func(const void *data)
 {
-	const zbx_lld_item_trigger_t	*item_trigger = (zbx_lld_item_trigger_t *)data;
+	const zbx_lld_item_trigger_t	*item_trigger = (const zbx_lld_item_trigger_t *)data;
 	zbx_hash_t			hash;
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&item_trigger->parent_triggerid);
@@ -1621,7 +1623,8 @@ static zbx_hash_t	items_triggers_hash_func(const void *data)
 
 static int	items_triggers_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_trigger_t	*item_trigger1 = (zbx_lld_item_trigger_t *)d1, *item_trigger2 = (zbx_lld_item_trigger_t *)d2;
+	const zbx_lld_item_trigger_t	*item_trigger1 = (const zbx_lld_item_trigger_t *)d1,
+					*item_trigger2 = (const zbx_lld_item_trigger_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(item_trigger1->parent_triggerid, item_trigger2->parent_triggerid);
 	ZBX_RETURN_IF_NOT_EQUAL(item_trigger1->itemid, item_trigger2->itemid);
@@ -1678,9 +1681,7 @@ static void	lld_triggers_make(const zbx_vector_ptr_t *trigger_prototypes, zbx_ve
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_dependency_make                                      *
- *                                                                            *
- * Purpose: create a trigger dependencies                                     *
+ * Purpose: create trigger dependencies                                       *
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
@@ -1689,7 +1690,7 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 {
 	zbx_lld_trigger_t			*trigger, *dep_trigger;
 	const zbx_lld_trigger_prototype_t	*dep_trigger_prototype;
-	zbx_lld_dependency_t			*dependency;
+	zbx_lld_dependency_t			*dependency = NULL;
 	zbx_uint64_t				triggerid_up;
 	int					i, j, index;
 
@@ -1726,6 +1727,8 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 				}
 				else
 				{
+					int	dependency_found = 0;
+
 					for (j = 0; j < trigger->dependencies.values_num; j++)
 					{
 						dependency = (zbx_lld_dependency_t *)trigger->dependencies.values[j];
@@ -1734,10 +1737,13 @@ static void 	lld_trigger_dependency_make(const zbx_lld_trigger_prototype_t *trig
 							continue;
 
 						if (dependency->triggerid_up == dep_trigger->triggerid)
+						{
+							dependency_found = 1;
 							break;
+						}
 					}
 
-					if (j == trigger->dependencies.values_num)
+					if (0 == dependency_found)
 					{
 						dependency = (zbx_lld_dependency_t *)zbx_malloc(NULL, sizeof(zbx_lld_dependency_t));
 
@@ -1881,19 +1887,14 @@ static void	lld_trigger_dependencies_make(const zbx_vector_ptr_t *trigger_protot
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_tag_make                                             *
- *                                                                            *
  * Purpose: create a trigger tag                                              *
  *                                                                            *
  ******************************************************************************/
-static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype,
-		zbx_hashset_t *items_triggers, zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
+static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
+		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
 {
 	zbx_lld_trigger_t	*trigger;
 	int			i;
-	zbx_lld_tag_t		*tag;
-	char			*buffer = NULL;
-	const char		*key, *value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1904,6 +1905,9 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 
 	for (i = 0; i < trigger_prototype->tags.values_num + trigger->override_tags.values_num; i++)
 	{
+		zbx_lld_tag_t	*tag;
+		const char	*key, *value;
+
 		if (i < trigger_prototype->tags.values_num)
 		{
 			zbx_lld_tag_t	*tag_proto;
@@ -1923,14 +1927,17 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 
 		if (i < trigger->tags.values_num)
 		{
+			char	*buffer = NULL;
+
 			tag = (zbx_lld_tag_t *)trigger->tags.values[i];
 
 			buffer = zbx_strdup(buffer, key);
 			substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
 			if (0 != strcmp(buffer, tag->tag))
 			{
-				zbx_free(tag->tag);
+				tag->tag_orig = tag->tag;
 				tag->tag = buffer;
 				buffer = NULL;
 				tag->flags |= ZBX_FLAG_LLD_TAG_UPDATE_TAG;
@@ -1939,13 +1946,16 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 			buffer = zbx_strdup(buffer, value);
 			substitute_lld_macros(&buffer, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
 			if (0 != strcmp(buffer, tag->value))
 			{
-				zbx_free(tag->value);
+				tag->value_orig = tag->value;
 				tag->value = buffer;
 				buffer = NULL;
 				tag->flags |= ZBX_FLAG_LLD_TAG_UPDATE_VALUE;
 			}
+
+			zbx_free(buffer);
 		}
 		else
 		{
@@ -1954,35 +1964,32 @@ static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype
 			tag->triggertagid = 0;
 
 			tag->tag = zbx_strdup(NULL, key);
+			tag->tag_orig = NULL;
 			substitute_lld_macros(&tag->tag, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(tag->tag, ZBX_WHITESPACE);
 
 			tag->value = zbx_strdup(NULL, value);
+			tag->value_orig = NULL;
 			substitute_lld_macros(&tag->value, &lld_row->jp_row, lld_macro_paths, ZBX_MACRO_FUNC, NULL, 0);
 			zbx_lrtrim(tag->value, ZBX_WHITESPACE);
 
 			tag->flags = ZBX_FLAG_LLD_TAG_UNSET;
 
 			zbx_vector_ptr_append(&trigger->tags, tag);
-
 		}
 
 		tag->flags |= ZBX_FLAG_LLD_TAG_DISCOVERED;
 	}
 out:
-	zbx_free(buffer);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_tags_make                                            *
- *                                                                            *
  * Purpose: create a trigger tags                                             *
  *                                                                            *
  ******************************************************************************/
-static void	lld_trigger_tags_make(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
+static void	lld_trigger_tags_make(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
 		const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths)
 {
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
@@ -2048,11 +2055,6 @@ static void	lld_trigger_tags_make(zbx_vector_ptr_t *trigger_prototypes, zbx_vect
 	zbx_vector_ptr_sort(triggers, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: lld_validate_trigger_field                                       *
- *                                                                            *
- ******************************************************************************/
 static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field, char **field_orig,
 		zbx_uint64_t flag, size_t field_len, char **error)
 {
@@ -2090,8 +2092,6 @@ static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field,
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_changed                                              *
- *                                                                            *
  * Return value: returns SUCCEED if a trigger description or expression has   *
  *               been changed; FAIL - otherwise                               *
  *                                                                            *
@@ -2115,12 +2115,6 @@ static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
 		function = (zbx_lld_function_t *)trigger->functions.values[i];
 
 		if (0 == function->functionid)
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			return SUCCEED;
-		}
-
-		if (0 != (function->flags & ZBX_FLAG_LLD_FUNCTION_UPDATE))
 			return SUCCEED;
 	}
 
@@ -2128,8 +2122,6 @@ static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_triggers_equal                                               *
  *                                                                            *
  * Return value: returns SUCCEED if descriptions and expressions of           *
  *               the triggers are identical; FAIL - otherwise                 *
@@ -2164,8 +2156,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_triggers_validate                                            *
  *                                                                            *
  * Parameters: triggers - [IN] sorted list of triggers                        *
  *                                                                            *
@@ -2240,23 +2230,27 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
-				" from triggers t,functions f,items i"
-				" where t.triggerid=f.triggerid"
-					" and f.itemid=i.itemid"
-					" and i.hostid=" ZBX_FS_UI64
-					" and",
+				"select t.triggerid,t.description,t.expression,t.recovery_expression"
+				" from triggers t"
+				" where t.triggerid in (select distinct tg.triggerid"
+					" from triggers tg,functions f,items i"
+					" where tg.triggerid=f.triggerid"
+						" and f.itemid=i.itemid"
+						" and i.hostid=" ZBX_FS_UI64
+						" and",
 				hostid);
-		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.description",
+		DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "tg.description",
 				(const char **)descriptions.values, descriptions.values_num);
 
 		if (0 != triggerids.values_num)
 		{
 			zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid",
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "tg.triggerid",
 					triggerids.values, triggerids.values_num);
 		}
+
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 
 		result = DBselect("%s", sql);
 
@@ -2336,24 +2330,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 						function = (zbx_lld_function_t *)trigger->functions.values[k];
 
 						if (0 != function->functionid)
-						{
-							lld_field_uint64_rollback(&function->itemid,
-									&function->itemid_orig,
-									&function->flags,
-									ZBX_FLAG_LLD_FUNCTION_UPDATE_ITEMID);
-
-							lld_field_str_rollback(&function->function,
-									&function->function_orig,
-									&function->flags,
-									ZBX_FLAG_LLD_FUNCTION_UPDATE_FUNCTION);
-
-							lld_field_str_rollback(&function->parameter,
-									&function->parameter_orig,
-									&function->flags,
-									ZBX_FLAG_LLD_FUNCTION_UPDATE_PARAMETER);
-
 							function->flags &= ~ZBX_FLAG_LLD_FUNCTION_DELETE;
-						}
 						else
 							function->flags &= ~ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
 					}
@@ -2377,11 +2354,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: lld_validate_trigger_tag_field                                   *
- *                                                                            *
- ******************************************************************************/
 static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
@@ -2418,8 +2390,6 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_trigger_tags_validate                                        *
  *                                                                            *
  * Purpose: validate created or updated trigger tags                          *
  *                                                                            *
@@ -2477,8 +2447,6 @@ static void	lld_trigger_tags_validate(zbx_vector_ptr_t *triggers, char **error)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_expression_create                                            *
  *                                                                            *
  * Purpose: transforms the simple trigger expression to the DB format         *
  *                                                                            *
@@ -2538,6 +2506,9 @@ static int	lld_expression_create(const zbx_lld_trigger_t *trigger, char **expres
 		{
 			const zbx_lld_function_t	*function = (zbx_lld_function_t *)functions->values[j];
 
+			if (0 != (ZBX_FLAG_LLD_FUNCTION_DELETE & function->flags))
+				continue;
+
 			if (function->index == function_index)
 			{
 				zbx_variant_set_ui64(&token->value, function->functionid);
@@ -2561,8 +2532,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_triggers_save                                                *
- *                                                                            *
  * Purpose: add or update triggers in database based on discovery rule        *
  *                                                                            *
  * Parameters: hostid            - [IN] parent host id                        *
@@ -2577,24 +2546,22 @@ out:
 static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigger_prototypes,
 		const zbx_vector_ptr_t *triggers)
 {
-	int					ret = SUCCEED, i, j, new_triggers = 0, upd_triggers = 0, new_functions = 0,
-						new_dependencies = 0, new_tags = 0, upd_tags = 0;
+	int					ret = SUCCEED, i, j, new_triggers = 0, upd_triggers = 0,
+						new_functions = 0, new_dependencies = 0, new_tags = 0, upd_tags = 0;
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
 	zbx_lld_trigger_t			*trigger;
 	zbx_lld_function_t			*function;
 	zbx_lld_dependency_t			*dependency;
 	zbx_lld_tag_t				*tag;
-	zbx_vector_ptr_t			upd_functions;	/* the ordered list of functions which will be updated */
 	zbx_vector_uint64_t			del_functionids, del_triggerdepids, del_triggertagids, trigger_protoids;
 	zbx_uint64_t				triggerid = 0, functionid = 0, triggerdepid = 0, triggerid_up, triggertagid;
-	char					*sql = NULL, *function_esc, *parameter_esc;
+	char					*sql = NULL;
 	size_t					sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
-	zbx_db_insert_t				db_insert, db_insert_tdiscovery, db_insert_tfunctions, db_insert_tdepends,
-						db_insert_ttags;
+	zbx_db_insert_t				db_insert, db_insert_tdiscovery, db_insert_tfunctions,
+						db_insert_tdepends, db_insert_ttags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&upd_functions);
 	zbx_vector_uint64_create(&del_functionids);
 	zbx_vector_uint64_create(&del_triggerdepids);
 	zbx_vector_uint64_create(&del_triggertagids);
@@ -2612,6 +2579,13 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		else if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE))
 			upd_triggers++;
 
+		if (0 != trigger->triggerid)
+		{
+			zbx_audit_trigger_create_entry(AUDIT_ACTION_UPDATE, trigger->triggerid,
+					(NULL == trigger->description_orig) ? trigger->description :
+					trigger->description_orig, ZBX_FLAG_DISCOVERY_CREATED);
+		}
+
 		for (j = 0; j < trigger->functions.values_num; j++)
 		{
 			function = (zbx_lld_function_t *)trigger->functions.values[j];
@@ -2627,8 +2601,6 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 
 			if (0 == function->functionid)
 				new_functions++;
-			else if (0 != (function->flags & ZBX_FLAG_LLD_FUNCTION_UPDATE))
-				zbx_vector_ptr_append(&upd_functions, function);
 		}
 
 		for (j = 0; j < trigger->dependencies.values_num; j++)
@@ -2638,6 +2610,9 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 			if (0 != (dependency->flags & ZBX_FLAG_LLD_DEPENDENCY_DELETE))
 			{
 				zbx_vector_uint64_append(&del_triggerdepids, dependency->triggerdepid);
+
+				zbx_audit_trigger_update_json_remove_dependency(ZBX_FLAG_DISCOVERY_NORMAL,
+						dependency->triggerdepid, trigger->triggerid);
 				continue;
 			}
 
@@ -2655,6 +2630,9 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 			if (0 != (tag->flags & ZBX_FLAG_LLD_TAG_DELETE))
 			{
 				zbx_vector_uint64_append(&del_triggertagids, tag->triggertagid);
+
+				zbx_audit_trigger_update_json_delete_tags(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, tag->triggertagid);
 				continue;
 			}
 
@@ -2669,9 +2647,8 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 	}
 
 	if (0 == new_triggers && 0 == new_functions && 0 == new_dependencies && 0 == upd_triggers &&
-			0 == upd_functions.values_num && 0 == del_functionids.values_num &&
-			0 == del_triggerdepids.values_num && 0 == new_tags && 0 == upd_tags &&
-			0 == del_triggertagids.values_num)
+			0 == del_functionids.values_num && 0 == del_triggerdepids.values_num && 0 == new_tags &&
+			0 == upd_tags && 0 == del_triggertagids.values_num)
 	{
 		goto out;
 	}
@@ -2729,7 +2706,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				NULL);
 	}
 
-	if (0 != upd_triggers || 0 != upd_functions.values_num || 0 != del_functionids.values_num ||
+	if (0 != upd_triggers || 0 != del_functionids.values_num ||
 			0 != del_triggerdepids.values_num || 0 != upd_tags || 0 != del_triggertagids.values_num)
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
@@ -2803,6 +2780,22 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 					trigger->correlation_tag, (int)trigger_prototype->manual_close,
 					trigger->opdata, trigger->event_name);
 
+			zbx_audit_trigger_create_entry(AUDIT_ACTION_ADD,triggerid, trigger->description,
+					ZBX_FLAG_DISCOVERY_CREATED);
+
+			zbx_audit_trigger_update_json_add_data(triggerid, 0, (int)trigger_prototype->recovery_mode,
+					trigger->status, trigger_prototype->type, TRIGGER_VALUE_OK,
+					TRIGGER_STATE_NORMAL, trigger->priority, trigger->comments, trigger->url,
+					ZBX_FLAG_DISCOVERY_CREATED, trigger_prototype->correlation_mode,
+					trigger->correlation_tag, trigger_prototype->manual_close, trigger->opdata, 0,
+					trigger->event_name);
+
+			zbx_audit_trigger_update_json_add_expr(triggerid,
+					(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->expression);
+
+			zbx_audit_trigger_update_json_add_rexpr(triggerid,
+					(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->recovery_expression);
+
 			zbx_db_insert_add_values(&db_insert_tdiscovery, triggerid, trigger->parent_triggerid);
 
 			trigger->triggerid = triggerid++;
@@ -2822,6 +2815,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 						description_esc);
 				zbx_free(description_esc);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_description(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->description_orig,
+						trigger->description);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION))
@@ -2831,6 +2828,11 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 						expression_esc);
 				zbx_free(expression_esc);
 				d = ",";
+
+				lld_expression_create(trigger, &trigger->expression_orig, &trigger->functions);
+				zbx_audit_trigger_update_json_update_expression(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->expression_orig,
+						trigger->expression);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
@@ -2840,6 +2842,11 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 						expression_esc);
 				zbx_free(expression_esc);
 				d = ",";
+
+				lld_expression_create(trigger, &trigger->recovery_expression_orig, &trigger->functions);
+				zbx_audit_trigger_update_json_update_recovery_expression(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->recovery_expression_orig,
+						trigger->recovery_expression);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE))
@@ -2847,6 +2854,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%srecovery_mode=%d", d,
 						(int)trigger_prototype->recovery_mode);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_recovery_mode(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger->recovery_mode_orig,
+						(int)trigger_prototype->recovery_mode);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_TYPE))
@@ -2854,6 +2865,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stype=%d", d,
 						(int)trigger_prototype->type);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_type(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger->type_orig,
+						(int)trigger_prototype->type);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY))
@@ -2861,6 +2876,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%spriority=%d", d,
 						(int)trigger->priority);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_priority(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger->priority_orig,
+						(int)trigger->priority);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_COMMENTS))
@@ -2869,6 +2888,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scomments='%s'", d, comments_esc);
 				zbx_free(comments_esc);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_comments(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->comments_orig,
+						trigger->comments);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_URL))
@@ -2877,6 +2900,9 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%surl='%s'", d, url_esc);
 				zbx_free(url_esc);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_url(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->url_orig, trigger->url);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_MODE))
@@ -2884,6 +2910,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scorrelation_mode=%d", d,
 						(int)trigger_prototype->correlation_mode);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_correlation_mode(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger->correlation_mode_orig,
+						(int)trigger_prototype->correlation_mode);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG))
@@ -2893,6 +2923,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 						value_esc);
 				zbx_free(value_esc);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_correlation_tag(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->correlation_tag_orig,
+						trigger->correlation_tag);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_MANUAL_CLOSE))
@@ -2900,6 +2934,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%smanual_close=%d", d,
 						(int)trigger_prototype->manual_close);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_manual_close(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger->manual_close_orig,
+						(int)trigger_prototype->manual_close);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA))
@@ -2908,6 +2946,9 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sopdata='%s'", d, opdata_esc);
 				zbx_free(opdata_esc);
 				d = ",";
+
+				zbx_audit_trigger_update_json_update_opdata(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->opdata_orig, trigger->opdata);
 			}
 
 			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_EVENT_NAME))
@@ -2915,6 +2956,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				event_name_esc = DBdyn_escape_string(trigger->event_name);
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sevent_name='%s'", d, event_name_esc);
 				zbx_free(event_name_esc);
+
+				zbx_audit_trigger_update_json_update_event_name(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, trigger->event_name_orig,
+						trigger->event_name);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -2947,6 +2992,9 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				zbx_db_insert_add_values(&db_insert_tdepends, triggerdepid, trigger->triggerid,
 						triggerid_up);
 
+				zbx_audit_trigger_update_json_add_dependency((int)ZBX_FLAG_DISCOVERY_CREATED,
+						triggerdepid, trigger->triggerid, triggerid_up);
+
 				dependency->triggerdepid = triggerdepid++;
 			}
 		}
@@ -2977,6 +3025,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 				tag->triggertagid = triggertagid++;
 				zbx_db_insert_add_values(&db_insert_ttags, tag->triggertagid, trigger->triggerid,
 						tag->tag, tag->value);
+
+				zbx_audit_trigger_update_json_add_tags_and_values(trigger->triggerid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, tag->triggertagid, tag->tag,
+						tag->value);
 			}
 			else if (0 != (tag->flags & ZBX_FLAG_LLD_TAG_UPDATE))
 			{
@@ -2990,6 +3042,9 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "tag='%s'", value_esc);
 					zbx_free(value_esc);
 					d = ",";
+
+					zbx_audit_trigger_update_json_update_tag_tag(trigger->triggerid,
+							tag->triggertagid, tag->tag_orig, tag->tag);
 				}
 
 				if (0 != (tag->flags & ZBX_FLAG_LLD_TAG_UPDATE_VALUE))
@@ -2997,50 +3052,15 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 					value_esc = DBdyn_escape_string(tag->value);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
 					zbx_free(value_esc);
+
+					zbx_audit_trigger_update_json_update_tag_value(trigger->triggerid,
+							tag->triggertagid, tag->value_orig, tag->value);
 				}
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 						" where triggertagid=" ZBX_FS_UI64 ";\n", tag->triggertagid);
 			}
 		}
-	}
-
-	zbx_vector_ptr_sort(&upd_functions, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < upd_functions.values_num; i++)
-	{
-		const char	*d = "";
-
-		function = (zbx_lld_function_t *)upd_functions.values[i];
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update functions set ");
-
-		if (0 != (function->flags & ZBX_FLAG_LLD_FUNCTION_UPDATE_ITEMID))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "itemid=" ZBX_FS_UI64,
-					function->itemid);
-			d = ",";
-		}
-
-		if (0 != (function->flags & ZBX_FLAG_LLD_FUNCTION_UPDATE_FUNCTION))
-		{
-			function_esc = DBdyn_escape_string(function->function);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sname='%s'", d,
-					function_esc);
-			zbx_free(function_esc);
-			d = ",";
-		}
-
-		if (0 != (function->flags & ZBX_FLAG_LLD_FUNCTION_UPDATE_PARAMETER))
-		{
-			parameter_esc = DBdyn_escape_string(function->parameter);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sparameter='%s'", d,
-					parameter_esc);
-			zbx_free(parameter_esc);
-		}
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				" where functionid=" ZBX_FS_UI64 ";\n", function->functionid);
 	}
 
 	if (0 != del_functionids.values_num)
@@ -3073,7 +3093,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	if (0 != upd_triggers || 0 != upd_functions.values_num || 0 != del_functionids.values_num ||
+	if (0 != upd_triggers || 0 != del_functionids.values_num ||
 			0 != del_triggerdepids.values_num || 0 != upd_tags || 0 != del_triggertagids.values_num)
 	{
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -3123,7 +3143,6 @@ out:
 	zbx_vector_uint64_destroy(&del_triggertagids);
 	zbx_vector_uint64_destroy(&del_triggerdepids);
 	zbx_vector_uint64_destroy(&del_functionids);
-	zbx_vector_ptr_destroy(&upd_functions);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -3189,12 +3208,10 @@ static int	zbx_lld_trigger_node_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_cache_append                                         *
- *                                                                            *
  * Purpose: adds a node to trigger cache                                      *
  *                                                                            *
  * Parameters: cache     - [IN] the trigger cache                             *
- *             triggerid - [IN] the trigger id                                *
+ *             triggerid - [IN]                                               *
  *             trigger   - [IN] the trigger data for new triggers             *
  *                                                                            *
  * Return value: the added node                                               *
@@ -3218,8 +3235,6 @@ static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zb
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_cache_add_trigger_node                               *
- *                                                                            *
  * Purpose: add trigger and all triggers related to it to trigger dependency  *
  *          validation cache.                                                 *
  *                                                                            *
@@ -3242,7 +3257,7 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 	trigger_node_local.trigger_ref.triggerid = trigger->triggerid;
 	trigger_node_local.trigger_ref.trigger = trigger;
 
-	if (NULL != (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_search(cache, &trigger_node_local)))
+	if (NULL != zbx_hashset_search(cache, &trigger_node_local))
 		return;
 
 	trigger_node = lld_trigger_cache_append(cache, trigger->triggerid, trigger);
@@ -3301,8 +3316,6 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_cache_init                                           *
- *                                                                            *
  * Purpose: initializes trigger cache used to perform trigger dependency      *
  *          validation                                                        *
  *                                                                            *
@@ -3326,7 +3339,7 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_hashset_create(cache, triggers->values_num, zbx_lld_trigger_ref_hash_func,
+	zbx_hashset_create(cache, (size_t)triggers->values_num, zbx_lld_trigger_ref_hash_func,
 			zbx_lld_trigger_ref_compare_func);
 
 	zbx_vector_uint64_create(&triggerids_down);
@@ -3482,8 +3495,6 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_trigger_cache_clean                                          *
- *                                                                            *
  * Purpose: releases resources allocated by trigger cache                     *
  *          validation                                                        *
  *                                                                            *
@@ -3506,8 +3517,6 @@ static void	zbx_trigger_cache_clean(zbx_hashset_t *cache)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_trigger_dependency_delete                                    *
  *                                                                            *
  * Purpose: removes trigger dependency                                        *
  *                                                                            *
@@ -3571,8 +3580,6 @@ static void	lld_trigger_dependency_delete(zbx_lld_trigger_ref_t *from, zbx_lld_t
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_trigger_dependencies_iter                                    *
- *                                                                            *
  * Purpose: iterates through trigger dependencies to find dependency loops    *
  *                                                                            *
  * Parameters: cache         - [IN] the trigger cache                         *
@@ -3588,8 +3595,8 @@ static void	lld_trigger_dependency_delete(zbx_lld_trigger_ref_t *from, zbx_lld_t
  * Comments: If the validation fails the offending dependency is removed.     *
  *                                                                            *
  ******************************************************************************/
-static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_vector_ptr_t *triggers,
-		zbx_lld_trigger_node_t *trigger_node, zbx_lld_trigger_node_iter_t *iter, int level, char **error)
+static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_lld_trigger_node_t *trigger_node,
+		zbx_lld_trigger_node_iter_t *iter, int level, char **error)
 {
 	int				i;
 	zbx_lld_trigger_ref_t		*trigger_ref;
@@ -3638,7 +3645,7 @@ static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_vector_ptr_t 
 		else
 			piter = iter;
 
-		if (FAIL == lld_trigger_dependencies_iter(cache, triggers, trigger_node_up, piter, level + 1, error))
+		if (FAIL == lld_trigger_dependencies_iter(cache, trigger_node_up, piter, level + 1, error))
 			return FAIL;
 	}
 
@@ -3648,8 +3655,6 @@ static int	lld_trigger_dependencies_iter(zbx_hashset_t *cache, zbx_vector_ptr_t 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_trigger_dependencies_validate                                *
  *                                                                            *
  * Purpose: validate discovered trigger dependencies                          *
  *                                                                            *
@@ -3681,7 +3686,7 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
 	/* This will give some consistency in choosing what dependencies should be deleted in the case of   */
 	/* recursion.                                                                                       */
 	zbx_vector_ptr_create(&nodes);
-	zbx_vector_ptr_reserve(&nodes, cache.num_data);
+	zbx_vector_ptr_reserve(&nodes, (size_t)cache.num_data);
 
 	zbx_hashset_iter_reset(&cache, &iter);
 	while (NULL != (trigger_node = (zbx_lld_trigger_node_t *)zbx_hashset_iter_next(&iter)))
@@ -3719,7 +3724,7 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
 			node_iter.ref_from = NULL;
 			node_iter.ref_to = NULL;
 		}
-		while (SUCCEED != lld_trigger_dependencies_iter(&cache, triggers, trigger_node, &node_iter, 0, error));
+		while (SUCCEED != lld_trigger_dependencies_iter(&cache, trigger_node, &node_iter, 0, error));
 	}
 
 	zbx_vector_ptr_destroy(&nodes);
@@ -3729,21 +3734,18 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
 }
 
 static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		int *ts_delete)
+		int *ts_delete, const char **name)
 {
-	zbx_lld_trigger_t	*trigger;
-
-	trigger = (zbx_lld_trigger_t *)object;
+	const zbx_lld_trigger_t	*trigger = (const zbx_lld_trigger_t *)object;
 
 	*id = trigger->triggerid;
 	*discovery_flag = trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
 	*lastcheck = trigger->lastcheck;
 	*ts_delete = trigger->ts_delete;
+	*name = trigger->description;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_update_triggers                                              *
  *                                                                            *
  * Purpose: add or update triggers for discovered items                       *
  *                                                                            *
@@ -3808,7 +3810,6 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows, lld_macro_paths);
 	lld_trigger_tags_validate(&triggers, error);
 	ret = lld_triggers_save(hostid, &trigger_prototypes, &triggers);
-
 	lld_remove_lost_objects("trigger_discovery", "triggerid", &triggers, lifetime, lastcheck, DBdelete_triggers,
 			get_trigger_info);
 	/* cleaning */

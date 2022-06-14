@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('search.js.php');
 
 $widgets = [];
 
@@ -44,14 +47,14 @@ $table = (new CTableInfo())
 
 foreach ($data['hosts'] as $hostid => $host) {
 	$interface = reset($host['interfaces']);
-	$link = 'hostid='.$hostid;
 	$visible_name = make_decoration($host['name'], $data['search']);
 
 	$name_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? new CLink($visible_name, (new CUrl('hosts.php'))
-			->setArgument('form', 'update')
+		? (new CLink($visible_name, (new CUrl('zabbix.php'))
+			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $hostid)
-		)
+		))
+			->onClick('view.editHost(event, '.json_encode($host['hostid']).')')
 		: new CSpan($visible_name);
 
 	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -69,8 +72,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('filter_hostids[]', $hostid)
-				->setArgument('filter_set', '1')
+				->setArgument('hostids[]', $hostid)
+				->setArgument('filter_name', '')
 		)
 		: _('Latest data');
 
@@ -89,8 +92,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		? new CLink(_('Graphs'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'charts.view')
-				->setArgument('view_as', HISTORY_GRAPH)
-				->setArgument('filter_hostids[]', $hostid)
+				->setArgument('filter_hostids', (array) $hostid)
 				->setArgument('filter_set', '1')
 		)
 		: _('Graphs');
@@ -207,7 +209,8 @@ foreach ($data['groups'] as $groupid => $group) {
 
 	if ($data['admin']) {
 		$hosts_link = ($group['editable'] && $data['allowed_ui_conf_hosts'] && $group['hosts'])
-			? [new CLink(_('Hosts'), (new CUrl('hosts.php'))
+			? [new CLink(_('Hosts'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'host.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_groups', [$groupid])
 			), CViewHelper::showNum($group['hosts'])]
@@ -227,8 +230,8 @@ foreach ($data['groups'] as $groupid => $group) {
 		? new CLink(_('Latest data'),
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'latest.view')
-				->setArgument('filter_groupids[]', $groupid)
-				->setArgument('filter_set', '1')
+				->setArgument('groupids[]', $groupid)
+				->setArgument('filter_name', '')
 		)
 		: _('Latest data');
 

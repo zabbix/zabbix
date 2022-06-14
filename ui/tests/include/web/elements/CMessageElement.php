@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,16 @@ class CMessageElement extends CElement {
 	}
 
 	/**
+	 * Check if message is warning.
+	 *
+	 * @return boolean
+	 */
+	public function isWarning() {
+		return in_array('msg-warning', explode(' ', $this->getAttribute('class')));
+	}
+
+
+	/**
 	 * Get message title.
 	 *
 	 * @return string
@@ -69,7 +79,7 @@ class CMessageElement extends CElement {
 	 * @return CElementCollection
 	 */
 	public function getLines() {
-		return $this->query('xpath://div[@class="msg-details"]//li')->all();
+		return $this->query('xpath:./div[@class="msg-details"]//li')->all();
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ use Core\CModule,
 require_once dirname(__FILE__).'/CAutoloader.php';
 
 class ZBase {
+
 	const EXEC_MODE_DEFAULT = 'default';
 	const EXEC_MODE_SETUP = 'setup';
 	const EXEC_MODE_API = 'api';
@@ -182,12 +183,8 @@ class ZBase {
 
 				$this->loadConfigFile();
 				$this->initDB();
-				$this->initLocales(CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG));
+				$this->setServerAddress();
 				$this->authenticateUser();
-
-				if (CWebUser::$data['lang'] !== CSettingsHelper::get(CSettingsHelper::DEFAULT_LANG)) {
-					$this->initLocales(CWebUser::$data['lang']);
-				}
 
 				$this->initMessages();
 				$this->setLayoutModeByUrl();
@@ -216,6 +213,7 @@ class ZBase {
 			case self::EXEC_MODE_API:
 				$this->loadConfigFile();
 				$this->initDB();
+				$this->setServerAddress();
 				$this->initLocales('en_us');
 				break;
 
@@ -225,7 +223,6 @@ class ZBase {
 					$this->loadConfigFile();
 					$this->initDB();
 					$this->authenticateUser();
-					$this->initLocales(CWebUser::$data['lang']);
 					$this->initComponents();
 				}
 				catch (ConfigFileException $e) {
@@ -416,47 +413,16 @@ class ZBase {
 	}
 
 	/**
-	 * Initialize translations.
+	 * Initialize translations, set up translated date and time constants.
 	 *
-	 * @param string $lang  Language.
+	 * @param string $lang  Locale variant prefix like en_US, ru_RU etc.
 	 */
-	public function initLocales(string $lang): void {
-		init_mbstrings();
-
-		$default_locales = ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252'];
-
-		if (function_exists('bindtextdomain')) {
-			// initializing gettext translations depending on language selected by user
-			$locales = zbx_locale_variants($lang);
-			$locale_found = false;
-			foreach ($locales as $locale) {
-				// since LC_MESSAGES may be unavailable on some systems, try to set all of the locales
-				// and then revert some of them back
-				putenv('LC_ALL='.$locale);
-				putenv('LANG='.$locale);
-				putenv('LANGUAGE='.$locale);
-				setlocale(LC_TIME, $locale);
-
-				if (setlocale(LC_ALL, $locale)) {
-					$locale_found = true;
-					break;
-				}
-			}
-
-			if (!$locale_found && strtolower($lang) !== strtolower(ZBX_DEFAULT_LANG)) {
-				setlocale(LC_ALL, $default_locales);
-				error('Locale for language "'.$lang.'" is not found on the web server. Tried to set: '.implode(', ', $locales).'. Unable to translate Zabbix interface.');
-			}
-			bindtextdomain('frontend', 'locale');
-			bind_textdomain_codeset('frontend', 'UTF-8');
-			textdomain('frontend');
+	public function initLocales(string $language): void {
+		if (!setupLocale($language, $error) && $error !== '') {
+			error($error);
 		}
 
-		// reset the LC_NUMERIC locale so that PHP would always use a point instead of a comma for decimal numbers
-		setlocale(LC_NUMERIC, $default_locales);
-
-		// should be after locale initialization
-		require_once 'include/translateDefines.inc.php';
+		require_once $this->getRootDir().'/include/translateDefines.inc.php';
 	}
 
 	/**
@@ -488,7 +454,7 @@ class ZBase {
 	}
 
 	/**
-	 * Authenticate user.
+	 * Authenticate user, apply some user-specific settings.
 	 *
 	 * @throws Exception
 	 */
@@ -498,6 +464,8 @@ class ZBase {
 		if (!CWebUser::checkAuthentication($session->extractSessionId() ?: '')) {
 			CWebUser::setDefault();
 		}
+
+		$this->initLocales(CWebUser::$data['lang']);
 
 		if (!$session->session_start(CWebUser::$data['sessionid'])) {
 			throw new Exception(_('Session initialization error.'));
@@ -618,6 +586,9 @@ class ZBase {
 				'javascript' => [
 					'files' => []
 				],
+				'stylesheet' => [
+					'files' => []
+				],
 				'web_layout_mode' => ZBX_LAYOUT_NORMAL,
 				'config' => [
 					'server_check_interval' => CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL),
@@ -632,6 +603,9 @@ class ZBase {
 					'main_block' => $view->getOutput(),
 					'javascript' => [
 						'files' => $view->getJsFiles()
+					],
+					'stylesheet' => [
+						'files' => $view->getCssFiles()
 					],
 					'web_layout_mode' => $view->getLayoutMode()
 				]);
@@ -683,7 +657,7 @@ class ZBase {
 		$modules_missing = [];
 
 		foreach ($db_modules as $db_module) {
-			if (!CWebUser::checkAccess(CRoleHelper::MODULES_MODULE.$db_module['moduleid'])) {
+			if (!CWebUser::checkAccess('modules.module.'.$db_module['moduleid'])) {
 				continue;
 			}
 
@@ -709,5 +683,43 @@ class ZBase {
 		$this->module_manager->initModules();
 
 		array_map('error', $this->module_manager->getErrors());
+	}
+
+	/**
+	 * Check for High availability override to standalone mode, set server to use for system information checks.
+	 *
+	 * @return void
+	 */
+	private function setServerAddress(): void {
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		if ($ZBX_SERVER !== null && $ZBX_SERVER_PORT !== null) {
+			return;
+		}
+
+		$ha_nodes = API::getApiService('hanode')->get([
+			'output' => ['address', 'port', 'status'],
+			'sortfield' => 'lastaccess',
+			'sortorder' => 'DESC'
+		], false);
+
+		$active_node = null;
+
+		if (count($ha_nodes) == 1) {
+			$active_node = $ha_nodes[0];
+		}
+		else {
+			foreach ($ha_nodes as $node) {
+				if ($node['status'] == ZBX_NODE_STATUS_ACTIVE) {
+					$active_node = $node;
+					break;
+				}
+			}
+		}
+
+		if ($active_node !== null) {
+			$ZBX_SERVER = $active_node['address'];
+			$ZBX_SERVER_PORT = $active_node['port'];
+		}
 	}
 }

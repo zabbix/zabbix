@@ -1,8 +1,9 @@
+//go:build !windows
 // +build !windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +24,6 @@ package zabbixsync
 
 func getMetrics() []string {
 	return []string{
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs DNS query.",
-		"system.hw.chassis", "Chassis information.",
-		"system.hw.devices", "Listing of PCI or USB devices.",
-		"vfs.dir.count", "Directory entry count.",
-		"vfs.dir.size", "Directory size (in bytes).",
+		"vfs.dir.get", "Directory entry list.",
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,8 +52,8 @@ size_t	zbx_curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 	return size * nmemb;
 }
 
-int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header,
-		zbx_http_response_t *body, void *header_cb, void *body_cb, char *errbuf, char **error)
+int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zbx_http_response_t *body,
+		zbx_curl_cb_t header_cb, zbx_curl_cb_t body_cb, char *errbuf, char **error)
 {
 	CURLcode	err;
 
@@ -291,6 +291,8 @@ int	zbx_http_get(const char *url, const char *header, long timeout, char **out, 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() URL '%s'", __func__, url);
 
+	*errbuf = '\0';
+
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
 		*error = zbx_strdup(NULL, "Cannot initialize cURL library");
@@ -337,7 +339,12 @@ int	zbx_http_get(const char *url, const char *header, long timeout, char **out, 
 		goto clean;
 	}
 
-	*errbuf = '\0';
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot set cURL encoding option: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+
 	if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot perform request: %s", '\0' == *errbuf ? curl_easy_strerror(err) :

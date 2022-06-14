@@ -1,7 +1,7 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -200,6 +200,19 @@ class CSelect extends CTag {
 	}
 
 	/**
+	 * Set custom template for selected option.
+	 *
+	 * @param string $template
+	 *
+	 * @return self
+	 */
+	public function setSelectedOptionTemplate(string $template) {
+		$this->setAttribute('selected-option-template', $template);
+
+		return $this;
+	}
+
+	/**
 	 * @deprecated
 	 *
 	 * @param string $onchange
@@ -247,8 +260,8 @@ class CSelect extends CTag {
 		$this->setAttribute('data-options', json_encode($this->toArray()));
 
 		/*
-		 * This attribute makes element "focusable", it match by jQuery(':focusable') queries and also browser would be
-		 * able to evaluate "autofocus" attribute correctly.
+		 * This attribute makes element "focusable", it is matched by jQuery(':focusable') queries and also browser
+		 * would be able to evaluate "autofocus" attribute correctly.
 		 */
 		$this->setAttribute('tabindex', '-1');
 

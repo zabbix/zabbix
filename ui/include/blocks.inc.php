@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -467,7 +467,7 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 		return '';
 	}
 
-	$severity_name = $is_total ? ' '.getSeverityName($severity) : '';
+	$severity_name = $is_total ? ' '.CSeverityHelper::getName($severity) : '';
 	$ext_ack = array_key_exists('ext_ack', $data['filter']) ? $data['filter']['ext_ack'] : EXTACK_OPTION_ALL;
 
 	$allTriggersNum = $stat['count'];
@@ -488,19 +488,19 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 
 	switch ($ext_ack) {
 		case EXTACK_OPTION_ALL:
-			return getSeverityCell($severity, [
+			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan($allTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$severity_name
 			], false, $is_total);
 
 		case EXTACK_OPTION_UNACK:
-			return getSeverityCell($severity, [
+			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan($unackTriggersNum))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$severity_name
 			], false, $is_total);
 
 		case EXTACK_OPTION_BOTH:
-			return getSeverityCell($severity, [
+			return CSeverityHelper::makeSeverityCell($severity, [
 				(new CSpan([$unackTriggersNum, ' '._('of').' ', $allTriggersNum]))
 					->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$severity_name
@@ -509,142 +509,6 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
 		default:
 			return '';
 	}
-}
-
-function make_status_of_zbx() {
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-		$server_details = $ZBX_SERVER.':'.$ZBX_SERVER_PORT;
-	}
-	else {
-		$server_details = '';
-	}
-
-	$table = (new CTableInfo())
-		->setHeader([_('Parameter'), _('Value'), _('Details')])
-		->setHeadingColumn(0);
-
-	$status = get_status();
-
-	$table
-		->addRow([_('Zabbix server is running'),
-			(new CSpan($status['is_running'] ? _('Yes') : _('No')))
-				->addClass($status['is_running'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
-			$server_details
-		])
-		->addRow([_('Number of hosts (enabled/disabled)'),
-			$status['has_status'] ? $status['hosts_count'] : '',
-			$status['has_status']
-				? [
-					(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-					(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED)
-				]
-				: ''
-		])
-		->addRow([_('Number of templates'),
-			$status['has_status'] ? $status['hosts_count_template'] : '', ''
-		]);
-
-	$title = (new CSpan(_('Number of items (enabled/disabled/not supported)')))
-		->setTitle(_('Only items assigned to enabled hosts are counted'));
-	$table->addRow([$title, $status['has_status'] ? $status['items_count'] : '',
-		$status['has_status']
-			? [
-				(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
-				(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED), ' / ',
-				(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
-			]
-			: ''
-	]);
-	$title = (new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
-		->setTitle(_('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
-	$table->addRow([$title, $status['has_status'] ? $status['triggers_count'] : '',
-		$status['has_status']
-			? [
-				$status['triggers_count_enabled'], ' / ',
-				$status['triggers_count_disabled'], ' [',
-				(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_RED), ' / ',
-				(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_GREEN), ']'
-			]
-			: ''
-	]);
-	$table->addRow([_('Number of users (online)'), $status['has_status'] ? $status['users_count'] : '',
-		$status['has_status'] ? (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN) : ''
-	]);
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$table->addRow([_('Required server performance, new values per second'),
-			($status['has_status'] && array_key_exists('vps_total', $status)) ? round($status['vps_total'], 2) : '', ''
-		]);
-	}
-
-	// Check requirements.
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$setup = new CFrontendSetup();
-		$reqs = $setup->checkRequirements();
-		$reqs[] = $setup->checkSslFiles();
-
-		foreach ($reqs as $req) {
-			if ($req['result'] == CFrontendSetup::CHECK_FATAL) {
-				$table->addRow(
-					(new CRow([$req['name'], $req['current'], $req['error']]))->addClass(ZBX_STYLE_RED)
-				);
-			}
-		}
-
-		$db = DB::getDbBackend();
-
-		if (!$db->checkEncoding()) {
-			$table->addRow(
-				(new CRow((new CCol($db->getWarning()))->setAttribute('colspan', 3)))->addClass(ZBX_STYLE_RED)
-			);
-		}
-	}
-
-	// Warn if database history tables have not been upgraded.
-	global $DB;
-
-	if (!$DB['DOUBLE_IEEE754']) {
-		$table->addRow([
-			_('Database history tables upgraded'),
-			(new CSpan(_('No')))->addClass(ZBX_STYLE_RED),
-			''
-		]);
-	}
-
-	// Check DB version.
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
-
-		if ($dbversion_status !== '') {
-			$dbversion_status = json_decode($dbversion_status);
-
-			foreach ($dbversion_status as $dbversion) {
-				if ($dbversion->flag != DB_VERSION_SUPPORTED) {
-					switch ($dbversion->flag) {
-						case DB_VERSION_LOWER_THAN_MINIMUM:
-							$error = _s('Minimum required database version is %1$s.', $dbversion->min_version);
-							break;
-
-						case DB_VERSION_HIGHER_THAN_MAXIMUM:
-							$error = _s('Maximum required database version is %1$s.', $dbversion->max_version);
-							break;
-
-						case DB_VERSION_FAILED_TO_RETRIEVE:
-							$error = _('Unable to retrieve database version.');
-							$dbversion->current_version = '';
-							break;
-					}
-
-					$table->addRow(
-						(new CRow([$dbversion->database, $dbversion->current_version, $error]))->addClass(ZBX_STYLE_RED)
-					);
-				}
-			}
-		}
-	}
-
-	return $table;
 }
 
 /**
@@ -847,7 +711,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		$table->addRow(array_merge($row, [
 			makeInformationList($info_icons),
 			$triggers_hosts[$trigger['triggerid']],
-			getSeverityCell($problem['severity'],
+			CSeverityHelper::makeSeverityCell((int) $problem['severity'],
 				(($show_opdata == OPERATIONAL_DATA_SHOW_WITH_PROBLEM && $opdata)
 					? [$problem['name'], ' (', $opdata, ')']
 					: $problem['name']

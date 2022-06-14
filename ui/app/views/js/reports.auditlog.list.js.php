@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,118 +17,128 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
+
+
 <script type="text/javascript">
-	const OPTION_ALL = '-1';
+	const view = new class {
 
-	class resourceInputManage {
-		constructor() {
-			this.action_elem = document.getElementById('action-select');
-			this.action_options = this.action_elem.getOptions();
-			this.resource_elem = document.getElementById('resourcetype-select');
+		init() {
+			this.filter_actions_checkboxes = document.querySelectorAll('#filter-actions input[type="checkbox"]');
 
-			this
-				.resource_elem
-				.addEventListener('change', this.updateHandler.bind(this));
+			this.filter_resource_select = document.getElementById('resourcetype-select');
+			this.filter_resource_select.addEventListener('change', () => this._update());
 
-			this.update(this.resource_elem.value);
-		}
+			this._update();
 
-		updateHandler(event) {
-			// Reset select to first element.
-			this.action_elem.selectedIndex = 0;
-
-			this.update(event.currentTarget.value);
-		}
-
-		update(resourceid) {
-			// Enabling all action options when selected resource option "All".
-			if (resourceid == OPTION_ALL) {
-				this.enableAllOptions();
-			}
-			else {
-				this.disableOptionsByActions(this.getActionsByResource(resourceid));
+			for (const details_link of document.forms['auditForm'].querySelectorAll('[data-details]')) {
+				details_link.addEventListener('click', (e) => {
+					this._openAuditDetails(JSON.parse(e.target.dataset.details))
+				});
 			}
 		}
 
-		enableAllOptions() {
-			[...this.action_options].map((elem) => {
-				elem.disabled = false;
-			});
+		_update() {
+			const enabled_actions = this.filter_resource_select.value !== '-1'
+				? this._getActionsByResource(this.filter_resource_select.value)
+				: null;
+
+			for (const checkbox of this.filter_actions_checkboxes) {
+				checkbox.disabled = enabled_actions !== null && !enabled_actions.includes(checkbox.value);
+
+				if (checkbox.disabled) {
+					checkbox.checked = false;
+				}
+			}
 		}
 
-		disableOptionsByActions(actions) {
-			[...this.action_options].map((elem) => {
-				elem.disabled = !actions.includes(elem.value);
-			});
-		}
-
-		getActionsByResource(resource) {
+		_getActionsByResource(resource) {
 			// [Action => [Resources]]
 			const resources = <?php echo json_encode([
-					AUDIT_ACTION_LOGIN => [AUDIT_RESOURCE_USER],
-					AUDIT_ACTION_LOGOUT => [AUDIT_RESOURCE_USER],
-					AUDIT_ACTION_ADD => [
-						AUDIT_RESOURCE_USER, AUDIT_RESOURCE_MEDIA_TYPE, AUDIT_RESOURCE_HOST,
-						AUDIT_RESOURCE_HOST_PROTOTYPE, AUDIT_RESOURCE_ACTION, AUDIT_RESOURCE_GRAPH,
-						AUDIT_RESOURCE_GRAPH_PROTOTYPE, AUDIT_RESOURCE_USER_GROUP, AUDIT_RESOURCE_TRIGGER,
-						AUDIT_RESOURCE_TRIGGER_PROTOTYPE, AUDIT_RESOURCE_HOST_GROUP, AUDIT_RESOURCE_ITEM,
-						AUDIT_RESOURCE_ITEM_PROTOTYPE, AUDIT_RESOURCE_VALUE_MAP, AUDIT_RESOURCE_IT_SERVICE,
-						AUDIT_RESOURCE_MAP, AUDIT_RESOURCE_SCENARIO, AUDIT_RESOURCE_DISCOVERY_RULE,
-						AUDIT_RESOURCE_PROXY, AUDIT_RESOURCE_REGEXP, AUDIT_RESOURCE_MAINTENANCE, AUDIT_RESOURCE_SCRIPT,
-						AUDIT_RESOURCE_MACRO, AUDIT_RESOURCE_TEMPLATE, AUDIT_RESOURCE_ICON_MAP,
-						AUDIT_RESOURCE_DASHBOARD, AUDIT_RESOURCE_AUTOREGISTRATION, AUDIT_RESOURCE_MODULE,
-						AUDIT_RESOURCE_TEMPLATE_DASHBOARD, AUDIT_RESOURCE_AUTH_TOKEN, AUDIT_RESOURCE_SCHEDULED_REPORT
-					],
-					AUDIT_ACTION_UPDATE => [
-						AUDIT_RESOURCE_USER, AUDIT_RESOURCE_MEDIA_TYPE,
-						AUDIT_RESOURCE_HOST, AUDIT_RESOURCE_HOST_PROTOTYPE, AUDIT_RESOURCE_ACTION, AUDIT_RESOURCE_GRAPH,
-						AUDIT_RESOURCE_GRAPH_PROTOTYPE, AUDIT_RESOURCE_USER_GROUP, AUDIT_RESOURCE_TRIGGER,
-						AUDIT_RESOURCE_TRIGGER_PROTOTYPE, AUDIT_RESOURCE_HOST_GROUP, AUDIT_RESOURCE_ITEM,
-						AUDIT_RESOURCE_ITEM_PROTOTYPE, AUDIT_RESOURCE_IMAGE, AUDIT_RESOURCE_VALUE_MAP,
-						AUDIT_RESOURCE_IT_SERVICE, AUDIT_RESOURCE_MAP, AUDIT_RESOURCE_SCENARIO,
-						AUDIT_RESOURCE_DISCOVERY_RULE, AUDIT_RESOURCE_PROXY, AUDIT_RESOURCE_REGEXP,
-						AUDIT_RESOURCE_MAINTENANCE, AUDIT_RESOURCE_SCRIPT, AUDIT_RESOURCE_MACRO,
-						AUDIT_RESOURCE_TEMPLATE, AUDIT_RESOURCE_ICON_MAP, AUDIT_RESOURCE_DASHBOARD,
-						AUDIT_RESOURCE_AUTOREGISTRATION, AUDIT_RESOURCE_MODULE, AUDIT_RESOURCE_SETTINGS,
-						AUDIT_RESOURCE_HOUSEKEEPING, AUDIT_RESOURCE_AUTHENTICATION, AUDIT_RESOURCE_TEMPLATE_DASHBOARD,
-						AUDIT_RESOURCE_AUTH_TOKEN, AUDIT_RESOURCE_SCHEDULED_REPORT
-					],
-					AUDIT_ACTION_DELETE => [
-						AUDIT_RESOURCE_USER, AUDIT_RESOURCE_MEDIA_TYPE, AUDIT_RESOURCE_HOST,
-						AUDIT_RESOURCE_HOST_PROTOTYPE, AUDIT_RESOURCE_ACTION, AUDIT_RESOURCE_GRAPH,
-						AUDIT_RESOURCE_GRAPH_PROTOTYPE, AUDIT_RESOURCE_USER_GROUP, AUDIT_RESOURCE_TRIGGER,
-						AUDIT_RESOURCE_TRIGGER_PROTOTYPE, AUDIT_RESOURCE_HOST_GROUP, AUDIT_RESOURCE_ITEM,
-						AUDIT_RESOURCE_ITEM_PROTOTYPE, AUDIT_RESOURCE_VALUE_MAP, AUDIT_RESOURCE_IT_SERVICE,
-						AUDIT_RESOURCE_MAP, AUDIT_RESOURCE_SCENARIO, AUDIT_RESOURCE_DISCOVERY_RULE,
-						AUDIT_RESOURCE_PROXY, AUDIT_RESOURCE_REGEXP, AUDIT_RESOURCE_MAINTENANCE, AUDIT_RESOURCE_SCRIPT,
-						AUDIT_RESOURCE_MACRO, AUDIT_RESOURCE_TEMPLATE, AUDIT_RESOURCE_ICON_MAP,
-						AUDIT_RESOURCE_CORRELATION, AUDIT_RESOURCE_DASHBOARD, AUDIT_RESOURCE_AUTOREGISTRATION,
-						AUDIT_RESOURCE_MODULE, AUDIT_RESOURCE_TEMPLATE_DASHBOARD, AUDIT_RESOURCE_AUTH_TOKEN,
-						AUDIT_RESOURCE_SCHEDULED_REPORT
-					],
-					AUDIT_ACTION_EXECUTE => [AUDIT_RESOURCE_SCRIPT]
-				]); ?>
-			// Add action "All" to every resource.
-			const arr = [OPTION_ALL];
+				CAudit::ACTION_ADD => [
+					CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTH_TOKEN, CAudit::RESOURCE_AUTOREGISTRATION,
+					CAudit::RESOURCE_CORRELATION, CAudit::RESOURCE_DASHBOARD, CAudit::RESOURCE_DISCOVERY_RULE,
+					CAudit::RESOURCE_GRAPH, CAudit::RESOURCE_GRAPH_PROTOTYPE, CAudit::RESOURCE_HA_NODE,
+					CAudit::RESOURCE_HOST, CAudit::RESOURCE_HOST_GROUP, CAudit::RESOURCE_HOST_PROTOTYPE,
+					CAudit::RESOURCE_ICON_MAP, CAudit::RESOURCE_IMAGE, CAudit::RESOURCE_ITEM,
+					CAudit::RESOURCE_ITEM_PROTOTYPE, CAudit::RESOURCE_IT_SERVICE, CAudit::RESOURCE_MACRO,
+					CAudit::RESOURCE_MAINTENANCE, CAudit::RESOURCE_MAP, CAudit::RESOURCE_MEDIA_TYPE,
+					CAudit::RESOURCE_MODULE, CAudit::RESOURCE_PROXY, CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO,
+					CAudit::RESOURCE_SCHEDULED_REPORT, CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SLA,
+					CAudit::RESOURCE_TEMPLATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TRIGGER,
+					CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER, CAudit::RESOURCE_USER_GROUP,
+					CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP
+				],
+				CAudit::ACTION_UPDATE => [
+					CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTHENTICATION, CAudit::RESOURCE_AUTH_TOKEN,
+					CAudit::RESOURCE_AUTOREGISTRATION, CAudit::RESOURCE_CORRELATION, CAudit::RESOURCE_DASHBOARD,
+					CAudit::RESOURCE_DISCOVERY_RULE, CAudit::RESOURCE_GRAPH, CAudit::RESOURCE_GRAPH_PROTOTYPE,
+					CAudit::RESOURCE_HA_NODE, CAudit::RESOURCE_HOST, CAudit::RESOURCE_HOST_GROUP,
+					CAudit::RESOURCE_HOST_PROTOTYPE, CAudit::RESOURCE_HOUSEKEEPING, CAudit::RESOURCE_ICON_MAP,
+					CAudit::RESOURCE_IMAGE, CAudit::RESOURCE_ITEM, CAudit::RESOURCE_ITEM_PROTOTYPE,
+					CAudit::RESOURCE_IT_SERVICE, CAudit::RESOURCE_MACRO, CAudit::RESOURCE_MAINTENANCE,
+					CAudit::RESOURCE_MAP, CAudit::RESOURCE_MEDIA_TYPE, CAudit::RESOURCE_MODULE, CAudit::RESOURCE_PROXY,
+					CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO, CAudit::RESOURCE_SCHEDULED_REPORT,
+					CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SETTINGS, CAudit::RESOURCE_SLA, CAudit::RESOURCE_TEMPLATE,
+					CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TRIGGER,
+					CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER, CAudit::RESOURCE_USER_GROUP,
+					CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP
+				],
+				CAudit::ACTION_DELETE => [
+					CAudit::RESOURCE_ACTION, CAudit::RESOURCE_AUTH_TOKEN, CAudit::RESOURCE_AUTOREGISTRATION,
+					CAudit::RESOURCE_CORRELATION, CAudit::RESOURCE_DASHBOARD, CAudit::RESOURCE_DISCOVERY_RULE,
+					CAudit::RESOURCE_GRAPH, CAudit::RESOURCE_GRAPH_PROTOTYPE, CAudit::RESOURCE_HA_NODE,
+					CAudit::RESOURCE_HOST, CAudit::RESOURCE_HOST_GROUP, CAudit::RESOURCE_HOST_PROTOTYPE,
+					CAudit::RESOURCE_ICON_MAP, CAudit::RESOURCE_IMAGE, CAudit::RESOURCE_ITEM,
+					CAudit::RESOURCE_ITEM_PROTOTYPE, CAudit::RESOURCE_IT_SERVICE, CAudit::RESOURCE_MACRO,
+					CAudit::RESOURCE_MAINTENANCE, CAudit::RESOURCE_MAP, CAudit::RESOURCE_MEDIA_TYPE,
+					CAudit::RESOURCE_MODULE, CAudit::RESOURCE_PROXY, CAudit::RESOURCE_REGEXP, CAudit::RESOURCE_SCENARIO,
+					CAudit::RESOURCE_SCHEDULED_REPORT, CAudit::RESOURCE_SCRIPT, CAudit::RESOURCE_SLA,
+					CAudit::RESOURCE_TEMPLATE, CAudit::RESOURCE_TEMPLATE_DASHBOARD, CAudit::RESOURCE_TRIGGER,
+					CAudit::RESOURCE_TRIGGER_PROTOTYPE, CAudit::RESOURCE_USER, CAudit::RESOURCE_USER_GROUP,
+					CAudit::RESOURCE_USER_ROLE, CAudit::RESOURCE_VALUE_MAP
+				],
+				CAudit::ACTION_LOGOUT => [CAudit::RESOURCE_USER],
+				CAudit::ACTION_EXECUTE => [CAudit::RESOURCE_SCRIPT],
+				CAudit::ACTION_LOGIN_SUCCESS => [CAudit::RESOURCE_USER],
+				CAudit::ACTION_LOGIN_FAILED => [CAudit::RESOURCE_USER],
+				CAudit::ACTION_HISTORY_CLEAR => [CAudit::RESOURCE_ITEM]
+			]); ?>
 
-			for (let i in resources) {
-				if (resources.hasOwnProperty(i) && resources[i].includes(parseInt(resource))) {
-					arr.push(i);
+			const actions = [];
+
+			for (let action in resources) {
+				if (resources.hasOwnProperty(action) && resources[action].includes(parseInt(resource))) {
+					actions.push(action);
 				}
 			}
 
-			return arr;
+			return actions;
 		}
-	}
 
-	// Initialize class when DOM ready.
-	document.addEventListener('DOMContentLoaded', () => {
-		new resourceInputManage();
-	}, false);
+		_openAuditDetails(details) {
+			const wrapper = document.createElement('div');
+			wrapper.classList.add('audit-details-popup-wrapper');
+
+			const textarea = document.createElement('textarea');
+			textarea.readOnly = true;
+			textarea.innerHTML = details;
+			textarea.classList.add('audit-details-popup-textarea', 'active-readonly');
+
+			wrapper.appendChild(textarea)
+
+			overlayDialogue({
+				title: <?= json_encode(_('Details')) ?>,
+				content: wrapper,
+				class: 'modal-popup modal-popup-generic',
+				buttons: [
+					{
+						title: <?= json_encode(_('Ok')) ?>,
+						cancel: true,
+						action: () => true
+					}
+				]
+			});
+		}
+	};
 </script>

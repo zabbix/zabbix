@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 const (
@@ -51,7 +51,7 @@ var impl Plugin
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (interface{}, error) {
 	var result []byte
 
-	params, err := metrics[key].EvalParams(rawParams, nil)
+	params, _, err := metrics[key].EvalParams(rawParams, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -190,6 +190,8 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 			return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
 		}
 
+		data.setCPUPercentUsage()
+
 		result, err = json.Marshal(data)
 		if err != nil {
 			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
@@ -205,4 +207,12 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 	}
 
 	return string(result), nil
+}
+
+func (s *Stats) setCPUPercentUsage() {
+	// based on formula from docker api doc.
+	delta := s.CPUStats.CPUUsage.TotalUsage - s.PreCPUStats.CPUUsage.TotalUsage
+	systemDelta := s.CPUStats.SystemUsage - s.PreCPUStats.SystemUsage
+	cpuNum := s.CPUStats.OnlineCPUs
+	s.CPUStats.CPUUsage.PercentUsage = (float64(delta) / float64(systemDelta)) * float64(cpuNum) * 100.0
 }

@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,6 +80,11 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const SCHEDULED_REPORT_TEST_TIMEOUT = 'report_test_timeout';
 	public const DBVERSION_STATUS = 'dbversion_status';
 	public const AUDITLOG_ENABLED = 'auditlog_enabled';
+	public const GEOMAPS_TILE_PROVIDER = 'geomaps_tile_provider';
+	public const GEOMAPS_TILE_URL = 'geomaps_tile_url';
+	public const GEOMAPS_MAX_ZOOM = 'geomaps_max_zoom';
+	public const GEOMAPS_ATTRIBUTION = 'geomaps_attribution';
+	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
 
 	/**
 	 * Settings API object parameters array.

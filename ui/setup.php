@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/include/classes/core/APP.php';
+require_once __DIR__.'/include/classes/core/APP.php';
 
 $page['file'] = 'setup.php';
 
@@ -57,9 +57,7 @@ $fields = [
 	'vault_url' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_db_path' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
 	'vault_token' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
-	'zbx_server' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
 	'zbx_server_name' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
-	'zbx_server_port' =>	[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')],
 	'default_timezone' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
 	'default_theme' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
 	// actions
@@ -71,30 +69,18 @@ $fields = [
 	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null]
 ];
 
-CSessionHelper::set('check_fields_result', check_fields($fields, false));
-if (!CSessionHelper::has('step')) {
-	CSessionHelper::set('step', 0);
-}
+$check_fields_result = check_fields($fields, false);
 
-// if a guest or a non-super admin user is logged in
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN) {
-	/*
-	 * On the last step of the setup guest user always logged in. When pressed "Finish" or "Cancel" button, guest user
-	 * must be redirected to the login screen.
-	 */
-	if (CWebUser::isGuest() && (hasRequest('finish') || hasRequest('cancel'))) {
-		redirect('index.php');
-	}
-	// the guest user can also view the last step of the setup
-	// all other user types must not have access to the setup
-	elseif (!(CWebUser::isGuest() && CSessionHelper::get('step') == 6)) {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-}
-// if a super admin or a non-logged in user presses the "Finish" or "Login" button - redirect him to the login screen
-elseif (hasRequest('cancel') || hasRequest('finish')) {
+if (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
+
+if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN
+		&& CSessionHelper::get('step') != CSetupWizard::STAGE_INSTALL) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
+CSessionHelper::set('check_fields_result', $check_fields_result);
 
 // Set default language.
 $default_lang = ZBX_DEFAULT_LANG;
@@ -138,8 +124,7 @@ elseif (CWebUser::$data) {
 
 $default_timezone = getRequest('default_timezone', $default_timezone);
 
-if ($default_timezone !== ZBX_DEFAULT_TIMEZONE
-		&& !array_key_exists($default_timezone, (new CDateTimeZoneHelper())->getAllDateTimeZones())) {
+if ($default_timezone !== ZBX_DEFAULT_TIMEZONE && !CTimezoneHelper::isSupported($default_timezone)) {
 	$default_timezone = ZBX_DEFAULT_TIMEZONE;
 }
 
@@ -157,7 +142,7 @@ elseif (CWebUser::$data) {
 
 $default_theme = getRequest('default_theme', $default_theme);
 
-if (!in_array($default_theme, array_keys(APP::getThemes()))) {
+if (!array_key_exists($default_theme, APP::getThemes())) {
 	$default_theme = ZBX_DEFAULT_THEME;
 }
 
@@ -168,10 +153,10 @@ DBclose();
 /*
  * Setup wizard
  */
-$ZBX_SETUP_WIZARD = new CSetupWizard();
+$setup_wizard = new CSetupWizard();
 
 // page title
-(new CPageHeader(_('Installation')))
+(new CPageHeader(_('Installation'), substr($default_lang, 0, strpos($default_lang, '_'))))
 	->addCssFile('assets/styles/'.CHtml::encode($default_theme).'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
@@ -198,11 +183,9 @@ $sub_footer = (new CDiv([_('Licensed under'), ' ', $link]))->addClass(ZBX_STYLE_
 
 (new CTag('body', true,
 	(new CDiv([
-		(new CTag('main', true, [$ZBX_SETUP_WIZARD, $sub_footer])), makePageFooter()])
+		(new CTag('main', true, [$setup_wizard, $sub_footer])), makePageFooter()])
 	)->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
-))
-	->setAttribute('lang', substr($default_lang, 0, strpos($default_lang, '_')))
-	->show();
+))->show();
 ?>
 </html>
 

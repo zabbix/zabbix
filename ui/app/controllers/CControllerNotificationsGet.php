@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,11 +51,7 @@ class CControllerNotificationsGet extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			return $this->setResponse(
-				new CControllerResponseData([
-					'main_block' => json_encode(['error' => true])
-				])
-			);
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode(['error' => true])]));
 		}
 
 		return $ret;
@@ -67,7 +63,8 @@ class CControllerNotificationsGet extends CController {
 
 	protected function doAction() {
 		if (!$this->settings['enabled']) {
-			return $this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
+			$this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
+			return;
 		}
 
 		// Server returns only basic details for events already known by client-side.

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,6 +74,13 @@ class CView {
 	 * @var array
 	 */
 	private $js_files = [];
+
+	/**
+	 * List of CSS files for inclusion into a HTML page using <link rel="stylesheet" type="text/css" src="...">.
+	 *
+	 * @var array
+	 */
+	private $css_files = [];
 
 	/**
 	 * Create a view based on view name and data.
@@ -195,6 +202,24 @@ class CView {
 	 */
 	public function getJsFiles() {
 		return $this->js_files;
+	}
+
+	/**
+	 * Add a CSS file to this view.
+	 *
+	 * @param string $src
+	 */
+	public function addCssFile($src) {
+		$this->css_files[] = $src;
+	}
+
+	/**
+	 * Get list of CSS files added to this view.
+	 *
+	 * @return array
+	 */
+	public function getCssFiles() {
+		return $this->css_files;
 	}
 
 	/**

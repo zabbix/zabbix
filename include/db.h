@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,9 @@
 #ifndef ZABBIX_DB_H
 #define ZABBIX_DB_H
 
-#include "common.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "dbschema.h"
-#include "zbxeval.h"
 
 extern char	*CONFIG_DBHOST;
 extern char	*CONFIG_DBNAME;
@@ -64,8 +62,6 @@ typedef enum
 	GRAPH_ITEM_AGGREGATED = 1
 }
 zbx_graph_item_type;
-
-struct	_DC_TRIGGER;
 
 #define ZBX_DB_CONNECT_NORMAL	0
 #define ZBX_DB_CONNECT_EXIT	1
@@ -205,7 +201,7 @@ struct	_DC_TRIGGER;
 
 #define PROXY_DHISTORY_VALUE_LEN	255
 
-#define ITEM_PREPROC_PARAMS_LEN		255
+#define ITEM_PREPROC_PARAMS_LEN		65535
 
 #define EVENT_NAME_LEN			2048
 
@@ -243,7 +239,6 @@ struct	_DC_TRIGGER;
 			'\0' != *str ? "<>'" : "",		\
 			'\0' != *str ? str   : " is not null",	\
 			'\0' != *str ? "'"   : ""
-
 #else
 #	define	DBbegin_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
 #	define	DBend_multiple_update(sql, sql_alloc, sql_offset)	do {} while (0)
@@ -343,8 +338,10 @@ typedef struct
 {
 	zbx_uint64_t		serviceid;
 	char			*name;
+	char			*description;
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_ptr_t	events;
+	zbx_vector_tags_t	service_tags;
 }
 DB_SERVICE;
 
@@ -489,6 +486,7 @@ typedef struct
 	unsigned char	pause_suppressed;
 	unsigned char	recovery;
 	unsigned char	status;
+	unsigned char	notify_if_canceled;
 }
 DB_ACTION;
 
@@ -545,9 +543,9 @@ const ZBX_FIELD	*DBget_field(const ZBX_TABLE *table, const char *fieldname);
 #define DBget_maxid(table)	DBget_maxid_num(table, 1)
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num);
 
-zbx_uint32_t	DBextract_version(struct zbx_json *json);
-void		DBflush_version_requirements(const char *version);
-int		DBcheck_capabilities(zbx_uint32_t db_version);
+void	DBextract_version_info(struct zbx_db_version_info_t *version_info);
+void	DBflush_version_requirements(const char *version);
+int	DBcheck_capabilities(zbx_uint32_t db_version);
 
 #ifdef HAVE_POSTGRESQL
 char	*zbx_db_get_schema_esc(void);
@@ -558,8 +556,6 @@ char	*zbx_db_get_schema_esc(void);
  * Type: ZBX_GRAPH_ITEMS                                                      *
  *                                                                            *
  * Purpose: represent graph item data                                         *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
 typedef struct
@@ -692,6 +688,7 @@ int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 #ifndef HAVE_SQLITE3
 int	DBindex_exists(const char *table_name, const char *index_name);
+int	DBpk_exists(const char *table_name);
 #endif
 
 int	DBprepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
@@ -900,6 +897,7 @@ zbx_db_tag_t;
 zbx_db_tag_t	*zbx_db_tag_create(const char *tag_tag, const char *tag_value);
 void		zbx_db_tag_free(zbx_db_tag_t *tag);
 int		zbx_db_tag_compare_func(const void *d1, const void *d2);
+int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
 ZBX_PTR_VECTOR_DECL(db_tag_ptr, zbx_db_tag_t *)
 
@@ -926,7 +924,7 @@ typedef struct
 	unsigned char		operator;
 	unsigned char		status;
 	unsigned char		severity;
-	unsigned char		inventory_mode;
+	signed char		inventory_mode;
 	unsigned char		discover;
 }
 zbx_lld_override_operation_t;
@@ -946,4 +944,5 @@ int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t
 void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *itemids);
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
+
 #endif

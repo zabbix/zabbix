@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ class CTableElement extends CElement {
 	public function findRows($param, $data = []) {
 		$rows = [];
 
-		if (is_callable($param)) {
+		if ($param instanceof \Closure) {
 			foreach ($this->getRows() as $i => $row) {
 				if (call_user_func($param, $row)) {
 					$rows[$i] = $row;

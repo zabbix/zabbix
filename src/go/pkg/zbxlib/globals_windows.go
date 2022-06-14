@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,13 +41,22 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/vector.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/zbxregexp.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/algodefs.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/persistent_state.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/logfiles.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/json_parser.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/jsonpath.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sha256crypt.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/variant.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_system.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dns.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_file.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/eventlog.o
 #cgo openssl LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/tls_version.o
-#cgo LDFLAGS: -lpcre -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
+#cgo LDFLAGS: -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
+#cgo pcre  LDFLAGS: -lpcre
+#cgo pcre2 LDFLAGS: -lpcre2-8
 #cgo openssl LDFLAGS: -lssl -lcrypto
 #cgo LDFLAGS: -Wl,--end-group
 

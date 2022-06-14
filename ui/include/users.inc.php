@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,19 +85,6 @@ function user_auth_type2str($authType) {
 	];
 
 	return isset($authUserType[$authType]) ? $authUserType[$authType] : _('Unknown');
-}
-
-/**
- * Unblock user account.
- *
- * @param array $userIds
- *
- * @return bool
- */
-function unblock_user_login($userIds) {
-	zbx_value2array($userIds);
-
-	return DBexecute('UPDATE users SET attempt_failed=0 WHERE '.dbConditionInt('userid', $userIds));
 }
 
 /**

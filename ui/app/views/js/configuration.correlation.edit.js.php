@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,9 @@
 
 		jQuery('#evaltype').closest('li').toggle(labels.length > 1);
 		jQuery('#condition_label').toggle(!show_formula);
-		jQuery('#formula').toggle(show_formula);
+		jQuery('#formula')
+			.toggle(show_formula)
+			.prop('disabled', !show_formula);
 
 		if (labels.length > 1) {
 			var conditions = [];

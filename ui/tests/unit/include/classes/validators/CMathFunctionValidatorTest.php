@@ -1,7 +1,7 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,7 +116,8 @@ class CMathFunctionValidatorTest extends TestCase {
 			['concat()', ['rc' => false, 'error' => 'invalid number of parameters in function "concat"']],
 			['concat("a")', ['rc' => false, 'error' => 'invalid number of parameters in function "concat"']],
 			['concat("a", "a")', ['rc' => true, 'error' => null]],
-			['concat("a", "a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "concat"']],
+			['concat("a", "a", "a")', ['rc' => true, 'error' => null]],
+			['concat("a", "a", "a", "a")', ['rc' => true, 'error' => null]],
 
 			['cos()', ['rc' => false, 'error' => 'invalid number of parameters in function "cos"']],
 			['cos(1)', ['rc' => true, 'error' => null]],
@@ -161,6 +162,15 @@ class CMathFunctionValidatorTest extends TestCase {
 			['floor()', ['rc' => false, 'error' => 'invalid number of parameters in function "floor"']],
 			['floor(1)', ['rc' => true, 'error' => null]],
 			['floor(1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "floor"']],
+
+			['histogram_quantile()', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1)', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1, 1)', ['rc' => true, 'error' => null]],
+			['histogram_quantile(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1, 1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1, 1, 1, 1, 1)', ['rc' => true, 'error' => null]],
+			['histogram_quantile(1, 1, 1, 1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "histogram_quantile"']],
+			['histogram_quantile(1, 1, 1, 1, 1, 1, 1)', ['rc' => true, 'error' => null]],
 
 			['in()', ['rc' => false, 'error' => 'invalid number of parameters in function "in"']],
 			['in(1)', ['rc' => false, 'error' => 'invalid number of parameters in function "in"']],

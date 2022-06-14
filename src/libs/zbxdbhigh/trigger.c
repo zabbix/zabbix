@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@
 #include "db.h"
 #include "log.h"
 #include "dbcache.h"
-#include "zbxserver.h"
-#include "template.h"
 #include "events.h"
 
 #define ZBX_FLAGS_TRIGGER_CREATE_NOTHING		0x00
@@ -33,8 +31,6 @@
 		(ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT | ZBX_FLAGS_TRIGGER_CREATE_INTERNAL_EVENT)
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_process_trigger                                              *
  *                                                                            *
  * Purpose: 1) calculate changeset of trigger fields to be updated            *
  *          2) generate events                                                *
@@ -145,8 +141,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_save_trigger_changes                                      *
- *                                                                            *
  * Purpose: save the trigger changes to database                              *
  *                                                                            *
  * Parameters: trigger_diff - [IN] the trigger changeset                      *
@@ -218,8 +212,6 @@ void	zbx_db_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_trigger_diff_free                                            *
- *                                                                            *
  * Purpose: frees trigger changeset                                           *
  *                                                                            *
  ******************************************************************************/
@@ -245,8 +237,6 @@ static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_process_triggers                                             *
  *                                                                            *
  * Purpose: process triggers - calculates property changeset and generates    *
  *          events                                                            *
@@ -280,8 +270,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_append_trigger_diff                                          *
- *                                                                            *
  * Purpose: Adds a new trigger diff to trigger changeset vector               *
  *                                                                            *
  ******************************************************************************/
@@ -303,7 +291,6 @@ void	zbx_append_trigger_diff(zbx_vector_ptr_t *trigger_diff, zbx_uint64_t trigge
 
 	zbx_vector_ptr_append(trigger_diff, diff);
 }
-
 
 /* temporary cache of trigger related data */
 typedef struct
@@ -327,8 +314,6 @@ typedef enum
 zbx_trigger_cache_state_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: db_trigger_get_cache                                             *
  *                                                                            *
  * Purpose: get trigger cache with the requested data cached                  *
  *                                                                            *
@@ -404,8 +389,6 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const DB_TRIGGER *trigger, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Function: trigger_cache_free                                               *
- *                                                                            *
  * Purpose: free trigger cache                                                *
  *                                                                            *
  * Parameters: cache - [IN] the trigger cache                                 *
@@ -426,8 +409,6 @@ static void	trigger_cache_free(zbx_trigger_cache_t *cache)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_get_all_functionids                               *
  *                                                                            *
  * Purpose: get functionids from trigger expression and recovery expression   *
  *                                                                            *
@@ -453,8 +434,6 @@ void	zbx_db_trigger_get_all_functionids(const DB_TRIGGER *trigger, zbx_vector_ui
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_trigger_get_functionids                                   *
- *                                                                            *
  * Purpose: get functionids from trigger expression                           *
  *                                                                            *
  * Parameters: trigger     - [IN] the trigger                                 *
@@ -474,8 +453,6 @@ void	zbx_db_trigger_get_functionids(const DB_TRIGGER *trigger, zbx_vector_uint64
 	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_get_constant                                      *
  *                                                                            *
  * Purpose: get trigger expression constant at the specified location         *
  *                                                                            *
@@ -503,8 +480,6 @@ int	zbx_db_trigger_get_constant(const DB_TRIGGER *trigger, int index, char **out
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_get_itemid                                        *
  *                                                                            *
  * Purpose: get the Nth function item from trigger expression                 *
  *                                                                            *
@@ -568,9 +543,7 @@ int	zbx_db_trigger_get_itemid(const DB_TRIGGER *trigger, int index, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_trigger_get_itemids                                       *
- *                                                                            *
- * Purpose: get unique itemids of trigger functions in the order at they are  *
+ * Purpose: get unique itemids of trigger functions in the order they are     *
  *          written in expression                                             *
  *                                                                            *
  * Parameters: trigger - [IN] the trigger                                     *
@@ -637,8 +610,6 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_trigger_get_all_hostids                                   *
- *                                                                            *
  * Purpose: get hostids from trigger expression and recovery expression       *
  *                                                                            *
  * Parameters: trigger - [IN] the trigger                                     *
@@ -663,8 +634,6 @@ int	zbx_db_trigger_get_all_hostids(const DB_TRIGGER *trigger, const zbx_vector_u
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_trigger_clean                                             *
- *                                                                            *
  * Purpose: frees resources allocated to store trigger data                   *
  *                                                                            *
  * Parameters: trigger -                                                      *
@@ -685,8 +654,6 @@ void	zbx_db_trigger_clean(DB_TRIGGER *trigger)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: db_trigger_get_expression                                        *
  *                                                                            *
  * Purpose: get original trigger expression/recovery expression with expanded *
  *          functions                                                         *
@@ -779,10 +746,7 @@ static void	db_trigger_get_expression(const zbx_eval_context_t *ctx, char **expr
 	zbx_eval_clear(&local_ctx);
 }
 
-
 /******************************************************************************
- *                                                                            *
- * Function: zbx_db_trigger_get_expression                                    *
  *                                                                            *
  * Purpose: get original trigger expression with expanded functions           *
  *                                                                            *
@@ -802,8 +766,6 @@ void	zbx_db_trigger_get_expression(const DB_TRIGGER *trigger, char **expression)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_trigger_get_recovery_expression                           *
- *                                                                            *
  * Purpose: get original trigger recovery expression with expanded functions  *
  *                                                                            *
  * Parameters: trigger    - [IN] the trigger                                  *
@@ -818,4 +780,177 @@ void	zbx_db_trigger_get_recovery_expression(const DB_TRIGGER *trigger, char **ex
 		*expression = zbx_strdup(NULL, trigger->recovery_expression);
 	else
 		db_trigger_get_expression(&cache->eval_ctx_r, expression);
+}
+
+static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, int (*eval_func_cb)(
+		zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *, char **))
+{
+	DC_ITEM		item;
+	DC_FUNCTION	function;
+	int		err_func, err_item;
+
+	DCconfig_get_functions_by_functionids(&function, &functionid, &err_func, 1);
+
+	if (SUCCEED == err_func)
+	{
+		DCconfig_get_items_by_itemids(&item, &function.itemid, &err_item, 1);
+
+		if (SUCCEED == err_item)
+		{
+			char		*error = NULL;
+			zbx_variant_t	var;
+			zbx_timespec_t	ts;
+
+			zbx_timespec(&ts);
+
+			if (SUCCEED == eval_func_cb(&var, &item, function.function,
+					function.parameter, &ts, &error) && ZBX_VARIANT_NONE != var.type)
+			{
+				*value = zbx_strdup(NULL, zbx_variant_value_desc(&var));
+				zbx_variant_clear(&var);
+			}
+			else
+				zbx_free(error);
+
+			DCconfig_clean_items(&item, &err_item, 1);
+		}
+
+		DCconfig_clean_functions(&function, &err_func, 1);
+	}
+
+	if (NULL == *value)
+		*value = zbx_strdup(NULL, "*UNKNOWN*");
+}
+
+static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **expression, int (*eval_func_cb)(
+		zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *, char **))
+{
+	int			i;
+	zbx_eval_context_t	local_ctx;
+
+	zbx_eval_copy(&local_ctx, ctx, ctx->expression);
+	local_ctx.rules |= ZBX_EVAL_COMPOSE_MASK_ERROR;
+
+	for (i = 0; i < local_ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &local_ctx.stack.values[i];
+		char			*value = NULL;
+		zbx_uint64_t		functionid;
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type)
+		{
+			/* reset cached token values to get the original expression */
+			zbx_variant_clear(&token->value);
+			continue;
+		}
+
+		switch (token->value.type)
+		{
+			case ZBX_VARIANT_UI64:
+				functionid = token->value.data.ui64;
+				break;
+			case ZBX_VARIANT_NONE:
+				if (SUCCEED != is_uint64_n(local_ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					continue;
+				}
+				break;
+			default:
+				continue;
+		}
+
+		zbx_variant_clear(&token->value);
+		evaluate_function_by_id(functionid, &value, eval_func_cb);
+		zbx_variant_set_str(&token->value, value);
+	}
+
+	zbx_eval_compose_expression(&local_ctx, expression);
+
+	zbx_eval_clear(&local_ctx);
+}
+
+static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int index, char **value_ret,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **))
+{
+	int			i;
+	zbx_eval_context_t	local_ctx;
+
+	zbx_eval_copy(&local_ctx, ctx, ctx->expression);
+
+	for (i = 0; i < local_ctx.stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &local_ctx.stack.values[i];
+		zbx_uint64_t		functionid;
+
+		if (ZBX_EVAL_TOKEN_FUNCTIONID != token->type || (int)token->opt + 1 != index)
+			continue;
+
+		switch (token->value.type)
+		{
+			case ZBX_VARIANT_UI64:
+				functionid = token->value.data.ui64;
+				break;
+			case ZBX_VARIANT_NONE:
+				if (SUCCEED != is_uint64_n(local_ctx.expression + token->loc.l + 1,
+						token->loc.r - token->loc.l - 1, &functionid))
+				{
+					continue;
+				}
+				break;
+			default:
+				continue;
+		}
+
+		evaluate_function_by_id(functionid, value_ret, eval_func_cb);
+		break;
+	}
+
+	zbx_eval_clear(&local_ctx);
+
+	if (NULL == *value_ret)
+		*value_ret = zbx_strdup(NULL, "*UNKNOWN*");
+}
+
+void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **expression,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery)
+{
+	zbx_trigger_cache_t		*cache;
+	zbx_trigger_cache_state_t	state;
+	const zbx_eval_context_t	*ctx;
+
+	state = (1 == recovery) ? ZBX_TRIGGER_CACHE_EVAL_CTX_R : ZBX_TRIGGER_CACHE_EVAL_CTX;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, state)))
+	{
+		*expression = zbx_strdup(NULL, "*UNKNOWN*");
+		return;
+	}
+
+	ctx = (1 == recovery) ? &cache->eval_ctx_r : &cache->eval_ctx;
+
+	db_trigger_explain_expression(ctx, expression, eval_func_cb);
+}
+
+void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
+		int (*eval_func_cb)(zbx_variant_t *, DC_ITEM *, const char *, const char *, const zbx_timespec_t *,
+		char **), int recovery)
+{
+	zbx_trigger_cache_t		*cache;
+	zbx_trigger_cache_state_t	state;
+	const zbx_eval_context_t	*ctx;
+
+	state = (1 == recovery) ? ZBX_TRIGGER_CACHE_EVAL_CTX_R : ZBX_TRIGGER_CACHE_EVAL_CTX;
+
+	if (NULL == (cache = db_trigger_get_cache(trigger, state)))
+	{
+		*value = zbx_strdup(NULL, "*UNKNOWN*");
+		return;
+	}
+
+	ctx = (1 == recovery) ? &cache->eval_ctx_r : &cache->eval_ctx;
+
+	db_trigger_get_function_value(ctx, index, value, eval_func_cb);
 }

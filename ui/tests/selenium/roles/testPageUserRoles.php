@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -289,7 +289,7 @@ class testPageUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'message_header' => 'Cannot delete user roles',
-					'message_details' => 'The role "Admin role" is assigned to at least one user and cannot be deleted.',
+					'message_details' => 'Cannot delete assigned user role "Admin role".',
 					'roles' => [
 						'Admin role',
 						'Remove_role_1'
@@ -300,7 +300,7 @@ class testPageUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'message_header' => 'Cannot delete user role',
-					'message_details' => 'The role "Admin role" is assigned to at least one user and cannot be deleted.',
+					'message_details' => 'Cannot delete assigned user role "Admin role".',
 					'roles' => [
 						'Admin role'
 					]
@@ -310,7 +310,7 @@ class testPageUserRoles extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'message_header' => 'Cannot delete user roles',
-					'message_details' => 'The role "Admin role" is assigned to at least one user and cannot be deleted.',
+					'message_details' => 'Cannot delete assigned user role "User role".',
 					'roles' => [
 						'All'
 					]

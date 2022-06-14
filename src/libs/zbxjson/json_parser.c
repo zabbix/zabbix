@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,19 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
-#include "zbxjson.h"
 #include "json_parser.h"
+
+#include "common.h"
 #include "json.h"
 
-#include "log.h"
-
-static int	json_parse_object(const char *start, char **error);
+static zbx_int64_t	json_parse_object(const char *start, char **error);
 
 /******************************************************************************
- *                                                                            *
- * Function: json_error                                                       *
  *                                                                            *
  * Purpose: Prepares JSON parsing error message                               *
  *                                                                            *
@@ -40,10 +35,8 @@ static int	json_parse_object(const char *start, char **error);
  * Return value: 0 - the json_error() function always returns 0 value         *
  *                      so it can be used to return from failed parses        *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
-static int	json_error(const char *message, const char *json_buffer, char **error)
+static zbx_int64_t	json_error(const char *message, const char *json_buffer, char **error)
 {
 	if (NULL != error)
 	{
@@ -58,8 +51,6 @@ static int	json_error(const char *message, const char *json_buffer, char **error
 
 /******************************************************************************
  *                                                                            *
- * Function: json_parse_string                                                *
- *                                                                            *
  * Purpose: Parses JSON string value or object name                           *
  *                                                                            *
  * Parameters: start - [IN] the JSON data without leading whitespace          *
@@ -69,10 +60,8 @@ static int	json_error(const char *message, const char *json_buffer, char **error
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
-static int	json_parse_string(const char *start, char **error)
+static zbx_int64_t	json_parse_string(const char *start, char **error)
 {
 	const char	*ptr = start;
 
@@ -130,12 +119,10 @@ static int	json_parse_string(const char *start, char **error)
 		ptr++;
 	}
 
-	return (int)(ptr - start) + 1;
+	return ptr - start + 1;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: json_parse_array                                                 *
  *                                                                            *
  * Purpose: Parses JSON array value                                           *
  *                                                                            *
@@ -146,13 +133,11 @@ static int	json_parse_string(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
-static int	json_parse_array(const char *start, char **error)
+static zbx_int64_t	json_parse_array(const char *start, char **error)
 {
 	const char	*ptr = start;
-	int		len;
+	zbx_int64_t	len;
 
 	ptr++;
 	SKIP_WHITESPACE(ptr);
@@ -179,12 +164,10 @@ static int	json_parse_array(const char *start, char **error)
 			return json_error("invalid array format, expected closing character ']'", ptr, error);
 	}
 
-	return (int)(ptr - start) + 1;
+	return ptr - start + 1;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: json_parse_number                                                *
  *                                                                            *
  * Purpose: Parses JSON number value                                          *
  *                                                                            *
@@ -195,10 +178,8 @@ static int	json_parse_array(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
-static int	json_parse_number(const char *start, char **error)
+static zbx_int64_t	json_parse_number(const char *start, char **error)
 {
 	const char	*ptr = start;
 	char		first_digit;
@@ -254,12 +235,10 @@ static int	json_parse_number(const char *start, char **error)
 		}
 	}
 
-	return (int)(ptr - start);
+	return ptr - start;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: json_parse_literal                                               *
  *                                                                            *
  * Purpose: Parses the specified literal value                                *
  *                                                                            *
@@ -271,13 +250,11 @@ static int	json_parse_number(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  * Comments: This function is used to parse JSON literal values null, true    *
  *           false.                                                           *
  *                                                                            *
  ******************************************************************************/
-static int	json_parse_literal(const char *start, const char *text, char **error)
+static zbx_int64_t	json_parse_literal(const char *start, const char *text, char **error)
 {
 	const char	*ptr = start;
 
@@ -289,12 +266,10 @@ static int	json_parse_literal(const char *start, const char *text, char **error)
 		text++;
 	}
 
-	return (int)(ptr - start);
+	return ptr - start;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: json_parse_value                                                 *
  *                                                                            *
  * Purpose: Parses JSON object value                                          *
  *                                                                            *
@@ -305,13 +280,11 @@ static int	json_parse_literal(const char *start, const char *text, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
-int	json_parse_value(const char *start, char **error)
+zbx_int64_t	json_parse_value(const char *start, char **error)
 {
 	const char	*ptr = start;
-	int		len;
+	zbx_int64_t	len;
 
 	SKIP_WHITESPACE(ptr);
 
@@ -361,12 +334,10 @@ int	json_parse_value(const char *start, char **error)
 			return json_error("invalid JSON object value starting character", ptr, error);
 	}
 
-	return (int)(ptr - start) + len;
+	return ptr - start + len;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: json_parse_object                                                *
  *                                                                            *
  * Purpose: Parses JSON object                                                *
  *                                                                            *
@@ -377,13 +348,11 @@ int	json_parse_value(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
-static int	json_parse_object(const char *start, char **error)
+static zbx_int64_t	json_parse_object(const char *start, char **error)
 {
 	const char	*ptr = start;
-	int		len;
+	zbx_int64_t	len;
 
 	/* parse object name */
 	SKIP_WHITESPACE(ptr);
@@ -430,12 +399,10 @@ static int	json_parse_object(const char *start, char **error)
 			return json_error("invalid object format, expected closing character '}'", ptr, error);
 	}
 
-	return (int)(ptr - start) + 1;
+	return ptr - start + 1;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_json_validate                                                *
  *                                                                            *
  * Purpose: Validates JSON object                                             *
  *                                                                            *
@@ -448,12 +415,10 @@ static int	json_parse_object(const char *start, char **error)
  *               error parameter (if not NULL) contains allocated error       *
  *               message.                                                     *
  *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
  ******************************************************************************/
-int	zbx_json_validate(const char *start, char **error)
+zbx_int64_t	zbx_json_validate(const char *start, char **error)
 {
-	int	len;
+	zbx_int64_t	len;
 
 	/* parse object name */
 	SKIP_WHITESPACE(start);
@@ -469,7 +434,7 @@ int	zbx_json_validate(const char *start, char **error)
 				return 0;
 			break;
 		default:
-			/* not an json data, failing */
+			/* not json data, failing */
 			return json_error("invalid object format, expected opening character '{' or '['", start, error);
 	}
 

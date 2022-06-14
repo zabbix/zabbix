@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #ifndef ZABBIX_ZBXIPCSERVICE_H
 #define ZABBIX_ZBXIPCSERVICE_H
 
-#include "common.h"
 #include "zbxalgo.h"
 
 #define ZBX_IPC_SOCKET_BUFFER_SIZE	4096
@@ -95,7 +94,7 @@ zbx_ipc_async_socket_t;
 int	zbx_ipc_service_init_env(const char *path, char **error);
 void	zbx_ipc_service_free_env(void);
 int	zbx_ipc_service_start(zbx_ipc_service_t *service, const char *service_name, char **error);
-int	zbx_ipc_service_recv(zbx_ipc_service_t *service, int timeout, zbx_ipc_client_t **client,
+int	zbx_ipc_service_recv(zbx_ipc_service_t *service, const zbx_timespec_t *timeout, zbx_ipc_client_t **client,
 		zbx_ipc_message_t **message);
 void	zbx_ipc_service_close(zbx_ipc_service_t *service);
 

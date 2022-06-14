@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,8 +129,8 @@ class testPageDashboardWidgets extends CWebTest {
 	 * Check "Problem Hosts" widget.
 	 */
 	public function testPageDashboardWidgets_checkProblemHostsWidget() {
-		// Authorize user and open the page 'zabbix.php?action=dashboard.view&dashboardid=100'.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=100');
+		// Authorize user and open the page with the desired widget.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=100100');
 
 		// Find dashboard element.
 		$dashboard = CDashboardElement::find()->one();
@@ -236,7 +236,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		// Set type to "Clock".
-		$form->getField('Type')->asZDropdown()->select('Clock');
+		$form->getField('Type')->asDropdown()->select('Clock');
 		// Wait until overlay is reloaded.
 		$overlay->waitUntilReady();
 		// Set name of widget.

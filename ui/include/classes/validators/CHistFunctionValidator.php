@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,9 @@ class CHistFunctionValidator extends CValidator {
 			_('invalid second parameter in function "%1$s"'),
 			_('invalid third parameter in function "%1$s"'),
 			_('invalid fourth parameter in function "%1$s"'),
-			_('invalid fifth parameter in function "%1$s"')
+			_('invalid fifth parameter in function "%1$s"'),
+			_('invalid sixth parameter in function "%1$s"'),
+			_('invalid seventh parameter in function "%1$s"')
 		];
 
 		if (!array_key_exists($token['data']['function'], $this->options['parameters'])) {
@@ -220,12 +222,51 @@ class CHistFunctionValidator extends CValidator {
 						return false;
 					}
 
+					// Make sure time shift uses units no less than one used in period.
+					if (array_key_exists('aligned_shift', $rule) && $rule['aligned_shift']) {
+						if (self::hasMacros($param['data']['sec_num'], $options)
+								|| self::hasMacros($param['data']['time_shift'], $options)) {
+							return true;
+						}
+
+						$period_parser = new CNumberParser([
+							'with_time_suffix' => true,
+							'with_year' => true
+						]);
+
+						if ($period_parser->parse($param['data']['sec_num']) != CParser::PARSE_SUCCESS) {
+							return false;
+						}
+
+						$period_unit_length = timeUnitToSeconds('1'.$period_parser->getSuffix(), true);
+						$shift_parser = new CRelativeTimeParser();
+
+						if ($shift_parser->parse($param['data']['time_shift']) != CParser::PARSE_SUCCESS) {
+							return false;
+						}
+
+						foreach ($shift_parser->getTokens() as $token) {
+							if (timeUnitToSeconds('1'.$token['suffix'], true) < $period_unit_length) {
+								return false;
+							}
+						}
+					}
+
 					break;
 
 				case 'number':
-					$with_suffix = array_key_exists('with_suffix', $rule) && $rule['with_suffix'];
+					$with_suffix = (array_key_exists('with_suffix', $rule) && $rule['with_suffix']);
+					$with_float = true;
 
-					$parser = new CNumberParser(['with_minus' => true, 'with_suffix' => $with_suffix]);
+					if (array_key_exists('with_float', $rule) && $rule['with_float'] === false) {
+						$with_float = false;
+					}
+
+					$parser = new CNumberParser([
+						'with_size_suffix'	=> $with_suffix,
+						'with_time_suffix'	=> $with_suffix,
+						'with_float' 		=> $with_float
+					]);
 
 					if ($parser->parse($param_match_unquoted) != CParser::PARSE_SUCCESS) {
 						return false;
@@ -248,13 +289,21 @@ class CHistFunctionValidator extends CValidator {
 					break;
 
 				case 'time':
-					$with_year = array_key_exists('with_year', $rule) && $rule['with_year'];
+					$parser = new CNumberParser([
+						'with_float' => false,
+						'with_time_suffix' => true,
+						'with_year' => (array_key_exists('with_year', $rule) && $rule['with_year'])
+					]);
+
+					if ($parser->parse($param_match_unquoted) != CParser::PARSE_SUCCESS) {
+						return false;
+					}
+
+					$sec = $parser->calcValue();
 					$min = array_key_exists('min', $rule) ? $rule['min'] : ZBX_MIN_INT32;
 					$max = array_key_exists('max', $rule) ? $rule['max'] : ZBX_MAX_INT32;
 
-					$sec = timeUnitToSeconds($param_match_unquoted, $with_year);
-
-					if ($sec === null || $sec < $min || $sec > $max) {
+					if ($sec < $min || $sec > $max) {
 						return false;
 					}
 
@@ -330,7 +379,7 @@ class CHistFunctionValidator extends CValidator {
 					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
 				}
 
-				return false;
+				break;
 
 			case CHistFunctionData::PERIOD_MODE_SEC:
 			case CHistFunctionData::PERIOD_MODE_SEC_ONLY:
@@ -344,14 +393,14 @@ class CHistFunctionValidator extends CValidator {
 					return ($sec > 0 && $sec <= ZBX_MAX_INT32);
 				}
 
-				return false;
+				break;
 
 			case CHistFunctionData::PERIOD_MODE_NUM_ONLY:
 				if (preg_match('/^#(?<num>\d+)$/', $sec_num, $matches) == 1) {
 					return ($matches['num'] > 0 && $matches['num'] <= ZBX_MAX_INT32);
 				}
 
-				return false;
+				break;
 
 			case CHistFunctionData::PERIOD_MODE_TREND:
 				if ($time_shift === '') {
@@ -368,10 +417,7 @@ class CHistFunctionValidator extends CValidator {
 					return ($sec > 0 && $sec <= ZBX_MAX_INT32 && $sec % SEC_PER_HOUR == 0);
 				}
 
-				return false;
-
-			default:
-				return false;
+				break;
 		}
 
 		return false;

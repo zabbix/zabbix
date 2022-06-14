@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import (
 	"time"
 	"unsafe"
 
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/log"
 
 	"golang.org/x/sys/windows"
 )
@@ -108,7 +108,10 @@ func execute(s string, timeout time.Duration, path string, strict bool) (out str
 }
 
 func ExecuteBackground(s string) error {
-	cmd := exec.Command("cmd", "/C", s)
+	cmd := exec.Command("cmd")
+	cmd.SysProcAttr = &windows.SysProcAttr{
+		CmdLine: fmt.Sprintf(`/C %s`, s),
+	}
 
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("Cannot execute command: %s", err)

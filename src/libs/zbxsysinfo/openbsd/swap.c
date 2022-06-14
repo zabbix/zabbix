@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,11 +42,6 @@ static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *
 	/* int pagesize;	size of a page (PAGE_SIZE): must be power of 2 */
 	/* int swpages;		number of PAGE_SIZE'ed swap pages */
 	/* int swpginuse;	number of swap pages in use */
-	if ((0 == v.swpages || 0 == v.pagesize) && NULL == total)
-	{
-		*error = zbx_strdup(NULL, "Cannot be calculated because swap file size is 0.");
-		return SYSINFO_RET_FAIL;
-	}
 
 	if (NULL != total)
 		*total = (zbx_uint64_t)v.swpages * v.pagesize;
@@ -55,9 +50,9 @@ static int	get_swap_size(zbx_uint64_t *total, zbx_uint64_t *free, zbx_uint64_t *
 	if (NULL != used)
 		*used = (zbx_uint64_t)v.swpginuse * v.pagesize;
 	if (NULL != pfree)
-		*pfree = (double)(100.0 * (v.swpages - v.swpginuse)) / v.swpages;
+		*pfree = 0 != v.swpages ? (double)(100.0 * (v.swpages - v.swpginuse)) / v.swpages : 100;
 	if (NULL != pused)
-		*pused = (double)(100.0 * v.swpginuse) / v.swpages;
+		*pused = 0 != v.swpages ? (double)(100.0 * v.swpginuse) / v.swpages : 0;
 
 	return SYSINFO_RET_OK;
 }
@@ -320,7 +315,6 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_UI64_RESULT(result, value);
 	else
 		SET_MSG_RESULT(result, error);
-
 
 	return ret;
 }

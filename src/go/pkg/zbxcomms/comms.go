@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import (
 	"net"
 	"time"
 
-	"zabbix.com/pkg/log"
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/tls"
 )
 
@@ -62,9 +62,10 @@ type Listener struct {
 	tlsconfig *tls.Config
 }
 
-func Open(address string, localAddr *net.Addr, timeout time.Duration, timeoutMode int, args ...interface{}) (c *Connection, err error) {
+func open(address string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration, timeoutMode int,
+	args ...interface{}) (c *Connection, err error) {
 	c = &Connection{state: connStateConnect, compress: true, timeout: timeout, timeoutMode: timeoutMode}
-	d := net.Dialer{Timeout: timeout, LocalAddr: *localAddr}
+	d := net.Dialer{Timeout: connect_timeout, LocalAddr: *localAddr}
 	c.conn, err = d.Dial("tcp", address)
 
 	if nil != err {
@@ -80,7 +81,7 @@ func Open(address string, localAddr *net.Addr, timeout time.Duration, timeoutMod
 			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
 		}
 		if tlsconfig != nil {
-			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout, timeoutMode == TimeoutModeShift)
+			c.conn, err = tls.NewClient(c.conn, tlsconfig, timeout, timeoutMode == TimeoutModeShift, address)
 		}
 	}
 	return
@@ -328,44 +329,71 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
-func Exchange(address string, localAddr *net.Addr, timeout time.Duration, data []byte, args ...interface{}) ([]byte, error) {
-	log.Tracef("connecting to [%s]", address)
+func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
+	data []byte, args ...interface{}) ([]byte, []error) {
+	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", *addresses, timeout, connect_timeout)
 
 	var tlsconfig *tls.Config
+	var err error
+	var errs []error
+	var c *Connection
+
 	if len(args) > 0 {
 		var ok bool
 		if tlsconfig, ok = args[0].(*tls.Config); !ok {
-			return nil, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0])
+			errs = append(errs, fmt.Errorf("invalid TLS configuration parameter of type %T", args[0]))
+			log.Tracef("%s", errs[len(errs)-1])
+
+			return nil, errs
 		}
 	}
 
-	c, err := Open(address, localAddr, timeout, TimeoutModeFixed, tlsconfig)
+	for i := 0; i < len(*addresses); i++ {
+		c, err = open((*addresses)[0], localAddr, timeout, connect_timeout, TimeoutModeFixed, tlsconfig)
+		if err == nil {
+			break
+		}
+
+		errs = append(errs, fmt.Errorf("cannot connect to [%s]: %s", (*addresses)[0], err))
+		log.Tracef("%s", errs[len(errs)-1])
+
+		tmp := (*addresses)[0]
+		*addresses = (*addresses)[1:]
+		*addresses = append(*addresses, tmp)
+	}
+
 	if err != nil {
-		log.Tracef("cannot connect to [%s]: %s", address, err)
-		return nil, err
+		return nil, errs
 	}
 
 	defer c.Close()
 
-	log.Tracef("sending [%s] to [%s]", string(data), address)
+	log.Tracef("sending [%s] to [%s]", string(data), (*addresses)[0])
 
 	err = c.Write(data)
 	if err != nil {
-		log.Tracef("cannot send to [%s]: %s", address, err)
-		return nil, err
+		errs = append(errs, fmt.Errorf("cannot send to [%s]: %s", (*addresses)[0], err))
+		log.Tracef("%s", errs[len(errs)-1])
+
+		return nil, errs
 	}
 
-	log.Tracef("receiving data from [%s]", address)
+	log.Tracef("receiving data from [%s]", (*addresses)[0])
 
 	b, err := c.Read()
 	if err != nil {
-		log.Tracef("cannot receive data from [%s]: %s", address, err)
-		return nil, err
+		errs = append(errs, fmt.Errorf("cannot receive data from [%s]: %s", (*addresses)[0], err))
+		log.Tracef("%s", errs[len(errs)-1])
+
+		return nil, errs
 	}
-	log.Tracef("received [%s] from [%s]", string(b), address)
+	log.Tracef("received [%s] from [%s]", string(b), (*addresses)[0])
 
 	if len(b) == 0 {
-		return nil, errors.New("connection closed")
+		errs = append(errs, fmt.Errorf("connection closed"))
+		log.Tracef("%s", errs[len(errs)-1])
+
+		return nil, errs
 	}
 
 	return b, nil

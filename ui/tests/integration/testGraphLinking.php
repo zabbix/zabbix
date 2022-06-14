@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,13 +83,11 @@ class testGraphLinking extends CIntegrationTest {
 	{
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
-			'eventsource' => 2,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => 0,
-			'host' => self::HOST_NAME,
 			'operations' => [
 				[
-					'actionid' => 1,
-					'operationtype' => 2
+					'operationtype' => OPERATION_TYPE_HOST_ADD
 				]
 			]
 		]);
@@ -105,12 +103,11 @@ class testGraphLinking extends CIntegrationTest {
 		}
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
-			'eventsource' => 2,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => 0,
 			'operations' => [
 				[
-					'actionid' => 12,
-					'operationtype' => 6,
+					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 					'optemplate' =>
 					$templateids_for_api_call
 				]
@@ -310,22 +307,15 @@ class testGraphLinking extends CIntegrationTest {
 	}
 
 	/**
-	* Test graph linking cases.
-	*
-	* @required-components server
-	*/
+	 * Test graph linking cases.
+	 *
+	 * @configurationDataProvider agentConfigurationProvider
+	 * @required-components server, agent
+	 */
 	public function testGraphLinking_checkGraphsCreate() {
-
 		$this->reloadConfigurationCache();
 
-		self::prepareComponentConfiguration(self::COMPONENT_AGENT, $this->agentConfigurationProvider());
-		self::startComponent(self::COMPONENT_AGENT);
-
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-			'End of DBregister_host_active():SUCCEED'
-		]);
-		sleep(10);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->checkGraphsCreate();
-		self::stopComponent(self::COMPONENT_AGENT);
 	}
 }

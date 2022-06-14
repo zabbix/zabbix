@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "log.h"
 #include "export.h"
+
+#include "log.h"
 
 #define ZBX_OPTION_EXPTYPE_EVENTS	"events"
 #define ZBX_OPTION_EXPTYPE_HISTORY	"history"
@@ -44,8 +44,6 @@ static zbx_export_file_t	*problems_file;
 static char	*export_dir;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_validate_export_type                                         *
  *                                                                            *
  * Purpose: validate export type                                              *
  *                                                                            *
@@ -113,8 +111,6 @@ int	zbx_validate_export_type(char *export_type, uint32_t *export_mask)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_is_export_enabled                                            *
  *                                                                            *
  * Purpose: checks if export is enabled for given type(s)                     *
  *                                                                            *

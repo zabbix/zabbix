@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,19 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxjson.h"
-#include "dbcache.h"
-#include "valuecache.h"
-#include "preproc.h"
-#include "zbxlld.h"
-#include "log.h"
-
 #include "zabbix_stats.h"
 
+#include "common.h"
+#include "dbcache.h"
+#include "valuecache.h"
+#include "zbxlld.h"
+#include "log.h"
+#include "zbxtrends.h"
+#include "zbxha.h"
+
 /******************************************************************************
- *                                                                            *
- * Function: zbx_get_zabbix_stats_ext                                         *
  *                                                                            *
  * Purpose: get program type (server) specific internal statistics            *
  *                                                                            *
@@ -41,9 +39,10 @@
  ******************************************************************************/
 void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
 {
-	zbx_vc_stats_t	vc_stats;
-	zbx_uint64_t	queue_size;
-	char		*error = NULL;
+	zbx_vc_stats_t		vc_stats;
+	zbx_uint64_t		queue_size;
+	char			*value, *error = NULL;
+	zbx_tfc_stats_t		tcache_stats;
 
 	/* zabbix[lld_queue] */
 	if (SUCCEED == zbx_lld_get_queue_size(&queue_size, &error))
@@ -77,9 +76,42 @@ void	zbx_get_zabbix_stats_ext(struct zbx_json *json)
 		zbx_json_adduint64(json, "requests", vc_stats.hits + vc_stats.misses);
 		zbx_json_adduint64(json, "hits", vc_stats.hits);
 		zbx_json_adduint64(json, "misses", vc_stats.misses);
-		zbx_json_adduint64(json, "mode", vc_stats.mode);
+		zbx_json_addint64(json, "mode", vc_stats.mode);
 		zbx_json_close(json);
 
 		zbx_json_close(json);
+	}
+
+	/* zabbix[tcache,cache,<parameters>] */
+	if (SUCCEED == zbx_tfc_get_stats(&tcache_stats, NULL))
+	{
+		zbx_uint64_t	total;
+
+		zbx_json_addobject(json, "tcache");
+
+		total = tcache_stats.hits + tcache_stats.misses;
+		zbx_json_adduint64(json, "hits", tcache_stats.hits);
+		zbx_json_adduint64(json, "misses", tcache_stats.misses);
+		zbx_json_adduint64(json, "all", total);
+		zbx_json_addfloat(json, "phits", (0 == total ? 0 : (double)tcache_stats.hits / total * 100));
+		zbx_json_addfloat(json, "pmisses", (0 == total ? 0 : (double)tcache_stats.misses / total * 100));
+
+		total = tcache_stats.items_num + tcache_stats.requests_num;
+		zbx_json_adduint64(json, "items", tcache_stats.items_num);
+		zbx_json_adduint64(json, "requests", tcache_stats.requests_num);
+		zbx_json_addfloat(json, "pitems", (0 == total ? 0 : (double)tcache_stats.items_num / total * 100));
+
+		zbx_json_close(json);
+	}
+
+	if (SUCCEED == zbx_ha_get_nodes(&value, &error))
+	{
+		zbx_json_addraw(json, "ha", value);
+		zbx_free(value);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get HA node data: %s", error);
+		zbx_free(error);
 	}
 }

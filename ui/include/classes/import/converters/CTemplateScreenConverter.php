@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,7 +331,7 @@ class CTemplateScreenConverter extends CConverter {
 	 *
 	 * @static
 	 *
-	 * @param array $dimensions      Prefered axis dimensions.
+	 * @param array $dimensions      Preferred axis dimensions.
 	 * @param array $dimensions_min  Minimal axis dimensions.
 	 * @param int   $target          Target summary size.
 	 *

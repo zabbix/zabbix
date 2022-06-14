@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
-#include "db.h"
-#include "log.h"
-#include "dbcache.h"
-
 #include "operations.h"
-#include "zbxserver.h"
 
+#include "log.h"
+#include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_host.h"
 
 typedef enum
@@ -39,12 +34,10 @@ zbx_dcheck_source_t;
 
 /******************************************************************************
  *                                                                            *
- * Function: select_discovered_host                                           *
- *                                                                            *
  * Purpose: select hostid of discovered host                                  *
  *                                                                            *
  * Parameters: event          - [IN] source event data                        *
- *             hostname       - [OUT] hostname where event occured            *
+ *             hostname       - [OUT] hostname where event occurred           *
  *                                                                            *
  * Return value: hostid - existing hostid, 0 - if not found                   *
  *                                                                            *
@@ -130,12 +123,10 @@ exit:
 
 /******************************************************************************
  *                                                                            *
- * Function: add_discovered_host_groups                                       *
- *                                                                            *
  * Purpose: add group to host if not added already                            *
  *                                                                            *
- * Parameters: hostid         - [IN]  host identificator                      *
- *             groupids       - [IN]  array of group identificators           *
+ * Parameters: hostid         - [IN]  host identifier                         *
+ *             groupids       - [IN]  array of group identifiers              *
  *                                                                            *
  ******************************************************************************/
 static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
@@ -203,8 +194,6 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: add_discovered_host                                              *
  *                                                                            *
  * Purpose: add discovered host if it was not added already                   *
  *                                                                            *
@@ -447,11 +436,12 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				zbx_db_insert_clean(&db_insert);
 
 				zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
-				zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
-						host_unique);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
 					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
+
+				zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(hostid,
+						proxy_hostid, host_unique, cfg->default_inventory_mode);
 
 				interfaceid = DBadd_interface(hostid, interface_type, 1, row[2], row[3], port,
 						ZBX_CONN_DEFAULT);
@@ -534,7 +524,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 						" and status=%d",
 					host_esc, HOST_STATUS_TEMPLATE);
 
-			if (NULL != (row2 = DBfetch(result2)))
+			if (NULL != DBfetch(result2))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host \"%s\":"
 						" template with the same name already exists", row[1]);
@@ -577,10 +567,8 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 						tls_accepted, tls_accepted, psk_identity, psk);
 
 					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
-					zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
-							hostname);
 					zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_accepted, tls_accepted,
-							AUDIT_SECRET_MASK, AUDIT_SECRET_MASK);
+							psk_identity, psk);
 				}
 				else
 				{
@@ -588,8 +576,6 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 							"name", NULL);
 
 					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
-					zbx_audit_host_update_json_add_proxy_hostid_and_hostname(hostid, proxy_hostid,
-							hostname);
 					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, hostname,
 							hostname);
 				}
@@ -599,6 +585,9 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
 					DBadd_host_inventory(hostid, cfg->default_inventory_mode);
+
+				zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(hostid,
+						proxy_hostid, hostname, cfg->default_inventory_mode);
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
 
@@ -619,8 +608,9 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 							" set proxy_hostid=%s"
 							" where hostid=" ZBX_FS_UI64,
 							DBsql_id_ins(proxy_hostid), hostid);
-					zbx_audit_update_json_append_uint64(hostid, AUDIT_DETAILS_ACTION_ADD,
-							"host.proxy_hostid", proxy_hostid);
+
+					zbx_audit_host_update_json_update_proxy_hostid(hostid, host_proxy_hostid,
+							proxy_hostid);
 				}
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
@@ -642,8 +632,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: is_discovery_or_autoregistration                                 *
  *                                                                            *
  * Purpose: checks if the event is discovery or autoregistration event        *
  *                                                                            *
@@ -669,8 +657,6 @@ static int	is_discovery_or_autoregistration(const DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
- * Function: op_host_add                                                      *
- *                                                                            *
  * Purpose: add discovered host                                               *
  *                                                                            *
  * Parameters: event          - [IN] source event data                        *
@@ -692,8 +678,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: op_host_del                                                      *
  *                                                                            *
  * Purpose: delete host                                                       *
  *                                                                            *
@@ -734,8 +718,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: op_host_enable                                                   *
- *                                                                            *
  * Purpose: enable discovered                                                 *
  *                                                                            *
  * Parameters: event          - [IN] the source event                         *
@@ -769,8 +751,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: op_host_disable                                                  *
  *                                                                            *
  * Purpose: disable host                                                      *
  *                                                                            *
@@ -806,8 +786,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: op_host_inventory_mode                                           *
- *                                                                            *
  * Purpose: sets host inventory mode                                          *
  *                                                                            *
  * Parameters: event          - [IN] the source event                         *
@@ -839,8 +817,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: op_groups_add                                                    *
- *                                                                            *
  * Purpose: add groups to discovered host                                     *
  *                                                                            *
  * Parameters: event    - [IN] the source event data                          *
@@ -867,8 +843,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: op_groups_del                                                    *
  *                                                                            *
  * Purpose: delete groups from discovered host                                *
  *                                                                            *
@@ -974,8 +948,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: op_template_add                                                  *
- *                                                                            *
  * Purpose: link host with template                                           *
  *                                                                            *
  * Parameters: event           - [IN] source event data                       *
@@ -1007,8 +979,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: op_template_del                                                  *
  *                                                                            *
  * Purpose: unlink and clear host from template                               *
  *                                                                            *

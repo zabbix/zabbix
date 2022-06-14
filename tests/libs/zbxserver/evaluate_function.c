@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,6 +120,7 @@ void	zbx_mock_test_entry(void **state)
 		zbx_uint64_t		expected_ui64;
 
 		handle = zbx_mock_get_parameter_handle("out.value");
+
 		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string_ex(handle, &expected_value)))
 			fail_msg("Cannot read output value: %s", zbx_mock_error_string(err));
 
@@ -132,9 +133,9 @@ void	zbx_mock_test_entry(void **state)
 			case ZBX_VARIANT_UI64:
 				if (SUCCEED != is_uint64(expected_value, &expected_ui64))
 				{
-					fail_msg("function result '" ZBX_FS_UI64 "' does not match expected result '%s'",
+					fail_msg("function result '" ZBX_FS_UI64
+							"' does not match expected result '%s'",
 							returned_value.data.ui64, expected_value);
-
 				}
 				zbx_mock_assert_uint64_eq("function result", expected_ui64, returned_value.data.ui64);
 				break;

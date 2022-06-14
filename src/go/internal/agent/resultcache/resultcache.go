@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,9 +49,9 @@ import (
 	"os"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 )
 
 const (
@@ -91,7 +91,7 @@ type AgentDataRequest struct {
 }
 
 type Uploader interface {
-	Write(data []byte, timeout time.Duration) (err error)
+	Write(data []byte, timeout time.Duration) (err []error)
 	Addr() (s string)
 	Hostname() (s string)
 	CanRetry() (enabled bool)
@@ -105,7 +105,7 @@ type cacheData struct {
 	clientID   uint64
 	token      string
 	lastDataID uint64
-	lastError  error
+	lastErrors []error
 	retry      *time.Timer
 	timeout    int
 }
@@ -201,7 +201,7 @@ func createTableQuery(table string, id int) string {
 		table, id)
 }
 
-func prepareDiskCache(options *agent.AgentOptions, addresses []string, hostnames []string) (err error) {
+func prepareDiskCache(options *agent.AgentOptions, addresses [][]string, hostnames []string) (err error) {
 	type activeCombination struct {
 		address  string
 		hostname string
@@ -234,7 +234,7 @@ func prepareDiskCache(options *agent.AgentOptions, addresses []string, hostnames
 
 	for _, addr := range addresses {
 		for _, host := range hostnames {
-			combinations = append(combinations, activeCombination{address: addr, hostname: host})
+			combinations = append(combinations, activeCombination{address: addr[0], hostname: host})
 		}
 	}
 
@@ -329,7 +329,7 @@ addressCheck:
 	return nil
 }
 
-func Prepare(options *agent.AgentOptions, addresses []string, hostnames []string) (err error) {
+func Prepare(options *agent.AgentOptions, addresses [][]string, hostnames []string) (err error) {
 	if options.EnablePersistentBuffer == 1 && options.PersistentBufferFile == "" {
 		return errors.New("\"EnablePersistentBuffer\" parameter misconfiguration: \"PersistentBufferFile\" parameter is not set")
 	}

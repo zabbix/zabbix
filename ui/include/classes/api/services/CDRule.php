@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -697,7 +697,7 @@ class CDRule extends CApiService {
 			$drule['druleid'] = $druleids[$index];
 		});
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_DISCOVERY_RULE, $drules);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_DISCOVERY_RULE, $drules);
 
 		$create_dchecks = [];
 		foreach ($drules as $dnum => $drule) {
@@ -802,7 +802,7 @@ class CDRule extends CApiService {
 			}
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_DISCOVERY_RULE, $drules, $db_drules);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DISCOVERY_RULE, $drules, $db_drules);
 
 		return ['druleids' => $druleids];
 	}
@@ -868,7 +868,7 @@ class CDRule extends CApiService {
 
 		DB::delete('drules', ['druleid' => $druleids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, $db_drules);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_DISCOVERY_RULE, $db_drules);
 
 		return ['druleids' => $druleids];
 	}

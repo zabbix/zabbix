@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,8 +134,8 @@ abstract class CGraphGeneral extends CApiService {
 		$this->updateReal($graphs);
 		$this->inherit($graphs);
 
-		$audit_resource = ($this instanceof CGraph) ? AUDIT_RESOURCE_GRAPH : AUDIT_RESOURCE_GRAPH_PROTOTYPE;
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, $audit_resource, $graphs, $db_graphs);
+		$resource = ($this instanceof CGraph) ? CAudit::RESOURCE_GRAPH : CAudit::RESOURCE_GRAPH_PROTOTYPE;
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, $resource, $graphs, $db_graphs);
 
 		return ['graphids' => $graphids];
 	}
@@ -169,8 +169,8 @@ abstract class CGraphGeneral extends CApiService {
 		$this->createReal($graphs);
 		$this->inherit($graphs);
 
-		$audit_resource = $this instanceof CGraph ? AUDIT_RESOURCE_GRAPH : AUDIT_RESOURCE_GRAPH_PROTOTYPE;
-		$this->addAuditBulk(AUDIT_ACTION_ADD, $audit_resource, $graphs);
+		$resource = ($this instanceof CGraph) ? CAudit::RESOURCE_GRAPH : CAudit::RESOURCE_GRAPH_PROTOTYPE;
+		$this->addAuditBulk(CAudit::ACTION_ADD, $resource, $graphs);
 
 		return ['graphids' => array_column($graphs, 'graphid')];
 	}
@@ -1279,7 +1279,8 @@ abstract class CGraphGeneral extends CApiService {
 			'output' => $output,
 			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
 			'hostids' => $data['templateids'],
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		if ($graphs) {

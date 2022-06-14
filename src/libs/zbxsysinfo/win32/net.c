@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #include "sysinfo.h"
 #include "log.h"
 #include "zbxjson.h"
+
+#define ZBX_GUID_LEN	38
 
 /* __stdcall calling convention is used for GetIfEntry2(). In order to declare a */
 /* pointer to GetIfEntry2() we have to expand NETIOPAPI_API macro manually since */
@@ -43,8 +45,6 @@ typedef struct
 zbx_ifrow_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ifrow_init                                                   *
  *                                                                            *
  * Purpose: initialize the zbx_ifrow_t variable                               *
  *                                                                            *
@@ -91,8 +91,6 @@ static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ifrow_clean                                                  *
- *                                                                            *
  * Purpose: clean the zbx_ifrow_t variable                                    *
  *                                                                            *
  * Parameters:                                                                *
@@ -108,8 +106,6 @@ static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_ifrow_call_get_if_entry                                      *
  *                                                                            *
  * Purpose: call either GetIfEntry() or GetIfEntry2() based on the Windows    *
  *          release to fill the passed MIB interface structure.               *
@@ -262,14 +258,12 @@ static ULONG64	zbx_ifrow_get_out_discards(const zbx_ifrow_t *pIfRow)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_ifrow_get_utf8_description                                   *
- *                                                                            *
  * Purpose: returns interface description encoded in UTF-8 format             *
  *                                                                            *
  * Parameters:                                                                *
  *     pIfRow      - [IN] pointer to initialized zbx_ifrow_t variable         *
  *                                                                            *
- * Comments: returns pointer do dynamically-allocated memory, caller must     *
+ * Comments: returns pointer to dynamically-allocated memory, caller must     *
  *           free it                                                          *
  *                                                                            *
  ******************************************************************************/
@@ -294,12 +288,45 @@ static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 			else
 				mb_to_unicode = zbx_acp_to_unicode;
 		}
+
 		wdescr = mb_to_unicode(pIfRow->ifRow->bDescr);
 		utf8_descr = zbx_unicode_to_utf8(wdescr);
 		zbx_free(wdescr);
 
 		return utf8_descr;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: returns interface GUID in string format                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pIfRow      - [IN] pointer to initialized zbx_ifrow_t variable         *
+ *                                                                            *
+ * Comments: returns pointer to dynamically-allocated memory, caller must     *
+ *           free it                                                          *
+ *                                                                            *
+ ******************************************************************************/
+static char	*zbx_ifrow_get_guid_str(const zbx_ifrow_t *pIfRow)
+{
+	char	*guid_cstr = NULL;
+	size_t	guid_alloc = 0, guid_offset = 0;
+
+	if (NULL != pIfRow->ifRow2)
+	{
+		GUID	*guid;
+
+		guid = &pIfRow->ifRow2->InterfaceGuid;
+
+		zbx_snprintf_alloc(&guid_cstr, &guid_alloc, &guid_offset,
+				"{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}",
+				guid->Data1, guid->Data2, guid->Data3,
+				guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3],
+				guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
+	}
+
+	return guid_cstr;
 }
 
 /*
@@ -362,8 +389,12 @@ static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 			continue;
 		}
 
-		utf8_descr = zbx_ifrow_get_utf8_description(ifrow);
-		if (0 == strcmp(if_name, utf8_descr))
+		if (ZBX_GUID_LEN == strlen(if_name) && '{' == if_name[0] && '}' == if_name[ZBX_GUID_LEN - 1])
+			utf8_descr = zbx_ifrow_get_guid_str(ifrow);
+		else
+			utf8_descr = zbx_ifrow_get_utf8_description(ifrow);
+
+		if (NULL != utf8_descr && 0 == strcmp(if_name, utf8_descr))
 			ret = SUCCEED;
 		zbx_free(utf8_descr);
 
@@ -556,7 +587,7 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_ifrow_t	ifrow = {NULL, NULL};
 
 	struct zbx_json	j;
-	char 		*utf8_descr;
+	char 		*utf8_descr, *guid;
 
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IFTABLE);
@@ -596,6 +627,10 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		utf8_descr = zbx_ifrow_get_utf8_description(&ifrow);
 		zbx_json_addstring(&j, "{#IFNAME}", utf8_descr, ZBX_JSON_TYPE_STRING);
 		zbx_free(utf8_descr);
+
+		guid = zbx_ifrow_get_guid_str(&ifrow);
+		zbx_json_addstring(&j, "{#IFGUID}", ZBX_NULL2EMPTY_STR(guid), ZBX_JSON_TYPE_STRING);
+		zbx_free(guid);
 
 		zbx_json_close(&j);
 	}

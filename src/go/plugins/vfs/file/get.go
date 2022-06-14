@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import (
 	"os"
 	"time"
 
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type jsTimeLoc time.Time
@@ -53,8 +53,11 @@ type fiTimeStamp struct {
 }
 
 type fileInfo struct {
-	Type string  `json:"type"`
-	User *string `json:"user"`
+	Basename string  `json:"basename"`
+	Pathname string  `json:"pathname"`
+	Dirname  string  `json:"dirname"`
+	Type     string  `json:"type"`
+	User     *string `json:"user"`
 	userInfo
 	Size      int64       `json:"size"`
 	Time      fiTime      `json:"time"`

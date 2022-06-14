@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,11 +24,7 @@
  */
 class CDiscoveryRule extends CItemGeneral {
 
-	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+	public const ACCESS_RULES = parent::ACCESS_RULES + [
 		'copy' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
@@ -665,10 +661,13 @@ class CDiscoveryRule extends CItemGeneral {
 		return true;
 	}
 
-	public function syncTemplates($data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
+	/**
+	 * @param array $templateids
+	 * @param array $hostids
+	 *
+	 * @return array Array of discovery rule IDs.
+	 */
+	public function syncTemplates(array $templateids, array $hostids): array {
 		$output = [];
 		foreach ($this->fieldRules as $field_name => $rules) {
 			if (!array_key_exists('system', $rules) && !array_key_exists('host', $rules)) {
@@ -678,12 +677,13 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$tpl_items = $this->get([
 			'output' => $output,
-			'hostids' => $data['templateids'],
 			'selectFilter' => ['formula', 'evaltype', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
-			'preservekeys' => true
+			'hostids' => $templateids,
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		foreach ($tpl_items as &$item) {
@@ -706,204 +706,233 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		unset($item);
 
-		$this->inherit($tpl_items, $data['hostids']);
+		$this->inherit($tpl_items, $hostids);
 
-		return true;
+		return array_keys($tpl_items);
 	}
 
 	/**
 	 * Copies all of the triggers from the source discovery to the target discovery rule.
 	 *
-	 * @throws APIException if trigger saving fails
-	 *
-	 * @param array $srcDiscovery    The source discovery rule to copy from
-	 * @param array $srcHost         The host the source discovery belongs to
-	 * @param array $dstHost         The host the target discovery belongs to
+	 * @param array  $src_discovery       The source discovery rule to copy from.
+	 * @param array  $src_host            The host the source discovery belongs to.
+	 * @param string $src_host['hostid']
+	 * @param string $src_host['host']
+	 * @param array  $dst_host            The host the target discovery belongs to.
+	 * @param string $dst_host['hostid']
+	 * @param string $dst_host['host']
 	 *
 	 * @return array
+	 *
+	 * @throws APIException
 	 */
-	protected function copyTriggerPrototypes(array $srcDiscovery, array $srcHost, array $dstHost) {
-		$srcTriggers = API::TriggerPrototype()->get([
-			'discoveryids' => $srcDiscovery['itemid'],
-			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
-				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'opdata', 'discover', 'event_name'
+	protected function copyTriggerPrototypes(array $src_discovery, array $src_host, array $dst_host): array {
+		$src_triggers = API::TriggerPrototype()->get([
+			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'opdata', 'discover',
+				'event_name'
 			],
-			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],
-			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectFunctions' => API_OUTPUT_EXTEND,
-			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
-			'preservekeys' => true
+			'selectDependencies' => ['triggerid'],
+			'discoveryids' => $src_discovery['itemid']
 		]);
 
-		foreach ($srcTriggers as $id => $trigger) {
+		$dst_triggers = [];
+
+		foreach ($src_triggers as $i => $src_trigger) {
 			// Skip trigger prototypes with web items and remove them from source.
-			if (httpItemExists($trigger['items'])) {
-				unset($srcTriggers[$id]);
+			if (httpItemExists($src_trigger['items'])) {
+				unset($src_triggers[$i]);
+			}
+			else {
+				$dst_triggers[] = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url',
+					'status', 'priority', 'comments','type', 'recovery_mode', 'recovery_expression', 'correlation_mode',
+					'correlation_tag', 'opdata', 'discover', 'event_name', 'tags'
+				]));
 			}
 		}
 
-		if (!$srcTriggers) {
+		if (!$dst_triggers) {
 			return [];
 		}
 
-		/*
-		 * Copy the remaining trigger prototypes to a new source. These will contain IDs and original dependencies.
-		 * The dependencies from $srcTriggers will be removed.
-		 */
-		$trigger_prototypes = $srcTriggers;
+		$src_triggers = array_values($src_triggers);
 
-		// Contains original trigger prototype dependency IDs.
-		$dep_triggerids = [];
-
-		/*
-		 * Collect dependency trigger IDs and remove them from source. Otherwise these IDs do not pass
-		 * validation, since they don't belong to destination discovery rule.
-		 */
-		$add_dependencies = false;
-
-		foreach ($srcTriggers as $id => &$trigger) {
-			if ($trigger['dependencies']) {
-				foreach ($trigger['dependencies'] as $dep_trigger) {
-					$dep_triggerids[] = $dep_trigger['triggerid'];
-				}
-				$add_dependencies = true;
-			}
-			unset($trigger['dependencies']);
-		}
-		unset($trigger);
-
-		// Save new trigger prototypes and without dependencies for now.
-		$dstTriggers = $srcTriggers;
-		$dstTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dstTriggers,
+		$dst_triggers = CMacrosResolverHelper::resolveTriggerExpressions($dst_triggers,
 			['sources' => ['expression', 'recovery_expression']]
 		);
-		foreach ($dstTriggers as $id => &$trigger) {
-			unset($trigger['triggerid'], $trigger['templateid'], $trigger['hosts'], $trigger['functions'],
-				$trigger['items'], $trigger['discoveryRule']
+
+		foreach ($dst_triggers as &$trigger) {
+			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $src_host['host'],
+				$dst_host['host']
 			);
 
-			// Update the destination expressions.
-			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $srcHost['host'],
-				$dstHost['host']
-			);
 			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				$trigger['recovery_expression'] = triggerExpressionReplaceHost($trigger['recovery_expression'],
-					$srcHost['host'], $dstHost['host']
+					$src_host['host'], $dst_host['host']
 				);
 			}
 		}
 		unset($trigger);
 
-		$result = API::TriggerPrototype()->create($dstTriggers);
+		$result = API::TriggerPrototype()->create($dst_triggers);
+
 		if (!$result) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone trigger prototypes.'));
 		}
 
-		// Process dependencies, if at least one trigger prototype has a dependency.
-		if ($add_dependencies) {
-			$trigger_prototypeids = array_keys($trigger_prototypes);
+		$dst_triggerids = $result['triggerids'];
+		$src_trigger_indexes = array_flip(array_column($src_triggers, 'triggerid'));
 
-			foreach ($result['triggerids'] as $i => $triggerid) {
-				$new_trigger_prototypes[$trigger_prototypeids[$i]] = [
-					'new_triggerid' => $triggerid,
-					'new_hostid' => $dstHost['hostid'],
-					'new_host' => $dstHost['host'],
-					'src_hostid' => $srcHost['hostid'],
-					'src_host' => $srcHost['host']
-				];
+		$dst_triggers = [];
+
+		/*
+		 * A check that the trigger-up belongs to the source host needs to be performed on copying the dependencies
+		 * on triggers.
+		 * If it does, we need to check that the triggers with the same description and expression exist on the
+		 * destination host.
+		 * If not, we need to check if the dependencies from destination triggers to these triggers are valid.
+		 */
+		$src_triggerids_up = [];
+
+		foreach ($dst_triggerids as $i => $dst_triggerid) {
+			if (!$src_triggers[$i]['dependencies']) {
+				unset($dst_triggerids[$i]);
+				continue;
 			}
 
-			/*
-			 * Search for original dependent triggers and expressions to find corresponding triggers on destination host
-			 * with same expression.
-			 */
-			$dep_triggers = API::Trigger()->get([
-				'output' => ['description', 'expression'],
-				'selectHosts' => ['hostid'],
-				'triggerids' => $dep_triggerids,
-				'preservekeys' => true
-			]);
-			$dep_triggers = CMacrosResolverHelper::resolveTriggerExpressions($dep_triggers);
+			$dst_triggers[$dst_triggerid] = ['triggerid' => $dst_triggerid];
 
-			// Map dependencies to the new trigger IDs and save.
-			foreach ($trigger_prototypes as &$trigger_prototype) {
-				// Get corresponding created trigger prototype ID.
-				$new_trigger_prototype = $new_trigger_prototypes[$trigger_prototype['triggerid']];
+			foreach ($src_triggers[$i]['dependencies'] as $i2 => $src_trigger_up) {
+				if (array_key_exists($src_trigger_up['triggerid'], $src_trigger_indexes)) {
+					// Add dependency on the trigger prototype of the same LLD rule.
+					$dst_triggers[$dst_triggerid]['dependencies'][] =
+						['triggerid' => $result['triggerids'][$src_trigger_indexes[$src_trigger_up['triggerid']]]];
 
-				if ($trigger_prototype['dependencies']) {
-					foreach ($trigger_prototype['dependencies'] as &$dependency) {
-						$dep_triggerid = $dependency['triggerid'];
-
-						/*
-						 * We have added a dependent trigger prototype and we know corresponding trigger prototype ID
-						 * for newly created trigger prototype.
-						 */
-						if (array_key_exists($dependency['triggerid'], $new_trigger_prototypes)) {
-							/*
-							 * Dependency is within same host according to $srcHostId parameter or dep trigger has
-							 * single host.
-							 */
-							if ($new_trigger_prototype['src_hostid'] ==
-									$new_trigger_prototypes[$dep_triggerid]['src_hostid']) {
-								$dependency['triggerid'] = $new_trigger_prototypes[$dep_triggerid]['new_triggerid'];
-							}
-						}
-						elseif (in_array(['hostid' => $new_trigger_prototype['src_hostid']],
-								$dep_triggers[$dep_triggerid]['hosts'])) {
-							// Get all possible $depTrigger matching triggers by description.
-							$target_triggers = API::Trigger()->get([
-								'output' => ['hosts', 'triggerid', 'expression'],
-								'hostids' => $new_trigger_prototype['new_hostid'],
-								'filter' => ['description' => $dep_triggers[$dep_triggerid]['description']],
-								'preservekeys' => true
-							]);
-							$target_triggers = CMacrosResolverHelper::resolveTriggerExpressions($target_triggers);
-
-							// Compare exploded expressions for exact match.
-							$expr1 = $dep_triggers[$dep_triggerid]['expression'];
-							$dependency['triggerid'] = null;
-
-							foreach ($target_triggers as $target_trigger) {
-								$expr2 = triggerExpressionReplaceHost($target_trigger['expression'],
-									$new_trigger_prototype['new_host'],
-									$new_trigger_prototype['src_host']
-								);
-
-								if ($expr2 === $expr1) {
-									// Matching trigger has been found.
-									$dependency['triggerid'] = $target_trigger['triggerid'];
-									break;
-								}
-							}
-
-							// If matching trigger was not found, raise exception.
-							if ($dependency['triggerid'] === null) {
-								$expr2 = triggerExpressionReplaceHost($dep_triggers[$dep_triggerid]['expression'],
-									$new_trigger_prototype['src_host'],
-									$new_trigger_prototype['new_host']
-								);
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-									'Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
-									$trigger_prototype['description'],
-									$trigger_prototype['expression'],
-									$dep_triggers[$dep_triggerid]['description'],
-									$expr2
-								));
-							}
-						}
-					}
-					unset($dependency);
-
-					$trigger_prototype['triggerid'] = $new_trigger_prototype['new_triggerid'];
+					unset($src_triggers[$i]['dependencies'][$i2]);
+				}
+				else {
+					$src_triggerids_up[$src_trigger_up['triggerid']] = true;
 				}
 			}
-			unset($trigger_prototype);
 
-			// If adding a dependency fails, the exception will be raised in TriggerPrototype API.
-			API::TriggerPrototype()->addDependencies($trigger_prototypes);
+			if (!$src_triggers[$i]['dependencies']) {
+				unset($dst_triggerids[$i]);
+			}
+		}
+
+		if ($src_triggerids_up) {
+			$src_host_triggers_up = DBfetchArrayAssoc(DBselect(
+				'SELECT DISTINCT t.triggerid,t.description,t.expression,t.recovery_expression'.
+				' FROM triggers t,functions f,items i'.
+				' WHERE t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND '.dbConditionId('t.triggerid', array_keys($src_triggerids_up)).
+					' AND '.dbConditionId('i.hostid', [$src_host['hostid']])
+			), 'triggerid');
+
+			$src_host_triggers_up = CMacrosResolverHelper::resolveTriggerExpressions($src_host_triggers_up,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+
+			$src_host_dependencies = [];
+			$other_host_dependencies = [];
+
+			foreach ($dst_triggerids as $i => $dst_triggerid) {
+				$src_trigger = $src_triggers[$i];
+
+				foreach ($src_trigger['dependencies'] as $src_trigger_up) {
+					if (array_key_exists($src_trigger_up['triggerid'], $src_host_triggers_up)) {
+						$src_host_dependencies[$src_trigger_up['triggerid']][$src_trigger['triggerid']] = true;
+					}
+					else {
+						// Add dependency on the trigger of the other templates or hosts.
+						$dst_triggers[$dst_triggerid]['dependencies'][] = ['triggerid' => $src_trigger_up['triggerid']];
+						$other_host_dependencies[$src_trigger_up['triggerid']][$dst_triggerid] = true;
+					}
+				}
+			}
+
+			if ($src_host_dependencies) {
+				$dst_host_triggers = DBfetchArrayAssoc(DBselect(
+					'SELECT DISTINCT t.triggerid,t.description,t.expression,t.recovery_expression'.
+					' FROM items i,functions f,triggers t'.
+					' WHERE i.itemid=f.itemid'.
+						' AND f.triggerid=t.triggerid'.
+						' AND '.dbConditionId('i.hostid', [$dst_host['hostid']]).
+						' AND '.dbConditionString('t.description',
+							array_unique(array_column($src_host_triggers_up, 'description'))
+						)
+				), 'triggerid');
+
+				$dst_host_triggers = CMacrosResolverHelper::resolveTriggerExpressions($dst_host_triggers);
+
+				$dst_host_triggerids = [];
+
+				foreach ($dst_host_triggers as $i => $trigger) {
+					$expression = triggerExpressionReplaceHost($trigger['expression'], $dst_host['host'],
+						$src_host['host']
+					);
+					$recovery_expression = $trigger['recovery_expression'];
+
+					if ($recovery_expression !== '') {
+						$recovery_expression = triggerExpressionReplaceHost($trigger['recovery_expression'],
+							$dst_host['host'], $src_host['host']
+						);
+					}
+
+					$dst_host_triggerids[$trigger['description']][$expression][$recovery_expression] =
+						$trigger['triggerid'];
+				}
+
+				foreach ($src_host_triggers_up as $src_trigger_up) {
+					$description = $src_trigger_up['description'];
+					$expression = $src_trigger_up['expression'];
+					$recovery_expression = $src_trigger_up['recovery_expression'];
+
+					if (array_key_exists($description, $dst_host_triggerids)
+							&& array_key_exists($expression, $dst_host_triggerids[$description])
+							&& array_key_exists($recovery_expression, $dst_host_triggerids[$description][$expression])) {
+						$dst_triggerid_up = $dst_host_triggerids[$description][$expression][$recovery_expression];
+
+						foreach ($src_host_dependencies[$src_trigger_up['triggerid']] as $src_triggerid => $foo) {
+							$dst_triggerid = $dst_triggerids[$src_trigger_indexes[$src_triggerid]];
+
+							$dst_triggers[$dst_triggerid]['dependencies'][] = ['triggerid' => $dst_triggerid_up];
+						}
+					}
+					else {
+						$src_triggerid = key($src_host_dependencies[$src_trigger_up['triggerid']]);
+						$src_trigger = $src_triggers[$src_trigger_indexes[$src_triggerid]];
+
+						$hosts = DB::select('hosts', [
+							'output' => ['status'],
+							'hostids' => $dst_host['hostid']
+						]);
+
+						$error = ($hosts[0]['status'] == HOST_STATUS_TEMPLATE)
+							? _('Trigger prototype "%1$s" cannot depend on the non-existent trigger "%2$s" on the template "%3$s".')
+							: _('Trigger prototype "%1$s" cannot depend on the non-existent trigger "%2$s" on the host "%3$s".');
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $src_trigger['description'],
+							$src_trigger_up['description'], $dst_host['host']
+						));
+					}
+				}
+			}
+
+			if ($other_host_dependencies) {
+				$trigger_hosts = CTriggerGeneral::getTriggerHosts($other_host_dependencies);
+
+				CTriggerGeneral::checkDependenciesOfHostTriggers($other_host_dependencies, $trigger_hosts);
+				CTriggerGeneral::checkDependenciesOfTemplateTriggers($other_host_dependencies, $trigger_hosts);
+			}
+		}
+
+		if ($dst_triggers) {
+			$dst_triggers = array_values($dst_triggers);
+			CTriggerGeneral::updateDependencies($dst_triggers);
 		}
 
 		return $result;
@@ -1370,7 +1399,7 @@ class CDiscoveryRule extends CItemGeneral {
 							// If same "lld_macro" is found in DB, update only "path" if necessary.
 
 							if (array_key_exists('path', $lld_macro_path)
-									&& $lld_macro_path['path'] !== $lld_macro_path['path']) {
+									&& $lld_macro_path['path'] !== $db_lld_macro_path['path']) {
 								$fields_to_update['path'] = $lld_macro_path['path'];
 							}
 						}
@@ -2193,7 +2222,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// copy host prototypes
-		$this->copyHostPrototypes($discoveryid, $dstDiscovery);
+		$this->copyHostPrototypes($discoveryid, $dstDiscovery['itemid']);
 
 		return true;
 	}
@@ -2518,59 +2547,88 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Copies all of the host prototypes from the source discovery to the target
-	 * discovery rule.
+	 * Copy all of the host prototypes from the source discovery rule to the target discovery rule.
 	 *
-	 * @throws APIException if prototype saving fails.
+	 * @param string $src_discoveryid
+	 * @param string $dst_discoveryid
 	 *
-	 * @param int   $srcid          The source discovery rule id to copy from.
-	 * @param array $dstDiscovery   The target discovery rule to copy to.
-	 *
-	 * @return array
+	 * @throws APIException
 	 */
-	protected function copyHostPrototypes($srcid, array $dstDiscovery) {
-		$prototypes = API::HostPrototype()->get([
-			'discoveryids' => $srcid,
-			'output' => ['host', 'name', 'status', 'inventory_mode', 'discover', 'custom_interfaces'],
+	protected function copyHostPrototypes(string $src_discoveryid, string $dst_discoveryid): void {
+		$src_host_prototypes = API::HostPrototype()->get([
+			'output' => ['host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'],
+			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
 			'selectGroupLinks' => ['groupid'],
 			'selectGroupPrototypes' => ['name'],
-			'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'main', 'details'],
 			'selectTemplates' => ['templateid'],
 			'selectTags' => ['tag', 'value'],
 			'selectMacros' => ['macro', 'type', 'value', 'description'],
-			'preservekeys' => true
+			'discoveryids' => $src_discoveryid
 		]);
 
-		$rs = [];
-		if ($prototypes) {
-			foreach ($prototypes as &$prototype) {
-				$prototype['ruleid'] = $dstDiscovery['itemid'];
-				unset($prototype['hostid'], $prototype['inventory']['hostid']);
-
-				foreach ($prototype['groupLinks'] as &$groupLinks) {
-					unset($groupLinks['group_prototypeid']);
-				}
-				unset($groupLinks);
-
-				foreach ($prototype['groupPrototypes'] as &$groupPrototype) {
-					unset($groupPrototype['group_prototypeid']);
-				}
-				unset($groupPrototype);
-
-				foreach ($prototype['macros'] as &$macro) {
-					$macro['type'] = ($macro['type'] == ZBX_MACRO_TYPE_SECRET) ? ZBX_MACRO_TYPE_TEXT : $macro['type'];
-					$macro += ['value' => ''];
-				}
-				unset($macro);
-			}
-			unset($prototype);
-
-			$rs = API::HostPrototype()->create($prototypes);
-			if (!$rs) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone host prototypes.'));
-			}
+		if (!$src_host_prototypes) {
+			return;
 		}
-		return $rs;
+
+		$dst_host_prototypes = [];
+
+		foreach ($src_host_prototypes as $i => $src_host_prototype) {
+			unset($src_host_prototypes[$i]);
+
+			$dst_host_prototype = ['ruleid' => $dst_discoveryid] + array_intersect_key($src_host_prototype, array_flip([
+				'host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode', 'groupLinks',
+				'groupPrototypes', 'templates', 'tags'
+			]));
+
+			if ($src_host_prototype['custom_interfaces'] == HOST_PROT_INTERFACES_CUSTOM) {
+				foreach ($src_host_prototype['interfaces'] as $src_interface) {
+					$dst_interface =
+						array_intersect_key($src_interface, array_flip(['type', 'useip', 'ip', 'dns', 'port', 'main']));
+
+					if ($src_interface['type'] == INTERFACE_TYPE_SNMP) {
+						switch ($src_interface['details']['version']) {
+							case SNMP_V1:
+							case SNMP_V2C:
+								$dst_interface['details'] = array_intersect_key($src_interface['details'],
+									array_flip(['version', 'bulk', 'community'])
+								);
+								break;
+
+							case SNMP_V3:
+								$field_names = array_flip(['version', 'bulk', 'contextname', 'securityname',
+									'securitylevel'
+								]);
+
+								if ($src_interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+									$field_names += array_flip(['authprotocol', 'authpassphrase']);
+								}
+								elseif ($src_interface['details']['securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+									$field_names +=
+										array_flip(['authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase']);
+								}
+
+								$dst_interface['details'] = array_intersect_key($src_interface['details'], $field_names);
+								break;
+						}
+					}
+
+					$dst_host_prototype['interfaces'][] = $dst_interface;
+				}
+			}
+
+			foreach ($src_host_prototype['macros'] as $src_macro) {
+				if ($src_macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$dst_host_prototype['macros'][] = ['type' => ZBX_MACRO_TYPE_TEXT, 'value' => ''] + $src_macro;
+				}
+				else {
+					$dst_host_prototype['macros'][] = $src_macro;
+				}
+			}
+
+			$dst_host_prototypes[] = $dst_host_prototype;
+		}
+
+		API::HostPrototype()->create($dst_host_prototypes);
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {

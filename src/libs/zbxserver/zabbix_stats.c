@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,22 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zabbix_stats.h"
+
 #include "common.h"
-#include "zbxjson.h"
 #include "dbcache.h"
 #include "zbxself.h"
-#include "valuecache.h"
 #include "../../zabbix_server/vmware/vmware.h"
 #include "preproc.h"
-#include "zbxtrends.h"
-
-#include "zabbix_stats.h"
 
 extern unsigned char	program_type;
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_send_zabbix_stats                                            *
  *                                                                            *
  * Purpose: collects all metrics required for Zabbix stats request            *
  *                                                                            *
@@ -45,16 +40,15 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 	zbx_vmware_stats_t	vmware_stats;
 	zbx_wcache_info_t	wcache_info;
 	zbx_process_info_t	process_stats[ZBX_PROCESS_TYPE_COUNT];
-	zbx_tfc_stats_t		tcache_stats;
 	int			proc_type;
 
 	DCget_count_stats_all(&count_stats);
 
 	/* zabbix[boottime] */
-	zbx_json_adduint64(json, "boottime", CONFIG_SERVER_STARTUP_TIME);
+	zbx_json_addint64(json, "boottime", CONFIG_SERVER_STARTUP_TIME);
 
 	/* zabbix[uptime] */
-	zbx_json_adduint64(json, "uptime", time(NULL) - CONFIG_SERVER_STARTUP_TIME);
+	zbx_json_addint64(json, "uptime", time(NULL) - CONFIG_SERVER_STARTUP_TIME);
 
 	/* zabbix[hosts] */
 	zbx_json_adduint64(json, "hosts", count_stats.hosts);
@@ -165,35 +159,12 @@ void	zbx_get_zabbix_stats(struct zbx_json *json)
 			zbx_json_addfloat(json, "max", process_stats[proc_type].idle_max);
 			zbx_json_addfloat(json, "min", process_stats[proc_type].idle_min);
 			zbx_json_close(json);
-			zbx_json_adduint64(json, "count", process_stats[proc_type].count);
+			zbx_json_addint64(json, "count", process_stats[proc_type].count);
 			zbx_json_close(json);
 		}
 	}
 
 	zbx_json_close(json);
 
-	/* zabbix[tcache,cache,<parameters>] */
-	if (SUCCEED == zbx_tfc_get_stats(&tcache_stats, NULL))
-	{
-		zbx_uint64_t	total;
-
-		zbx_json_addobject(json, "tcache");
-
-		total = tcache_stats.hits + tcache_stats.misses;
-		zbx_json_adduint64(json, "hits", tcache_stats.hits);
-		zbx_json_adduint64(json, "misses", tcache_stats.misses);
-		zbx_json_adduint64(json, "all", total);
-		zbx_json_addfloat(json, "phits", (0 == total ? 0 : (double)tcache_stats.hits / total * 100));
-		zbx_json_addfloat(json, "pmisses", (0 == total ? 0 : (double)tcache_stats.misses / total * 100));
-
-		total = tcache_stats.items_num + tcache_stats.requests_num;
-		zbx_json_adduint64(json, "items", tcache_stats.items_num);
-		zbx_json_adduint64(json, "requests", tcache_stats.requests_num);
-		zbx_json_addfloat(json, "pitems", (0 == total ? 0 : (double)tcache_stats.items_num / total * 100));
-
-		zbx_json_close(json);
-	}
-
 	zbx_json_close(json);
 }
-

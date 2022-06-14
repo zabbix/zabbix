@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ class CControllerModuleScan extends CController {
 					'id' => $manifest['id'],
 					'relative_path' => $relative_path,
 					'status' => MODULE_STATUS_DISABLED,
-					'config' => []
+					'config' => $manifest['config']
 				];
 				$db_modules_create_names[] = $manifest['name'];
 			}
@@ -127,7 +127,7 @@ class CControllerModuleScan extends CController {
 			? _('Modules updated')
 			: _('No new modules discovered');
 
-		if (hasErrorMesssages()) {
+		if (hasErrorMessages()) {
 			CMessageHelper::setErrorTitle($message);
 		}
 		else {

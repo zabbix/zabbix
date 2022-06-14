@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -294,8 +294,6 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: proc_read_tcp_listen                                             *
- *                                                                            *
  * Purpose: reads /proc/net/tcp(6) file by chunks until the last line in      *
  *          in buffer has non-listening socket state                          *
  *                                                                            *
@@ -378,8 +376,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_read_file                                                   *
  *                                                                            *
  * Purpose: reads whole file into a buffer in a single read operation         *
  *                                                                            *
@@ -623,7 +619,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		pattern[64], *port_str, *buffer = NULL;
 	unsigned short	port;
 	zbx_uint64_t	listen = 0;
-	int		ret = SYSINFO_RET_FAIL, n, buffer_alloc = 64 * ZBX_KIBIBYTE;
+	int		ret = SYSINFO_RET_FAIL, buffer_alloc = 64 * ZBX_KIBIBYTE;
 #ifdef HAVE_INET_DIAG
 	int		found;
 #endif
@@ -686,7 +682,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 		buffer = (char *)zbx_malloc(NULL, buffer_alloc);
 
-		if (0 < (n = proc_read_tcp_listen("/proc/net/tcp", &buffer, &buffer_alloc)))
+		if (0 < proc_read_tcp_listen("/proc/net/tcp", &buffer, &buffer_alloc))
 		{
 			ret = SYSINFO_RET_OK;
 
@@ -699,7 +695,7 @@ int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 		}
 
-		if (0 < (n = proc_read_tcp_listen("/proc/net/tcp6", &buffer, &buffer_alloc)))
+		if (0 < proc_read_tcp_listen("/proc/net/tcp6", &buffer, &buffer_alloc))
 		{
 			ret = SYSINFO_RET_OK;
 

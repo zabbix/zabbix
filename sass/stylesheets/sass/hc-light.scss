@@ -94,6 +94,7 @@ $menu-main-icons: (
 	dashboard: -570px -664px,
 	problems: -570px -688px,
 	monitoring: -570px -712px,
+	services: -570px -832px,
 	inventory: -570px -736px,
 	reports: -570px -760px,
 	configuration: -570px -784px,
@@ -102,7 +103,7 @@ $menu-main-icons: (
 
 $menu-user-expanded-icons: (
 	support: -247px -84px,
-	share: -168px -84px,
+	integrations: -168px -84px,
 	help: -168px -48px,
 	guest: -247px -192px,
 	profile: -168px -120px,
@@ -165,6 +166,7 @@ $msg-warning-border-color: #ffb319;
 $btn-font-color: #ffffff;
 $btn-bg-color: #555555;
 $btn-border-color: #333333;
+$btn-border-focus-color: #000000;
 
 $btn-alt-font-color: #000000;
 $btn-alt-bg-color: transparent;
@@ -225,6 +227,11 @@ $toc-title-color: #ffffff;
 $toc-title-bg-color: #333333;
 $diff-added-bg-color: transparent;
 $diff-removed-bg-color: transparent;
+
+// Change indicators.
+$arrow-fill-up: #000000;
+$arrow-fill-down: #000000;
+$arrow-fill-up-down: #000000;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
@@ -367,41 +374,39 @@ $diff-removed-bg-color: transparent;
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -203px -802px,
-	depend-up: url($sprite-path) no-repeat -208px -729px,
-	depend-down: url($sprite-path) no-repeat -208px -765px,
-	ackn: url($sprite-path) no-repeat -203px -693px
+	maintenance: -205px -803px,
+	depend-up: -206px -731px,
+	depend-down: -206px -766px,
+	ackn: -203px -693px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
-		margin: 0 18px 0 0;
 		&::before {
-			background: $bgimage;
-			@extend %var-icons;
+			background-position: $bgimage;
 		}
 	}
 }
 
 $form-icon-btn: (
 	cal: url($sprite-path) no-repeat -201px -834px,
-	wzrd-action: url($sprite-path) no-repeat -168px -617px
+	wizard-action: url($sprite-path) no-repeat -168px -617px
 );
 
 // Dynamically generated classes:
 //  .icon-cal
-//  .icon-wzrd-action
+//  .icon-wizard-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
 		@extend %form-icon-btn;
 
-		@if $form-icon-btn == 'wzrd-action' {
+		@if $form-icon-btn == 'wizard-action' {
 			margin-top: -16px;
 		}
 	}
@@ -534,6 +539,7 @@ button {
 }
 
 .radio-list-control {
+	.normal-bg,
 	.average-bg,
 	.disaster-bg,
 	.high-bg,
@@ -811,11 +817,19 @@ a.link-action {
 
 			box-shadow: inset 0 -1px 0 0 $table-border-color;
 
-			.icon-maint::before {
-				background-position: -206px -804px;
+			.icon-depend-up::before {
+				background-position: -208px -731px;
 			}
 
-			.icon-wzrd-action {
+			.icon-depend-down::before {
+				background-position: -208px -767px;
+			}
+
+			.icon-wizard-action {
+				background: transparent url($sprite-path) no-repeat -318px -624px;
+			}
+
+			.icon-wizard-action {
 				background: transparent url($sprite-path) no-repeat -165px -624px;
 			}
 		}
@@ -988,10 +1002,6 @@ td.log-disaster-bg {
 	width: 34px;
 	height: 27px;
 	position: relative;
-	margin: 0 0 0 -42px;
-}
-
-.notif-indic-container {
 	margin: 0 0 0 -42px;
 }
 
@@ -1237,6 +1247,13 @@ td.inactive-bg {
 	}
 }
 
+.problem-icon-link {
+	&:focus {
+		box-shadow: 0 0 0 2px $blue;
+	}
+}
+
+.problem-icon-link,
 .problem-icon-list {
 	.problem-icon-list-item {
 		background: transparent;

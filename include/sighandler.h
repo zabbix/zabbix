@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,10 +20,16 @@
 #ifndef ZABBIX_SIGHANDLER_H
 #define ZABBIX_SIGHANDLER_H
 
+#include "sysinc.h"
+
 void	zbx_set_common_signal_handlers(void);
 void	zbx_set_child_signal_handler(void);
+void	zbx_unset_child_signal_handler(void);
 void	zbx_set_metric_thread_signal_handler(void);
 void	zbx_block_signals(sigset_t *orig_mask);
 void	zbx_unblock_signals(const sigset_t *orig_mask);
+
+void	zbx_set_exit_on_terminate(void);
+void	zbx_unset_exit_on_terminate(void);
 
 #endif

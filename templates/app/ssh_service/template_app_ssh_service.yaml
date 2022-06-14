@@ -1,0 +1,53 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:44Z'
+  groups:
+    -
+      uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    -
+      uuid: 0bbd5e407d7544b28a508e18db81c235
+      template: 'SSH Service'
+      name: 'SSH Service'
+      description: |
+        Template module for monitoring SSH service
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Modules
+      items:
+        -
+          uuid: 096952457aad464e9669a0fef710874b
+          name: 'SSH service is running'
+          type: SIMPLE
+          key: 'net.tcp.service[ssh]'
+          history: 1w
+          valuemap:
+            name: 'Service state'
+          tags:
+            -
+              tag: component
+              value: network
+          triggers:
+            -
+              uuid: 8f6ce4930afd48f0acc229bad5092c79
+              expression: 'max(/SSH Service/net.tcp.service[ssh],#3)=0'
+              name: 'SSH service is down on {HOST.NAME}'
+              priority: AVERAGE
+              tags:
+                -
+                  tag: scope
+                  value: availability
+      valuemaps:
+        -
+          uuid: 80377235a65c4d119745137e4658ef67
+          name: 'Service state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Down
+            -
+              value: '1'
+              newvalue: Up

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,15 +20,16 @@
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
-define('COMPARE_AVERAGE', 0);
-define('COMPARE_LAST', 1);
-
 /**
  * Test suite for agent2 (GO agent) metric collection.
  *
  * @backup history
  */
 class testGoAgentDataCollection extends CIntegrationTest {
+
+	const COMPARE_AVERAGE = 0;
+	const COMPARE_LAST = 1;
+	const OFFSET_MAX = 20;
 
 	private static $hostids = [];
 	private static $itemids = [];
@@ -244,19 +245,21 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
 			'threshold' => 10.0,
-			'compareType' => COMPARE_AVERAGE
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'system.swap.in[,pages]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100
+			'threshold' => 100,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'system.swap.out[,pages]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100
+			'threshold' => 100,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'proc.mem[zabbix_server,zabbix,avg]',
@@ -269,7 +272,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
 			'threshold' => 1.0,
-			'compareType' => COMPARE_AVERAGE
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'net.tcp.service.perf[ssh]',
@@ -287,25 +290,29 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'system.swap.size[,total]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 100
+			'threshold' => 100,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'vfs.fs.inode[/,pfree]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.1
+			'threshold' => 0.1,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'vfs.fs.size[/tmp,free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 262144
+			'threshold' => 10000000,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[
 			'key' => 'vm.memory.size[free]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 10000000
+			'threshold' => 10000000,
+			'compareType' => self::COMPARE_AVERAGE
 		],
 		[// Should be treated as a special case, since this metric returns JSON object.
 			// Maybe, it should e pulled to separate test suite. At this point we just compare it as string.
@@ -322,7 +329,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 	public function prepareData() {
 		// Create host "agentd" and "agent2".
 		$hosts = [];
-		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 => 53] as $component => $port) {
+		foreach ([self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 => self::AGENT2_PORT_SUFFIX] as $component => $port) {
 			$hosts[] = [
 				'host' => $component,
 				'interfaces' => [
@@ -419,7 +426,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'ListenPort' => PHPUNIT_PORT_PREFIX.'53',
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX,
 				'AllowKey' => 'system.run[*]',
 				'Plugins.Uptime.Capacity' => '10'
 			]
@@ -441,7 +448,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		}
 
 		// Delay to ensure that all metrics were collected.
-		sleep(90);
+		sleep(110);
 	}
 
 	/**
@@ -546,26 +553,54 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
-				if (CTestArrayHelper::get($item, 'compareType', COMPARE_LAST) === COMPARE_AVERAGE) {
-					$value = [];
-					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-						$value[$component] = 0;
-						$records = count($values[$component]);
+				$diff_values = [];
 
-						if ($records > 0) {
-							$value[$component] = array_sum($values[$component]) / $records;
+				if (CTestArrayHelper::get($item, 'compareType', self::COMPARE_LAST) === self::COMPARE_AVERAGE) {
+					$value = [];
+
+					foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+						// Calculate offset between Agent and Agent2 result arrays
+						for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+							$value[$component][$i] = 0;
+
+							if (self::COMPONENT_AGENT == $component) {
+								$j = $i;
+							} else {
+								$j = 0;
+							}
+							$slice = array_slice($values[$component], $j);
+							$records = count($slice);
+
+							if ($records > 0) {
+								$value[$component][$i] = array_sum($slice) / $records;
+							}
 						}
 					}
 
-					$a = $value[self::COMPONENT_AGENT];
-					$b = $value[self::COMPONENT_AGENT2];
+					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+						$a = $value[self::COMPONENT_AGENT][$i];
+						$b = $value[self::COMPONENT_AGENT2][$i];
+						$diff_values[$i] = abs($a - $b);
+					}
+					$offset = array_search(min($diff_values), $diff_values);
+
+					$a = $value[self::COMPONENT_AGENT][$offset];
+					$b = $value[self::COMPONENT_AGENT2][$offset];
+
+					$diff = abs($a - $b);
 				}
 				else {
-					$a = end($values[self::COMPONENT_AGENT]);
-					$b = end($values[self::COMPONENT_AGENT2]);
+					$records = count($values[self::COMPONENT_AGENT]);
+					for ($i = 0; $i < self::OFFSET_MAX; $i++) {
+						$slice = array_slice($values[self::COMPONENT_AGENT], 0, $records - $i);
+						$a = end($slice);
+						$b = end($values[self::COMPONENT_AGENT2]);
+						$diff_values[$i] = abs($a - $b);
+					}
+
+					$diff = min($diff_values);
 				}
 
-				$diff = abs(abs($a) - abs($b));
 				$this->assertTrue($diff < $item['threshold'], 'Difference for '.$item['key'].
 						' is more than defined threshold '.$diff.' > '.$item['threshold']
 				);

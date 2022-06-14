@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ class CTabView extends CDiv {
 			$this->addItem($this->tabs);
 
 			zbx_add_post_js($this->makeJavascript());
-			zbx_add_post_js('try { new TabIndicators(); } catch(e) { }');
+			zbx_add_post_js('try { new TabIndicators('.json_encode($this->id).'); } catch(e) { }');
 		}
 
 		$this->addItem($this->footer);

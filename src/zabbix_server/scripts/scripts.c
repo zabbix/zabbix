@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "scripts.h"
+
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"
 #include "../poller/checks_ssh.h"
@@ -27,10 +28,7 @@
 #include "db.h"
 #include "log.h"
 #include "zbxtasks.h"
-#include "scripts.h"
-#include "zbxjson.h"
 #include "zbxembed.h"
-#include "../events.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -237,7 +235,6 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 {
 	int		ret = SUCCEED;
 	DB_RESULT	result;
-	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " scriptid:" ZBX_FS_UI64,
 			__func__, userid, hostid, script->scriptid);
@@ -257,7 +254,7 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 		PERM_DENY,
 		script->host_access);
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == DBfetch(result))
 		ret = FAIL;
 
 	DBfree_result(result);
@@ -284,8 +281,6 @@ void	zbx_script_clean(zbx_script_t *script)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_webhook_params_pack_json                                     *
  *                                                                            *
  * Purpose: pack webhook script parameters into JSON                          *
  *                                                                            *
@@ -314,8 +309,6 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
 }
 
 /***********************************************************************************
- *                                                                                 *
- * Function: zbx_script_prepare                                                    *
  *                                                                                 *
  * Purpose: prepares user script                                                   *
  *                                                                                 *
@@ -381,8 +374,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DBfetch_webhook_params                                           *
- *                                                                            *
  * Purpose: fetch webhook parameters                                          *
  *                                                                            *
  * Parameters:  scriptid  - [IN] the id of script to be executed              *
@@ -428,8 +419,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_script_execute                                               *
- *                                                                            *
  * Purpose: executing user scripts or remote commands                         *
  *                                                                            *
  * Parameters:  script         - [IN] the script to be executed               *
@@ -469,8 +458,11 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
-					ret = zbx_execute(script->command, result, error, max_error_len,
-							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL);
+					if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
+							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
+					{
+						ret = FAIL;
+					}
 					break;
 				default:
 					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option \"%d\".",
@@ -516,8 +508,6 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_script_create_task                                           *
  *                                                                            *
  * Purpose: creates remote command task from a script                         *
  *                                                                            *

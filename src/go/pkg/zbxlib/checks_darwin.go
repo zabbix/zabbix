@@ -1,8 +1,9 @@
+//go:build !linux
 // +build !linux
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +31,6 @@ package zbxlib
 #include "sysinfo.h"
 
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -40,8 +39,7 @@ int	CHECK_SERVICE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -59,10 +57,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
 	case "system.localtime":
 		return unsafe.Pointer(C.SYSTEM_LOCALTIME)
-	case "net.dns":
-		return unsafe.Pointer(C.NET_DNS)
-	case "net.dns.record":
-		return unsafe.Pointer(C.NET_DNS_RECORD)
 	case "system.boottime":
 		return unsafe.Pointer(C.SYSTEM_BOOTTIME)
 	case "net.tcp.listen":
@@ -73,10 +67,8 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		return unsafe.Pointer(C.NET_UDP_LISTEN)
 	case "system.cpu.load":
 		return unsafe.Pointer(C.SYSTEM_CPU_LOAD)
-	case "vfs.dir.count":
-		return unsafe.Pointer(C.VFS_DIR_COUNT)
-	case "vfs.dir.size":
-		return unsafe.Pointer(C.VFS_DIR_SIZE)
+	case "vfs.dir.get":
+		return unsafe.Pointer(C.VFS_DIR_GET)
 	case "vfs.fs.discovery":
 		return unsafe.Pointer(C.VFS_FS_DISCOVERY)
 	case "vfs.fs.inode":

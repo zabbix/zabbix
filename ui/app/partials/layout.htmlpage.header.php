@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,36 +21,38 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 
 global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
 
+$theme = ZBX_DEFAULT_THEME;
+$scripts = $data['javascript']['files'];
 $page_title = $data['page']['title'];
+
 if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
 	$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER.$page_title;
 }
 
-$pageHeader = new CPageHeader($page_title);
+$pageHeader = new CPageHeader($page_title, CWebUser::getLang());
 
-$scripts = $data['javascript']['files'];
-
-$theme = ZBX_DEFAULT_THEME;
 if (!empty($DB['DB'])) {
 	$theme = getUserTheme($data['user']);
 
-	$pageHeader->addStyle(getTriggerSeverityCss());
-	$pageHeader->addStyle(getTriggerStatusCss());
+	$pageHeader
+		->addStyle(getTriggerSeverityCss())
+		->addStyle(getTriggerStatusCss());
 
 	// Perform Zabbix server check only for standard pages.
-	if ($data['config']['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {
+	if ($data['config']['server_check_interval']) {
 		$scripts[] = 'servercheck.js';
 	}
 }
 
 // Show GUI messages in pages with menus and in kiosk mode.
 $show_gui_messaging = (!defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE)
-		? intval(!CWebUser::isGuest())
-		: null;
+	? intval(!CWebUser::isGuest())
+	: null;
 
 $pageHeader
 	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
@@ -66,6 +68,10 @@ $pageHeader
 		->getUrl()
 	);
 
+foreach ($data['stylesheet']['files'] as $css_file) {
+	$pageHeader->addCssFile($css_file);
+}
+
 if ($scripts) {
 	$pageHeader->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)
@@ -74,6 +80,7 @@ if ($scripts) {
 		->getUrl()
 	);
 }
+
 $pageHeader->display();
 
-echo '<body lang="'.CWebUser::getLang().'">';
+echo '<body>';

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -226,9 +226,9 @@
 	jQuery(function() {
 		addDCheck(<?= json_encode(array_values($data['drule']['dchecks'])) ?>);
 
-		jQuery('input:radio[name="uniqueness_criteria"][value=<?= json_encode($data['drule']['uniqueness_criteria']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="host_source"][value=<?= json_encode($data['drule']['host_source']) ?>]').attr('checked', 'checked');
-		jQuery('input:radio[name="name_source"][value=<?= json_encode($data['drule']['name_source']) ?>]').attr('checked', 'checked');
+		jQuery('input:radio[name="uniqueness_criteria"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['uniqueness_criteria']) ?>)+']').attr('checked', 'checked');
+		jQuery('input:radio[name="host_source"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['host_source']) ?>)+']').attr('checked', 'checked');
+		jQuery('input:radio[name="name_source"][value='+jQuery.escapeSelector(<?= json_encode($data['drule']['name_source']) ?>)+']').attr('checked', 'checked');
 
 		jQuery('#clone').click(function() {
 			jQuery('#update')
@@ -261,7 +261,10 @@
 
 			switch ($btn.data('action')) {
 				case 'add':
-					PopUp('popup.discovery.check', {}, null, $btn);
+					PopUp('popup.discovery.check', {}, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 
 				case 'edit':
@@ -280,7 +283,10 @@
 						}
 					});
 
-					PopUp('popup.discovery.check', params, null, $btn);
+					PopUp('popup.discovery.check', params, {
+						dialogue_class: 'modal-popup-medium',
+						trigger_element: this
+					});
 					break;
 			}
 		});

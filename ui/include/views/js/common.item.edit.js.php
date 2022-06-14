@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,8 +49,66 @@
 		</td>
 	</tr>
 </script>
-<script type="text/javascript">
-	jQuery(function($) {
+<script>
+	function setAuthTypeLabel() {
+		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
+				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
+			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
+		}
+		else {
+			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
+		}
+	}
+
+	const item_form = {
+		init({interfaces, key_type_suggestions, testable_item_types, field_switches, interface_types}) {
+			this.interfaces = interfaces;
+			this.testable_item_types = testable_item_types;
+			this.field_switches = field_switches;
+			this.interface_types = interface_types;
+
+			if (typeof key_type_suggestions !== 'undefined') {
+				item_type_lookup.init(key_type_suggestions);
+			}
+		}
+	}
+
+	function updateItemFormElements() {
+		// test button
+		var testable_item_types = item_form.testable_item_types,
+			type = parseInt(jQuery('#type').val(), 10),
+			key = jQuery('#key').val(),
+			is_http_agent_type = (type == <?= ITEM_TYPE_HTTPAGENT ?>);
+
+		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
+			jQuery('#test_item').prop('disabled', true);
+		}
+		else {
+			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
+		}
+
+		// delay field
+		if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
+			const toggle_fields = [
+				'delay',
+				'js-item-delay-label',
+				'js-item-delay-field',
+				'js-item-flex-intervals-label',
+				'js-item-flex-intervals-field'
+			];
+			const set_hidden = (key.substr(0, 8) === 'mqtt.get'),
+				object_switcher = globalAllObjForViewSwitcher['type'];
+
+			toggle_fields.forEach((element_id) =>
+				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
+			);
+		}
+
+		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !is_http_agent_type);
+		$('input[name=interfaceid]').prop('aria-required', !is_http_agent_type);
+	}
+
+	jQuery(document).ready(function($) {
 		$('#delayFlexTable').on('click', 'input[type="radio"]', function() {
 			var rowNum = $(this).attr('id').split('_')[2];
 
@@ -66,223 +124,39 @@
 			}
 		});
 
-		$('#delayFlexTable').dynamicRows({
-			template: '#delayFlexRow'
-		});
-	});
-</script>
-<?php
+		$('#delayFlexTable').dynamicRows({template: '#delayFlexRow'});
 
-/*
- * Visibility
- */
-$this->data['typeVisibility'] = [];
+		new CViewSwitcher('authtype', 'change', item_form.field_switches.for_authtype);
 
-if ($data['display_interfaces']) {
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_ZABBIX, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_ZABBIX, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMP, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMP, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_EXTERNAL, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_EXTERNAL, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_IPMI, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_IPMI, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPTRAP, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPTRAP, 'interfaceid');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_HTTPAGENT, 'interface_row');
-	zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_HTTPAGENT, 'interfaceid');
-}
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'row_username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'row_password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SIMPLE, 'password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMP, 'snmp_oid');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMP, 'row_snmp_oid');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_IPMI, 'ipmi_sensor');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_IPMI, 'row_ipmi_sensor');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'authtype');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'row_authtype');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'row_username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'row_username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'row_username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'row_username');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'jmx_endpoint');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'row_jmx_endpoint');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'row_password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'row_password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'row_password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_JMX, 'row_password');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'label_executed_script');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'label_executed_script');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'label_params');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_CALCULATED, 'label_formula');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'params_script');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SSH, 'row_params');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'params_script');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TELNET, 'row_params');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'params_dbmonitor');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DB_MONITOR, 'row_params');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_CALCULATED, 'params_calculted');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_CALCULATED, 'row_params');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'trapper_hosts');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_TRAPPER, 'row_trapper_hosts');
-zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_DEPENDENT, 'row_master_item');
-$ui_rows = [
-	ITEM_TYPE_HTTPAGENT => [
-		'url_row', 'query_fields_row', 'request_method_row', 'timeout_row', 'post_type_row', 'posts_row', 'headers_row',
-		'status_codes_row', 'follow_redirects_row', 'retrieve_mode_row', 'output_format_row', 'allow_traps_row',
-		'request_method', 'http_proxy_row', 'http_authtype_row', 'http_authtype', 'verify_peer_row', 'verify_host_row',
-		'ssl_key_file_row', 'ssl_cert_file_row', 'ssl_key_password_row', 'trapper_hosts', 'allow_traps'
-	],
-	ITEM_TYPE_SCRIPT => [
-		'parameters_row', 'script_row', 'timeout_row'
-	]
-];
-foreach ($ui_rows as $type => $rows) {
-	foreach ($rows as $row) {
-		zbx_subarray_push($this->data['typeVisibility'], $type, $row);
-	}
-}
+		new CViewSwitcher('type', 'change', item_form.field_switches.for_type);
 
-foreach ($this->data['types'] as $type => $label) {
-	switch ($type) {
-		case ITEM_TYPE_DB_MONITOR:
-			$defaultKey = $this->data['is_discovery_rule']
-				? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
-				: ZBX_DEFAULT_KEY_DB_MONITOR;
-			zbx_subarray_push($this->data['typeVisibility'], $type,
-				['id' => 'key', 'defaultValue' => $defaultKey]
-			);
-			break;
-		case ITEM_TYPE_SSH:
-			zbx_subarray_push($this->data['typeVisibility'], $type,
-				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH]
-			);
-			break;
-		case ITEM_TYPE_TELNET:
-			zbx_subarray_push($this->data['typeVisibility'], $type,
-				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
-			);
-			break;
-		default:
-			zbx_subarray_push($this->data['typeVisibility'], $type, ['id' => 'key', 'defaultValue' => '']);
-	}
-}
-foreach ($this->data['types'] as $type => $label) {
-	if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_SNMPTRAP || $type == ITEM_TYPE_DEPENDENT) {
-		continue;
-	}
-
-	zbx_subarray_push($this->data['typeVisibility'], $type, 'row_flex_intervals');
-}
-foreach ($this->data['types'] as $type => $label) {
-	if ($type == ITEM_TYPE_TRAPPER || $type == ITEM_TYPE_SNMPTRAP || $type == ITEM_TYPE_DEPENDENT) {
-		continue;
-	}
-	zbx_subarray_push($this->data['typeVisibility'], $type, 'delay');
-	zbx_subarray_push($this->data['typeVisibility'], $type, 'row_delay');
-}
-
-$this->data['authTypeVisibility'] = [];
-zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
-zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
-zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
-zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_privatekey');
-zbx_subarray_push($this->data['typeDisable'], ITEM_TYPE_CALCULATED, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT], 'value_type');
-
-?>
-<script type="text/javascript">
-	function setAuthTypeLabel() {
-		if (jQuery('#authtype').val() == <?= json_encode(ITEM_AUTHTYPE_PUBLICKEY) ?>
-				&& jQuery('#type').val() == <?= json_encode(ITEM_TYPE_SSH) ?>) {
-			jQuery('#row_password label').html(<?= json_encode(_('Key passphrase')) ?>);
-		}
-		else {
-			jQuery('#row_password label').html(<?= json_encode(_('Password')) ?>);
-		}
-	}
-
-	function updateItemFormElements() {
-		// test button
-		var testable_item_types = <?= json_encode(CControllerPopupItemTest::getTestableItemTypes($this->data['hostid'])) ?>,
-			type = parseInt(jQuery('#type').val()),
-			key = jQuery('#key').val();
-
-		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
-			jQuery('#test_item').prop('disabled', true);
-		}
-		else {
-			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
-		}
-
-		// delay field
-		if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
-			if (key.substr(0, 8) === 'mqtt.get') {
-				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'delay']) ?>);
-				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'row_delay']) ?>);
-				globalAllObjForViewSwitcher['type'].hideObj(<?= json_encode(['id' => 'row_flex_intervals']) ?>);
-			}
-			else {
-				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'delay']) ?>);
-				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'row_delay']) ?>);
-				globalAllObjForViewSwitcher['type'].showObj(<?= json_encode(['id' => 'row_flex_intervals']) ?>);
-			}
-		}
-	}
-
-	jQuery(document).ready(function($) {
-		<?php
-		if (!empty($this->data['authTypeVisibility'])) { ?>
-			var authTypeSwitcher = new CViewSwitcher('authtype', 'change',
-				<?php echo zbx_jsvalue($this->data['authTypeVisibility'], true); ?>);
-		<?php }
-		if (!empty($this->data['typeVisibility'])) { ?>
-			var typeSwitcher = new CViewSwitcher('type', 'change',
-				<?php echo zbx_jsvalue($this->data['typeVisibility'], true); ?>,
-				<?php echo zbx_jsvalue($this->data['typeDisable'], true); ?>);
-		<?php } ?>
 		if ($('#http_authtype').length) {
-			new CViewSwitcher('http_authtype', 'change', <?= zbx_jsvalue([
-				HTTPTEST_AUTH_BASIC => ['http_username_row', 'http_password_row'],
-				HTTPTEST_AUTH_NTLM => ['http_username_row', 'http_password_row'],
-				HTTPTEST_AUTH_KERBEROS => ['http_username_row', 'http_password_row'],
-				HTTPTEST_AUTH_DIGEST => ['http_username_row', 'http_password_row']
-			], true) ?>);
+			new CViewSwitcher('http_authtype', 'change', item_form.field_switches.for_http_auth_type);
 		}
 
 		if ($('#allow_traps').length) {
-			new CViewSwitcher('allow_traps', 'change', <?= zbx_jsvalue([
-				HTTPCHECK_ALLOW_TRAPS_ON => ['row_trapper_hosts']
-			], true) ?>);
+			new CViewSwitcher('allow_traps', 'change', item_form.field_switches.for_traps);
 		}
 
 		$("#key").on('keyup change', updateItemFormElements);
 
 		$('#parameters_table').dynamicRows({template: '#parameters_table_row'});
 
+		const item_interface_types = item_form.interface_types;
+		const interface_ids_by_types = {};
+
+		for (const interface of Object.values(item_form.interfaces)) {
+			if (typeof interface_ids_by_types[interface.type] === 'undefined') {
+				interface_ids_by_types[interface.type] = [];
+			}
+
+			interface_ids_by_types[interface.type].push(interface.interfaceid);
+		}
+
 		$('#type')
 			.change(function() {
-				var item_interface_types = <?= json_encode(itemTypeInterface()) ?>,
-					interface_ids_by_types = <?= json_encode($interface_ids_by_types) ?>;
-
 				updateItemFormElements();
-				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt($(this).val()));
+				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt(this.value, 10));
 
 				setAuthTypeLabel();
 			})
@@ -303,22 +177,24 @@ zbx_subarray_push($this->data['typeDisable'], ITEM_TYPE_CALCULATED, [ITEM_VALUE_
 		});
 
 		$('[data-action="parse_url"]').click(function(e) {
-			var url_node = $(this).siblings('[name="url"]'),
-				table = $('#query_fields_pairs').data('editableTable'),
-				url = parseUrlString(url_node.val())
+			const url_node = $(this).siblings('[name="url"]');
+			const table = $('#query_fields_pairs').data('editableTable');
+			const url = parseUrlString(url_node.val());
 
 			if (typeof url === 'object') {
 				if (url.pairs.length > 0) {
 					table.addRows(url.pairs);
-					table.getTableRows().map(function() {
-						var empty = $(this).find('input[type="text"]').map(function() {
-							return $(this).val() == '' ? this : null;
-						});
+					table.getTableRows()
+						.map(function() {
+							const empty = $(this).find('input[type="text"]').map(function() {
+								return ($(this).val() === '') ? this : null;
+							});
 
-						return empty.length == 2 ? this : null;
-					}).map(function() {
-						table.removeRow(this);
-					});
+							return (empty.length == 2) ? this : null;
+						})
+						.map(function() {
+							table.removeRow(this);
+						});
 				}
 
 				url_node.val(url.url);
@@ -326,6 +202,7 @@ zbx_subarray_push($this->data['typeDisable'], ITEM_TYPE_CALCULATED, [ITEM_VALUE_
 			else {
 				overlayDialogue({
 					'title': <?= json_encode(_('Error')); ?>,
+					'class': 'modal-popup position-middle',
 					'content': $('<span>').html(<?=
 						json_encode(_('Failed to parse URL.').'<br><br>'._('URL is not properly encoded.'));
 					?>),
@@ -353,4 +230,152 @@ zbx_subarray_push($this->data['typeDisable'], ITEM_TYPE_CALCULATED, [ITEM_VALUE_
 			}
 		});
 	});
+
+	const item_type_lookup = {
+		key_type_suggestions: [],
+		preprocessing_active: false,
+		form: null,
+		key_field: null,
+		item_tab_type_field: null,
+		preprocessing_tab_type_field: null,
+		last_lookup: '',
+		inferred_type: null,
+
+		init(key_type_suggestions) {
+			this.key_type_suggestions = key_type_suggestions;
+			this.form = document.querySelector('#item-form, #item-prototype-form');
+			this.key_field = this.form.querySelector('[name=key]');
+			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
+			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
+
+			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
+				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
+			});
+
+			this.item_tab_type_field.addEventListener('change', (e) => {
+				this.preprocessing_tab_type_field.value = this.item_tab_type_field.value;
+
+				this.updateHintDisplay();
+
+				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
+				if (this.form.querySelector('[name=type]').value == <?=ITEM_TYPE_CALCULATED ?>) {
+					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
+							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {
+						this.form.querySelector('#trends_mode_1').disabled = false;
+					}
+					else {
+						this.form.querySelector('#trends_mode_0').checked = true;
+						this.form.querySelector('#trends_mode_1').disabled = true;
+					}
+				}
+			});
+
+			['change', 'input', 'help_items.paste'].forEach((event_type) => {
+				this.key_field.addEventListener(event_type, (e) => {
+					if (this.preprocessing_active) {
+						return this.lookup(this.key_field.value, false);
+					}
+
+					this.lookup(this.key_field.value);
+				});
+			});
+
+			this.form.querySelector('#preprocessing').addEventListener('item.preprocessing.change', () => {
+				this.updatePreprocessingState();
+			});
+
+			this.form.querySelector('[name=type]').addEventListener('change', () => {
+				this.updateHintDisplay();
+			});
+
+			this.updatePreprocessingState();
+
+			this.lookup(this.key_field.value, false);
+		},
+
+		updateHintDisplay() {
+			this.form.querySelector('#js-item-type-hint')
+				.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, (
+					this.form.querySelector('[name=type]').value == <?=ITEM_TYPE_CALCULATED ?>
+						|| this.preprocessing_active || this.inferred_type === null
+						|| this.item_tab_type_field.value == this.inferred_type
+				));
+		},
+
+		updatePreprocessingState() {
+			const last_state_active = this.preprocessing_active;
+			const change_event = new CustomEvent('change');
+
+			this.preprocessing_active = (this.form.querySelector('.preprocessing-step') !== null);
+
+			if (last_state_active && !this.preprocessing_active) {
+				this.last_lookup = '';
+				this.key_field.dispatchEvent(change_event);
+			}
+
+			this.form.querySelectorAll('.js-item-preprocessing-type').forEach((element) =>
+				element.classList.toggle(<?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>, !this.preprocessing_active)
+			);
+
+			this.item_tab_type_field.dispatchEvent(change_event);
+		},
+
+		/**
+		 * Infer expected Item value type from (partial) key name.
+		 *
+		 * Best case scenario a direct match to a key name is found.
+		 * Otherwise a check is performed to see that key names matching so far are of the same type.
+		 * Else type is undetermined (null).
+		 *
+		 * @param {string}  key_part           Key name part entered.
+		 * @param {boolean} set_to_field=true  Pass False to perform background lookup, not updating input states.
+		 * @return {void}
+		 */
+		lookup(key_part, set_to_field = true) {
+			key_part = key_part
+				.split('[')
+				.shift()
+				.trimLeft()
+				.toLowerCase();
+
+			if (key_part === this.last_lookup) {
+				return;
+			}
+
+			this.last_lookup = key_part;
+			this.inferred_type = null;
+
+			if (key_part === '') {
+				return;
+			}
+
+			if (this.last_lookup in this.key_type_suggestions) {
+				this.inferred_type = this.key_type_suggestions[this.last_lookup];
+			}
+			else {
+				const matches = Object.entries(this.key_type_suggestions).filter(([key_name, value_type]) => {
+					return key_name.startsWith(this.last_lookup);
+				});
+
+				if (matches.length > 0) {
+					const sample_type = matches[0][1];
+
+					if (matches.length == 1 || matches.every(([key_name, value_type]) => value_type === sample_type)) {
+						this.inferred_type = sample_type;
+					}
+				}
+			}
+
+			if (this.inferred_type === null) {
+				this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
+				return;
+			}
+
+			if (set_to_field) {
+				this.item_tab_type_field.value = this.inferred_type;
+			}
+
+			this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
+		}
+	};
 </script>

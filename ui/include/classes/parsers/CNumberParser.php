@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,9 @@ class CNumberParser extends CParser {
 	private $options = [
 		'with_minus' => true,
 		'with_float' => true,
-		'with_suffix' => false
+		'with_size_suffix' => false,
+		'with_time_suffix' => false,
+		'with_year' => false
 	];
 
 	/**
@@ -54,17 +56,31 @@ class CNumberParser extends CParser {
 	 *
 	 * @var string
 	 */
-	private static $suffixes = ZBX_TIME_SUFFIXES.ZBX_BYTE_SUFFIXES;
+	private $suffixes;
 
 	/**
 	 * Suffix multiplier table for value calculation.
 	 *
 	 * @var array
 	 */
-	private static $suffix_multipliers = ZBX_BYTE_SUFFIX_MULTIPLIERS + ZBX_TIME_SUFFIX_MULTIPLIERS;
+	private static $suffix_multipliers;
 
 	public function __construct(array $options = []) {
 		$this->options = array_replace($this->options, array_intersect_key($options, $this->options));
+
+		if ($this->options['with_size_suffix'] && $this->options['with_year']) {
+			throw new Exception('Ambiguous options.');
+		}
+
+		if ($this->options['with_size_suffix']) {
+			$this->suffixes .= ZBX_BYTE_SUFFIXES;
+			self::$suffix_multipliers = ZBX_BYTE_SUFFIX_MULTIPLIERS;
+		}
+
+		if ($this->options['with_time_suffix']) {
+			$this->suffixes .= $this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
+			self::$suffix_multipliers += ZBX_TIME_SUFFIX_MULTIPLIERS;
+		}
 	}
 
 	/**
@@ -86,8 +102,8 @@ class CNumberParser extends CParser {
 		$fragment = substr($source, $pos);
 
 		$pattern = $this->options['with_float'] ? ZBX_PREG_NUMBER : ZBX_PREG_INT;
-		$pattern = $this->options['with_suffix']
-			? '/^'.$pattern.'(?<suffix>['.self::$suffixes.'])?/'
+		$pattern = ($this->options['with_size_suffix'] || $this->options['with_time_suffix'])
+			? '/^'.$pattern.'(?<suffix>['.$this->suffixes.'])?/'
 			: '/^'.$pattern.'/';
 
 		if (!preg_match($pattern, $fragment, $matches)) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -337,7 +337,7 @@ class CGraph extends CGraphGeneral {
 
 		CGraphManager::delete($graphids);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, $db_graphs);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_GRAPH, $db_graphs);
 
 		return ['graphids' => $graphids];
 	}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "db.h"
-#include "sysinfo.h"
 #include "dbupgrade.h"
 #include "log.h"
 #include "sysinfo.h"
@@ -44,10 +43,8 @@ static int	DBmodify_proxy_table_id_field(const char *table_name)
 
 /*********************************************************************************
  *                                                                               *
- * Function: parse_db_monitor_item_params                                        *
- *                                                                               *
  * Purpose: parse database monitor item params string "user=<user> password=     *
- *          <passsword> DSN=<dsn> sql=<sql>" into parameter values.              *
+ *          <password> DSN=<dsn> sql=<sql>" into parameter values.               *
  *                                                                               *
  * Parameters:  params     - [IN] the params string                              *
  *              dsn        - [OUT] the ODBC DSN output buffer                    *
@@ -941,17 +938,19 @@ static int	DBpatch_2010101(void)
 		{
 			char	*param = NULL;
 			size_t	param_alloc = 0, param_offset = 0;
-			int	nparam;
 
 			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, row[1] + 15, key_len - 16);
 
-			if (1 != (nparam = num_param(param)))
+			if (1 != num_param(param))
 			{
 				if (FAIL == (ret = quote_key_param(&param, 0)))
+				{
 					error_message = zbx_dsprintf(error_message, "unique description"
 							" \"%s\" contains invalid symbols and cannot be quoted", param);
+				}
 			}
-			if (FAIL == (ret = quote_key_param(&dsn, 0)))
+
+			if (SUCCEED == ret && FAIL == (ret = quote_key_param(&dsn, 0)))
 			{
 				error_message = zbx_dsprintf(error_message, "data source name"
 						" \"%s\" contains invalid symbols and cannot be quoted", dsn);
@@ -1666,8 +1665,6 @@ static int	DBpatch_2010194(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: DBpatch_2010195_replace_key_param_cb                             *
  *                                                                            *
  * Comments: auxiliary function for DBpatch_2010195()                         *
  *                                                                            *

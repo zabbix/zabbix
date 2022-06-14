@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,25 @@
 #ifndef ZABBIX_ZBXPROMETHEUS_H
 #define ZABBIX_ZBXPROMETHEUS_H
 
-int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *output, char **value,
-		char **error);
+#include "zbxalgo.h"
+
+int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *request, const char *output,
+		char **value, char **error);
 int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **error);
 
 int	zbx_prometheus_validate_filter(const char *pattern, char **error);
 int	zbx_prometheus_validate_label(const char *label);
+
+typedef struct
+{
+	zbx_vector_ptr_t	rows;
+	zbx_vector_ptr_t	indexes;
+}
+zbx_prometheus_t;
+
+int	zbx_prometheus_init(zbx_prometheus_t *prom, const char *data, char **error);
+void	zbx_prometheus_clear(zbx_prometheus_t *prom);
+int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, const char *request,
+		const char *output, char **value, char **error);
 
 #endif

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ class CControllerMapView extends CController {
 
 		$severities_dropdown = [];
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severity_name = getSeverityName($severity);
+			$severity_name = CSeverityHelper::getName($severity);
 
 			$severities_dropdown[$severity] = ($severity == $map['severity_min'])
 				? $severity_name.' ('._('default').')'

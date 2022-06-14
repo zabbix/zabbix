@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,25 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "lld_worker.h"
+
 #include "daemon.h"
-#include "db.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "dbcache.h"
 #include "proxy.h"
 #include "../events.h"
-
-#include "lld_worker.h"
 #include "lld_protocol.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_register_worker                                              *
  *                                                                            *
  * Purpose: registers lld worker with lld manager                             *
  *                                                                            *
@@ -52,8 +48,6 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_process_task                                                 *
  *                                                                            *
  * Purpose: processes lld task and updates rule state/error in configuration  *
  *          cache and database                                                *
@@ -170,7 +164,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 ZBX_THREAD_ENTRY(lld_worker_thread, args)
 {
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -203,7 +196,6 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	lld_register_worker(&lld_socket);
 
 	time_stat = zbx_time();
-
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 

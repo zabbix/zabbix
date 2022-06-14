@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/zbxcomms"
 	"zabbix.com/pkg/zbxnet"

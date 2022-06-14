@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,9 @@
 #ifndef ZABBIX_VMWARE_H
 #define ZABBIX_VMWARE_H
 
-#include "common.h"
+#include "config.h"
 #include "threads.h"
+#include "zbxalgo.h"
 
 /* the vmware service state */
 #define ZBX_VMWARE_STATE_NEW		0x001
@@ -115,8 +116,8 @@ ZBX_PTR_VECTOR_DECL(vmware_diskextent, zbx_vmware_diskextent_t *)
 
 typedef struct
 {
-	char				*name;
 	char				*uuid;
+	char				*name;
 	char				*id;
 	zbx_uint64_t			capacity;
 	zbx_uint64_t			free_space;
@@ -126,6 +127,7 @@ typedef struct
 }
 zbx_vmware_datastore_t;
 
+int	vmware_ds_uuid_compare(const void *d1, const void *d2);
 int	vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore, zbx_vmware_datastore_t *)
 
@@ -142,6 +144,7 @@ ZBX_VECTOR_DECL(vmware_hvdisk, zbx_vmware_hvdisk_t)
 typedef struct
 {
 	char				*name;
+	char				*uuid;
 	zbx_vector_vmware_hvdisk_t	hvdisks;
 }
 zbx_vmware_dsname_t;
@@ -333,7 +336,8 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 
-int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid);
+int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid,
+		int *unit);
 int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
 		zbx_uint64_t counterid, const char *instance);
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
@@ -356,8 +360,11 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_HVPROP_VERSION			13
 #define ZBX_VMWARE_HVPROP_NAME				14
 #define ZBX_VMWARE_HVPROP_STATUS			15
+#define ZBX_VMWARE_HVPROP_MAINTENANCE			16
+#define ZBX_VMWARE_HVPROP_SENSOR			17
+#define ZBX_VMWARE_HVPROP_NET_NAME			18
 
-#define ZBX_VMWARE_HVPROPS_NUM				16
+#define ZBX_VMWARE_HVPROPS_NUM				19
 
 /* virtual machine properties */
 #define ZBX_VMWARE_VMPROP_CPU_NUM			0
@@ -396,6 +403,23 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_SOAP_DS		"Datastore"
 #define ZBX_VMWARE_SOAP_HV		"HostSystem"
 #define ZBX_VMWARE_SOAP_VM		"VirtualMachine"
+
+/* Indicates the unit of measure represented by a counter or statistical value */
+#define ZBX_VMWARE_UNIT_UNDEFINED		0
+#define ZBX_VMWARE_UNIT_JOULE			1
+#define ZBX_VMWARE_UNIT_KILOBYTES		2
+#define ZBX_VMWARE_UNIT_KILOBYTESPERSECOND	3
+#define ZBX_VMWARE_UNIT_MEGABYTES		4
+#define ZBX_VMWARE_UNIT_MEGABYTESPERSECOND	5
+#define ZBX_VMWARE_UNIT_MEGAHERTZ		6
+#define ZBX_VMWARE_UNIT_MICROSECOND		7
+#define ZBX_VMWARE_UNIT_MILLISECOND		8
+#define ZBX_VMWARE_UNIT_NUMBER			9
+#define ZBX_VMWARE_UNIT_PERCENT			10
+#define ZBX_VMWARE_UNIT_SECOND			11
+#define ZBX_VMWARE_UNIT_TERABYTES		12
+#define ZBX_VMWARE_UNIT_WATT			13
+#define ZBX_VMWARE_UNIT_CELSIUS			14
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

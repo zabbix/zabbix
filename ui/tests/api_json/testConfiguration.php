@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class testConfiguration extends CAPITest {
 					],
 					'format' => ''
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json, raw.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of "yaml", "xml", "json", "raw".'
 			],
 			[
 				'export' => [
@@ -56,7 +56,7 @@ class testConfiguration extends CAPITest {
 					],
 					'format' => 'æų'
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json, raw.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of "yaml", "xml", "json", "raw".'
 			],
 			// Check unexpected parameter.
 			[
@@ -291,7 +291,7 @@ class testConfiguration extends CAPITest {
 					],
 					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of "yaml", "xml", "json".'
 			],
 			[
 				'import' => [
@@ -303,7 +303,7 @@ class testConfiguration extends CAPITest {
 					],
 					'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T07:29:55Z"}}'
 				],
-				'expected_error' => 'Invalid parameter "/format": value must be one of yaml, xml, json.'
+				'expected_error' => 'Invalid parameter "/format": value must be one of "yaml", "xml", "json".'
 			],
 			[
 				'import' => [
@@ -673,7 +673,7 @@ class testConfiguration extends CAPITest {
 
 		// Condition for different error message text.
 		if (array_key_exists('error_contains', $data)) {
-			$this->assertContains($data['error_contains'], $result['error']['data']);
+			$this->assertStringContainsString($data['error_contains'], $result['error']['data']);
 		}
 		else {
 			$this->assertSame($data['error'], $result['error']['data']);
@@ -860,21 +860,21 @@ class testConfiguration extends CAPITest {
 								</groups>
 								</zabbix_export>',
 				'sql' => 'select * from hstgrp where name=\'API host group xml import as non Super Admin\'',
-				'expected_error' => 'Only Super Admins can create host groups.'
+				'expected_error' => 'No permissions to call "hostgroup.create".'
 			],
 			[
 				'format' => 'json',
 				'parameter' => 'groups',
 				'source' => '{"zabbix_export":{"version":"3.2","date":"2016-12-09T12:29:57Z","groups":[{"name":"API host group json import as non Super Admin"}]}}',
 				'sql' => 'select * from hstgrp where name=\'API host group json import as non Super Admin\'',
-				'expected_error' => 'Only Super Admins can create host groups.'
+				'expected_error' => 'No permissions to call "hostgroup.create".'
 			],
 			[
 				'format' => 'yaml',
 				'parameter' => 'groups',
 				'source' => "---\nzabbix_export:\n  version: \"4.0\"\n  date: \"2020-08-03T12:41:17Z\"\n  groups:\n  - name: API host group yaml import as non Super Admin\n...\n",
 				'sql' => 'select * from hstgrp where name=\'API host group yaml import as non Super Admin\'',
-				'expected_error' => 'Only Super Admins can create host groups.'
+				'expected_error' => 'No permissions to call "hostgroup.create".'
 			]
 		];
 	}

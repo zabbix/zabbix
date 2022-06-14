@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,7 +171,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 						// Couldn't open Hosts page due access.
 						[
-							'page' => 'hosts.php',
+							'page' => self::HOST_LIST_PAGE,
 							'error' => 'Access denied'
 						],
 						// Couldn't open GUI page due access.
@@ -209,7 +209,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 //						// wait for ZBX-14774.
 //						// Redirect to HTTP login form and user is signed on hosts page.
 //						[
-//							'page' => 'hosts.php',
+//							'page' => self::HOST_LIST_PAGE,
 //							'action' => self::LOGIN_HTTP,
 //							'target' => 'Hosts'
 //						],
@@ -317,7 +317,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 //						// Redirect to HTTP login form and user is signed on hosts page.
 //						// wait for ZBX-14774.
 //						[
-//							'page' => 'hosts.php',
+//							'page' => self::HOST_LIST_PAGE,
 //							'action' => self::LOGIN_HTTP,
 //							'target' => 'Hosts'
 //						],
@@ -371,7 +371,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 						],
 //						// wait for ZBX-14774.
 //						[
-//							'page' => 'hosts.php',
+//							'page' => self::HOST_LIST_PAGE,
 //							'action' => self::LOGIN_HTTP,
 //							'target' => 'hosts'
 //						],
@@ -526,7 +526,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					$message = CMessageElement::find()->one();
 					$this->assertEquals('msg-bad msg-global', $message->getAttribute('class'));
 					$message_title= $message->getText();
-					$this->assertContains($check['error'], $message_title);
+					$this->assertStringContainsString($check['error'], $message_title);
 				}
 
 				continue;

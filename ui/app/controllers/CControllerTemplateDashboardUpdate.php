@@ -1,7 +1,7 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,14 +23,18 @@ class CControllerTemplateDashboardUpdate extends CController {
 
 	private $dashboard_pages;
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'templateid' => 'required|db dashboard.templateid',
-			'dashboardid' => 'db dashboard.dashboardid',
-			'name' => 'required|db dashboard.name|not_empty',
-			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
-			'auto_start' => 'required|db dashboard.auto_start|in 0,1',
-			'pages' => 'array'
+			'templateid' =>		'required|db dashboard.templateid',
+			'dashboardid' =>	'db dashboard.dashboardid',
+			'name' =>			'required|db dashboard.name|not_empty',
+			'display_period' =>	'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'auto_start' =>		'required|db dashboard.auto_start|in 0,1',
+			'pages' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -140,7 +144,7 @@ class CControllerTemplateDashboardUpdate extends CController {
 			$data['system-message-ok'] = $message;
 		}
 		else {
-			if (!hasErrorMesssages()) {
+			if (!hasErrorMessages()) {
 				error($error_msg);
 			}
 		}

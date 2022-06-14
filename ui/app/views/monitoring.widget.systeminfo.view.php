@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,11 +21,39 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+switch ($data['info_type']) {
+	case ZBX_SYSTEM_INFO_SERVER_STATS:
+		$body = (new CPartial('administration.system.info', [
+			'system_info' => $data['system_info'],
+			'user_type' => $data['user_type']
+		]))->getOutput();
+		break;
+
+	case ZBX_SYSTEM_INFO_HAC_STATUS:
+		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
+			$body = (new CPartial('administration.ha.nodes', [
+				'ha_nodes' => $data['system_info']['ha_nodes'],
+				'ha_cluster_enabled' => $data['system_info']['ha_cluster_enabled'],
+				'failover_delay' => $data['system_info']['failover_delay']
+			]))->getOutput();
+		}
+		else {
+			$body = (new CTableInfo())
+				->setNoDataMessage(_('No permissions to referred object or it does not exist!'))
+				->toString();
+		}
+		break;
+
+	default:
+		$body = '';
+}
 
 $output = [
 	'name' => $data['name'],
-	'body' => make_status_of_zbx()->toString()
+	'body' => $body
 ];
 
 if (($messages = getMessages()) !== null) {

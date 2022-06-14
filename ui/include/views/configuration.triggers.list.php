@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
@@ -139,7 +140,7 @@ $filter = (new CFilter())
 	->setResetUrl((new CUrl('triggers.php'))->setArgument('context', $data['context']))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addvar('context', $data['context'])
+	->addvar('context', $data['context'], 'filter_context')
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $widget = (new CWidget())
@@ -174,7 +175,7 @@ $url = (new CUrl('triggers.php'))
 $triggers_form = (new CForm('post', $url))
 	->setName('triggersForm')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], 'form_context');
 
 // create table
 $triggers_table = (new CTableInfo())->setHeader([
@@ -242,7 +243,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$dep_trigger = $data['dep_triggers'][$dependency['triggerid']];
 
 			$dep_trigger_desc = CHtml::encode(
-				implode(', ', zbx_objectValues($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description']
+				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description']
 			);
 
 			$trigger_deps[] = (new CLink($dep_trigger_desc,
@@ -320,7 +321,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	$triggers_table->addRow([
 		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
-		getSeverityCell($trigger['priority']),
+		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$data['show_value_column'] ? $trigger_value : null,
 		$hosts,
 		$description,
@@ -343,7 +344,12 @@ $triggers_form->addItem([
 			'trigger.masscopyto' => ['name' => _('Copy')],
 			'popup.massupdate.trigger' => [
 				'content' => (new CButton('', _('Mass update')))
-					->onClick("return openMassupdatePopup(this, 'popup.massupdate.trigger');")
+					->onClick(
+						"openMassupdatePopup('popup.massupdate.trigger', {}, {
+							dialogue_class: 'modal-popup-static',
+							trigger_element: this
+						});"
+					)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
@@ -357,3 +363,7 @@ $triggers_form->addItem([
 $widget->addItem($triggers_form);
 
 $widget->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();

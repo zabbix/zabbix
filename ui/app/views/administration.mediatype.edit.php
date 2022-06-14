@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
  */
 
 $this->addJsFile('multilineinput.js');
-$this->addJsFile('class.tab-indicators.js');
 
 $this->includeJsFile('administration.mediatype.edit.js.php');
 
@@ -228,7 +227,7 @@ $mediatype_formlist
 			->setAriaRequired(),
 		'row_webhook_script'
 	)
-	->addRow(new CLabel(_('Timeout'), 'timeout'),
+	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
 		(new CTextBox('timeout', $data['timeout']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'row_webhook_timeout'
 	)

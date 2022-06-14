@@ -1,8 +1,9 @@
+//go:build !windows
 // +build !windows
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +26,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"path/filepath"
 	"strconv"
 	"syscall"
 	"time"
@@ -45,11 +47,22 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 		return nil, fmt.Errorf("Cannot obtain %s permission information.", name)
 	}
 
+	fi.Pathname, err = filepath.Abs(name)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot obtain %s path name.", name)
+	}
+
+	fi.Basename = filepath.Base(name)
+	fi.Dirname = filepath.Dir(name)
+
 	fi.Permissions = mode2str(stat.Mode)
 
 	u := strconv.FormatUint(uint64(stat.Uid), 10)
 	if usr, er := user.LookupId(u); er == nil {
 		fi.User = &usr.Username
+	} else {
+		username := fmt.Sprintf("%d", stat.Uid)
+		fi.User = &username
 	}
 
 	fi.Uid = stat.Uid
@@ -57,6 +70,9 @@ func getFileInfo(info *os.FileInfo, name string) (fileinfo *fileInfo, err error)
 	g := strconv.FormatUint(uint64(stat.Gid), 10)
 	if group, er := user.LookupGroupId(g); er == nil {
 		fi.Group = &group.Name
+	} else {
+		groupname := fmt.Sprintf("%d", stat.Gid)
+		fi.Group = &groupname
 	}
 
 	fi.Gid = stat.Gid

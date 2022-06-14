@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,11 +19,17 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CTest.php';
-require_once dirname(__FILE__).'/../../include/classes/api/managers/CHistoryManager.php';
-require_once dirname(__FILE__).'/../../include/classes/core/CRegistryFactory.php';
-require_once dirname(__FILE__).'/../../include/classes/core/Manager.php';
-require_once dirname(__FILE__).'/../../include/classes/helpers/CArrayHelper.php';
+require_once __DIR__.'/../include/CTest.php';
+require_once __DIR__.'/../../include/classes/core/CRegistryFactory.php';
+require_once __DIR__.'/../../include/classes/core/Manager.php';
+require_once __DIR__.'/../../include/classes/api/API.php';
+require_once __DIR__.'/../../include/classes/api/CApiServiceFactory.php';
+require_once __DIR__.'/../../include/classes/api/managers/CHistoryManager.php';
+require_once __DIR__.'/../../include/classes/api/services/CSettings.php';
+require_once __DIR__.'/../../include/classes/helpers/CArrayHelper.php';
+require_once __DIR__.'/../../include/classes/helpers/CConfigGeneralHelper.php';
+require_once __DIR__.'/../../include/classes/helpers/CSettingsHelper.php';
+require_once __DIR__.'/../../include/classes/validators/CApiInputValidator.php';
 
 /**
  * @backup history_uint
@@ -146,8 +152,19 @@ class testHistoryManager extends CTest {
 	public function test($items, $history, $limit, $expected_result) {
 		DB::insertBatch('history_uint', $history, false);
 
-		$values = Manager::History()->getLastValues($items, $limit);
+		API::setWrapper(null);
+		API::setApiServiceFactory(new CApiServiceFactory());
 
-		$this->assertSame($expected_result, $values);
+		$values = Manager::History()
+			->setPrimaryKeysEnabled(false)
+			->getLastValues($items, $limit);
+
+		$this->assertSame($expected_result, $values, 'Item history values are same via non-PK queries');
+
+		$values = Manager::History()
+			->setPrimaryKeysEnabled()
+			->getLastValues($items, $limit);
+
+		$this->assertSame($expected_result, $values, 'Item history values are same via with-PK queries');
 	}
 }

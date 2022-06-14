@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-06-22T16:33:44Z'
+  version: '6.0'
+  date: '2022-04-06T19:26:58Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -16,7 +16,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384764-discussion-thread-for-official-zabbix-template-apache
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: Templates/Applications
@@ -44,8 +44,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: network
         -
           uuid: b36010be10874cf188eeacc81f2c366f
           name: 'Apache: Bytes per second'
@@ -75,8 +75,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: network
         -
           uuid: e61be8ad92004100aca55fcedd2a3807
           name: 'Apache: Get status'
@@ -138,13 +138,14 @@ zabbix_export:
           retrieve_mode: BOTH
           tags:
             -
-              tag: Application
-              value: 'Zabbix raw items'
+              tag: component
+              value: raw
           triggers:
             -
               uuid: db396445cc5042f89f31dc12cb99c32e
               expression: 'nodata(/Apache by HTTP/apache.get_status,30m)=1'
-              name: 'Apache: Failed to fetch status page (or no data for 30m)'
+              name: 'Apache: Failed to fetch status page'
+              event_name: 'Apache: Failed to fetch status page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -152,6 +153,10 @@ zabbix_export:
                 -
                   name: 'Apache: Service is down'
                   expression: 'last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 5fb5101de70a43fab50d55f418462255
           name: 'Apache: Total requests'
@@ -169,8 +174,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: network
         -
           uuid: ee15f4958040459da53251cc3561ed39
           name: 'Apache: Requests per second'
@@ -195,8 +200,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: network
         -
           uuid: 3dd8ba505d584b028c7ac08d8b959eb3
           name: 'Apache: Uptime'
@@ -215,16 +220,21 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
           triggers:
             -
               uuid: 76cfa6ebf39f4c8fbd8fde9e0f36d3ed
               expression: 'last(/Apache by HTTP/apache.uptime)<10m'
-              name: 'Apache: has been restarted (uptime < 10m)'
+              name: 'Apache: has been restarted'
+              event_name: 'Apache: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: fe0de2eb1478482f99b38c13bd20564c
           name: 'Apache: Version'
@@ -248,16 +258,21 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
           triggers:
             -
               uuid: 5296d69af0704d0e8a07398f0b4c9685
               expression: 'last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2) and length(last(/Apache by HTTP/apache.version))>0'
-              name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Apache: Version has changed'
+              event_name: 'Apache: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Apache version has changed. Ack to close.'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: f74ffb92e30e48958b5b82f7dfbe5147
           name: 'Apache: Workers idle cleanup'
@@ -275,8 +290,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: d664bee9a330480bbaee7273b871a8d3
           name: 'Apache: Workers closing connection'
@@ -294,8 +309,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: a6fb3444585749be998ec840cd8e4511
           name: 'Apache: Workers DNS lookup'
@@ -313,8 +328,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: fcf771f2a9b64a81a37db679f0494ed3
           name: 'Apache: Workers finishing'
@@ -332,8 +347,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: cb81a6a77395444283bc5e065fcbfc2e
           name: 'Apache: Workers keepalive (read)'
@@ -351,8 +366,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 7fc0002a279b4541af569a03c1aca2ac
           name: 'Apache: Workers logging'
@@ -370,8 +385,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 78b0bd7d8bec49549fc003d460af9177
           name: 'Apache: Workers reading request'
@@ -389,8 +404,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 379ac66397b94463ad17b24fbd20c615
           name: 'Apache: Workers sending reply'
@@ -408,8 +423,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 1c90055e02a244fc8d18e73b23daa0f1
           name: 'Apache: Workers slot with no current process'
@@ -427,8 +442,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: ae21ea113e8840349aff81ab582d92b4
           name: 'Apache: Workers starting up'
@@ -446,8 +461,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: be1a05a6eab84b64ac4d51c966ea91e8
           name: 'Apache: Workers waiting for connection'
@@ -465,8 +480,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 1752b9bcf7b34abbaf105f5261638271
           name: 'Apache: Total workers busy'
@@ -484,8 +499,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: b1b1c86a12964ae2813c63481e464ec7
           name: 'Apache: Total workers idle'
@@ -503,8 +518,8 @@ zabbix_export:
             key: apache.get_status
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: system
         -
           uuid: 5039d11bc3964d6e9928a0a46dd0b402
           name: 'Apache: Service response time'
@@ -515,19 +530,27 @@ zabbix_export:
           units: s
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: ffbb564032c7462eb0bb9b4c2f700559
               expression: 'min(/Apache by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}'
-              name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              name: 'Apache: Service response time is too high'
+              event_name: 'Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
                 -
                   name: 'Apache: Service is down'
                   expression: 'last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: fb65918695094026838e2b9e4ca00402
           name: 'Apache: Service ping'
@@ -543,8 +566,11 @@ zabbix_export:
                 - 10m
           tags:
             -
-              tag: Application
-              value: Apache
+              tag: component
+              value: application
+            -
+              tag: component
+              value: health
           triggers:
             -
               uuid: afe2fde35d054333adc8369a0f9af778
@@ -552,6 +578,10 @@ zabbix_export:
               name: 'Apache: Service is down'
               priority: AVERAGE
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
       discovery_rules:
         -
           uuid: eee8abd3174d426092e8bca9b3ba982e
@@ -582,8 +612,8 @@ zabbix_export:
                 key: apache.get_status
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 062d7c941f0c468d8b63fa76ae0610f6
               name: 'Apache: Connections async closing'
@@ -601,8 +631,8 @@ zabbix_export:
                 key: apache.get_status
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 6cb8b255ad8343a48e622912bc298366
               name: 'Apache: Connections async keep alive'
@@ -620,8 +650,8 @@ zabbix_export:
                 key: apache.get_status
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 997b3452aac24ad6afbad775d649c727
               name: 'Apache: Connections async writing'
@@ -639,8 +669,8 @@ zabbix_export:
                 key: apache.get_status
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 31cb044eed904ca19150921fe36f3285
               name: 'Apache: Connections total'
@@ -658,8 +688,8 @@ zabbix_export:
                 key: apache.get_status
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: connection
             -
               uuid: 34555340f3ad4b878504df188f54a9c9
               name: 'Apache: Number of async processes'
@@ -677,8 +707,8 @@ zabbix_export:
                 key: apache.get_status
               tags:
                 -
-                  tag: Application
-                  value: Apache
+                  tag: component
+                  value: system
           graph_prototypes:
             -
               uuid: 066b53ed2244414ca3090498eb035c27
@@ -731,6 +761,13 @@ zabbix_export:
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
+      tags:
+        -
+          tag: class
+          value: software
+        -
+          tag: target
+          value: apache
       macros:
         -
           macro: '{$APACHE.RESPONSE_TIME.MAX.WARN}'

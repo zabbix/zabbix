@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,16 +111,9 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			],
 			[
 				[
-					'name' => 'Event correlation for update',
-					'error_header' => 'Cannot add correlation',
-					'error_message' => 'Correlation "Event correlation for update" already exists.'
-				]
-			],
-			[
-				[
 					'name' => 'Without conditions',
 					'error_header' => 'Cannot add correlation',
-					'error_message' => 'No "conditions" given for correlation "Without conditions".'
+					'error_message' => 'Invalid parameter "/1/filter/conditions": cannot be empty.'
 				]
 			],
 			[
@@ -128,7 +121,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'name' => 'Without operation',
 					'tag' => 'tag name',
 					'error_header' => 'Cannot add correlation',
-					'error_message' => 'No "operations" given for correlation "Without operation".'
+					'error_message' => 'Invalid parameter "/1/operations": cannot be empty.'
 				]
 			]
 		];
@@ -160,9 +153,9 @@ class testFormEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestClick('add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_header']);
 		$error = $this->zbxTestGetText('//ul[@class=\'list-dashed msg-details-border\']');
-		$this->assertContains($data['error_message'], $error);
+		$this->assertStringContainsString($data['error_message'], $error);
 
-		if 	(array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
+		if (array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
 			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 			$this->assertEquals(1, CDBHelper::getCount($sql));
 		}
@@ -551,7 +544,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> '',
-					'error_message' => 'Incorrect custom expression "" for correlation "Test create with empty expression": expression is empty.'
+					'error_message' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
 				]
 			],
 			[
@@ -563,7 +556,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> 'A or B',
-					'error_message' => 'Condition "C" is not used in formula "A or B" for correlation "Test create with missing argument".'
+					'error_message' => 'Invalid parameter "/1/operations": cannot be empty.'
 				]
 			],
 			[
@@ -575,7 +568,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> '(A or B) and (C or D)',
-					'error_message' => 'Condition "D" used in formula "(A or B) and (C or D)" for correlation "Test create with extra argument" is not defined.'
+					'error_message' => 'Invalid parameter "/1/operations": cannot be empty.'
 				]
 			],
 			[
@@ -587,7 +580,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
 					],
 					'formula'=> 'Wrong formula',
-					'error_message' => 'Incorrect custom expression "Wrong formula" for correlation "Test create with wrong formula": check expression starting from "Wrong formula".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from "Wrong formula".'
 				]
 			],
 			[
@@ -598,7 +591,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> 'A and Not B',
-					'error_message' => 'Incorrect custom expression "A and Not B" for correlation "Check case sensitive of operator in formula": check expression starting from "Not B".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from "Not B".'
 				]
 			],
 			[
@@ -609,7 +602,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> 'NOT A and not B',
-					'error_message' => 'Incorrect custom expression "NOT A and not B" for correlation "Check case sensitive of first operator in formula": check expression starting from " A and not B".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from " A and not B".'
 				]
 			],
 			[
@@ -620,7 +613,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
 					],
 					'formula'=> 'not A not B',
-					'error_message' => 'Incorrect custom expression "not A not B" for correlation "Test create with only NOT in formula": check expression starting from " not B".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from " not B".'
 				]
 			]
 		];
@@ -663,7 +656,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add correlation');
 		$error = $this->zbxTestGetText('//ul[@class=\'list-dashed msg-details-border\']');
-		$this->assertContains($data['error_message'], $error);
+		$this->assertStringContainsString($data['error_message'], $error);
 
 		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
 		$this->assertEquals(0, CDBHelper::getCount($sql));

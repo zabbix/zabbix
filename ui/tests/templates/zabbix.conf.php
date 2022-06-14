@@ -4,7 +4,7 @@ global $DB;
 
 $DB['TYPE']				= '{DBTYPE}';
 $DB['SERVER']			= '{DBHOST}';
-$DB['PORT']				= '0';
+$DB['PORT']				= {DBPORT};
 $DB['DATABASE']			= '{DBNAME}';
 $DB['USER']				= '{DBUSER}';
 $DB['PASSWORD']			= '{DBPASSWORD}';
@@ -20,7 +20,7 @@ $DB['VERIFY_HOST']		= false;
 $DB['CIPHER_LIST']		= '';
 
 $ZBX_SERVER				= 'localhost';
-$ZBX_SERVER_PORT		= '10051';
+$ZBX_SERVER_PORT		= '{SERVER_PORT}';
 $ZBX_SERVER_NAME		= 'TEST_SERVER_NAME';
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
@@ -36,7 +36,7 @@ if (!defined('PHPUNIT_BASEDIR')) {
 	}
 
 	function formatCallStack() {
-		$calls = debug_backtrace(0);
+		$calls = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
 		// never show the call to this method
 		array_shift($calls);

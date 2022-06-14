@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@
 #ifndef ZABBIX_SYSINFO_COMMON_DIR_H
 #define ZABBIX_SYSINFO_COMMON_DIR_H
 
-#include "sysinfo.h"
+#include "module.h"
+#include "zbxjson.h"
 
 #define DISK_BLOCK_SIZE			512	/* 512-byte blocks */
 
@@ -58,7 +59,9 @@ typedef struct
 
 int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 int	zbx_etypes_to_mask(const char *etypes, AGENT_RESULT *result);
+int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error);
 
 #endif /* ZABBIX_SYSINFO_COMMON_DIR_H */

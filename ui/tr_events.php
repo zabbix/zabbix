@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,11 +134,10 @@ if ($trigger['opdata'] !== '') {
 }
 else {
 	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units'],
+		'output' => ['itemid', 'name', 'value_type', 'units'],
 		'selectValueMap' => ['mappings'],
 		'triggerids' => $event['objectid']
 	]);
-	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
 	$event['opdata'] = (new CCol(CScreenProblem::getLatestValues($db_items)))->addClass('latest-values');
 }
 
@@ -167,6 +166,8 @@ $allowed = [
 /*
  * Display
  */
+require_once dirname(__FILE__).'/include/views/js/tr_events.js.php';
+
 $event_tab = (new CDiv([
 	new CDiv([
 		(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger, $event['eventid'])))
@@ -190,13 +191,6 @@ $event_tab = (new CDiv([
 	->addClass(ZBX_STYLE_COLUMNS)
 	->addClass(ZBX_STYLE_COLUMNS_2);
 
-$script = (new CScriptTag(
-	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
-		'postMessageOk(response.message);'.
-		'location.href = location.href;'.
-	'});'
-))->setOnDocumentReady();
-
 (new CWidget())
 	->setTitle(_('Event details'))
 	->setWebLayoutMode($page['web_layout_mode'])
@@ -207,7 +201,10 @@ $script = (new CScriptTag(
 		->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($event_tab)
-	->addItem($script)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

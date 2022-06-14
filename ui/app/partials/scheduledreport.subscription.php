@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@ $table = (new CTable())
 	->addStyle('width: 100%;')
 	->setAriaRequired()
 	->setHeader([
-		(new CColHeader(_('Recipient')))->setWidth('40%'),
-		(new CColHeader(_('Generate report by')))->setWidth('35%'),
+		(new CColHeader(_('Recipient')))->setWidth('38%'),
+		(new CColHeader(_('Generate report by')))->setWidth('30%'),
 		_('Status'),
 		_('Action')
 	])

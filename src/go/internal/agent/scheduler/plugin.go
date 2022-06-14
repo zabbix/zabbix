@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ package scheduler
 import (
 	"container/heap"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // pluginAgent manages plugin usage
@@ -35,10 +35,14 @@ type pluginAgent struct {
 	maxCapacity int
 	// used plugin capacity
 	usedCapacity int
+	// force active check on first configuration
+	forceActiveChecksOnStart int
 	// index in plugin queue
 	index int
 	// refcount us used to track plugin usage by clients
 	refcount int
+	// usrprm is used to indicate that plugin is user parameter
+	usrprm bool
 }
 
 // peekTask() returns next task in the queue without removing it from queue or nil
@@ -50,7 +54,7 @@ func (p *pluginAgent) peekTask() performer {
 	return p.tasks[0]
 }
 
-// peekTask() returns next task in the queue and removes it from queue.
+// popTask() returns next task in the queue and removes it from queue.
 // nil is returned for empty queues.
 func (p *pluginAgent) popTask() performer {
 	if len(p.tasks) == 0 {

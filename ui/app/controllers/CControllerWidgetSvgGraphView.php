@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'content_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
 			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
-			'from_ts' => 'string',
-			'to_ts' => 'string',
+			'from' => 'string',
+			'to' => 'string',
 			'fields' => 'json'
 		]);
 	}
@@ -51,7 +51,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
 
-		$parser = new CNumberParser(['with_suffix' => true]);
+		$parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 		$lefty_min = $parser->parse($fields['lefty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
 		$lefty_max = $parser->parse($fields['lefty_max']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
 		$righty_min = $parser->parse($fields['righty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
@@ -98,23 +98,22 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'overrides' => array_values($fields['or'])
 		];
 
-		// Use dashboard time.
 		if ($graph_data['dashboard_time'] && !$preview) {
-			$graph_data['time_period'] = [
-				'time_from' => $this->getInput('from_ts', 0),
-				'time_to' => $this->getInput('to_ts', 0)
-			];
+			$from = $this->getInput('from');
+			$to = $this->getInput('to');
 		}
-		// Otherwise, set graph time period options.
 		else {
-			$range_time_parser = new CRangeTimeParser();
-
-			$range_time_parser->parse($fields['time_from']);
-			$graph_data['time_period']['time_from'] = $range_time_parser->getDateTime(true)->getTimestamp();
-
-			$range_time_parser->parse($fields['time_to']);
-			$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
+			$from = $fields['time_from'];
+			$to = $fields['time_to'];
 		}
+
+		$range_time_parser = new CRangeTimeParser();
+
+		$range_time_parser->parse($from);
+		$graph_data['time_period']['time_from'] = $range_time_parser->getDateTime(true)->getTimestamp();
+
+		$range_time_parser->parse($to);
+		$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
 		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);
 		if ($svg_options['errors']) {

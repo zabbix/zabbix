@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ RPC.Call.prototype = {
 				request[key] = params.request[key];
 			});
 		}
-		request.data = JSON.stringify(body),
+		request.data = JSON.stringify(body);
 
 		new jQuery.ajax(RPC.rpcurl(), request);
 	},
@@ -132,4 +132,3 @@ RPC.Call.prototype = {
 		return false;
 	}
 };
-

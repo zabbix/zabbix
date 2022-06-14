@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ class CZabbixServer {
 	const ZBX_TCP_EXPECT_DATA = 2;
 
 	/**
-	 * Max number of bytes to read from the response for each each iteration.
+	 * Max number of bytes to read from the response for each iteration.
 	 */
 	const READ_BYTES_LIMIT = 8192;
 
@@ -126,11 +126,11 @@ class CZabbixServer {
 	/**
 	 * Class constructor.
 	 *
-	 * @param string $host
-	 * @param int $port
-	 * @param int $connect_timeout
-	 * @param int $timeout
-	 * @param int $totalBytesLimit
+	 * @param string|null $host
+	 * @param int|null    $port
+	 * @param int         $connect_timeout
+	 * @param int         $timeout
+	 * @param int         $totalBytesLimit
 	 */
 	public function __construct($host, $port, $connect_timeout, $timeout, $totalBytesLimit) {
 		$this->host = $host;
@@ -368,6 +368,21 @@ class CZabbixServer {
 	 * @return bool
 	 */
 	public function isRunning($sid) {
+		$active_node = API::getApiService('hanode')->get([
+			'output' => ['address', 'port', 'lastaccess'],
+			'filter' => ['status' => ZBX_NODE_STATUS_ACTIVE],
+			'sortfield' => 'lastaccess',
+			'sortorder' => 'DESC',
+			'limit' => 1
+		], false);
+
+		if ($active_node && $active_node[0]['address'] === $this->host && $active_node[0]['port'] == $this->port) {
+			if ((time() - $active_node[0]['lastaccess']) <
+					timeUnitToSeconds(CSettingsHelper::getGlobal(CSettingsHelper::HA_FAILOVER_DELAY))) {
+				return true;
+			}
+		}
+
 		$response = $this->request([
 			'request' => 'status.get',
 			'type' => 'ping',
@@ -379,6 +394,7 @@ class CZabbixServer {
 		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+
 		return CApiInputValidator::validate($api_input_rules, $response, '/', $this->error);
 	}
 
@@ -570,7 +586,8 @@ class CZabbixServer {
 	 */
 	protected function connect() {
 		if (!$this->socket) {
-			if (!$this->host || !$this->port) {
+			if ($this->host === null || $this->port === null) {
+				$this->error = _('Connection to Zabbix server failed. Incorrect configuration.');
 				return false;
 			}
 

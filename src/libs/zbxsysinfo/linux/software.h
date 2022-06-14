@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 
 #ifndef ZABBIX_SOFTWARE_H
 #define ZABBIX_SOFTWARE_H
+
+#include "zbxtypes.h"
 
 #define SW_OS_FULL			"/proc/version"
 #define SW_OS_SHORT 			"/proc/version_signature"

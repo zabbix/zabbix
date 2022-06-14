@@ -1,6 +1,5 @@
 # LIBNETSNMP_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
-#    Eugene Grigorjev <eugene@zabbix.com>   Feb-02-2007
 #
 # Checks for net-snmp.  DEFAULT-ACTION is the string yes or no to
 # specify whether to default to --with-net-snmp or --without-net-snmp.
@@ -197,6 +196,18 @@ struct snmp_session session;
 session.localname = "";
 		],
 		AC_DEFINE(HAVE_NETSNMP_SESSION_LOCALNAME, 1, [Define to 1 if 'session.localname' exist.])
+		AC_MSG_RESULT(yes),
+		AC_MSG_RESULT(no))
+
+		AC_TRY_COMPILE([
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>],
+		[
+struct snmp_session session;
+
+session.securityPrivProto = usmDESPrivProtocol;
+		],
+		AC_DEFINE(HAVE_NETSNMP_SESSION_DES, 1, [Define to 1 if 'usmDESPrivProtocol' exist.])
 		AC_MSG_RESULT(yes),
 		AC_MSG_RESULT(no))
 

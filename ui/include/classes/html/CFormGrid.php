@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@ class CFormGrid extends CTag {
 	public const ZBX_STYLE_FORM_GRID_1_1 = 'form-grid-1-1';
 	public const ZBX_STYLE_FORM_GRID_3_1 = 'form-grid-3-1';
 
-	// 100px label column width for use in popup forms.
-	public const ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED = 'label-width-fixed';
 	// True label column width for use in filter forms.
 	public const ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE = 'label-width-true';
 

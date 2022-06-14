@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,9 @@ function local_showHeader(array $data): void {
 		'javascript' => [
 			'files' => $data['javascript']['files']
 		],
+		'stylesheet' => [
+			'files' => $data['stylesheet']['files']
+		],
 		'page' => [
 			'title' => $data['page']['title']
 		],
@@ -105,5 +108,9 @@ echo $data['main_block'];
 makeServerStatusOutput()->show();
 
 local_showFooter($data);
+
+require_once 'include/views/js/common.init.js.php';
+
+insertPagePostJs();
 
 echo '</div></body></html>';

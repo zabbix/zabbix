@@ -7,15 +7,15 @@ import (
 	"strconv"
 	"time"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/zbxcomms"
 )
 
 type Options struct {
-	Timeout  int    `conf:"optional,range=1:30"`
-	Capacity int    `conf:"optional,range=1:100"`
-	SourceIP string `conf:"optional"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int    `conf:"optional,range=1:30"`
+	SourceIP             string `conf:"optional"`
 }
 
 // Plugin -
@@ -48,17 +48,17 @@ var impl Plugin
 func (p *Plugin) getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
 	var parse response
 
-	resp, err := zbxcomms.Exchange(addr, &p.localAddr, time.Duration(p.options.Timeout)*time.Second, req)
+	resp, errs := zbxcomms.Exchange(&[]string{addr}, &p.localAddr, time.Duration(p.options.Timeout)*time.Second, time.Duration(p.options.Timeout)*time.Second, req)
 
-	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", err)
+	if errs != nil {
+		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", errs[0])
 	}
 
 	if len(resp) <= 0 {
 		return nil, fmt.Errorf("Cannot obtain internal statistics: received empty response.")
 	}
 
-	err = json.Unmarshal(resp, &parse)
+	err := json.Unmarshal(resp, &parse)
 
 	if err != nil {
 		return nil, fmt.Errorf("Value should be a JSON object.")

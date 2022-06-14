@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,9 @@
 #define	ZBX_CFG_NOT_STRICT	0
 #define	ZBX_CFG_STRICT		1
 
+#define	ZBX_CFG_EXIT_FAILURE	0
+#define	ZBX_CFG_NO_EXIT_FAILURE	1
+
 #define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY	5
 
@@ -60,14 +63,28 @@ struct cfg_line
 	zbx_uint64_t	max;
 };
 
-typedef int	(*cfg_custom_parameter_parser_t)(const char *value, struct cfg_line *cfg);
+typedef struct
+{
+	char		*ip;
+	unsigned short	port;
+}
+zbx_addr_t;
 
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict);
+typedef struct
+{
+	int	(*cfg_custom_parameter_parser_func)(const char *value, const struct cfg_line *cfg);
+}	cfg_custom_parameter_parser_t;
+
+void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from);
+void	zbx_addr_free(zbx_addr_t *addr);
+
+int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit);
 
 int	check_cfg_feature_int(const char *parameter, int value, const char *feature);
 int	check_cfg_feature_str(const char *parameter, const char *value, const char *feature);
 
-typedef int	(*add_serveractive_host_f)(const char *host, unsigned short port, zbx_vector_str_t *hostnames);
-void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb, zbx_vector_str_t *hostnames);
+typedef int	(*add_serveractive_host_f)(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data);
+int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *name, add_serveractive_host_f cb,
+		zbx_vector_str_t *hostnames, void *data, char **error);
 
 #endif

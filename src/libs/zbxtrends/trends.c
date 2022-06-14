@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trends.h"
+
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zbxtrends.h"
-#include "trends.h"
 
 static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 		"unknown error",
@@ -31,8 +31,6 @@ static char	*trends_errors[ZBX_TREND_STATE_COUNT] = {
 };
 
 /******************************************************************************
- *                                                                            *
- * Function: trends_parse_base                                                *
  *                                                                            *
  * Purpose: parse largest period base from function parameters                *
  *                                                                            *
@@ -76,8 +74,6 @@ static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, ch
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_trends_parse_base                                            *
- *                                                                            *
  * Purpose: parse largest period base from function parameters                *
  *                                                                            *
  * Parameters: params - [IN] the function parameters                          *
@@ -91,7 +87,6 @@ static int	trends_parse_base(const char *period_shift, zbx_time_unit_t *base, ch
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error)
 {
 	const char	*period_shift;
-	int		ret;
 
 	if (NULL == (period_shift = strchr(params, ':')))
 	{
@@ -99,14 +94,10 @@ int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **erro
 		return FAIL;
 	}
 
-	ret = trends_parse_base(period_shift + 1, base, error);
-
-	return ret;
+	return trends_parse_base(period_shift + 1, base, error);
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: trends_parse_timeshift                                           *
  *                                                                            *
  * Purpose: parse timeshift                                                   *
  *                                                                            *
@@ -201,8 +192,6 @@ static int	trends_parse_timeshift(time_t from, const char *timeshift, zbx_time_u
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_parse_timeshift                                              *
- *                                                                            *
  * Purpose: parse timeshift                                                   *
  *                                                                            *
  * Parameters: from          - [IN] the start time                            *
@@ -220,8 +209,6 @@ int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_trends_parse_range                                           *
  *                                                                            *
  * Purpose: parse trend function period arguments into time range             *
  *                                                                            *
@@ -252,7 +239,8 @@ int	zbx_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char 
  ******************************************************************************/
 int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end, char **error)
 {
-	int		period_num, period_hours[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, 1, 24, 24 * 7, 24 * 30, 24 * 365};
+	int		period_num;
+	int		period_hours[ZBX_TIME_UNIT_COUNT] = {0, 0, 0, 1, 24, 24 * 7, 24 * 30, 24 * 365, 24 * 7 * 53};
 	zbx_time_unit_t	period_unit;
 	size_t		len;
 	struct tm	tm_end, tm_start;
@@ -267,6 +255,12 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 	if ('\0' != param[len] && ':' != param[len])
 	{
 		*error = zbx_dsprintf(*error, "unexpected character[s] in period \"%s\"", param + len);
+		return FAIL;
+	}
+
+	if (0 == period_num)
+	{
+		*error = zbx_strdup(*error, "period cannot be zero");
 		return FAIL;
 	}
 
@@ -313,8 +307,6 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_trends_parse_nextcheck                                       *
- *                                                                            *
  * Purpose: calculate possible nextcheck based on trend function parameters   *
  *                                                                            *
  * Parameters: from         - [IN] the time the period shift is calculated    *
@@ -359,7 +351,8 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 		{
 			if (ZBX_TIME_UNIT_UNKNOWN == (unit = zbx_tm_str_to_unit(++period_shift)))
 			{
-				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", period_shift);
+				*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"",
+						period_shift);
 				return FAIL;
 			}
 
@@ -389,6 +382,10 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 
 			period_shift += len;
 		}
+		else if (',' == *period_shift)
+		{
+			break;
+		}
 		else
 		{
 			*error = zbx_dsprintf(*error, "unexpected character starting with \"%s\"", period_shift);
@@ -410,8 +407,6 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: trends_eval                                                      *
  *                                                                            *
  * Purpose: evaluate expression with trends data                              *
  *                                                                            *
@@ -475,8 +470,6 @@ static zbx_trend_state_t	trends_eval(const char *table, zbx_uint64_t itemid, int
 
 /******************************************************************************
  *                                                                            *
- * Function: trends_eval_avg                                                  *
- *                                                                            *
  * Purpose: evaluate avg function with trends data                            *
  *                                                                            *
  * Parameters: table       - [IN] the trends table name                       *
@@ -535,8 +528,6 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: trends_eval_sum                                                  *
  *                                                                            *
  * Purpose: evaluate sum function with trends data                            *
  *                                                                            *
@@ -622,26 +613,6 @@ int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int
 	return SUCCEED;
 }
 
-int	zbx_trends_eval_delta(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error)
-{
-	zbx_trend_state_t	state;
-
-	if (FAIL == zbx_tfc_get_value(itemid, start, end, ZBX_TREND_FUNCTION_DELTA, value, &state))
-	{
-		state = trends_eval(table, itemid, start, end, "value_max-value_min", "max(value_max)-min(value_min)",
-				value);
-		zbx_tfc_put_value(itemid, start, end, ZBX_TREND_FUNCTION_DELTA, *value, state);
-	}
-
-	if (ZBX_TREND_STATE_NORMAL == state)
-		return SUCCEED;
-
-	if (NULL != error)
-		*error = zbx_strdup(*error, trends_errors[state]);
-
-	return FAIL;
-}
-
 int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error)
 {
 	zbx_trend_state_t	state;
@@ -697,4 +668,28 @@ int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int e
 		*error = zbx_strdup(*error, trends_errors[state]);
 
 	return FAIL;
+}
+
+zbx_trend_state_t	zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+{
+	zbx_trend_state_t	state;
+
+	if (FAIL == zbx_tfc_get_value(itemid, start, end, ZBX_TREND_FUNCTION_AVG, value, &state))
+	{
+		state = trends_eval_avg(table, itemid, start, end, value);
+		zbx_tfc_put_value(itemid, start, end, ZBX_TREND_FUNCTION_AVG, *value, state);
+	}
+
+	return state;
+}
+
+const char	*zbx_trends_error(zbx_trend_state_t state)
+{
+	if (0 > state || state >= ZBX_TREND_STATE_COUNT)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return "unknown trend cache state";
+	}
+
+	return trends_errors[state];
 }

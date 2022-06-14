@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,9 @@ else {
 
 		$table->addRow([
 			(new CCol($macro_cell))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-			(new CCol($macro_value))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+			(new CCol($macro_value))
+				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
+				->addClass(ZBX_STYLE_NOWRAP),
 			(new CCol(
 				(new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -100,4 +102,4 @@ $table->show();
 
 // Initializing input secret and macro value init script separately.
 (new CScriptTag("jQuery('.input-secret').inputSecret();"))->show();
-(new CScriptTag("jQuery('.input-group').macroValue();"))->show();
+(new CScriptTag("jQuery('.macro-input-group').macroValue();"))->show();

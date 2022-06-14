@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@ package zbxlib
 #include "module.h"
 
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_DNS(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	NET_DNS_RECORD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -42,9 +40,7 @@ int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_LOAD(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_SWITCHES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_CPU_INTR(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_CHASSIS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_CPU(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	SYSTEM_HW_DEVICES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_HW_MACADDR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_OS(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -52,8 +48,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_SWAP_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	SYSTEM_USERS_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result);
-int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	VFS_FS_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -70,10 +65,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
 	case "system.localtime":
 		cfunc = unsafe.Pointer(C.SYSTEM_LOCALTIME)
-	case "net.dns":
-		cfunc = unsafe.Pointer(C.NET_DNS)
-	case "net.dns.record":
-		cfunc = unsafe.Pointer(C.NET_DNS_RECORD)
 	case "system.boottime":
 		cfunc = unsafe.Pointer(C.SYSTEM_BOOTTIME)
 	case "net.tcp.listen":
@@ -88,12 +79,8 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_SWITCHES)
 	case "system.cpu.intr":
 		cfunc = unsafe.Pointer(C.SYSTEM_CPU_INTR)
-	case "system.hw.chassis":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_CHASSIS)
 	case "system.hw.cpu":
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_CPU)
-	case "system.hw.devices":
-		cfunc = unsafe.Pointer(C.SYSTEM_HW_DEVICES)
 	case "system.hw.macaddr":
 		cfunc = unsafe.Pointer(C.SYSTEM_HW_MACADDR)
 	case "system.sw.os":
@@ -102,10 +89,8 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_IN)
 	case "system.swap.out":
 		cfunc = unsafe.Pointer(C.SYSTEM_SWAP_OUT)
-	case "vfs.dir.count":
-		cfunc = unsafe.Pointer(C.VFS_DIR_COUNT)
-	case "vfs.dir.size":
-		cfunc = unsafe.Pointer(C.VFS_DIR_SIZE)
+	case "vfs.dir.get":
+		cfunc = unsafe.Pointer(C.VFS_DIR_GET)
 	}
 	return
 }

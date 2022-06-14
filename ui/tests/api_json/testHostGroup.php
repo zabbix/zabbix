@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -254,7 +254,7 @@ class testHostGroup extends CAPITest {
 					'name' => 'API updated discovered group'
 					]
 				],
-				'expected_error' => 'Cannot update a discovered host group.'
+				'expected_error' => 'Cannot update a discovered host group "API discovery group {#HV.NAME}".'
 			],
 			// Check successfully update.
 			[
@@ -402,14 +402,14 @@ class testHostGroup extends CAPITest {
 				'hostgroup' => [
 					'62002'
 				],
-				'expected_error' => 'Cannot delete host group because maintenance "maintenance_has_only_group" must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete host group "maintenance_has_only_group" because maintenance "maintenance_has_only_group" must contain at least one host or host group.'
 			],
 			[
 				'hostgroup' => [
 					'62002',
 					'62003'
 				],
-				'expected_error' => 'Cannot delete selected host groups because maintenance "maintenance_has_only_group" must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete host group "maintenance_has_only_group" because maintenance "maintenance_has_only_group" must contain at least one host or host group.'
 			],
 			[
 				'hostgroup' => [
@@ -422,7 +422,7 @@ class testHostGroup extends CAPITest {
 					'62004',
 					'62005'
 				],
-				'expected_error' => 'Cannot delete selected host groups because maintenance "maintenance_two_groups" must contain at least one host or host group.'
+				'expected_error' => 'Cannot delete host groups "maintenance_group_1", "maintenance_group_2" because maintenance "maintenance_two_groups" must contain at least one host or host group.'
 			],
 			[
 				'hostgroup' => [

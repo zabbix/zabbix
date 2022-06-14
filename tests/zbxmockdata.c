@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -207,8 +207,6 @@ static void	zbx_yaml_replace_node_rec(yaml_document_t *doc, yaml_node_t *parent,
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_yaml_replace_node                                            *
- *                                                                            *
  * Purpose: replaces node occurrences in mappings and sequences with the new  *
  *          node index                                                        *
  *                                                                            *
@@ -239,8 +237,6 @@ static void	zbx_yaml_replace_node(yaml_document_t *doc, int old_index, int new_i
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_yaml_include_rec                                             *
  *                                                                            *
  * Purpose: recursively include yaml documents from first level 'include'     *
  *          mapping scalar value or sequence                                  *
@@ -280,8 +276,6 @@ static void	zbx_yaml_include_rec(yaml_document_t *doc, int *index)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_yaml_check_include                                           *
  *                                                                            *
  * Purpose: includes another yaml document if include tag is set              *
  *                                                                            *
@@ -534,6 +528,8 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 			return "Invalid timestamp format.";
 		case ZBX_MOCK_NOT_ENOUGH_MEMORY:
 			return "Not enough space in output buffer.";
+		case ZBX_MOCK_NOT_AN_INT:
+			return "Provided handle is not a integer handle.";
 		default:
 			return "Unknown error.";
 	}
@@ -940,9 +936,40 @@ zbx_mock_error_t	zbx_mock_float(zbx_mock_handle_t object, double *value)
 	return res;
 }
 
+zbx_mock_error_t	zbx_mock_int(zbx_mock_handle_t object, int *value)
+{
+	const zbx_mock_pool_handle_t	*handle;
+	char				*tmp = NULL, *ptr;
+	zbx_mock_error_t		res = ZBX_MOCK_SUCCESS;
+
+	if (0 > object || object >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[object];
+
+	if (YAML_SCALAR_NODE != handle->node->type)
+		return ZBX_MOCK_NOT_AN_INT;
+
+	tmp = zbx_malloc(tmp, handle->node->data.scalar.length + 1);
+	memcpy(tmp, handle->node->data.scalar.value, handle->node->data.scalar.length);
+	tmp[handle->node->data.scalar.length] = '\0';
+
+	ptr = tmp;
+	if ('-' == *ptr)
+		ptr++;
+
+	if (SUCCEED != is_uint31(ptr, value))
+		res = ZBX_MOCK_NOT_AN_INT;
+
+	if (ptr != tmp)
+		*value = -(*value);
+
+	zbx_free(tmp);
+
+	return res;
+}
+
 /******************************************************************************
- *                                                                            *
- * Function: zbx_mock_string_ex                                               *
  *                                                                            *
  * Purpose: return string object contents                                     *
  *                                                                            *

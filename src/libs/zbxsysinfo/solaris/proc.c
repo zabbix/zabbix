@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ typedef struct
 	/* process command line in format <arg0> <arg1> ... <argN>\0 */
 	char		*cmdline;
 
-
 #ifdef HAVE_ZONE_H
 	zoneid_t	zoneid;
 #endif
@@ -55,8 +54,6 @@ zbx_sysinfo_proc_t;
 /* but is running on a newer Solaris where zones are supported */
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_solaris_version_get                                          *
  *                                                                            *
  * Purpose: get Solaris version at runtime                                    *
  *                                                                            *
@@ -70,10 +67,9 @@ zbx_sysinfo_proc_t;
  ******************************************************************************/
 static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *minor_version)
 {
-	int		res;
 	struct utsname	name;
 
-	if (-1 == (res = uname(&name)))
+	if (-1 == uname(&name))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): uname() failed: %s", __func__, zbx_strerror(errno));
 
@@ -94,8 +90,6 @@ static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *mi
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_detect_zone_support                                          *
  *                                                                            *
  * Purpose: find if zones are supported                                       *
  *                                                                            *
@@ -146,8 +140,6 @@ static void	zbx_sysinfo_proc_clear(zbx_sysinfo_proc_t *proc)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_sysinfo_proc_free                                            *
  *                                                                            *
  * Purpose: frees process data structure                                      *
  *                                                                            *
@@ -212,8 +204,6 @@ static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_get_process_info                                            *
  *                                                                            *
  * Purpose: get single process information                                    *
  *                                                                            *
@@ -304,8 +294,6 @@ static int	proc_get_process_info(const char *pid, unsigned int flags, zbx_sysinf
 
 /******************************************************************************
  *                                                                            *
- * Function: proc_match_name                                                  *
- *                                                                            *
  * Purpose: checks if the process name matches filter                         *
  *                                                                            *
  ******************************************************************************/
@@ -325,8 +313,6 @@ static int	proc_match_name(const zbx_sysinfo_proc_t *proc, const char *procname)
 
 /******************************************************************************
  *                                                                            *
- * Function: proc_match_user                                                  *
- *                                                                            *
  * Purpose: checks if the process user matches filter                         *
  *                                                                            *
  ******************************************************************************/
@@ -342,8 +328,6 @@ static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_match_cmdline                                               *
  *                                                                            *
  * Purpose: checks if the process command line matches filter                 *
  *                                                                            *
@@ -362,8 +346,6 @@ static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdlin
 #ifdef HAVE_ZONE_H
 /******************************************************************************
  *                                                                            *
- * Function: proc_match_zone                                                  *
- *                                                                            *
  * Purpose: checks if the process zone matches filter                         *
  *                                                                            *
  ******************************************************************************/
@@ -380,8 +362,6 @@ static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, z
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: proc_match_props                                                 *
  *                                                                            *
  * Purpose: checks if the process properties (except zone) matches filter     *
  *                                                                            *
@@ -403,7 +383,7 @@ static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd 
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *memtype = NULL;
+	char			*procname, *proccomm, *param, *memtype = NULL;
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
@@ -567,12 +547,10 @@ out:
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			tmp[MAX_STRING_LEN], *procname, *proccomm, *param, *zone_parameter;
+	char			*procname, *proccomm, *param, *zone_parameter;
 	DIR			*dir;
 	struct dirent		*entries;
-	zbx_stat_t		buf;
 	struct passwd		*usrinfo;
-	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
@@ -680,6 +658,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	while (NULL != (entries = readdir(dir)))
 	{
 		zbx_sysinfo_proc_t	proc;
+		psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
 
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
@@ -694,23 +673,27 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			}
 
 #endif
+			if (SUCCEED != check_procstate(&psinfo, zbx_proc_stat))
+			{
+				zbx_sysinfo_proc_clear(&proc);
+				continue;
+			}
+
 			proccount++;
 		}
 
 		zbx_sysinfo_proc_clear(&proc);
 	}
 
-	closedir(dir);
+	if (0 != closedir(dir))
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot close /proc: %s", __func__, zbx_strerror(errno));
 out:
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
 }
 
-
 /******************************************************************************
- *                                                                            *
- * Function: proc_read_cpu_util                                               *
  *                                                                            *
  * Purpose: reads process cpu utilization values from /proc/[pid]/usage file  *
  *                                                                            *
@@ -775,8 +758,6 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_proc_get_process_stats                                       *
- *                                                                            *
  * Purpose: get process cpu utilization data                                  *
  *                                                                            *
  * Parameters: procs     - [IN/OUT] an array of process utilization data      *
@@ -797,8 +778,6 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_proc_get_processes                                           *
- *                                                                            *
  * Purpose: get system processes                                              *
  *                                                                            *
  * Parameters: processes - [OUT] the system processes                         *
@@ -813,8 +792,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 {
 	DIR			*dir;
 	struct dirent		*entries;
-	char			tmp[MAX_STRING_LEN];
-	int			pid, ret = FAIL, fd = -1, n;
+	int			ret = FAIL;
 	zbx_sysinfo_proc_t	*proc = NULL;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
@@ -849,8 +827,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_proc_free_processes                                          *
- *                                                                            *
  * Purpose: frees process vector read by zbx_proc_get_processes function      *
  *                                                                            *
  * Parameters: processes - [IN/OUT] the process vector to free                *
@@ -862,8 +838,6 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_proc_get_matching_pids                                       *
  *                                                                            *
  * Purpose: get pids matching the specified process name, user name and       *
  *          command line                                                      *
@@ -887,8 +861,9 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	zoneid_t		zoneid;
 #endif
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%d", __func__,
-			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline), flags);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%llu", __func__,
+			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline),
+			(long long unsigned)flags);
 
 	if (NULL != username)
 	{

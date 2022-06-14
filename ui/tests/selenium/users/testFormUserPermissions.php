@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ class testFormUserPermissions extends CWebTest {
 	 *
 	 * @dataProvider getUpdateRoleData
 	 */
-	public function testPageUserPermission_UpdateRole($data) {
+	public function testFormUserPermissions_UpdateRole($data) {
 		$this->page->login()->open('zabbix.php?action=user.list');
 		$table = $this->query('class:list-table')->one()->asTable();
 
@@ -204,7 +204,7 @@ class testFormUserPermissions extends CWebTest {
 	 *
 	 * @dataProvider getDisplayData
 	 */
-	public function testPageUserPermission_Display($data) {
+	public function testFormUserPermissions_Display($data) {
 		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $data['user_name'])->waitUntilClickable()->one()->click();
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
@@ -237,7 +237,7 @@ class testFormUserPermissions extends CWebTest {
 	 *
 	 * @dataProvider getUpdateUserRoletypeData
 	 */
-	public function testPageUserPermission_UpdateUserRoletype($data) {
+	public function testFormUserPermissions_UpdateUserRoletype($data) {
 		$this->page->login()->open('zabbix.php?action=user.edit&userid=4');
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
 		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm();
@@ -281,7 +281,7 @@ class testFormUserPermissions extends CWebTest {
 	 *
 	 * @dataProvider getUpdateRoleParametersData
 	 */
-	public function testPageUserPermission_UpdateRoleParameters($data) {
+	public function testFormUserPermissions_UpdateRoleParameters($data) {
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 
 		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm();
@@ -289,11 +289,11 @@ class testFormUserPermissions extends CWebTest {
 		$form->checkValue($data['before']);
 
 		$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
-		$fluid_form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+		$role_form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 
 		$update_field = (array_key_exists('User type', $data['before'])) ? $data['after'] : $data['change'];
-		$fluid_form->fill($update_field);
-		$fluid_form->submit();
+		$role_form->fill($update_field);
+		$role_form->submit();
 
 		$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 		$form->selectTab('Permissions');
@@ -303,7 +303,7 @@ class testFormUserPermissions extends CWebTest {
 	/**
 	 * Check that changing rules (UI) color changed in permission page for UI and action.
 	 */
-	public function testPageUserPermission_UpdateFrontendAccess() {
+	public function testFormUserPermissions_UpdateFrontendAccess() {
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 
 		// UI elements that should be DISPLAYED. Other UI elements from Reports, will be disabled. Action checked out.
@@ -320,7 +320,7 @@ class testFormUserPermissions extends CWebTest {
 			// Select UI elements from $fields. Other elements from report, will be disabled.
 			if ($status === 'status-green') {
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
-				$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->fill($fields);
 				$form->submit();
 				$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
@@ -331,7 +331,7 @@ class testFormUserPermissions extends CWebTest {
 	/**
 	 * Check that changing rules (API) color changed in permission page for API. Add/Remove api requests.
 	 */
-	public function testPageUserPermission_UpdateApiAccess() {
+	public function testFormUserPermissions_UpdateApiAccess() {
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 		$selector = 'xpath://h4[text()="Access to API"]/../../following::li/div/div/span[text()=';
 
@@ -368,7 +368,7 @@ class testFormUserPermissions extends CWebTest {
 
 					// User role page.
 					$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
-					$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+					$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 
 					// API gets disabled.
 					if ($api_status_field === 'Disabled') {
@@ -377,7 +377,8 @@ class testFormUserPermissions extends CWebTest {
 					else {
 						// Change Deny to Allow list and add request. Now they became green on permission page.
 						$form->fill(['API methods' => 'Allow list']);
-						$this->query('class:multiselect-control')->asMultiselect()->one()->fill(['host.create', 'host.delete']);
+						$this->query('xpath:(//div[@class="multiselect-control"])[3]')->asMultiselect()->one()
+								->setFillMode(CMultiselectElement::MODE_SELECT_MULTIPLE)->fill(['host.create', 'host.delete']);
 					}
 					$form->submit();
 					$this->page->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
@@ -389,7 +390,7 @@ class testFormUserPermissions extends CWebTest {
 	/**
 	 * Check group permission field.
 	 */
-	public function testPageUserPermission_UpdatePermissions() {
+	public function testFormUserPermissions_UpdatePermissions() {
 		$table_selector = 'xpath://ul[@id="permissionsFormList"]//table';
 		$this->page->login()->open('zabbix.php?action=user.edit&userid=2')->waitUntilReady();
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
@@ -444,7 +445,7 @@ class testFormUserPermissions extends CWebTest {
 	/**
 	 * Check enabled/disabled module.
 	 */
-	public function testPageUserPermission_Module() {
+	public function testFormUserPermissions_Module() {
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user)->waitUntilReady();
 		$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
 		$this->assertTrue($this->query('xpath://em[text()="No enabled modules found."]')->one()->isDisplayed());
@@ -463,7 +464,7 @@ class testFormUserPermissions extends CWebTest {
 			if ($enable_modules) {
 				$this->assertEquals('status-green', $this->query($selector.'"4"]')->one()->getAttribute('class'));
 				$this->page->open('zabbix.php?action=userrole.edit&roleid='.self::$admin_roleid);
-				$form = $this->query('id:userrole-form')->waitUntilPresent()->asFluidForm()->one();
+				$form = $this->query('id:userrole-form')->waitUntilPresent()->asForm()->one();
 				$form->getField('4th Module')->uncheck();
 				$form->submit();
 			}

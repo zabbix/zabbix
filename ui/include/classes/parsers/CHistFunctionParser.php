@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,8 @@ class CHistFunctionParser extends CParser {
 	private $user_macro_parser;
 	private $lld_macro_parser;
 	private $lld_macro_function_parser;
-	private $number_parser;
+	private $time_parser;
+	private $size_parser;
 
 	/**
 	 * Parsed function name.
@@ -94,17 +95,17 @@ class CHistFunctionParser extends CParser {
 			'usermacros' => $this->options['usermacros'],
 			'lldmacros' => $this->options['lldmacros']
 		]);
+		$this->size_parser = new CNumberParser(['with_size_suffix' => true]);
+		$this->time_parser = new CNumberParser(['with_time_suffix' => true, 'with_year' => true]);
+
 		if ($this->options['usermacros']) {
 			$this->user_macro_parser = new CUserMacroParser();
 		}
+
 		if ($this->options['lldmacros']) {
 			$this->lld_macro_parser = new CLLDMacroParser();
 			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
 		}
-		$this->number_parser = new CNumberParser([
-			'with_minus' => true,
-			'with_suffix' => true
-		]);
 	}
 
 	/**
@@ -157,7 +158,7 @@ class CHistFunctionParser extends CParser {
 		$num = 0;
 
 		// The list of parsers for unquoted parameters.
-		$parsers = [$this->number_parser];
+		$parsers = [$this->size_parser, $this->time_parser];
 		if ($this->options['usermacros']) {
 			$parsers[] = $this->user_macro_parser;
 		}
@@ -274,8 +275,12 @@ class CHistFunctionParser extends CParser {
 									break;
 
 								default:
+									$length = 0;
+									$new_p = $p;
+
 									foreach ($parsers as $parser) {
-										if ($parser->parse($source, $p) != CParser::PARSE_FAIL) {
+										if ($parser->parse($source, $p) != CParser::PARSE_FAIL
+												&& $parser->getLength() > $length) {
 											$_parameters[$num] = [
 												'type' => self::PARAM_TYPE_UNQUOTED,
 												'pos' => $p,
@@ -283,7 +288,8 @@ class CHistFunctionParser extends CParser {
 												'length' => $parser->getLength()
 											];
 
-											$p += $parser->getLength() - 1;
+											$new_p = $p + $parser->getLength() - 1;
+											$length = $parser->getLength();
 											$state = self::STATE_END;
 										}
 									}
@@ -291,6 +297,8 @@ class CHistFunctionParser extends CParser {
 									if ($state != self::STATE_END) {
 										break 3;
 									}
+
+									$p = $new_p;
 							}
 						}
 					}

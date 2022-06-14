@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,7 +256,9 @@ class CControllerAuthenticationUpdate extends CController {
 			: $this->validateDefaultAuth();
 
 		if ($auth_valid && $this->getInput('saml_auth_enabled', ZBX_AUTH_SAML_DISABLED) == ZBX_AUTH_SAML_ENABLED) {
-			$auth_valid &= $this->validateSamlAuth();
+			if (!$this->validateSamlAuth()) {
+				$auth_valid = false;
+			}
 		}
 
 		if (!$auth_valid) {
@@ -396,6 +398,9 @@ class CControllerAuthenticationUpdate extends CController {
 				$this->response->setFormData($this->getInputAll());
 				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
 			}
+		}
+		else {
+			CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
 		}
 
 		$this->setResponse($this->response);

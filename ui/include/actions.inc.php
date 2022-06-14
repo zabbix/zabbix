@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ function actionConditionValueToString(array $actions) {
 					break;
 
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
-					$result[$i][$j] = getSeverityName($condition['value']);
+					$result[$i][$j] = CSeverityHelper::getName((int) $condition['value']);
 					break;
 
 				case CONDITION_TYPE_DRULE:
@@ -861,7 +861,7 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 						break;
 
 					case OPERATION_TYPE_RECOVERY_MESSAGE:
-					case OPERATION_TYPE_ACK_MESSAGE:
+					case OPERATION_TYPE_UPDATE_MESSAGE:
 						$result[$i][$j][] = bold(_('Notify all involved'));
 						break;
 				}
@@ -964,7 +964,7 @@ function getAllowedOperations($eventsource) {
 			ACTION_UPDATE_OPERATION => [
 				OPERATION_TYPE_MESSAGE,
 				OPERATION_TYPE_COMMAND,
-				OPERATION_TYPE_ACK_MESSAGE
+				OPERATION_TYPE_UPDATE_MESSAGE
 			]
 		];
 	}
@@ -1036,7 +1036,7 @@ function operation_type2str($type) {
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
 		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
 		OPERATION_TYPE_RECOVERY_MESSAGE => _('Notify all involved'),
-		OPERATION_TYPE_ACK_MESSAGE => _('Notify all involved')
+		OPERATION_TYPE_UPDATE_MESSAGE => _('Notify all involved')
 	];
 
 	if (is_null($type)) {
@@ -1760,8 +1760,8 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButton {
 		$severity['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		// severity changes
-		$old_severity_name = getSeverityName($severity['old_severity']);
-		$new_severity_name = getSeverityName($severity['new_severity']);
+		$old_severity_name = CSeverityHelper::getName((int) $severity['old_severity']);
+		$new_severity_name = CSeverityHelper::getName((int) $severity['new_severity']);
 
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']),
@@ -2088,8 +2088,8 @@ function makeActionTableIcon(array $action) {
 					? ZBX_STYLE_ACTION_ICON_SEV_UP
 					: ZBX_STYLE_ACTION_ICON_SEV_DOWN;
 
-				$old_severity_name = getSeverityName($action['old_severity']);
-				$new_severity_name = getSeverityName($action['new_severity']);
+				$old_severity_name = CSeverityHelper::getName((int) $action['old_severity']);
+				$new_severity_name = CSeverityHelper::getName((int) $action['new_severity']);
 				$hint = $old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name;
 
 				$action_icons[] = makeActionIcon(['button' => true, 'icon' => $action_type, 'hint' => $hint]);
@@ -2156,7 +2156,7 @@ function makeActionTableStatus(array $action) {
  * @param string $action['status']             Alert status.
  * @param string $action['alerttype']          Type of alert.
  * @param string $action['mediatypeid']        ID for mediatype, where alert message was sent.
- * @param string $action['retries']            How many retries was done for pending alert message.
+ * @param string $action['retries']            How many retries were done for pending alert message.
  * @param array  $mediatypes                   Array of media type data.
  * @param array  $mediatypes[]['maxattempts']  Maximum attempts for this mediatype.
  *

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,9 @@
 
 // Sync with SASS variable: $ui-transition-duration.
 const UI_TRANSITION_DURATION = 300;
+
+const PROFILE_TYPE_INT = 2;
+const PROFILE_TYPE_STR = 3;
 
 // Array indexOf method for javascript<1.6 compatibility
 if (!Array.prototype.indexOf) {
@@ -208,7 +211,6 @@ var AudioControl = {
  * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
  * If 'data-seconds-to-blink' is omitted, element will blink forever.
  * For elements with class 'blink' and attribute 'data-toggle-class' class will be toggled.
- * @author Konstantin Buravcov
  */
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?
@@ -317,7 +319,10 @@ var hintBox = {
 				return false;
 			}
 
-			hintBox.displayHint(e, $target, 400);
+			hintBox.displayHint(e, $target, $target.data('hintbox-delay') !== undefined
+				? $target.data('hintbox-delay')
+				: 400
+			);
 
 			return false;
 		});
@@ -435,7 +440,7 @@ var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
 		var hintboxid = hintBox.getUniqueId(),
-			box = jQuery('<div></div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
+			box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue'),
 			appendTo = appendTo || '.wrapper';
 
 		if (styles) {
@@ -457,7 +462,7 @@ var hintBox = {
 		}
 
 		if (!empty(className)) {
-			box.append(jQuery('<div></div>').addClass(className).html(hintText));
+			box.append(jQuery('<div>').addClass(className).html(hintText));
 		}
 		else {
 			box.html(hintText);
@@ -656,14 +661,20 @@ function rm4favorites(object, objectid) {
  * Toggles filter state and updates title and icons accordingly.
  *
  * @param {string} 	idx					User profile index
- * @param {string} 	value_int			Integer value
+ * @param {string} 	value				Value
  * @param {object} 	idx2				An array of IDs
+ * @param {integer} profile_type		Profile type
  */
-function updateUserProfile(idx, value_int, idx2) {
+function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {
+	const value_fields = {
+		[PROFILE_TYPE_INT]: 'value_int',
+		[PROFILE_TYPE_STR]: 'value_str'
+	};
+
 	return sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
 			idx: idx,
-			value_int: value_int,
+			[value_fields[profile_type]]: value,
 			idx2: idx2
 		}
 	});
@@ -920,10 +931,13 @@ function getConditionFormula(conditions, evalType) {
 
 			for (const name in data) {
 				// Set 'z-select' value.
-				$row.find('z-select[name$="[' + counter + '][' + name + ']"]').val(data[name]);
+				$row
+					.find(`z-select[name$="[${counter}][${name}]"]`)
+					.val(data[name]);
 
 				// Set 'radio' value.
-				$row.find('[type="radio"][name$="[' + counter + '][' + name + ']"][value="' + data[name] + '"]')
+				$row
+					.find(`[type="radio"][name$="[${counter}][${name}]"][value="${$.escapeSelector(data[name])}"]`)
 					.attr('checked', 'checked');
 			}
 

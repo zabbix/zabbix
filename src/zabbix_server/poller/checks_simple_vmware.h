@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "common.h"
+
 #ifndef ZABBIX_CHECKS_SIMPLE_VMWARE_H
 #define ZABBIX_CHECKS_SIMPLE_VMWARE_H
 
-#include "common.h"
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-#include "sysinfo.h"
+#include "module.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
 
@@ -103,9 +104,13 @@ int	check_vcenter_hv_sensor_health_state(AGENT_REQUEST *request, const char *use
 		AGENT_RESULT *result);
 int	check_vcenter_hv_status(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_maintenance(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_version(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_hv_sensors_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);

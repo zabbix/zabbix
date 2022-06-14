@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class CActionButtonList extends CObject {
 	 */
 	function __construct($action_name, $checkboxes_name, array $buttons_data, $name_prefix = null) {
 		$this->checkboxes_name = $checkboxes_name;
-		$this->name_prefix = $name_prefix ? $name_prefix : null;
+		$this->name_prefix = $name_prefix;
 
 		foreach ($buttons_data as $action => $button_data) {
 			if (array_key_exists('content', $button_data)) {

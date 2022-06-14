@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,21 +46,24 @@ $form->addItem(
 );
 
 // Stick preview to the top of configuration window when scroll.
-$scripts[] =
-	'jQuery(".overlay-dialogue-body").on("scroll", function() {'.
-		'if (jQuery("#svg-graph-preview").length) {'.
-			'var $dialogue_body = jQuery(this),'.
-				'$preview_container = jQuery(".'.ZBX_STYLE_SVG_GRAPH_PREVIEW.'");'.
-				'jQuery("#svg-graph-preview").css("top",'.
-					'($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 500)'.
-						' ? $dialogue_body.offset().top - $preview_container.offset().top'.
-						' : 0'.
-				');'.
-		'}'.
-		'else {'.
-			'jQuery(".overlay-dialogue-body").off("scroll");'.
-		'}'.
-	'})';
+$scripts[] = '
+	jQuery(".overlay-dialogue-body").on("scroll", function() {
+		if (jQuery("#svg-graph-preview").length) {
+			var $dialogue_body = jQuery(this),
+			$preview_container = jQuery(".'.ZBX_STYLE_SVG_GRAPH_PREVIEW.'");
+			if ($preview_container.offset().top < $dialogue_body.offset().top && $dialogue_body.height() > 500) {
+				jQuery("#svg-graph-preview").css("top", $dialogue_body.offset().top - $preview_container.offset().top);
+				jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", $preview_container.height());
+			}
+			else {
+				jQuery("#svg-graph-preview").css("top", 0);
+				jQuery(".graph-widget-config-tabs .ui-tabs-nav").css("top", 0);
+			}
+		}
+		else {
+			jQuery(".overlay-dialogue-body").off("scroll");
+		}
+	})';
 
 $scripts[] =
 	'function onLeftYChange() {'.
@@ -148,7 +151,8 @@ $scripts[] =
 		'preview_data.xhr = jQuery.ajax({'.
 			'url: url.getUrl(),'.
 			'method: "POST",'.
-			'data: data,'.
+			'contentType: "application/json",'.
+			'data: JSON.stringify(data),'.
 			'dataType: "json",'.
 			'success: function(r) {'.
 				'if (preview_data.timeoutid) {'.
@@ -214,8 +218,18 @@ $tab_displaying_opt = (new CFormList())
 // Create 'Time period' tab.
 $tab_time_period = (new CFormList())
 	->addRow(CWidgetHelper::getLabel($fields['graph_time']), CWidgetHelper::getCheckBox($fields['graph_time']))
-	->addRow(CWidgetHelper::getLabel($fields['time_from']), CWidgetHelper::getDatePicker($fields['time_from']))
-	->addRow(CWidgetHelper::getLabel($fields['time_to']), CWidgetHelper::getDatePicker($fields['time_to']));
+	->addRow(
+		CWidgetHelper::getLabel($fields['time_from']),
+		CWidgetHelper::getDatePicker($fields['time_from'])
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+	)
+	->addRow(
+		CWidgetHelper::getLabel($fields['time_to']),
+		CWidgetHelper::getDatePicker($fields['time_to'])
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+	);
 
 // Create 'Axes' tab.
 $tab_axes = (new CFormList())->addRow('',

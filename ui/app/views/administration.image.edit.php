@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ $form_list = (new CFormList('imageFormList'))
 			->setAriaRequired()
 	)
 	->addRow(
-		(new CLabel(_('Upload'), 'image'))->setAsteriskMark(),
+		(new CLabel(_('Upload'), 'image'))->setAsteriskMark($data['imageid'] == 0),
 		(new CFile('image'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()

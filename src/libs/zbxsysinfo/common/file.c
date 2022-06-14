@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "file.h"
+
 #include "common.h"
 #include "sysinfo.h"
 #include "md5.h"
-#include "file.h"
-#include "dir.h"
 #include "zbxregexp.h"
 #include "log.h"
-#include "zbxjson.h"
+#include "dir.h"
 #include "sha256crypt.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -1151,29 +1151,19 @@ int	VFS_FILE_OWNER(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			struct group	*grp;
 
-			grp = getgrgid(st.st_gid);
-
-			if (NULL == grp)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain group name."));
-				goto err;
-			}
-
-			SET_STR_RESULT(result, zbx_strdup(NULL, grp->gr_name));
+			if (NULL == (grp = getgrgid(st.st_gid)))
+				SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_gid));
+			else
+				SET_STR_RESULT(result, zbx_strdup(NULL, grp->gr_name));
 		}
 		else
 		{
 			struct passwd	*pwd;
 
-			pwd = getpwuid(st.st_uid);
-
-			if (NULL == pwd)
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user name."));
-				goto err;
-			}
-
-			SET_STR_RESULT(result, zbx_strdup(NULL, pwd->pw_name));
+			if (NULL == (pwd = getpwuid(st.st_uid)))
+				SET_STR_RESULT(result, zbx_dsprintf(NULL, ZBX_FS_UI64, (zbx_uint64_t)st.st_uid));
+			else
+				SET_STR_RESULT(result, zbx_strdup(NULL, pwd->pw_name));
 		}
 	}
 	else
@@ -1254,83 +1244,142 @@ static char	*get_print_time(time_t st_raw)
 #define VFS_FILE_ADD_TIME(time, tag)						\
 	do									\
 	{									\
+		char	*tmp;							\
+										\
 		if (0 < time)							\
 		{								\
 			tmp = get_print_time((time_t)time);			\
-			zbx_json_addstring(&j, tag, tmp, ZBX_JSON_TYPE_STRING);	\
+			zbx_json_addstring(j, tag, tmp, ZBX_JSON_TYPE_STRING);	\
 			zbx_free(tmp);						\
 		}								\
 		else								\
-			zbx_json_addstring(&j, tag, NULL, ZBX_JSON_TYPE_STRING);\
+			zbx_json_addstring(j, tag, NULL, ZBX_JSON_TYPE_STRING);	\
 	} while (0)
 
 #define VFS_FILE_ADD_TS(time, tag)						\
 	do									\
 	{									\
 		if (0 < time)							\
-			zbx_json_adduint64(&j, tag, (zbx_uint64_t)time);	\
+			zbx_json_adduint64(j, tag, (zbx_uint64_t)time);		\
 		else								\
-			zbx_json_addstring(&j, tag, NULL, ZBX_JSON_TYPE_STRING);\
+			zbx_json_addstring(j, tag, NULL, ZBX_JSON_TYPE_STRING);	\
 	} while (0)
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
+#	define ZBX_DIR_DELIMITER	"\\"
+#else
+#	define ZBX_DIR_DELIMITER	"/"
+#endif
+
+static int	get_dir_names(const char *filename, char **basename, char **dirname, char **pathname)
 {
-	int			ret = SYSINFO_RET_FAIL;
+	char	*ptr1, *ptr2;
+	size_t	len;
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	if (NULL == (*pathname = _fullpath(NULL, filename, 0)))
+		return FAIL;
+#elif defined(__hpux)
+	char resolved_path[PATH_MAX + 1];
+
+	if (NULL == (*pathname = realpath(filename, resolved_path)))
+		return FAIL;
+
+	*pathname = zbx_strdup(NULL, *pathname);
+#else
+	if (NULL == (*pathname = realpath(filename, NULL)))
+		return FAIL;
+#endif
+
+	ptr1 = *pathname;
+	ptr2 = strstr(ptr1, ZBX_DIR_DELIMITER);
+
+	while (NULL != ptr2)
+	{
+		len = strlen(ptr2) + 1;
+		ptr1 = &ptr1[strlen(ptr1) - len + 2];
+		ptr2 = strstr(ptr1, ZBX_DIR_DELIMITER);
+	}
+
+	if (0 == strlen(ptr1))
+		*basename = zbx_strdup(NULL, *pathname);
+	else
+		*basename = zbx_strdup(NULL, ptr1);
+
+	ptr2 = zbx_strdup(NULL, *pathname);
+	len = strlen(*pathname) - strlen(ptr1);
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	if (3 == len)
+#else
+	if (1 == len)
+#endif
+		len++;
+	ptr2[len - 1] = '\0';
+	*dirname = zbx_dsprintf(NULL, "%s", ptr2);
+	zbx_free(ptr2);
+
+	return SUCCEED;
+}
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error)
+{
+	int			ret = FAIL;
 	DWORD			file_attributes, acc_sz = 0, dmn_sz = 0;
 	wchar_t			*wpath = NULL, *sid_string = NULL, *acc_name = NULL, *dmn_name = NULL;
-	char			*tmp, *acc_ut8, *dmn_ut8;
-	struct zbx_json		j;
+	char			*type = NULL, *basename = NULL, *dirname = NULL,
+				*pathname = NULL, *user = NULL, *sidbuf = NULL;
 	PSID			sid = NULL;
 	PSECURITY_DESCRIPTOR	sec = NULL;
 	SID_NAME_USE		acc_type = SidTypeUnknown;
 	zbx_stat_t		buf;
 	zbx_file_time_t		file_time;
+	zbx_uint64_t		size;
 
 	if (NULL == (wpath = zbx_utf8_to_unicode(filename)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot convert file name to UTF-16."));
+		*error = zbx_strdup(NULL, "Cannot convert file name to UTF-16.");
 		goto err;
 	}
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	/* type */
 
 	file_attributes = GetFileAttributesW(wpath);
 
 	if (INVALID_FILE_ATTRIBUTES == file_attributes)
 	{
-		DWORD	error;
+		DWORD	last_error;
 
-		switch (error = GetLastError())
+		switch (last_error = GetLastError())
 		{
 			case ERROR_FILE_NOT_FOUND:
 				goto err;
 			case ERROR_BAD_NETPATH:	/* special case from GetFileAttributesW() documentation */
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "The specified file is a network share."
-						" Use a path to a subfolder on that share."));
+				*error = zbx_dsprintf(NULL, "The specified file is a network share."
+						" Use a path to a subfolder on that share.");
 				goto err;
 			default:
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
-						strerror_from_system(error)));
+				*error = zbx_dsprintf(NULL, "Cannot obtain file information: %s",
+						strerror_from_system(last_error));
 				goto err;
 		}
 	}
 
 	if (0 != (file_attributes & FILE_ATTRIBUTE_REPARSE_POINT))
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "sym", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "sym");
 	else if (0 != (file_attributes & FILE_ATTRIBUTE_DIRECTORY))
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "dir", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "dir");
 	else
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "file", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "file");
 
-	/* User name */
+	if (SUCCEED != get_dir_names(filename, &basename, &dirname, &pathname))
+	{
+		*error = zbx_strdup(NULL, "Cannot obtain file or directory name.");
+		goto err;
+	}
 
 	if (ERROR_SUCCESS != GetNamedSecurityInfo(wpath, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION, &sid, NULL, NULL,
 			NULL, &sec))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain security information."));
+		*error = zbx_strdup(NULL, "Cannot obtain security information.");
 		goto err;
 	}
 
@@ -1342,51 +1391,64 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 	if (TRUE == LookupAccountSid(NULL, sid, acc_name, (LPDWORD)&acc_sz, dmn_name, (LPDWORD)&dmn_sz,
 			&acc_type))
 	{
+		char	*acc_ut8, *dmn_ut8;
+
 		acc_ut8 = zbx_unicode_to_utf8(acc_name);
 		dmn_ut8 = zbx_unicode_to_utf8(dmn_name);
 
 		if (0 == strlen(dmn_ut8))
-			tmp = zbx_dsprintf(NULL, "%s", acc_ut8);
+			user = zbx_dsprintf(NULL, "%s", acc_ut8);
 		else
-			tmp = zbx_dsprintf(NULL, "%s\\%s", dmn_ut8, acc_ut8);
+			user = zbx_dsprintf(NULL, "%s\\%s", dmn_ut8, acc_ut8);
 
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_USER, tmp, ZBX_JSON_TYPE_STRING);
 		zbx_free(acc_ut8);
 		zbx_free(dmn_ut8);
-		zbx_free(tmp);
 	}
-	else
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_USER, NULL, ZBX_JSON_TYPE_STRING);
 
 	zbx_free(acc_name);
 	zbx_free(dmn_name);
 
-	/* SID */
-
 	if (TRUE != ConvertSidToStringSid(sid, &sid_string))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain SID."));
+		*error = zbx_strdup(NULL, "Cannot obtain SID.");
 		goto err;
 	}
 
-	tmp = zbx_unicode_to_utf8(sid_string);
+	sidbuf = zbx_unicode_to_utf8(sid_string);
 	LocalFree(sid_string);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_SID, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(tmp);
-
-	/* size */
 
 	if (0 != (file_attributes & (FILE_ATTRIBUTE_REPARSE_POINT | FILE_ATTRIBUTE_DIRECTORY)))
 	{
-		zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_SIZE, 0);
+		size = 0;
 	}
 	else if (0 != zbx_stat(filename, &buf))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
+		*error = zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno));
 		goto err;
 	}
 	else
-		zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_SIZE, (zbx_uint64_t)buf.st_size);
+		size = (zbx_uint64_t)buf.st_size;
+
+	/* name */
+
+	if (0 != array)
+		zbx_json_addobject(j, NULL);
+
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_BASENAME, basename, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_PATHNAME, pathname, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_DIRNAME, dirname, ZBX_JSON_TYPE_STRING);
+
+	/* type */
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_TYPE, type, ZBX_JSON_TYPE_STRING);
+
+	/* User name */
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_USER, user, ZBX_JSON_TYPE_STRING);
+
+	/* SID */
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_SID, sidbuf, ZBX_JSON_TYPE_STRING);
+
+	/* size */
+	zbx_json_adduint64(j, ZBX_SYSINFO_FILE_TAG_SIZE, size);
 
 	/* time */
 
@@ -1395,137 +1457,178 @@ static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
 		memset(&file_time, 0 ,sizeof(file_time));
 	}
 
-	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIME);
+	zbx_json_addobject(j, ZBX_SYSINFO_FILE_TAG_TIME);
 	VFS_FILE_ADD_TIME(file_time.access_time, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS);
 	VFS_FILE_ADD_TIME(file_time.modification_time, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY);
 	VFS_FILE_ADD_TIME(file_time.change_time, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE);
-	zbx_json_close(&j);
+	zbx_json_close(j);
 
-	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIMESTAMP);
+	zbx_json_addobject(j, ZBX_SYSINFO_FILE_TAG_TIMESTAMP);
 	VFS_FILE_ADD_TS(file_time.access_time, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS);
 	VFS_FILE_ADD_TS(file_time.modification_time, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY);
 	VFS_FILE_ADD_TS(file_time.change_time, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE);
-	zbx_json_close(&j);
+	zbx_json_close(j);
 
-	/* close object and array */
-	zbx_json_close(&j);
-	zbx_json_close(&j);
+	/* close object*/
+	zbx_json_close(j);
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
-
-	ret =  SYSINFO_RET_OK;
+	ret =  SUCCEED;
 err:
 	if (NULL != sec)
 		LocalFree(sec);
 
 	zbx_free(wpath);
-	zbx_json_free(&j);
+
+	zbx_free(type);
+	zbx_free(basename);
+	zbx_free(dirname);
+	zbx_free(pathname);
+	zbx_free(user);
+	zbx_free(sidbuf);
 
 	return ret;
 }
 #else /* not _WINDOWS or __MINGW32__ */
-static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
+int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char **error)
 {
-	int		ret = SYSINFO_RET_FAIL;
-	char		*tmp = NULL;
+	int		ret = FAIL;
+	char		*permissions, *type = NULL, *basename = NULL, *dirname = NULL, *pathname = NULL;
 	zbx_file_time_t	file_time;
 	zbx_stat_t	buf;
-	struct zbx_json	j;
 	struct group	*grp;
 	struct passwd	*pwd;
 
 	if (0 != lstat(filename, &buf))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
-				zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		*error = zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno));
+		return FAIL;
 	}
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	/* type */
 
 	if (0 != S_ISLNK(buf.st_mode))
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "sym", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "sym");
 	else if (0 != S_ISREG(buf.st_mode))
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "file", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "file");
 	else if (0 != S_ISDIR(buf.st_mode))
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "dir", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "dir");
 	else if (0 != S_ISSOCK(buf.st_mode))
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "sock", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "sock");
 	else if (0 != S_ISBLK(buf.st_mode))
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "bdev", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "bdev");
 	else if (0 != S_ISCHR(buf.st_mode))
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "cdev", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "cdev");
 	else if (0 != S_ISFIFO(buf.st_mode))
-		zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_TYPE, "fifo", ZBX_JSON_TYPE_STRING);
+		type = zbx_strdup(NULL, "fifo");
 
-	/* user */
-
-	if (NULL == (pwd = getpwuid(buf.st_uid)))
+	if (SUCCEED != get_dir_names(filename, &basename, &dirname, &pathname))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain user name."));
+		*error = zbx_strdup(NULL, "Cannot obtain file or directory name.");
 		goto err;
 	}
-
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_USER, pwd->pw_name, ZBX_JSON_TYPE_STRING);
-
-	/* group */
-
-	if (NULL == (grp = getgrgid(buf.st_gid)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain group name."));
-		goto err;
-	}
-
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_GROUP, grp->gr_name, ZBX_JSON_TYPE_STRING);
-
-	/* permissions */
-	tmp = get_file_permissions(&buf);
-	zbx_json_addstring(&j, ZBX_SYSINFO_FILE_TAG_PERMISSIONS, tmp, ZBX_JSON_TYPE_STRING);
-	zbx_free(tmp);
-
-	/* uid */
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_UID, (zbx_uint64_t)buf.st_uid);
-
-	/* gid */
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_GID, (zbx_uint64_t)buf.st_gid);
-
-	/* size */
-	zbx_json_adduint64(&j, ZBX_SYSINFO_FILE_TAG_SIZE, (zbx_uint64_t)buf.st_size);
-
-	/* time */
 
 	if (SUCCEED != zbx_get_file_time(filename, 1, &file_time))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
+		*error = zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno));
 		goto err;
 	}
 
-	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIME);
+	/* name */
+
+	if (0 != array)
+		zbx_json_addobject(j, NULL);
+
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_BASENAME, basename, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_PATHNAME, pathname, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_DIRNAME, dirname, ZBX_JSON_TYPE_STRING);
+
+	/* type */
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_TYPE, type, ZBX_JSON_TYPE_STRING);
+
+	/* user */
+	if (NULL == (pwd = getpwuid(buf.st_uid)))
+	{
+		char	buffer[MAX_ID_LEN];
+
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, (zbx_uint64_t)buf.st_uid);
+		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_USER, buffer, ZBX_JSON_TYPE_STRING);
+	}
+	else
+		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_USER, pwd->pw_name, ZBX_JSON_TYPE_STRING);
+
+	/* group */
+	if (NULL == (grp = getgrgid(buf.st_gid)))
+	{
+		char	buffer[MAX_ID_LEN];
+
+		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, (zbx_uint64_t)buf.st_gid);
+		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_GROUP, buffer, ZBX_JSON_TYPE_STRING);
+	}
+	else
+		zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_GROUP, grp->gr_name, ZBX_JSON_TYPE_STRING);
+
+	/* permissions */
+	permissions = get_file_permissions(&buf);
+	zbx_json_addstring(j, ZBX_SYSINFO_FILE_TAG_PERMISSIONS, permissions, ZBX_JSON_TYPE_STRING);
+	zbx_free(permissions);
+
+	/* uid */
+	zbx_json_adduint64(j, ZBX_SYSINFO_FILE_TAG_UID, (zbx_uint64_t)buf.st_uid);
+
+	/* gid */
+	zbx_json_adduint64(j, ZBX_SYSINFO_FILE_TAG_GID, (zbx_uint64_t)buf.st_gid);
+
+	/* size */
+	zbx_json_adduint64(j, ZBX_SYSINFO_FILE_TAG_SIZE, (zbx_uint64_t)buf.st_size);
+
+	/* time */
+
+	zbx_json_addobject(j, ZBX_SYSINFO_FILE_TAG_TIME);
 	VFS_FILE_ADD_TIME(file_time.access_time, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS);
 	VFS_FILE_ADD_TIME(file_time.modification_time, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY);
 	VFS_FILE_ADD_TIME(file_time.change_time, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE);
-	zbx_json_close(&j);
+	zbx_json_close(j);
 
-	zbx_json_addobject(&j, ZBX_SYSINFO_FILE_TAG_TIMESTAMP);
+	zbx_json_addobject(j, ZBX_SYSINFO_FILE_TAG_TIMESTAMP);
 	VFS_FILE_ADD_TS(file_time.access_time, ZBX_SYSINFO_FILE_TAG_TIME_ACCESS);
 	VFS_FILE_ADD_TS(file_time.modification_time, ZBX_SYSINFO_FILE_TAG_TIME_MODIFY);
 	VFS_FILE_ADD_TS(file_time.change_time, ZBX_SYSINFO_FILE_TAG_TIME_CHANGE);
-	zbx_json_close(&j);
+	zbx_json_close(j);
 
-	zbx_json_close(&j);
-	zbx_json_close(&j);
+	zbx_json_close(j);
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
-
-	ret =  SYSINFO_RET_OK;
+	ret =  SUCCEED;
 err:
-	zbx_json_free(&j);
+	zbx_free(type);
+	zbx_free(basename);
+	zbx_free(dirname);
+	zbx_free(pathname);
 
 	return ret;
 }
 #endif
+
+static int	vfs_file_get(const char *filename, AGENT_RESULT *result)
+{
+	int		ret = SYSINFO_RET_FAIL;
+	char		*error = NULL;
+	struct zbx_json	j;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+
+	if (SUCCEED == zbx_vfs_file_info(filename, &j, 0, &error))
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+
+		ret =  SYSINFO_RET_OK;
+	}
+	else
+		SET_MSG_RESULT(result, error);
+
+	zbx_json_close(&j);
+
+	zbx_json_free(&j);
+
+	return ret;
+}
 
 #undef VFS_FILE_ADD_TIME
 #undef VFS_FILE_ADD_TS

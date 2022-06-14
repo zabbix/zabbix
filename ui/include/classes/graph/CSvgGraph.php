@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -390,13 +390,19 @@ class CSvgGraph extends CSvg {
 		 */
 		if ($step == 0) {
 			return [
-				0 => date('H:i:s', $this->time_from),
-				$this->canvas_width => date('H:i:s', $this->time_till)
+				0 => zbx_date2str(TIME_FORMAT_SECONDS, $this->time_from),
+				$this->canvas_width => zbx_date2str(TIME_FORMAT_SECONDS, $this->time_till)
 			];
 		}
 
 		$start = $this->time_from + $step - $this->time_from % $step;
-		$time_formats = ['Y-n-d', 'n-d', 'n-d H:i','H:i', 'H:i:s'];
+		$time_formats = [
+			SVG_GRAPH_DATE_FORMAT,
+			SVG_GRAPH_DATE_FORMAT_SHORT,
+			SVG_GRAPH_DATE_TIME_FORMAT_SHORT,
+			TIME_FORMAT,
+			TIME_FORMAT_SECONDS
+		];
 
 		// Search for most appropriate time format.
 		foreach ($time_formats as $fmt) {
@@ -404,7 +410,7 @@ class CSvgGraph extends CSvg {
 
 			for ($clock = $start; $this->time_till >= $clock; $clock += $step) {
 				$relative_pos = round($this->canvas_width - $this->canvas_width * ($this->time_till - $clock) / $period);
-				$grid_values[$relative_pos] = date($fmt, $clock);
+				$grid_values[$relative_pos] = zbx_date2str($fmt, $clock);
 			}
 
 			/**
@@ -556,8 +562,10 @@ class CSvgGraph extends CSvg {
 
 		$this->left_y_is_binary = $this->left_y_units === 'B' || $this->left_y_units === 'Bps';
 
+		$calc_power = $this->left_y_units === '' || $this->left_y_units[0] !== '!';
+
 		$result = calculateGraphScaleExtremes($this->left_y_min, $this->left_y_max, $this->left_y_is_binary,
-			$this->left_y_min_calculated, $this->left_y_max_calculated, $rows_min, $rows_max
+			$calc_power, $this->left_y_min_calculated, $this->left_y_max_calculated, $rows_min, $rows_max
 		);
 
 		[
@@ -585,8 +593,10 @@ class CSvgGraph extends CSvg {
 
 		$this->right_y_is_binary = $this->right_y_units === 'B' || $this->right_y_units === 'Bps';
 
+		$calc_power = $this->right_y_units === '' || $this->right_y_units[0] !== '!';
+
 		$result = calculateGraphScaleExtremes($this->right_y_min, $this->right_y_max, $this->right_y_is_binary,
-			$this->right_y_min_calculated, $this->right_y_max_calculated, $rows_min, $rows_max
+			$calc_power, $this->right_y_min_calculated, $this->right_y_max_calculated, $rows_min, $rows_max
 		);
 
 		[
@@ -1084,22 +1094,29 @@ class CSvgGraph extends CSvg {
 				}
 			}
 
+			$clock_fmt = ($problem['clock'] >= $today)
+				? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
+				: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
+
+			if ($problem['r_clock'] != 0) {
+				$r_clock_fmt = ($problem['r_clock'] >= $today)
+					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
+					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']);
+			}
+			else {
+				$r_clock_fmt = '';
+			}
+
 			$info = [
 				'name' => $problem['name'],
-				'clock' => ($problem['clock'] >= $today)
-					? zbx_date2str(TIME_FORMAT_SECONDS, $problem['clock'])
-					: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']),
-				'r_clock' => ($problem['r_clock'] != 0)
-					? ($problem['r_clock'] >= $today)
-						? zbx_date2str(TIME_FORMAT_SECONDS, $problem['r_clock'])
-						: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])
-					: '',
+				'clock' => $clock_fmt,
+				'r_clock' => $r_clock_fmt,
 				'url' => (new CUrl('tr_events.php'))
 					->setArgument('triggerid', $problem['objectid'])
 					->setArgument('eventid', $problem['eventid'])
 					->getUrl(),
 				'r_eventid' => $problem['r_eventid'],
-				'severity' => getSeverityStyle($problem['severity'], $problem['r_clock'] == 0),
+				'severity' => CSeverityHelper::getStyle((int) $problem['severity'], $problem['r_clock'] == 0),
 				'status' => $status_str,
 				'status_color' => $status_color
 			];

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 
 var globalAllObjForViewSwitcher = {};
-
 var CViewSwitcher = function(objId, objAction, confData, disableDDItems) {
 	this.mainObj = document.getElementById(objId);
 	this.objAction = objAction;
@@ -68,22 +67,35 @@ CViewSwitcher.prototype = {
 	rebuildView: function(e) {
 		var myValue = this.objValue(this.mainObj);
 
-		// enable previously disabled dropdown items
+		// Enable previously disabled dropdown items.
 		if (this.disableDDItems && this.disableDDItems[this.lastValue]) {
 			for (var DDi in this.disableDDItems[this.lastValue]) {
+				if (jQuery('#' + DDi).length == 0) {
+					continue;
+				}
+
 				jQuery('#' + DDi).get(0).getOptions().map((opt) => opt.disabled = false);
 			}
 		}
 
-		// disable dropdown items
+		// Disable dropdown items.
 		if (this.disableDDItems && this.disableDDItems[myValue]) {
 			for (var DDi in this.disableDDItems[myValue]) {
 				var DD = jQuery('#' + DDi);
 
+				if (DD.length == 0) {
+					continue;
+				}
+
 				for (var Oi in this.disableDDItems[myValue][DDi]) {
+					if (DD.get(0).getOptionByValue(this.disableDDItems[myValue][DDi][Oi]) === null) {
+						continue;
+					}
+
 					DD.get(0).getOptionByValue(this.disableDDItems[myValue][DDi][Oi]).disabled = true;
 				}
-				// if selected option unavailable set to first available
+
+				// If selected option unavailable set to first available.
 				if (DD.get(0).getOptionByValue(DD.val()).disabled) {
 					for (let opt of DD.get(0).getOptions()) {
 						if (!opt.disabled) {
@@ -91,6 +103,7 @@ CViewSwitcher.prototype = {
 							break;
 						}
 					}
+
 					DD.trigger(this.objAction);
 				}
 			}
@@ -113,7 +126,7 @@ CViewSwitcher.prototype = {
 			}
 		}
 
-		if (isset(myValue, this.depObjects)) {
+		if (isset(myValue, this.depObjects) && !this.mainObj.disabled) {
 			for (var key in this.depObjects[myValue]) {
 				if (empty(this.depObjects[myValue][key])) {
 					continue;
@@ -133,20 +146,19 @@ CViewSwitcher.prototype = {
 			return null;
 		}
 
-		switch (obj.tagName) {
-			case 'SELECT':
+		switch (obj.tagName.toLowerCase) {
+			case 'select':
 				return (obj.selectedIndex > -1) ? obj.options[obj.selectedIndex].value : null;
 
-			case 'INPUT':
-				if (obj.getAttribute('type').toUpperCase() === 'CHECKBOX') {
+			case 'input':
+				if (obj.getAttribute('type').toLowerCase() === 'checkbox') {
 					return obj.checked ? obj.value : null;
 				}
+				return obj.value;
 
 			default:
 				return obj.value;
 		}
-
-		return null;
 	},
 
 	setObjValue : function (obj, value) {
@@ -163,16 +175,19 @@ CViewSwitcher.prototype = {
 					}
 				}
 				break;
+
 			case 'input':
-				var inpType = obj.getAttribute('type');
-				if (!is_null(inpType) && inpType.toLowerCase() == 'checkbox') {
+				const input_type = obj.getAttribute('type');
+				if (!is_null(input_type) && input_type.toLowerCase() === 'checkbox') {
 					obj.checked = true;
-					obj.value == value;
-					break;
 				}
+				obj.value = value;
+				break;
+
 			case 'textarea':
 			default:
 				obj.value = value;
+				break;
 		}
 	},
 
@@ -365,13 +380,13 @@ ActionProcessor.prototype = {
 				case 'enable':
 					jQuery(action.value)
 						.prop('disabled', !this.checkConditions(action.cond))
-						.closest('.input-color-picker')
+						.closest('.color-picker')
 						.toggleClass('disabled', !this.checkConditions(action.cond));
 					break;
 				case 'disable':
 					jQuery(action.value)
 						.prop('disabled', this.checkConditions(action.cond))
-						.closest('.input-color-picker')
+						.closest('.color-picker')
 						.toggleClass('disabled', this.checkConditions(action.cond));
 					break;
 			}

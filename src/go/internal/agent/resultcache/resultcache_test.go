@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@ import (
 	"testing"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 )
 
 type mockWriter struct {
@@ -36,10 +36,10 @@ type mockWriter struct {
 	t       *testing.T
 }
 
-func (w *mockWriter) Write(data []byte, timeout time.Duration) (err error) {
+func (w *mockWriter) Write(data []byte, timeout time.Duration) (err []error) {
 	log.Debugf("%s", string(data))
 	if w.counter&1 != 0 {
-		err = errors.New("mock error")
+		err = []error{errors.New("mock error")}
 	} else {
 		var request AgentDataRequest
 		_ = json.Unmarshal(data, &request)

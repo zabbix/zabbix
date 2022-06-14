@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,31 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "proxyconfig.h"
+
 #include "db.h"
 #include "log.h"
 #include "proxy.h"
+#include "zbxrtc.h"
 
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
-
-#include "proxyconfig.h"
+#include "zbxcompress.h"
 
 /******************************************************************************
- *                                                                            *
- * Function: send_proxyconfig                                                 *
  *                                                                            *
  * Purpose: send configuration tables to the proxy from server                *
  *          (for active proxies)                                              *
  *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
  ******************************************************************************/
 void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	char		*error = NULL;
+	char		*error = NULL, *buffer = NULL;
 	struct zbx_json	j;
 	DC_PROXY	proxy;
-	int		flags = ZBX_TCP_PROTOCOL;
+	int		ret, flags = ZBX_TCP_PROTOCOL;
+	size_t		buffer_size, reserved = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -59,7 +56,7 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), time(NULL),
+	zbx_update_proxy_data(&proxy, zbx_get_proxy_protocol_version(jp), (int)time(NULL),
 			(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
 
 	if (0 != proxy.auto_compress)
@@ -75,11 +72,38 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen " ZBX_FS_SIZE_T,
-			proxy.host, sock->peer, (zbx_fs_size_t)j.buffer_size);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
-	if (SUCCEED != zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), flags, CONFIG_TRAPPER_TIMEOUT))
+	if (0 != proxy.auto_compress)
+	{
+		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+		{
+			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+			goto clean;
+		}
+
+		reserved = j.buffer_size;
+
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+
+		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+				ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy.host,
+				sock->peer, (zbx_fs_size_t)reserved, (zbx_fs_size_t)buffer_size,
+				(double)reserved / (double)buffer_size);
+
+		ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, (unsigned char)flags,
+				CONFIG_TRAPPER_TIMEOUT);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+				ZBX_FS_SIZE_T, proxy.host, sock->peer, (zbx_fs_size_t)j.buffer_size);
+
+		ret = zbx_tcp_send_ext(sock, j.buffer, strlen(j.buffer), 0, (unsigned char)flags,
+				CONFIG_TRAPPER_TIMEOUT);
+	}
+
+	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy \"%s\" at \"%s\": %s",
 				proxy.host, sock->peer, zbx_socket_strerror());
@@ -88,22 +112,19 @@ clean:
 	zbx_json_free(&j);
 out:
 	zbx_free(error);
+	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: recv_proxyconfig                                                 *
- *                                                                            *
  * Purpose: receive configuration tables from server (passive proxies)        *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
 void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
-	struct zbx_json_parse	jp_data;
+	struct zbx_json_parse	jp_data, jp_kvs_paths = {0};
 	int			ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -119,7 +140,22 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update"))
 		goto out;
 
-	process_proxyconfig(&jp_data);
+	if (SUCCEED == process_proxyconfig(&jp_data, &jp_kvs_paths))
+	{
+		char	*error = NULL;
+
+		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
+		{
+			if (NULL != jp_kvs_paths.start)
+				DCsync_kvs_paths(&jp_kvs_paths);
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			zabbix_log(LOG_LEVEL_WARNING, "cannot send message to configuration syncer: %s", error);
+			zbx_free(error);
+		}
+	}
 	zbx_send_proxy_response(sock, ret, NULL, CONFIG_TIMEOUT);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

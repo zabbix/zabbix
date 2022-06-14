@@ -1,8 +1,9 @@
+//go:build linux
 // +build linux
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,14 +145,14 @@ func (p *Plugin) getProcCpuUtil(pid int64, stat *cpuUtil) {
 }
 
 func getProcesses(flags int) (processes []*procInfo, err error) {
-	var entries []os.FileInfo
+	var entries []os.DirEntry
 	f, err := os.Open("/proc")
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	for entries, err = f.Readdir(1); err != io.EOF; entries, err = f.Readdir(1) {
+	for entries, err = f.ReadDir(1); err != io.EOF; entries, err = f.ReadDir(1) {
 		if err != nil {
 			return nil, err
 		}

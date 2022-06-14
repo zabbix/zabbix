@@ -18,7 +18,8 @@ zabbix_js_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
-	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a
+	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a
 	
 zabbix_js_LDADD += @ZBXJS_LIBS@
 

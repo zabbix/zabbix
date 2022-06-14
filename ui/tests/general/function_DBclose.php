@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,6 @@ class function_DBclose extends CTest {
 	public function test_DBcloseOfClosedDatabase() {
 		DBconnect($error);
 		DBclose();
-		$this->assertFalse(DBclose(), 'Chuck Norris: DBclose() must return False if the datbase is already closed');
+		$this->assertFalse(DBclose(), 'Chuck Norris: DBclose() must return False if the database is already closed');
 	}
 }

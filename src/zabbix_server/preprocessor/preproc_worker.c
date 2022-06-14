@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,30 +17,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "preproc_worker.h"
+
 #include "common.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxipcservice.h"
-#include "zbxserialize.h"
 #include "preprocessing.h"
 #include "zbxembed.h"
-
-#include "sysinfo.h"
-#include "preproc_worker.h"
 #include "item_preproc.h"
 #include "preproc_history.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #define ZBX_PREPROC_VALUE_PREVIEW_LEN		100
+
+typedef struct
+{
+	zbx_preproc_dep_t	*deps;
+	int			deps_alloc;
+	int			deps_offset;
+	zbx_variant_t		value;
+	zbx_timespec_t		ts;
+}
+zbx_preproc_dep_request_t;
 
 zbx_es_t	es_engine;
 
 /******************************************************************************
- *                                                                            *
- * Function: worker_format_value                                              *
  *                                                                            *
  * Purpose: formats value in text format                                      *
  *                                                                            *
@@ -53,8 +60,8 @@ zbx_es_t	es_engine;
  ******************************************************************************/
 static void	worker_format_value(const zbx_variant_t *value, char **value_str)
 {
-	int		len, i;
 	const char	*value_desc;
+	size_t		i, len;
 
 	value_desc = zbx_variant_value_desc(value);
 
@@ -81,8 +88,6 @@ static void	worker_format_value(const zbx_variant_t *value, char **value_str)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: worker_format_result                                             *
  *                                                                            *
  * Purpose: formats one preprocessing step result                             *
  *                                                                            *
@@ -112,8 +117,6 @@ static void	worker_format_result(int step, const zbx_preproc_result_t *result, c
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: worker_format_error                                              *
  *                                                                            *
  * Purpose: formats preprocessing error message                               *
  *                                                                            *
@@ -192,11 +195,10 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
 
 /******************************************************************************
  *                                                                            *
- * Function: worker_item_preproc_execute                                      *
- *                                                                            *
  * Purpose: execute preprocessing steps                                       *
  *                                                                            *
- * Parameters: value_type    - [IN] the item value type                       *
+ * Parameters: cache         - [IN/OUT] the preprocessing cache               *
+ *             value_type    - [IN] the item value type                       *
  *             value         - [IN/OUT] the value to process                  *
  *             ts            - [IN] the value timestamp                       *
  *             steps         - [IN] the preprocessing steps to execute        *
@@ -211,24 +213,33 @@ static void	worker_format_error(const zbx_variant_t *value, zbx_preproc_result_t
  *               FAIL - otherwise, error contains the error message           *
  *                                                                            *
  ******************************************************************************/
-static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
+static int	worker_item_preproc_execute(zbx_preproc_cache_t *cache, unsigned char value_type,
+		zbx_variant_t *value_in, zbx_variant_t *value_out, const zbx_timespec_t *ts,
 		zbx_preproc_op_t *steps, int steps_num, zbx_vector_ptr_t *history_in, zbx_vector_ptr_t *history_out,
 		zbx_preproc_result_t *results, int *results_num, char **error)
 {
 	int		i, ret = SUCCEED;
+
+	if (value_in != value_out)
+	{
+		if (0 == steps_num || NULL == cache || NULL == zbx_preproc_cache_get(cache, steps[0].type))
+			zbx_variant_copy(value_out, value_in);
+	}
 
 	for (i = 0; i < steps_num; i++)
 	{
 		zbx_preproc_op_t	*op = &steps[i];
 		zbx_variant_t		history_value;
 		zbx_timespec_t		history_ts;
+		zbx_preproc_cache_t	*pcache = (0 == i ? cache : NULL);
 
 		zbx_preproc_history_pop_value(history_in, i, &history_value, &history_ts);
 
-		if (FAIL == (ret = zbx_item_preproc(value_type, value, ts, op, &history_value, &history_ts, error)))
+		if (FAIL == (ret = zbx_item_preproc(pcache, value_type, value_out, ts, op, &history_value, &history_ts,
+				error)))
 		{
 			results[i].action = op->error_handler;
-			ret = zbx_item_preproc_handle_error(value, op, error);
+			ret = zbx_item_preproc_handle_error(value_out, op, error);
 			zbx_variant_clear(&history_value);
 		}
 		else
@@ -241,7 +252,7 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 				/* result history is kept to report results of steps before failing step, */
 				/* which means it can be omitted for the last step.                       */
 				if (i != steps_num - 1)
-					zbx_variant_copy(&results[i].value, value);
+					zbx_variant_copy(&results[i].value, value_out);
 				else
 					zbx_variant_set_none(&results[i].value);
 			}
@@ -264,7 +275,7 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 			zbx_preproc_history_add_value(history_out, i, &history_value, &history_ts);
 		}
 
-		if (ZBX_VARIANT_NONE == value->type)
+		if (ZBX_VARIANT_NONE == value_out->type)
 			break;
 	}
 
@@ -274,8 +285,6 @@ static int	worker_item_preproc_execute(unsigned char value_type, zbx_variant_t *
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: worker_preprocess_value                                          *
  *                                                                            *
  * Purpose: handle item value preprocessing task                              *
  *                                                                            *
@@ -303,10 +312,10 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 			message->data);
 
 	zbx_variant_copy(&value_start, &value);
-	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
-	memset(results, 0, sizeof(zbx_preproc_result_t) * steps_num);
+	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
+	memset(results, 0, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
 
-	if (FAIL == (ret = worker_item_preproc_execute(value_type, &value, ts, steps, steps_num, &history_in,
+	if (FAIL == (ret = worker_item_preproc_execute(NULL, value_type, &value, &value, ts, steps, steps_num, &history_in,
 			&history_out, results, &results_num, &errmsg)) && 0 != results_num)
 	{
 		int action = results[results_num - 1].action;
@@ -333,7 +342,7 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_variant_clear(&value);
 	zbx_free(error);
 	zbx_free(ts);
-	zbx_free(steps);
+	zbx_preprocessor_free_steps(steps, steps_num);
 
 	if (FAIL == zbx_ipc_socket_write(socket, ZBX_IPC_PREPROCESSOR_RESULT, data, size))
 	{
@@ -357,8 +366,6 @@ static void	worker_preprocess_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: worker_test_value                                                *
  *                                                                            *
  * Purpose: handle item value test preprocessing task                         *
  *                                                                            *
@@ -387,8 +394,8 @@ static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *messa
 	zbx_variant_set_str(&value, value_str);
 	zbx_variant_copy(&value_start, &value);
 
-	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * steps_num);
-	memset(results, 0, sizeof(zbx_preproc_result_t) * steps_num);
+	results = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
+	memset(results, 0, sizeof(zbx_preproc_result_t) * (size_t)steps_num);
 
 	zbx_item_preproc_test(value_type, &value, &ts, steps, steps_num, &history_in, &history_out, results,
 			&results_num, &error);
@@ -403,7 +410,7 @@ static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *messa
 
 	zbx_variant_clear(&value);
 	zbx_free(error);
-	zbx_free(steps);
+	zbx_preprocessor_free_steps(steps, steps_num);
 	zbx_free(data);
 
 	zbx_variant_clear(&value_start);
@@ -422,12 +429,159 @@ static void	worker_test_value(zbx_ipc_socket_t *socket, zbx_ipc_message_t *messa
 	zbx_vector_ptr_destroy(&history_in);
 }
 
+static void	worker_dep_request_clear(zbx_preproc_dep_request_t *request)
+{
+	zbx_variant_clear(&request->value);
+	zbx_preprocessor_free_deps(request->deps, request->deps_alloc);
+	memset(request, 0, sizeof(zbx_preproc_dep_request_t));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: preprocess dependent items                                        *
+ *                                                                            *
+ * Parameters: socket  - [IN] IPC socket                                      *
+ *             request - [IN] the dependent item preprocessing request        *
+ *                                                                            *
+ ******************************************************************************/
+static void	worker_preprocess_dep_items(zbx_ipc_socket_t *socket, zbx_preproc_dep_request_t *request)
+{
+	int				i, results_alloc = 10;
+	zbx_preproc_result_t		*results;
+	zbx_preproc_cache_t		cache;
+	zbx_vector_ptr_t		history_out;
+	zbx_preproc_result_buffer_t	buf;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): items:%d/%d", __func__, request->deps_offset, request->deps_alloc);
+
+	if (request->deps_alloc != request->deps_offset)
+	{
+		if (FAIL == zbx_ipc_socket_write(socket, ZBX_IPC_PREPROCESSOR_DEP_NEXT, NULL, 0))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot send preprocessing result");
+			exit(EXIT_FAILURE);
+		}
+
+		goto out;
+	}
+
+	results = (zbx_preproc_result_t *)zbx_malloc(NULL, (size_t)results_alloc * sizeof(zbx_preproc_result_t));
+	zbx_vector_ptr_create(&history_out);
+
+	zbx_preprocessor_result_init(&buf, request->deps_alloc);
+	zbx_preproc_cache_init(&cache);
+
+	for (i = 0; i < request->deps_alloc; i++)
+	{
+		zbx_preproc_dep_t		*dep = request->deps + i;
+		char				*errmsg = NULL, *error = NULL;
+		int				j, step_results_num, ret;
+		zbx_variant_t			value;
+
+		zbx_variant_set_none(&value);
+
+		if (dep->steps_num > results_alloc)
+		{
+			results_alloc = dep->steps_num * 1.5;
+			results = (zbx_preproc_result_t *)zbx_realloc(results,
+					(size_t)results_alloc * sizeof(zbx_preproc_result_t));
+		}
+
+		if (0 != dep->steps_num)
+			memset(results, 0, (size_t)dep->steps_num * sizeof(zbx_preproc_result_t));
+
+		if (FAIL == (ret = worker_item_preproc_execute(&cache, dep->value_type, &request->value, &value,
+				&request->ts, dep->steps, dep->steps_num, &dep->history, &history_out, results,
+				&step_results_num, &errmsg)) && 0 != step_results_num)
+		{
+			int action = results[step_results_num - 1].action;
+
+			if (ZBX_PREPROC_FAIL_SET_ERROR != action && ZBX_PREPROC_FAIL_FORCE_ERROR != action)
+			{
+				worker_format_error(&request->value, results, step_results_num, errmsg, &error);
+				zbx_free(errmsg);
+			}
+			else
+				error = errmsg;
+		}
+
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+		{
+			const char	*result_msg;
+
+			result_msg = (SUCCEED == ret ? zbx_variant_value_desc(&value) : error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): %s", __func__, zbx_variant_value_desc(&request->value));
+			zabbix_log(LOG_LEVEL_DEBUG, "%s: %s %s",__func__, zbx_result_string(ret), result_msg);
+		}
+
+		zbx_preprocessor_result_append(&buf, dep->itemid, dep->flags, dep->value_type, &value, error,
+				&history_out, socket);
+
+		zbx_variant_clear(&value);
+
+		for (j = 0; j < step_results_num; j++)
+			zbx_variant_clear(&results[j].value);
+
+		zbx_vector_ptr_clear_ext(&history_out, (zbx_clean_func_t)zbx_preproc_op_history_free);
+		zbx_free(error);
+	}
+
+	zbx_preprocessor_result_flush(&buf, socket);
+	zbx_preprocessor_result_clear(&buf);
+
+	zbx_preproc_cache_clear(&cache);
+
+	zbx_free(results);
+
+	worker_dep_request_clear(request);
+	zbx_vector_ptr_destroy(&history_out);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: handle item value preprocessing request                           *
+ *                                                                            *
+ * Parameters: socket  - [IN] IPC socket                                      *
+ *             message - [IN] packed preprocessing request                    *
+ *             request - [IN/OUT] the unpacked preprocessing request          *
+ *                                                                            *
+ ******************************************************************************/
+static void	worker_process_dep_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message,
+		zbx_preproc_dep_request_t *request)
+{
+	zbx_preprocessor_unpack_dep_task(&request->ts, &request->value, &request->deps_alloc, &request->deps,
+			&request->deps_offset, message->data);
+
+	worker_preprocess_dep_items(socket, request);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: handle following item value preprocessing request                 *
+ *                                                                            *
+ * Parameters: socket  - [IN] IPC socket                                      *
+ *             message - [IN] packed preprocessing request                    *
+ *             request - [IN/OUT] the unpacked preprocessing request          *
+ *                                                                            *
+ ******************************************************************************/
+static void	worker_process_dep_request_cont(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message,
+		zbx_preproc_dep_request_t *request)
+{
+	zbx_preprocessor_unpack_dep_task_cont(request->deps + request->deps_offset, &request->deps_offset,
+			message->data);
+
+	worker_preprocess_dep_items(socket, request);
+}
+
 ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 {
-	pid_t			ppid;
-	char			*error = NULL;
-	zbx_ipc_socket_t	socket;
-	zbx_ipc_message_t	message;
+	pid_t				ppid;
+	char				*error = NULL;
+	zbx_ipc_socket_t		socket;
+	zbx_ipc_message_t		message;
+	zbx_preproc_dep_request_t	dep_request;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -454,6 +608,9 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
+	memset(&dep_request, 0, sizeof(dep_request));
+	zbx_variant_set_none(&dep_request.value);
+
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
 	while (ZBX_IS_RUNNING())
@@ -476,6 +633,13 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 				break;
 			case ZBX_IPC_PREPROCESSOR_TEST_REQUEST:
 				worker_test_value(&socket, &message);
+				break;
+			case ZBX_IPC_PREPROCESSOR_DEP_REQUEST:
+				worker_dep_request_clear(&dep_request);
+				worker_process_dep_request(&socket, &message, &dep_request);
+				break;
+			case ZBX_IPC_PREPROCESSOR_DEP_REQUEST_CONT:
+				worker_process_dep_request_cont(&socket, &message, &dep_request);
 				break;
 		}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -500,7 +500,8 @@ class CElement extends CBaseElement implements IWaitable {
 	* @inheritdoc
 	*/
 	public function isEnabled($enabled = true) {
-		$classes = explode(' ', parent::getAttribute('class'));
+		$attribute = parent::getAttribute('class');
+		$classes = ($attribute !== null) ? explode(' ', $attribute) : [];
 
 		$is_enabled = parent::isEnabled()
 				&& (parent::getAttribute('disabled') === null)
@@ -605,11 +606,11 @@ class CElement extends CBaseElement implements IWaitable {
 		}
 
 		if ($tag === 'select') {
-			return $this->asDropdown($options);
+			return $this->asList($options);
 		}
 
 		if ($tag === 'z-select') {
-			return $this->asZDropdown($options);
+			return $this->asDropdown($options);
 		}
 
 		if ($tag === 'table') {
@@ -643,7 +644,7 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asCompositeInput($options);
 		}
 
-		if (in_array('input-color-picker', $class)) {
+		if (in_array('color-picker', $class)) {
 			return $this->asColorPicker($options);
 		}
 
@@ -651,11 +652,11 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asMultiline($options);
 		}
 
-		if (in_array('input-group', $class)) {
+		if (in_array('macro-input-group', $class)) {
 			return $this->asInputGroup($options);
 		}
 
-		CTest::addWarning('No specific element was detected');
+		CTest::zbxAddWarning('No specific element was detected');
 
 		return $this;
 	}
@@ -731,5 +732,12 @@ class CElement extends CBaseElement implements IWaitable {
 		CElementQuery::getDriver()->executeScript('arguments[0].blur();', [$this]);
 
 		return $this;
+	}
+
+	/**
+	 * Scroll the element to the top position.
+	 */
+	public function scrollToTop() {
+		CElementQuery::getDriver()->executeScript('arguments[0].scrollTo(0, 0)', [$this]);
 	}
 }

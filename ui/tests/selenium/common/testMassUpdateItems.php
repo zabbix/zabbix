@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2019 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -654,7 +654,8 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055']
 					],
-					'details' => 'No SNMP OID specified.'
+					'details' => 'No SNMP OID specified.',
+					'interface_text_part' => 'SNMPv3, Context name: zabbix'
 				]
 			],
 			[
@@ -871,7 +872,9 @@ class testMassUpdateItems extends CWebTest{
 						'User name' => ['id' => 'username', 'value' => 'test_username'],
 						'Password' => ['id' => 'password', 'value' => 'test_password'],
 						'Log time format' => ['id' => 'logtimefmt', 'value' => 'PPPPPP:YYYYMMDD:HHMMSS.mmm']
-					]
+					],
+					'interface_text_part' => 'SNMPv2, Community: {$SNMP_COMMUNITY}'
+
 				]
 			],
 			[
@@ -1045,7 +1048,8 @@ class testMassUpdateItems extends CWebTest{
 							'radio' => ['id' => 'trends_mode', 'value' => 'Storage period'],
 							'input' => ['id' => 'trends', 'value' => '99d']
 						]
-					]
+					],
+					'interface_text_part' => 'SNMPv3, Context name: zabbix'
 				]
 			],
 			[
@@ -1058,7 +1062,8 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'SNMP agent'],
 						'Type of information' => ['id' => 'value_type', 'value' => 'Character'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.5:10055']
-					]
+					],
+					'interface_text_part' => 'SNMPv3, Context name: zabbix'
 				]
 			],
 			[
@@ -1198,10 +1203,19 @@ class testMassUpdateItems extends CWebTest{
 			// Set field value.
 			switch ($field) {
 				case 'Type':
-				case 'Host interface':
 				case 'Type of information':
 				case 'Authentication method':
-					$form->query('id', $value['id'])->asZDropdown()->one()->select($value['value']);
+					$form->query('id', $value['id'])->asDropdown()->one()->select($value['value']);
+					break;
+
+				case 'Host interface':
+					/**
+					 * The value of an SNMP interface option element contains not only the IP and port, but also the
+					 * interface type and context name or community. In this case the address and details must be merged.
+					 */
+					$interface = $value['value'].CTestArrayHelper::get($data, 'interface_text_part', '');
+
+					$form->query('id', $value['id'])->asDropdown()->one()->select($interface);
 					break;
 
 				case 'Units':
@@ -1647,7 +1661,8 @@ class testMassUpdateItems extends CWebTest{
 						['type' => 'Simple change'],
 						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name']
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
+								'parameter_3' => 'label_name']
 					]
 				]
 			]
@@ -1718,7 +1733,7 @@ class testMassUpdateItems extends CWebTest{
 							]
 						]
 					],
-					'details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'details' => 'Invalid parameter "/1/tags/2/tag": cannot be empty.'
 				]
 			],
 			// TODO: Uncomment this case when ZBX-19263 is fixed.

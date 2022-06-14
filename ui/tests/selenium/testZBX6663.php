@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,10 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
+/**
+ * @backup profiles
+ */
 class testZBX6663 extends CLegacyWebTest {
-
 
 	/**
 	 * The name of the discovery rule created in the test data set.
@@ -67,7 +69,7 @@ class testZBX6663 extends CLegacyWebTest {
 			[
 				[
 					'host' => 'Host ZBX6663',
-					'link' => 'Discovery rules',
+					'link' => 'Discovery',
 					'checkbox' => 'items'
 				]
 			],
@@ -95,7 +97,7 @@ class testZBX6663 extends CLegacyWebTest {
 			[
 				[
 					'host' => 'Host ZBX6663',
-					'link' => 'Web scenarios',
+					'link' => 'Web',
 					'checkbox' => 'httptests'
 				]
 			],
@@ -167,27 +169,43 @@ class testZBX6663 extends CLegacyWebTest {
 		$checkbox = $zbx_data['checkbox'];
 
 		if (isset($zbx_data['host'])) {
-			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->query('button:Reset')->one()->click();
-			$this->zbxTestClickLinkText($zbx_data['host']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$form->fill(['Name' => $zbx_data['host']]);
+			$this->query('button:Apply')->one()->waitUntilClickable()->click();
+
+			if (isset($zbx_data['discoveryRule'])) {
+				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $zbx_data['host'])
+						->getColumn('Discovery')->query('link:Discovery')->one()->click();
+				$this->zbxTestCheckHeader('Discovery rules');
+				$this->zbxTestClickLinkTextWait($this->discoveryRule);
+				$this->zbxTestClickLinkTextWait($zbx_data['discoveryRule']);
+			}
+			else {
+				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $zbx_data['host'])
+					->getColumn($zbx_data['link'])->query('link', $zbx_data['link'])->one()->click();
+			}
 		}
 
 		if (isset($zbx_data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
-			$this->zbxTestOpen('templates.php?page=2');
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$form->fill(['Name' => $zbx_data['template']]);
+			$this->query('button:Apply')->one()->waitUntilClickable()->click();
 			$this->zbxTestClickLinkText($zbx_data['template']);
-		}
 
-		if (isset($zbx_data['discoveryRule'])) {
-			$this->zbxTestClickLinkTextWait('Discovery rules');
-			$this->zbxTestCheckHeader('Discovery rules');
-			$this->zbxTestClickLinkTextWait($this->discoveryRule);
-			$this->zbxTestClickLinkTextWait($zbx_data['discoveryRule']);
-		}
-		else {
-			$link = $zbx_data['link'];
-			$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="'.$link.'"]');
+			if (isset($zbx_data['discoveryRule'])) {
+				$this->zbxTestClickLinkTextWait('Discovery rules');
+				$this->zbxTestCheckHeader('Discovery rules');
+				$this->zbxTestClickLinkTextWait($this->discoveryRule);
+				$this->zbxTestClickLinkTextWait($zbx_data['discoveryRule']);
+			}
+			else {
+				$link = $zbx_data['link'];
+				$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="'.$link.'"]');
+			}
 		}
 
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('selected_count'));

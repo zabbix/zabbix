@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-require_once dirname(__FILE__).'/js/common.template.edit.js.php';
+require_once __DIR__.'/js/common.template.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Templates'));
 
@@ -31,62 +31,121 @@ if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
 	$widget->setNavigation(getHostNavigation('', $data['templateid']));
 }
 
-$divTabs = new CTabView();
+$tabs = new CTabView();
 
 if (!hasRequest('form_refresh')) {
-	$divTabs->setSelected(0);
+	$tabs->setSelected(0);
 }
 
-$host = getRequest('template_name', '');
-$visiblename = getRequest('visiblename', '');
-$newgroup = getRequest('newgroup', '');
-$templateids = getRequest('templates', []);
-$clear_templates = getRequest('clear_templates', []);
-
-$frm_title = _('Template');
-
-if ($data['templateid'] != 0) {
-	$frm_title .= SPACE.' ['.$data['dbTemplate']['name'].']';
-}
-$frmHost = (new CForm())
+$form = (new CForm())
 	->setId('templates-form')
 	->setName('templatesForm')
 	->setAttribute('aria-labeledby', ZBX_STYLE_PAGE_TITLE)
 	->addVar('form', $data['form']);
 
 if ($data['templateid'] != 0) {
-	$frmHost->addVar('templateid', $data['templateid']);
+	$form->addVar('templateid', $data['templateid']);
 }
 
-if ($data['templateid'] != 0 && !hasRequest('form_refresh')) {
-	$host = $data['dbTemplate']['host'];
-	$visiblename = $data['dbTemplate']['name'];
+$form->addVar('clear_templates', $data['clear_templates']);
 
-	// Display empty visible name if equal to host name.
-	if ($visiblename === $host) {
-		$visiblename = '';
-	}
-
-	$templateids = $data['original_templates'];
-}
-
-$clear_templates = array_intersect($clear_templates, array_keys($data['original_templates']));
-$clear_templates = array_diff($clear_templates, array_keys($templateids));
-
-natcasesort($templateids);
-
-$frmHost->addVar('clear_templates', $clear_templates);
-
-$templateList = (new CFormList('hostlist'))
+$template_tab = (new CFormList('hostlist'))
 	->addRow(
 		(new CLabel(_('Template name'), 'template_name'))->setAsteriskMark(),
-		(new CTextBox('template_name', $host, false, 128))
+		(new CTextBox('template_name', $data['template_name'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->addRow(
+		_('Visible name'),
+		(new CTextBox('visiblename', $data['visible_name'], false, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
+
+$templates_field_items = [];
+
+if ($data['linked_templates']) {
+	$linked_templates= (new CTable())
+		->setHeader([_('Name'), _('Action')])
+		->setId('linked-templates')
+		->addClass(ZBX_STYLE_TABLE_FORMS)
+		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+
+	foreach ($data['linked_templates'] as $template) {
+		$linked_templates->addItem(
+			(new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId()
+		);
+
+		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
+			$template_link = (new CLink(
+					$template['name'],
+					'templates.php?form=update&templateid='.$template['templateid']
+				))
+					->setTarget('_blank');
+		}
+		else {
+			$template_link = new CSpan($template['name']);
+		}
+
+		$template_link->addClass(ZBX_STYLE_WORDWRAP);
+
+		$clone_mode = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
+
+		$unlink_parameters = array_map('json_encode', [
+			$form->getName(),
+			'unlink['.$template['templateid'].']',
+			'1'
+		]);
+
+		$unlink_clear_parameters = array_map('json_encode', [
+			$form->getName(),
+			'unlink_and_clear['.$template['templateid'].']',
+			'1'
+		]);
+
+		$linked_templates->addRow([
+			$template_link,
+			(new CCol(
+				new CHorList([
+					(new CSimpleButton(_('Unlink')))
+						->onClick('submitFormWithParam('.implode(', ', $unlink_parameters).');')
+						->addClass(ZBX_STYLE_BTN_LINK),
+					(array_key_exists($template['templateid'], $data['original_templates']) && !$clone_mode)
+						? (new CSimpleButton(_('Unlink and clear')))
+							->onClick('submitFormWithParam('.implode(', ', $unlink_clear_parameters).');')
+							->addClass(ZBX_STYLE_BTN_LINK)
+						: null
+				])
+			))->addClass(ZBX_STYLE_NOWRAP)
+		], null, 'conditions_'.$template['templateid']);
+	}
+
+	$templates_field_items[] = $linked_templates;
+}
+
+$templates_field_items[] = (new CMultiSelect([
+	'name' => 'add_templates[]',
+	'object_name' => 'templates',
+	'data' => $data['add_templates'],
+	'popup' => [
+		'parameters' => [
+			'srctbl' => 'templates',
+			'srcfld1' => 'hostid',
+			'srcfld2' => 'host',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'add_templates_',
+			'excludeids' => ($data['templateid'] == 0) ? [] : [$data['templateid']],
+			'disableids' => array_column($data['linked_templates'], 'templateid')
+		]
+	]
+]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+$template_tab
+	->addRow(
+		new CLabel(_('Templates')),
+		(count($templates_field_items) > 1)
+			? (new CDiv($templates_field_items))->addClass('linked-templates')
+			: $templates_field_items
 	)
 	->addRow((new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
 		(new CMultiSelect([
@@ -98,9 +157,10 @@ $templateList = (new CFormList('hostlist'))
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => $frmHost->getName(),
+					'dstfrm' => $form->getName(),
 					'dstfld1' => 'groups_',
-					'editable' => true
+					'editable' => true,
+					'disableids' => array_column($data['groups_ms'], 'id')
 				]
 			]
 		]))
@@ -113,98 +173,20 @@ $templateList = (new CFormList('hostlist'))
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	);
 
-$cloneOrFullClone = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
-
-$divTabs->addTab('templateTab', _('Template'), $templateList);
-
-// templates
-$tmplList = new CFormList();
-
-$disableids = [];
-
-$linkedTemplateTable = (new CTable())
-	->setId('linked-template')
-	->setHeader([_('Name'), _('Action')])
-	->addStyle('width: 100%;');
-
-foreach ($data['linked_templates'] as $template) {
-	$tmplList->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId());
-
-	if (array_key_exists($template['templateid'], $data['writable_templates'])) {
-		$template_link = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
-			->setTarget('_blank');
-	}
-	else {
-		$template_link = new CSpan($template['name']);
-	}
-
-	$linkedTemplateTable->addRow([
-		$template_link,
-		(new CCol(
-			new CHorList([
-				(new CSimpleButton(_('Unlink')))
-					->onClick('javascript: submitFormWithParam('.
-						'"'.$frmHost->getName().'", "unlink['.$template['templateid'].']", "1"'.
-					');')
-					->addClass(ZBX_STYLE_BTN_LINK),
-				(array_key_exists($template['templateid'], $data['original_templates']) && !$cloneOrFullClone)
-					? (new CSimpleButton(_('Unlink and clear')))
-						->onClick('javascript: submitFormWithParam('.
-							'"'.$frmHost->getName().'", "unlink_and_clear['.$template['templateid'].']", "1"'.
-						');')
-						->addClass(ZBX_STYLE_BTN_LINK)
-					: null
-			])
-		))->addClass(ZBX_STYLE_NOWRAP)
-	], null, 'conditions_'.$template['templateid']);
-
-	$disableids[] = $template['templateid'];
-}
-
-$add_templates_ms = (new CMultiSelect([
-	'name' => 'add_templates[]',
-	'object_name' => 'templates',
-	'data' => $data['add_templates'],
-	'popup' => [
-		'parameters' => [
-			'srctbl' => 'templates',
-			'srcfld1' => 'hostid',
-			'srcfld2' => 'host',
-			'dstfrm' => $frmHost->getName(),
-			'dstfld1' => 'add_templates_',
-			'excludeids' => ($data['templateid'] == 0) ? [] : [$data['templateid']],
-			'disableids' => $disableids
-		]
-	]
-]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-
-$tmplList
-	->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	)
-	->addRow((new CLabel(_('Link new templates'), 'add_templates__ms')),
-		(new CDiv(
-			(new CTable())->addRow([$add_templates_ms])
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	);
-
-$divTabs->addTab('tmplTab', _('Linked templates'), $tmplList, TAB_INDICATOR_LINKED_TEMPLATE);
+$tabs->addTab('tmplTab', _('Templates'), $template_tab, false);
 
 // tags
-$divTabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+$tabs->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 		'source' => 'template',
 		'tags' => $data['tags'],
-		'readonly' => $data['readonly']
+		'readonly' => $data['readonly'],
+		'tabs_id' => 'tabs'
 	]), TAB_INDICATOR_TAGS
 );
 
 // macros
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
-$divTabs->addTab('macroTab', _('Macros'),
+$tabs->addTab('macroTab', _('Macros'),
 	(new CFormList('macrosFormList'))
 		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
 			->addValue(_('Template macros'), 0)
@@ -219,7 +201,7 @@ $divTabs->addTab('macroTab', _('Macros'),
 );
 
 // Value mapping.
-$divTabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-formlist'))->addRow(null,
+$tabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-formlist'))->addRow(null,
 	new CPartial('configuration.valuemap', [
 		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
@@ -231,7 +213,7 @@ $divTabs->addTab('valuemap-tab', _('Value mapping'), (new CFormList('valuemap-fo
 
 // footer
 if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
-	$divTabs->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new CSubmit('clone', _('Clone')),
@@ -248,14 +230,13 @@ if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 	));
 }
 else {
-	$divTabs->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel()]
 	));
 }
 
-$frmHost->addItem($divTabs);
-
-$widget->addItem($frmHost);
+$form->addItem($tabs);
+$widget->addItem($form);
 
 $widget->show();

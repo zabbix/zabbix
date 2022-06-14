@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ import (
 	"strconv"
 	"strings"
 
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/std"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/std"
 )
 
 const (
@@ -127,7 +127,7 @@ func (p *Plugin) getDevDiscovery() (netInterfaces []msgIfDiscovery, err error) {
 	for sLines := bufio.NewScanner(f); sLines.Scan(); {
 		dev := strings.Split(sLines.Text(), ":")
 		if len(dev) > 1 {
-			netInterfaces = append(netInterfaces, msgIfDiscovery{strings.TrimSpace(dev[0])})
+			netInterfaces = append(netInterfaces, msgIfDiscovery{strings.TrimSpace(dev[0]), nil})
 		}
 	}
 

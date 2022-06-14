@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,9 +46,11 @@ class CControllerPopupMassupdateService extends CController {
 		return $ret;
 	}
 
+	/**
+	 * @throws APIException
+	 */
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-				|| !$this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SERVICES)) {
+		if (!$this->checkAccess(CRoleHelper::UI_SERVICES_SERVICES)) {
 			return false;
 		}
 
@@ -60,7 +62,6 @@ class CControllerPopupMassupdateService extends CController {
 
 	protected function doAction(): void {
 		if ($this->hasInput('update')) {
-			$output = [];
 			$serviceids = $this->getInput('ids', []);
 			$visible = $this->getInput('visible', []);
 			$tags = array_filter($this->getInput('tags', []),

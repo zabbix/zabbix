@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,8 +87,7 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 }
 
 $form_grid = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_3_1)
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED);
+	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_3_1);
 
 if ($data['is_item_testable']) {
 	$form_grid->addItem([

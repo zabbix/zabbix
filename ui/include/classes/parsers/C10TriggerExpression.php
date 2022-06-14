@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -226,7 +226,11 @@ class C10TriggerExpression {
 		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->lld_macro_function_parser = new CLLDMacroFunctionParser;
 		$this->user_macro_parser = new CUserMacroParser();
-		$this->number_parser = new CNumberParser(['with_minus' => false, 'with_suffix' => true]);
+		$this->number_parser = new CNumberParser([
+			'with_minus' => false,
+			'with_size_suffix' => true,
+			'with_time_suffix' => true
+		]);
 	}
 
 	/**
@@ -871,7 +875,7 @@ class C10TriggerExpression {
 	 */
 	public static function quoteString(string $value, bool $allow_macros = true, bool $force = false): string {
 		if (!$force) {
-			$number_parser = new CNumberParser(['with_suffix' => true]);
+			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 			if ($number_parser->parse($value) == CParser::PARSE_SUCCESS) {
 				return $value;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
-#include "zbxtypes.h"
+#include "zbxalgo.h"
 
 #ifdef _WINDOWS
 #	define ZBX_TCP_WRITE(s, b, bl)		((ssize_t)send((s), (b), (int)(bl), 0))
@@ -110,9 +110,11 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
+void	zbx_socket_timeout_set(zbx_socket_t *s, int timeout);
 
 #define ZBX_TCP_PROTOCOL		0x01
 #define ZBX_TCP_COMPRESS		0x02
+#define ZBX_TCP_LARGE			0x04
 
 #define ZBX_TCP_SEC_UNENCRYPTED		1		/* do not use encryption with this socket */
 #define ZBX_TCP_SEC_TLS_PSK		2		/* use TLS with pre-shared key (PSK) with this socket */
@@ -123,12 +125,13 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 
 const char	*zbx_tcp_connection_type_name(unsigned int type);
 
-#define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, 0)
-#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, timeout)
-#define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, ZBX_TCP_PROTOCOL, timeout)
-#define zbx_tcp_send_raw(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, 0)
+#define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, 0)
+#define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), 0, ZBX_TCP_PROTOCOL, timeout)
+#define zbx_tcp_send_bytes_to(s, d, len, timeout)	zbx_tcp_send_ext((s), (d), len, 0, ZBX_TCP_PROTOCOL, timeout)
+#define zbx_tcp_send_raw(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), 0, 0, 0)
 
-int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout);
+int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reserved, unsigned char flags,
+		int timeout);
 
 void	zbx_tcp_close(zbx_socket_t *s);
 
@@ -137,17 +140,19 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 #endif
 
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port);
+void	zbx_tcp_unlisten(zbx_socket_t *s);
 
 int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept);
 void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01
 
-#define	zbx_tcp_recv(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0))
-#define	zbx_tcp_recv_to(s, timeout)	SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout))
-#define	zbx_tcp_recv_raw(s)		SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
+#define	zbx_tcp_recv(s)				SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, 0))
+#define	zbx_tcp_recv_large(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, 0, ZBX_TCP_LARGE))
+#define	zbx_tcp_recv_to(s, timeout)		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout, 0))
+#define	zbx_tcp_recv_raw(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
 
-ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout);
+ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
@@ -193,6 +198,12 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 		zbx_send_response_ext(sock, result, info, ZABBIX_VERSION, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, timeout)
 
 int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
+int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
+		int connect_timeout, unsigned int tls_connect, int retry_interval, int level);
+void	disconnect_server(zbx_socket_t *sock);
+
+int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
+int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
 
 #ifdef HAVE_IPV6
 #	define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)		\

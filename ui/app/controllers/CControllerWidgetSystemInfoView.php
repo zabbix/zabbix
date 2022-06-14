@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/blocks.inc.php';
+require_once __DIR__.'/../../include/blocks.inc.php';
 
 class CControllerWidgetSystemInfoView extends CControllerWidget {
 
@@ -34,8 +34,13 @@ class CControllerWidgetSystemInfoView extends CControllerWidget {
 	}
 
 	protected function doAction() {
+		$fields = $this->getForm()->getFieldsData();
+
 		$this->setResponse(new CControllerResponseData([
 			'name' => $this->getInput('name', $this->getDefaultName()),
+			'system_info' => CSystemInfoHelper::getData(),
+			'info_type' => $fields['info_type'],
+			'user_type' => CWebUser::getType(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

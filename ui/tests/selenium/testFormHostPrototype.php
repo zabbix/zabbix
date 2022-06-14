@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -29,6 +30,15 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormHostPrototype extends CLegacyWebTest {
 
 	use MacrosTrait;
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	/**
 	 * Discovery rule id used in test.
@@ -253,8 +263,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestInputType('name', $data['visible_name']);
 		}
 
-		$this->zbxTestTabSwitch('Groups');
-
 		if (array_key_exists('hostgroup', $data)) {
 			$this->zbxTestClickButtonMultiselect('group_links_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
@@ -380,8 +388,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestInputClearAndTypeByXpath('//input[@id="name"]', $data['visible_name']);
 		}
 
-		$this->zbxTestTabSwitch('Groups');
-
 		if (array_key_exists('clear_groups', $data)) {
 			$this->zbxTestMultiselectClear('group_links_');
 		}
@@ -483,7 +489,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 			$this->zbxTestCheckboxSelect('status', $data['checkbox']);
 		}
 
-		$this->zbxTestTabSwitch('Groups');
 		$this->zbxTestClickButtonMultiselect('group_links_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkTextWait($data['hostgroup']);
@@ -493,7 +498,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find()->one()->setDataContext('Templates');
@@ -604,7 +608,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change Host group and Group prototype.
 		if (array_key_exists('hostgroup', $data)) {
-			$this->zbxTestTabSwitch('Groups');
 			$this->zbxTestMultiselectClear('group_links_');
 			$this->zbxTestClickButtonMultiselect('group_links_');
 			$this->zbxTestLaunchOverlayDialog('Host groups');
@@ -614,7 +617,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestTabSwitch('Templates');
 			$this->zbxTestClickXpathWait('//button[contains(@onclick,"unlink")]');
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
@@ -656,7 +658,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * Check IPMI tab before and after changes on parent host.
 	 */
 	public function testFormHostPrototype_CheckIPMIFromHost() {
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+		$this->page->login()->open('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
 				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
 		$this->zbxTestWaitForPageToLoad();
 
@@ -676,8 +678,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		// Go to host and change IPMI settings.
-		$this->zbxTestOpen('hosts.php?form=update&hostid='.self::HOST_ID);
-		$this->zbxTestTabSwitch('IPMI');
+		$this->page->open('zabbix.php?action=host.edit&hostid='.self::HOST_ID);
+		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$form->selectTab('IPMI');
 
 		$new_values = [
 			['field' => 'authtype', 'value' => 'MD2'],
@@ -694,12 +697,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 				$this->zbxTestInputType('ipmi_'.$new_value['field'], $new_value['value']);
 			}
 		}
-		$this->zbxTestClick('update');
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Go back to prototype and check changes.
-		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+		$this->page->open('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
 				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
-		$this->zbxTestTabSwitch('IPMI');
+		$prototype_form = $this->query('id:host-prototype-form')->asForm()->one()->waitUntilVisible();
+		$prototype_form->selectTab('IPMI');
 
 		foreach ($new_values as $new_value) {
 			$this->zbxTestAssertElementValue('ipmi_'.$new_value['field'], $new_value['value']);
@@ -763,13 +768,14 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		// Go to host and change Encryption settings.
-		$this->zbxTestOpen('hosts.php?form=update&hostid='.self::HOST_ID.'&context=host');
-		$this->zbxTestTabSwitch('Encryption');
-		$this->zbxTestWaitForPageToLoad();
+		$this->page->open('zabbix.php?action=host.edit&hostid='.self::HOST_ID);
+		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$form->selectTab('Encryption');
+		$form->fill(['Connections to host' => $data['connection_to_host']]);
 
-		$this->zbxTestClickXpathWait('//ul[@id="tls_connect"]//label[text()="'.$data['connection_to_host'].'"]');
 		foreach ($data['connection_from_host'] as $label => $state) {
-			$id = $this->zbxTestGetAttributeValue('//ul[@class="list-check-radio"]//label[text()="'.$label.'"]/../input', 'id');
+			$id = $this->zbxTestGetAttributeValue('//div[@class="form-field"]//label[text()="'.$label.
+					'"]/..//input[@class="checkbox-radio"]', 'id');
 			$this->zbxTestCheckboxSelect($id, $state);
 		}
 
@@ -783,7 +789,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('subject', $data)) {
 			$this->zbxTestInputTypeOverwrite('tls_subject', $data['subject']);
 		}
-		$this->zbxTestClick('update');
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Go back to prototype and check changes.
 		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
@@ -838,7 +845,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Clone_6 of Host prototype {#1}',
-					'template' => 'Mac OS X'
+					'template' => 'Alcatel Timetra TiMOS SNMP'
 				]
 			],
 			[
@@ -871,7 +878,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		if (array_key_exists('checkbox', $data)) {
 			$this->zbxTestCheckboxSelect('status', $data['checkbox']);
 		}
-		$this->zbxTestTabSwitch('Groups');
 		// Change host group.
 		if (array_key_exists('hostgroup', $data)) {
 			$this->zbxTestClickXpathWait('//span[@class="subfilter-disable-btn"]');
@@ -887,8 +893,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		// Change template.
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestTabSwitch('Templates');
-			$this->zbxTestWaitForPageToLoad();
 			$this->zbxTestClickButtonMultiselect('add_templates_');
 			$this->zbxTestLaunchOverlayDialog('Templates');
 			COverlayDialogElement::find()->one()->setDataContext('Templates');
@@ -936,7 +940,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('hostgroup', $data)) {
-			$this->zbxTestTabSwitch('Groups');
 			$this->zbxTestMultiselectAssertSelected('group_links_', $data['hostgroup']);
 			if (array_key_exists('group_prototype', $data)) {
 				$this->assertEquals($data['group_prototype'], $this->zbxTestGetValue('//input[@name="group_prototypes[0][name]"]'));
@@ -944,8 +947,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('template', $data)) {
-			$this->zbxTestTabSwitch('Templates');
-			$this->zbxTestAssertElementText('//div[@id="templateTab"]//a', $data['template']);
+			$this->query('link', $data['template']);
 		}
 
 		if (array_key_exists('macros', $data)) {
@@ -981,15 +983,19 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM hosts ORDER BY hostid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkTextWait($host);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$form->fill(['Name' => $host]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
+				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+
 		$this->zbxTestClickLinkTextWait($discovery_rule);
 		$this->zbxTestClickLinkTextWait('Host prototypes');
 		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 
 		$this->zbxTestInputType('host', $name);
-		$this->zbxTestTabSwitch('Groups');
 		$this->zbxTestClickButtonMultiselect('group_links_');
 		$this->zbxTestLaunchOverlayDialog('Host groups');
 		$this->zbxTestClickLinkText($group);

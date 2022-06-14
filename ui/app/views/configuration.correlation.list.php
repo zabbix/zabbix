@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,14 +93,14 @@ if ($data['correlations']) {
 				$condition['operator'] = CONDITION_OPERATOR_EQUAL;
 			}
 
-			$conditions[] = getCorrConditionDescription($condition, $data['group_names']);
+			$conditions[] = CCorrelationHelper::getConditionDescription($condition, $data['group_names']);
 			$conditions[] = BR();
 		}
 
 		CArrayHelper::sort($correlation['operations'], ['type']);
 
 		foreach ($correlation['operations'] as $operation) {
-			$operations[] = getCorrOperationDescription($operation);
+			$operations[] = CCorrelationHelper::getOperationTypes()[$operation['type']];
 			$operations[] = BR();
 		}
 

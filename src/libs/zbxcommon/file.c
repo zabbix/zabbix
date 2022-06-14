@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,8 +79,6 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_read                                                         *
  *                                                                            *
  * Purpose: Read one text line from a file descriptor into buffer             *
  *                                                                            *
@@ -186,6 +184,37 @@ char	*zbx_fgets(char *buffer, int size, FILE *fp)
 
 	return s;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: call write in a loop, iterating until all the data is written.    *
+ *                                                                            *
+ * Parameters: fd      - [IN] descriptor                                      *
+ *             buf     - [IN] buffer to write                                 *
+ *             n       - [IN] bytes count to write                            *
+ *                                                                            *
+ * Return value: SUCCEED - n bytes successfully written                       *
+ *               FAIL    - less than n bytes are written                      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_write_all(int fd, const char *buf, size_t n)
+{
+	while (0 < n)
+	{
+		ssize_t	ret;
+
+		if (-1 != (ret = write(fd, buf, n)))
+		{
+			buf += ret;
+			n -= (size_t)ret;
+		}
+		else if (EINTR != errno)
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #else	/* _WINDOWS */
 static	int	get_file_time_stat(const char *path, zbx_file_time_t *time)
 {

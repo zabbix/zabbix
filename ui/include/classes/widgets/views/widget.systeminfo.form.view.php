@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,12 @@ $rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
 
 $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
 	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
+);
+
+// Toggle systems stats or HAC node list.
+$form_list->addRow(
+	CWidgetHelper::getLabel($fields['info_type']),
+	CWidgetHelper::getRadioButtonList($fields['info_type'])
 );
 
 $form->addItem($form_list);

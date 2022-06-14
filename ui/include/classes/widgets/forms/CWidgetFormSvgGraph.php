@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,7 +76,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_graph_time->getName()] = $field_graph_time;
 
 		// Date from.
-		$field_time_from = (new CWidgetFieldDatePicker('time_from', _('From')))->setDefault('now-1h');
+		$field_time_from = (new CWidgetFieldDatePicker('time_from', _('From'), false))
+			->setDefault('now-1h')
+			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 
 		if ($field_graph_time->getValue() != SVG_GRAPH_CUSTOM_TIME) {
 			$field_time_from->setFlags(CWidgetField::FLAG_DISABLED);
@@ -88,7 +90,9 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$this->fields[$field_time_from->getName()] = $field_time_from;
 
 		// Time to.
-		$field_time_to = (new CWidgetFieldDatePicker('time_to', _('To')))->setDefault('now');
+		$field_time_to = (new CWidgetFieldDatePicker('time_to', _('To'), false))
+			->setDefault('now')
+			->setFlags(CWidgetField::FLAG_NOT_EMPTY);
 
 		if ($field_graph_time->getValue() != SVG_GRAPH_CUSTOM_TIME) {
 			$field_time_to->setFlags(CWidgetField::FLAG_DISABLED);
@@ -442,7 +446,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		}
 		elseif ($period > $max_period) {
 			$errors[] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) ($max_period / SEC_PER_DAY)
+				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 			);
 		}
 
@@ -467,7 +471,7 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 			));
 		}
 
-		$number_parser = new CNumberParser(['with_suffix' => true]);
+		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 		// Validate Min/Max values in Axes tab.
 		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_SHOW) {

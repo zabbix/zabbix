@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ class testFormPreprocessingClone extends CWebTest {
 			],
 			[
 				'type' => '22',
-				'params' => "cpu_usage_system\nlabel_name",
+				'params' => "cpu_usage_system\nlabel\nlabel_name",
 				'error_handler' => 3,
 				'error_handler_params' => 'error2'
 			]
@@ -262,12 +262,15 @@ class testFormPreprocessingClone extends CWebTest {
 				$this->lldid.'&context='.$context.'&itemid='.$this->item_prototypeid);
 
 		// Open host or template and make a full clone of it.
-		$url = ($template) ? 'templates.php?form=update&templateid=' : 'hosts.php?form=update&hostid=';
+		$url = ($template) ? 'templates.php?form=update&templateid=' : 'zabbix.php?action=host.edit&hostid=';
 		$this->page->open($url.$this->hostid);
 		$this->query('button:Full clone')->waitUntilClickable()->one()->click();
 
 		// Fill cloned host or template form and save it.
-		$form = $this->query('name', ($template) ? 'templatesForm' : 'hostsForm')->asForm()->waitUntilPresent()->one();
+		$form = ($template)
+			? $this->query('name:templatesForm')->asForm()->waitUntilPresent()->one()
+			: $this->query('id:host-form')->asForm()->waitUntilPresent()->one();
+
 		$new_host_name = 'Cloned host name'.time();
 		$form->fill([($template) ? 'Template name' : 'Host name' => $new_host_name]);
 		$form->submit();

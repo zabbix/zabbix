@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,8 +60,7 @@ else {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')), [
 			(new CSubmit('clone', _('Clone')))->setEnabled(CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
-			(new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid')))
-				->setEnabled(array_key_exists($data['groupid'], $data['deletable_host_groups'])),
+			(new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'))),
 			new CButtonCancel()
 		]
 	));

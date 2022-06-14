@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of item prototypes');
 $page['file'] = 'disc_prototypes.php';
-$page['scripts'] = ['effects.js', 'class.cviewswitcher.js', 'multilineinput.js', 'multiselect.js', 'items.js',
-	'textareaflexible.js', 'class.tab-indicators.js'
-];
+$page['scripts'] = ['effects.js', 'multilineinput.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -246,6 +244,12 @@ $fields = [
 									],
 	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
+
+if (getRequest('type') == ITEM_TYPE_HTTPAGENT && getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+	unset($fields['interfaceid']);
+	unset($_REQUEST['interfaceid']);
+}
+
 $valid_input = check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -349,12 +353,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['delay']));
+					error(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
 				elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['period']));
+					error(_s('Invalid interval "%1$s".', $interval['period']));
 					break;
 				}
 
@@ -367,7 +371,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 				if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
 					$result = false;
-					info(_s('Invalid interval "%1$s".', $interval['schedule']));
+					error(_s('Invalid interval "%1$s".', $interval['schedule']));
 					break;
 				}
 
@@ -382,62 +386,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	if ($result) {
 		$preprocessing = getRequest('preprocessing', []);
-
-		foreach ($preprocessing as &$step) {
-			switch ($step['type']) {
-				case ZBX_PREPROC_MULTIPLIER:
-				case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-					$step['params'] = trim($step['params'][0]);
-					break;
-
-				case ZBX_PREPROC_RTRIM:
-				case ZBX_PREPROC_LTRIM:
-				case ZBX_PREPROC_TRIM:
-				case ZBX_PREPROC_XPATH:
-				case ZBX_PREPROC_JSONPATH:
-				case ZBX_PREPROC_VALIDATE_REGEX:
-				case ZBX_PREPROC_VALIDATE_NOT_REGEX:
-				case ZBX_PREPROC_ERROR_FIELD_JSON:
-				case ZBX_PREPROC_ERROR_FIELD_XML:
-				case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
-				case ZBX_PREPROC_SCRIPT:
-					$step['params'] = $step['params'][0];
-					break;
-
-				case ZBX_PREPROC_VALIDATE_RANGE:
-				case ZBX_PREPROC_PROMETHEUS_PATTERN:
-					foreach ($step['params'] as &$param) {
-						$param = trim($param);
-					}
-					unset($param);
-
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				case ZBX_PREPROC_REGSUB:
-				case ZBX_PREPROC_ERROR_FIELD_REGEX:
-				case ZBX_PREPROC_STR_REPLACE:
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				// ZBX-16642
-				case ZBX_PREPROC_CSV_TO_JSON:
-					if (!array_key_exists(2, $step['params'])) {
-						$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
-					}
-					$step['params'] = implode("\n", $step['params']);
-					break;
-
-				default:
-					$step['params'] = '';
-			}
-
-			$step += [
-				'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-				'error_handler_params' => ''
-			];
-		}
-		unset($step);
+		$preprocessing = normalizeItemPreprocessingSteps($preprocessing);
 
 		$item = [
 			'name'			=> getRequest('name'),
@@ -468,27 +417,55 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'ruleid'		=> getRequest('parent_discoveryid')
 		];
 
-		if ($item['type'] == ITEM_TYPE_SCRIPT) {
-			$script_item = [
-				'parameters' => getRequest('parameters', []),
-				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
-			];
+		switch ($item['type']) {
+			case ITEM_TYPE_SCRIPT:
+				$script_item = [
+					'parameters' => getRequest('parameters', []),
+					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout'))
+				];
 
-			$item = prepareScriptItemFormData($script_item) + $item;
-		}
+				$item = prepareScriptItemFormData($script_item) + $item;
+				break;
 
-		if ($item['type'] == ITEM_TYPE_JMX) {
-			$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+			case ITEM_TYPE_JMX:
+				$item['jmx_endpoint'] = getRequest('jmx_endpoint', '');
+				break;
+
+			case ITEM_TYPE_DEPENDENT:
+				$item['master_itemid'] = getRequest('master_itemid');
+				break;
+
+			case ITEM_TYPE_HTTPAGENT:
+				$http_item = [
+					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+					'url' => getRequest('url'),
+					'query_fields' => getRequest('query_fields', []),
+					'posts' => getRequest('posts'),
+					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+					'follow_redirects' => (int) getRequest('follow_redirects'),
+					'post_type' => (int) getRequest('post_type'),
+					'http_proxy' => getRequest('http_proxy'),
+					'headers' => getRequest('headers', []),
+					'retrieve_mode' => (int) getRequest('retrieve_mode'),
+					'request_method' => (int) getRequest('request_method'),
+					'output_format' => (int) getRequest('output_format'),
+					'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
+					'ssl_cert_file' => getRequest('ssl_cert_file'),
+					'ssl_key_file' => getRequest('ssl_key_file'),
+					'ssl_key_password' => getRequest('ssl_key_password'),
+					'verify_peer' => (int) getRequest('verify_peer'),
+					'verify_host' => (int) getRequest('verify_host'),
+					'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
+					'username' => getRequest('http_username', ''),
+					'password' => getRequest('http_password', '')
+				];
+				break;
 		}
 
 		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 			$item['trends'] = (getRequest('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF)
 				? ITEM_NO_STORAGE_VALUE
 				: getRequest('trends');
-		}
-
-		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-			$item['master_itemid'] = getRequest('master_itemid');
 		}
 
 		if (hasRequest('update')) {
@@ -511,30 +488,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$db_item = $db_item[0];
 
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				$http_item = [
-					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
-					'url' => getRequest('url'),
-					'query_fields' => getRequest('query_fields', []),
-					'posts' => getRequest('posts'),
-					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-					'follow_redirects' => (int) getRequest('follow_redirects'),
-					'post_type' => (int) getRequest('post_type'),
-					'http_proxy' => getRequest('http_proxy'),
-					'headers' => getRequest('headers', []),
-					'retrieve_mode' => (int) getRequest('retrieve_mode'),
-					'request_method' => (int) getRequest('request_method'),
-					'output_format' => (int) getRequest('output_format'),
-					'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'ssl_cert_file' => getRequest('ssl_cert_file'),
-					'ssl_key_file' => getRequest('ssl_key_file'),
-					'ssl_key_password' => getRequest('ssl_key_password'),
-					'verify_peer' => (int) getRequest('verify_peer'),
-					'verify_host' => (int) getRequest('verify_host'),
-					'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-					'username' => getRequest('http_username', ''),
-					'password' => getRequest('http_password', '')
-				];
+			if ($item['type'] == ITEM_TYPE_HTTPAGENT && $db_item['templateid'] == 0) {
 				$item = prepareItemHttpAgentFormData($http_item) + $item;
 			}
 
@@ -548,49 +502,40 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$item['preprocessing'] = $preprocessing;
 			}
 
-			$compare = function($arr, $arr2) {
-				return (array_combine(array_column($arr, 'name'), array_column($arr, 'value')) ==
-					array_combine(array_column($arr2, 'name'), array_column($arr2, 'value'))
-				);
-			};
+			function parameters_equal(array $stored_parameters, array $input_parameters): bool {
+				return (array_column($stored_parameters, 'value') == array_column($input_parameters, 'value')
+						&& array_column($stored_parameters, 'name') == array_column($input_parameters, 'name'));
+			}
+
 			if (getRequest('type') == ITEM_TYPE_SCRIPT && $db_item['type'] == getRequest('type')
-					&& $compare($db_item['parameters'], $item['parameters'])) {
+					&& parameters_equal($db_item['parameters'], $item['parameters'])) {
 				unset($item['parameters']);
 			}
 
 			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
 			CArrayHelper::sort($tags, ['tag', 'value']);
+
 			if (array_values($db_item['tags']) !== array_values($tags)) {
 				$item['tags'] = $tags;
+			}
+
+			if ($db_item['templateid'] != 0) {
+				$allowed_fields = array_fill_keys([
+					'itemid', 'delay', 'delay_flex', 'history', 'trends', 'history_mode', 'trends_mode', 'allow_traps',
+					'description', 'status', 'discover', 'tags'
+				], true);
+
+				foreach ($item as $field => $value) {
+					if (!array_key_exists($field, $allowed_fields)) {
+						unset($item[$field]);
+					}
+				}
 			}
 
 			$result = API::ItemPrototype()->update($item);
 		}
 		else {
 			if (getRequest('type') == ITEM_TYPE_HTTPAGENT) {
-				$http_item = [
-					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
-					'url' => getRequest('url'),
-					'query_fields' => getRequest('query_fields', []),
-					'posts' => getRequest('posts'),
-					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-					'follow_redirects' => (int) getRequest('follow_redirects'),
-					'post_type' => (int) getRequest('post_type'),
-					'http_proxy' => getRequest('http_proxy'),
-					'headers' => getRequest('headers', []),
-					'retrieve_mode' => (int) getRequest('retrieve_mode'),
-					'request_method' => (int) getRequest('request_method'),
-					'output_format' => (int) getRequest('output_format'),
-					'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'ssl_cert_file' => getRequest('ssl_cert_file'),
-					'ssl_key_file' => getRequest('ssl_key_file'),
-					'ssl_key_password' => getRequest('ssl_key_password'),
-					'verify_peer' => (int) getRequest('verify_peer'),
-					'verify_host' => (int) getRequest('verify_host'),
-					'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-					'username' => getRequest('http_username', ''),
-					'password' => getRequest('http_password', '')
-				];
 				$item = prepareItemHttpAgentFormData($http_item) + $item;
 			}
 
@@ -701,6 +646,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 		]);
 		$itemPrototype = reset($itemPrototype);
 
+		$i = 0;
 		foreach ($itemPrototype['preprocessing'] as &$step) {
 			if ($step['type'] == ZBX_PREPROC_SCRIPT) {
 				$step['params'] = [$step['params'], ''];
@@ -708,6 +654,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 			else {
 				$step['params'] = explode("\n", $step['params']);
 			}
+			$step['sortorder'] = $i++;
 		}
 		unset($step);
 
@@ -754,6 +701,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 
 	$form_action = (hasRequest('clone') && getRequest('itemid') != 0) ? 'clone' : getRequest('form');
 	$data = getItemFormData($itemPrototype, ['form' => $form_action]);
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;
 	$data['trends_default'] = DB::getDefault('items', 'trends');

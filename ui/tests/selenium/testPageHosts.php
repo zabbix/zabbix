@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
+require_once dirname(__FILE__).'/traits/TagTrait.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
@@ -31,7 +31,7 @@ class testPageHosts extends CLegacyWebTest {
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
 
-	use FilterTrait;
+	use TagTrait;
 	use TableTrait;
 
 	public static function allHosts() {
@@ -48,7 +48,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_CheckLayout() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
@@ -117,14 +117,15 @@ class testPageHosts extends CLegacyWebTest {
 		$sqlHostInventory = "select * from host_inventory where hostid=$hostid";
 		$oldHashHostInventory = CDBHelper::getHash($sqlHostInventory);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestClickLinkText($name);
-		$this->zbxTestClickWait('update');
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent($name);
@@ -143,12 +144,12 @@ class testPageHosts extends CLegacyWebTest {
 	public function testPageHosts_MassDisableAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_MONITORED." where status=".HOST_STATUS_NOT_MONITORED);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestClickButton('host.massdisable');
+		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -167,12 +168,12 @@ class testPageHosts extends CLegacyWebTest {
 
 		$hostid = $host['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
-		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
-		$this->zbxTestClickButton('host.massdisable');
+		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
+		$this->zbxTestClickButtonText('Disable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -190,12 +191,12 @@ class testPageHosts extends CLegacyWebTest {
 
 		$hostid = $host['hostid'];
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
-		$this->zbxTestCheckboxSelect('hosts_'.$hostid);
-		$this->zbxTestClickButton('host.massenable');
+		$this->zbxTestCheckboxSelect('hostids_'.$hostid);
+		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -208,12 +209,12 @@ class testPageHosts extends CLegacyWebTest {
 	public function testPageHosts_MassActivateAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
 
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->query('button:Reset')->one()->click();
 
 		$this->zbxTestCheckboxSelect('all_hosts');
-		$this->zbxTestClickButton('host.massenable');
+		$this->zbxTestClickButtonText('Enable');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -225,7 +226,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByName() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill($this->HostName);
@@ -235,9 +236,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByTemplates() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill([
@@ -252,7 +251,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByProxy() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 
@@ -273,7 +272,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterNone() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('1928379128ksdhksdjfh');
@@ -286,7 +285,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterByAllFields() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Host groups')->select($this->HostGroup);
@@ -299,7 +298,7 @@ class testPageHosts extends CLegacyWebTest {
 	}
 
 	public function testPageHosts_FilterReset() {
-		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
@@ -683,7 +682,14 @@ class testPageHosts extends CLegacyWebTest {
 	 * @dataProvider getFilterByTagsData
 	 */
 	public function testPageHosts_FilterByTags($data) {
-		$this->page->login()->open('hosts.php?filter_groups%5B%5D=4&filter_host=host&filter_port=10051&&filter_set=1');
+		$this->page->login()->open((new CUrl('zabbix.php'))
+			->setArgument('action', 'host.list')
+			->setArgument('filter_groups[]', 4)
+			->setArgument('filter_host', 'host')
+			->setArgument('filter_port', 10051)
+			->setArgument('filter_set', 1)
+			->getUrl()
+		);
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:filter_evaltype' => $data['evaluation_type']]);
 		$this->setTags($data['tags']);

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2020-10-16T09:33:53Z'
+  date: '2021-12-14T12:07:56Z'
   media_types:
     -
       name: Zammad
@@ -147,18 +147,27 @@ zabbix_export:
                 };
             },
         
-            setTicketTags: function(tags, ticket_id) {
+            setTicketTags: function (tags, ticket_id) {
+                var data = {
+                    item: '',
+                    object: 'Ticket',
+                    o_id: ticket_id
+                };
+        
                 try {
                     var tags_json = JSON.parse(tags),
                         result;
         
                     for (var i in tags_json) {
-                        result = Zammad.request('get',
-                            '/api/v1/tags/add?object=Ticket&o_id=' + ticket_id +
-                            '&item=' + tags_json[i].tag);
         
-                        if (typeof result.response !== 'object'
-                            || result.status != 200) {
+                        if (tags_json[i].value) {
+                            data.item = tags_json[i].tag + ": " + tags_json[i].value;
+                        } else {
+                            data.item = tags_json[i].tag;
+                        }
+                        result = Zammad.request('post', 'api/v1/tags/add', data);
+        
+                        if (typeof result.response !== 'object' || result.status != 200) {
                             Zabbix.log(4, '[ Zammad Webhook ] Cannot add ticket tag:' + tags_json[i].tag);
                         }
                     }
@@ -347,10 +356,10 @@ zabbix_export:
         -
           event_source: TRIGGERS
           operation_mode: RECOVERY
-          subject: 'Resolved: {EVENT.NAME}'
+          subject: 'Resolved: {EVENT.RECOVERY.NAME}'
           message: |
             Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
-            Problem name: {EVENT.NAME}
+            Problem name: {EVENT.RECOVERY.NAME}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}

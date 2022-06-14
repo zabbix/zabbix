@@ -1,7 +1,7 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,7 +101,11 @@ class C52AggregateItemKeyConverter extends CConverter {
 	}
 
 	private function isQuotableTimeperiod(string $timeperiod): bool {
-		$number_parser = new CNumberParser(['with_minus' => false, 'with_suffix' => true]);
+		$number_parser = new CNumberParser([
+			'with_minus' => false,
+			'with_size_suffix' => true,
+			'with_time_suffix' => true
+		]);
 
 		if ($number_parser->parse($timeperiod) == CParser::PARSE_SUCCESS) {
 			return false;

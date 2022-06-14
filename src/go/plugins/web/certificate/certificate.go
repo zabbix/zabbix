@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,12 +27,13 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 type Output struct {
@@ -65,7 +66,8 @@ type ValidationResult struct {
 }
 
 type Options struct {
-	Timeout int `conf:"optional,range=1:30"`
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int `conf:"optional,range=1:30"`
 }
 
 type Plugin struct {
@@ -102,12 +104,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func (p *Plugin) webCertificateGet(params []string) (interface{}, error) {
-	hostname, port, domain, err := getParameters(params)
+	address, port, domain, err := getParameters(params)
 	if err != nil {
 		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
-	certs, err := getCertificatesPEM(fmt.Sprintf("%s:%s", hostname, port), domain, p.options.Timeout)
+	certs, err := getCertificatesPEM(fmt.Sprintf("%s:%s", address, port), domain, p.options.Timeout)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
@@ -180,41 +182,100 @@ func getValidationResult(leaf *x509.Certificate, opts x509.VerifyOptions, subjec
 	return out
 }
 
-func getParameters(params []string) (hostname, port, domain string, err error) {
+func getParameters(params []string) (address, port, domain string, err error) {
 	switch len(params) {
 	case allParameters:
-		hostname, port, err = parseURL(params[0], params[1])
-		domain = hostname
-
-		if params[2] != "" {
-			hostname, port, err = parseURL(params[2], params[1])
-		}
+		address, port, domain, err = getParsedParameters(params)
 	case noThirdParameter:
-		hostname, port, err = parseURL(params[0], params[1])
-		domain = hostname
+		address, port, err = parseURL(params[0], params[1])
+		domain = address
 	case onlyFirstParameter:
-		hostname, port, err = parseURL(params[0], "")
-		domain = hostname
+		address, port, err = parseURL(params[0], "")
+		domain = address
 	case emptyParameters:
-		err = zbxerr.ErrorTooFewParameters
+		return "", "", "", zbxerr.ErrorTooFewParameters
 	default:
-		err = zbxerr.ErrorTooManyParameters
+		return "", "", "", zbxerr.ErrorTooManyParameters
 	}
 
 	return
 }
 
+func checkForIPv6(address string) error {
+	if isIpV6(net.ParseIP(cutBrackets(address))) {
+		return zbxerr.New(fmt.Sprintf("%s can not be ipv6", address))
+	}
+
+	return nil
+}
+
+func getParsedParameters(params []string) (address, port, domain string, err error) {
+	address, port, err = parseURL(params[0], params[1])
+	if err != nil {
+		return
+	}
+
+	domain = address
+
+	if params[2] == "" {
+		return
+	}
+
+	if ip := net.ParseIP(cutBrackets(params[2])); ip != nil {
+		address, port, err = parseURL(params[2], params[1])
+		if err != nil {
+			return "", "", "", fmt.Errorf("failed to parse ip %s, and port %s, %s", params[2], params[1], err.Error())
+		}
+
+		return
+	}
+
+	if err = uri.IsHostnameOnly(params[2]); err != nil {
+		return "", "", "", fmt.Errorf("failed to parse host %s, %s, required: hostname or IPv4", params[2], err.Error())
+	}
+
+	domain = params[2]
+
+	return
+}
+
+func cutBrackets(in string) string {
+	return strings.TrimSuffix(strings.TrimPrefix(in, "["), "]")
+}
+
+func isIpV6(ip net.IP) bool {
+	if ip.To4() != nil {
+		return false
+	}
+
+	if ip.To16() != nil {
+		return true
+	}
+
+	return false
+}
+
 func parseURL(url, port string) (string, string, error) {
-	uri, err := uri.New(url, &uri.Defaults{Port: port, Scheme: "https"})
+	// must be checked before url.New because url.New can not parse `::1` .
+	if err := checkForIPv6(url); err != nil {
+		return "", "", err
+	}
+
+	u, err := uri.New(url, &uri.Defaults{Port: port, Scheme: "https"})
 	if err != nil {
 		return "", "", err
 	}
 
-	if uri.Scheme() != "" && uri.Scheme() != "https" {
+	// must be checked after the url is created to rule out full IPv6 with scheme.
+	if err := checkForIPv6(u.Host()); err != nil {
+		return "", "", err
+	}
+
+	if u.Scheme() != "" && u.Scheme() != "https" {
 		return "", "", errors.New("scheme must be https")
 	}
 
-	return getHostAndPort(uri, port)
+	return getHostAndPort(u, port)
 }
 
 func getHostAndPort(uri *uri.URI, port string) (string, string, error) {

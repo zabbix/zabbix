@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -420,18 +420,7 @@ class testPageHostInterfaces extends CWebTest {
 	 * @dataProvider getCheckInterfacesData
 	 */
 	public function testPageHostInterfaces_ConfigurationHosts($data) {
-		$this->checkInterfaces($data, 'hosts.php', 'hosts');
-	}
-
-	/**
-	 * Test displaying host interfaces on Host form page.
-	 *
-	 * @dataProvider getCheckInterfacesData
-	 */
-	public function testPageHostInterfaces_HostForm($data) {
-		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host ='.zbx_dbstr($data['host']));
-		$link = 'hosts.php?form=update&hostid='.$id;
-		$this->checkInterfaces($data, $link, $selector = null, true);
+		$this->checkInterfaces($data, self::HOST_LIST_PAGE, 'hosts');
 	}
 
 	/**

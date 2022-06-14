@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -310,18 +310,19 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormGraphPrototype_CheckLayout($data) {
-
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
-			$this->zbxTestClickLinkTextWait($data['template']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $data['template']);
 			$discoveryRule = $this->discoveryRuleTemplate;
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestClickLinkTextWait($data['host']);
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $data['host']);
 			if (!isset($data['templatedHost'])) {
 				$discoveryRule = $this->discoveryRule;
 				$hostid = 40001;
@@ -332,7 +333,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickLinkTextWait($discoveryRule);
 		$this->zbxTestClickLinkTextWait('Graph prototypes');
 
@@ -363,7 +363,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
@@ -375,7 +374,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Width');
 		$this->zbxTestAssertVisibleId('width');
 		$this->zbxTestAssertAttribute("//input[@id='width']", 'maxlength', 5);
-		$this->zbxTestAssertAttribute("//input[@id='width']", 'size', 20);
 		$this->zbxTestAssertElementValue('width', 900);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='width']", 'readonly');
@@ -387,7 +385,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Height');
 		$this->zbxTestAssertVisibleId('height');
 		$this->zbxTestAssertAttribute("//input[@id='height']", 'maxlength', 5);
-		$this->zbxTestAssertAttribute("//input[@id='height']", 'size', 20);
 		$this->zbxTestAssertElementValue('height', 200);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='height']", 'readonly');
@@ -634,7 +631,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			case 'Fixed':
 				$this->zbxTestAssertVisibleId('yaxismin');
 					$this->zbxTestAssertAttribute("//input[@id='yaxismin']", 'maxlength', 255);
-					$this->zbxTestAssertAttribute("//input[@id='yaxismin']", 'size', 20);
 					$this->zbxTestAssertElementValue('yaxismin', 0);
 
 					$this->zbxTestAssertElementNotPresentId('ymin_name');
@@ -665,7 +661,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			case 'Fixed':
 				$this->zbxTestAssertVisibleId('yaxismax');
 					$this->zbxTestAssertAttribute("//input[@id='yaxismax']", 'maxlength', 255);
-					$this->zbxTestAssertAttribute("//input[@id='yaxismax']", 'size', 20);
 					$this->zbxTestAssertElementValue('yaxismax', 100);
 
 					$this->zbxTestAssertElementNotPresentId('ymax_name');
@@ -1062,8 +1057,6 @@ class testFormGraphPrototype extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-		$itemName = $this->item;
 		$this->zbxTestLogin('graphs.php?parent_discoveryid=133800&context=host&form=Create+graph+prototype');
 
 		$this->zbxTestCheckTitle('Configuration of graph prototypes');
@@ -1092,7 +1085,7 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestClick('add_item');
 			$this->zbxTestLaunchOverlayDialog('Items');
 
-			$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+			$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')->asMultiselect()->one();
 			$host->fill([
 				'values' => $this->host,
 				'context' => $this->hostGroup
@@ -1192,9 +1185,9 @@ class testFormGraphPrototype extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Graph prototypes');
 
@@ -1218,9 +1211,9 @@ class testFormGraphPrototype extends CLegacyWebTest {
 				$graphid = $row['graphid'];
 			}
 
-			$this->zbxTestOpen('hosts.php');
-			$this->zbxTestClickLinkTextWait($this->host);
-			$this->zbxTestClickLinkTextWait('Discovery rules');
+			$this->zbxTestOpen(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenDiscovery($form, $this->host);
 			$this->zbxTestClickLinkTextWait($this->discoveryRule);
 			$this->zbxTestClickLinkTextWait('Graph prototypes');
 
@@ -1231,5 +1224,17 @@ class testFormGraphPrototype extends CLegacyWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
 			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}
+	}
+
+	/**
+	 * Function for filtering necessary hosts or templates and opening their Discovery rules.
+	 *
+	 * @param string    $name    name of a host
+	 */
+	private function filterEntriesAndOpenDiscovery($form, $name) {
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zabbix_sender.h"
+
 #include "zbxjson.h"
 #include "comms.h"
-
-#include "zabbix_sender.h"
+#include "cfg.h"
 
 const char	*progname = NULL;
 const char	title_message[] = "";
@@ -33,12 +33,32 @@ unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
+static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+{
+	ZBX_UNUSED(hostnames);
+
+	zbx_addr_copy((zbx_vector_ptr_t *)data, addrs);
+
+	return SUCCEED;
+}
+
 int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
 		const zabbix_sender_value_t *values, int count, char **result)
 {
-	zbx_socket_t	sock;
-	int		ret, i;
-	struct zbx_json	json;
+	zbx_socket_t					sock;
+	int						ret, i;
+	struct zbx_json					json;
+	static ZBX_THREAD_LOCAL zbx_vector_ptr_t	zbx_addrs;
+	static ZBX_THREAD_LOCAL char			*last_address;
+	static unsigned short				last_port;
+
+	if (NULL == address)
+	{
+		if (NULL != result)
+			*result = zbx_strdup(NULL, "address must not be NULL");
+
+		return FAIL;
+	}
 
 	if (1 > count)
 	{
@@ -46,6 +66,27 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 			*result = zbx_strdup(NULL, "values array must have at least one item");
 
 		return FAIL;
+	}
+
+	if (NULL == last_address)
+		zbx_vector_ptr_create(&zbx_addrs);
+
+	if (0 != zbx_strcmp_null(last_address, address) || port != last_port)
+	{
+		last_address = zbx_strdup(last_address, address);
+		last_port = port;
+
+		zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
+
+		if (FAIL == zbx_set_data_destination_hosts(address, port, "<server>", sender_add_serveractive_host_cb,
+				NULL, &zbx_addrs, result))
+		{
+			zbx_free(last_address);
+			last_port = 0;
+			zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
+			zbx_vector_ptr_destroy(&zbx_addrs);
+			return FAIL;
+		}
 	}
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -62,8 +103,8 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 	zbx_json_close(&json);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&sock, source, address, port, GET_SENDER_TIMEOUT,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+	if (SUCCEED == (ret = connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30,
+		ZBX_TCP_SEC_UNENCRYPTED, 0, 0)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
 		{

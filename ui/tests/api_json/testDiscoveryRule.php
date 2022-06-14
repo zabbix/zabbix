@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2394,7 +2394,7 @@ class testDiscoveryRule extends CAPITest {
 					'itemids' => [$itemid],
 					'selectLLDMacroPaths' => ['lld_macro', 'path']
 				],
-				'get_result' => [
+				'expected_result' => [
 					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
@@ -2427,7 +2427,7 @@ class testDiscoveryRule extends CAPITest {
 					'itemids' => [$itemid],
 					'selectLLDMacroPaths' => ['lld_macro_pathid', 'lld_macro', 'path']
 				],
-				'get_result' => [
+				'expected_result' => [
 					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
@@ -2465,7 +2465,7 @@ class testDiscoveryRule extends CAPITest {
 					'itemids' => [$itemid],
 					'selectLLDMacroPaths' => 'extend'
 				],
-				'get_result' => [
+				'expected_result' => [
 					'itemid' => $itemid,
 					'lld_macro_paths' => [
 						[
@@ -2503,27 +2503,27 @@ class testDiscoveryRule extends CAPITest {
 	/**
 	 * @dataProvider discoveryrule_lld_macro_paths_get_data_valid
 	 */
-	public function testDiscoveryRuleLLDMacroPaths_Get($discoveryrule, $get_result, $expected_error) {
+	public function testDiscoveryRuleLLDMacroPaths_Get($discoveryrule, $expected_result, $expected_error) {
 		$result = $this->call('discoveryrule.get', $discoveryrule);
 
 		if ($expected_error === null) {
 			foreach ($result['result'] as $entry) {
-				$this->assertSame($entry['itemid'], $get_result['itemid']);
+				$this->assertSame($expected_result['itemid'], $entry['itemid']);
 
 				// Check related objects.
 				if (array_key_exists('selectLLDMacroPaths', $discoveryrule)) {
-					$this->assertArrayHasKey('lld_macro_paths', $get_result);
-					CTestArrayHelper::usort($get_result['lld_macro_paths'], ['lld_macro']);
+					$this->assertArrayHasKey('lld_macro_paths', $entry);
+					CTestArrayHelper::usort($entry['lld_macro_paths'], ['lld_macro']);
 
-					$this->assertSame($entry['lld_macro_paths'], $get_result['lld_macro_paths']);
+					$this->assertSame($expected_result['lld_macro_paths'], $entry['lld_macro_paths']);
 				}
 				else {
-					$this->assertArrayNotHasKey('lld_macro_paths', $get_result);
+					$this->assertArrayNotHasKey('lld_macro_paths', $entry);
 				}
 			}
 		}
 		else {
-			$this->assertSame($result['result'], $get_result);
+			$this->assertSame($result['result'], $expected_result);
 		}
 	}
 
@@ -3060,8 +3060,8 @@ class testDiscoveryRule extends CAPITest {
 			],
 			'Test overrides and override operations are deleted.' => [
 				['133763'],
-				['1001', '1002'],
-				['1001', '1002', '1003', '1004', '1005', '1006'],
+				['10001', '10002'],
+				['10001', '10002', '10003', '10004', '10005', '10006'],
 				null
 			]
 		];
@@ -3891,7 +3891,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/ophistory/history": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
 			],
-			'Test /1/overrides/1/operations/1/ophistory is is not supported for trigger prototype object.' => [
+			'Test /1/overrides/1/operations/1/ophistory is not supported for trigger prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -3911,7 +3911,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "ophistory".'
 			],
-			'Test /1/overrides/1/operations/1/ophistory is is not supported for graph prototype object.' => [
+			'Test /1/overrides/1/operations/1/ophistory is not supported for graph prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -3931,7 +3931,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "ophistory".'
 			],
-			'Test /1/overrides/1/operations/1/ophistory is is not supported for host prototype object.' => [
+			'Test /1/overrides/1/operations/1/ophistory is not supported for host prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4030,7 +4030,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optrends/trends": value must be one of 0, '.SEC_PER_HOUR.'-'.(25 * SEC_PER_YEAR).'.'
 			],
-			'Test /1/overrides/1/operations/1/optrends is is not supported for trigger prototype object.' => [
+			'Test /1/overrides/1/operations/1/optrends is not supported for trigger prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4050,7 +4050,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optrends".'
 			],
-			'Test /1/overrides/1/operations/1/optrends is is not supported for graph prototype object.' => [
+			'Test /1/overrides/1/operations/1/optrends is not supported for graph prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4070,7 +4070,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "optrends".'
 			],
-			'Test /1/overrides/1/operations/1/optrends is is not supported for host prototype object.' => [
+			'Test /1/overrides/1/operations/1/optrends is not supported for host prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4129,7 +4129,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opseverity/severity": value must be one of '.implode(', ', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)).'.'
 			],
-			'Test /1/overrides/1/operations/1/opseverity is is not supported for item prototype object.' => [
+			'Test /1/overrides/1/operations/1/opseverity is not supported for item prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4149,7 +4149,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opseverity".'
 			],
-			'Test /1/overrides/1/operations/1/opseverity is is not supported for graph prototype object.' => [
+			'Test /1/overrides/1/operations/1/opseverity is not supported for graph prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4169,7 +4169,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opseverity".'
 			],
-			'Test /1/overrides/1/operations/1/opseverity is is not supported for host prototype object.' => [
+			'Test /1/overrides/1/operations/1/opseverity is not supported for host prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4250,7 +4250,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optag/1/tag": cannot be empty.'
 			],
-			'Test /1/overrides/1/operations/1/optag is is not supported for graph prototype object.' => [
+			'Test /1/overrides/1/operations/1/optag is not supported for graph prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4378,7 +4378,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			'Test /1/overrides/1/operations/1/optemplate is is not supported for item prototype object.' => [
+			'Test /1/overrides/1/operations/1/optemplate is not supported for item prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4398,7 +4398,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": unexpected parameter "template".'
 			],
-			'Test /1/overrides/1/operations/1/optemplate is is not supported for trigger prototype object.' => [
+			'Test /1/overrides/1/operations/1/optemplate is not supported for trigger prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4418,7 +4418,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/optemplate/1": unexpected parameter "template".'
 			],
-			'Test /1/overrides/1/operations/1/optemplate is is not supported for graph prototype object.' => [
+			'Test /1/overrides/1/operations/1/optemplate is not supported for graph prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4477,7 +4477,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1/opinventory/inventory_mode": value must be one of '.implode(', ', [HOST_INVENTORY_DISABLED, HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]).'.'
 			],
-			'Test /1/overrides/1/operations/1/opinventory is is not supported for item prototype object.' => [
+			'Test /1/overrides/1/operations/1/opinventory is not supported for item prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4497,7 +4497,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opinventory".'
 			],
-			'Test /1/overrides/1/operations/1/opinventory is is not supported for trigger prototype object.' => [
+			'Test /1/overrides/1/operations/1/opinventory is not supported for trigger prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[
@@ -4517,7 +4517,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/overrides/1/operations/1": unexpected parameter "opinventory".'
 			],
-			'Test /1/overrides/1/operations/1/opinventory is is not supported for graph prototype object.' => [
+			'Test /1/overrides/1/operations/1/opinventory is not supported for graph prototype object.' => [
 				'discoveryrules' => [
 					$new_lld_overrides([
 						[

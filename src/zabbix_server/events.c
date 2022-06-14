@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,15 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
-#include "log.h"
-
-#include "actions.h"
 #include "events.h"
+
+#include "log.h"
+#include "actions.h"
 #include "zbxserver.h"
 #include "export.h"
-#include "zbxservice.h"
 #include "service_protocol.h"
 
 /* event recovery data */
@@ -65,8 +62,6 @@ static zbx_hashset_t		correlation_cache;
 static zbx_correlation_rules_t	correlation_rules;
 
 /******************************************************************************
- *                                                                            *
- * Function: validate_event_tag                                               *
  *                                                                            *
  * Purpose: Check that tag name is not empty and that tag is not duplicate.   *
  *                                                                            *
@@ -169,13 +164,11 @@ static void	get_item_tags_by_expression(const DB_TRIGGER *trigger, zbx_vector_pt
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_add_event                                                    *
- *                                                                            *
  * Purpose: add event to an array                                             *
  *                                                                            *
  * Parameters: source   - [IN] event source (EVENT_SOURCE_*)                  *
  *             object   - [IN] event object (EVENT_OBJECT_*)                  *
- *             objectid - [IN] trigger, item ... identificator from database, *
+ *             objectid - [IN] trigger, item ... identifier from database,    *
  *                             depends on source and object                   *
  *             timespec - [IN] event time                                     *
  *             value    - [IN] event value (TRIGGER_VALUE_*,                  *
@@ -312,12 +305,10 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Function: close_trigger_event                                              *
- *                                                                            *
  * Purpose: add closing OK event for the specified problem event to an array  *
  *                                                                            *
  * Parameters: eventid  - [IN] the problem eventid                            *
- *             objectid - [IN] trigger, item ... identificator from database, *
+ *             objectid - [IN] trigger, item ... identifier from database,    *
  *                             depends on source and object                   *
  *             ts       - [IN] event time                                     *
  *             userid   - [IN] the user closing the problem                   *
@@ -361,8 +352,6 @@ static DB_EVENT	*close_trigger_event(zbx_uint64_t eventid, zbx_uint64_t objectid
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: save_events                                                      *
  *                                                                            *
  * Purpose: flushes the events into a database                                *
  *                                                                            *
@@ -441,8 +430,6 @@ static int	save_events(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: save_problems                                                    *
  *                                                                            *
  * Purpose: generates problems from problem events (trigger and internal      *
  *          event sources)                                                    *
@@ -553,8 +540,6 @@ static void	save_problems(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: save_event_recovery                                              *
- *                                                                            *
  * Purpose: saves event recovery data and removes recovered events from       *
  *          problem table                                                     *
  *                                                                            *
@@ -617,8 +602,6 @@ static void	save_event_recovery(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_event_index_by_source_object_id                              *
- *                                                                            *
  * Purpose: find event index by its source object                             *
  *                                                                            *
  * Parameters: source   - [IN] the event source                               *
@@ -645,8 +628,6 @@ static DB_EVENT	*get_event_by_source_object_id(int source, int object, zbx_uint6
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: correlation_match_event_hostgroup                                *
  *                                                                            *
  * Purpose: checks if the event matches the specified host group              *
  *          (including nested groups)                                         *
@@ -694,8 +675,6 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: correlation_condition_match_new_event                            *
  *                                                                            *
  * Purpose: checks if the correlation condition matches the new event         *
  *                                                                            *
@@ -777,8 +756,6 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 
 /******************************************************************************
  *                                                                            *
- * Function: correlation_match_new_event                                      *
- *                                                                            *
  * Purpose: checks if the correlation rule might match the new event          *
  *                                                                            *
  * Parameters: correlation - [IN] the correlation rule to check               *
@@ -848,8 +825,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: correlation_has_old_event_operation                              *
- *                                                                            *
  * Purpose: checks if correlation has operations to change old events         *
  *                                                                            *
  * Parameters: correlation - [IN] the correlation to check                    *
@@ -878,8 +853,6 @@ static int	correlation_has_old_event_operation(const zbx_correlation_t *correlat
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: correlation_condition_add_tag_match                              *
  *                                                                            *
  * Purpose: adds sql statement to match tag according to the defined          *
  *          matching operation                                                *
@@ -931,10 +904,7 @@ static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, s
 	zbx_free(tag_esc);
 }
 
-
 /******************************************************************************
- *                                                                            *
- * Function: correlation_condition_get_event_filter                           *
  *                                                                            *
  * Purpose: creates sql filter to find events matching a correlation          *
  *          condition                                                         *
@@ -989,7 +959,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 			if (0 == values.values_num)
 			{
 				/* no new tag found, substitute condition with failure expression */
-				filter = zbx_strdup(NULL, "0");
+				filter = zbx_strdup(NULL, "1=0");
 			}
 			else
 			{
@@ -1025,8 +995,6 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: correlation_add_event_filter                                     *
  *                                                                            *
  * Purpose: add sql statement to filter out correlation conditions and        *
  *          matching events                                                   *
@@ -1091,8 +1059,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: correlation_execute_operations                                   *
- *                                                                            *
  * Purpose: execute correlation operations for the new event and matched      *
  *          old eventid                                                       *
  *                                                                            *
@@ -1120,7 +1086,7 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, DB_EV
 			case ZBX_CORR_OPERATION_CLOSE_NEW:
 				/* generate OK event to close the new event */
 
-				/* check if this event was not been closed by another correlation rule */
+				/* check if this event has not been closed by another correlation rule */
 				if (NULL != zbx_hashset_search(&event_recovery, &event->eventid))
 					break;
 
@@ -1176,8 +1142,6 @@ typedef enum
 zbx_problem_state_t;
 
 /******************************************************************************
- *                                                                            *
- * Function: correlate_event_by_global_rules                                  *
  *                                                                            *
  * Purpose: find problem events that must be recovered by global correlation  *
  *          rules and check if the new event must be closed                   *
@@ -1249,7 +1213,7 @@ static void	correlate_event_by_global_rules(DB_EVENT *event, zbx_problem_state_t
 			if (ZBX_PROBLEM_STATE_RESOLVED == *problem_state)
 			{
 				/* with no open problems all conditions involving old events will fail       */
-				/* so there are no need to check old events. Instead re-check if correlation */
+				/* so there is no need to check old events. Instead re-check if correlation  */
 				/* still matches the new event and must be processed in new event scope.     */
 				if (CORRELATION_MATCH == correlation_match_new_event(correlation, event, FAIL))
 					zbx_vector_ptr_append(&corr_new, correlation);
@@ -1326,8 +1290,6 @@ static void	correlate_event_by_global_rules(DB_EVENT *event, zbx_problem_state_t
 
 /******************************************************************************
  *                                                                            *
- * Function: correlate_events_by_global_rules                                 *
- *                                                                            *
  * Purpose: add events to the closing queue according to global correlation   *
  *          rules                                                             *
  *                                                                            *
@@ -1373,8 +1335,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: flush_correlation_queue                                          *
  *                                                                            *
  * Purpose: try flushing correlation close events queue, generated by         *
  *          correlation rules                                                 *
@@ -1539,8 +1499,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: update_trigger_problem_count                                     *
- *                                                                            *
  * Purpose: update number of open problems                                    *
  *                                                                            *
  * Parameters: trigger_diff    - [IN/OUT] the changeset of triggers that      *
@@ -1618,8 +1576,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: update_trigger_changes                                           *
- *                                                                            *
  * Purpose: update trigger value, problem count fields depending on problem   *
  *          and recovered events                                              *
  *                                                                            *
@@ -1681,8 +1637,6 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_initialize_events                                            *
- *                                                                            *
  * Purpose: initializes the data structures required for event processing     *
  *                                                                            *
  ******************************************************************************/
@@ -1696,8 +1650,6 @@ void	zbx_initialize_events(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_uninitialize_events                                          *
  *                                                                            *
  * Purpose: uninitializes the data structures required for event processing   *
  *                                                                            *
@@ -1713,8 +1665,6 @@ void	zbx_uninitialize_events(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_reset_event_recovery                                         *
- *                                                                            *
  * Purpose: reset event_recovery data                                         *
  *                                                                            *
  ******************************************************************************/
@@ -1724,8 +1674,6 @@ void	zbx_reset_event_recovery(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_clean_event                                                  *
  *                                                                            *
  * Purpose: cleans single event                                               *
  *                                                                            *
@@ -1751,8 +1699,6 @@ static void	zbx_clean_event(DB_EVENT *event)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_clean_events                                                 *
- *                                                                            *
  * Purpose: cleans all events and events recoveries                           *
  *                                                                            *
  ******************************************************************************/
@@ -1764,8 +1710,6 @@ void	zbx_clean_events(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: db_trigger_get_hosts                                             *
  *                                                                            *
  * Purpose:  get hosts that are associated with trigger expression/recovery   *
  *           expression                                                       *
@@ -1782,8 +1726,6 @@ static void	db_trigger_get_hosts(zbx_hashset_t *hosts, DB_TRIGGER *trigger)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_export_events                                                *
  *                                                                            *
  * Purpose: export events                                                     *
  *                                                                            *
@@ -1963,8 +1905,6 @@ void	zbx_events_update_itservices(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: add_event_suppress_data                                          *
- *                                                                            *
  * Purpose: adds event suppress data for problem events matching active       *
  *          maintenance periods                                               *
  *                                                                            *
@@ -2051,8 +1991,6 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 /******************************************************************************
  *                                                                            *
- * Function: save_event_suppress_data                                         *
- *                                                                            *
  * Purpose: retrieve running maintenances for each event and saves it in      *
  *          event_suppress table                                              *
  *                                                                            *
@@ -2098,8 +2036,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: flush_events                                                     *
- *                                                                            *
  * Purpose: flushes local event cache to database                             *
  *                                                                            *
  ******************************************************************************/
@@ -2134,8 +2070,6 @@ static int	flush_events(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: recover_event                                                    *
  *                                                                            *
  * Purpose: recover an event                                                  *
  *                                                                            *
@@ -2176,8 +2110,6 @@ static void	recover_event(zbx_uint64_t eventid, int source, int object, zbx_uint
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_internal_ok_events                                       *
  *                                                                            *
  * Purpose: process internal recovery events                                  *
  *                                                                            *
@@ -2282,8 +2214,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_internal_events_without_actions                          *
- *                                                                            *
  * Purpose: do not generate unnecessary internal events if there are no       *
  *          internal actions and no problem recovery from when actions were   *
  *          enabled                                                           *
@@ -2314,8 +2244,6 @@ static void	process_internal_events_without_actions(zbx_vector_ptr_t *internal_p
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_open_problems                                                *
  *                                                                            *
  * Purpose: gets open problems created by the specified triggers              *
  *                                                                            *
@@ -2396,8 +2324,6 @@ static void	get_open_problems(const zbx_vector_uint64_t *triggerids, zbx_vector_
 
 /******************************************************************************
  *                                                                            *
- * Function: event_problem_free                                               *
- *                                                                            *
  * Purpose: frees cached problem event                                        *
  *                                                                            *
  ******************************************************************************/
@@ -2408,10 +2334,7 @@ static void	event_problem_free(zbx_event_problem_t *problem)
 	zbx_free(problem);
 }
 
-
 /******************************************************************************
- *                                                                            *
- * Function: trigger_dep_free                                                 *
  *                                                                            *
  * Purpose: frees trigger dependency                                          *
  *                                                                            *
@@ -2424,8 +2347,6 @@ static void	trigger_dep_free(zbx_trigger_dep_t *dep)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: event_check_dependency                                           *
  *                                                                            *
  * Purpose: check event dependency based on cached and actual trigger values  *
  *                                                                            *
@@ -2475,8 +2396,6 @@ static int	event_check_dependency(const DB_EVENT *event, const zbx_vector_ptr_t 
 
 /******************************************************************************
  *                                                                            *
- * Function: match_tag                                                        *
- *                                                                            *
  * Purpose: checks if the two tag sets have matching tag                      *
  *                                                                            *
  * Parameters: name  - [IN] the name of tag to match                          *
@@ -2513,8 +2432,6 @@ static int	match_tag(const char *name, const zbx_vector_ptr_t *tags1, const zbx_
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: process_trigger_events                                           *
  *                                                                            *
  * Purpose: processes trigger events                                          *
  *                                                                            *
@@ -2672,8 +2589,6 @@ static void	process_trigger_events(zbx_vector_ptr_t *trigger_events, zbx_vector_
 
 /******************************************************************************
  *                                                                            *
- * Function: process_internal_events_dependency                               *
- *                                                                            *
  * Purpose: process internal trigger events                                   *
  *          to avoid trigger dependency                                       *
  *                                                                            *
@@ -2742,8 +2657,6 @@ static void	process_internal_events_dependency(zbx_vector_ptr_t *internal_events
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_process_events                                               *
  *                                                                            *
  * Purpose: processes cached events                                           *
  *                                                                            *
@@ -2861,8 +2774,6 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_close_problem                                                *
  *                                                                            *
  * Purpose: closes problem event                                              *
  *                                                                            *

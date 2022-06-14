@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,22 +32,29 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 });
 
 // Host groups.
-<?php if (CWebUser:: getType() == USER_TYPE_SUPER_ADMIN): ?>
+<?php if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN): ?>
 (() => {
 	const groups_elem = document.querySelector('#groups-div');
-	if (!groups_elem) {
+
+	if (groups_elem === null) {
 		return false;
 	}
 
-	let obj = groups_elem
-	if (groups_elem.tagName === 'SPAN') {
-		obj = groups_elem.originalObject;
-	}
+	const obj = groups_elem.tagName === 'SPAN' ? groups_elem.originalObject : groups_elem;
+	const $groups_ms = $(groups_elem).find('#groups_');
 
-	[...obj.querySelectorAll('input[name=mass_update_groups]')].map((elem) => {
-		elem.addEventListener('change', (event) => {
-			$('#groups_').multiSelect('modify', {
-				'addNew': (event.currentTarget.value == <?= ZBX_ACTION_ADD ?> || event.currentTarget.value == <?= ZBX_ACTION_REPLACE ?>)
+	$groups_ms.on('change', (e) => {
+		$groups_ms.multiSelect('setDisabledEntries',
+			[... document.querySelectorAll('[name^="groups["]')].map((input) => input.value)
+		);
+	});
+
+	[... obj.querySelectorAll('input[name=mass_update_groups]')].map((elem) => {
+		elem.addEventListener('change', (e) => {
+			const action_value = e.currentTarget.value;
+
+			$groups_ms.multiSelect('modify', {
+				'addNew': (action_value == <?= ZBX_ACTION_ADD ?> || action_value == <?= ZBX_ACTION_REPLACE ?>)
 			});
 		})
 	});
@@ -69,13 +76,13 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	$(obj.querySelector('#tbl_macros')).dynamicRows({template: '#macro-row-tmpl'});
 	$(obj.querySelector('#tbl_macros'))
 		.on('afteradd.dynamicRows', () => {
-			$('.input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
+			$('.macro-input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
 			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $(obj.querySelector('#tbl_macros'))).textareaFlexible();
 			obj.querySelector('#macro_add').scrollIntoView({block: 'nearest'});
 		});
 
 	$(obj.querySelector('#tbl_macros'))
-		.find('.input-group')
+		.find('.macro-input-group')
 		.macroValue();
 
 	$(obj.querySelector('#tbl_macros'))
@@ -122,25 +129,31 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 // Linked templates.
 (() => {
 	const template_visible = document.querySelector('#linked-templates-div');
+
 	if (!template_visible) {
 		return false;
 	}
 
-	let obj = template_visible
-	if (template_visible.tagName === 'SPAN') {
-		obj = template_visible.originalObject;
-	}
-
+	const obj = template_visible.tagName === 'SPAN' ? template_visible.originalObject : template_visible;
 	const mass_action_tpls = obj.querySelector('#mass_action_tpls');
 
-	if (!mass_action_tpls) {
+	if (mass_action_tpls === null) {
 		return false;
 	}
 
-	mass_action_tpls.addEventListener('change', (ev) => {
+	const $template_ms = $(template_visible).find('#templates_, #linked_templates_');
+
+	$template_ms.on('change', (e) => {
+		$template_ms.multiSelect('setDisabledEntries',
+			[... template_visible.querySelectorAll('[name^="templates["], [name^="linked_templates["]')]
+				.map((input) => input.value)
+		);
+	});
+
+	mass_action_tpls.addEventListener('change', (e) => {
 		const action = obj.querySelector('input[name="mass_action_tpls"]:checked').value;
 
-		obj.querySelector('#mass_clear_tpls').disabled = action === '<?= ZBX_ACTION_ADD ?>';
+		obj.querySelector('#mass_clear_tpls').disabled = (action === '<?= ZBX_ACTION_ADD ?>');
 	});
 
 	mass_action_tpls.dispatchEvent(new CustomEvent('change', {}));
@@ -321,17 +334,17 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		}
 	}
 
-	function openAddfromPopup(elm) {
+	function openAddfromPopup(element) {
 		let disable_names = [];
-		let valuemap_table = elm.closest('table');
+		let valuemap_table = element.closest('table');
 
-		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => disable_names.push(elm.value));
+		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((element) => disable_names.push(element.value));
 		PopUp('popup.generic', {
 			srctbl: 'valuemaps',
 			srcfld1: 'valuemapid',
 			disable_names: disable_names,
 			editable: true
-		}, null, elm);
+		}, {dialogue_class: 'modal-popup-generic', trigger_element: element});
 	}
 
 	function toggleVisible(obj, data_type) {
@@ -343,36 +356,6 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	toggleVisible(obj, obj.querySelector('[name=valuemap_massupdate]:checked').value);
 })();
-
-function visibility_status_changeds(value, obj_id, replace_to) {
-	const obj = document.getElementById(obj_id);
-	if (obj === null) {
-		throw `Cannot find objects with name [${obj_id}]`;
-	}
-
-	if (replace_to && replace_to != '') {
-		if (obj.originalObject) {
-			const old_obj = obj.originalObject;
-			old_obj.originalObject = obj;
-			obj.parentNode.replaceChild(old_obj, obj);
-		}
-		else if (!value) {
-			const new_obj = document.createElement('span');
-			new_obj.setAttribute('name', obj.name);
-			new_obj.setAttribute('id', obj.id);
-
-			new_obj.innerHTML = replace_to;
-			new_obj.originalObject = obj;
-			obj.parentNode.replaceChild(new_obj, obj);
-		}
-		else {
-			throw 'Missing originalObject for restoring';
-		}
-	}
-	else {
-		obj.style.visibility = value ? 'visible' : 'hidden';
-	}
-}
 
 if (!CR && !GK) {
 	$("textarea[maxlength]").bind("paste contextmenu change keydown keypress keyup", function() {
@@ -408,7 +391,7 @@ function submitPopup(overlay) {
 		overlayDialogue({
 			'title': <?= json_encode(_('Warning')) ?>,
 			'type': 'popup',
-			'class': 'modal-popup modal-popup-medium',
+			'class': 'position-middle',
 			'content': $('<span>').text(warning_message),
 			'buttons': [
 				{
@@ -457,22 +440,26 @@ function submitPopup(overlay) {
 
 	fetch(url.getUrl(), {
 		method: 'post',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-		},
+		headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
 		body: $(form).serialize()
 	})
 	.then((response) => response.json())
 	.then((response) => {
+		if ('script_inline' in response) {
+			$('head').append(response.script_inline);
+		}
+
 		if ('errors' in response) {
 			overlay.unsetLoading();
 			$(response.errors).insertBefore(form);
 		}
 		else {
-			postMessageOk(response['title']);
+			postMessageOk(response.title);
+
 			if ('messages' in response) {
 				postMessageDetails('success', response.messages);
 			}
+
 			overlayDialogueDestroy(overlay.dialogueid);
 			location.href = location_url;
 		}

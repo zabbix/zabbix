@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,17 +24,18 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"reflect"
 	"strings"
 	"time"
 	"unicode/utf8"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxcomms"
@@ -45,16 +46,17 @@ const hostInterfaceLen = 255
 const defaultAgentPort = 10050
 
 type Connector struct {
-	clientID    uint64
-	input       chan interface{}
-	address     string
-	hostname    string
-	localAddr   net.Addr
-	lastError   error
-	resultCache resultcache.ResultCache
-	taskManager scheduler.Scheduler
-	options     *agent.AgentOptions
-	tlsConfig   *tls.Config
+	clientID                   uint64
+	input                      chan interface{}
+	addresses                  []string
+	hostname                   string
+	localAddr                  net.Addr
+	lastErrors                 []error
+	firstActiveChecksRefreshed bool
+	resultCache                resultcache.ResultCache
+	taskManager                scheduler.Scheduler
+	options                    *agent.AgentOptions
+	tlsConfig                  *tls.Config
 }
 
 type activeChecksRequest struct {
@@ -68,9 +70,9 @@ type activeChecksRequest struct {
 }
 
 type activeChecksResponse struct {
-	Response string            `json:"response"`
-	Info     string            `json:"info"`
-	Data     []*plugin.Request `json:"data"`
+	Response    string               `json:"response"`
+	Info        string               `json:"info"`
+	Data        []*plugin.Request    `json:"data"`
 	Expressions []*glexpr.Expression `json:"regexp"`
 }
 
@@ -80,44 +82,55 @@ type agentDataResponse struct {
 }
 
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
-func ParseServerActive() ([]string, error) {
+func ParseServerActive() ([][]string, error) {
+
 	if 0 == len(strings.TrimSpace(agent.Options.ServerActive)) {
-		return []string{}, nil
+		return [][]string{}, nil
 	}
 
 	var checkAddr string
-	addresses := strings.Split(agent.Options.ServerActive, ",")
+	clusters := strings.Split(agent.Options.ServerActive, ",")
 
-	for i := 0; i < len(addresses); i++ {
-		addresses[i] = strings.TrimSpace(addresses[i])
-		u := url.URL{Host: addresses[i]}
-		ip := net.ParseIP(addresses[i])
-		if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
-			return nil, fmt.Errorf("address \"%s\": empty value", addresses[i])
-		}
+	addrs := make([][]string, len(clusters))
 
-		if nil != ip {
-			checkAddr = net.JoinHostPort(addresses[i], "10051")
-		} else if 0 == len(u.Port()) {
-			checkAddr = net.JoinHostPort(u.Hostname(), "10051")
-		} else {
-			checkAddr = addresses[i]
-		}
+	for i := 0; i < len(clusters); i++ {
+		addresses := strings.Split(clusters[i], ";")
 
-		if h, p, err := net.SplitHostPort(checkAddr); err != nil {
-			return nil, fmt.Errorf("address \"%s\": %s", addresses[i], err)
-		} else {
-			addresses[i] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
-		}
-
-		for j := 0; j < i; j++ {
-			if addresses[j] == addresses[i] {
-				return nil, fmt.Errorf("address \"%s\" specified more than once", addresses[i])
+		for j := 0; j < len(addresses); j++ {
+			addresses[j] = strings.TrimSpace(addresses[j])
+			u := url.URL{Host: addresses[j]}
+			ip := net.ParseIP(addresses[j])
+			if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
+				return nil, fmt.Errorf("address \"%s\": empty value", addresses[j])
 			}
+
+			if nil != ip {
+				checkAddr = net.JoinHostPort(addresses[j], "10051")
+			} else if 0 == len(u.Port()) {
+				checkAddr = net.JoinHostPort(u.Hostname(), "10051")
+			} else {
+				checkAddr = addresses[j]
+			}
+
+			if h, p, err := net.SplitHostPort(checkAddr); err != nil {
+				return nil, fmt.Errorf("address \"%s\": %s", addresses[j], err)
+			} else {
+				addresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
+			}
+
+			for k := 0; k < len(addrs); k++ {
+				for l := 0; l < len(addrs[k]); l++ {
+					if addrs[k][l] == addresses[j] {
+						return nil, fmt.Errorf("address \"%s\" specified more than once", addresses[j])
+					}
+				}
+			}
+
+			addrs[i] = append(addrs[i], addresses[j])
 		}
 	}
 
-	return addresses, nil
+	return addrs, nil
 }
 
 func (c *Connector) refreshActiveChecks() {
@@ -129,8 +142,8 @@ func (c *Connector) refreshActiveChecks() {
 		Version: version.Short(),
 	}
 
-	log.Debugf("[%d] In refreshActiveChecks() from [%s]", c.clientID, c.address)
-	defer log.Debugf("[%d] End of refreshActiveChecks() from [%s]", c.clientID, c.address)
+	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.addresses)
+	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.addresses)
 
 	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostInterface",
 		c.options.HostInterface, c.options.HostInterfaceItem, hostInterfaceLen, agent.LocalChecksClientID); err != nil {
@@ -158,47 +171,53 @@ func (c *Connector) refreshActiveChecks() {
 
 	request, err := json.Marshal(&a)
 	if err != nil {
-		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.address, err)
+		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.addresses[0], err)
 		return
 	}
 
-	data, err := zbxcomms.Exchange(c.address, &c.localAddr, time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
+	data, errs := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
+		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
-	if err != nil {
-		if c.lastError == nil || err.Error() != c.lastError.Error() {
-			log.Warningf("[%d] active check configuration update from [%s %s] started to fail (%s)", c.clientID,
-				c.address, c.hostname, err)
-			c.lastError = err
+	if errs != nil {
+		if !reflect.DeepEqual(errs, c.lastErrors) {
+			for i := 0; i < len(errs); i++ {
+				log.Warningf("[%d] %s", c.clientID, errs[i])
+			}
+			log.Warningf("[%d] active check configuration update from host [%s] started to fail", c.clientID,
+				c.hostname)
+			c.lastErrors = errs
 		}
 		return
 	}
 
-	if c.lastError != nil {
-		log.Warningf("[%d] active check configuration update from [%s] is working again", c.clientID, c.address)
-		c.lastError = nil
+	if c.lastErrors != nil {
+		log.Warningf("[%d] active check configuration update from [%s] is working again", c.clientID, c.addresses[0])
+		c.lastErrors = nil
 	}
 
 	var response activeChecksResponse
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Errf("[%d] cannot parse list of active checks from [%s]: %s", c.clientID, c.address, err)
+		log.Errf("[%d] cannot parse list of active checks from [%s]: %s", c.clientID, c.addresses[0], err)
 		return
 	}
 
 	if response.Response != "success" {
 		if len(response.Info) != 0 {
-			log.Errf("[%d] no active checks on server [%s]: %s", c.clientID, c.address, response.Info)
+			log.Errf("[%d] no active checks on server [%s]: %s", c.clientID, c.addresses[0], response.Info)
 		} else {
-			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address)
+			log.Errf("[%d] no active checks on server [%s]", c.clientID, c.addresses[0])
 		}
-		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), []*glexpr.Expression{}, []*plugin.Request{})
+		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
+			[]*glexpr.Expression{}, []*plugin.Request{})
+		c.firstActiveChecksRefreshed = true
 		return
 	}
 
 	if response.Data == nil {
 		log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
-			c.address)
+			c.addresses[0])
 		return
 	}
 
@@ -206,36 +225,36 @@ func (c *Connector) refreshActiveChecks() {
 		if len(response.Data[i].Key) == 0 {
 			if response.Data[i].Itemid == 0 {
 				log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing",
-					c.clientID, c.address)
+					c.clientID, c.addresses[0])
 				return
 			}
 
 			log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing for itemid '%d'",
-				c.clientID, c.address, response.Data[i].Itemid)
+				c.clientID, c.addresses[0], response.Data[i].Itemid)
 			return
 		}
 
 		if response.Data[i].Itemid == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: itemid is missing for key '%s'",
-				c.clientID, c.address, response.Data[i].Key)
+				c.clientID, c.addresses[0], response.Data[i].Key)
 			return
 		}
 
 		if len(response.Data[i].Delay) == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: delay is missing for itemid '%d'",
-				c.clientID, c.address, response.Data[i].Itemid)
+				c.clientID, c.addresses[0], response.Data[i].Itemid)
 			return
 		}
 
 		if response.Data[i].LastLogsize == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: lastlogsize is missing for itemid '%d'",
-				c.clientID, c.address, response.Data[i].Itemid)
+				c.clientID, c.addresses[0], response.Data[i].Itemid)
 			return
 		}
 
 		if response.Data[i].Mtime == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: mtime is missing for itemid '%d'",
-				c.clientID, c.address, response.Data[i].Itemid)
+				c.clientID, c.addresses[0], response.Data[i].Itemid)
 			return
 		}
 	}
@@ -243,42 +262,44 @@ func (c *Connector) refreshActiveChecks() {
 	for i := 0; i < len(response.Expressions); i++ {
 		if len(response.Expressions[i].Name) == 0 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "name"`,
-				c.clientID, c.address)
+				c.clientID, c.addresses[0])
 			return
 		}
 
 		if len(response.Expressions[i].Body) == 0 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression"`,
-				c.clientID, c.address)
+				c.clientID, c.addresses[0])
 			return
 		}
 
 		if response.Expressions[i].Type == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression_type"`,
-				c.clientID, c.address)
+				c.clientID, c.addresses[0])
 			return
 		}
 
 		if response.Expressions[i].Delimiter == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "exp_delimiter"`,
-				c.clientID, c.address)
+				c.clientID, c.addresses[0])
 			return
 		}
 
-		if len(*response.Expressions[i].Delimiter) != 1 {
+		if len(*response.Expressions[i].Delimiter) > 1 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: invalid tag "exp_delimiter" value "%s"`,
-				c.clientID, c.address, *response.Expressions[i].Delimiter)
+				c.clientID, c.addresses[0], *response.Expressions[i].Delimiter)
 			return
 		}
 
 		if response.Expressions[i].Mode == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "case_sensitive"`,
-				c.clientID, c.address)
+				c.clientID, c.addresses[0])
 			return
 		}
 	}
 
-	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), response.Expressions, response.Data)
+	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
+		response.Expressions, response.Data)
+	c.firstActiveChecksRefreshed = true
 }
 
 func (c *Connector) run() {
@@ -286,7 +307,7 @@ func (c *Connector) run() {
 	var lastFlush time.Time
 
 	defer log.PanicHook()
-	log.Debugf("[%d] starting server connector for '%s'", c.clientID, c.address)
+	log.Debugf("[%d] starting server connector for %s", c.clientID, c.addresses)
 
 	ticker := time.NewTicker(time.Second)
 run:
@@ -323,10 +344,11 @@ func (c *Connector) updateOptions(options *agent.AgentOptions) {
 	c.localAddr = &net.TCPAddr{IP: net.ParseIP(agent.Options.SourceIP), Port: 0}
 }
 
-func New(taskManager scheduler.Scheduler, address string, hostname string, options *agent.AgentOptions) (connector *Connector, err error) {
+func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
+	options *agent.AgentOptions) (connector *Connector, err error) {
 	c := &Connector{
 		taskManager: taskManager,
-		address:     address,
+		addresses:   addresses,
 		hostname:    hostname,
 		input:       make(chan interface{}, 10),
 		clientID:    agent.NewClientID(),
@@ -338,10 +360,11 @@ func New(taskManager scheduler.Scheduler, address string, hostname string, optio
 	}
 
 	ac := &activeConnection{
-		address:   address,
+		addresses: addresses,
 		hostname:  hostname,
 		localAddr: c.localAddr,
 		tlsConfig: c.tlsConfig,
+		timeout:   options.Timeout,
 	}
 	c.resultCache = resultcache.New(&agent.Options, c.clientID, ac)
 
@@ -380,7 +403,7 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 		}
 
 		if !utf8.ValidString(value) {
-			return "", fmt.Errorf("value is not an UTF-8 string")
+			return "", fmt.Errorf("value is not a UTF-8 string")
 		}
 
 		if len(value) > length {

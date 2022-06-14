@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,18 +187,18 @@ class testFormTrigger extends CLegacyWebTest {
 	 * @dataProvider layout
 	 */
 	public function testFormTrigger_CheckLayout($data) {
-
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
-			$this->zbxTestClickLinkTextWait($data['template']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenTriggers($data['template'], $form);
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
-			$this->zbxTestClickLinkTextWait($data['host']);
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenTriggers($data['host'], $form);
 		}
 
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -237,7 +237,6 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('description');
 		$this->zbxTestAssertAttribute("//input[@id='description']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='description']", 'size', 20);
 
 		if (!isset($data['constructor']) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(['Expression', 'Expression constructor']);
@@ -306,7 +305,6 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestTextPresent('URL');
 		$this->zbxTestAssertVisibleId('url');
 		$this->zbxTestAssertAttribute("//input[@id='url']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='url']", 'size', 20);
 
 		$this->zbxTestAssertElementPresentId('priority_0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_0'));
@@ -375,8 +373,10 @@ class testFormTrigger extends CLegacyWebTest {
 
 		$this->zbxTestTabSwitch('Dependencies');
 		$this->zbxTestTextPresent(['Dependencies', 'Name', 'Action']);
-		$this->zbxTestAssertElementPresentId('bnt1');
-		$this->zbxTestAssertElementText("//button[@id='bnt1']", 'Add');
+		if (!isset($data['templatedHost'])) {
+			$this->zbxTestAssertElementPresentId('bnt1');
+			$this->zbxTestAssertElementText("//button[@id='bnt1']", 'Add');
+		}
 	}
 
 	// Returns update data
@@ -399,9 +399,9 @@ class testFormTrigger extends CLegacyWebTest {
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 		$oldHashFunctions = CDBHelper::getHash($sqlFunctions);
 
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenTriggers($this->host, $form);
 		$this->zbxTestClickLinkTextWait($data['description']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of triggers');
@@ -762,6 +762,48 @@ class testFormTrigger extends CLegacyWebTest {
 						]
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'description' => 'MyTrigger_rate_good',
+					'expression' => 'rate(/Simple form test host/test-item-reuse,2m:now-1h)>0.5'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_rate_bad_second_par',
+					'expression' => 'rate(/Simple form test host/test-item-reuse,test)>0.5',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
+								"\"rate(/Simple form test host/test-item-reuse,test)>0.5\"."
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_rate_no_slash',
+					'expression' => 'rate(Simple form test host/test-item-reuse,1h)>0.5',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						"Invalid parameter \"/1/expression\": incorrect expression starting from ".
+								"\"rate(Simple form test host/test-item-reuse,1h)>0.5\"."
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'MyTrigger_rate_bad_key',
+					'expression' => 'rate(/Simple form test host/test,1h)>0.5',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Incorrect item key "test" provided for trigger expression on "Simple form test host".'
+					]
+				]
 			]
 		];
 	}
@@ -770,9 +812,9 @@ class testFormTrigger extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormTrigger_SimpleCreate($data) {
-		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickLinkTextWait($this->host);
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Triggers"]');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$this->filterEntriesAndOpenTriggers($this->host, $form);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 		$this->zbxTestCheckHeader('Triggers');
 
@@ -868,20 +910,21 @@ class testFormTrigger extends CLegacyWebTest {
 				}
 				if (isset($constructor['elementError'])) {
 					$count = CTestArrayHelper::get($constructor, 'element_count', 1);
-					$this->assertEquals($count, $this->query('xpath://span[@class="icon-info status-red"]')->all()->count());
+					$this->assertEquals($count, $this->query('xpath://a[@class="icon-info status-red"]')->all()->count());
 					$text = $this->query('xpath://tr[1]//div[@class="hint-box"]')->one()->getText();
 					foreach ($constructor['errors'] as $error) {
-						$this->assertContains($error, $text);
+						$this->assertStringContainsString($error, $text);
 					}
 				}
 				else {
-					$this->zbxTestAssertElementNotPresentXpath('//span[@class="icon-info status-red"]');
+					$this->zbxTestAssertElementNotPresentXpath('//a[@class="icon-info status-red"]');
 				}
 			}
 		}
 
 		if (!isset($data['constructor'])) {
 			$this->zbxTestClickWait('add');
+			$this->page->waitUntilReady();
 			switch ($data['expected']) {
 				case TEST_GOOD:
 					$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger added');
@@ -890,12 +933,7 @@ class testFormTrigger extends CLegacyWebTest {
 					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[6]", $expression);
 					break;
 				case TEST_BAD:
-					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
-					$this->zbxTestCheckTitle('Configuration of triggers');
-					foreach ($data['errors'] as $msg) {
-						$msg = str_replace('<', '&lt;', $msg);
-						$this->zbxTestTextPresent($msg);
-					}
+					$this->assertMessage(TEST_BAD, $data['error_msg'], $data['errors']);
 					$this->zbxTestTextPresent('Name');
 					$this->zbxTestTextPresent('Expression');
 					$this->zbxTestTextPresent('Description');
@@ -947,5 +985,18 @@ class testFormTrigger extends CLegacyWebTest {
 				}
 			}
 		}
+	}
+
+	/**
+	* Function for filtering necessary hosts and opening their Web scenarios.
+	*
+	* @param string    $name    name of a host or template where triggers are opened
+	*/
+	private function filterEntriesAndOpenTriggers($name, $form) {
+		$this->query('button:Reset')->one()->click();
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+			->getColumn('Triggers')->query('link:Triggers')->one()->click();
 	}
 }

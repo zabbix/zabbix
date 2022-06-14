@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ zbx_uint64_t	zbx_mock_get_object_member_uint64(zbx_mock_handle_t object, const c
 
 double	zbx_mock_get_parameter_float(const char *path);
 double	zbx_mock_get_object_member_float(zbx_mock_handle_t object, const char *name);
+int	zbx_mock_get_object_member_int(zbx_mock_handle_t object, const char *name);
 
 int	zbx_mock_str_to_return_code(const char *str);
 unsigned char	zbx_mock_str_to_value_type(const char *str);

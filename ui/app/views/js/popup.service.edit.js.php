@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,37 +17,60 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.service_edit_popup = {
-	algorithm_names: <?= json_encode(CServiceHelper::getAlgorithmNames(), JSON_FORCE_OBJECT) ?>,
 
-	serviceid: null,
-	overlay: null,
-	dialogue: null,
-	form: null,
+window.service_edit_popup = new class {
 
-	init({serviceid, children, children_problem_tags_html, problem_tags}) {
+	constructor() {
+		this.status_rule_template = null;
+		this.child_template = null;
+
+		this.serviceid = null;
+		this.children = new Map();
+
+		this.create_url = null;
+		this.update_url = null;
+		this.delete_url = null;
+		this.search_limit = null;
+
+		this.overlay = null;
+		this.dialogue = null;
+		this.form = null;
+		this.footer = null;
+	}
+
+	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, create_url, update_url,
+			delete_url, search_limit}) {
+		this.initTemplates();
+
 		this.serviceid = serviceid;
+
+		this.create_url = create_url;
+		this.update_url = update_url;
+		this.delete_url = delete_url;
+		this.search_limit = search_limit;
+
 		this.overlay = overlays_stack.getById('service_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.footer = this.overlay.$dialogue.$footer[0];
 
-		// Setup Tabs.
+		for (const status_rule of status_rules) {
+			this.addStatusRule(status_rule);
+		}
 
-		const $tabs = $('#tabs');
+		for (const service of children) {
+			this.children.set(service.serviceid, {
+				serviceid: service.serviceid,
+				name: service.name,
+				problem_tags_html: children_problem_tags_html[service.serviceid]
+			});
+		}
 
-		$tabs.tabs();
-		$tabs.on('tabsactivate', () => {
-			$tabs.resize();
-		});
+		this.filterChildren();
 
-		// Add custom Select button for Parent services.
+		// Setup parent services.
 
 		jQuery('#parent_serviceids_')
 			.multiSelect('getSelectButton')
@@ -55,59 +78,84 @@ window.service_edit_popup = {
 				this.selectParents();
 			});
 
-		// Fill-in current Child services.
-		for (const service of children) {
-			this.addChild({
-				serviceid: service.serviceid,
-				name: service.name,
-				algorithm: service.algorithm,
-				problem_tags_html: children_problem_tags_html[service.serviceid]
-			});
-		}
+		// Setup problem tags.
 
-		// Setup Tags.
+		const $problem_tags = jQuery(document.getElementById('problem_tags'));
 
-		const $tags = jQuery(document.getElementById('tags-table'));
-
-		$tags.dynamicRows({template: '#tag-row-tmpl'});
-		$tags.on('click', '.element-table-add', () => {
-			$tags
-				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-				.textareaFlexible();
-		});
-
-		// Update form field state according to the form data.
-
-		for (const id of ['algorithm', 'showsla']) {
-			document
-				.getElementById(id)
-				.addEventListener('change', () => this.update());
-		}
-
-		this.update();
-
-		// Setup Problem tags.
-		jQuery(document.getElementById('problem_tags')).dynamicRows({
+		$problem_tags.dynamicRows({
 			template: '#problem-tag-row-tmpl',
 			rows: problem_tags
 		});
 
-		// Setup Service times.
+		$problem_tags.on('tableupdate.dynamicRows', () => this.update());
+
+		document.getElementById('problem_tags').addEventListener('change', () => this.update());
+
+		// Setup service rules.
+
 		document
-			.getElementById('times')
+			.getElementById('status_rules')
 			.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-add')) {
-					this.editTime();
+					this.editStatusRule();
 				}
 				else if (e.target.classList.contains('js-edit')) {
-					this.editTime(e.target.closest('tr'));
+					this.editStatusRule(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
 				}
 			});
 
-		// Setup Child services.
+		// Setup tags tab.
+
+		const tabs = jQuery('#' + tabs_id);
+
+		const initialize_tags = (event, ui) => {
+			const $panel = event.type === 'tabscreate' ? ui.panel : ui.newPanel;
+
+			if ($panel.attr('id') === 'tags-tab') {
+				const $tags = jQuery('#tags-table');
+
+				$tags
+					.dynamicRows({template: '#tag-row-tmpl'})
+					.on('afteradd.dynamicRows', () => {
+						$tags
+							.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+							.textareaFlexible();
+					})
+					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+					.textareaFlexible();
+
+					tabs.off('tabscreate tabsactivate', initialize_tags);
+			}
+		};
+
+		tabs.on('tabscreate tabsactivate', initialize_tags);
+
+		// Setup child services.
+
+		document
+			.getElementById('children-filter')
+			.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-filter')) {
+					this.filterChildren();
+				}
+				else if (e.target.classList.contains('js-reset')) {
+					document.getElementById('children-filter-name').value = '';
+					this.filterChildren();
+				}
+			});
+
+		document
+			.getElementById('children-filter-name')
+			.addEventListener('keypress', (e) => {
+				if (e.key === 'Enter') {
+					this.filterChildren();
+					e.preventDefault();
+				}
+			}, {passive: false});
+
 		document
 			.getElementById('children')
 			.addEventListener('click', (e) => {
@@ -115,102 +163,228 @@ window.service_edit_popup = {
 					this.selectChildren();
 				}
 				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove();
+					this.removeChild(e.target.closest('tr').dataset.serviceid);
 				}
 			});
-	},
+
+		// Update form field state according to the form data.
+
+		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
+			document
+				.getElementById(id)
+				.addEventListener('change', () => this.update());
+		}
+
+		this.update();
+	}
+
+	initTemplates() {
+		this.status_rule_template = new Template(`
+			<tr data-row_index="#{row_index}">
+				<td>
+					#{*name}
+					<input type="hidden" id="status_rules_#{row_index}_new_status" name="status_rules[#{row_index}][new_status]" value="#{new_status}">
+					<input type="hidden" id="status_rules_#{row_index}_type" name="status_rules[#{row_index}][type]" value="#{type}">
+					<input type="hidden" id="status_rules_#{row_index}_limit_value" name="status_rules[#{row_index}][limit_value]" value="#{limit_value}">
+					<input type="hidden" id="status_rules_#{row_index}_limit_status" name="status_rules[#{row_index}][limit_status]" value="#{limit_status}">
+				</td>
+				<td>
+					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
+						</li>
+						<li>
+							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+						</li>
+					</ul>
+				</td>
+			</tr>
+		`);
+
+		this.child_template = new Template(`
+			<tr data-serviceid="#{serviceid}">
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
+				<td class="<?= ZBX_STYLE_WORDWRAP ?>">#{*problem_tags_html}</td>
+				<td>
+					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
+				</td>
+			</tr>
+		`);
+	}
 
 	update() {
-		const status_enabled = document.getElementById('algorithm').value != <?= SERVICE_ALGORITHM_NONE ?>;
-		const showsla = document.getElementById('showsla').checked;
+		const advanced_configuration = document.getElementById('advanced_configuration').checked;
+		const propagation_rule = document.getElementById('propagation_rule').value;
 
-		document.getElementById('problem_tags_label').style.display = status_enabled ? '' : 'none';
-		document.getElementById('problem_tags_field').style.display = status_enabled ? '' : 'none';
+		let has_problem_tags = false;
 
-		document.getElementById('showsla').disabled = !status_enabled;
-		document.getElementById('goodsla').disabled = !status_enabled || !showsla;
-	},
+		for (const problem_tag of document.querySelectorAll('#problem_tags .js-problem-tag-tag')) {
+			if (problem_tag.value !== '') {
+				has_problem_tags = true;
 
-	editTime(row = null) {
-		let popup_params;
+				break;
+			}
+		}
+
+		document
+			.getElementById('problem_tags')
+			.querySelectorAll('.js-problem-tag-input, .element-table-remove, .element-table-add')
+			.forEach((element) => {
+				element.disabled = this.children.size > 0;
+			});
+
+		document.getElementById('algorithm-not-applicable-warning').style.display =
+			this.children.size > 0 ? 'none' : '';
+
+		document.getElementById('additional_rules_label').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('additional_rules_field').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('status_propagation_rules_label').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('status_propagation_rules_field').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('status_propagation_value_field').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('weight_label').style.display = advanced_configuration ? '' : 'none';
+		document.getElementById('weight_field').style.display = advanced_configuration ? '' : 'none';
+
+		switch (propagation_rule) {
+			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_INCREASE ?>':
+			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_DECREASE ?>':
+				document.getElementById('propagation_value_number').style.display = '';
+				document.getElementById('propagation_value_status').style.display = 'none';
+				break;
+
+			case '<?= ZBX_SERVICE_STATUS_PROPAGATION_FIXED ?>':
+				document.getElementById('propagation_value_number').style.display = 'none';
+				document.getElementById('propagation_value_status').style.display = '';
+				break;
+
+			default:
+				document.getElementById('propagation_value_number').style.display = 'none';
+				document.getElementById('propagation_value_status').style.display = 'none';
+				document.getElementById('status_propagation_value_field').style.display = 'none';
+		}
+
+		document.querySelector('#children .js-add').disabled = has_problem_tags;
+	}
+
+	editStatusRule(row = null) {
+		let parameters;
 
 		if (row !== null) {
 			const row_index = row.dataset.row_index;
 
-			popup_params = {
+			parameters = {
 				edit: '1',
 				row_index,
-				type: row.querySelector(`[name="times[${row_index}][type]"`).value,
-				ts_from: row.querySelector(`[name="times[${row_index}][ts_from]"`).value,
-				ts_to: row.querySelector(`[name="times[${row_index}][ts_to]"`).value,
-				note: row.querySelector(`[name="times[${row_index}][note]"`).value
+				new_status: row.querySelector(`[name="status_rules[${row_index}][new_status]"`).value,
+				type: row.querySelector(`[name="status_rules[${row_index}][type]"`).value,
+				limit_value: row.querySelector(`[name="status_rules[${row_index}][limit_value]"`).value,
+				limit_status: row.querySelector(`[name="status_rules[${row_index}][limit_status]"`).value
 			};
 		}
 		else {
 			let row_index = 0;
 
-			while (document.querySelector(`#times [data-row_index="${row_index}"]`) !== null) {
+			while (document.querySelector(`#status_rules [data-row_index="${row_index}"]`) !== null) {
 				row_index++;
 			}
 
-			popup_params = {row_index};
+			parameters = {row_index};
 		}
 
-		const overlay = PopUp('popup.service.time.edit', popup_params, 'service_time_edit', document.activeElement);
+		const overlay = PopUp('popup.service.statusrule.edit', parameters, {dialogueid: 'service_status_rule_edit'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			const new_row = e.detail;
-
 			if (row !== null) {
-				row.insertAdjacentHTML('afterend', new_row);
-				row.remove();
+				this.updateStatusRule(row, e.detail)
 			}
 			else {
-				document
-					.querySelector('#times tbody')
-					.insertAdjacentHTML('beforeend', new_row);
+				this.addStatusRule(e.detail);
 			}
 		});
-	},
+	}
 
-	addChild(service) {
-		const input_name = `child_serviceids[${service.serviceid}]`;
+	addStatusRule(status_rule) {
+		document
+			.querySelector('#status_rules tbody')
+			.insertAdjacentHTML('beforeend', this.status_rule_template.evaluate(status_rule));
+	}
 
-		if (document.querySelector(`#children tbody input[name="${input_name}"]`) !== null) {
-			return;
-		}
+	updateStatusRule(row, status_rule) {
+		row.insertAdjacentHTML('afterend', this.status_rule_template.evaluate(status_rule));
+		row.remove();
+	}
 
-		const template = document.createElement('template');
-
-		template.innerHTML = `
-			<tr>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-name" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">
-					<input type="hidden">
-				</td>
-				<td class="js-algorithm"></td>
-				<td class="<?= ZBX_STYLE_WORDWRAP ?> js-problem_tags_html"></td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"></button>
-				</td>
-			</tr>
-		`;
-
-		const row = template.content.firstElementChild;
-
-		row.querySelector('.js-name').insertAdjacentText('afterbegin', service.name);
-
-		const input = row.querySelector('.js-name input');
-		input.name = input_name;
-		input.value = service.serviceid;
-
-		row.querySelector('.js-algorithm').textContent = this.algorithm_names[service.algorithm];
-		row.querySelector('.js-problem_tags_html').innerHTML = service.problem_tags_html;
-		row.querySelector('.js-remove').textContent = <?= json_encode(_('Remove')); ?>;
-
+	renderChild(service) {
 		document
 			.querySelector('#children tbody')
-			.appendChild(row);
-	},
+			.insertAdjacentHTML('beforeend', this.child_template.evaluate({
+				serviceid: service.serviceid,
+				name: service.name,
+				problem_tags_html: service.problem_tags_html
+			}));
+	}
+
+	removeChild(serviceid) {
+		const child = this.form.querySelector(`#children tbody tr[data-serviceid="${serviceid}"]`);
+
+		if (child !== null) {
+			child.remove();
+		}
+
+		this.children.delete(serviceid);
+		this.updateChildrenFilterStats();
+		this.updateTabIndicator();
+		this.update();
+	}
+
+	removeAllChildren() {
+		document.querySelector('#children tbody').innerHTML = '';
+
+		this.children.clear();
+		this.updateChildrenFilterStats();
+		this.updateTabIndicator();
+		this.update();
+	}
+
+	filterChildren() {
+		const container = document.querySelector('#children tbody');
+
+		container.innerHTML = '';
+
+		const filter_name = document.getElementById('children-filter-name').value.toLowerCase();
+
+		let count = 0;
+
+		for (const service of this.children.values()) {
+			if (!service.name.toLowerCase().includes(filter_name)) {
+				continue;
+			}
+
+			this.renderChild(service);
+
+			if (++count == this.search_limit) {
+				break;
+			}
+		}
+
+		this.updateChildrenFilterStats();
+		this.updateTabIndicator();
+	}
+
+	updateChildrenFilterStats() {
+		const container = document.querySelector('#children tbody');
+
+		const stats_template = <?= json_encode(_('Displaying %1$s of %2$s found')) ?>;
+
+		document.querySelector('#children tfoot .inline-filter-stats').textContent = this.children.size > 0
+			? sprintf(stats_template, container.childElementCount, this.children.size)
+			: '';
+	}
+
+	updateTabIndicator() {
+		document
+			.querySelector('#children')
+			.setAttribute('data-tab-indicator', this.children.size);
+	}
 
 	selectChildren() {
 		const exclude_serviceids = [];
@@ -224,16 +398,23 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-			title: <?= json_encode(_('Add child services')); ?>,
+			title: <?= json_encode(_('Add child services')) ?>,
 			exclude_serviceids
-		}, 'services', document.activeElement);
+		}, {dialogueid: 'services'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			for (const service of e.detail) {
-				this.addChild(service);
+				if (!this.children.has(service.serviceid)) {
+					this.children.set(service.serviceid, service);
+					this.renderChild(service);
+				}
 			}
+
+			this.updateChildrenFilterStats();
+			this.updateTabIndicator();
+			this.update();
 		});
-	},
+	}
 
 	selectParents() {
 		const exclude_serviceids = [];
@@ -247,9 +428,9 @@ window.service_edit_popup = {
 		}
 
 		const overlay = PopUp('popup.services', {
-			title: <?= json_encode(_('Add parent services')); ?>,
+			title: <?= json_encode(_('Add parent services')) ?>,
 			exclude_serviceids
-		}, 'services', document.activeElement);
+		}, {dialogueid: 'services'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];
@@ -260,12 +441,91 @@ window.service_edit_popup = {
 
 			jQuery('#parent_serviceids_').multiSelect('addData', data);
 		});
-	},
+	}
+
+	clone({title, buttons}) {
+		this.serviceid = null;
+
+		this.removeAllChildren();
+
+		this.overlay.unsetLoading();
+		this.overlay.setProperties({title, buttons});
+	}
+
+	delete() {
+		for (const el of this.form.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+
+		this.overlay.setLoading();
+
+		const curl = new Curl(this.delete_url);
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({serviceids: [this.serviceid]})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {response_error: response.error};
+				}
+
+				if ('success' in response) {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
+						detail: {
+							title: response.success.title,
+							messages: ('messages' in response.success) ? response.success.messages : null
+						}
+					}));
+				}
+			})
+			.catch((error) => {
+				this.overlay.unsetLoading();
+
+				let title, messages;
+
+				if (typeof error === 'object' && 'response_error' in error) {
+					title = error.response_error.title;
+					messages = error.response_error.messages;
+				}
+				else {
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
+					messages = [];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+	}
 
 	submit() {
 		const fields = getFormFields(this.form);
 
+		if (this.serviceid !== null) {
+			fields.serviceid = this.serviceid;
+		}
+
 		fields.name = fields.name.trim();
+		fields.child_serviceids = [...this.children.keys()];
+
+		if ('tags' in fields) {
+			for (const tag of Object.values(fields.tags)) {
+				tag.tag = tag.tag.trim();
+				tag.value = tag.value.trim();
+			}
+		}
+
+		if ('problem_tags' in fields) {
+			for (const problem_tag of Object.values(fields.problem_tags)) {
+				problem_tag.tag = problem_tag.tag.trim();
+				problem_tag.value = problem_tag.value.trim();
+			}
+		}
 
 		for (const el of this.form.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
@@ -275,12 +535,12 @@ window.service_edit_popup = {
 
 		this.overlay.setLoading();
 
-		const curl = new Curl(this.form.getAttribute('action'));
+		const curl = new Curl(this.serviceid !== null ? this.update_url : this.create_url);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-			body: urlEncodeData(fields)
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(fields)
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -316,4 +576,4 @@ window.service_edit_popup = {
 				this.overlay.unsetLoading();
 			});
 	}
-};
+}();

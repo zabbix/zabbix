@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,20 +25,6 @@ require_once dirname(__FILE__).'/../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../include/users.inc.php';
 require_once dirname(__FILE__).'/../../include/js.inc.php';
 require_once dirname(__FILE__).'/../../include/discovery.inc.php';
-
-function get_window_opener($field, $value) {
-	if ($field === '') {
-		return '';
-	}
-
-	return '
-		try {'.
-			"document.getElementById(".zbx_jsvalue($field).").value=".zbx_jsvalue($value)."; ".
-		'} catch(e) {'.
-			'throw("Error: Target not found")'.
-		'}'."\n";
-}
-
 class CControllerPopupGeneric extends CController {
 
 	/**
@@ -391,6 +377,18 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Name')
 				]
+			],
+			'sla' => [
+				'title' => _('SLA'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'slaid,name',
+				'form' => [
+					'name' => 'slaform',
+					'id' => 'sla'
+				],
+				'table_columns' => [
+					_('Name')
+				]
 			]
 		];
 	}
@@ -442,10 +440,10 @@ class CControllerPopupGeneric extends CController {
 			'itemtype' =>							'in '.implode(',', self::ALLOWED_ITEM_TYPES),
 			'value_types' =>						'array',
 			'context' =>							'string|in host,template',
+			'enabled_only' =>						'in 1',
 			'disable_names' =>						'array',
 			'numeric' =>							'in 1',
 			'reference' =>							'string',
-			'orig_names' =>							'in 1',
 			'writeonly' =>							'in 1',
 			'noempty' =>							'in 1',
 			'submit_parent' =>						'in 1',
@@ -765,7 +763,7 @@ class CControllerPopupGeneric extends CController {
 	 * Main controller action.
 	 */
 	protected function doAction() {
-		$popup = $this->popup_properties[$this->source_table];
+		$popup = $this->getPopupProperties();
 
 		// Update or read profile.
 		if ($this->groupids) {
@@ -833,6 +831,25 @@ class CControllerPopupGeneric extends CController {
 	}
 
 	/**
+	 * Customize and return popup properties.
+	 *
+	 * @return array
+	 */
+	protected function getPopupProperties(): array {
+		$popup_properties = $this->popup_properties[$this->source_table];
+
+		switch ($this->source_table) {
+			case 'sla':
+				if (!$this->hasInput('enabled_only')) {
+					$popup_properties['table_columns'] = array_merge($popup_properties['table_columns'], [_('Status')]);
+				}
+				break;
+		}
+
+		return $popup_properties;
+	}
+
+	/**
 	 * Unset records having IDs passed in 'excludeids'.
 	 *
 	 * @param array $records
@@ -884,9 +901,9 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'items':
-				foreach ($records as $itmeid => $row) {
-					$records[$row['name_expanded']] = ['itemid' => $row['name_expanded']] + $row;
-					unset($records[$itmeid]);
+				foreach ($records as $itemid => $row) {
+					$records[$row['name']] = ['itemid' => $row['name']] + $row;
+					unset($records[$itemid]);
 				}
 				break;
 
@@ -1055,7 +1072,7 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'help_items':
-				$records = (new CHelpItems())->getByType($this->page_options['itemtype']);
+				$records = CItemData::getByType($this->page_options['itemtype']);
 				break;
 
 			case 'triggers':
@@ -1114,8 +1131,8 @@ class CControllerPopupGeneric extends CController {
 			case 'items':
 			case 'item_prototypes':
 				$options += [
-					'output' => ['itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
-					'selectHosts' => ['name', 'host'],
+					'output' => ['itemid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
+					'selectHosts' => ['name'],
 					'templated' => $this->hasInput('templated_hosts') ? true : null
 				];
 
@@ -1159,23 +1176,20 @@ class CControllerPopupGeneric extends CController {
 						: [];
 				}
 
-				// Resolve item names by default.
-				$records = $this->hasInput('orig_names')
-					? CArrayHelper::copyObjectsKeys($records, ['name' => 'name_expanded'])
-					: CMacrosResolverHelper::resolveItemNames($records);
-
-				CArrayHelper::sort($records, ['name_expanded']);
+				CArrayHelper::sort($records, ['name']);
 				break;
 
 			case 'graphs':
 			case 'graph_prototypes':
 				$options += [
 					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => ['name'],
+					'selectHosts' => ['hostid', 'name'],
 					'hostids' => $this->hostids ? $this->hostids : null
 				];
 
 				if ($this->source_table === 'graph_prototypes') {
+					$options['selectDiscoveryRule'] = ['hostid'];
+
 					$records = (!$this->host_preselect_required || $this->hostids)
 						? API::GraphPrototype()->get($options)
 						: [];
@@ -1373,13 +1387,29 @@ class CControllerPopupGeneric extends CController {
 
 			case 'dashboard':
 				$options += [
-					'output' => ['dashboardid', 'name'],
-					'preservekeys' => true
+					'output' => ['dashboardid', 'name']
 				];
 
 				$records = API::Dashboard()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				$records = CArrayHelper::renameObjectsKeys($records, ['dashboardid' => 'id']);
+				break;
+
+			case 'sla':
+				$options += $this->hasInput('enabled_only')
+					? [
+						'output' => ['slaid', 'name'],
+						'filter' => [
+							'status' => ZBX_SLA_STATUS_ENABLED
+						]
+					]
+					: [
+						'output' => ['slaid', 'name', 'status']
+					];
+
+				$records = API::Sla()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['slaid' => 'id']);
 				break;
 		}
 

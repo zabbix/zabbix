@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,12 +80,10 @@ class testTriggerLinking extends CIntegrationTest {
 	{
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
-			'eventsource' => 2,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => 0,
-			'host' => self::HOST_NAME,
 			'operations' => [
 				[
-					'actionid' => 1,
 					'operationtype' => 2
 				]
 			]
@@ -108,7 +106,6 @@ class testTriggerLinking extends CIntegrationTest {
 			'status' => 0,
 			'operations' => [
 				[
-					'actionid' => 12,
 					'operationtype' => 6,
 					'optemplate' =>
 					$templateids_for_api_call
@@ -297,22 +294,15 @@ class testTriggerLinking extends CIntegrationTest {
 	}
 
 	/**
-	* Test trigger linking cases.
-	*
-	* @required-components server
-	*/
+	 * Test trigger linking cases.
+	 *
+	 * @configurationDataProvider agentConfigurationProvider
+	 * @required-components server, agent
+	 */
 	public function testTriggerLinking_checkMe() {
-
 		$this->reloadConfigurationCache();
 
-		self::prepareComponentConfiguration(self::COMPONENT_AGENT, $this->agentConfigurationProvider());
-		self::restartComponent(self::COMPONENT_AGENT);
-
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-			'End of DBregister_host_active():SUCCEED'
-		]);
-		sleep(10);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->checkTriggersCreate();
-		self::stopComponent(self::COMPONENT_AGENT);
 	}
 }

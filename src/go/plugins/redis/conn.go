@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,16 +21,19 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/uri"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/mediocregopher/radix/v3"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/uri"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const hkInterval = 10
+
+var errMasterDown = errors.New("MASTERDOWN Link with MASTER is down and slave-serve-stale-data is set to 'no'.")
 
 type redisClient interface {
 	Query(cmd radix.CmdAction) error
@@ -147,6 +150,12 @@ func (c *ConnManager) create(uri uri.URI) (*RedisConn, error) {
 		// Set name for connection. It will be showed in "client list" output.
 		if err == nil {
 			err = conn.Do(radix.Cmd(nil, "CLIENT", "SETNAME", clientName))
+		}
+
+		// Older redis servers return this as an error and the connection is present,
+		// and redis-cli does not return this error but continues
+		if err != nil && err.Error() == errMasterDown.Error() && conn != nil {
+			return conn, nil
 		}
 
 		return conn, err

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ import (
 	_ "zabbix.com/plugins/log"
 	_ "zabbix.com/plugins/memcached"
 	_ "zabbix.com/plugins/modbus"
-	_ "zabbix.com/plugins/mongodb"
 	_ "zabbix.com/plugins/mqtt"
 	_ "zabbix.com/plugins/mysql"
+	_ "zabbix.com/plugins/net/dns"
 	_ "zabbix.com/plugins/net/netif"
 	_ "zabbix.com/plugins/net/tcp"
 	_ "zabbix.com/plugins/net/udp"
@@ -41,9 +41,11 @@ import (
 	_ "zabbix.com/plugins/system/uptime"
 	_ "zabbix.com/plugins/system/users"
 	_ "zabbix.com/plugins/systemrun"
+	_ "zabbix.com/plugins/vfs/dir"
 	_ "zabbix.com/plugins/vfs/file"
 	_ "zabbix.com/plugins/vfs/fs"
 	_ "zabbix.com/plugins/vm/memory"
+	_ "zabbix.com/plugins/vm/vmemory"
 	_ "zabbix.com/plugins/web/certificate"
 	_ "zabbix.com/plugins/web/page"
 	_ "zabbix.com/plugins/windows/eventlog"

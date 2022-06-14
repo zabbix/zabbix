@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,8 +120,6 @@ class CWidget extends CBaseComponent {
 		this._update_abort_controller = null;
 		this._is_updating_paused = false;
 		this._update_retry_sec = 3;
-		this._preloader_timeout = null;
-		this._preloader_timeout_sec = 10;
 		this._show_preloader_asap = true;
 		this._resizable_handles = [];
 	}
@@ -388,10 +386,8 @@ class CWidget extends CBaseComponent {
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-				},
-				body: urlEncodeData({widgetid: this._widgetid, rf_rate})
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({widgetid: this._widgetid, rf_rate})
 			});
 		}
 	}
@@ -516,7 +512,7 @@ class CWidget extends CBaseComponent {
 		if (delay_sec > 0) {
 			this._update_timeout_id = setTimeout(() => {
 				this._update_timeout_id = null;
-				this._startUpdating(0, {do_update_once: do_update_once});
+				this._startUpdating(0, {do_update_once});
 			}, delay_sec * 1000);
 		}
 		else {
@@ -556,7 +552,7 @@ class CWidget extends CBaseComponent {
 
 	_update(do_update_once) {
 		if (this._update_abort_controller !== null || this._is_updating_paused || this.isUserInteracting()) {
-			this._startUpdating(1, {do_update_once: do_update_once});
+			this._startUpdating(1, {do_update_once});
 
 			return;
 		}
@@ -584,7 +580,7 @@ class CWidget extends CBaseComponent {
 					this._hidePreloader();
 				}
 				else {
-					this._startUpdating(this._update_retry_sec, {do_update_once: do_update_once});
+					this._startUpdating(this._update_retry_sec, {do_update_once});
 				}
 			})
 			.finally(() => {
@@ -601,10 +597,8 @@ class CWidget extends CBaseComponent {
 
 		return fetch(curl.getUrl(), {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: urlEncodeData(this._getUpdateRequestData()),
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(this._getUpdateRequestData()),
 			signal: this._update_abort_controller.signal
 		})
 			.then((response) => response.json())
@@ -786,38 +780,16 @@ class CWidget extends CBaseComponent {
 	}
 
 	_showPreloader() {
-		if (this._preloader_timeout !== null) {
-			clearTimeout(this._preloader_timeout);
-			this._preloader_timeout = null;
-		}
-
 		this._content_body.classList.add('is-loading');
+		this._content_body.classList.remove('is-loading-fadein', 'delayed-15s');
 	}
 
 	_hidePreloader() {
-		if (this._preloader_timeout !== null) {
-			clearTimeout(this._preloader_timeout);
-			this._preloader_timeout = null;
-		}
-
-		this._content_body.classList.remove('is-loading');
+		this._content_body.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
 	}
 
-	_schedulePreloader(delay_sec = this._preloader_timeout_sec) {
-		if (this._preloader_timeout !== null) {
-			return;
-		}
-
-		const is_showing_preloader = this._content_body.classList.contains('is-loading');
-
-		if (is_showing_preloader) {
-			return;
-		}
-
-		this._preloader_timeout = setTimeout(() => {
-			this._preloader_timeout = null;
-			this._showPreloader();
-		}, delay_sec * 1000);
+	_schedulePreloader() {
+		this._content_body.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
 	}
 
 	_makeView() {

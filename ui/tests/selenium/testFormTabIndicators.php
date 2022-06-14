@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,14 +38,6 @@ class testFormTabIndicators extends CWebTest {
 					'url' => 'templates.php?form=create',
 					'form' => 'name:templatesForm',
 					'tabs' => [
-						[
-							'name' => 'Linked templates',
-							'entries' => [
-								'Link new templates' => ['Empty template', 'Form test template', 'Docker']
-							],
-							'field_type' => 'DEV-1671', // Change field type to multiselect once DEV-1671 is merged.
-							'count' => 3
-						],
 						[
 							'name' => 'Tags',
 							'entries' => [
@@ -97,17 +89,9 @@ class testFormTabIndicators extends CWebTest {
 			// Host configuration form tab data.
 			[
 				[
-					'url' => 'hosts.php?form=create',
-					'form' => 'name:hostsForm',
+					'url' => 'zabbix.php?action=host.edit',
+					'form' => 'id:host-form',
 					'tabs' => [
-						[
-							'name' => 'Templates',
-							'entries' => [
-								'Link new templates' => ['Empty template', 'Form test template']
-							],
-							'field_type' => 'DEV-1671', // Change field type to multiselect once DEV-1671 is merged.
-							'count' => 2
-						],
 						[
 							'name' => 'Tags',
 							'entries' => [
@@ -183,25 +167,9 @@ class testFormTabIndicators extends CWebTest {
 			// Host prototype configuration form tab data.
 			[
 				[
-					'url' => 'host_prototypes.php?form=create&context=host&parent_discoveryid=31369',
+					'url' => 'host_prototypes.php?form=create&parent_discoveryid=42275&context=host',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
-						[
-							'name' => 'Groups',
-							'entries' => [
-								'Groups' => ['Discovered hosts', 'Empty group', 'Hypervisors']
-							],
-							'field_type' => 'multiselect',
-							'count' => 3
-						],
-						[
-							'name' => 'Templates',
-							'entries' => [
-								'Link new templates' => ['Empty template', 'Form test template', 'MySQL by Zabbix agent']
-							],
-							'field_type' => 'DEV-1671', // Change field type to multiselect once DEV-1671 is merged.
-							'count' => 3
-						],
 						[
 							'name' => 'Tags',
 							'entries' => [
@@ -273,7 +241,7 @@ class testFormTabIndicators extends CWebTest {
 			// Item prototype configuration form tab data.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=create&context=host&parent_discoveryid=31369',
+					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=42275&context=host',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -633,15 +601,15 @@ class testFormTabIndicators extends CWebTest {
 			// Map configuration form tab data.
 			[
 				[
-					'url' => 'sysmaps.php?form=update&sysmapid=1',
+					'url' => 'sysmaps.php?form=Create+map',
 					'form' => 'id:sysmap-form',
 					'tabs' => [
 						[
 							'name' => 'Sharing',
 							'entries' => [
 								'selector' => 'id:private',
-								'value' => 'Private',
-								'old_value' => 'Public'
+								'value' => 'Public',
+								'old_value' => 'Private'
 							],
 							'field_type' => 'general_field'
 						]
@@ -815,13 +783,11 @@ class testFormTabIndicators extends CWebTest {
 			[
 				'name' => 'Service 1',
 				'algorithm' => 0,
-				'showsla' => 0,
 				'sortorder' => 0
 			],
 			[
 				'name' => 'Service 2',
 				'algorithm' => 0,
-				'showsla' => 0,
 				'sortorder' => 0
 			]
 		]);
@@ -853,19 +819,6 @@ class testFormTabIndicators extends CWebTest {
 		// Remove all child services and check count indicator.
 		$child_services_tab->query('button:Remove')->all()->click();
 		$this->assertTabIndicator($tab_selector, 0);
-
-		// Open SLA tab and check count indicator.
-		$form->selectTab('SLA');
-		$tab_selector = $form->query('id:tab_sla-tab')->one();
-		$this->assertTabIndicator($tab_selector, false);
-
-		// Add Show SLA and check status indicator.
-		$form->query('id:showsla')->one()->click();
-		$this->assertTabIndicator($tab_selector, true);
-
-		// Remove the Show SLA and check status indicator.
-		$form->query('id:showsla')->one()->click();
-		$this->assertTabIndicator($tab_selector, false);
 
 		// Open Tags tab and check count indicator.
 		$form->selectTab('Tags');
@@ -983,6 +936,8 @@ class testFormTabIndicators extends CWebTest {
 
 			case 'data_set':
 				if ($action === USER_ACTION_REMOVE) {
+					// In graph widget form the 1st row is covered by header with tabs if scroll is not in top position.
+					COverlayDialogElement::find()->one()->scrollToTop();
 					$form->query('class:btn-remove')->all()->click();
 				}
 				else {

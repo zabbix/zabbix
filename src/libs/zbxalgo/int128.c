@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxtypes.h"
 #include "zbxalgo.h"
 
 #define UINT64_BIT_COUNT	(sizeof(zbx_uint64_t) << 3)
@@ -26,14 +26,10 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: udec128_128                                                      *
- *                                                                            *
  * Purpose: Decrement of 128 bit unsigned integer by the specified value.     *
  *                                                                            *
  * Parameters: base   - [IN,OUT] the integer to decrement.                    *
  *             value  - [IN] the value to decrement by.                       *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static void	udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
@@ -48,14 +44,10 @@ static void	udec128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
 
 /******************************************************************************
  *                                                                            *
- * Function: ushiftr128                                                       *
- *                                                                            *
  * Purpose: Logical right shift of 128 bit unsigned integer.                  *
  *                                                                            *
  * Parameters: base  - [IN,OUT] the initial value and result                  *
  *             bits  - [IN] the number of bits to shift for.                  *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static void	ushiftr128(zbx_uint128_t *base, unsigned int bits)
@@ -76,17 +68,12 @@ static void	ushiftr128(zbx_uint128_t *base, unsigned int bits)
 	base->hi >>= bits;
 }
 
-
 /******************************************************************************
- *                                                                            *
- * Function: ushiftl128                                                       *
  *                                                                            *
  * Purpose: Logical left shift of 128 bit unsigned integer.                   *
  *                                                                            *
  * Parameters: base  - [IN,OUT] the initial value and result                  *
  *             bits  - [IN] the number of bits to shift for.                  *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static void	ushiftl128(zbx_uint128_t *base, unsigned int bits)
@@ -109,8 +96,6 @@ static void	ushiftl128(zbx_uint128_t *base, unsigned int bits)
 
 /******************************************************************************
  *                                                                            *
- * Function: ucmp128_128                                                      *
- *                                                                            *
  * Purpose: Comparison of two 128 bit unsigned integer values.                *
  *                                                                            *
  * Parameters: value1  - [IN] the first value to compare.                     *
@@ -119,8 +104,6 @@ static void	ushiftl128(zbx_uint128_t *base, unsigned int bits)
  * Return value: -1  - value1 < value2                                        *
  *                0  - value1 = value2                                        *
  *                1  - value1 > value2                                        *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static int	ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
@@ -134,8 +117,6 @@ static int	ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
 
 /******************************************************************************
  *                                                                            *
- * Function: umul64_32_shift                                                  *
- *                                                                            *
  * Purpose: Multiplication of 64 bit unsigned integer with 32 bit unsigned    *
  *          integer value, shifted left by specified number of bits           *
  *                                                                            *
@@ -146,8 +127,6 @@ static int	ucmp128_128(const zbx_uint128_t *value1, const zbx_uint128_t *value2)
  *                      adding it to the base value.                          *
  *                                                                            *
  * Comments: This is a helper function for umul64_64 implementation.          *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 static void	umul64_32_shift(zbx_uint128_t *base, zbx_uint64_t value, zbx_uint64_t factor, int shift)
@@ -165,15 +144,11 @@ static void	umul64_32_shift(zbx_uint128_t *base, zbx_uint64_t value, zbx_uint64_
 
 /******************************************************************************
  *                                                                            *
- * Function: uinc128_64                                                       *
- *                                                                            *
  * Purpose: Increment of 128 bit unsigned integer by the specified 64 bit     *
  *          value.                                                            *
  *                                                                            *
  * Parameters: base   - [IN,OUT] the integer to increment.                    *
  *             value  - [IN] the value to increment by.                       *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value)
@@ -188,15 +163,11 @@ void	uinc128_64(zbx_uint128_t *base, zbx_uint64_t value)
 
 /******************************************************************************
  *                                                                            *
- * Function: uinc128_128                                                      *
- *                                                                            *
  * Purpose: Increment of 128 bit unsigned integer by the specified 128 bit    *
  *          value                                                             *
  *                                                                            *
  * Parameters: base   - [IN,OUT] the integer to increment.                    *
  *             value  - [IN] the value to increment by.                       *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
@@ -212,15 +183,11 @@ void	uinc128_128(zbx_uint128_t *base, const zbx_uint128_t *value)
 
 /******************************************************************************
  *                                                                            *
- * Function: umul64_64                                                        *
- *                                                                            *
  * Purpose: Multiplication of two 64 bit unsigned integer values.             *
  *                                                                            *
  * Parameters: result - [OUT] the resulting 128 bit unsigned integer value    *
  *             value  - [IN] the value to multiply.                           *
  *             factor - [IN] the factor to multiply by.                       *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
@@ -234,16 +201,12 @@ void	umul64_64(zbx_uint128_t *result, zbx_uint64_t value, zbx_uint64_t factor)
 
 /******************************************************************************
  *                                                                            *
- * Function: udiv128_64                                                       *
- *                                                                            *
  * Purpose: Division of 128 bit unsigned integer by a 64 bit unsigned integer *
  *          value.                                                            *
  *                                                                            *
  * Parameters: result    - [OUT] the resulting quotient value.                *
  *             dividend  - [IN] the dividend.                                 *
  *             value     - [IN] the divisor.                                  *
- *                                                                            *
- * Author: Andris Zeila                                                       *
  *                                                                            *
  ******************************************************************************/
 void	udiv128_64(zbx_uint128_t *result, const zbx_uint128_t *dividend, zbx_uint64_t value)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -163,13 +163,14 @@ class testGraphAxis extends CWebTest {
 		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
 		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')
 				->waitUntilReady()->asTable()->one();
-		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->click();
+		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->query('tag:a')->one()->click();
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();
 		$this->query('id:from')->one()->fill($data['start_period']);
 		$this->query('id:to')->one()->fill($data['end_period']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
+		// TODO: This sleep is added here because of DEV-1908.
 		sleep(1);
 		$this->assertScreenshot($this->waitUntilGraphIsLoaded(), $data['name']);
 	}
@@ -188,3 +189,4 @@ class testGraphAxis extends CWebTest {
 		return $this->query('xpath://div[not(contains(@class,"is-loading"))]/img')->waitUntilPresent()->one();
 	}
 }
+

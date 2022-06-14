@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,10 +46,8 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Expressions');
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 128);
-		$this->zbxTestAssertAttribute("//input[@id='name']", "size", 20);
 
 		$this->zbxTestAssertAttribute("//input[@id='expressions_0_expression']", "maxlength", 255);
-		$this->zbxTestAssertAttribute("//input[@id='expressions_0_expression']", "size", 20);
 
 		$this->zbxTestDropdownHasOptions('expressions_0_expression_type', [
 			'Character string included',
@@ -128,7 +126,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestInputType('name', '1_regexp3');
 		$this->zbxTestClickWait('add');
 
-		$this->zbxTestTextPresent(['Cannot add regular expression', 'Expression cannot be empty']);
+		$this->zbxTestTextPresent(['Cannot add regular expression', 'Invalid parameter "/1/expressions/1/expression": cannot be empty.']);
 	}
 
 	public function testFormAdministrationGeneralRegexp_TestTrue() {

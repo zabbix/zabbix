@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "active.h"
-#include "zbxconf.h"
 
-#include "cfg.h"
+#include "zbxconf.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
@@ -29,7 +27,7 @@
 #include "threads.h"
 #include "zbxjson.h"
 #include "alias.h"
-#include "metrics.h"
+#include "zbxregexp.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -49,6 +47,14 @@ static ZBX_THREAD_LOCAL zbx_vector_ptr_t	active_metrics;
 static ZBX_THREAD_LOCAL zbx_vector_ptr_t	regexps;
 static ZBX_THREAD_LOCAL char			*session_token;
 static ZBX_THREAD_LOCAL zbx_uint64_t		last_valueid = 0;
+static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used for staging of data going */
+										/* into persistent files */
+/* used for deleting inactive persistent files */
+static ZBX_THREAD_LOCAL zbx_vector_persistent_inactive_t	persistent_inactive_vec;
+
+#ifndef _WINDOWS
+static volatile sig_atomic_t	need_update_userparam;
+#endif
 
 static void	init_active_metrics(void)
 {
@@ -59,7 +65,7 @@ static void	init_active_metrics(void)
 	if (NULL == buffer.data)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer: first allocation for %d elements", CONFIG_BUFFER_SIZE);
-		sz = CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
+		sz = (size_t)CONFIG_BUFFER_SIZE * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
 		buffer.data = (ZBX_ACTIVE_BUFFER_ELEMENT *)zbx_malloc(buffer.data, sz);
 		memset(buffer.data, 0, sz);
 		buffer.count = 0;
@@ -70,6 +76,8 @@ static void	init_active_metrics(void)
 
 	zbx_vector_ptr_create(&active_metrics);
 	zbx_vector_ptr_create(&regexps);
+	zbx_vector_pre_persistent_create(&pre_persistent_vec);
+	zbx_vector_persistent_inactive_create(&persistent_inactive_vec);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -85,6 +93,9 @@ static void	free_active_metric(ZBX_ACTIVE_METRIC *metric)
 		zbx_free(metric->logfiles[i].filename);
 
 	zbx_free(metric->logfiles);
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	zbx_free(metric->persistent_file_name);
+#endif
 	zbx_free(metric);
 }
 
@@ -159,8 +170,35 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->logfiles_num = 0;
 			metric->start_time = 0.0;
 			metric->processed_bytes = 0;
-		}
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+			if (NULL != metric->persistent_file_name)
+			{
+				char	*error = NULL;
 
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() removing persistent file '%s'",
+						__func__, metric->persistent_file_name);
+
+				zbx_remove_from_persistent_inactive_list(&persistent_inactive_vec, metric->key_orig);
+
+				if (SUCCEED != zbx_remove_persistent_file(metric->persistent_file_name, &error))
+				{
+					/* log error and continue operation */
+					zabbix_log(LOG_LEVEL_WARNING, "cannot remove persistent file \"%s\": %s",
+							metric->persistent_file_name, error);
+					zbx_free(error);
+				}
+
+				zbx_free(metric->persistent_file_name);
+			}
+#endif
+		}
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+		else if (NULL != metric->persistent_file_name)
+		{
+			/* the metric is active, but it could have been placed on inactive list earlier */
+			zbx_remove_from_persistent_inactive_list(&persistent_inactive_vec, metric->key_orig);
+		}
+#endif
 		/* replace metric */
 		if (metric->refresh != refresh)
 		{
@@ -206,6 +244,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 	metric->start_time = 0.0;
 	metric->processed_bytes = 0;
+	metric->persistent_file_name = NULL;	/* initialized but not used on Microsoft Windows */
 
 	zbx_vector_ptr_append(&active_metrics, metric);
 out:
@@ -213,8 +252,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: mode_parameter_is_skip                                           *
  *                                                                            *
  * Purpose: test log[] or log.count[] item key if <mode> parameter is set to  *
  *          'skip'                                                            *
@@ -250,8 +287,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_list_of_checks                                             *
- *                                                                            *
  * Purpose: Parse list of active checks received from server                  *
  *                                                                            *
  * Parameters: str  - NULL terminated string received from server             *
@@ -260,8 +295,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on an incorrect format of string                        *
- *                                                                            *
- * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
  *                                                                            *
  * Comments:                                                                  *
  *    String represented as "ZBX_EOF" termination list                        *
@@ -400,6 +433,13 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 
 		if (0 == found)
 		{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+			if (NULL != metric->persistent_file_name)
+			{
+				zbx_add_to_persistent_inactive_list(&persistent_inactive_vec, metric->key_orig,
+						metric->persistent_file_name);
+			}
+#endif
 			zbx_vector_ptr_remove_noorder(&active_metrics, i);
 			free_active_metric(metric);
 			i--;	/* consider the same index on the next run */
@@ -478,8 +518,6 @@ out:
 
 /*********************************************************************************
  *                                                                               *
- * Function: process_config_item                                                 *
- *                                                                               *
  * Purpose: process configuration item and set it value to respective parameter  *
  *                                                                               *
  * Parameters: json   - pointer to JSON structure where to put resulting value   *
@@ -515,7 +553,7 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
 					" \"%s\" configuration parameter: returned value is not"
-					" an UTF-8 string",config_type, config, config_name);
+					" a UTF-8 string",config_type, config, config_name);
 		}
 		else
 		{
@@ -542,30 +580,21 @@ static void process_config_item(struct zbx_json *json, char *config, size_t leng
 
 /******************************************************************************
  *                                                                            *
- * Function: refresh_active_checks                                            *
- *                                                                            *
  * Purpose: Retrieve from Zabbix server list of active checks                 *
- *                                                                            *
- * Parameters: host - IP or Hostname of Zabbix server                         *
- *             port - port of Zabbix server                                   *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
- * Author: Eugene Grigorjev, Alexei Vladishev (new json protocol)             *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
  ******************************************************************************/
-static int	refresh_active_checks(const char *host, unsigned short port)
+static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
-	int				ret;
-	char				*tls_arg1, *tls_arg2;
+	int				ret, level;
 	zbx_socket_t			s;
 	struct zbx_json			json;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __func__, host, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __func__, ((zbx_addr_t *)addrs->values[0])->ip,
+			((zbx_addr_t *)addrs->values[0])->port);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -604,32 +633,12 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	}
 
 	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, (zbx_uint64_t)CONFIG_LISTEN_PORT);
 
-	switch (configured_tls_connect_mode)
-	{
-		case ZBX_TCP_SEC_UNENCRYPTED:
-			tls_arg1 = NULL;
-			tls_arg2 = NULL;
-			break;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		case ZBX_TCP_SEC_TLS_CERT:
-			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
-			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
-			break;
-		case ZBX_TCP_SEC_TLS_PSK:
-			tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
-			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
-			break;
-#endif
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			ret = FAIL;
-			goto out;
-	}
+	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
-			configured_tls_connect_mode, tls_arg1, tls_arg2)))
+	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
+			configured_tls_connect_mode, 0, level)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -643,22 +652,32 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 
 				if (SUCCEED != last_ret)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "active check configuration update from [%s:%hu]"
-							" is working again", host, port);
+					zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update from [%s:%hu]"
+							" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
+							((zbx_addr_t *)addrs->values[0])->port);
 				}
-				parse_list_of_checks(s.buffer, host, port);
+				parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port);
 			}
+			else
+			{
+				zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
+						((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
+			}
+		}
+		else
+		{
+			zabbix_log(level, "Unable to send to [%s]:%d [%s]",
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+					zbx_socket_strerror());
 		}
 
 		zbx_tcp_close(&s);
 	}
-out:
+
 	if (SUCCEED != ret && SUCCEED == last_ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING,
-				"active check configuration update from [%s:%hu] started to fail (%s)",
-				host, port, zbx_socket_strerror());
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "Active check configuration update started to fail");
 
 	last_ret = ret;
 
@@ -671,16 +690,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: check_response                                                   *
- *                                                                            *
  * Purpose: Check whether JSON response is SUCCEED                            *
  *                                                                            *
  * Parameters: JSON response from Zabbix trapper                              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: zabbix_sender has almost the same function!                      *
  *                                                                            *
@@ -712,31 +727,31 @@ static int	check_response(char *response)
 
 /******************************************************************************
  *                                                                            *
- * Function: send_buffer                                                      *
- *                                                                            *
  * Purpose: Send value stored in the buffer to Zabbix server                  *
  *                                                                            *
- * Parameters: host - IP or Hostname of Zabbix server                         *
- *             port - port number                                             *
+ * Parameters: addrs    - [IN] vector with a pair of Zabbix server IP or      *
+ *                             Hostname and port number                       *
+ *             prep_vec - [IN/OUT] vector with data for writing into          *
+ *                                 persistent files                           *
  *                                                                            *
- * Return value: returns SUCCEED on successful sending,                       *
- *               FAIL on other cases                                          *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Return value: SUCCEED if:                                                  *
+ *                    - no need to send data now (buffer empty or has enough  *
+ *                      free elements, or recently sent)                      *
+ *                    - data successfully sent to server (proxy)              *
+ *               FAIL - error when sending data                               *
  *                                                                            *
  ******************************************************************************/
-static int	send_buffer(const char *host, unsigned short port)
+static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
-	int				ret = SUCCEED, i, now;
-	char				*tls_arg1, *tls_arg2;
+	int				ret = SUCCEED, i, now, level;
 	zbx_timespec_t			ts;
-	const char			*err_send_step = "";
 	zbx_socket_t			s;
 	struct zbx_json 		json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
-			__func__, host, port, buffer.count, CONFIG_BUFFER_SIZE);
+			__func__, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+			buffer.count, CONFIG_BUFFER_SIZE);
 
 	if (0 == buffer.count)
 		goto ret;
@@ -801,30 +816,10 @@ static int	send_buffer(const char *host, unsigned short port)
 
 	zbx_json_close(&json);
 
-	switch (configured_tls_connect_mode)
-	{
-		case ZBX_TCP_SEC_UNENCRYPTED:
-			tls_arg1 = NULL;
-			tls_arg2 = NULL;
-			break;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		case ZBX_TCP_SEC_TLS_CERT:
-			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
-			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
-			break;
-		case ZBX_TCP_SEC_TLS_PSK:
-			tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
-			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
-			break;
-#endif
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			ret = FAIL;
-			goto out;
-	}
+	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
-			configured_tls_connect_mode, tls_arg1, tls_arg2)))
+	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * CONFIG_TIMEOUT, 60),
+			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, level)))
 	{
 		zbx_timespec(&ts);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
@@ -847,20 +842,33 @@ static int	send_buffer(const char *host, unsigned short port)
 					zabbix_log(LOG_LEVEL_DEBUG, "OK");
 			}
 			else
-				err_send_step = "[recv] ";
+			{
+				zabbix_log(level, "Unable to receive from [%s]:%d [%s]",
+						((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port,
+						zbx_socket_strerror());
+			}
 		}
 		else
-			err_send_step = "[send] ";
+		{
+			zabbix_log(level, "Unable to send to [%s]:%d [%s]",
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+					zbx_socket_strerror());
+		}
 
 		zbx_tcp_close(&s);
 	}
-	else
-		err_send_step = "[connect] ";
-out:
+
 	zbx_json_free(&json);
 
 	if (SUCCEED == ret)
 	{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+		zbx_write_persistent_files(prep_vec);
+		zbx_clean_pre_persistent_elements(prep_vec);
+#else
+		ZBX_UNUSED(prep_vec);
+#endif
 		/* free buffer */
 		for (i = 0; i < buffer.count; i++)
 		{
@@ -877,7 +885,7 @@ out:
 		if (0 != buffer.first_error)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] is working again",
-					host, port);
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port);
 			buffer.first_error = 0;
 		}
 	}
@@ -885,11 +893,9 @@ out:
 	{
 		if (0 == buffer.first_error)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] started to fail (%s%s)",
-					host, port, err_send_step, zbx_socket_strerror());
+			zabbix_log(LOG_LEVEL_WARNING, "Active check data upload started to fail");
 			buffer.first_error = now;
 		}
-		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s%s", err_send_step, zbx_socket_strerror());
 	}
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -899,12 +905,15 @@ ret:
 
 /******************************************************************************
  *                                                                            *
- * Function: process_value                                                    *
- *                                                                            *
  * Purpose: Buffer new value or send the whole buffer to the server           *
  *                                                                            *
- * Parameters: server      - IP or Hostname of Zabbix server                  *
- *             port        - port of Zabbix server                            *
+ * Parameters: addrs       - in C agent - vector with a pair of Zabbix server *
+ *                           IP or Hostname and port number. In Agent2 it is  *
+ *                           not used (NULL).                                 *
+ *             agent2_result - NULL in C agent. In Agent2 it is used for      *
+ *                             passing address of buffer where to store       *
+ *                             matching log records. It is here to have the   *
+ *                             same function prototype as in Agent2.          *
  *             host        - name of host in Zabbix database                  *
  *             key         - name of metric                                   *
  *             value       - key value or error message why an item became    *
@@ -923,8 +932,6 @@ ret:
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
  * Comments: ATTENTION! This function's address and pointers to arguments     *
  *           are described in Zabbix defined type "zbx_process_value_func_t"  *
  *           and used when calling process_log(), process_logrt() and         *
@@ -934,14 +941,16 @@ ret:
  *           process_log(), process_logrt(), zbx_read2() and their callers.   *
  *                                                                            *
  ******************************************************************************/
-static int	process_value(const char *server, unsigned short port, const char *host, const char *key,
-		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime,
-		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
-		unsigned char flags)
+static int	process_value(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
+		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
+		const int *mtime, const unsigned long *timestamp, const char *source,
+		const unsigned short *severity, const unsigned long *logeventid, unsigned char flags)
 {
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
 	int				i, ret = FAIL;
 	size_t				sz;
+
+	ZBX_UNUSED(agent2_result);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
@@ -958,7 +967,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 		}
 	}
 
-	/* do not sent data from buffer if host/key are the same as previous unless buffer is full already */
+	/* do not send data from buffer if host/key are the same as previous unless buffer is full already */
 	if (0 < buffer.count)
 	{
 		el = &buffer.data[buffer.count - 1];
@@ -967,7 +976,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 				CONFIG_BUFFER_SIZE <= buffer.count ||
 				0 != strcmp(el->key, key) || 0 != strcmp(el->host, host))
 		{
-			send_buffer(server, port);
+			send_buffer(addrs, &pre_persistent_vec);
 		}
 	}
 
@@ -1015,7 +1024,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 			zbx_free(el->source);
 		}
 
-		sz = (CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
+		sz = (size_t)(CONFIG_BUFFER_SIZE - i - 1) * sizeof(ZBX_ACTIVE_BUFFER_ELEMENT);
 		memmove(&buffer.data[i], &buffer.data[i + 1], sz);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "buffer full: new element %d", buffer.count - 1);
@@ -1049,6 +1058,14 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 
 	if (0 != (ZBX_METRIC_FLAG_PERSISTENT & flags))
 		buffer.pcount++;
+
+	/* If conditions are met then send buffer now. It is necessary for synchronization */
+	/* between sending data to server and writing of persistent files. */
+	if ((0 != (flags & ZBX_METRIC_FLAG_PERSISTENT) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount) ||
+			CONFIG_BUFFER_SIZE <= buffer.count)
+	{
+		send_buffer(addrs, &pre_persistent_vec);
+	}
 
 	ret = SUCCEED;
 out:
@@ -1086,12 +1103,12 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-static int	process_eventlog_check(char *server, unsigned short port, zbx_vector_ptr_t *regular_expressions,
-		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		char **error)
+static int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		zbx_vector_ptr_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
+		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, char **error)
 {
-	ZBX_UNUSED(server);
-	ZBX_UNUSED(port);
+	ZBX_UNUSED(addrs);
+	ZBX_UNUSED(agent2_result);
 	ZBX_UNUSED(regular_expressions);
 	ZBX_UNUSED(metric);
 	ZBX_UNUSED(process_value_cb);
@@ -1101,11 +1118,12 @@ static int	process_eventlog_check(char *server, unsigned short port, zbx_vector_
 	return FAIL;
 }
 #else
-int	process_eventlog_check(char *server, unsigned short port, zbx_vector_ptr_t *regexps, ZBX_ACTIVE_METRIC *metric,
-		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent, char **error);
+int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
+		char **error);
 #endif
 
-static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric, char **error)
+static int	process_common_check(zbx_vector_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric, char **error)
 {
 	int		ret;
 	AGENT_RESULT	result;
@@ -1124,7 +1142,7 @@ static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_ME
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
-		process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
+		process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
 				NULL, NULL, NULL, NULL, metric->flags);
 	}
 out:
@@ -1133,22 +1151,63 @@ out:
 	return ret;
 }
 
-static void	process_active_checks(char *server, unsigned short port)
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize an element of preparation vector with available data   *
+ *                                                                            *
+ * Parameters: lastlogsize   - [IN] lastlogize value to write into persistent *
+ *                                  data file                                 *
+ *             mtime         - [IN] mtime value to write into persistent data *
+ *                                  file                                      *
+ *             prep_vec_elem - [IN/OUT] element of vector to initialize       *
+ *                                                                            *
+ * Comments: this is a minimal initialization for using before sending status *
+ *           updates or meta-data. It initializes only 2 attributes to be     *
+ *           usable without any data about log files.                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_minimal_init_prep_vec_data(zbx_uint64_t lastlogsize, int mtime, zbx_pre_persistent_t *prep_vec_elem)
+{
+	if (NULL != prep_vec_elem->filename)
+		zbx_free(prep_vec_elem->filename);	/* filename == NULL should be checked when preparing JSON */
+							/* for writing as most attributes are not initialized */
+	prep_vec_elem->processed_size = lastlogsize;
+	prep_vec_elem->mtime = mtime;
+}
+
+static void	zbx_fill_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, const char *key,
+		const char *persistent_file_name, const struct st_logfile *logfile, const zbx_uint64_t lastlogsize,
+		const int mtime)
+{
+	/* index in preparation vector */
+	int	idx = zbx_find_or_create_prep_vec_element(prep_vec, key, persistent_file_name);
+
+	if (NULL != logfile)
+	{
+		zbx_init_prep_vec_data(logfile, prep_vec->values + idx);
+		zbx_update_prep_vec_data(logfile, logfile->processed_size, prep_vec->values + idx);
+	}
+	else
+		zbx_minimal_init_prep_vec_data(lastlogsize, mtime, prep_vec->values + idx);
+}
+#endif	/* not WINDOWS, not __MINGW32__ */
+
+static void	process_active_checks(zbx_vector_ptr_t *addrs)
 {
 	char	*error = NULL;
-	int	i, now, ret;
+	int	i, now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, server, port);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, ((zbx_addr_t *)addrs->values[0])->ip,
+			((zbx_addr_t *)addrs->values[0])->port);
 
 	now = (int)time(NULL);
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
 		zbx_uint64_t		lastlogsize_last, lastlogsize_sent;
-		int			mtime_last, mtime_sent;
-		ZBX_ACTIVE_METRIC	*metric;
-
-		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		int			mtime_last, mtime_sent, ret;
+		ZBX_ACTIVE_METRIC	*metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
 
 		if (metric->nextcheck > now)
 			continue;
@@ -1164,31 +1223,50 @@ static void	process_active_checks(char *server, unsigned short port)
 		if (0 == metric->refresh)
 		{
 			ret = FAIL;
+			metric->refresh = SEC_PER_YEAR;
 			error = zbx_strdup(error, "Incorrect update interval.");
 		}
 		else if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
 		{
-			ret = process_log_check(server, port, &regexps, metric, process_value, &lastlogsize_sent,
-					&mtime_sent, &error);
+			ret = process_log_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
+					&mtime_sent, &error, &pre_persistent_vec);
 		}
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
-			ret = process_eventlog_check(server, port, &regexps, metric, process_value, &lastlogsize_sent, &error);
+		{
+			ret = process_eventlog_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
+					&error);
+		}
 		else
-			ret = process_common_check(server, port, metric, &error);
+			ret = process_common_check(addrs, metric, &error);
 
 		if (SUCCEED != ret)
 		{
-			const char	*perror;
-
-			perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
+			const char	*perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
 
 			metric->state = ITEM_STATE_NOTSUPPORTED;
 			metric->error_count = 0;
 			metric->processed_bytes = 0;
 
 			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+			/* only for log*[] items */
+			if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags) &&
+					NULL != metric->persistent_file_name)
+			{
+				const struct st_logfile	*logfile = NULL;
 
-			process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
+				if (0 < metric->logfiles_num)
+				{
+					logfile = find_last_processed_file_in_logfiles_list(metric->logfiles,
+							metric->logfiles_num);
+				}
+
+				zbx_fill_prep_vec_element(&pre_persistent_vec, metric->key_orig,
+						metric->persistent_file_name, logfile, metric->lastlogsize,
+						metric->mtime);
+			}
+#endif
+			process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
 					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags);
 
 			zbx_free(error);
@@ -1197,9 +1275,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			if (0 == metric->error_count)
 			{
-				unsigned char	old_state;
-
-				old_state = metric->state;
+				unsigned char	old_state = metric->state;
 
 				if (ITEM_STATE_NOTSUPPORTED == metric->state)
 				{
@@ -1210,8 +1286,24 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (SUCCEED == need_meta_update(metric, lastlogsize_sent, mtime_sent, old_state,
 						lastlogsize_last, mtime_last))
 				{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+					if (NULL != metric->persistent_file_name)
+					{
+						const struct st_logfile	*logfile = NULL;
+
+						if (0 < metric->logfiles_num)
+						{
+							logfile = find_last_processed_file_in_logfiles_list(
+									metric->logfiles, metric->logfiles_num);
+						}
+
+						zbx_fill_prep_vec_element(&pre_persistent_vec, metric->key_orig,
+								metric->persistent_file_name, logfile,
+								metric->lastlogsize, metric->mtime);
+					}
+#endif
 					/* meta information update */
-					process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL,
+					process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, NULL,
 							metric->state, &metric->lastlogsize, &metric->mtime, NULL, NULL,
 							NULL, NULL, metric->flags);
 				}
@@ -1221,7 +1313,7 @@ static void	process_active_checks(char *server, unsigned short port)
 			}
 		}
 
-		send_buffer(server, port);
+		send_buffer(addrs, &pre_persistent_vec);
 		metric->nextcheck = (int)time(NULL) + metric->refresh;
 	}
 
@@ -1229,8 +1321,6 @@ static void	process_active_checks(char *server, unsigned short port)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: update_schedule                                                  *
  *                                                                            *
  * Purpose: update active check and send buffer schedule by the specified     *
  *          time delta                                                        *
@@ -1254,11 +1344,19 @@ static void	update_schedule(int delta)
 	buffer.lastsent += delta;
 }
 
+#ifndef _WINDOWS
+static void	zbx_active_checks_sigusr_handler(int flags)
+{
+	if (ZBX_RTC_USER_PARAMETERS_RELOAD == ZBX_RTC_GET_MSG(flags))
+		need_update_userparam = 1;
+}
+#endif
+
 ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	time_t	nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0;
+	time_t			nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1270,8 +1368,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
-	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->port;
+	zbx_vector_ptr_create(&activechk_args.addrs);
+
+	zbx_addr_copy(&activechk_args.addrs, &((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->addrs);
 	CONFIG_HOSTNAME = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->hostname);
 
 	zbx_free(args);
@@ -1283,13 +1382,26 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 #endif
 	init_active_metrics();
 
+#ifndef _WINDOWS
+	zbx_set_sigusr_handler(zbx_active_checks_sigusr_handler);
+#endif
+
 	while (ZBX_IS_RUNNING())
 	{
+#ifndef _WINDOWS
+		if (1 == need_update_userparam)
+		{
+			zbx_setproctitle("active checks #%d [reloading user parameters]", process_num);
+			reload_user_parameters(process_type, process_num);
+			need_update_userparam = 0;
+		}
+#endif
+
 		zbx_update_env(zbx_time());
 
 		if ((now = time(NULL)) >= nextsend)
 		{
-			send_buffer(activechk_args.host, activechk_args.port);
+			send_buffer(&activechk_args.addrs, &pre_persistent_vec);
 			nextsend = time(NULL) + 1;
 		}
 
@@ -1297,21 +1409,25 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			zbx_setproctitle("active checks #%d [getting list of active checks]", process_num);
 
-			if (FAIL == refresh_active_checks(activechk_args.host, activechk_args.port))
+			if (FAIL == refresh_active_checks(&activechk_args.addrs))
 			{
 				nextrefresh = time(NULL) + 60;
 			}
 			else
 			{
 				nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+				nextcheck = 0;
 			}
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+			zbx_remove_inactive_persistent_files(&persistent_inactive_vec);
+#endif
 		}
 
 		if (now >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)
 		{
 			zbx_setproctitle("active checks #%d [processing active checks]", process_num);
 
-			process_active_checks(activechk_args.host, activechk_args.port);
+			process_active_checks(&activechk_args.addrs);
 
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)	/* failed to complete processing active checks */
 				continue;
@@ -1342,7 +1458,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_free(session_token);
 
 #ifdef _WINDOWS
-	zbx_free(activechk_args.host);
+	zbx_vector_ptr_clear_ext(&activechk_args.addrs, (zbx_clean_func_t)zbx_addr_free);
+	zbx_vector_ptr_destroy(&activechk_args.addrs);
 	free_active_metrics();
 
 	ZBX_DO_EXIT();

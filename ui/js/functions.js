@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ function testUserSound(idx) {
  * Converts all HTML symbols into HTML entities.
  */
 jQuery.escapeHtml = function(html) {
-	return jQuery('<div />').text(html).html();
+	return jQuery('<div>').text(html).html();
 }
 
 function validateNumericBox(obj, allowempty, allownegative) {
@@ -264,10 +264,22 @@ function postMessageError(message) {
 }
 
 function postMessageDetails(type, messages) {
-	cookie.create('system-message-details', btoa(JSON.stringify({
+	const encode = function (string) {
+		const uint8 = new TextEncoder().encode(string);
+
+		let result = '';
+		for (let i = 0; i < uint8.byteLength; i++) {
+			result += String.fromCharCode(uint8[i]);
+		}
+
+		return result;
+	};
+
+	const data = JSON.stringify({
 		type: type,
 		messages: messages
-	})));
+	});
+	cookie.create('system-message-details', btoa(encode(data)));
 }
 
 /**
@@ -489,6 +501,7 @@ function overlayDialogueDestroy(dialogueid) {
  *
  * @param {object} params                                   Modal window params.
  * @param {string} params.title                             Modal window title.
+ * @param {string} params.class                             Modal window CSS class, often based on .modal-popup*.
  * @param {object} params.content                           Window content.
  * @param {object} params.footer                           	Window footer content.
  * @param {object} params.controls                          Window controls.
@@ -505,7 +518,7 @@ function overlayDialogueDestroy(dialogueid) {
  * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
  *                                                          or create a new one if value is not set.
  * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
- * @param {object} trigger_elmnt                (optional)  UI element which triggered opening of overlay dialogue.
+ * @param {Node|null} trigger_elmnt                         UI element which triggered opening of overlay dialogue.
  *
  * @return {Overlay}
  */
@@ -534,11 +547,11 @@ function overlayDialogue(params, trigger_elmnt) {
  *
  * @param string scriptid			Script ID.
  * @param string confirmation		Confirmation text.
- * @param {object} trigger_elmnt	UI element that was clicked to open overlay dialogue.
+ * @param {Node} trigger_element	UI element that was clicked to open overlay dialogue.
  * @param string hostid				Host ID.
  * @param string eventid			Event ID.
  */
-function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eventid = null) {
+function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null) {
 	var execute = function() {
 		var popup_options = {scriptid: scriptid};
 
@@ -551,7 +564,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 		}
 
 		if (Object.keys(popup_options).length === 2) {
-			PopUp('popup.scriptexec', popup_options, null, trigger_elmnt);
+			PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
 		}
 	};
 
@@ -561,7 +574,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 			'content': jQuery('<span>')
 				.addClass('confirmation-msg')
 				.text(confirmation),
-			'class': 'modal-popup modal-popup-small',
+			'class': 'modal-popup modal-popup-small position-middle',
 			'buttons': [
 				{
 					'title': t('Cancel'),
@@ -578,7 +591,7 @@ function executeScript(scriptid, confirmation, trigger_elmnt, hostid = null, eve
 					}
 				}
 			]
-		}, trigger_elmnt);
+		}, trigger_element);
 
 		return false;
 	}
@@ -707,8 +720,8 @@ function parseUrlString(url) {
  * @param {string}       type            Message type. ('good'|'bad'|'warning')
  * @param {string|array} messages        Array with details messages or message string with normal font.
  * @param {string}       title           Larger font title.
- * @param {bool}         show_close_box  Show close button.
- * @param {bool}         show_details    Show details on opening.
+ * @param {boolean}      show_close_box  Show close button.
+ * @param {boolean}      show_details    Show details on opening.
  *
  * @return {jQuery}
  */
@@ -777,22 +790,24 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 		}
 	}
 
-	if (Array.isArray(messages) && messages.length > 0) {
-		jQuery.map(messages, function(message) {
+	if (messages.length > 0) {
+		if (Array.isArray(messages)) {
+			jQuery.map(messages, function (message) {
+				jQuery('<li>')
+					.text(message)
+					.appendTo($list);
+				return null;
+			});
+
+			$msg_box.append($msg_details);
+		}
+		else {
 			jQuery('<li>')
-				.text(message)
+				.text(messages ? messages : ' ')
 				.appendTo($list);
-			return null;
-		});
 
-		$msg_box.append($msg_details);
-	}
-	else {
-		jQuery('<li>')
-			.text(messages ? messages : ' ')
-			.appendTo($list);
-
-		$msg_box.append($msg_details);
+			$msg_box.append($msg_details);
+		}
 	}
 
 	if (show_close_box) {
@@ -926,39 +941,75 @@ function urlEncodeData(parameters, prefix = '') {
 		else {
 			result.push([encodeURIComponent(prefixed_name), encodeURIComponent(value)].join('='));
 		}
-	};
+	}
 
 	return result.join('&');
 }
 
+/**
+ * Get form field values as deep object.
+ *
+ * Example:
+ *     <form>
+ *         <input name="a" value="1">
+ *         <input name="b[c]" value="2">
+ *         <input name="b[d]" value="3">
+ *         <input name="e[f][]" value="4">
+ *         <input name="e[f][]" value="5">
+ *     </form>
+ *
+ *    ... will result in:
+ *
+ *    {
+ *        a: "1",
+ *        b: {
+ *            c: "2",
+ *            d: "3"
+ *        },
+ *        e: {
+ *            f: ["4", "5"]
+ *        }
+ *    }
+ *
+ * @param {HTMLFormElement} form
+ *
+ * @return {object}
+ */
 function getFormFields(form) {
 	const fields = {};
 
 	for (let [key, value] of new FormData(form)) {
-		const key_parts = [...key.matchAll(/[^\[\]]*[^\[\]]|\[\]/g)];
+		value = value.replace(/\r?\n/g, '\r\n');
+
+		const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
 
 		let key_fields = fields;
 
 		for (let i = 0; i < key_parts.length; i++) {
 			const key_part = key_parts[i][0];
 
-			if (i < key_parts.length - 1 && key_parts[i + 1][0] === '[]') {
-				if (!(key_part in key_fields)) {
-					key_fields[key_part] = [];
+			if (i == key_parts.length - 1) {
+				if (key_part === '[]') {
+					key_fields.push(value);
 				}
-
-				key_fields[key_part].push(value);
+				else {
+					key_fields[key_part] = value;
+				}
 
 				break;
 			}
 
-			if (i == key_parts.length - 1) {
-				key_fields[key_part] = value;
+			if (key_part === '[]') {
+				const key_field = key_parts[i + 1][0] === '[]' ? [] : {};
+
+				key_fields.push(key_field);
+				key_fields = key_field;
 			}
 			else {
 				if (!(key_part in key_fields)) {
-					key_fields[key_part] = {};
+					key_fields[key_part] = key_parts[i + 1][0] === '[]' ? [] : {};
 				}
+
 				key_fields = key_fields[key_part];
 			}
 		}

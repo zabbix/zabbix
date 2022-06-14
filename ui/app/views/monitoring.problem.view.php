@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $options = [
@@ -77,7 +78,6 @@ if ($data['action'] === 'problem.view') {
 	$this->addJsFile('class.calendar.js');
 	$this->addJsFile('gtlc.js');
 	$this->addJsFile('flickerfreescreen.js');
-	$this->addJsFile('multiselect.js');
 	$this->addJsFile('layout.mode.js');
 	$this->addJsFile('class.tabfilter.js');
 	$this->addJsFile('class.tabfilteritem.js');
@@ -118,14 +118,24 @@ if ($data['action'] === 'problem.view') {
 		$data['filter_options'] = $filter->options;
 		$widget->addItem($filter);
 	}
+	else {
+		$data['filter_options'] = null;
+	}
 
 	$this->includeJsFile('monitoring.problem.view.js.php', $data);
 	$widget
 		->addItem($screen->get())
 		->show();
 
-	// Activate blinking.
-	(new CScriptTag('jqBlink.blink();'))->show();
+	(new CScriptTag('
+		view.init('.json_encode([
+			'filter_options' => $data['filter_options'],
+			'refresh_interval' => $data['refresh_interval'],
+			'filter_defaults' => $data['filter_defaults']
+		]).');
+	'))
+		->setOnDocumentReady()
+		->show();
 }
 else {
 	echo $screen->get();

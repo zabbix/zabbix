@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,8 +34,11 @@ class CControllerReportStatus extends CController {
 	}
 
 	protected function doAction() {
-		// no data is passed to the view
-		$response = new CControllerResponseData([]);
+		$response = new CControllerResponseData([
+			'system_info' => CSystemInfoHelper::getData(),
+			'user_type' => CWebUser::getType()
+		]);
+
 		$response->setTitle(_('System information'));
 		$this->setResponse($response);
 	}

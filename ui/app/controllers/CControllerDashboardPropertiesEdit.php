@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,11 +27,11 @@ class CControllerDashboardPropertiesEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'template' => 'in 1',
-			'userid' => 'db users.userid',
-			'name' => 'required|db dashboard.name',
-			'display_period' => 'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
-			'auto_start' => 'required|db dashboard.auto_start|in 0,1'
+			'template' =>		'in 1',
+			'userid' =>			'db users.userid',
+			'name' =>			'required|db dashboard.name',
+			'display_period' =>	'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
+			'auto_start' =>		'required|db dashboard.auto_start|in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);

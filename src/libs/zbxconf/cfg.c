@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,10 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "cfg.h"
+
+#include "common.h"
 #include "log.h"
-#include "comms.h"
 
 extern unsigned char	program_type;
 
@@ -33,11 +33,10 @@ int	CONFIG_LOG_FILE_SIZE	= 1;
 int	CONFIG_ALLOW_ROOT	= 0;
 int	CONFIG_TIMEOUT		= 3;
 
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict);
+static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
+		int noexit);
 
 /******************************************************************************
- *                                                                            *
- * Function: match_glob                                                       *
  *                                                                            *
  * Purpose: see whether a file (e.g., "parameter.conf")                       *
  *          matches a pattern (e.g., "p*.conf")                               *
@@ -126,8 +125,6 @@ static int	match_glob(const char *file, const char *pattern)
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_glob                                                       *
- *                                                                            *
  * Purpose: parse a glob like "/usr/local/etc/zabbix_agentd.conf.d/p*.conf"   *
  *          into "/usr/local/etc/zabbix_agentd.conf.d" and "p*.conf" parts    *
  *                                                                            *
@@ -198,8 +195,6 @@ trim:
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_cfg_dir                                                    *
- *                                                                            *
  * Purpose: parse directory with configuration files                          *
  *                                                                            *
  * Parameters: path    - full path to directory                               *
@@ -207,13 +202,15 @@ trim:
  *             cfg     - pointer to configuration parameter structure         *
  *             level   - a level of included file                             *
  *             strict  - treat unknown parameters as error                    *
+ *             noexit  - on error return FAIL instead of EXIT_FAILURE         *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing directory                            *
  *                                                                            *
  ******************************************************************************/
 #ifdef _WINDOWS
-static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict)
+static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict,
+		int noexit)
 {
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
@@ -244,7 +241,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line 
 
 		zbx_free(file_name);
 
-		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict, noexit))
 			goto close;
 	}
 
@@ -259,7 +256,8 @@ clean:
 	return ret;
 }
 #else
-static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict)
+static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line *cfg, int level, int strict,
+		int noexit)
 {
 	DIR		*dir;
 	struct dirent	*d;
@@ -283,7 +281,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line 
 		if (NULL != pattern && SUCCEED != match_glob(d->d_name, pattern))
 			continue;
 
-		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict))
+		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict, noexit))
 			goto close;
 	}
 
@@ -303,20 +301,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_cfg_object                                                 *
- *                                                                            *
  * Purpose: parse "Include=..." line in configuration file                    *
  *                                                                            *
  * Parameters: cfg_file - full name of config file                            *
  *             cfg      - pointer to configuration parameter structure        *
  *             level    - a level of included file                            *
  *             strict   - treat unknown parameters as error                   *
+ *             noexit   - on error return FAIL instead of EXIT_FAILURE        *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing object                               *
  *                                                                            *
  ******************************************************************************/
-static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict)
+static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int level, int strict, int noexit)
 {
 	int		ret = FAIL;
 	char		*path = NULL, *pattern = NULL;
@@ -335,7 +332,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 	{
 		if (NULL == pattern)
 		{
-			ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict);
+			ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict, noexit);
 			goto clean;
 		}
 
@@ -343,7 +340,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 		goto clean;
 	}
 
-	ret = parse_cfg_dir(path, pattern, cfg, level, strict);
+	ret = parse_cfg_dir(path, pattern, cfg, level, strict, noexit);
 clean:
 	zbx_free(pattern);
 	zbx_free(path);
@@ -353,8 +350,6 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Function: parse_cfg_file                                                   *
- *                                                                            *
  * Purpose: parse configuration file                                          *
  *                                                                            *
  * Parameters: cfg_file - full name of config file                            *
@@ -362,14 +357,14 @@ clean:
  *             level    - a level of included file                            *
  *             optional - do not treat missing configuration file as error    *
  *             strict   - treat unknown parameters as error                   *
+ *             noexit   - on error return FAIL instead of EXIT_FAILURE        *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing config file                          *
  *                                                                            *
- * Author: Alexei Vladishev, Eugene Grigorjev                                 *
- *                                                                            *
  ******************************************************************************/
-static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict)
+static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
+		int noexit)
 {
 #define ZBX_MAX_INCLUDE_LEVEL	10
 
@@ -433,7 +428,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 			if (0 == strcmp(parameter, "Include"))
 			{
-				if (FAIL == parse_cfg_object(value, cfg, level, strict))
+				if (FAIL == parse_cfg_object(value, cfg, level, strict, noexit))
 				{
 					fclose(file);
 					goto error;
@@ -487,11 +482,14 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 					case TYPE_CUSTOM:
 						if (NULL != cfg[i].variable)
 						{
-							cfg_custom_parameter_parser_t custom_parser =
-									(cfg_custom_parameter_parser_t)cfg[i].variable;
+							cfg_custom_parameter_parser_t	*p =
+									(cfg_custom_parameter_parser_t*)cfg[i].variable;
 
-							if (SUCCEED != custom_parser(value, &cfg[i]))
+							if (SUCCEED != p->cfg_custom_parameter_parser_func(value,
+									&cfg[i]))
+							{
 								goto incorrect_config;
+							}
 
 							continue;
 						}
@@ -561,12 +559,15 @@ unknown_parameter:
 missing_mandatory:
 	zbx_error("missing mandatory parameter \"%s\" in config file \"%s\"", cfg[i].parameter, cfg_file);
 error:
-	exit(EXIT_FAILURE);
+	if (0 == noexit)
+		exit(EXIT_FAILURE);
+
+	return FAIL;
 }
 
-int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict)
+int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)
 {
-	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict);
+	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit);
 }
 
 int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
@@ -593,47 +594,119 @@ int	check_cfg_feature_str(const char *parameter, const char *value, const char *
 	return SUCCEED;
 }
 
+void	zbx_addr_free(zbx_addr_t *addr)
+{
+	zbx_free(addr->ip);
+	zbx_free(addr);
+}
+
+void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from)
+{
+	int	j;
+
+	for (j = 0; j < addr_from->values_num; j++)
+	{
+		const zbx_addr_t	*addr;
+		zbx_addr_t		*addr_ptr;
+
+		addr = (const zbx_addr_t *)addr_from->values[j];
+
+		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
+		addr_ptr->port = addr->port;
+		zbx_vector_ptr_append(addr_to, addr_ptr);
+	}
+}
+
+static int	addr_compare_func(const void *d1, const void *d2)
+{
+	const zbx_addr_t	*a1 = *(const zbx_addr_t * const *)d1;
+	const zbx_addr_t	*a2 = *(const zbx_addr_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(a1->port, a2->port);
+
+	return strcmp(a1->ip, a2->ip);
+}
+
 /******************************************************************************
- *                                                                            *
- * Function: zbx_set_data_destination_hosts                                   *
  *                                                                            *
  * Purpose: parse "ServerActive' parameter value and set destination servers  *
  *          using a callback function                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_set_data_destination_hosts(char *active_hosts, add_serveractive_host_f cb, zbx_vector_str_t *hostnames)
+int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *name, add_serveractive_host_f cb,
+		zbx_vector_str_t *hostnames, void *data, char **error)
 {
-	char	*l = active_hosts, *r;
+	char			*r, *r_node;
+	zbx_vector_ptr_t	addrs, cluster_addrs;
+	int			ret = SUCCEED;
+
+	zbx_vector_ptr_create(&addrs);
+	zbx_vector_ptr_create(&cluster_addrs);
 
 	do
 	{
-		char		*host = NULL;
-		unsigned short	port;
-
-		if (NULL != (r = strchr(l, ',')))
+		if (NULL != (r = strchr(str, ',')))
 			*r = '\0';
 
-		if (SUCCEED != parse_serveractive_element(l, &host, &port, (unsigned short)ZBX_DEFAULT_SERVER_PORT))
+		do
 		{
-			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" is invalid", l);
-			exit(EXIT_FAILURE);
-		}
+			zbx_addr_t	*addr;
 
-		if (SUCCEED != cb(host, port, hostnames))
-		{
-			zbx_error("error parsing the \"ServerActive\" parameter: address \"%s\" specified more than"
-					" once", l);
-			zbx_free(host);
-			exit(EXIT_FAILURE);
-		}
+			if (NULL != (r_node = strchr(str, ';')))
+				*r_node = '\0';
 
-		zbx_free(host);
+			addr = zbx_malloc(NULL, sizeof(zbx_addr_t));
+			addr->ip = NULL;
+
+			if (SUCCEED != parse_serveractive_element(str, &addr->ip, &addr->port, port))
+			{
+				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\" is "
+						"invalid", name, str);
+				ret = FAIL;
+			}
+			else if (FAIL == is_supported_ip(addr->ip) && FAIL == zbx_validate_hostname(addr->ip))
+			{
+				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
+						" is invalid", name, str);
+				ret = FAIL;
+			}
+			else if (SUCCEED == zbx_vector_ptr_search(&addrs, addr, addr_compare_func))
+			{
+				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
+						" specified more than once", name, str);
+				ret = FAIL;
+			}
+
+			if (NULL != r_node)
+			{
+				*r_node = ';';
+				str = r_node + 1;
+			}
+
+			zbx_vector_ptr_append(&cluster_addrs, addr);
+			zbx_vector_ptr_append(&addrs, addr);
+
+			if (FAIL == ret)
+				goto fail;
+		}
+		while (NULL != r_node);
+
+		cb(&cluster_addrs, hostnames, data);
+
+		cluster_addrs.values_num = 0;
 
 		if (NULL != r)
 		{
 			*r = ',';
-			l = r + 1;
+			str = r + 1;
 		}
 	}
 	while (NULL != r);
+fail:
+	zbx_vector_ptr_destroy(&cluster_addrs);
+	zbx_vector_ptr_clear_ext(&addrs, (zbx_clean_func_t)zbx_addr_free);
+	zbx_vector_ptr_destroy(&addrs);
+
+	return ret;
 }

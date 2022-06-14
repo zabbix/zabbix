@@ -1,0 +1,658 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:33:15Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: 3bbfe42c78c74f04a2565431fbdd19e2
+      template: 'Morningstar SureSine SNMP'
+      name: 'Morningstar SureSine SNMP'
+      description: |
+        MIBs used:
+        SURESINE
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: c577d82138d04ca689155f01fe32dd74
+          name: 'Battery: Battery Voltage discovery'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.9.30.0
+          key: 'battery.voltage.discovery[batteryVoltageSlow.0]'
+          delay: 15m
+          history: '0'
+          value_type: FLOAT
+          units: V
+          description: 'MIB: SURESINE'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '2.581787109375E-4'
+            -
+              type: REGEX
+              parameters:
+                - '^(\d+)(\.\d{1,2})?'
+                - \1\2
+          tags:
+            -
+              tag: component
+              value: battery
+            -
+              tag: component
+              value: discovery
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 0cbf90bdfbc44bc9939167625c20aaed
+          name: 'Load: A/C Current'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.9.31.0
+          key: 'load.ac_current[acCurrent.0]'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: SURESINE
+            Description:AC Output Current
+            Scaling Factor:0.0001953125
+            Units:A
+            Range:[0.0, 17]
+            Modbus address:0x0005
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1.953125E-4'
+            -
+              type: REGEX
+              parameters:
+                - '^(\d+)(\.\d{1,2})?'
+                - \1\2
+          tags:
+            -
+              tag: component
+              value: load
+        -
+          uuid: 193eeecf87c24527b5ba4b0df2b66cfc
+          name: 'Load: State'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.9.33.0
+          key: 'load.state[loadState.0]'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            MIB: SURESINE
+            Description:Load State
+            Modbus address:0x000B
+            
+             0: Start
+            1: LoadOn
+            2: LvdWarning
+            3: LowVoltageDisconnect
+            4: Fault
+            5: Disconnect
+            6: NormalOff
+            7: UnknownState
+            8: Standby
+          valuemap:
+            name: 'SureSine load state'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            -
+              tag: component
+              value: load
+          triggers:
+            -
+              uuid: 83a1cad652b445a69541208f81b12c23
+              expression: 'last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+              name: 'Load: Device load in critical state'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: bed6bfb29f5d4a3e89b9028b45bfb8b8
+              expression: 'last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}'
+              name: 'Load: Device load in warning state'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              dependencies:
+                -
+                  name: 'Load: Device load in critical state'
+                  expression: 'last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SureSine SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: d15815c3d6024a83ac03425e23d798cd
+          name: 'Status: Alarms'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.9.34.0
+          key: 'status.alarms[alarms.0]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: SURESINE
+            Description:Faults
+            Modbus address:0x0007
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var FIELDS = [
+                    'heatsinkTempSensorOpen',
+                    'heatsinkTempSensorShort',
+                    'unknownAlarm',
+                    'suresineHot'
+                  ];
+                  
+                  var flags = parseInt(value.replace(/\x20/g, ''), 16),
+                    result = [];
+                  
+                  for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
+                      if (flags & f) {
+                          result.push(FIELDS[i]);
+                      }
+                  }
+                  
+                  return result.length ? result.join('\n') : 'No alarms';
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 6181b0f6c4cf4febaa86039dae994f30
+              expression: 'count(/Morningstar SureSine SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2'
+              name: 'Status: Device has "heatsinkTempSensorOpen" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: ebe250d8faf543429bd5732114f05fd4
+              expression: 'count(/Morningstar SureSine SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShort")=2'
+              name: 'Status: Device has "heatsinkTempSensorShort" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: ff3ee8e7bd074037a99a56f02dfaff72
+              expression: 'count(/Morningstar SureSine SNMP/status.alarms[alarms.0],#3,"like","suresineHot")=2'
+              name: 'Status: Device has "suresineHot" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 64c7437f53f74578a85b358f73529322
+              expression: 'count(/Morningstar SureSine SNMP/status.alarms[alarms.0],#3,"like","unknownAlarm")=2'
+              name: 'Status: Device has "unknownAlarm" alarm flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: d92ff915ccda482db946118238ea2ef3
+          name: 'Status: Faults'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.9.35.0
+          key: 'status.faults[faults.0]'
+          history: 1h
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: SURESINE
+            Description:Faults
+            Modbus address:0x0007
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var FIELDS = [
+                    'reset',
+                    'overcurrent',
+                    'unknownFault',
+                    'software',
+                    'highVoltageDisconnect',
+                    'suresineHot',
+                    'dipSwitchChanged',
+                    'customSettingsEdit'
+                  ];
+                  
+                  var flags = parseInt(value.replace(/\x20/g, ''), 16),
+                    result = [];
+                  
+                  for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
+                      if (flags & f) {
+                          result.push(FIELDS[i]);
+                      }
+                  }
+                  
+                  return result.length ? result.join('\n') : 'No faults';
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: 438d1fb319234de9aaa74fa565e6c661
+              expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2'
+              name: 'Status: Device has "customSettingsEdit" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 174685e8f89f4e21b7275db6be7623b2
+              expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","dipSwitchChanged")=2'
+              name: 'Status: Device has "dipSwitchChanged" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 283d5eb818744b25b4275509b0492bfd
+              expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","highVoltageDisconnect")=2'
+              name: 'Status: Device has "highVoltageDisconnect" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: a271f6d0e1504e46966da689b91cf1f7
+              expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","overcurrent")=2'
+              name: 'Status: Device has "overcurrent" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 88df087dcb434c5d9980d249f077a661
+              expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","reset")=2'
+              name: 'Status: Device has "reset" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 9fa2ec74f9b34f0082d9173f57e1edf6
+              expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","software")=2'
+              name: 'Status: Device has "software" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 970e89c852c34a219ad0c1fce357e97a
+              expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","suresineHot")=2'
+              name: 'Status: Device has "suresineHot" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: fe023e11a544470cb09db1585d7f1e83
+              expression: 'count(/Morningstar SureSine SNMP/status.faults[faults.0],#3,"like","unknownFault")=2'
+              name: 'Status: Device has "unknownFault" faults flag'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: cb4a5c3033f84baa8260a8199265e5a9
+          name: 'Status: Uptime'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.2.1.1.3.0
+          key: status.uptime
+          history: 7d
+          units: uptime
+          description: 'Device uptime in seconds'
+          preprocessing:
+            -
+              type: MULTIPLIER
+              parameters:
+                - '0.01'
+          tags:
+            -
+              tag: component
+              value: status
+          triggers:
+            -
+              uuid: f9404001de4c4c1d8438e0b560977398
+              expression: 'last(/Morningstar SureSine SNMP/status.uptime)<10m'
+              name: 'Status: Device has been restarted'
+              event_name: 'Status: Device has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: db5506294fd945659eae945014332a62
+              expression: 'nodata(/Morningstar SureSine SNMP/status.uptime,5m)=1'
+              name: 'Status: Failed to fetch data'
+              event_name: 'Status: Failed to fetch data (or no data for 5m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 5 minutes'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: c6119c74beeb4ab69854d52f2eaa969d
+          name: 'Temperature: Heatsink'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.33333.9.32.0
+          key: 'temp.heatsink[heatsinkTemperature.0]'
+          history: 7d
+          value_type: FLOAT
+          units: C
+          description: |
+            MIB: SURESINE
+            Description:Heatsink Temperature
+            Scaling Factor:1
+            Units:C
+            Range:[-128, 127]
+            Modbus address:0x0006
+          tags:
+            -
+              tag: component
+              value: temperature
+      discovery_rules:
+        -
+          uuid: c43e02a5d94343e2b54cba50b3388826
+          name: 'Battery voltage discovery'
+          type: DEPENDENT
+          key: battery.voltage.discovery
+          delay: '0'
+          description: 'Discovery for battery voltage triggers'
+          item_prototypes:
+            -
+              uuid: 3a526ad82f7a48c589c3079599e0334e
+              name: 'Battery: Voltage{#SINGLETON}'
+              type: SNMP_AGENT
+              snmp_oid: 1.3.6.1.4.1.33333.9.30.0
+              key: 'battery.voltage[batteryVoltageSlow.0{#SINGLETON}]'
+              history: 7d
+              value_type: FLOAT
+              units: V
+              description: |
+                MIB: SURESINE
+                Description:Battery Voltage(slow)
+                Scaling Factor:0.0002581787109375
+                Units:V
+                Range:[0.0, 17.0]
+                Modbus address:0x0004
+              preprocessing:
+                -
+                  type: MULTIPLIER
+                  parameters:
+                    - '2.581787109375E-4'
+                -
+                  type: REGEX
+                  parameters:
+                    - '^(\d+)(\.\d{1,2})?'
+                    - \1\2
+              tags:
+                -
+                  tag: component
+                  value: battery
+              trigger_prototypes:
+                -
+                  uuid: 4b27f6ecdc674803a883a8a60e3ddce2
+                  expression: 'min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                  name: 'Battery: Critically high battery voltage'
+                  event_name: 'Battery: Critically high battery voltage (over {#VOLTAGE.MAX.CRIT}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: dfbcd455a92d423fbb841f2d6b6293a8
+                  expression: 'max(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                  name: 'Battery: Critically low battery voltage'
+                  event_name: 'Battery: Critically low battery voltage (below {#VOLTAGE.MIN.CRIT}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: HIGH
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: e0173479978841ec8607430cf2fb356e
+                  expression: 'min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}'
+                  name: 'Battery: High battery voltage'
+                  event_name: 'Battery: High battery voltage (over {#VOLTAGE.MAX.WARN}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Battery: Critically high battery voltage'
+                      expression: 'min(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+                -
+                  uuid: 75a433d7ec28440f947a4aaed3aed33d
+                  expression: 'max(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}'
+                  name: 'Battery: Low battery voltage'
+                  event_name: 'Battery: Low battery voltage (below {#VOLTAGE.MIN.WARN}V for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  dependencies:
+                    -
+                      name: 'Battery: Critically low battery voltage'
+                      expression: 'max(/Morningstar SureSine SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}'
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
+          graph_prototypes:
+            -
+              uuid: 6cdc54f509c045b0880af6f7f901b6ab
+              name: 'Voltage: Battery{#SINGLETON}'
+              graph_items:
+                -
+                  drawtype: GRADIENT_LINE
+                  color: 1A7C11
+                  item:
+                    host: 'Morningstar SureSine SNMP'
+                    key: 'battery.voltage[batteryVoltageSlow.0{#SINGLETON}]'
+          master_item:
+            key: 'battery.voltage.discovery[batteryVoltageSlow.0]'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var v_range = [
+                        [[0, 18], [12, 15, 11.5, 15.5]],
+                        [[18, 36], [24, 30, 23, 31]],
+                        [[36, 99], [48, 60, 46, 62]],
+                    ],
+                    result = [];
+                  
+                  for (var idx in v_range) {
+                      if (v_range[idx][0][0] < value && value <= v_range[idx][0][1]) {
+                          result = [{
+                              '{#VOLTAGE.MIN.WARN}': parseInt({$VOLTAGE.MIN.WARN}) || v_range[idx][1][0],
+                              '{#VOLTAGE.MAX.WARN}': parseInt({$VOLTAGE.MAX.WARN}) || v_range[idx][1][1],
+                              '{#VOLTAGE.MIN.CRIT}': parseInt({$VOLTAGE.MIN.CRIT}) || v_range[idx][1][2],
+                              '{#VOLTAGE.MAX.CRIT}': parseInt({$VOLTAGE.MAX.CRIT}) || v_range[idx][1][3],
+                              '{#SINGLETON}': ''
+                          }];
+                          break;
+                      }
+                  }
+                  
+                  return JSON.stringify(result);
+      tags:
+        -
+          tag: class
+          value: power
+        -
+          tag: target
+          value: morningstar
+      macros:
+        -
+          macro: '{$BATTERY.TEMP.MAX.CRIT}'
+          value: '60'
+          description: 'Battery high temperature critical value'
+        -
+          macro: '{$BATTERY.TEMP.MAX.WARN}'
+          value: '45'
+          description: 'Battery high temperature warning value'
+        -
+          macro: '{$BATTERY.TEMP.MIN.CRIT}'
+          value: '-20'
+          description: 'Battery low temperature critical value'
+        -
+          macro: '{$BATTERY.TEMP.MIN.WARN}'
+          value: '0'
+          description: 'Battery low temperature warning value'
+        -
+          macro: '{$CHARGE.STATE.CRIT}'
+          value: '4'
+          description: fault
+        -
+          macro: '{$CHARGE.STATE.WARN}'
+          value: '2'
+          description: disconnect
+        -
+          macro: '{$LOAD.STATE.CRIT:"fault"}'
+          value: '4'
+          description: fault
+        -
+          macro: '{$LOAD.STATE.CRIT:"lvd"}'
+          value: '3'
+          description: lvd
+        -
+          macro: '{$LOAD.STATE.WARN:"disconnect"}'
+          value: '5'
+          description: disconnect
+        -
+          macro: '{$LOAD.STATE.WARN:"lvdWarning"}'
+          value: '2'
+          description: lvdWarning
+        -
+          macro: '{$LOAD.STATE.WARN:"override"}'
+          value: '7'
+          description: override
+        -
+          macro: '{$VOLTAGE.MAX.CRIT}'
+        -
+          macro: '{$VOLTAGE.MAX.WARN}'
+        -
+          macro: '{$VOLTAGE.MIN.CRIT}'
+        -
+          macro: '{$VOLTAGE.MIN.WARN}'
+      valuemaps:
+        -
+          uuid: 1d6f60ea7d414cb8a26ddad70fc352b2
+          name: 'SureSine load state'
+          mappings:
+            -
+              value: '0'
+              newvalue: Start
+            -
+              value: '1'
+              newvalue: LoadOn
+            -
+              value: '2'
+              newvalue: LvdWarning
+            -
+              value: '3'
+              newvalue: LowVoltageDisconnect
+            -
+              value: '4'
+              newvalue: Fault
+            -
+              value: '5'
+              newvalue: Disconnect
+            -
+              value: '6'
+              newvalue: NormalOff
+            -
+              value: '7'
+              newvalue: UnknownState
+            -
+              value: '8'
+              newvalue: Standby
+  graphs:
+    -
+      uuid: 45df99d33eb0472e946d2f6f7a5a2745
+      name: 'Current: A/C Load'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar SureSine SNMP'
+            key: 'load.ac_current[acCurrent.0]'
+    -
+      uuid: e15d5c71b19444f18d5917519d3fdb74
+      name: 'Temperature: Heatsink'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: 'Morningstar SureSine SNMP'
+            key: 'temp.heatsink[heatsinkTemperature.0]'

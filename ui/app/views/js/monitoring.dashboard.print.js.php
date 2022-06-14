@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,9 +25,8 @@
 ?>
 
 <script>
-	function initializeView(dashboard, widget_defaults, time_period) {
-
-		const init = () => {
+	const view = {
+		init({dashboard, widget_defaults, time_period}) {
 			timeControl.refreshPage = false;
 
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
@@ -75,8 +74,6 @@
 			}
 
 			ZABBIX.Dashboard.activate();
-		};
-
-		init();
+		}
 	}
 </script>

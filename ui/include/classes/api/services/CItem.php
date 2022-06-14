@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -335,7 +335,7 @@ class CItem extends CItemGeneral {
 
 				$sqlParts['from']['hosts'] = 'hosts h';
 				$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host'], false, true);
+				$sqlParts['where']['h'] = dbConditionString('h.host', $options['filter']['host']);
 			}
 
 			if (array_key_exists('flags', $options['filter'])
@@ -501,6 +501,10 @@ class CItem extends CItemGeneral {
 			else {
 				$item['query_fields'] = '';
 				$item['headers'] = '';
+			}
+
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
 			}
 		}
 		unset($item);
@@ -710,6 +714,10 @@ class CItem extends CItemGeneral {
 					return $tag + ['value' => ''];
 				}, $item['tags']);
 			}
+
+			if (array_key_exists('preprocessing', $item)) {
+				$item['preprocessing'] = $this->normalizeItemPreprocessingSteps($item['preprocessing']);
+			}
 		}
 		unset($item);
 
@@ -731,7 +739,7 @@ class CItem extends CItemGeneral {
 
 		CItemManager::delete($itemids);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM, $db_items);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_ITEM, $db_items);
 
 		return ['itemids' => $itemids];
 	}
@@ -789,7 +797,8 @@ class CItem extends CItemGeneral {
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'preservekeys' => true
+			'preservekeys' => true,
+			'nopermissions' => true
 		]);
 
 		foreach ($tpl_items as &$tpl_item) {

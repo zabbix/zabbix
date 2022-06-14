@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,9 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "dir.h"
+
 #include "common.h"
 #include "sysinfo.h"
-#include "dir.h"
 #include "zbxregexp.h"
 #include "log.h"
 
@@ -28,8 +29,6 @@
 #endif
 
 /******************************************************************************
- *                                                                            *
- * Function: filename_matches                                                 *
  *                                                                            *
  * Purpose: checks if filename matches the include-regexp and doesn't match   *
  *          the exclude-regexp                                                *
@@ -51,8 +50,6 @@ static int	filename_matches(const char *fname, const zbx_regexp_t *regex_incl, c
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: queue_directory                                                  *
  *                                                                            *
  * Purpose: adds directory to processing queue after checking if current      *
  *          depth is less than 'max_depth'                                    *
@@ -87,8 +84,6 @@ static int	queue_directory(zbx_vector_ptr_t *list, char *path, int depth, int ma
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: compare_descriptors                                              *
  *                                                                            *
  * Purpose: compares two zbx_file_descriptor_t values to perform search       *
  *          within descriptor vector                                          *
@@ -141,6 +136,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in second parameter: %s", error));
+			zbx_regexp_err_msg_free(error);
 			return FAIL;
 		}
 	}
@@ -151,6 +147,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in third parameter: %s", error));
+			zbx_regexp_err_msg_free(error);
 			return FAIL;
 		}
 	}
@@ -161,6 +158,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in %s parameter: %s",
 					(5 == excl_dir_param ? "sixth" : "eleventh"), error));
+			zbx_regexp_err_msg_free(error);
 			return FAIL;
 		}
 	}
@@ -411,8 +409,6 @@ static void	descriptors_vector_destroy(zbx_vector_ptr_t *descriptors)
 #define		FT2UT(ft) 	(time_t)(DW2UI64(ft.dwHighDateTime,ft.dwLowDateTime) / 10000000ULL - 11644473600ULL)
 
 /******************************************************************************
- *                                                                            *
- * Function: has_timed_out                                                    *
  *                                                                            *
  * Purpose: Checks if timeout has occurred. If it is, thread should           *
  *          immediately stop whatever it is doing, clean up everything and    *
@@ -844,20 +840,35 @@ int	VFS_DIR_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return zbx_execute_threaded_metric(vfs_dir_size, request, result);
 }
 
+#define EVALUATE_DIR_ENTITY()											\
+{														\
+	if (0 == count_mode)											\
+	{													\
+		char	*error = NULL;										\
+														\
+		if (SUCCEED != zbx_vfs_file_info((const char*)path, &j, 1, &error))				\
+		{												\
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot process directory entry '%s': %s",		\
+					__func__, path, error);							\
+			zbx_free(error);									\
+		}												\
+	}													\
+	else													\
+		++count;											\
+}
+
 /******************************************************************************
  *                                                                            *
- * Function: vfs_dir_count                                                    *
- *                                                                            *
- * Purpose: counts files in directory, subject to regexp, type and depth      *
- *          filters                                                           *
+ * Purpose: counts or lists files in directory, subject to regexp, type and   *
+ *          depth filters                                                     *
  *                                                                            *
  * Return value: boolean failure flag                                         *
  *                                                                            *
- * Comments: under Widows we only support entry types "file" and "dir"        *
+ * Comments: under Windows we only support entry types "file" and "dir"       *
  *                                                                            *
  *****************************************************************************/
 #if defined(_WINDOWS) || defined(__MINGW32__)
-static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event, int count_mode)
 {
 	char			*dir = NULL;
 	int			types, max_depth, ret = SYSINFO_RET_FAIL;
@@ -868,6 +879,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE ti
 	zbx_uint64_t		min_size = 0, max_size = __UINT64_C(0x7fffffffffffffff);
 	time_t			min_time = 0, max_time = 0x7fffffff;
 	size_t			dir_len;
+	struct zbx_json		j;
 
 	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
 		return ret;
@@ -878,6 +890,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE ti
 		goto err1;
 	}
 
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_vector_ptr_create(&descriptors);
 	zbx_vector_ptr_create(&list);
 
@@ -980,14 +993,15 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE ti
 								/* not a symlink directory => symlink regular file*/
 								/* counting symlink files as MS explorer */
 					if (0 != (types & ZBX_FT_FILE) && 0 != match)
-						++count;
-					break;
+						EVALUATE_DIR_ENTITY()
+					goto free_path;
 				case FILE_ATTRIBUTE_DIRECTORY:
+					if (0 != (types & ZBX_FT_DIR) && 0 != match)
+						EVALUATE_DIR_ENTITY()
+
 					if (SUCCEED != queue_directory(&list, path, item->depth, max_depth))
 						zbx_free(path);
 
-					if (0 != (types & ZBX_FT_DIR) && 0 != match)
-						++count;
 					break;
 				default:	/* not a directory => regular file */
 					if (0 != (types & ZBX_FT_FILE) && 0 != match)
@@ -996,7 +1010,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE ti
 						if (FAIL == link_processed(data.dwFileAttributes, wpath, &descriptors,
 								path))
 						{
-							++count;
+							EVALUATE_DIR_ENTITY()
 						}
 
 						zbx_free(wpath);
@@ -1024,18 +1038,35 @@ skip:
 		goto err2;
 	}
 
-	SET_UI64_RESULT(result, count);
+	if (0 == count_mode)
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+		zbx_json_close(&j);
+	}
+	else
+		SET_UI64_RESULT(result, count);
 	ret = SYSINFO_RET_OK;
 err2:
 	list_vector_destroy(&list);
 	descriptors_vector_destroy(&descriptors);
+	zbx_json_free(&j);
 err1:
 	regex_incl_excl_free(regex_incl, regex_excl, regex_excl_dir);
 
 	return ret;
 }
+
+static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+{
+	return vfs_dir_info(request, result, timeout_event, 1);
+}
+
+static int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
+{
+	return vfs_dir_info(request, result, timeout_event, 0);
+}
 #else /* not _WINDOWS or __MINGW32__ */
-static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	vfs_dir_info(AGENT_REQUEST *request, AGENT_RESULT *result, int count_mode)
 {
 	char			*dir = NULL;
 	int			types, max_depth, ret = SYSINFO_RET_FAIL;
@@ -1046,6 +1077,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		min_size = 0, max_size = __UINT64_C(0x7FFFffffFFFFffff);
 	time_t			min_time = 0, max_time = 0x7fffffff;
 	size_t			dir_len;
+	struct zbx_json		j;
 
 	if (SUCCEED != prepare_count_parameters(request, result, &types, &min_size, &max_size, &min_time, &max_time))
 		return ret;
@@ -1055,6 +1087,8 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		goto err1;
 	}
+
+	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_vector_ptr_create(&list);
 
@@ -1097,7 +1131,10 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (0 == strcmp(entry->d_name, ".") || 0 == strcmp(entry->d_name, ".."))
 				continue;
 
-			path = zbx_dsprintf(NULL, "%s/%s", item->path, entry->d_name);
+			if (0 == strcmp(item->path, "/"))
+				path = zbx_dsprintf(NULL, "%s%s", item->path, entry->d_name);
+			else
+				path = zbx_dsprintf(NULL, "%s/%s", item->path, entry->d_name);
 
 			if (0 == lstat(path, &status))
 			{
@@ -1124,7 +1161,7 @@ static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 						(min_time < status.st_mtime &&
 								status.st_mtime <= max_time))
 				{
-					++count;
+					EVALUATE_DIR_ENTITY()
 				}
 
 				if (!(0 != S_ISDIR(status.st_mode) && SUCCEED == queue_directory(&list, path,
@@ -1147,18 +1184,40 @@ skip:
 		zbx_free(item);
 	}
 
-	SET_UI64_RESULT(result, count);
+	if (0 == count_mode)
+	{
+		SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
+		zbx_json_close(&j);
+	}
+	else
+		SET_UI64_RESULT(result, count);
 	ret = SYSINFO_RET_OK;
 err2:
 	list_vector_destroy(&list);
+	zbx_json_free(&j);
 err1:
 	regex_incl_excl_free(regex_incl, regex_excl, regex_excl_dir);
 
 	return ret;
+}
+
+static int	vfs_dir_count(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return vfs_dir_info(request, result, 1);
+}
+
+static int	vfs_dir_get(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return vfs_dir_info(request, result, 0);
 }
 #endif
 
 int	VFS_DIR_COUNT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_execute_threaded_metric(vfs_dir_count, request, result);
+}
+
+int	VFS_DIR_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	return zbx_execute_threaded_metric(vfs_dir_get, request, result);
 }

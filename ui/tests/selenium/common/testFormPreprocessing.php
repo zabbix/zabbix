@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -842,7 +842,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Simple change'],
 						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name']
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
+								'parameter_3' => 'label_name']
 					]
 				]
 			],
@@ -1563,7 +1564,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-space'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label name']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => 'label name'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1576,8 +1582,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-quotes'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '"label_name"']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '"label_name"'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1590,8 +1600,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-triangle-quotes'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '<label_name>']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '<label_name>'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1604,8 +1618,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-slash'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '\0']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '\0'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1618,8 +1636,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'wrong-second-parameter-digits'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern',  'parameter_1' => 'cpu_usage_system', 'parameter_2' => '123']
-
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => '123'
+						]
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus output.'
 				]
@@ -1652,6 +1674,34 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus wrong first parameter =!',
+						'Key' => 'wrong-second-parameter-equals-exlamation'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name=!"name"}']
+
+					],
+					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Item Prometeus wrong first parameter ~!',
+						'Key' => 'wrong-second-parameter-tilda-exclamation'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name~!"name"}']
+
+					],
+					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
+				]
+			],
 			// Successful Prometheus pattern creation.
 			[
 				[
@@ -1673,7 +1723,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometeus-both-parameters-present'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label_name']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => 'cpu_usage_system',
+							'parameter_2' => 'label',
+							'parameter_3' => 'label_name'
+						]
 					]
 				]
 			],
@@ -1801,6 +1856,30 @@ abstract class testFormPreprocessing extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Name' => 'Item Prometeus label operator !=',
+						'Key' => 'prometeus-label-operator-exclamation-equals'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!="name"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus label operator !~',
+						'Key' => 'prometeus-label-operator-exclamation-tilda'
+					],
+					'preprocessing' => [
+						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"name"}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'Item Prometeus slashes in pattern',
 						'Key' => 'prometeus-slashes-pattern'
 					],
@@ -1817,7 +1896,11 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometeus-macros-1'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '{$METRIC_NAME}==1', 'parameter_2' => '{$LABEL_NAME}']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{$METRIC_NAME}==1',
+							'parameter_2' => 'label',
+							'parameter_3' => '{$LABEL_NAME}']
 					]
 				]
 			],
@@ -1880,20 +1963,116 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name!~"<regex>"}']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function sum',
+						'Key' => 'prometeus-function-sum'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{$METRIC_NAME}==1',
+							'parameter_2' => 'sum'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function min',
+						'Key' => 'prometeus-function-min'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{label_name!~"<regex>"}',
+							'parameter_2' => 'min'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function max',
+						'Key' => 'prometeus-function-max'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{{$LABEL_NAME}="<label value>"}',
+							'parameter_2' => 'max'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function avg',
+						'Key' => 'prometeus-function-avg'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{label="value\\\\"}',
+							'parameter_2' => 'avg'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item Prometeus function count',
+						'Key' => 'prometeus-function-count'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '{label_name!~"name"}',
+							'parameter_2' => 'count'
+						]
+					]
+				]
 			]
 		]);
 	}
 
 	/**
 	 * Add item and preprocessing steps.
+	 *
+	 * @param array   $data    data provider
+	 * @param boolean $lld     true if item is lld, false if item or item prototype
+	 *
+	 * @return CFormElement|CGridFormElement
+	 *
 	 */
-	protected function addItemWithPreprocessing($data) {
+	protected function addItemWithPreprocessing($data, $lld = false) {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
 		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
+
+		// Check that 'Type of information' field is not visible before first step is added.
+		$this->assertFalse($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
+				->one(false)->isVisible()
+		);
 		$this->addPreprocessingSteps($data['preprocessing']);
+
+		// Check that 'Type of information' field is visible after steps are added, but not for LLD.
+		$this->assertTrue($form->query('xpath:.//div[@id="item_preproc_list"]/label[text()="Type of information"]')
+				->one(false)->isVisible(!$lld)
+		);
 
 		return $form;
 	}
@@ -1901,13 +2080,13 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check creating items, item prototypes or LLD rules with preprocessing steps.
 	 */
-	protected function checkCreate($data) {
+	protected function checkCreate($data, $lld = false) {
 		if ($data['expected'] === TEST_BAD) {
 			$sql_items = 'SELECT * FROM items ORDER BY itemid';
 			$old_hash = CDBHelper::getHash($sql_items);
 		}
 
-		$form = $this->addItemWithPreprocessing($data);
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -1962,7 +2141,12 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'prometeus-space-in-parameters'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus pattern', 'parameter_1' => '  metric  ', 'parameter_2' => '  output  ']
+						[
+							'type' => 'Prometheus pattern',
+							'parameter_1' => '  metric  ',
+							'parameter_2' => 'label',
+							'parameter_3' => '  output  '
+						]
 					]
 				]
 			],
@@ -1994,15 +2178,20 @@ abstract class testFormPreprocessing extends CWebTest {
 	/**
 	 * Check spaces in preprocessing steps.
 	 */
-	protected function checkTrailingSpaces($data) {
-		$form = $this->addItemWithPreprocessing($data);
+	protected function checkTrailingSpaces($data, $lld = false) {
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $this->success_message);
 
 		// Remove spaces.
 		foreach ($data['preprocessing'] as $i => &$options) {
-			foreach (['parameter_1', 'parameter_2'] as $parameter) {
+
+		$parameters = CTestArrayHelper::get($options, 'type') === 'Prometheus pattern'
+			? ['parameter_1', 'parameter_3']
+			: ['parameter_1', 'parameter_2'];
+
+			foreach ($parameters as $parameter) {
 				if (array_key_exists($parameter, $options)) {
 					$options[$parameter] = trim($options[$parameter]);
 				}
@@ -2202,7 +2391,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * Check "Custom on fail" fields and checkbox state.
 	 */
 	public function checkCustomOnFail($data, $lld = null) {
-		$form = $this->addItemWithPreprocessing($data);
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$steps = $this->getPreprocessingSteps();
 
 		foreach ($data['preprocessing'] as $i => $options) {
@@ -2509,7 +2698,8 @@ abstract class testFormPreprocessing extends CWebTest {
 					[
 						'type' => 'Prometheus pattern',
 						'parameter_1' => 'cpu_usage_system',
-						'parameter_2' => 'label_name',
+						'parameter_2' => 'label',
+						'parameter_3' => 'label_name',
 						'on_fail' => true,
 						'error_handler' => 'Set error to',
 						'error_handler_params' => 'Custom_text'
@@ -2525,9 +2715,9 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * @param array		$data		data provider
 	 * @param string	$host_link	URL of host configuration
 	 */
-	protected function checkPreprocessingInheritance($data, $host_link) {
+	protected function checkPreprocessingInheritance($data, $host_link, $lld = false) {
 		// Create item on template.
-		$form = $this->addItemWithPreprocessing($data);
+		$form = $this->addItemWithPreprocessing($data, $lld);
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $this->success_message);

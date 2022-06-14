@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,10 @@
 #ifndef ZABBIX_ZBXODBC_H
 #define ZABBIX_ZBXODBC_H
 
+#include "config.h"
+
+#ifdef HAVE_UNIXODBC
+
 typedef struct zbx_odbc_data_source	zbx_odbc_data_source_t;
 typedef struct zbx_odbc_query_result	zbx_odbc_query_result_t;
 
@@ -33,5 +37,7 @@ int	zbx_odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, char **
 
 void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result);
 void	zbx_odbc_data_source_free(zbx_odbc_data_source_t *data_source);
+
+#endif	/* HAVE_UNIXODBC */
 
 #endif

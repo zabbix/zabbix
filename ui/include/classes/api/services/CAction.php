@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,7 @@ class CAction extends CApiService {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'validateoperationsintegrity' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
 	protected $tableName = 'actions';
@@ -41,7 +40,7 @@ class CAction extends CApiService {
 	 *
 	 * @var array
 	 */
-	protected $valid_condition_types = [
+	private const VALID_CONDITION_TYPES = [
 		EVENT_SOURCE_TRIGGERS => [
 			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TRIGGER_NAME,
 			CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD, CONDITION_TYPE_TEMPLATE,
@@ -66,50 +65,14 @@ class CAction extends CApiService {
 	];
 
 	/**
-	 * Valid operators for each condition type.
+	 * Operation group names.
 	 *
 	 * @var array
 	 */
-	protected $valid_condition_type_operators = [
-		CONDITION_TYPE_HOST_GROUP => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_HOST => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_TRIGGER => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_TRIGGER_NAME => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE],
-		CONDITION_TYPE_TRIGGER_SEVERITY => [
-			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_MORE_EQUAL,
-			CONDITION_OPERATOR_LESS_EQUAL
-		],
-		CONDITION_TYPE_TIME_PERIOD => [CONDITION_OPERATOR_IN, CONDITION_OPERATOR_NOT_IN],
-		CONDITION_TYPE_DHOST_IP => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_DSERVICE_TYPE => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_DSERVICE_PORT => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_DSTATUS => [CONDITION_OPERATOR_EQUAL],
-		CONDITION_TYPE_DUPTIME => [CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL],
-		CONDITION_TYPE_DVALUE => [
-			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-			CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL
-		],
-		CONDITION_TYPE_TEMPLATE => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_SUPPRESSED => [CONDITION_OPERATOR_YES, CONDITION_OPERATOR_NO],
-		CONDITION_TYPE_DRULE => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_DCHECK => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_PROXY => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_DOBJECT => [CONDITION_OPERATOR_EQUAL],
-		CONDITION_TYPE_HOST_NAME => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_REGEXP,
-			CONDITION_OPERATOR_NOT_REGEXP
-		],
-		CONDITION_TYPE_EVENT_TYPE => [CONDITION_OPERATOR_EQUAL],
-		CONDITION_TYPE_HOST_METADATA => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE,
-			CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP
-		],
-		CONDITION_TYPE_EVENT_TAG => [
-			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
-		],
-		CONDITION_TYPE_EVENT_TAG_VALUE => [
-			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
-		],
-		CONDITION_TYPE_SERVICE => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL],
-		CONDITION_TYPE_SERVICE_NAME => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]
+	private const OPERATION_GROUPS = [
+		ACTION_OPERATION => 'operations',
+		ACTION_RECOVERY_OPERATION => 'recovery_operations',
+		ACTION_UPDATE_OPERATION => 'update_operations'
 	];
 
 	/**
@@ -581,67 +544,268 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Add actions.
+	 * @param array $actions
 	 *
-	 * @param array $actions multidimensional array with actions data
-	 * @param array $actions[0,...]['expression']
-	 * @param array $actions[0,...]['description']
-	 * @param array $actions[0,...]['type'] OPTIONAL
-	 * @param array $actions[0,...]['priority'] OPTIONAL
-	 * @param array $actions[0,...]['status'] OPTIONAL
-	 * @param array $actions[0,...]['comments'] OPTIONAL
-	 * @param array $actions[0,...]['url'] OPTIONAL
-	 * @param array $actions[0,...]['filter'] OPTIONAL
-	 * @param array $actions[0,...]['pause_suppressed'] OPTIONAL
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	public function create($actions) {
-		$actions = zbx_toArray($actions);
-
+	public function create(array $actions): array {
 		$this->validateCreate($actions);
 
-		// Set "evaltype" if specified in "filter" section of action.
-		foreach ($actions as &$action) {
-			if (isset($action['filter'])) {
+		$ins_actions = [];
+
+		foreach ($actions as $action) {
+			if (array_key_exists('filter', $action)) {
 				$action['evaltype'] = $action['filter']['evaltype'];
 			}
 
-			// Set default values for recovery operations and their messages.
-			if (array_key_exists('recovery_operations', $action)) {
-				foreach ($action['recovery_operations'] as &$operation) {
-					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
-							|| $operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
-						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
-							? $operation['opmessage']
-							: [];
+			$ins_actions[] = $action;
+		}
 
-						$operation['opmessage'] = $message + [
-							'default_msg' => 1,
-							'mediatypeid' => 0,
-							'subject' => '',
-							'message' => ''
+		$actionids = DB::insert('actions', $ins_actions);
+
+		foreach ($actions as $index => &$action) {
+			$action['actionid'] = $actionids[$index];
+		}
+		unset($action);
+
+		self::updateFilter($actions);
+		self::updateOperations($actions);
+
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_ACTION, $actions);
+
+		return ['actionids' => $actionids];
+	}
+
+	/**
+	 * @param array $actions
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	public function update(array $actions): array {
+		$this->validateUpdate($actions, $db_actions);
+
+		$upd_actions = [];
+
+		foreach ($actions as $action) {
+			$db_action = $db_actions[$action['actionid']];
+
+			if (array_key_exists('filter', $action)) {
+				$action['evaltype'] = $action['filter']['evaltype'];
+				$db_action['evaltype'] = $db_action['filter']['evaltype'];
+			}
+
+			$upd_action = DB::getUpdatedValues('actions', $action, $db_action);
+
+			if ($upd_action) {
+				$upd_actions[] = [
+					'values' => $upd_action,
+					'where' => ['actionid' => $action['actionid']]
+				];
+			}
+		}
+
+		if ($upd_actions) {
+			DB::update('actions', $upd_actions);
+		}
+
+		self::updateFilter($actions, $db_actions);
+		self::updateOperations($actions, $db_actions);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_ACTION, $actions, $db_actions);
+
+		return ['actionids' => array_column($actions, 'actionid')];
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateFilter(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_conditions = [];
+		$upd_conditions = [];
+		$del_conditionids = [];
+
+		foreach ($actions as &$action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			$db_conditions = $is_update ? $db_actions[$action['actionid']]['filter']['conditions'] : [];
+
+			foreach ($action['filter']['conditions'] as &$condition) {
+				$db_condition = current(
+					array_filter($db_conditions, static function(array $db_condition) use ($condition): bool {
+						if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+							return $condition['conditiontype'] == $db_condition['conditiontype'];
+						}
+
+						if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE) {
+							return $condition['conditiontype'] == $db_condition['conditiontype']
+								&& $condition['value2'] === $db_condition['value2'];
+						}
+
+						return $condition['conditiontype'] == $db_condition['conditiontype']
+							&& $condition['value'] == $db_condition['value'];
+					})
+				);
+
+				if ($db_condition) {
+					$condition['conditionid'] = $db_condition['conditionid'];
+					unset($db_conditions[$db_condition['conditionid']]);
+
+					$upd_condition = DB::getUpdatedValues('conditions', $condition, $db_condition);
+
+					if ($upd_condition) {
+						$upd_conditions[] = [
+							'values' => $upd_condition,
+							'where' => ['conditionid' => $db_condition['conditionid']]
 						];
 					}
 				}
-				unset($operation);
+				else {
+					$ins_conditions[] = ['actionid' => $action['actionid']] + $condition;
+				}
+			}
+			unset($condition);
+
+			$del_conditionids = array_merge($del_conditionids, array_keys($db_conditions));
+		}
+		unset($action);
+
+		if ($del_conditionids) {
+			DB::delete('conditions', ['conditionid' => $del_conditionids]);
+		}
+
+		if ($upd_conditions) {
+			DB::update('conditions', $upd_conditions);
+		}
+
+		if ($ins_conditions) {
+			$conditionids = DB::insert('conditions', $ins_conditions);
+		}
+
+		foreach ($actions as &$action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
 			}
 
-			// Set default values for update operations and their messages.
-			if (array_key_exists('update_operations', $action)) {
-				foreach ($action['update_operations'] as &$operation) {
-					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
-							|| $operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-						$message = (array_key_exists('opmessage', $operation) && is_array($operation['opmessage']))
-							? $operation['opmessage']
-							: [];
+			foreach ($action['filter']['conditions'] as &$condition) {
+				if (!array_key_exists('conditionid', $condition)) {
+					$condition['conditionid'] = array_shift($conditionids);
+				}
+			}
+			unset($condition);
+		}
+		unset($action);
 
-						$operation['opmessage'] = $message + [
-							'default_msg' => 1,
-							'mediatypeid' => 0,
-							'subject' => '',
-							'message' => ''
-						];
+		// Update formula.
+		$upd_actions = [];
+
+		foreach ($actions as &$action) {
+			if (!array_key_exists('filter', $action)) {
+				continue;
+			}
+
+			$action['filter']['formula'] = ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION)
+				? CConditionHelper::replaceLetterIds($action['filter']['formula'],
+					array_column($action['filter']['conditions'], 'conditionid', 'formulaid')
+				)
+				: '';
+
+			$db_formula = $is_update ? $db_actions[$action['actionid']]['filter']['formula'] : '';
+
+			if ($action['filter']['formula'] !== $db_formula) {
+				$upd_actions[] = [
+					'values' => ['formula' => $action['filter']['formula']],
+					'where' => ['actionid' => $action['actionid']]
+				];
+			}
+		}
+		unset($action);
+
+		if ($upd_actions) {
+			DB::update('actions', $upd_actions);
+		}
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperations(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_operations = [];
+		$upd_operations = [];
+		$del_operationids = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					$db_operation = current(
+						array_filter($db_operations, static function (array $db_operation) use ($operation): bool {
+							return $operation['operationtype'] == $db_operation['operationtype']
+								&& $operation['recovery'] == $db_operation['recovery'];
+						})
+					);
+
+					if ($db_operation) {
+						$operation['operationid'] = $db_operation['operationid'];
+						unset($db_operations[$operation['operationid']]);
+
+						$upd_operation = DB::getUpdatedValues('operations', $operation, $db_operation);
+
+						if ($upd_operation) {
+							$upd_operations[] = [
+								'values' => $upd_operation,
+								'where' => ['operationid' => $db_operation['operationid']]
+							];
+						}
+					}
+					else {
+						$ins_operations[] = ['actionid' => $action['actionid']] + $operation;
+					}
+				}
+				unset($operation);
+
+				$del_operationids = array_merge($del_operationids, array_keys($db_operations));
+			}
+		}
+		unset($action);
+
+		if ($del_operationids) {
+			DB::delete('operations', ['operationid' => $del_operationids]);
+		}
+
+		if ($upd_operations) {
+			DB::update('operations', $upd_operations);
+		}
+
+		if ($ins_operations) {
+			$operationids = DB::insert('operations', $ins_operations);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('operationid', $operation)) {
+						$operation['operationid'] = array_shift($operationids);
 					}
 				}
 				unset($operation);
@@ -649,922 +813,695 @@ class CAction extends CApiService {
 		}
 		unset($action);
 
-		// Insert actions into db, get back array with new actionids.
-		$actions = DB::save('actions', $actions);
-		$actions = zbx_toHash($actions, 'actionid');
-		$audit = [];
-
-		$conditions_to_create = [];
-		$operations_to_create = [];
-
-		// Collect conditions and operations to be created and set appropriate action ID.
-		foreach ($actions as $actionid => $action) {
-			$audit[] = ['actionid' => $actionid, 'name' => $action['name']];
-
-			if (isset($action['filter'])) {
-				foreach ($action['filter']['conditions'] as $condition) {
-					$condition['actionid'] = $actionid;
-					$conditions_to_create[] = $condition;
-				}
-			}
-
-			if (array_key_exists('operations', $action) && $action['operations']) {
-				foreach ($action['operations'] as $operation) {
-					$operation['actionid'] = $actionid;
-					$operation['recovery'] = ACTION_OPERATION;
-					$operations_to_create[] = $operation;
-				}
-			}
-
-			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']) {
-				foreach ($action['recovery_operations'] as $recovery_operation) {
-					$recovery_operation['actionid'] = $actionid;
-					$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
-					unset($recovery_operation['esc_period'], $recovery_operation['esc_step_from'],
-						$recovery_operation['esc_step_to']
-					);
-
-					if ($recovery_operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
-						unset($recovery_operation['opmessage']['mediatypeid']);
-					}
-
-					$operations_to_create[] = $recovery_operation;
-				}
-			}
-
-			if (array_key_exists('update_operations', $action) && $action['update_operations']) {
-				foreach ($action['update_operations'] as $update_operation) {
-					$update_operation['actionid'] = $actionid;
-					$update_operation['recovery'] = ACTION_UPDATE_OPERATION;
-					unset($update_operation['esc_period'], $update_operation['esc_step_from'],
-						$update_operation['esc_step_to']
-					);
-					$operations_to_create[] = $update_operation;
-				}
-			}
-		}
-
-		$createdConditions = $this->addConditions($conditions_to_create);
-
-		// Group back created action conditions by action ID to be used for updating action formula.
-		$conditionsForActions = [];
-		foreach ($createdConditions as $condition) {
-			$conditionsForActions[$condition['actionid']][$condition['conditionid']] = $condition;
-		}
-
-		// Update "formula" field if evaltype is custom expression.
-		foreach ($actions as $actionid => $action) {
-			if (isset($action['filter'])) {
-				$actionFilter = $action['filter'];
-				if ($actionFilter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-					$this->updateFormula($actionid, $actionFilter['formula'], $conditionsForActions[$actionid]);
-				}
-			}
-		}
-
-		// Add operations.
-		$this->addOperations($operations_to_create);
-
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_ACTION, $audit);
-
-		return ['actionids' => array_keys($actions)];
+		self::updateOperationConditions($actions, $db_actions);
+		self::updateOperationMessages($actions, $db_actions);
+		self::updateOperationCommands($actions, $db_actions);
+		self::updateOperationGroups($actions, $db_actions);
+		self::updateOperationTemplates($actions, $db_actions);
+		self::updateOperationInventories($actions, $db_actions);
 	}
 
 	/**
-	 * Update actions.
-	 *
-	 * @param array $actions multidimensional array with actions data
-	 * @param array $actions[0,...]['actionid']
-	 * @param array $actions[0,...]['expression']
-	 * @param array $actions[0,...]['description']
-	 * @param array $actions[0,...]['type'] OPTIONAL
-	 * @param array $actions[0,...]['priority'] OPTIONAL
-	 * @param array $actions[0,...]['status'] OPTIONAL
-	 * @param array $actions[0,...]['comments'] OPTIONAL
-	 * @param array $actions[0,...]['url'] OPTIONAL
-	 * @param array $actions[0,...]['filter'] OPTIONAL
-	 * @param array $actions[0,...]['pause_suppressed'] OPTIONAL
-	 *
-	 * @return array
+	 * @param array      $actions
+	 * @param array|null $db_actions
 	 */
-	public function update($actions) {
-		$actions = zbx_toArray($actions);
-		$actions = zbx_toHash($actions, 'actionid');
-		$actionIds = array_keys($actions);
+	private static function updateOperationConditions(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
 
-		$db_actions = $this->get([
-			'output' => API_OUTPUT_EXTEND,
-			'selectFilter' => ['formula', 'conditions'],
-			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectRecoveryOperations' => API_OUTPUT_EXTEND,
-			'selectUpdateOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
-				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
-			],
-			'actionids' => $actionIds,
-			'editable' => true,
-			'preservekeys' => true
-		]);
+		$ins_opconditions = [];
+		$upd_opconditions = [];
+		$del_opconditionids = [];
 
-		$this->validateUpdate($actions, $db_actions);
-
-		$operations_to_create = [];
-		$operations_to_update = [];
-		$operationids_to_delete = [];
-
-		$actions_update_data = [];
-
-		$newActionConditions = null;
-		foreach ($actions as $actionId => $action) {
-			$db_action = $db_actions[$actionId];
-
-			$actionUpdateValues = $action;
-			unset(
-				$actionUpdateValues['actionid'],
-				$actionUpdateValues['filter'],
-				$actionUpdateValues['operations'],
-				$actionUpdateValues['recovery_operations'],
-				$actionUpdateValues['update_operations'],
-				$actionUpdateValues['conditions'],
-				$actionUpdateValues['formula'],
-				$actionUpdateValues['evaltype']
-			);
-
-			if (isset($action['filter'])) {
-				$actionFilter = $action['filter'];
-
-				// set formula to empty string of not custom expression
-				if ($actionFilter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-					$actionUpdateValues['formula'] = '';
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
 				}
 
-				$actionUpdateValues['evaltype'] = $actionFilter['evaltype'];
-			}
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
 
-			if (array_key_exists('operations', $action)) {
-				$db_operations = zbx_toHash($db_action['operations'], 'operationid');
-
-				foreach ($action['operations'] as $operation) {
-					if (!array_key_exists('operationid', $operation)) {
-						$operation['actionid'] = $action['actionid'];
-						$operation['recovery'] = ACTION_OPERATION;
-						$operations_to_create[] = $operation;
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('opconditions', $operation)) {
+						continue;
 					}
-					else {
-						$operationid = $operation['operationid'];
 
-						if (array_key_exists($operationid, $db_operations)) {
-							$operation['recovery'] = ACTION_OPERATION;
-							$operations_to_update[] = $operation;
-							unset($db_operations[$operationid]);
-						}
-						else {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-								$operationid, 'operationid'
-							));
-						}
-					}
-				}
-				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_operations));
-			}
-
-			if (array_key_exists('recovery_operations', $action)) {
-				$db_recovery_operations = zbx_toHash($db_action['recovery_operations'], 'operationid');
-
-				foreach ($action['recovery_operations'] as $recovery_operation) {
-					unset($recovery_operation['esc_period'], $recovery_operation['esc_step_from'],
-						$recovery_operation['esc_step_to']
-					);
-					$recovery_operation['actionid'] = $action['actionid'];
-
-					if (!array_key_exists('operationid', $recovery_operation)) {
-						if ($recovery_operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
-							unset($recovery_operation['opmessage']['mediatypeid']);
-						}
-
-						$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
-						$operations_to_create[] = $recovery_operation;
-					}
-					else {
-						$recovery_operationid = $recovery_operation['operationid'];
-
-						if (array_key_exists($recovery_operationid, $db_recovery_operations)) {
-							$db_operation_type = $db_recovery_operations[$recovery_operationid]['operationtype'];
-							if ((array_key_exists('operationtype', $recovery_operation)
-									&& $recovery_operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE)
-									|| (!array_key_exists('operationtype', $recovery_operation)
-										&& $db_operation_type == OPERATION_TYPE_RECOVERY_MESSAGE)) {
-								unset($recovery_operation['opmessage']['mediatypeid']);
-							}
-
-							$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
-							$operations_to_update[] = $recovery_operation;
-							unset($db_recovery_operations[$recovery_operationid]);
-						}
-						else {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-								$recovery_operationid, 'operationid'
-							));
-						}
-					}
-				}
-				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_recovery_operations));
-			}
-
-			if (array_key_exists('update_operations', $action)) {
-				$db_update_operations = zbx_toHash($db_action['update_operations'], 'operationid');
-
-				foreach ($action['update_operations'] as $update_operation) {
-					$update_operation['recovery'] = ACTION_UPDATE_OPERATION;
-					$opmessage = (array_key_exists('opmessage', $update_operation)
-							&& is_array($update_operation['opmessage']))
-						? $update_operation['opmessage']
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
 						: [];
-					unset($update_operation['esc_period'], $update_operation['esc_step_from'],
-						$update_operation['esc_step_to']
-					);
-					$update_operation['actionid'] = $action['actionid'];
 
-					if (!array_key_exists('operationid', $update_operation)) {
-						if ($update_operation['operationtype'] == OPERATION_TYPE_MESSAGE
-								|| $update_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$update_operation['opmessage'] += [
-								'default_msg' => 1,
-								'mediatypeid' => 0,
-								'subject' => '',
-								'message' => ''
-							];
-						}
+					$db_opconditions = array_key_exists('opconditions', $db_operation)
+						? array_column($db_operation['opconditions'], null, 'value')
+						: [];
 
-						$operations_to_create[] = $update_operation;
-					}
-					elseif (array_key_exists($update_operation['operationid'], $db_update_operations)) {
-						if ($update_operation['operationtype'] == OPERATION_TYPE_MESSAGE
-								|| $update_operation['operationtype'] == OPERATION_TYPE_ACK_MESSAGE) {
-							$db_opmessage = array_key_exists('opmessage', $db_update_operations[$update_operation['operationid']])
-								? $db_update_operations[$update_operation['operationid']]['opmessage']
-								: [
-									'default_msg' => 1,
-									'mediatypeid' => 0,
-									'subject' => '',
-									'message' => ''
+					foreach ($operation['opconditions'] as &$opcondition) {
+						if (array_key_exists($opcondition['value'], $db_opconditions)) {
+							$db_opcondition = $db_opconditions[$opcondition['value']];
+
+							$opcondition['opconditionid'] = $db_opcondition['opconditionid'];
+							unset($db_opconditions[$opcondition['value']]);
+
+							$upd_opcondition = DB::getUpdatedValues('opconditions', $opcondition, $db_opcondition);
+
+							if ($upd_opcondition) {
+								$upd_opconditions[] = [
+									'values' => $upd_opcondition,
+									'where' => ['operationid' => $operation['operationid']]
 								];
-							$default_msg = array_key_exists('default_msg', $opmessage)
-								? $opmessage['default_msg']
-								: $db_opmessage['default_msg'];
-
-							if ($default_msg == 1) {
-								$opmessage['subject'] = '';
-								$opmessage['message'] = '';
-								$update_operation['opmessage'] = $opmessage;
 							}
 						}
-
-						$operations_to_update[] = $update_operation;
-						unset($db_update_operations[$update_operation['operationid']]);
+						else {
+							$ins_opconditions[] = ['operationid' => $operation['operationid']] + $opcondition;
+						}
 					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value "%1$s" for "%2$s" field.',
-							$update_operation['operationid'], 'operationid'
-						));
+					unset($opcondition);
+
+					$del_opconditionids = array_merge($del_opconditionids,
+						array_column($db_opconditions, 'opconditionid')
+					);
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+
+		if ($del_opconditionids) {
+			DB::delete('opconditions', ['opconditionid' => $del_opconditionids]);
+		}
+
+		if ($upd_opconditions) {
+			DB::update('opconditions', $upd_opconditions);
+		}
+
+		if ($ins_opconditions) {
+			$opconditionids = DB::insert('opconditions', $ins_opconditions);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('opconditions', $operation)) {
+						continue;
 					}
+
+					foreach ($operation['opconditions'] as &$opcondition) {
+						if (!array_key_exists('opconditionid', $opcondition)) {
+							$opcondition['opconditionid'] = array_shift($opconditionids);
+						}
+					}
+					unset($opcondition);
 				}
-				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_update_operations));
-			}
-
-			if ($actionUpdateValues) {
-				$actions_update_data[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+				unset($operation);
 			}
 		}
-
-		if ($actions_update_data) {
-			DB::update('actions', $actions_update_data);
-			$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, $actions, $db_actions);
-		}
-
-		// add, update and delete operations
-		$this->addOperations($operations_to_create);
-		$this->updateOperations($operations_to_update, $db_actions);
-		if (!empty($operationids_to_delete)) {
-			$this->deleteOperations($operationids_to_delete);
-		}
-
-		// set actionid for all conditions and group by actionid into $newActionConditions
-		$newActionConditions = null;
-		foreach ($actions as $actionId => $action) {
-			if (isset($action['filter'])) {
-				if ($newActionConditions === null) {
-					$newActionConditions = [];
-				}
-
-				$newActionConditions[$actionId] = [];
-				foreach ($action['filter']['conditions'] as $condition) {
-					$condition['actionid'] = $actionId;
-					$newActionConditions[$actionId][] = $condition;
-				}
-			}
-		}
-
-		// if we have any conditions, fetch current conditions from db and do replace by position and group result
-		// by actionid into $actionConditions
-		$actionConditions = [];
-		if ($newActionConditions !== null) {
-			$existingConditions = DBfetchArray(DBselect(
-				'SELECT conditionid,actionid,conditiontype,operator,value,value2'.
-				' FROM conditions'.
-				' WHERE '.dbConditionInt('actionid', $actionIds).
-				' ORDER BY conditionid'
-			));
-			$existingActionConditions = [];
-			foreach ($existingConditions as $condition) {
-				$existingActionConditions[$condition['actionid']][] = $condition;
-			}
-
-			$conditions = DB::replaceByPosition('conditions', $existingActionConditions, $newActionConditions);
-			foreach ($conditions as $condition) {
-				$actionConditions[$condition['actionid']][] = $condition;
-			}
-		}
-
-		// update formulas for user expressions using new conditions
-		foreach ($actions as $actionId => $action) {
-			if (isset($action['filter']) && $action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$this->updateFormula($actionId, $action['filter']['formula'], $actionConditions[$actionId]);
-			}
-		}
-
-		return ['actionids' => $actionIds];
+		unset($action);
 	}
 
 	/**
-	 * @param array $conditions
-	 *
-	 * @return mixed
+	 * @param array      $actions
+	 * @param array|null $db_actions
 	 */
-	protected function addConditions($conditions) {
-		foreach ($conditions as $condition) {
-			$connectionDbFields = [
-				'actionid' => null,
-				'conditiontype' => null
-			];
-			if (!check_db_fields($connectionDbFields, $condition)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for condition.'));
+	private static function updateOperationMessages(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_opmessages = [];
+		$upd_opmessages = [];
+
+		$ins_opmessage_grps = [];
+		$del_opmessage_grpids = [];
+
+		$ins_opmessage_usrs = [];
+		$del_opmessage_usrids = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
+
+					switch ($operation['operationtype']) {
+						case OPERATION_TYPE_MESSAGE:
+							if (array_key_exists('opmessage_grp', $operation)) {
+								$db_opmessage_grps = array_key_exists('opmessage_grp', $db_operation)
+									? array_column($db_operation['opmessage_grp'], null, 'usrgrpid')
+									: [];
+
+								foreach ($operation['opmessage_grp'] as &$opmessage_grp) {
+									if (array_key_exists($opmessage_grp['usrgrpid'], $db_opmessage_grps)) {
+										$db_opmessage_grp = $db_opmessage_grps[$opmessage_grp['usrgrpid']];
+										$opmessage_grp['opmessage_grpid'] = $db_opmessage_grp['opmessage_grpid'];
+										unset($db_opmessage_grps[$opmessage_grp['usrgrpid']]);
+									}
+									else {
+										$ins_opmessage_grps[] =
+											['operationid' => $operation['operationid']] + $opmessage_grp;
+									}
+								}
+								unset($opmessage_grp);
+
+								$del_opmessage_grpids = array_merge($del_opmessage_grpids,
+									array_column($db_opmessage_grps, 'opmessage_grpid')
+								);
+							}
+
+							if (array_key_exists('opmessage_usr', $operation)) {
+								$db_opmessage_usrs = array_key_exists('opmessage_usr', $db_operation)
+									? array_column($db_operation['opmessage_usr'], null, 'userid')
+									: [];
+
+								foreach ($operation['opmessage_usr'] as &$opmessage_usr) {
+									if (array_key_exists($opmessage_usr['userid'], $db_opmessage_usrs)) {
+										$db_opmessage_usr = $db_opmessage_usrs[$opmessage_usr['userid']];
+										$opmessage_usr['opmessage_usrid'] = $db_opmessage_usr['opmessage_usrid'];
+										unset($db_opmessage_usrs[$opmessage_usr['userid']]);
+									}
+									else {
+										$ins_opmessage_usrs[] =
+											['operationid' => $operation['operationid']] + $opmessage_usr;
+									}
+								}
+								unset($opmessage_usr);
+
+								$del_opmessage_usrids = array_merge($del_opmessage_usrids,
+									array_column($db_opmessage_usrs, 'opmessage_usrid')
+								);
+							}
+							// break; is not missing here
+
+						case OPERATION_TYPE_RECOVERY_MESSAGE:
+						case OPERATION_TYPE_UPDATE_MESSAGE:
+							if (array_key_exists('opmessage', $db_operation)) {
+								$upd_opmessage = DB::getUpdatedValues('opmessage', $operation['opmessage'],
+									$db_operation['opmessage']
+								);
+
+								if ($upd_opmessage) {
+									$upd_opmessages[] = [
+										'values' => $upd_opmessage,
+										'where' => ['operationid' => $operation['operationid']]
+									];
+								}
+							}
+							else {
+								$ins_opmessages[] =
+									['operationid' => $operation['operationid']] + $operation['opmessage'];
+							}
+							break;
+					}
+				}
+				unset($operation);
 			}
 		}
+		unset($action);
 
-		return DB::save('conditions', $conditions);
-	}
-
-	protected function updateConditions($conditions) {
-		$update = [];
-		foreach ($conditions as $condition) {
-			$conditionId = $condition['conditionid'];
-			unset($condition['conditionid']);
-			$update = [
-				'values' => $condition,
-				'where' => ['conditionid' => $conditionId]
-			];
+		if ($upd_opmessages) {
+			DB::update('opmessage', $upd_opmessages);
 		}
-		DB::update('conditions', $update);
 
-		return $conditions;
-	}
+		if ($ins_opmessages) {
+			DB::insert('opmessage', $ins_opmessages, false);
+		}
 
-	protected function deleteConditions($conditionids) {
-		DB::delete('conditions', ['conditionid' => $conditionids]);
+		if ($del_opmessage_grpids) {
+			DB::delete('opmessage_grp', ['opmessage_grpid' => $del_opmessage_grpids]);
+		}
+
+		if ($ins_opmessage_grps) {
+			$opmessage_grpids = DB::insert('opmessage_grp', $ins_opmessage_grps);
+		}
+
+		if ($del_opmessage_usrids) {
+			DB::delete('opmessage_usr', ['opmessage_usrid' => $del_opmessage_usrids]);
+		}
+
+		if ($ins_opmessage_usrs) {
+			$opmessage_usrids = DB::insert('opmessage_usr', $ins_opmessage_usrs);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (array_key_exists('opmessage_grp', $operation)) {
+						foreach ($operation['opmessage_grp'] as &$opmessage_grp) {
+							if (!array_key_exists('opmessage_grpid', $opmessage_grp)) {
+								$opmessage_grp['opmessage_grpid'] = array_shift($opmessage_grpids);
+							}
+						}
+						unset($opmessage_grp);
+					}
+
+					if (array_key_exists('opmessage_usr', $operation)) {
+						foreach ($operation['opmessage_usr'] as &$opmessage_usr) {
+							if (!array_key_exists('opmessage_usrid', $opmessage_usr)) {
+								$opmessage_usr['opmessage_usrid'] = array_shift($opmessage_usrids);
+							}
+						}
+						unset($opmessage_usr);
+					}
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
 	}
 
 	/**
-	 * @param array $operations
-	 *
-	 * @return bool
+	 * @param array      $actions
+	 * @param array|null $db_actions
 	 */
-	protected function addOperations($operations) {
-		foreach ($operations as $operation) {
-			$operationDbFields = [
-				'actionid' => null,
-				'operationtype' => null
-			];
-			if (!check_db_fields($operationDbFields, $operation)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter for operations.'));
-			}
-		}
+	private static function updateOperationCommands(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
 
-		$operations = DB::save('operations', $operations);
-		$operations = zbx_toHash($operations, 'operationid');
+		$ins_opcommands = [];
+		$upd_opcommands = [];
 
-		$opMessagesToInsert = [];
-		$opCommandsToInsert = [];
-		$msggroups_to_insert = [];
-		$msgusers_to_insert = [];
-		$opCommandHstsToInsert = [];
-		$opCommandGroupInserts = [];
-		$opGroupsToInsert = [];
-		$opTemplatesToInsert = [];
-		$opConditionsToInsert = [];
-		$opInventoryToInsert = [];
+		$ins_opcommand_grps = [];
+		$del_opcommand_grpids = [];
 
-		foreach ($operations as $operationId => $operation) {
-			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_MESSAGE:
-					if (isset($operation['opmessage']) && !empty($operation['opmessage'])) {
-						$operation['opmessage']['operationid'] = $operationId;
-						$opMessagesToInsert[] = $operation['opmessage'];
-					}
-					if (isset($operation['opmessage_usr'])) {
-						foreach ($operation['opmessage_usr'] as $user) {
-							$msgusers_to_insert[] = [
-								'operationid' => $operationId,
-								'userid' => $user['userid']
-							];
-						}
-					}
-					if (isset($operation['opmessage_grp'])) {
-						foreach ($operation['opmessage_grp'] as $userGroup) {
-							$msggroups_to_insert[] = [
-								'operationid' => $operationId,
-								'usrgrpid' => $userGroup['usrgrpid']
-							];
-						}
-					}
-					break;
+		$ins_opcommand_hsts = [];
+		$del_opcommand_hstids = [];
 
-				case OPERATION_TYPE_COMMAND:
-					if (isset($operation['opcommand']) && !empty($operation['opcommand'])) {
-						$operation['opcommand']['operationid'] = $operationId;
-						$opCommandsToInsert[] = $operation['opcommand'];
-					}
-					if (isset($operation['opcommand_hst'])) {
-						foreach ($operation['opcommand_hst'] as $host) {
-							$opCommandHstsToInsert[] = [
-								'operationid' => $operationId,
-								'hostid' => $host['hostid']
-							];
-						}
-					}
-					if (isset($operation['opcommand_grp'])) {
-						foreach ($operation['opcommand_grp'] as $hostGroup) {
-							$opCommandGroupInserts[] = [
-								'operationid' => $operationId,
-								'groupid' => $hostGroup['groupid']
-							];
-						}
-					}
-					break;
-
-				case OPERATION_TYPE_GROUP_ADD:
-				case OPERATION_TYPE_GROUP_REMOVE:
-					foreach ($operation['opgroup'] as $hostGroup) {
-						$opGroupsToInsert[] = [
-							'operationid' => $operationId,
-							'groupid' => $hostGroup['groupid']
-						];
-					}
-					break;
-
-				case OPERATION_TYPE_TEMPLATE_ADD:
-				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					foreach ($operation['optemplate'] as $template) {
-						$opTemplatesToInsert[] = [
-							'operationid' => $operationId,
-							'templateid' => $template['templateid']
-						];
-					}
-					break;
-
-				case OPERATION_TYPE_HOST_INVENTORY:
-					$opInventoryToInsert[] = [
-						'operationid' => $operationId,
-						'inventory_mode' => $operation['opinventory']['inventory_mode']
-					];
-					break;
-
-				case OPERATION_TYPE_ACK_MESSAGE:
-					// falls through
-				case OPERATION_TYPE_RECOVERY_MESSAGE:
-					if (array_key_exists('opmessage', $operation) && $operation['opmessage']) {
-						$operation['opmessage']['operationid'] = $operationId;
-						$opMessagesToInsert[] = $operation['opmessage'];
-					}
-					break;
-			}
-			if (isset($operation['opconditions'])) {
-				foreach ($operation['opconditions'] as $opCondition) {
-					$opCondition['operationid'] = $operationId;
-					$opConditionsToInsert[] = $opCondition;
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
 				}
-			}
-		}
 
-		DB::insert('opmessage_grp', $msggroups_to_insert);
-		DB::insert('opmessage_usr', $msgusers_to_insert);
-		DB::insert('opconditions', $opConditionsToInsert);
-		DB::insert('opmessage', $opMessagesToInsert, false);
-		DB::insert('opcommand', $opCommandsToInsert, false);
-		DB::insert('opcommand_hst', $opCommandHstsToInsert);
-		DB::insert('opcommand_grp', $opCommandGroupInserts);
-		DB::insert('opgroup', $opGroupsToInsert);
-		DB::insert('optemplate', $opTemplatesToInsert);
-		DB::insert('opinventory', $opInventoryToInsert, false);
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
 
-		return true;
-	}
-
-	/**
-	 * @param array $operations
-	 * @param array $db_actions
-	 */
-	protected function updateOperations($operations, $db_actions) {
-		$operationsUpdate = [];
-
-		// messages
-		$opMessagesToInsert = [];
-		$opMessagesToUpdate = [];
-		$opMessagesToDeleteByOpId = [];
-
-		$opMessageGrpsToInsert = [];
-		$opMessageUsrsToInsert = [];
-		$opMessageGrpsToDeleteByOpId = [];
-		$opMessageUsrsToDeleteByOpId = [];
-
-		// commands
-		$opCommandsToInsert = [];
-		$opCommandsToUpdate = [];
-		$opCommandsToDeleteByOpId = [];
-
-		$opCommandGrpsToInsert = [];
-		$opCommandHstsToInsert = [];
-		$opCommandGrpsToDeleteByOpId = [];
-		$opCommandHstsToDeleteByOpId = [];
-
-		// groups
-		$opGroupsToInsert = [];
-		$opGroupsToDeleteByOpId = [];
-
-		// templates
-		$opTemplateToInsert = [];
-		$opTemplatesToDeleteByOpId = [];
-
-		// operation conditions
-		$opConditionsToInsert = [];
-
-		// inventory
-		$opInventoryToInsert = [];
-		$opInventoryToUpdate = [];
-		$opInventoryToDeleteByOpId = [];
-
-		$operation_actions_hashkey = [
-			ACTION_OPERATION => 'operations',
-			ACTION_RECOVERY_OPERATION => 'recovery_operations',
-			ACTION_UPDATE_OPERATION => 'update_operations'
-		];
-
-		foreach ($operations as $operation) {
-			$actions_key = $operation_actions_hashkey[$operation['recovery']];
-
-			$operationsDb = zbx_toHash($db_actions[$operation['actionid']][$actions_key], 'operationid');
-
-			$operationDb = $operationsDb[$operation['operationid']];
-
-			$type_changed = false;
-
-			if (isset($operation['operationtype']) && ($operation['operationtype'] != $operationDb['operationtype'])) {
-				$type_changed = true;
-
-				switch ($operationDb['operationtype']) {
-					case OPERATION_TYPE_MESSAGE:
-						$opMessagesToDeleteByOpId[] = $operationDb['operationid'];
-						$opMessageGrpsToDeleteByOpId[] = $operationDb['operationid'];
-						$opMessageUsrsToDeleteByOpId[] = $operationDb['operationid'];
-						break;
-
-					case OPERATION_TYPE_COMMAND:
-						$opCommandsToDeleteByOpId[] = $operationDb['operationid'];
-						$opCommandHstsToDeleteByOpId[] = $operationDb['operationid'];
-						$opCommandGrpsToDeleteByOpId[] = $operationDb['operationid'];
-						break;
-
-					case OPERATION_TYPE_GROUP_ADD:
-						if ($operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) {
-							break;
-						}
-					case OPERATION_TYPE_GROUP_REMOVE:
-						if ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD) {
-							break;
-						}
-						$opGroupsToDeleteByOpId[] = $operationDb['operationid'];
-						break;
-
-					case OPERATION_TYPE_TEMPLATE_ADD:
-						if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
-							break;
-						}
-					case OPERATION_TYPE_TEMPLATE_REMOVE:
-						if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD) {
-							break;
-						}
-						$opTemplatesToDeleteByOpId[] = $operationDb['operationid'];
-						break;
-
-					case OPERATION_TYPE_HOST_INVENTORY:
-						$opInventoryToDeleteByOpId[] = $operationDb['operationid'];
-						break;
-
-					case OPERATION_TYPE_ACK_MESSAGE:
-						// falls through
-					case OPERATION_TYPE_RECOVERY_MESSAGE:
-						$opMessagesToDeleteByOpId[] = $operationDb['operationid'];
-						break;
-				}
-			}
-
-			if (!isset($operation['operationtype'])) {
-				$operation['operationtype'] = $operationDb['operationtype'];
-			}
-
-			switch ($operation['operationtype']) {
-				case OPERATION_TYPE_MESSAGE:
-					if (!isset($operation['opmessage_grp'])) {
-						$operation['opmessage_grp'] = [];
-					}
-					else {
-						zbx_array_push($operation['opmessage_grp'], ['operationid' => $operation['operationid']]);
+				foreach ($action[$operation_group] as &$operation) {
+					if ($operation['operationtype'] != OPERATION_TYPE_COMMAND) {
+						continue;
 					}
 
-					if (!isset($operation['opmessage_usr'])) {
-						$operation['opmessage_usr'] = [];
-					}
-					else {
-						zbx_array_push($operation['opmessage_usr'], ['operationid' => $operation['operationid']]);
-					}
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
 
-					if (!isset($operationDb['opmessage_usr'])) {
-						$operationDb['opmessage_usr'] = [];
-					}
-					if (!isset($operationDb['opmessage_grp'])) {
-						$operationDb['opmessage_grp'] = [];
-					}
+					if (array_key_exists('opcommand', $db_operation)) {
+						$upd_opcommand = DB::getUpdatedValues('opcommand', $operation['opcommand'],
+							$db_operation['opcommand']
+						);
 
-					if ($type_changed) {
-						$operation['opmessage']['operationid'] = $operation['operationid'];
-						$opMessagesToInsert[] = $operation['opmessage'];
-
-						$opMessageGrpsToInsert = array_merge($opMessageGrpsToInsert, $operation['opmessage_grp']);
-						$opMessageUsrsToInsert = array_merge($opMessageUsrsToInsert, $operation['opmessage_usr']);
-					}
-					else {
-						if (array_key_exists('opmessage', $operation)) {
-							$opMessagesToUpdate[] = [
-								'values' => $operation['opmessage'],
+						if ($upd_opcommand) {
+							$upd_opcommands[] = [
+								'values' => $upd_opcommand,
 								'where' => ['operationid' => $operation['operationid']]
 							];
 						}
+					}
+					else {
+						$ins_opcommands[] =
+							['operationid' => $operation['operationid']] + $operation['opcommand'];
+					}
 
-						$diff = zbx_array_diff($operation['opmessage_grp'], $operationDb['opmessage_grp'], 'usrgrpid');
-						$opMessageGrpsToInsert = array_merge($opMessageGrpsToInsert, $diff['first']);
+					if (array_key_exists('opcommand_grp', $operation)) {
+						$db_opcommand_grps = array_key_exists('opcommand_grp', $db_operation)
+							? array_column($db_operation['opcommand_grp'], null, 'groupid')
+							: [];
 
-						foreach ($diff['second'] as $opMessageGrp) {
-							DB::delete('opmessage_grp', [
-								'usrgrpid' => $opMessageGrp['usrgrpid'],
-								'operationid' => $operation['operationid']
-							]);
+						foreach ($operation['opcommand_grp'] as &$opcommand_grp) {
+							if (array_key_exists($opcommand_grp['groupid'], $db_opcommand_grps)) {
+								$db_opcommand_grp = $db_opcommand_grps[$opcommand_grp['groupid']];
+								$opcommand_grp['opcommand_grpid'] = $db_opcommand_grp['opcommand_grpid'];
+								unset($db_opcommand_grps[$opcommand_grp['groupid']]);
+							}
+							else {
+								$ins_opcommand_grps[] =
+									['operationid' => $operation['operationid']] + $opcommand_grp;
+							}
 						}
+						unset($opcommand_grp);
 
-						$diff = zbx_array_diff($operation['opmessage_usr'], $operationDb['opmessage_usr'], 'userid');
-						$opMessageUsrsToInsert = array_merge($opMessageUsrsToInsert, $diff['first']);
-						foreach ($diff['second'] as $opMessageUsr) {
-							DB::delete('opmessage_usr', [
-								'userid' => $opMessageUsr['userid'],
-								'operationid' => $operation['operationid']
-							]);
+						$del_opcommand_grpids = array_merge($del_opcommand_grpids,
+							array_column($db_opcommand_grps, 'opcommand_grpid')
+						);
+					}
+
+					if (array_key_exists('opcommand_hst', $operation)) {
+						$db_opcommand_hsts = array_key_exists('opcommand_hst', $db_operation)
+							? array_column($db_operation['opcommand_hst'], null, 'hostid')
+							: [];
+
+						foreach ($operation['opcommand_hst'] as &$opcommand_hst) {
+							if (array_key_exists($opcommand_hst['hostid'], $db_opcommand_hsts)) {
+								$db_opcommand_hst = $db_opcommand_hsts[$opcommand_hst['hostid']];
+								$opcommand_hst['opcommand_hstid'] = $db_opcommand_hst['opcommand_hstid'];
+								unset($db_opcommand_hsts[$opcommand_hst['hostid']]);
+							}
+							else {
+								$ins_opcommand_hsts[] =
+									['operationid' => $operation['operationid']] + $opcommand_hst;
+							}
+						}
+						unset($opcommand_hst);
+
+						$del_opcommand_hstids = array_merge($del_opcommand_hstids,
+							array_column($db_opcommand_hsts, 'opcommand_hstid')
+						);
+					}
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+
+		if ($del_opcommand_grpids) {
+			DB::delete('opcommand_grp', ['opcommand_grpid' => $del_opcommand_grpids]);
+		}
+
+		if ($del_opcommand_hstids) {
+			DB::delete('opcommand_hst', ['opcommand_hstid' => $del_opcommand_hstids]);
+		}
+
+		if ($upd_opcommands) {
+			DB::update('opcommand', $upd_opcommands);
+		}
+
+		if ($ins_opcommands) {
+			DB::insert('opcommand', $ins_opcommands, false);
+		}
+
+		if ($ins_opcommand_grps) {
+			$opcommand_grpids = DB::insert('opcommand_grp', $ins_opcommand_grps);
+		}
+
+		if ($ins_opcommand_hsts) {
+			$opcommand_hstids = DB::insert('opcommand_hst', $ins_opcommand_hsts);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (array_key_exists('opcommand_grp', $operation)) {
+						foreach ($operation['opcommand_grp'] as &$opcommand_grp) {
+							if (!array_key_exists('opcommand_grpid', $opcommand_grp)) {
+								$opcommand_grp['opcommand_grpid'] = array_shift($opcommand_grpids);
+							}
+						}
+						unset($opcommand_grp);
+					}
+
+					if (array_key_exists('opcommand_hst', $operation)) {
+						foreach ($operation['opcommand_hst'] as &$opcommand_hst) {
+							if (!array_key_exists('opcommand_hstid', $opcommand_hst)) {
+								$opcommand_hst['opcommand_hstid'] = array_shift($opcommand_hstids);
+							}
+						}
+						unset($opcommand_hst);
+					}
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationGroups(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_opgroups = [];
+		$del_opgroupids = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					// Proceed only if operation type is OPERATION_TYPE_GROUP_ADD or OPERATION_TYPE_GROUP_REMOVE.
+					if (!array_key_exists('opgroup', $operation)) {
+						continue;
+					}
+
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
+
+					$db_opgroups = array_key_exists('opgroup', $db_operation)
+						? array_column($db_operation['opgroup'], null, 'groupid')
+						: [];
+
+					foreach ($operation['opgroup'] as &$opgroup) {
+						if (array_key_exists($opgroup['groupid'], $db_opgroups)) {
+							$db_opgroup = $db_opgroups[$opgroup['groupid']];
+							$opgroup['opgroupid'] = $db_opgroup['opgroupid'];
+							unset($db_opgroups[$opgroup['groupid']]);
+						}
+						else {
+							$ins_opgroups[] = ['operationid' => $operation['operationid']] + $opgroup;
 						}
 					}
-					break;
+					unset($opgroup);
 
-				case OPERATION_TYPE_COMMAND:
-					if (!isset($operation['opcommand_grp'])) {
-						$operation['opcommand_grp'] = [];
-					}
-					else {
-						zbx_array_push($operation['opcommand_grp'], ['operationid' => $operation['operationid']]);
+					$del_opgroupids = array_merge($del_opgroupids, array_column($db_opgroups, 'opgroupid'));
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+
+		if ($del_opgroupids) {
+			DB::delete('opgroup', ['opgroupid' => $del_opgroupids]);
+		}
+
+		if ($ins_opgroups) {
+			$opgroupids = DB::insert('opgroup', $ins_opgroups);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('opgroup', $operation)) {
+						continue;
 					}
 
-					if (!isset($operation['opcommand_hst'])) {
-						$operation['opcommand_hst'] = [];
+					foreach ($operation['opgroup'] as &$opgroup) {
+						if (!array_key_exists('opgroupid', $opgroup)) {
+							$opgroup['opgroupid'] = array_shift($opgroupids);
+						}
 					}
-					else {
-						zbx_array_push($operation['opcommand_hst'], ['operationid' => $operation['operationid']]);
+					unset($opgroup);
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationTemplates(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_optemplates = [];
+		$del_optemplateids = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					// Proceed only if operation type is OPERATION_TYPE_TEMPLATE_ADD or OPERATION_TYPE_TEMPLATE_REMOVE.
+					if (!array_key_exists('optemplate', $operation)) {
+						continue;
 					}
 
-					if (!isset($operationDb['opcommand_grp'])) {
-						$operationDb['opcommand_grp'] = [];
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
+
+					$db_optemplates = array_key_exists('optemplate', $db_operation)
+						? array_column($db_operation['optemplate'], null, 'templateid')
+						: [];
+
+					foreach ($operation['optemplate'] as &$optemplate) {
+						if (array_key_exists($optemplate['templateid'], $db_optemplates)) {
+							$db_optemplate = $db_optemplates[$optemplate['templateid']];
+							$optemplate['optemplateid'] = $db_optemplate['optemplateid'];
+							unset($db_optemplates[$optemplate['templateid']]);
+						}
+						else {
+							$ins_optemplates[] = ['operationid' => $operation['operationid']] + $optemplate;
+						}
 					}
-					if (!isset($operationDb['opcommand_hst'])) {
-						$operationDb['opcommand_hst'] = [];
+					unset($optemplate);
+
+					$del_optemplateids = array_merge($del_optemplateids, array_column($db_optemplates, 'optemplateid'));
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+
+		if ($del_optemplateids) {
+			DB::delete('optemplate', ['optemplateid' => $del_optemplateids]);
+		}
+
+		if ($ins_optemplates) {
+			$optemplateids = DB::insert('optemplate', $ins_optemplates);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('optemplate', $operation)) {
+						continue;
 					}
 
-					if ($type_changed) {
-						$operation['opcommand']['operationid'] = $operation['operationid'];
-						$opCommandsToInsert[] = $operation['opcommand'];
-
-						$opCommandGrpsToInsert = array_merge($opCommandGrpsToInsert, $operation['opcommand_grp']);
-						$opCommandHstsToInsert = array_merge($opCommandHstsToInsert, $operation['opcommand_hst']);
+					foreach ($operation['optemplate'] as &$optemplate) {
+						if (!array_key_exists('optemplateid', $optemplate)) {
+							$optemplate['optemplateid'] = array_shift($optemplateids);
+						}
 					}
-					else {
-						// Check if "scriptid" needs to be updated in "opcommand" table.
-						if (bccomp($operation['opcommand']['scriptid'], $operationDb['opcommand']['scriptid']) != 0) {
-							$opCommandsToUpdate[] = [
-								'values' => $operation['opcommand'],
+					unset($optemplate);
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationInventories(array $actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_opinventories = [];
+		$upd_opinventories = [];
+
+		foreach ($actions as $action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] != OPERATION_TYPE_HOST_INVENTORY) {
+						continue;
+					}
+
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
+
+					if (array_key_exists('opinventory', $db_operation)) {
+						$upd_opinventory = DB::getUpdatedValues('opinventory', $operation['opinventory'],
+							$db_operation['opinventory']
+						);
+
+						if ($upd_opinventory) {
+							$upd_opinventories[] = [
+								'values' => $upd_opinventory,
 								'where' => ['operationid' => $operation['operationid']]
 							];
 						}
-
-						$diff = zbx_array_diff($operation['opcommand_grp'], $operationDb['opcommand_grp'], 'groupid');
-						$opCommandGrpsToInsert = array_merge($opCommandGrpsToInsert, $diff['first']);
-
-						foreach ($diff['second'] as $opMessageGrp) {
-							DB::delete('opcommand_grp', [
-								'groupid' => $opMessageGrp['groupid'],
-								'operationid' => $operation['operationid']
-							]);
-						}
-
-						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'hostid');
-						$opCommandHstsToInsert = array_merge($opCommandHstsToInsert, $diff['first']);
-						$opCommandHostIds = zbx_objectValues($diff['second'], 'opcommand_hstid');
-						if ($opCommandHostIds) {
-							DB::delete('opcommand_hst', [
-								'opcommand_hstid' => $opCommandHostIds
-							]);
-						}
-					}
-					break;
-
-				case OPERATION_TYPE_GROUP_ADD:
-				case OPERATION_TYPE_GROUP_REMOVE:
-					if (!isset($operation['opgroup'])) {
-						$operation['opgroup'] = [];
 					}
 					else {
-						zbx_array_push($operation['opgroup'], ['operationid' => $operation['operationid']]);
+						$ins_opinventories[] =
+							['operationid' => $operation['operationid']] + $operation['opinventory'];
 					}
-
-					if (!isset($operationDb['opgroup'])) {
-						$operationDb['opgroup'] = [];
-					}
-
-					$diff = zbx_array_diff($operation['opgroup'], $operationDb['opgroup'], 'groupid');
-					$opGroupsToInsert = array_merge($opGroupsToInsert, $diff['first']);
-					foreach ($diff['second'] as $opGroup) {
-						DB::delete('opgroup', [
-							'groupid' => $opGroup['groupid'],
-							'operationid' => $operation['operationid']
-						]);
-					}
-					break;
-
-				case OPERATION_TYPE_TEMPLATE_ADD:
-				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					if (!isset($operation['optemplate'])) {
-						$operation['optemplate'] = [];
-					}
-					else {
-						zbx_array_push($operation['optemplate'], ['operationid' => $operation['operationid']]);
-					}
-
-					if (!isset($operationDb['optemplate'])) {
-						$operationDb['optemplate'] = [];
-					}
-
-					$diff = zbx_array_diff($operation['optemplate'], $operationDb['optemplate'], 'templateid');
-					$opTemplateToInsert = array_merge($opTemplateToInsert, $diff['first']);
-
-					foreach ($diff['second'] as $opTemplate) {
-						DB::delete('optemplate', [
-							'templateid' => $opTemplate['templateid'],
-							'operationid' => $operation['operationid']
-						]);
-					}
-					break;
-
-				case OPERATION_TYPE_HOST_INVENTORY:
-					if ($type_changed) {
-						$operation['opinventory']['operationid'] = $operation['operationid'];
-						$opInventoryToInsert[] = $operation['opinventory'];
-					}
-					else {
-						$opInventoryToUpdate[] = [
-							'values' => $operation['opinventory'],
-							'where' => ['operationid' => $operation['operationid']]
-						];
-					}
-					break;
-
-				case OPERATION_TYPE_ACK_MESSAGE:
-					// falls through
-				case OPERATION_TYPE_RECOVERY_MESSAGE:
-					if ($type_changed) {
-						$operation['opmessage']['operationid'] = $operation['operationid'];
-						$opMessagesToInsert[] = $operation['opmessage'];
-					}
-					elseif (array_key_exists('opmessage', $operation)) {
-						$opMessagesToUpdate[] = [
-							'values' => $operation['opmessage'],
-							'where' => ['operationid' => $operation['operationid']]
-						];
-					}
-					break;
-			}
-
-			if (!isset($operation['opconditions'])) {
-				$operation['opconditions'] = [];
-			}
-			else {
-				zbx_array_push($operation['opconditions'], ['operationid' => $operation['operationid']]);
-			}
-
-			self::validateOperationConditions($operation['opconditions']);
-
-			$db_opconditions = array_key_exists('opconditions', $operationDb) ? $operationDb['opconditions'] : [];
-			$diff = zbx_array_diff($operation['opconditions'], $db_opconditions, 'opconditionid');
-			$opConditionsToInsert = array_merge($opConditionsToInsert, $diff['first']);
-
-			$opConditionsIdsToDelete = zbx_objectValues($diff['second'], 'opconditionid');
-			if (!empty($opConditionsIdsToDelete)) {
-				DB::delete('opconditions', ['opconditionid' => $opConditionsIdsToDelete]);
-			}
-
-			$operationId = $operation['operationid'];
-			unset($operation['operationid']);
-			if (!empty($operation)) {
-				$operationsUpdate[] = [
-					'values' => $operation,
-					'where' => ['operationid' => $operationId]
-				];
+				}
 			}
 		}
 
-		DB::update('operations', $operationsUpdate);
-
-		if (!empty($opMessagesToDeleteByOpId)) {
-			DB::delete('opmessage', ['operationid' => $opMessagesToDeleteByOpId]);
-		}
-		if (!empty($opCommandsToDeleteByOpId)) {
-			DB::delete('opcommand', ['operationid' => $opCommandsToDeleteByOpId]);
-		}
-		if (!empty($opMessageGrpsToDeleteByOpId)) {
-			DB::delete('opmessage_grp', ['operationid' => $opMessageGrpsToDeleteByOpId]);
-		}
-		if (!empty($opMessageUsrsToDeleteByOpId)) {
-			DB::delete('opmessage_usr', ['operationid' => $opMessageUsrsToDeleteByOpId]);
-		}
-		if (!empty($opCommandHstsToDeleteByOpId)) {
-			DB::delete('opcommand_hst', ['operationid' => $opCommandHstsToDeleteByOpId]);
-		}
-		if (!empty($opCommandGrpsToDeleteByOpId)) {
-			DB::delete('opcommand_grp', ['operationid' => $opCommandGrpsToDeleteByOpId]);
-		}
-		if (!empty($opCommandGrpsToDeleteByOpId)) {
-			DB::delete('opcommand_grp', ['opcommand_grpid' => $opCommandGrpsToDeleteByOpId]);
-		}
-		if (!empty($opCommandHstsToDeleteByOpId)) {
-			DB::delete('opcommand_hst', ['opcommand_hstid' => $opCommandHstsToDeleteByOpId]);
-		}
-		if (!empty($opGroupsToDeleteByOpId)) {
-			DB::delete('opgroup', ['operationid' => $opGroupsToDeleteByOpId]);
-		}
-		if (!empty($opTemplatesToDeleteByOpId)) {
-			DB::delete('optemplate', ['operationid' => $opTemplatesToDeleteByOpId]);
-		}
-		if (!empty($opInventoryToDeleteByOpId)) {
-			DB::delete('opinventory', ['operationid' => $opInventoryToDeleteByOpId]);
+		if ($upd_opinventories) {
+			DB::update('opinventory', $upd_opinventories);
 		}
 
-		DB::insert('opmessage', $opMessagesToInsert, false);
-		DB::insert('opcommand', $opCommandsToInsert, false);
-		DB::insert('opmessage_grp', $opMessageGrpsToInsert);
-		DB::insert('opmessage_usr', $opMessageUsrsToInsert);
-		DB::insert('opcommand_grp', $opCommandGrpsToInsert);
-		DB::insert('opcommand_hst', $opCommandHstsToInsert);
-		DB::insert('opgroup', $opGroupsToInsert);
-		DB::insert('optemplate', $opTemplateToInsert);
-		DB::update('opmessage', $opMessagesToUpdate);
-		DB::update('opcommand', $opCommandsToUpdate);
-		DB::insert('opconditions', $opConditionsToInsert);
-		DB::insert('opinventory', $opInventoryToInsert, false);
-		DB::update('opinventory', $opInventoryToUpdate);
-	}
-
-	protected function deleteOperations($operationIds) {
-		DB::delete('operations', ['operationid' => $operationIds]);
+		if ($ins_opinventories) {
+			DB::insert('opinventory', $ins_opinventories, false);
+		}
 	}
 
 	/**
 	 * @param array $actionids
 	 *
+	 * @throws APIException
+	 *
 	 * @return array
 	 */
-	public function delete(array $actionids) {
+	public function delete(array $actionids): array {
+		$this->validateDelete($actionids, $db_actions);
+
+		$operationids = array_keys(DB::select('operations', [
+			'output' => ['operationid'],
+			'filter' => ['actionid' => $actionids],
+			'preservekeys' => true
+		]));
+
+		DB::delete('opcommand', ['operationid' => $operationids]);
+		DB::delete('opcommand_grp', ['operationid' => $operationids]);
+		DB::delete('opcommand_hst', ['operationid' => $operationids]);
+		DB::delete('opmessage', ['operationid' => $operationids]);
+		DB::delete('opmessage_grp', ['operationid' => $operationids]);
+		DB::delete('opmessage_usr', ['operationid' => $operationids]);
+		DB::delete('opgroup', ['operationid' => $operationids]);
+		DB::delete('optemplate', ['operationid' => $operationids]);
+		DB::delete('opinventory', ['operationid' => $operationids]);
+		DB::delete('opconditions', ['operationid' => $operationids]);
+
+		DB::delete('operations', ['actionid' => $actionids]);
+		DB::delete('conditions', ['actionid' => $actionids]);
+		DB::delete('actions', ['actionid' => $actionids]);
+
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_ACTION, $db_actions);
+
+		return ['actionids' => $actionids];
+	}
+
+	/**
+	 * @param array      $actionids
+	 * @param array|null $db_actions
+	 *
+	 * @throws APIException
+	 */
+	private function validateDelete(array &$actionids, ?array &$db_actions): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $actionids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -1572,344 +1509,12 @@ class CAction extends CApiService {
 		$db_actions = $this->get([
 			'output' => ['actionid', 'name'],
 			'actionids' => $actionids,
-			'editable' => true,
-			'preservekeys' => true
+			'editable' => true
 		]);
 
-		foreach ($actionids as $actionid) {
-			if (!array_key_exists($actionid, $db_actions)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($db_actions) != count($actionids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
-
-		DB::delete('actions', ['actionid' => $actionids]);
-
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, $db_actions);
-
-		return ['actionids' => $actionids];
-	}
-
-	/**
-	 * Validate condition type and operator based on action event source.
-	 *
-	 * @param string $name                           Action name.
-	 * @param int    $eventsource                    Action event source.
-	 * @param array  $conditions                     Conditions data array.
-	 * @param string $conditions[]['conditiontype']  Action condition type.
-	 * @param int    $conditions[]['operator']       Action condition operator.
-	 *
-	 * @throws APIException
-	 */
-	public function validateFilterConditionsIntegrity($name, $eventsource, array $conditions): void {
-		foreach ($conditions as $condition) {
-			if (!in_array($condition['conditiontype'], $this->valid_condition_types[$eventsource])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect filter condition type for action "%1$s".', $name)
-				);
-			}
-
-			if (!in_array($condition['operator'],
-					$this->valid_condition_type_operators[$condition['conditiontype']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect filter condition operator for action "%1$s".', $name)
-				);
-			}
-		}
-	}
-
-	/**
-	 * Validate operations, recovery operations, update operations.
-	 *
-	 * @param array $operations  Operation data array.
-	 *
-	 * @return bool
-	 */
-	public function validateOperationsIntegrity(array $operations) {
-		$operations = zbx_toArray($operations);
-
-		$all_groupids = [];
-		$all_hostids = [];
-		$all_templateids = [];
-		$all_userids = [];
-		$all_usrgrpids = [];
-		$all_mediatypeids = [];
-
-		$valid_operationtypes = [
-			ACTION_OPERATION => [
-				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND],
-				EVENT_SOURCE_DISCOVERY => [
-					OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_GROUP_ADD,
-					OPERATION_TYPE_GROUP_REMOVE, OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE,
-					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
-					OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY
-				],
-				EVENT_SOURCE_AUTOREGISTRATION => [
-					OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_GROUP_ADD,
-					OPERATION_TYPE_GROUP_REMOVE, OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE,
-					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
-					OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY
-				],
-				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE],
-				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND]
-			],
-			ACTION_RECOVERY_OPERATION => [
-				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
-					OPERATION_TYPE_RECOVERY_MESSAGE
-				],
-				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_RECOVERY_MESSAGE],
-				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
-					OPERATION_TYPE_RECOVERY_MESSAGE
-				]
-			],
-			ACTION_UPDATE_OPERATION => [
-				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE],
-				EVENT_SOURCE_SERVICE => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_ACK_MESSAGE]
-			]
-		];
-
-		$required_fields = ['eventsource', 'recovery', 'operationtype'];
-
-		$default_msg_validator = new CLimitedSetValidator([
-			'values' => [0, 1]
-		]);
-
-		foreach ($operations as $operation) {
-			foreach ($required_fields as $field) {
-				if (!array_key_exists($field, $operation)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', $field));
-				}
-			}
-			$eventsource = $operation['eventsource'];
-			$recovery = $operation['recovery'];
-			$operationtype = $operation['operationtype'];
-
-			if ($recovery == ACTION_OPERATION) {
-				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
-						&& (!array_key_exists('esc_step_from', $operation)
-							|| !array_key_exists('esc_step_to', $operation))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('esc_step_from and esc_step_to must be set together.'));
-				}
-
-				if (array_key_exists('esc_step_from', $operation) && array_key_exists('esc_step_to', $operation)) {
-					if ($operation['esc_step_from'] < 1 || $operation['esc_step_to'] < 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Incorrect action operation escalation step values.')
-						);
-					}
-
-					if ($operation['esc_step_from'] > $operation['esc_step_to'] && $operation['esc_step_to'] != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Incorrect action operation escalation step values.')
-						);
-					}
-				}
-
-				if (array_key_exists('esc_period', $operation)
-						&& !validateTimeUnit($operation['esc_period'], SEC_PER_MIN, SEC_PER_WEEK, true, $error,
-							['usermacros' => true])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'esc_period', $error)
-					);
-				}
-			}
-
-			if (!array_key_exists($eventsource, $valid_operationtypes[$recovery])
-					|| !in_array($operationtype, $valid_operationtypes[$recovery][$eventsource])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect action operation type "%1$s" for event source "%2$s".', $operationtype, $eventsource)
-				);
-			}
-
-			switch ($operationtype) {
-				case OPERATION_TYPE_MESSAGE:
-					$userids = array_key_exists('opmessage_usr', $operation)
-						? zbx_objectValues($operation['opmessage_usr'], 'userid')
-						: [];
-
-					$usrgrpids = array_key_exists('opmessage_grp', $operation)
-						? zbx_objectValues($operation['opmessage_grp'], 'usrgrpid')
-						: [];
-
-					if (!$userids && !$usrgrpids) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for action operation message.'));
-					}
-
-					$all_userids = array_merge($all_userids, $userids);
-					$all_usrgrpids = array_merge($all_usrgrpids, $usrgrpids);
-					// falls through
-				case OPERATION_TYPE_ACK_MESSAGE:
-					$message = array_key_exists('opmessage', $operation) ? $operation['opmessage'] : [];
-
-					if (array_key_exists('mediatypeid', $message) && $message['mediatypeid']) {
-						$all_mediatypeids[$message['mediatypeid']] = true;
-					}
-
-					if (array_key_exists('default_msg', $message)
-							&& (!$default_msg_validator->validate($message['default_msg']))) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect value "%1$s" for "%2$s" field: must be between %3$s and %4$s.',
-							$message['default_msg'], 'default_msg', 0, 1
-						));
-					}
-					break;
-				case OPERATION_TYPE_COMMAND:
-					if (!array_key_exists('scriptid', $operation['opcommand'])
-							|| $operation['opcommand']['scriptid'] === null) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('No script specified for action operation command.')
-						);
-					}
-
-					$scripts = API::Script()->get([
-						'output' => ['scriptid', 'name'],
-						'scriptids' => $operation['opcommand']['scriptid'],
-						'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION],
-						'preservekeys' => true
-					]);
-
-					if (!array_key_exists($operation['opcommand']['scriptid'], $scripts)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _(
-							'Specified script does not exist or you do not have rights on it for action operation command.'
-						));
-					}
-
-					if ($eventsource == EVENT_SOURCE_SERVICE) {
-						break;
-					}
-
-					$groupids = [];
-					if (array_key_exists('opcommand_grp', $operation)) {
-						$groupids = zbx_objectValues($operation['opcommand_grp'], 'groupid');
-					}
-
-					$hostids = [];
-					$withoutCurrent = true;
-					if (array_key_exists('opcommand_hst', $operation)) {
-						foreach ($operation['opcommand_hst'] as $hstCommand) {
-							if (!is_array($hstCommand) || !array_key_exists('hostid', $hstCommand)) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect value for field "%1$s": %2$s.', 'hostid', _('cannot be empty'))
-								);
-							}
-
-							if ($hstCommand['hostid'] == 0) {
-								$withoutCurrent = false;
-							}
-							else {
-								$hostids[$hstCommand['hostid']] = $hstCommand['hostid'];
-							}
-						}
-					}
-
-					if (!$groupids && !$hostids && $withoutCurrent) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('You did not specify targets for action operation global script "%1$s".',
-								$scripts[$operation['opcommand']['scriptid']]['name']
-							)
-						);
-					}
-
-					$all_hostids = array_merge($all_hostids, $hostids);
-					$all_groupids = array_merge($all_groupids, $groupids);
-					break;
-				case OPERATION_TYPE_GROUP_ADD:
-				case OPERATION_TYPE_GROUP_REMOVE:
-					$groupids = array_key_exists('opgroup', $operation)
-						? zbx_objectValues($operation['opgroup'], 'groupid')
-						: [];
-
-					if (!$groupids) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no group to operate.'));
-					}
-
-					$all_groupids = array_merge($all_groupids, $groupids);
-					break;
-				case OPERATION_TYPE_TEMPLATE_ADD:
-				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					$templateids = isset($operation['optemplate'])
-						? zbx_objectValues($operation['optemplate'], 'templateid')
-						: [];
-
-					if (!$templateids) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no template to operate.'));
-					}
-
-					$all_templateids = array_merge($all_templateids, $templateids);
-					break;
-				case OPERATION_TYPE_HOST_ADD:
-				case OPERATION_TYPE_HOST_REMOVE:
-				case OPERATION_TYPE_HOST_ENABLE:
-				case OPERATION_TYPE_HOST_DISABLE:
-					break;
-
-				case OPERATION_TYPE_HOST_INVENTORY:
-					if (!array_key_exists('opinventory', $operation)
-							|| !array_key_exists('inventory_mode', $operation['opinventory'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('No inventory mode specified for action operation.')
-						);
-					}
-					if ($operation['opinventory']['inventory_mode'] != HOST_INVENTORY_MANUAL
-							&& $operation['opinventory']['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect inventory mode in action operation.'));
-					}
-					break;
-			}
-		}
-
-		$this->checkMediatypesExists($all_mediatypeids, _s('Incorrect value for field "%1$s": %2$s.', 'mediatypeid',
-			_('No permissions to referred object or it does not exist!')
-		));
-		$this->checkHostGroupsPermissions($all_groupids, _(
-			'Incorrect action operation host group. Host group does not exist or you have no access to this host group.'
-		));
-		$this->checkHostsPermissions($all_hostids,
-			_('Incorrect action operation host. Host does not exist or you have no access to this host.')
-		);
-		$this->checkTemplatesPermissions($all_templateids,
-			_('Incorrect action operation template. Template does not exist or you have no access to this template.')
-		);
-		$this->checkUsersPermissions($all_userids,
-			_('Incorrect action operation user. User does not exist or you have no access to this user.')
-		);
-		$this->checkUserGroupsPermissions($all_usrgrpids, _(
-			'Incorrect action operation user group. User group does not exist or you have no access to this user group.'
-		));
-
-		return true;
-	}
-
-	/**
-	 * Validate operation conditions.
-	 *
-	 * @static
-	 * @param $conditions
-	 * @return bool
-	 */
-	public static function validateOperationConditions($conditions) {
-		$conditions = zbx_toArray($conditions);
-		$ackStatuses = [
-			EVENT_ACKNOWLEDGED => 1,
-			EVENT_NOT_ACKNOWLEDGED => 1
-		];
-
-		foreach ($conditions as $condition) {
-			switch ($condition['conditiontype']) {
-				case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-					if (!isset($ackStatuses[$condition['value']])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation condition acknowledge type.'));
-					}
-					break;
-
-				default:
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation condition type.'));
-					break;
-			}
-		}
-
-		return true;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -2440,22 +2045,24 @@ class CAction extends CApiService {
 	/**
 	 * Returns an array of update operations according to requested options.
 	 *
-	 * @param array  $update_operations                 An array of update operations.
-	 * @param string $update_operations[<operationid>]  Operation ID.
-	 * @param array  $update_options                    An array of update operation options from request.
+	 * @param array        $update_operations                 An array of update operations.
+	 * @param string       $update_operations[<operationid>]  Operation ID.
+	 * @param array|string $update_options                    An array of output options from request, or "extend".
 	 *
 	 * @return array
 	 */
-	protected function getUpdateOperations(array $update_operations, array $update_options): array {
+	protected function getUpdateOperations(array $update_operations, $update_options): array {
 		$opmessages = [];
 		$nonack_messages = [];
 		$opcommands = [];
 
 		foreach ($update_operations as $operationid => &$update_operation) {
-			unset($update_operation['esc_period'], $update_operation['esc_step_from'], $update_operation['esc_step_to']);
+			unset($update_operation['esc_period'], $update_operation['esc_step_from'],
+				$update_operation['esc_step_to']
+			);
 
 			switch ($update_operation['operationtype']) {
-				case OPERATION_TYPE_ACK_MESSAGE:
+				case OPERATION_TYPE_UPDATE_MESSAGE:
 					$opmessages[] = $operationid;
 					break;
 				case OPERATION_TYPE_MESSAGE:
@@ -2578,85 +2185,6 @@ class CAction extends CApiService {
 		return $this->unsetExtraFields($update_operations, ['operationid', 'operationtype'], $update_options);
 	}
 
-	/**
-	 * Returns the parameters for creating a discovery rule filter validator.
-	 *
-	 * @return array
-	 */
-	protected function getFilterSchema() {
-		return [
-			'validators' => [
-				'evaltype' => new CLimitedSetValidator([
-					'values' => [
-						CONDITION_EVAL_TYPE_OR,
-						CONDITION_EVAL_TYPE_AND,
-						CONDITION_EVAL_TYPE_AND_OR,
-						CONDITION_EVAL_TYPE_EXPRESSION
-					],
-					'messageInvalid' => _('Incorrect type of calculation for action "%1$s".')
-				]),
-				'formula' => new CStringValidator([
-					'empty' => true
-				]),
-				'conditions' => new CCollectionValidator([
-					'empty' => true,
-					'messageInvalid' => _('Incorrect conditions for action "%1$s".')
-				])
-			],
-			'postValidators' => [
-				new CConditionValidator([
-					'messageMissingFormula' => _('Formula missing for action "%1$s".'),
-					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for action "%1$s": %3$s.'),
-					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for action "%1$s" is not defined.'),
-					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for action "%1$s".'),
-					'messageAndWithSeveralTriggers' => _('Comparing several triggers with "and" is not allowed.')
-				])
-			],
-			'required' => ['evaltype', 'conditions'],
-			'messageRequired' => _('No "%2$s" given for the filter of action "%1$s".'),
-			'messageUnsupported' => _('Unsupported parameter "%2$s" for the filter of action "%1$s".')
-		];
-	}
-
-	/**
-	 * Returns the parameters for creating a action filter condition validator.
-	 *
-	 * @return array
-	 */
-	protected function getFilterConditionSchema() {
-		return [
-			'validators' => [
-				'conditiontype' => new CStringValidator([
-					'regex' => '/\d+/',
-					'messageEmpty' => _('Empty filter condition type for action "%1$s".'),
-					'messageRegex' => _('Incorrect filter condition type for action "%1$s".')
-				]),
-				'value' => new CStringValidator([
-					'empty' => true
-				]),
-				'value2' => new CStringValidator([
-					'empty' => true
-				]),
-				'formulaid' => new CStringValidator([
-					'regex' => '/[A-Z]+/',
-					'messageEmpty' => _('Empty filter condition formula ID for action "%1$s".'),
-					'messageRegex' => _('Incorrect filter condition formula ID for action "%1$s".')
-				]),
-				'operator' => new CStringValidator([
-					'regex' => '/\d+/',
-					'messageEmpty' => _('Empty filter condition operator for action "%1$s".'),
-					'messageRegex' => _('Incorrect filter condition operator for action "%1$s".')
-				])
-			],
-			'required' => ['conditiontype', 'value'],
-			'postValidators' => [
-				new CActionCondValidator()
-			],
-			'messageRequired' => _('No "%2$s" given for a filter condition of action "%1$s".'),
-			'messageUnsupported' => _('Unsupported parameter "%2$s" for a filter condition of action "%1$s".')
-		];
-	}
-
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
@@ -2678,707 +2206,1464 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Converts a formula with letters to a formula with IDs and updates it.
+	 * Returns validation rules for the filter object.
 	 *
-	 * @param string 	$actionId
-	 * @param string 	$formulaWithLetters		formula with letters
-	 * @param array 	$conditions
-	 */
-	protected function updateFormula($actionId, $formulaWithLetters, array $conditions) {
-		$formulaIdToConditionId = [];
-
-		foreach ($conditions as $condition) {
-			$formulaIdToConditionId[$condition['formulaid']] = $condition['conditionid'];
-		}
-		$formula = CConditionHelper::replaceLetterIds($formulaWithLetters, $formulaIdToConditionId);
-
-		DB::updateByPk('actions', $actionId, ['formula' => $formula]);
-	}
-
-	/**
-	 * Validate input given to action.create API call.
+	 * @param int $eventsource  Action event source. Possible values:
+	 *                          EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+	 *                          EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 	 *
-	 * @param $actions
+	 * @return array
 	 */
-	protected function validateCreate($actions) {
-		if (!$actions) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+	private static function getFilterValidationRules(int $eventsource): array {
+		switch ($eventsource) {
+			case EVENT_SOURCE_TRIGGERS:
+				$value_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TEMPLATE])], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_TRIGGER_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')],
+					['else' => true, 'type' => API_UNEXPECTED]
+				];
+				$operator_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_GROUP))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TEMPLATE], 'type' => API_INT32,'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TEMPLATE))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER_SEVERITY))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TIME_PERIOD))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SUPPRESSED))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG_VALUE))]
+				];
+				break;
+
+			case EVENT_SOURCE_DISCOVERY:
+				$value_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DHOST_IP], 'type' => API_IP_RANGES, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_RANGE, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_TYPE], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET])],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32_RANGES, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value'), 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSTATUS], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER, DOBJECT_STATUS_LOST])],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.SEC_PER_MONTH],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DVALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_PROXY])], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DOBJECT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE])]
+				];
+				$operator_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DHOST_IP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DHOST_IP))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_TYPE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DSERVICE_TYPE))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DSERVICE_PORT))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSTATUS], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DSTATUS))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DUPTIME))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DVALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DVALUE))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DRULE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DRULE))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DCHECK], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DCHECK))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_PROXY))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DOBJECT], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DOBJECT))]
+				];
+				break;
+
+			case EVENT_SOURCE_AUTOREGISTRATION:
+				$value_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_HOST_METADATA])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')]
+				];
+				$operator_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_PROXY))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_METADATA], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_METADATA))]
+				];
+				break;
+
+			case EVENT_SOURCE_INTERNAL:
+				$value_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TEMPLATE])], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TYPE], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_TYPE_ITEM_NOTSUPPORTED, EVENT_TYPE_LLDRULE_NOTSUPPORTED, EVENT_TYPE_TRIGGER_UNKNOWN])],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
+				];
+				$operator_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_GROUP))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TEMPLATE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TEMPLATE))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TYPE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TYPE))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG_VALUE))]
+				];
+				break;
+
+			case EVENT_SOURCE_SERVICE:
+				$value_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_SERVICE_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
+				];
+				$operator_rules = [
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SERVICE))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SERVICE_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG_VALUE))]
+				];
+				break;
 		}
 
-		$actionDbFields = [
-			'name'        => null,
-			'eventsource' => null
+		$condition_fields = [
+			'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::VALID_CONDITION_TYPES[$eventsource])],
+			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => $operator_rules],
+			'value' =>			['type' => API_MULTIPLE, 'rules' => $value_rules],
+			'value2' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value2')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]]
 		];
 
-		$duplicates = [];
-
-		foreach ($actions as $action) {
-			if (!check_db_fields($actionDbFields, $action)) {
-				self::exception(
-					ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect parameter for action "%1$s".', $action['name'])
-				);
-			}
-
-			if (isset($duplicates[$action['name']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
-			}
-			else {
-				$duplicates[$action['name']] = $action['name'];
-			}
-
-			if (array_key_exists('esc_period', $action)
-					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
-						|| $action['eventsource'] == EVENT_SOURCE_SERVICE)) {
-				self::validateStepDuration($action['esc_period']);
-			}
-		}
-
-		$dbActionsWithSameName = $this->get([
-			'output' => ['name'],
-			'filter' => ['name' => $duplicates],
-			'nopermissions' => true
-		]);
-		if ($dbActionsWithSameName) {
-			$dbActionWithSameName = reset($dbActionsWithSameName);
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $dbActionWithSameName['name']));
-		}
-
-		$filterValidator = new CSchemaValidator($this->getFilterSchema());
-		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
-		$pause_suppressed_validator = new CLimitedSetValidator([
-			'values' => [ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE]
-		]);
-
-		$conditionsToValidate = [];
-		$operations_to_validate = [];
-
-		// Validate "filter" sections and "conditions" in them, ensure that "operations" section
-		// is present and is not empty. Also collect conditions and operations for more validation.
-		foreach ($actions as $action) {
-			if ($action['eventsource'] != EVENT_SOURCE_TRIGGERS) {
-				$this->checkNoParameters($action, ['pause_suppressed'], _('Cannot set "%1$s" for action "%2$s".'),
-					$action['name']
-				);
-			}
-			elseif (array_key_exists('pause_suppressed', $action)
-					&& !$pause_suppressed_validator->validate($action['pause_suppressed'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.', $action['pause_suppressed'], 'pause_suppressed')
-				);
-			}
-
-			if (isset($action['filter'])) {
-				$filterValidator->setObjectName($action['name']);
-				$this->checkValidator($action['filter'], $filterValidator);
-				$filterConditionValidator->setObjectName($action['name']);
-
-				foreach ($action['filter']['conditions'] as $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE &&
-							!array_key_exists('value2', $condition)) {
-						self::exception(
-							ZBX_API_ERROR_PARAMETERS,
-							_s('No "%2$s" given for a filter condition of action "%1$s".', $action['name'], 'value2')
-						);
-					}
-
-					$this->checkValidator($condition, $filterConditionValidator);
-					$conditionsToValidate[] = $condition;
-				}
-
-				$this->validateFilterConditionsIntegrity($action['name'], $action['eventsource'],
-					$action['filter']['conditions']
-				);
-			}
-
-			if ((!array_key_exists('operations', $action) || !$action['operations'])
-					&& (!array_key_exists('recovery_operations', $action) || !$action['recovery_operations'])
-					&& (!array_key_exists('update_operations', $action) || !$action['update_operations'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $action['name']));
-			}
-
-			if (array_key_exists('operations', $action)) {
-				foreach ($action['operations'] as $operation) {
-					if (array_key_exists('operationid', $operation)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
-					}
-
-					$operation['recovery'] = ACTION_OPERATION;
-					$operation['eventsource'] = $action['eventsource'];
-					$operations_to_validate[] = $operation;
-				}
-			}
-
-			if (array_key_exists('recovery_operations', $action)) {
-				foreach ($action['recovery_operations'] as $operation) {
-					if (array_key_exists('operationid', $operation)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
-					}
-
-					$operation['recovery'] = ACTION_RECOVERY_OPERATION;
-					$operation['eventsource'] = $action['eventsource'];
-					$operations_to_validate[] = $operation;
-				}
-			}
-
-			if (array_key_exists('update_operations', $action)) {
-				foreach ($action['update_operations'] as $operation) {
-					if (array_key_exists('operationid', $operation)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect input parameters.'));
-					}
-
-					$operation['recovery'] = ACTION_UPDATE_OPERATION;
-					$operation['eventsource'] = $action['eventsource'];
-					$operations_to_validate[] = $operation;
-				}
-			}
-		}
-
-		// Validate conditions and operations in regard to what's in database now.
-		if ($conditionsToValidate) {
-			$this->validateConditionsPermissions($conditionsToValidate);
-		}
-		if ($operations_to_validate) {
-			$this->validateOperationsIntegrity($operations_to_validate);
-		}
+		return [
+			'evaltype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
+			'formula' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('actions', 'formula')],
+								['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'conditions' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'flags' => API_REQUIRED, 'uniq' => [['formulaid']], 'fields' => [
+									'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
+								] + $condition_fields],
+								['else' => true, 'type' => API_OBJECTS, 'fields' => $condition_fields]
+			]]
+		];
 	}
 
 	/**
-	 * Validate default step duration and operation step duration values.
+	 * Returns validation rules for objects of normal, recovery and update operations.
 	 *
-	 * @param string $esc_period  Step duration.
+	 * @param int $recovery     Action operation mode. Possible values:
+	 *                          ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION
+	 * @param int $eventsource  Action event source. Possible values:
+	 *                          EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+	 *                          EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @return array
 	 */
-	private static function validateStepDuration($esc_period) {
-		if (!validateTimeUnit($esc_period, SEC_PER_MIN, SEC_PER_WEEK, false, $error, ['usermacros' => true])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Incorrect value for field "%1$s": %2$s.', 'esc_period', $error)
-			);
+	private static function getOperationValidationRules(int $recovery, int $eventsource): array {
+		$escalation_fields = [
+			'esc_period' =>		['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => '0,'.SEC_PER_MIN.':'.SEC_PER_WEEK, 'length' => DB::getFieldLength('operations', 'esc_period')],
+			'esc_step_from' =>	['type' => API_INT32, 'in' => '1:99999'],
+			'esc_step_to' =>	['type' => API_INT32, 'in' => '0:99999']
+		];
+		$opmessage_fields = [
+			'default_msg' =>	['type' => API_INT32, 'in' => implode(',', [0, 1]), 'default' => DB::getDefault('opmessage', 'default_msg')],
+			'subject' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'default_msg', 'in' => 0], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('opmessage', 'subject')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'message' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'default_msg', 'in' => 0], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('opmessage', 'message')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		];
+		$all_opmessage_fields = [
+			'opmessage' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'operationtype', 'in' => implode(',', [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_UPDATE_MESSAGE])], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => $opmessage_fields + [
+										'mediatypeid' =>	['type' => API_ID]
+									]],
+									['if' => ['field' => 'operationtype', 'in' => OPERATION_TYPE_RECOVERY_MESSAGE], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => $opmessage_fields],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'opmessage_grp' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'operationtype', 'in' => OPERATION_TYPE_MESSAGE], 'type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
+										'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+									]],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'opmessage_usr' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'operationtype', 'in' => OPERATION_TYPE_MESSAGE], 'type' => API_OBJECTS, 'uniq' => [['userid']], 'fields' => [
+										'userid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+									]],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		];
+		$opcommand_fields = [
+			'opcommand' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'operationtype', 'in' => OPERATION_TYPE_COMMAND], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+										'scriptid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+									]],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		];
+		$common_fields = $all_opmessage_fields + $opcommand_fields + [
+			'opcommand_grp' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'operationtype', 'in' => OPERATION_TYPE_COMMAND], 'type' => API_OBJECTS, 'uniq' => [['groupid']], 'fields' => [
+										'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+									]],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'opcommand_hst' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'operationtype', 'in' => OPERATION_TYPE_COMMAND], 'type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
+										'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+									]],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		];
+
+		$operationtype_field = [
+			'operationtype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', getAllowedOperations($eventsource)[$recovery])]
+		];
+
+		switch ($recovery) {
+			case ACTION_OPERATION:
+				switch ($eventsource) {
+					case EVENT_SOURCE_TRIGGERS:
+						return $operationtype_field + $escalation_fields + [
+							'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])],
+							'opconditions' =>	['type' => API_OBJECTS, 'uniq' => [['value']], 'fields' => [
+								'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => CONDITION_TYPE_EVENT_ACKNOWLEDGED],
+								'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED]), 'length' => DB::getFieldLength('opconditions', 'value')],
+								'operator' =>		['type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
+							]]
+						] + $common_fields;
+
+					case EVENT_SOURCE_DISCOVERY:
+					case EVENT_SOURCE_AUTOREGISTRATION:
+						return $operationtype_field + $common_fields + [
+							'opgroup' =>		['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'operationtype', 'in' => implode(',', [OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
+														'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+													]],
+													['else' => true, 'type' => API_UNEXPECTED]
+							]],
+							'optemplate' =>		['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'operationtype', 'in' => implode(',', [OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['templateid']], 'fields' => [
+														'templateid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
+													]],
+													['else' => true, 'type' => API_UNEXPECTED]
+							]],
+							'opinventory' =>	['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'operationtype', 'in' => OPERATION_TYPE_HOST_INVENTORY], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+														'inventory_mode' =>	['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
+													]],
+													['else' => true, 'type' => API_UNEXPECTED]
+							]]
+						];
+
+					case EVENT_SOURCE_INTERNAL:
+						return $operationtype_field + $escalation_fields + $all_opmessage_fields;
+
+					case EVENT_SOURCE_SERVICE:
+						return $operationtype_field + $escalation_fields + $all_opmessage_fields + $opcommand_fields;
+				}
+				break;
+
+			case ACTION_RECOVERY_OPERATION:
+				switch ($eventsource) {
+					case EVENT_SOURCE_TRIGGERS:
+						return $operationtype_field + $common_fields;
+
+					case EVENT_SOURCE_INTERNAL:
+						return $operationtype_field + $all_opmessage_fields;
+
+					case EVENT_SOURCE_SERVICE:
+						return $operationtype_field + $all_opmessage_fields + $opcommand_fields;
+				}
+				break;
+
+			case ACTION_UPDATE_OPERATION:
+				switch ($eventsource) {
+					case EVENT_SOURCE_TRIGGERS:
+						return $operationtype_field + $common_fields;
+
+					case EVENT_SOURCE_SERVICE:
+						return $operationtype_field + $all_opmessage_fields + $opcommand_fields;
+				}
+				break;
 		}
 	}
 
 	/**
-	 * Validate input given to action.update API call.
-	 *
 	 * @param array $actions
-	 * @param array $db_actions
+	 *
+	 * @throws APIException
 	 */
-	protected function validateUpdate($actions, $db_actions) {
+	private function validateCreate(array &$actions): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('actions', 'name')],
+			'eventsource' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])],
+			'status' =>					['type' => API_INT32, 'in' => implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])],
+			'esc_period' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])], 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => SEC_PER_MIN.':'.SEC_PER_WEEK, 'length' => DB::getFieldLength('actions', 'esc_period')],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'pause_suppressed' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE])],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'filter' =>					['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_DISCOVERY)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_AUTOREGISTRATION], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_AUTOREGISTRATION)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_INTERNAL)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_SERVICE)]
+			]],
+			'operations' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_DISCOVERY)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_AUTOREGISTRATION], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_AUTOREGISTRATION)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_INTERNAL)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_SERVICE)]
+			]],
+			'recovery_operations' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_INTERNAL)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_SERVICE)],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'update_operations' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_SERVICE)],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'notify_if_canceled' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_NOTIFY_IF_CANCELED_FALSE, ACTION_NOTIFY_IF_CANCELED_TRUE])],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $actions, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::checkDuplicates($actions);
+		self::checkFilter($actions);
+		self::checkOperations($actions);
+
+		self::checkMediatypesPermissions($actions);
+		self::checkScriptsPermissions($actions);
+		self::checkHostGroupsPermissions($actions);
+		self::checkHostsPermissions($actions);
+		self::checkTemplatesPermissions($actions);
+		self::checkUsersPermissions($actions);
+		self::checkUserGroupsPermissions($actions);
+		self::checkTriggersPermissions($actions);
+		self::checkDRulesPermissions($actions);
+		self::checkDChecksPermissions($actions);
+		self::checkProxiesPermissions($actions);
+		self::checkServicesPermissions($actions);
+	}
+
+	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 *
+	 * @throws APIException
+	 */
+	private function validateUpdate(array &$actions, ?array &$db_actions): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['actionid']], 'fields' => [
+			'actionid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $actions, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_actions = $this->get([
+			'output' => ['actionid', 'name', 'eventsource', 'status', 'esc_period', 'pause_suppressed',
+				'notify_if_canceled'
+			],
+			'actionids' => array_column($actions, 'actionid'),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		if (count($actions) != count($db_actions)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		// If not specified, copy original "name" and "eventsource" values for further validation and error reporting.
+		$actions = $this->extendObjectsByKey($actions, $db_actions, 'actionid', ['name', 'eventsource']);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+			'actionid' =>				['type' => API_ID],
+			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('actions', 'name')],
+			'eventsource' =>			['type' => API_INT32, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])],
+			'status' =>					['type' => API_INT32, 'in' => implode(',', [ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED])],
+			'esc_period' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])], 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO, 'in' => SEC_PER_MIN.':'.SEC_PER_WEEK, 'length' => DB::getFieldLength('actions', 'esc_period')],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'pause_suppressed' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE])],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'filter' =>					['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_DISCOVERY)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_AUTOREGISTRATION], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_AUTOREGISTRATION)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_INTERNAL)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECT, 'fields' => self::getFilterValidationRules(EVENT_SOURCE_SERVICE)]
+			]],
+			'operations' =>				['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_DISCOVERY)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_AUTOREGISTRATION], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_AUTOREGISTRATION)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_INTERNAL)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_OPERATION, EVENT_SOURCE_SERVICE)]
+			]],
+			'recovery_operations' =>	['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_INTERNAL)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_RECOVERY_OPERATION, EVENT_SOURCE_SERVICE)],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'update_operations' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_TRIGGERS)],
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_SERVICE], 'type' => API_OBJECTS, 'fields' => self::getOperationValidationRules(ACTION_UPDATE_OPERATION, EVENT_SOURCE_SERVICE)],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'notify_if_canceled' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'eventsource', 'in' => EVENT_SOURCE_TRIGGERS], 'type' => API_INT32, 'in' => implode(',', [ACTION_NOTIFY_IF_CANCELED_FALSE, ACTION_NOTIFY_IF_CANCELED_TRUE])],
+											['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $actions, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		self::checkDuplicates($actions, $db_actions);
+
 		foreach ($actions as $action) {
-			if (isset($action['actionid']) && !isset($db_actions[$action['actionid']])) {
-				self::exception(
-					ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
+			if ($action['eventsource'] != $db_actions[$action['actionid']]['eventsource']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Cannot update "%1$s" for action "%2$s".', 'eventsource', $action['name'])
 				);
 			}
 		}
-		$actions = zbx_toHash($actions, 'actionid');
 
-		$pause_suppressed_validator = new CLimitedSetValidator([
-			'values' => [ACTION_PAUSE_SUPPRESSED_FALSE, ACTION_PAUSE_SUPPRESSED_TRUE]
-		]);
+		self::addAffectedObjects($actions, $db_actions);
 
-		// check fields
-		$duplicates = [];
+		self::checkFilter($actions);
+		self::checkOperations($actions, $db_actions);
+
+		self::checkMediatypesPermissions($actions);
+		self::checkScriptsPermissions($actions);
+		self::checkHostGroupsPermissions($actions);
+		self::checkHostsPermissions($actions);
+		self::checkTemplatesPermissions($actions);
+		self::checkUsersPermissions($actions);
+		self::checkUserGroupsPermissions($actions);
+		self::checkTriggersPermissions($actions);
+		self::checkDRulesPermissions($actions);
+		self::checkDChecksPermissions($actions);
+		self::checkProxiesPermissions($actions);
+		self::checkServicesPermissions($actions);
+	}
+
+	/**
+	 * Check for unique action names.
+	 *
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 *
+	 * @throws APIException if action name is not unique.
+	 */
+	private static function checkDuplicates(array $actions, array $db_actions = null): void {
+		$names = [];
 
 		foreach ($actions as $action) {
-			$action_name = isset($action['name']) ? $action['name'] : $db_actions[$action['actionid']]['name'];
-
-			if (!check_db_fields(['actionid' => null], $action)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect parameters for action update method "%1$s".', $action_name
-				));
+			if ($db_actions === null || $action['name'] !== $db_actions[$action['actionid']]['name']) {
+				$names[] = $action['name'];
 			}
+		}
 
-			// check if user changed esc_period for trigger eventsource
-			if (array_key_exists('esc_period', $action)
-					&& ($db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS
-						|| $db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_SERVICE)) {
-				self::validateStepDuration($action['esc_period']);
-			}
+		if (!$names) {
+			return;
+		}
 
-			$this->checkNoParameters($action, ['eventsource'], _('Cannot update "%1$s" for action "%2$s".'),
-				$action_name
-			);
+		$duplicates = DB::select('actions', [
+			'output' => ['name'],
+			'filter' => ['name' => $names],
+			'limit' => 1
+		]);
 
-			if ($db_actions[$action['actionid']]['eventsource'] != EVENT_SOURCE_TRIGGERS) {
-				$this->checkNoParameters($action, ['pause_suppressed'], _('Cannot update "%1$s" for action "%2$s".'),
-					$action_name
-				);
-			}
-			elseif (array_key_exists('pause_suppressed', $action)
-					&& !$pause_suppressed_validator->validate($action['pause_suppressed'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.', $action['pause_suppressed'], 'pause_suppressed')
-				);
-			}
+		if ($duplicates) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $duplicates[0]['name']));
+		}
+	}
 
-			if (!isset($action['name'])) {
+	/**
+	 * @param array $actions
+	 *
+	 * @throws APIException
+	 */
+	private static function checkFilter(array $actions): void {
+		$condition_formula_parser = new CConditionFormula();
+		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
+
+		foreach ($actions as $i => $action) {
+			if (!array_key_exists('filter', $action)) {
 				continue;
 			}
 
-			if (isset($duplicates[$action['name']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action['name']));
-			}
-			else {
-				$duplicates[$action['name']] = $action['name'];
-			}
-		}
+			$path = '/'.($i + 1).'/filter';
 
-		// Unset accidentally passed in "evaltype" and "formula" fields.
-		foreach ($actions as &$action) {
-			unset($action['evaltype'], $action['formula']);
-		}
-		unset($action);
+			if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				$condition_formula_parser->parse($action['filter']['formula']);
 
-		$filterValidator = new CSchemaValidator($this->getFilterSchema());
+				$constants = array_column($condition_formula_parser->constants, 'value', 'value');
 
-		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
-
-		$operations_to_validate = [];
-		$conditionsToValidate = [];
-
-		foreach ($actions as $actionId => $action) {
-			$db_action = $db_actions[$actionId];
-
-			if (isset($action['name'])) {
-				$action_name = $action['name'];
-
-				$actionExists = $this->get([
-					'output' => ['actionid'],
-					'filter' => ['name' => $action_name],
-					'nopermissions' => true
-				]);
-				if (($actionExists = reset($actionExists))
-						&& (bccomp($actionExists['actionid'], $actionId) != 0)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $action_name));
-				}
-			}
-			else {
-				$action_name = $db_action['name'];
-			}
-
-			if (isset($action['filter'])) {
-				$action_filter = $action['filter'];
-
-				$filterValidator->setObjectName($action_name);
-				$filterConditionValidator->setObjectName($action_name);
-
-				$this->checkValidator($action_filter, $filterValidator);
-
-				foreach ($action_filter['conditions'] as $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE
-							&& !array_key_exists('value2', $condition)) {
-						self::exception(
-							ZBX_API_ERROR_PARAMETERS,
-							_s('No "%2$s" given for a filter condition of action "%1$s".', $action_name, 'value2')
-						);
-					}
-
-					$this->checkValidator($condition, $filterConditionValidator);
-					$conditionsToValidate[] = $condition;
+				if (count($action['filter']['conditions']) != count($constants)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $path.'/conditions', _('incorrect number of conditions'))
+					);
 				}
 
-				$this->validateFilterConditionsIntegrity($action_name, $db_action['eventsource'],
-					$action_filter['conditions']
-				);
-			}
-
-			$operations_defined = array_key_exists('operations', $action)
-				? (bool) $action['operations']
-				: (bool) $db_action['operations'];
-			$recovery_operations_defined = array_key_exists('recovery_operations', $action)
-				? (bool) $action['recovery_operations']
-				: (bool) $db_action['recovery_operations'];
-			$update_operations_defined = array_key_exists('update_operations', $action)
-				? (bool) $action['update_operations']
-				: (bool) $db_action['update_operations'];
-
-			if (!$operations_defined && !$recovery_operations_defined && !$update_operations_defined) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $action_name));
-			}
-
-			if (array_key_exists('operations', $action) && $action['operations']) {
-				$db_operations = zbx_toHash($db_actions[$action['actionid']]['operations'], 'operationid');
-				foreach ($action['operations'] as $operation) {
-					if (!array_key_exists('operationid', $operation)
-							|| array_key_exists($operation['operationid'], $db_operations)) {
-						$operation['recovery'] = ACTION_OPERATION;
-						$operation['eventsource'] = $db_action['eventsource'];
-						$operations_to_validate[] = $operation;
-					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action "operationid".'));
+				foreach ($action['filter']['conditions'] as $j => $condition) {
+					if (!array_key_exists($condition['formulaid'], $constants)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
+						));
 					}
 				}
 			}
 
-			// Recovery operations.
-			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']) {
-				$db_recovery_operations = zbx_toHash($db_actions[$action['actionid']]['recovery_operations'],
-					'operationid'
-				);
-				foreach ($action['recovery_operations'] as $recovery_operation) {
-					if (!array_key_exists('operationid', $recovery_operation)
-							|| array_key_exists($recovery_operation['operationid'], $db_recovery_operations)) {
-						$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
-						$recovery_operation['eventsource'] = $db_action['eventsource'];
-						$operations_to_validate[] = $recovery_operation;
+			if (array_key_exists('conditions', $action['filter'])) {
+				foreach ($action['filter']['conditions'] as $j => $condition) {
+					if ($condition['conditiontype'] == CONDITION_TYPE_DHOST_IP) {
+						if (!$ip_range_parser->parse($condition['value'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								$path.'/conditions/'.($j + 1).'/value', $ip_range_parser->getError()
+							));
+						}
 					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action "operationid".'));
-					}
-				}
-			}
-
-			if (array_key_exists('update_operations', $action) && $action['update_operations']) {
-				$db_update_operations = zbx_toHash($db_actions[$action['actionid']]['update_operations'], 'operationid');
-
-				foreach ($action['update_operations'] as $update_operation) {
-					if (!array_key_exists('operationid', $update_operation)
-							|| array_key_exists($update_operation['operationid'], $db_update_operations)) {
-						$update_operation['recovery'] = ACTION_UPDATE_OPERATION;
-						$update_operation['eventsource'] = $db_action['eventsource'];
-
-						if (array_key_exists('operationid', $update_operation)
-								&& array_key_exists($update_operation['operationid'], $db_update_operations)) {
-							$db_update_operation = $db_update_operations[$update_operation['operationid']];
-							$operation_type = array_key_exists('operationtype', $update_operation)
-								? $update_operation['operationtype']
-								: $db_update_operation['operationtype'];
-
-							// Field 'operationtype' is required.
-							unset($db_update_operation['operationtype']);
-
-							if ($operation_type == OPERATION_TYPE_MESSAGE) {
-								unset($db_update_operation['opmessage_grp'], $db_update_operation['opmessage_usr']);
-							}
-							elseif ($operation_type == OPERATION_TYPE_COMMAND) {
-								unset($db_update_operation['opcommand_grp'], $db_update_operation['opcommand_hst']);
-							}
-
-							$update_operation += $db_update_operation;
+					elseif ($condition['conditiontype'] == CONDITION_TYPE_DVALUE) {
+						if ($condition['operator'] == CONDITION_OPERATOR_EQUAL
+								|| $condition['operator'] == CONDITION_OPERATOR_NOT_EQUAL) {
+							continue;
 						}
 
-						$operations_to_validate[] = $update_operation;
-					}
-					else {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect update action "operationid".'));
+						if ($condition['value'] === '') {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+								$path.'/conditions/'.($j + 1).'/value', _('cannot be empty')
+							));
+						}
 					}
 				}
 			}
 		}
-
-		if ($conditionsToValidate) {
-			$this->validateConditionsPermissions($conditionsToValidate);
-		}
-		$this->validateOperationsIntegrity($operations_to_validate);
 	}
 
 	/**
-	 * Check permissions to DB entities referenced by action conditions.
+	 * @param array      $actions
+	 * @param array|null $db_actions
 	 *
-	 * @param array $conditions   conditions for which permissions to referenced DB entities will be checked
+	 * @throws APIException
 	 */
-	protected function validateConditionsPermissions(array $conditions) {
-		$hostGroupIdsAll = [];
-		$templateIdsAll = [];
-		$triggerIdsAll = [];
-		$hostIdsAll = [];
-		$discoveryRuleIdsAll = [];
-		$discoveryCheckIdsAll = [];
-		$proxyIdsAll = [];
+	private static function checkOperations(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
 
-		foreach ($conditions as $condition) {
-			$conditionValue = $condition['value'];
-			// validate condition values depending on condition type
-			switch ($condition['conditiontype']) {
-				case CONDITION_TYPE_HOST_GROUP:
-					$hostGroupIdsAll[$conditionValue] = $conditionValue;
-					break;
+		foreach ($actions as &$action) {
+			if ($is_update) {
+				if (!array_intersect_key(array_flip(self::OPERATION_GROUPS), $action)) {
+					continue;
+				}
 
-				case CONDITION_TYPE_TEMPLATE:
-					$templateIdsAll[$conditionValue] = $conditionValue;
-					break;
+				$db_action = $db_actions[$action['actionid']];
+			}
+			else {
+				$db_action = [];
+			}
 
-				case CONDITION_TYPE_TRIGGER:
-					$triggerIdsAll[$conditionValue] = $conditionValue;
-					break;
+			$operations = array_intersect_key($action + $db_action, array_flip(self::OPERATION_GROUPS));
 
-				case CONDITION_TYPE_HOST:
-					$hostIdsAll[$conditionValue] = $conditionValue;
-					break;
+			if (!array_filter($operations, 'boolval')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('No operations defined for action "%1$s".', $action['name'])
+				);
+			}
 
-				case CONDITION_TYPE_DRULE:
-					$discoveryRuleIdsAll[$conditionValue] = $conditionValue;
-					break;
+			$unique_operations = [
+				OPERATION_TYPE_HOST_ADD => 0,
+				OPERATION_TYPE_HOST_REMOVE => 0,
+				OPERATION_TYPE_HOST_ENABLE => 0,
+				OPERATION_TYPE_HOST_DISABLE => 0,
+				OPERATION_TYPE_HOST_INVENTORY => 0
+			];
 
-				case CONDITION_TYPE_DCHECK:
-					$discoveryCheckIdsAll[$conditionValue] = $conditionValue;
-					break;
+			foreach (self::OPERATION_GROUPS as $recovery => $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
 
-				case CONDITION_TYPE_PROXY:
-					$proxyIdsAll[$conditionValue] = $conditionValue;
-					break;
+				foreach ($action[$operation_group] as &$operation) {
+					$operation['recovery'] = $recovery;
+
+					if ($recovery == ACTION_OPERATION) {
+						if (array_key_exists($operation['operationtype'], $unique_operations)) {
+							$unique_operations[$operation['operationtype']]++;
+
+							if ($unique_operations[$operation['operationtype']] > 1) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Operation "%1$s" already exists for action "%2$s".',
+										operation_type2str($operation['operationtype']), $action['name']
+									)
+								);
+							}
+						}
+
+						if (array_key_exists('esc_step_from', $operation)
+								|| array_key_exists('esc_step_to', $operation)) {
+							if (!array_key_exists('esc_step_from', $operation)
+									|| !array_key_exists('esc_step_to', $operation)) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_('Parameters "esc_step_from" and "esc_step_to" must be set together.')
+								);
+							}
+
+							if ($operation['esc_step_from'] > $operation['esc_step_to']
+									&& $operation['esc_step_to'] != 0) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_('Incorrect action operation escalation step values.')
+								);
+							}
+						}
+					}
+
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
+						$has_groups = array_key_exists('opmessage_grp', $operation) && $operation['opmessage_grp'];
+						$has_users = array_key_exists('opmessage_usr', $operation) && $operation['opmessage_usr'];
+
+						if (!$has_groups && !$has_users) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('No recipients specified for action operation message.')
+							);
+						}
+					}
+					elseif ($operation['operationtype'] == OPERATION_TYPE_COMMAND
+							&& $action['eventsource'] != EVENT_SOURCE_SERVICE) {
+						$has_groups = array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp'];
+						$has_hosts = array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst'];
+
+						if (!$has_groups && !$has_hosts) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('No targets specified for action operation global script.')
+							);
+						}
+					}
+				}
+				unset($operation);
 			}
 		}
-
-		$this->checkHostGroupsPermissions($hostGroupIdsAll,
-			_('Incorrect action condition host group. Host group does not exist or you have no access to it.')
-		);
-		$this->checkHostsPermissions($hostIdsAll,
-			_('Incorrect action condition host. Host does not exist or you have no access to it.')
-		);
-		$this->checkTemplatesPermissions($templateIdsAll,
-			_('Incorrect action condition template. Template does not exist or you have no access to it.')
-		);
-		$this->checkTriggersPermissions($triggerIdsAll,
-			_('Incorrect action condition trigger. Trigger does not exist or you have no access to it.')
-		);
-		$this->checkDRulesPermissions($discoveryRuleIdsAll,
-			_('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.')
-		);
-		$this->checkDChecksPermissions($discoveryCheckIdsAll,
-			_('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.')
-		);
-		$this->checkProxiesPermissions($proxyIdsAll,
-			_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
-		);
+		unset($action);
 	}
 
 	/**
-	 * Checks if all given media types are valid.
+	 * Checks if all the given media types are valid.
 	 *
-	 * @param array  $mediatypeids  Array of media type ids where key is checked media type id.
-	 * @param string $error         Error message to throw if invalid media type id was supplied.
+	 * @param array $actions
 	 *
 	 * @throws APIException if invalid media types given.
 	 */
-	private function checkMediatypesExists(array $mediatypeids, $error) {
-		if ($mediatypeids) {
-			$count = API::MediaType()->get([
-				'countOutput' => true,
-				'mediatypeids' => array_keys($mediatypeids)
-			]);
+	private static function checkMediatypesPermissions(array $actions): void {
+		$mediatypeids = [];
 
-			if ($count != count($mediatypeids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+		foreach ($actions as $action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+							|| $operation['operationtype'] == OPERATION_TYPE_UPDATE_MESSAGE) {
+						if (array_key_exists('mediatypeid', $operation)
+								&& $operation['opmessage']['mediatypeid'] != 0) {
+							$mediatypeids[$operation['opmessage']['mediatypeid']] = true;
+						}
+					}
+				}
 			}
+		}
+
+		if (!$mediatypeids) {
+			return;
+		}
+
+		$mediatypeids = array_keys($mediatypeids);
+
+		$count = API::MediaType()->get([
+			'countOutput' => true,
+			'mediatypeids' => $mediatypeids
+		]);
+
+		if ($count != count($mediatypeids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action operation media type. Media type does not exist or you have no access to it.')
+			);
+		}
+	}
+
+	/**
+	 * Checks if all the given global scripts are valid.
+	 *
+	 * @param array $actions
+	 *
+	 * @throws APIException if invalid global scripts given.
+	 */
+	private static function checkScriptsPermissions(array $actions): void {
+		$scriptids = [];
+
+		foreach ($actions as $action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND) {
+						$scriptids[$operation['opcommand']['scriptid']] = true;
+					}
+				}
+			}
+		}
+
+		if (!$scriptids) {
+			return;
+		}
+
+		$scriptids = array_keys($scriptids);
+
+		$count = API::Script()->get([
+			'countOutput' => true,
+			'scriptids' => $scriptids,
+			'filter' => ['scope' => ZBX_SCRIPT_SCOPE_ACTION]
+		]);
+
+		if ($count != count($scriptids)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_('Specified script does not exist or you do not have rights on it for action operation command.')
+			);
 		}
 	}
 
 	/**
 	 * Checks if the current user has access to the given host groups.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given host groups
+	 * @param array $actions
 	 *
-	 * @param  array     $groupids
-	 * @param  string    $error
+	 * @throws APIException if the user doesn't have write permissions for the given host groups.
 	 */
-	private function checkHostGroupsPermissions(array $groupids, $error) {
-		if ($groupids) {
-			$groupids = array_unique($groupids);
+	private static function checkHostGroupsPermissions(array $actions): void {
+		$groupids = [];
 
-			$count = API::HostGroup()->get([
-				'countOutput' => true,
-				'groupids' => $groupids,
-				'editable' => true
-			]);
-
-			if ($count != count($groupids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+		foreach ($actions as $action) {
+			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
+				foreach ($action['filter']['conditions'] as $condition) {
+					if ($condition['conditiontype'] == CONDITION_TYPE_HOST_GROUP) {
+						$groupids[] = $condition['value'];
+					}
+				}
 			}
+
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
+							// Service actions do not support "opcommand_grp".
+							&& array_key_exists('opcommand_grp', $operation)) {
+						$groupids = array_merge($groupids, array_column($operation['opcommand_grp'], 'groupid'));
+					}
+					elseif ($operation['operationtype'] == OPERATION_TYPE_GROUP_ADD
+							|| $operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) {
+						$groupids = array_merge($groupids, array_column($operation['opgroup'], 'groupid'));
+					}
+				}
+			}
+		}
+
+		if (!$groupids) {
+			return;
+		}
+
+		$groupids = array_keys(array_flip($groupids));
+
+		$count = API::HostGroup()->get([
+			'countOutput' => true,
+			'groupids' => $groupids,
+			'editable' => true
+		]);
+
+		if ($count != count($groupids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition or operation host group. Host group does not exist or you have no access to it.')
+			);
 		}
 	}
 
 	/**
 	 * Checks if the current user has access to the given hosts.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given hosts
+	 * @param array $actions
 	 *
-	 * @param  array     $hostids
-	 * @param  string    $error
+	 * @throws APIException if the user doesn't have write permissions for the given hosts.
 	 */
-	private function checkHostsPermissions(array $hostids, $error) {
-		if ($hostids) {
-			$hostids = array_unique($hostids);
+	private static function checkHostsPermissions(array $actions): void {
+		$hostids = [];
 
-			$count = API::Host()->get([
-				'countOutput' => true,
-				'hostids' => $hostids,
-				'editable' => true
-			]);
-
-			if ($count != count($hostids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+		foreach ($actions as $action) {
+			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
+				foreach ($action['filter']['conditions'] as $condition) {
+					if ($condition['conditiontype'] == CONDITION_TYPE_HOST) {
+						$hostids[] = $condition['value'];
+					}
+				}
 			}
+
+			if ($action['eventsource'] == EVENT_SOURCE_SERVICE) {
+				continue;
+			}
+
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
+							&& array_key_exists('opcommand_hst', $operation)) {
+						foreach ($operation['opcommand_hst'] as $opcommand_hst) {
+							if ($opcommand_hst['hostid'] != 0) {
+								$hostids[] = $opcommand_hst['hostid'];
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (!$hostids) {
+			return;
+		}
+
+		$hostids = array_keys(array_flip($hostids));
+
+		$count = API::Host()->get([
+			'countOutput' => true,
+			'hostids' => $hostids,
+			'editable' => true
+		]);
+
+		if ($count != count($hostids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition or operation host. Host does not exist or you have no access to it.')
+			);
 		}
 	}
 
 	/**
 	 * Checks if the current user has access to the given users.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given users
+	 * @param array $actions
 	 *
-	 * @param array  $userids
-	 * @param string $error
+	 * @throws APIException if the user doesn't have write permissions for the given users.
 	 */
-	protected function checkUsersPermissions(array $userids, $error) {
-		if ($userids) {
-			$userids = array_unique($userids);
+	private static function checkUsersPermissions(array $actions): void {
+		$userids = [];
 
-			$count = API::User()->get([
-				'countOutput' => true,
-				'userids' => $userids
-			]);
+		foreach ($actions as $action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
 
-			if ($count != count($userids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+							&& array_key_exists('opmessage_usr', $operation)) {
+						$userids = array_merge($userids, array_column($operation['opmessage_usr'], 'userid'));
+					}
+				}
 			}
+		}
+
+		if (!$userids) {
+			return;
+		}
+
+		$userids = array_keys(array_flip($userids));
+
+		$count = API::User()->get([
+			'countOutput' => true,
+			'userids' => $userids
+		]);
+
+		if ($count != count($userids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action operation user. User does not exist or you have no access to it.')
+			);
 		}
 	}
 
 	/**
 	 * Checks if the current user has access to the given user groups.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given user groups
+	 * @param array $actions
 	 *
-	 * @param array  $usrgrpids
-	 * @param string $error
+	 * @throws APIException if the user doesn't have write permissions for the given user groups.
 	 */
-	protected function checkUserGroupsPermissions(array $usrgrpids, $error) {
-		if ($usrgrpids) {
-			$usrgrpids = array_unique($usrgrpids);
+	private static function checkUserGroupsPermissions(array $actions): void {
+		$usrgrpids = [];
 
-			$count = API::UserGroup()->get([
-				'countOutput' => true,
-				'usrgrpids' => $usrgrpids
-			]);
+		foreach ($actions as $action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
 
-			if ($count != count($usrgrpids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+							&& array_key_exists('opmessage_grp', $operation)) {
+						$usrgrpids = array_merge($usrgrpids, array_column($operation['opmessage_grp'], 'usrgrpid'));
+					}
+				}
 			}
+		}
+
+		if (!$usrgrpids) {
+			return;
+		}
+
+		$usrgrpids = array_keys(array_flip($usrgrpids));
+
+		$count = API::UserGroup()->get([
+			'countOutput' => true,
+			'usrgrpids' => $usrgrpids
+		]);
+
+		if ($count != count($usrgrpids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action operation user group. User group does not exist or you have no access to it.')
+			);
 		}
 	}
 
 	/**
 	 * Checks if the current user has access to the given templates.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given templates
+	 * @param array $actions
 	 *
-	 * @param array  $templateids
-	 * @param string $error
+	 * @throws APIException if the user doesn't have write permissions for the given templates.
 	 */
-	protected function checkTemplatesPermissions(array $templateids, $error) {
-		if ($templateids) {
-			$templateids = array_unique($templateids);
+	private static function checkTemplatesPermissions(array $actions): void {
+		$templateids = [];
 
-			$count = API::Template()->get([
-				'countOutput' => true,
-				'templateids' => $templateids,
-				'editable' => true
-			]);
-
-			if ($count != count($templateids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+		foreach ($actions as $action) {
+			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
+				foreach ($action['filter']['conditions'] as $condition) {
+					if ($condition['conditiontype'] == CONDITION_TYPE_TEMPLATE) {
+						$templateids[] = $condition['value'];
+					}
+				}
 			}
+
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as $operation) {
+					if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD
+							|| $operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
+						$templateids = array_merge($templateids, array_column($operation['optemplate'], 'templateid'));
+					}
+				}
+			}
+		}
+
+		if (!$templateids) {
+			return;
+		}
+
+		$templateids = array_keys(array_flip($templateids));
+
+		$count = API::Template()->get([
+			'countOutput' => true,
+			'templateids' => $templateids,
+			'editable' => true
+		]);
+
+		if ($count != count($templateids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition or operation template. Template does not exist or you have no access to it.')
+			);
 		}
 	}
 
 	/**
 	 * Checks if the current user has access to the given triggers.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given triggers
+	 * @param array $actions
 	 *
-	 * @param array  $triggerids
-	 * @param string $error
+	 * @throws APIException if the user doesn't have write permissions for the given triggers.
 	 */
-	protected function checkTriggersPermissions(array $triggerids, $error) {
-		if ($triggerids) {
-			$triggerids = array_unique($triggerids);
+	private static function checkTriggersPermissions(array $actions): void {
+		$triggerids = [];
 
-			$count = API::Trigger()->get([
-				'countOutput' => true,
-				'triggerids' => $triggerids,
-				'editable' => true
-			]);
-
-			if ($count != count($triggerids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
 			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER) {
+					$triggerids[$condition['value']] = true;
+				}
+			}
+		}
+
+		if (!$triggerids) {
+			return;
+		}
+
+		$triggerids = array_keys($triggerids);
+
+		$count = API::Trigger()->get([
+			'countOutput' => true,
+			'triggerids' => $triggerids,
+			'editable' => true
+		]);
+
+		if ($count != count($triggerids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition trigger. Trigger does not exist or you have no access to it.')
+			);
 		}
 	}
 
 	/**
 	 * Checks if the current user has access to the given discovery rules.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given discovery rules
+	 * @param array $actions
 	 *
-	 * @param array  $druleids
-	 * @param string $error
+	 * @throws APIException if the user doesn't have write permissions for the given discovery rules.
 	 */
-	protected function checkDRulesPermissions(array $druleids, $error) {
-		if ($druleids) {
-			$druleids = array_unique($druleids);
+	private static function checkDRulesPermissions(array $actions): void {
+		$druleids = [];
 
-			$count = API::DRule()->get([
-				'countOutput' => true,
-				'druleids' => $druleids,
-				'editable' => true
-			]);
-
-			if ($count != count($druleids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
 			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_DRULE) {
+					$druleids[$condition['value']] = true;
+				}
+			}
+		}
+
+		if (!$druleids) {
+			return;
+		}
+
+		$druleids = array_keys($druleids);
+
+		$count = API::DRule()->get([
+			'countOutput' => true,
+			'druleids' => $druleids,
+			'editable' => true
+		]);
+
+		if ($count != count($druleids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it.')
+			);
 		}
 	}
 
 	/**
 	 * Checks if the current user has access to the given discovery checks.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given discovery checks
+	 * @param array $actions
 	 *
-	 * @param array  $dcheckids
-	 * @param string $error
+	 * @throws APIException if the user doesn't have write permissions for the given discovery checks.
 	 */
-	protected function checkDChecksPermissions(array $dcheckids, $error) {
-		if ($dcheckids) {
-			$dcheckids = array_unique($dcheckids);
+	private static function checkDChecksPermissions(array $actions): void {
+		$dcheckids = [];
 
-			$count = API::DCheck()->get([
-				'countOutput' => true,
-				'dcheckids' => $dcheckids,
-				'editable' => true
-			]);
-
-			if ($count != count($dcheckids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
 			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_DCHECK) {
+					$druleids[$condition['value']] = true;
+				}
+			}
+		}
+
+		if (!$dcheckids) {
+			return;
+		}
+
+		$dcheckids = array_keys($dcheckids);
+
+		$count = API::DCheck()->get([
+			'countOutput' => true,
+			'dcheckids' => $dcheckids,
+			'editable' => true
+		]);
+
+		if ($count != count($dcheckids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition discovery check. Discovery check does not exist or you have no access to it.')
+			);
 		}
 	}
 
 	/**
 	 * Checks if the current user has access to the given proxies.
 	 *
-	 * @throws APIException if the user doesn't have write permissions for the given proxies
+	 * @param array $actions
 	 *
-	 * @param array  $proxyids
-	 * @param string $error
+	 * @throws APIException if the user doesn't have write permissions for the given proxies.
 	 */
-	protected function checkProxiesPermissions(array $proxyids, $error) {
-		if ($proxyids) {
-			$proxyids = array_unique($proxyids);
+	private static function checkProxiesPermissions(array $actions): void {
+		$proxyids = [];
 
-			$count = API::Proxy()->get([
-				'countOutput' => true,
-				'proxyids' => $proxyids,
-				'editable' => true
-			]);
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
 
-			if ($count != count($proxyids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_PROXY) {
+					$proxyids[$condition['value']] = true;
+				}
 			}
 		}
+
+		if (!$proxyids) {
+			return;
+		}
+
+		$proxyids = array_keys($proxyids);
+
+		$count = API::Proxy()->get([
+			'countOutput' => true,
+			'proxyids' => $proxyids,
+			'editable' => true
+		]);
+
+		if ($count != count($proxyids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
+			);
+		}
+	}
+
+	/**
+	 * Checks if the current user has access to the given services.
+	 *
+	 * @param array $actions
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given services.
+	 */
+	private static function checkServicesPermissions(array $actions): void {
+		$serviceids = [];
+
+		foreach ($actions as $action) {
+			if (!array_key_exists('filter', $action) || !array_key_exists('conditions', $action['filter'])) {
+				continue;
+			}
+
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_SERVICE) {
+					$serviceids[$condition['value']] = true;
+				}
+			}
+		}
+
+		if ($serviceids) {
+			return;
+		}
+
+		$serviceids = array_keys($serviceids);
+
+		$count = API::Service()->get([
+			'countOutput' => true,
+			'serviceids' => $serviceids
+		]);
+
+		if ($count != count($serviceids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect action condition service. Service does not exist or you have no access to it.')
+			);
+		}
+	}
+
+	/**
+	 * Add existing filter with conditions and operations to $db_actions if they are affected by the update.
+	 *
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function addAffectedObjects(array $actions, array &$db_actions = null): void {
+		$actionids = ['filter' => [], 'operations' => []];
+
+		foreach ($actions as $action) {
+			if (array_key_exists('filter', $action)) {
+				$actionids['filter'][] = $action['actionid'];
+				$db_actions[$action['actionid']]['filter'] = [];
+				$db_actions[$action['actionid']]['filter']['conditions'] = [];
+			}
+
+			if (!array_intersect_key(array_flip(self::OPERATION_GROUPS), $action)) {
+				continue;
+			}
+
+			$actionids['operations'][] = $action['actionid'];
+
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				$db_actions[$action['actionid']][$operation_group] = [];
+			}
+		}
+
+		if ($actionids['filter']) {
+			$options = [
+				'output' => ['actionid', 'evaltype', 'formula'],
+				'filter' => ['actionid' => $actionids['filter']]
+			];
+			$db_filters = DBselect(DB::makeSql('actions', $options));
+
+			while ($db_filter = DBfetch($db_filters)) {
+				$db_actions[$db_filter['actionid']]['filter'] += array_diff_key($db_filter, array_flip(['actionid']));
+			}
+
+			$options = [
+				'output' => ['conditionid', 'actionid', 'conditiontype', 'operator', 'value', 'value2'],
+				'filter' => ['actionid' => $actionids['filter']]
+			];
+			$db_conditions = DBselect(DB::makeSql('conditions', $options));
+
+			while ($db_condition = DBfetch($db_conditions)) {
+				$db_actions[$db_condition['actionid']]['filter']['conditions'][$db_condition['conditionid']] =
+					array_diff_key($db_condition, array_flip(['actionid']));
+			}
+
+			foreach ($db_actions as &$db_action) {
+				if ($db_action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					$formula = $db_action['filter']['formula'];
+
+					$formulaids = CConditionHelper::getFormulaIds($formula);
+
+					foreach ($db_action['filter']['conditions'] as &$db_condition) {
+						$db_condition['formulaid'] = $formulaids[$db_condition['conditionid']];
+					}
+					unset($db_condition);
+				}
+			}
+			unset($db_action);
+		}
+
+		if (!$actionids['operations']) {
+			return;
+		}
+
+		$operationids = array_fill_keys([
+			'opconditions', 'opmessage_grp', 'opmessage_usr', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'optemplate'
+		], []);
+
+		$db_operations = DBselect(
+			'SELECT o.operationid,o.actionid,o.operationtype,o.esc_period,o.esc_step_from,o.esc_step_to,o.evaltype,'.
+				'o.recovery,m.default_msg,m.subject,m.message,m.mediatypeid,c.scriptid,i.inventory_mode'.
+			' FROM operations o'.
+				' LEFT JOIN opmessage m ON m.operationid=o.operationid'.
+				' LEFT JOIN opcommand c ON c.operationid=o.operationid'.
+				' LEFT JOIN opinventory i ON i.operationid=o.operationid'.
+			' WHERE '.dbConditionId('o.actionid', $actionids['operations'])
+		);
+
+		while ($db_operation = DBfetch($db_operations)) {
+			$operation = [
+				'operationid' => $db_operation['operationid'],
+				'operationtype' => $db_operation['operationtype'],
+				'evaltype' => $db_operation['evaltype'],
+				'recovery' => $db_operation['recovery']
+			];
+
+			$eventsource = $db_actions[$db_operation['actionid']]['eventsource'];
+
+			if ($db_operation['recovery'] == ACTION_OPERATION
+					&& in_array($eventsource, [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
+				$operation['esc_period'] = $db_operation['esc_period'];
+				$operation['esc_step_from'] = $db_operation['esc_step_from'];
+				$operation['esc_step_to'] = $db_operation['esc_step_to'];
+
+				if ($eventsource == EVENT_SOURCE_TRIGGERS) {
+					$operation['opconditions'] = [];
+					$operationids['opconditions'][$db_operation['operationid']] = true;
+				}
+			}
+
+			switch ($db_operation['operationtype']) {
+				case OPERATION_TYPE_MESSAGE:
+				case OPERATION_TYPE_RECOVERY_MESSAGE:
+				case OPERATION_TYPE_UPDATE_MESSAGE:
+					$operation['opmessage'] = [
+						'default_msg' => $db_operation['default_msg'],
+						'subject' => $db_operation['subject'],
+						'message' => $db_operation['message'],
+						'mediatypeid' => $db_operation['mediatypeid']
+					];
+
+					if ($db_operation['operationtype'] == OPERATION_TYPE_MESSAGE) {
+						$operation['opmessage_grp'] = [];
+						$operation['opmessage_usr'] = [];
+						$operationids['opmessage_grp'][$db_operation['operationid']] = true;
+						$operationids['opmessage_usr'][$db_operation['operationid']] = true;
+					}
+					break;
+
+				case OPERATION_TYPE_COMMAND:
+					$operation['opcommand']['scriptid'] = $db_operation['scriptid'];
+
+					if ($eventsource != EVENT_SOURCE_SERVICE) {
+						$operation['opcommand_grp'] = [];
+						$operation['opcommand_hst'] = [];
+						$operationids['opcommand_grp'][$db_operation['operationid']] = true;
+						$operationids['opcommand_hst'][$db_operation['operationid']] = true;
+					}
+					break;
+
+				case OPERATION_TYPE_GROUP_ADD:
+				case OPERATION_TYPE_GROUP_REMOVE:
+					$operationids['opgroup'][$db_operation['operationid']] = true;
+					break;
+
+				case OPERATION_TYPE_TEMPLATE_ADD:
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					$operationids['optemplate'][$db_operation['operationid']] = true;
+					break;
+
+				case OPERATION_TYPE_HOST_INVENTORY:
+					$operation['opinventory']['inventory_mode'] = $db_operation['inventory_mode'];
+					break;
+			}
+
+			$operation_group = self::OPERATION_GROUPS[$db_operation['recovery']];
+
+			$db_actions[$db_operation['actionid']][$operation_group][$db_operation['operationid']] = $operation;
+		}
+
+		$db_opdata = [];
+
+		if ($operationids['opconditions']) {
+			$options = [
+				'output' => ['opconditionid', 'operationid', 'conditiontype', 'operator', 'value'],
+				'filter' => ['operationid' => array_keys($operationids['opconditions'])]
+			];
+			$db_opconditions = DBselect(DB::makeSql('opconditions', $options));
+
+			while ($db_opcondition = DBfetch($db_opconditions)) {
+				$db_opdata[$db_opcondition['operationid']]['opconditions'][$db_opcondition['opconditionid']] =
+					array_diff_key($db_opcondition, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['opmessage_grp']) {
+			$options = [
+				'output' => ['opmessage_grpid', 'operationid', 'usrgrpid'],
+				'filter' => ['operationid' => array_keys($operationids['opmessage_grp'])]
+			];
+			$db_opmessage_grps = DBselect(DB::makeSql('opmessage_grp', $options));
+
+			while ($db_opmessage_grp = DBfetch($db_opmessage_grps)) {
+				$db_opdata[$db_opmessage_grp['operationid']]['opmessage_grp'][$db_opmessage_grp['opmessage_grpid']] =
+					array_diff_key($db_opmessage_grp, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['opmessage_usr']) {
+			$options = [
+				'output' => ['opmessage_usrid', 'operationid', 'userid'],
+				'filter' => ['operationid' => array_keys($operationids['opmessage_usr'])]
+			];
+			$db_opmessage_usrs = DBselect(DB::makeSql('opmessage_usr', $options));
+
+			while ($db_opmessage_usr = DBfetch($db_opmessage_usrs)) {
+				$db_opdata[$db_opmessage_usr['operationid']]['opmessage_usr'][$db_opmessage_usr['opmessage_usrid']] =
+					array_diff_key($db_opmessage_usr, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['opcommand_grp']) {
+			$options = [
+				'output' => ['opcommand_grpid', 'operationid', 'groupid'],
+				'filter' => ['operationid' => array_keys($operationids['opcommand_grp'])]
+			];
+			$db_opcommand_grps = DBselect(DB::makeSql('opcommand_grp', $options));
+
+			while ($db_opcommand_grp = DBfetch($db_opcommand_grps)) {
+				$db_opdata[$db_opcommand_grp['operationid']]['opcommand_grp'][$db_opcommand_grp['opcommand_grpid']] =
+					array_diff_key($db_opcommand_grp, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['opcommand_hst']) {
+			$options = [
+				'output' => ['opcommand_hstid', 'operationid', 'hostid'],
+				'filter' => ['operationid' => array_keys($operationids['opcommand_hst'])]
+			];
+			$db_opcommand_hsts = DBselect(DB::makeSql('opcommand_hst', $options));
+
+			while ($db_opcommand_hst = DBfetch($db_opcommand_hsts)) {
+				$db_opdata[$db_opcommand_hst['operationid']]['opcommand_hst'][$db_opcommand_hst['opcommand_hstid']] =
+					array_diff_key($db_opcommand_hst, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['opgroup']) {
+			$options = [
+				'output' => ['opgroupid', 'operationid', 'groupid'],
+				'filter' => ['operationid' => array_keys($operationids['opgroup'])]
+			];
+			$db_opgroups = DBselect(DB::makeSql('opgroup', $options));
+
+			while ($db_opgroup = DBfetch($db_opgroups)) {
+				$db_opdata[$db_opgroup['operationid']]['opgroup'][$db_opgroup['opgroupid']] =
+					array_diff_key($db_opgroup, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['optemplate']) {
+			$options = [
+				'output' => ['optemplateid', 'operationid', 'templateid'],
+				'filter' => ['operationid' => array_keys($operationids['optemplate'])]
+			];
+			$db_optemplates = DBselect(DB::makeSql('optemplate', $options));
+
+			while ($db_optemplate = DBfetch($db_optemplates)) {
+				$db_opdata[$db_optemplate['operationid']]['optemplate'][$db_optemplate['optemplateid']] =
+					array_diff_key($db_optemplate, array_flip(['operationid']));
+			}
+		}
+
+		foreach ($db_actions as &$db_action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $db_action)) {
+					continue;
+				}
+
+				foreach ($db_action[$operation_group] as &$db_operation) {
+					if (array_key_exists($db_operation['operationid'], $db_opdata)) {
+						$db_operation = array_merge($db_operation, $db_opdata[$db_operation['operationid']]);
+					}
+				}
+				unset($db_operation);
+			}
+		}
+		unset($db_action);
 	}
 }

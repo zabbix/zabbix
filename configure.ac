@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2021 Zabbix SIA
+dnl Copyright (C) 2001-2022 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.0.0alpha1])
+AC_INIT([Zabbix],[6.0.6rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([subdir-objects filename-length-max=99])
+AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -1212,7 +1212,7 @@ if test "x$ARCH" = "xsolaris"; then
 	AC_MSG_RESULT(yes),
 	CFLAGS="$saved_CFLAGS"
 	AC_MSG_RESULT(no))
-	CFLAGS="${CFLAGS} -DDUK_F_OLD_SOLARIS"
+	CFLAGS="${CFLAGS} -DZBX_OLD_SOLARIS"
 fi
 
 if test "x$ARCH" = "xhpux"; then
@@ -1669,6 +1669,9 @@ PROXY_LIBS="$PROXY_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 AGENT_LDFLAGS="$AGENT_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 
+AGENT2_LDFLAGS="$AGENT2_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
+AGENT2_LIBS="$AGENT2_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
+
 ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $ZLIB_LDFLAGS $LIBPTHREAD_LDFLAGS"
 ZBXGET_LIBS="$ZBXGET_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 
@@ -1760,6 +1763,9 @@ PROXY_LIBS="$PROXY_LIBS $TLS_LIBS"
 
 AGENT_LDFLAGS="$AGENT_LDFLAGS $TLS_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $TLS_LIBS"
+
+AGENT2_LDFLAGS="$AGENT2_LDFLAGS $TLS_LDFLAGS"
+AGENT2_LIBS="$AGENT2_LIBS $TLS_LIBS"
 
 ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $TLS_LDFLAGS"
 ZBXGET_LIBS="$ZBXGET_LIBS $TLS_LIBS"
@@ -1864,21 +1870,52 @@ SENDER_LIBS="$SENDER_LIBS $ZLIB_LIBS $LIBPTHREAD_LIBS"
 ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
-dnl Check for libpcre, used by Zabbix for regular expressions
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
-	LIBPCRE_CHECK_CONFIG([no])
+dnl Check for libpcre or libpcre2, used by Zabbix for regular expressions
+dnl Must check for both pcre and pcre2 to check if both were selected by the user and produce an error in that case
+LIBPCRE_CHECK_CONFIG([no])
+if test "x$enable_static_libs" != "xyes" || test "x$found_libpcre" != "xyes"; then
+LIBPCRE2_CHECK_CONFIG([no])
+fi
+if test "x$want_libpcre2" = "xyes"; then
+	if test "x$want_libpcre" = "xyes"; then
+		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time!])
+	fi
+
+	if test "x$found_libpcre2" != "xyes"; then
+		AC_MSG_ERROR([Unable to use libpcre2 (libpcre2 check failed)])
+	fi
+
+	CFLAGS="$CFLAGS $LIBPCRE2_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE2_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE2_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE2_LIBS"
+	fi
+
+	AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
+	have_pcre2=1
+else
 	if test "x$found_libpcre" != "xyes"; then
 		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
 	fi
+
+	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE_LIBS"
+	fi
+
+	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
+	have_pcre=1
+fi
 fi
 
-CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
-LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
-if test "x$ARCH" = "xosx"; then
-	LIBS="$LIBPCRE_LIBS $LIBS"
-else
-	LIBS="$LIBS $LIBPCRE_LIBS"
-fi
+AM_CONDITIONAL([HAVE_PCRE], [test "x$have_pcre" = "x1"])
+AM_CONDITIONAL([HAVE_PCRE2], [test "x$have_pcre2" = "x1"])
 
 found_iconv="no"
 dnl Check for libiconv [by default - skip]
@@ -1896,6 +1933,8 @@ SERVER_CONFIG_FILE="${sysconfdir}/zabbix_server.conf"
 PROXY_CONFIG_FILE="${sysconfdir}/zabbix_proxy.conf"
 AGENT_CONFIG_FILE="${sysconfdir}/zabbix_agentd.conf"
 AGENT2_CONFIG_FILE="${sysconfdir}/zabbix_agent2.conf"
+AGENT2_CONFIG_PATH="${sysconfdir}/zabbix_agent2.d"
+AGENT2_CONFIG_PLUGINS_PATH="${AGENT2_CONFIG_PATH}/plugins.d"
 WEBSERVICE_CONFIG_FILE="${sysconfdir}/zabbix_web_service.conf"
 
 EXTERNAL_SCRIPTS_PATH="${datadir}/zabbix/externalscripts"
@@ -1915,14 +1954,17 @@ AC_SUBST(PROXY_LIBS)
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
+AC_SUBST(AGENT2_LDFLAGS)
+AC_SUBST(AGENT2_LIBS)
+
 if test "x$HAVE_START_GROUP" = "xyes"; then
 	LD_START_GROUP=-Wl,--start-group
 	LD_END_GROUP=-Wl,--end-group
 fi
 
 if test "x$agent2" = "xyes"; then
-	CGO_CFLAGS=$TLS_CFLAGS
-	CGO_LDFLAGS="$AGENT_LDFLAGS $LD_START_GROUP \
+	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
+	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
 		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
@@ -1941,7 +1983,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-		$LIBS $AGENT_LIBS $LD_END_GROUP"
+		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
 	AC_SUBST(CGO_LDFLAGS)
@@ -1960,6 +2002,8 @@ AC_SUBST(SERVER_CONFIG_FILE)
 AC_SUBST(PROXY_CONFIG_FILE)
 AC_SUBST(AGENT_CONFIG_FILE)
 AC_SUBST(AGENT2_CONFIG_FILE)
+AC_SUBST(AGENT2_CONFIG_PATH)
+AC_SUBST(AGENT2_CONFIG_PLUGINS_PATH)
 AC_SUBST(WEBSERVICE_CONFIG_FILE)
 
 AC_SUBST(EXTERNAL_SCRIPTS_PATH)
@@ -2008,7 +2052,7 @@ dnl *                 Output configuration results                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-m4_ifdef([CONF_TESTS],[CONF_TESTS(ZBXCMOCKA)])
+m4_ifdef([CONF_TESTS],[CONF_TESTS])
 
 AC_OUTPUT([
 	Makefile
@@ -2071,6 +2115,9 @@ AC_OUTPUT([
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxaudit/Makefile
 	src/libs/zbxservice/Makefile
+	src/libs/zbxxml/Makefile
+	src/libs/zbxha/Makefile
+	src/libs/zbxrtc/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_get/Makefile
@@ -2081,6 +2128,7 @@ AC_OUTPUT([
 	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/dbconfig/Makefile
 	src/zabbix_server/discoverer/Makefile
+	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/pinger/Makefile
@@ -2129,6 +2177,12 @@ AGENT_CONFIG_FILE=`eval echo "${AGENT_CONFIG_FILE}"`
 
 AGENT2_CONFIG_FILE=`eval echo "${AGENT2_CONFIG_FILE}"`
 AGENT2_CONFIG_FILE=`eval echo "${AGENT2_CONFIG_FILE}"`
+
+AGENT2_CONFIG_PATH=`eval echo "${AGENT2_CONFIG_PATH}"`
+AGENT2_CONFIG_PATH=`eval echo "${AGENT2_CONFIG_PATH}"`
+
+AGENT2_CONFIG_PLUGINS_PATH=`eval echo "${AGENT2_CONFIG_PLUGINS_PATH}"`
+AGENT2_CONFIG_PLUGINS_PATH=`eval echo "${AGENT2_CONFIG_PLUGINS_PATH}"`
 
 WEBSERVICE_CONFIG_FILE=`eval echo "${WEBSERVICE_CONFIG_FILE}"`
 WEBSERVICE_CONFIG_FILE=`eval echo "${WEBSERVICE_CONFIG_FILE}"`

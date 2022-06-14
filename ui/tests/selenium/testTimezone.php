@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ class testTimezone extends CWebTest {
 	 * @dataProvider getUserSettingsData
 	 *
 	 * Change timezones for user, from user setting. Check that time for user displayed correctly according
-	 * to choosed timezone.
+	 * to chosen timezone.
 	 */
 	public function testTimezone_UserSettings($data) {
 		// Set system timezone.
@@ -184,7 +184,7 @@ class testTimezone extends CWebTest {
 	 * @dataProvider getCreateUsersData
 	 *
 	 * Create users with different timezones and check that time displayed for them correctly, according
-	 * to choosed timezone.
+	 * to chosen timezone.
 	 */
 	public function testTimezone_CreateUsers($data) {
 		$this->page->userLogin('Admin', 'zabbix');

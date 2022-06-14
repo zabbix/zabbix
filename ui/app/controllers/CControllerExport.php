@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class CControllerExport extends CController {
 			'action' =>			'required|string',
 			'backurl' =>		'required|string',
 			'valuemapids' =>	'not_empty|array_db valuemaps.valuemapid',
-			'hosts' =>			'not_empty|array_db hosts.hostid',
+			'hostids' =>		'not_empty|array_db hosts.hostid',
 			'mediatypeids' =>	'not_empty|array_db media_type.mediatypeid',
 			'maps' =>			'not_empty|array_db sysmaps.sysmapid',
 			'templates' =>		'not_empty|array_db hosts.hostid',
@@ -78,7 +78,7 @@ class CControllerExport extends CController {
 				break;
 
 			case 'export.hosts':
-				$params['options']['hosts'] = $this->getInput('hosts', []);
+				$params['options']['hosts'] = $this->getInput('hostids', []);
 				break;
 
 			case 'export.mediatypes':

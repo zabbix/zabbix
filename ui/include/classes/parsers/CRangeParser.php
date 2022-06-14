@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ class CRangeParser extends CParser {
 	 * lldmacros    Allow lldmacros in ranges.
 	 * with_minus   Allow negative ranges.
 	 * with_float   Allow float number ranges.
-	 * with_suffix  Allow number ranges with suffix, supported suffixes see CNumberParser::$suffixes.
+	 * with_suffix  Allow number ranges with size and time suffixes.
 	 *
 	 * @var array
 	 */
@@ -87,7 +87,8 @@ class CRangeParser extends CParser {
 		$this->number_parser = new CNumberParser([
 			'with_minus' => $this->options['with_minus'],
 			'with_float' => $this->options['with_float'],
-			'with_suffix' => $this->options['with_suffix']
+			'with_size_suffix' => $this->options['with_suffix'],
+			'with_time_suffix' => $this->options['with_suffix']
 		]);
 
 		if ($this->options['usermacros']) {

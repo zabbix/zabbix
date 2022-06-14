@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,16 @@ class CControllerDashboardWidgetCheck extends CController {
 
 	private $context;
 
+	protected function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput() {
 		$fields = [
-			'templateid' => 'db dashboard.templateid',
-			'type' => 'required|string',
-			'name' => 'required|string',
-			'fields' => 'json'
+			'templateid' =>	'db dashboard.templateid',
+			'type' =>		'required|string',
+			'name' =>		'required|string',
+			'fields' =>		'json'
 		];
 
 		$ret = $this->validateInput($fields);

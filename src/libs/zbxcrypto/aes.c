@@ -34,8 +34,9 @@
 /*****************************************************************************/
 /* Includes:                                                                 */
 /*****************************************************************************/
-#include <string.h> // CBC mode, for memset
 #include "aes.h"
+
+#include <string.h> // CBC mode, for memset
 
 /*****************************************************************************/
 /* Defines:                                                                  */
@@ -121,7 +122,7 @@ static const uint8_t Rcon[11] =
  *
  * From Wikipedia's article on the Rijndael key schedule @ https://en.wikipedia.org/wiki/Rijndael_key_schedule#Rcon
  *
- * "Only the first some of these constants are actually used – up to rcon[10] for AES-128 (as 11 round keys are needed),
+ * "Only the first some of these constants are actually used - up to rcon[10] for AES-128 (as 11 round keys are needed),
  *  up to rcon[8] for AES-192, up to rcon[7] for AES-256. rcon[0] is not used in AES algorithm."
  */
 
@@ -564,4 +565,3 @@ void AES_CTR_xcrypt_buffer(struct AES_ctx *ctx, uint8_t *buf, size_t length)
 }
 
 #endif // #if defined(CTR) && (CTR == 1)
-

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -174,6 +174,24 @@ class CDBHelper {
 	}
 
 	/**
+	 * Get all values of database column.
+	 *
+	 * @param type $sql			 query to be executed
+	 * @param type $column		 column name
+	 *
+	 * @return array
+	 */
+	public static function getColumn($sql, $column) {
+		$data = [];
+
+		foreach (CDBHelper::getAll($sql) as $row) {
+			$data[] = $row[$column];
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Get list of all referenced tables sorted by dependency level.
 	 *
 	 * For example: getTables($tables, 'users')
@@ -230,26 +248,37 @@ class CDBHelper {
 
 	/*
 	 * Saves data of the specified table and all dependent tables in temporary storage.
-	 * For example: backupTables('users')
+	 * For example: backupTables(['users'])
 	 */
-	public static function backupTables($top_table) {
+	public static function backupTables(array $top_tables) {
 		global $DB;
 
 		$tables = [];
-		static::getTables($tables, $top_table);
+		static::getTables($tables, $top_tables);
 		self::$backups[] = $tables;
 
 		$suffix = '_tmp'.count(self::$backups);
 
-		foreach ($tables as $table) {
-			DBexecute('DROP TABLE IF EXISTS '.$table.$suffix);
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			if ($DB['PASSWORD'] !== '') {
+				putenv('PGPASSWORD='.$DB['PASSWORD']);
+			}
+			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
+			$db_name = $DB['DATABASE'];
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
 
-			switch ($DB['TYPE']) {
-				case ZBX_DB_MYSQL:
-					DBexecute('CREATE TABLE '.$table.$suffix.' AS SELECT * FROM '.$table);
-					break;
-				default:
-					DBexecute('SELECT * INTO TABLE '.$table.$suffix.' FROM '.$table);
+			exec('pg_dump'.$server.' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' '.$db_name.' -f'.$file,
+				$output, $result_code
+			);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to backup "'.implode('", "', $top_tables).'".');
+			}
+		}
+		else {
+			foreach ($tables as $table) {
+				DBexecute('DROP TABLE IF EXISTS '.$table.$suffix);
+				DBexecute('CREATE TABLE '.$table.$suffix.' AS SELECT * FROM '.$table);
 			}
 		}
 	}
@@ -268,22 +297,42 @@ class CDBHelper {
 		$suffix = '_tmp'.count(self::$backups);
 		$tables = array_pop(self::$backups);
 
-		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			if ($DB['PASSWORD'] !== '') {
+				putenv('PGPASSWORD='.$DB['PASSWORD']);
+			}
+			$server = $DB['SERVER'] !== '' ? ' -h'.$DB['SERVER'] : '';
+			$db_name = $DB['DATABASE'];
+			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
+
+			exec('pg_restore'.$server.' -U'.$DB['USER'].' -Fd -j5 --clean -d '.$db_name.' '.$file, $output,
+				$result_code
+			);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to restore "'.$file.'".');
+			}
+
+			exec('rm -rf '.$file);
+
+			if ($result_code != 0) {
+				throw new Exception('Failed to remove "'.$file.'".');
+			}
+		}
+		else {
 			$result = DBselect('SELECT @@unique_checks,@@foreign_key_checks');
 			$row = DBfetch($result);
 			DBexecute('SET unique_checks=0,foreign_key_checks=0');
-		}
 
-		foreach (array_reverse($tables) as $table) {
-			DBexecute('DELETE FROM '.$table);
-		}
+			foreach (array_reverse($tables) as $table) {
+				DBexecute('DELETE FROM '.$table);
+			}
 
-		foreach ($tables as $table) {
-			DBexecute('INSERT INTO '.$table.' SELECT * FROM '.$table.$suffix);
-			DBexecute('DROP TABLE '.$table.$suffix);
-		}
+			foreach ($tables as $table) {
+				DBexecute('INSERT INTO '.$table.' SELECT * FROM '.$table.$suffix);
+				DBexecute('DROP TABLE '.$table.$suffix);
+			}
 
-		if ($DB['TYPE'] == ZBX_DB_MYSQL) {
 			DBexecute('SET foreign_key_checks='.$row['@@foreign_key_checks'].',unique_checks='.$row['@@unique_checks']);
 		}
 	}

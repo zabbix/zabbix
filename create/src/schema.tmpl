@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2021 Zabbix SIA
+-- Copyright (C) 2001-2022 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -264,13 +264,13 @@ FIELD		|verify_host	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|allow_traps	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
-INDEX		|1		|hostid,key_(1021)
+INDEX		|1		|hostid,key_(764)
 INDEX		|3		|status
 INDEX		|4		|templateid
 INDEX		|5		|valuemapid
 INDEX		|6		|interfaceid
 INDEX		|7		|master_itemid
-INDEX		|8		|key_(1024)
+INDEX		|8		|key_(768)
 
 TABLE|httpstepitem|httpstepitemid|ZBX_TEMPLATE
 FIELD		|httpstepitemid	|t_id		|	|NOT NULL	|0
@@ -332,7 +332,7 @@ FIELD		|mediatypeid	|t_id		|	|NOT NULL	|0			|1|media_type
 FIELD		|eventsource	|t_integer	|	|NOT NULL	|0
 FIELD		|recovery	|t_integer	|	|NOT NULL	|0
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|message	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|message	|t_text		|''	|NOT NULL	|0
 UNIQUE		|1		|mediatypeid,eventsource,recovery
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
@@ -361,7 +361,7 @@ FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|confirmation	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|type		|t_integer	|'5'	|NOT NULL	|0
 FIELD		|execute_on	|t_integer	|'2'	|NOT NULL	|0
-FIELD		|timeout	|t_varchar(32)	|'30s'	|NOT NULL	|ZBX_NODATA
+FIELD		|timeout	|t_varchar(32)	|'30s'	|NOT NULL	|0
 FIELD		|scope		|t_integer	|'1'	|NOT NULL	|0
 FIELD		|port		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|authtype	|t_integer	|'0'	|NOT NULL	|0
@@ -388,8 +388,9 @@ FIELD		|eventsource	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|esc_period	|t_varchar(255)	|'1h'	|NOT NULL	|0
-FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|formula	|t_varchar(1024)|''	|NOT NULL	|0
 FIELD		|pause_suppressed|t_integer	|'1'	|NOT NULL	|0
+FIELD		|notify_if_canceled|t_integer	|'1'	|NOT NULL	|0
 INDEX		|1		|eventsource,status
 UNIQUE		|2		|name
 
@@ -582,18 +583,23 @@ FIELD		|item_test_timeout	|t_varchar(32)	|'60s'	|NOT NULL	|ZBX_NODATA
 FIELD		|session_key	|t_varchar(32)|''	|NOT NULL	|ZBX_NODATA
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|report_test_timeout|t_varchar(32)|'60s'|NOT NULL	|ZBX_NODATA
-FIELD		|dbversion_status	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|dbversion_status	|t_shorttext|''	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_events_service|t_varchar(32)|'1d'	|NOT NULL	|ZBX_NODATA
 FIELD		|passwd_min_length	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
 FIELD		|passwd_check_rules	|t_integer	|'8'	|NOT NULL	|ZBX_NODATA
 FIELD		|auditlog_enabled	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
+FIELD		|ha_failover_delay	|t_varchar(32)	|'1m'	|NOT NULL	|ZBX_NODATA
+FIELD		|geomaps_tile_provider|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|geomaps_tile_url	|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
+FIELD		|geomaps_max_zoom	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|geomaps_attribution|t_varchar(1024)|''	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
 TABLE|triggers|triggerid|ZBX_TEMPLATE
 FIELD		|triggerid	|t_id		|	|NOT NULL	|0
 FIELD		|expression	|t_varchar(2048)|''	|NOT NULL	|0
-FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
@@ -752,11 +758,15 @@ INDEX		|2		|id
 TABLE|services|serviceid|ZBX_DATA
 FIELD		|serviceid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
-FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|status		|t_integer	|'-1'	|NOT NULL	|0
 FIELD		|algorithm	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|showsla	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|goodsla	|t_double	|'99.9'	|NOT NULL	|0
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|weight		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|propagation_rule|t_integer	|'0'	|NOT NULL	|0
+FIELD		|propagation_value|t_integer	|'0'	|NOT NULL	|0
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
+FIELD		|created_at	|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|services_links|linkid|ZBX_DATA
 FIELD		|linkid		|t_id		|	|NOT NULL	|0
@@ -764,15 +774,6 @@ FIELD		|serviceupid	|t_id		|	|NOT NULL	|0			|1|services	|serviceid
 FIELD		|servicedownid	|t_id		|	|NOT NULL	|0			|2|services	|serviceid
 INDEX		|1		|servicedownid
 UNIQUE		|2		|serviceupid,servicedownid
-
-TABLE|services_times|timeid|ZBX_DATA
-FIELD		|timeid		|t_id		|	|NOT NULL	|0
-FIELD		|serviceid	|t_id		|	|NOT NULL	|0			|1|services
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|ts_from	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|ts_to		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|note		|t_varchar(255)	|''	|NOT NULL	|0
-INDEX		|1		|serviceid,type,ts_from,ts_to
 
 TABLE|icon_map|iconmapid|ZBX_DATA
 FIELD		|iconmapid	|t_id		|	|NOT NULL	|0
@@ -974,7 +975,7 @@ FIELD		|esc_step	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|alerttype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|p_eventid	|t_id		|	|NULL		|0			|5|events	|eventid
 FIELD		|acknowledgeid	|t_id		|	|NULL		|0			|6|acknowledges	|acknowledgeid
-FIELD		|parameters	|t_shorttext	|'{}'	|NOT NULL	|0
+FIELD		|parameters	|t_text		|'{}'	|NOT NULL	|0
 INDEX		|1		|actionid
 INDEX		|2		|clock
 INDEX		|3		|eventid
@@ -982,29 +983,27 @@ INDEX		|4		|status
 INDEX		|5		|mediatypeid
 INDEX		|6		|userid
 INDEX		|7		|p_eventid
+INDEX		|8		|acknowledgeid
 
-TABLE|history||0
+TABLE|history|itemid,clock,ns|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_double	|'0.0000'|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
-INDEX		|1		|itemid,clock
 
-TABLE|history_uint||0
+TABLE|history_uint|itemid,clock,ns|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
-INDEX		|1		|itemid,clock
 
-TABLE|history_str||0
+TABLE|history_str|itemid,clock,ns|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
-INDEX		|1		|itemid,clock
 
-TABLE|history_log||0
+TABLE|history_log|itemid,clock,ns|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|timestamp	|t_time		|'0'	|NOT NULL	|0
@@ -1013,14 +1012,12 @@ FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_text		|''	|NOT NULL	|0
 FIELD		|logeventid	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
-INDEX		|1		|itemid,clock
 
-TABLE|history_text||0
+TABLE|history_text|itemid,clock,ns|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_text		|''	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
-INDEX		|1		|itemid,clock
 
 TABLE|proxy_history|id|0
 FIELD		|id		|t_serial	|	|NOT NULL	|0
@@ -1103,10 +1100,11 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|resourceid	|t_id		|	|NOT NULL	|0
+FIELD		|resourceid	|t_id		|	|NULL		|0
+FIELD		|resource_cuid	|t_cuid		|	|NULL		|0
 FIELD		|resourcename	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|recordsetid	|t_cuid		|	|NOT NULL	|0
-FIELD		|details	|t_text		|''	|NOT NULL	|0
+FIELD		|details	|t_longtext	|''	|NOT NULL	|0
 INDEX		|1		|userid,clock
 INDEX		|2		|clock
 INDEX		|3		|resourcetype,resourceid
@@ -1115,7 +1113,7 @@ TABLE|service_alarms|servicealarmid|0
 FIELD		|servicealarmid	|t_id		|	|NOT NULL	|0
 FIELD		|serviceid	|t_id		|	|NOT NULL	|0			|1|services
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
-FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value		|t_integer	|'-1'	|NOT NULL	|0
 INDEX		|1		|serviceid,clock
 INDEX		|2		|clock
 
@@ -1312,7 +1310,7 @@ FIELD		|idx		|t_varchar(96)	|''	|NOT NULL	|0
 FIELD		|idx2		|t_id		|'0'	|NOT NULL	|0
 FIELD		|value_id	|t_id		|'0'	|NOT NULL	|0
 FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|value_str	|t_text	|''	|NOT NULL	|0
+FIELD		|value_str	|t_text		|''	|NOT NULL	|0
 FIELD		|source		|t_varchar(96)	|''	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|userid,idx,idx2
@@ -1468,7 +1466,7 @@ FIELD		|item_preprocid	|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|ZBX_PROXY			|1|items
 FIELD		|step		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
-FIELD		|params		|t_shorttext	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|params		|t_text		|''	|NOT NULL	|ZBX_PROXY
 FIELD		|error_handler	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|error_handler_params|t_varchar(255)|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|itemid,step
@@ -1612,12 +1610,16 @@ FIELD		|value_hostid	|t_id		|	|NULL		|0			|3|hosts	|hostid
 FIELD		|value_itemid	|t_id		|	|NULL		|0			|4|items	|itemid
 FIELD		|value_graphid	|t_id		|	|NULL		|0			|5|graphs	|graphid
 FIELD		|value_sysmapid	|t_id		|	|NULL		|0			|6|sysmaps	|sysmapid
+FIELD		|value_serviceid|t_id		|	|NULL		|0			|7|services	|serviceid
+FIELD		|value_slaid	|t_id		|	|NULL		|0			|8|sla		|slaid
 INDEX		|1		|widgetid
 INDEX		|2		|value_groupid
 INDEX		|3		|value_hostid
 INDEX		|4		|value_itemid
 INDEX		|5		|value_graphid
 INDEX		|6		|value_sysmapid
+INDEX		|7		|value_serviceid
+INDEX		|8		|value_slaid
 
 TABLE|task_check_now|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
@@ -1770,8 +1772,10 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value_str	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value_moduleid	|t_id		|	|NULL		|0			|2|module	|moduleid
+FIELD		|value_serviceid|t_id		|	|NULL	|0			|3|services	|serviceid
 INDEX		|1		|roleid
 INDEX		|2		|value_moduleid
+INDEX		|3		|value_serviceid
 
 TABLE|token|tokenid|ZBX_DATA
 FIELD	|tokenid	|t_id		|	|NOT NULL	|0
@@ -1874,7 +1878,62 @@ FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|serviceid
 
-TABLE|dbversion||
+TABLE|service_status_rule|service_status_ruleid|ZBX_DATA
+FIELD		|service_status_ruleid|t_id	|	|NOT NULL	|0
+FIELD		|serviceid	|t_id		|	|NOT NULL	|0		|1|services|serviceid
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|limit_value	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|limit_status	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|new_status	|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|serviceid
+
+TABLE|ha_node|ha_nodeid|ZBX_DATA
+FIELD		|ha_nodeid	|t_cuid		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|address	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|port		|t_integer	|'10051'|NOT NULL	|0
+FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ha_sessionid	|t_cuid		|''	|NOT NULL	|0
+UNIQUE		|1		|name
+INDEX		|2		|status,lastaccess
+
+TABLE|sla|slaid|ZBX_DATA
+FIELD		|slaid		|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|period		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|slo		|t_double	|'99.9'	|NOT NULL	|0
+FIELD		|effective_date	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|timezone	|t_varchar(50)	|'UTC'	|NOT NULL	|ZBX_NODATA
+FIELD		|status		|t_integer	|'1'	|NOT NULL	|0
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+UNIQUE		|1		|name
+
+TABLE|sla_schedule|sla_scheduleid|ZBX_DATA
+FIELD		|sla_scheduleid	|t_id		|	|NOT NULL	|0
+FIELD		|slaid		|t_id		|	|NOT NULL	|0		|1|sla|slaid
+FIELD		|period_from	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|period_to	|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|slaid
+
+TABLE|sla_excluded_downtime|sla_excluded_downtimeid|ZBX_DATA
+FIELD		|sla_excluded_downtimeid|t_id		|	|NOT NULL	|0
+FIELD		|slaid			|t_id		|	|NOT NULL	|0	|1|sla|slaid
+FIELD		|name			|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|period_from		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|period_to		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1			|slaid
+
+TABLE|sla_service_tag|sla_service_tagid|0
+FIELD		|sla_service_tagid	|t_id		|	|NOT NULL	|0
+FIELD		|slaid			|t_id		|	|NOT NULL	|0	|1|sla|slaid
+FIELD		|tag			|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|operator		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value			|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1			|slaid
+
+TABLE|dbversion|dbversionid|
+FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|5050034	|5050034
+ROW		|1		|6000000	|6000002

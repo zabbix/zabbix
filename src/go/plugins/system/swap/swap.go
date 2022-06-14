@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import (
 	"errors"
 	"fmt"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // Plugin -
@@ -60,10 +60,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		mode = params[1]
 	}
 
-	if total == 0 && mode != "total" {
-		return nil, errors.New("Cannot be calculated because swap file size is 0.")
-	}
-
 	switch mode {
 	case "total":
 		return total, nil
@@ -72,8 +68,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "used":
 		return total - avail, nil
 	case "pfree":
+		if total == 0 {
+			return 100.0, nil
+		}
 		return float64(avail) / float64(total) * 100, nil
 	case "pused":
+		if total == 0 {
+			return 0.0, nil
+		}
 		return float64(total-avail) / float64(total) * 100, nil
 	default:
 		return nil, errors.New("Invalid second parameter.")

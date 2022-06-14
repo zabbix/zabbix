@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,21 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "avail_manager.h"
+
 #include "log.h"
 #include "zbxself.h"
 #include "zbxavailability.h"
 #include "zbxipcservice.h"
-#include "avail_manager.h"
 #include "daemon.h"
 #include "sighandler.h"
 #include "dbcache.h"
-#include "zbxalgo.h"
 #include "avail_protocol.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
-static sigset_t		orig_mask;
+
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
+static sigset_t				orig_mask;
 
 #define ZBX_AVAILABILITY_MANAGER_DELAY			1
 #define ZBX_AVAILABILITY_MANAGER_FLUSH_DELAY_SEC	5
@@ -55,6 +56,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	int				ret, processed_num = 0;
 	double				time_stat, time_idle = 0, time_now, time_flush, sec;
 	zbx_vector_availability_ptr_t	interface_availabilities;
+	zbx_timespec_t			timeout = {ZBX_AVAILABILITY_MANAGER_DELAY, 0};
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -104,7 +106,7 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 		}
 
 		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&service, ZBX_AVAILABILITY_MANAGER_DELAY, &client, &message);
+		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 		sec = zbx_time();
 		zbx_update_env(sec);
@@ -151,4 +153,3 @@ ZBX_THREAD_ENTRY(availability_manager_thread, args)
 	exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
-

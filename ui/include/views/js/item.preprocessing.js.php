@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
 
 	echo (new CListItem([
 		(new CDiv([
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+			(new CDiv(new CVar('preprocessing[#{rowNum}][sortorder]', '#{sortorder}')))->addClass(ZBX_STYLE_DRAG_ICON),
 			(new CDiv($preproc_types_select))
 				->addClass('list-numbered-item')
 				->addClass('step-name'),
@@ -110,6 +110,26 @@
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-prometheus-pattern">
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+			->setAttribute('placeholder', '#{placeholder_0}').
+		(new CSelect('preprocessing[#{rowNum}][params][1]'))
+			->addOptions(CSelect::createOptionsFromArray([
+				ZBX_PREPROC_PROMETHEUS_VALUE => _('value'),
+				ZBX_PREPROC_PROMETHEUS_LABEL => _('label'),
+				ZBX_PREPROC_PROMETHEUS_SUM => 'sum',
+				ZBX_PREPROC_PROMETHEUS_MIN => 'min',
+				ZBX_PREPROC_PROMETHEUS_MAX => 'max',
+				ZBX_PREPROC_PROMETHEUS_AVG => 'avg',
+				ZBX_PREPROC_PROMETHEUS_COUNT => 'count'
+			]))
+			->addClass('js-preproc-param-prometheus-pattern-function').
+		(new CTextBox('preprocessing[#{rowNum}][params][2]', ''))
+			->setAttribute('placeholder', '#{placeholder_2}')
+			->setEnabled(false)
+	?>
+</script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		function makeParameterInput(index, type) {
@@ -117,7 +137,10 @@
 				preproc_param_double_tmpl = new Template($('#preprocessing-steps-parameters-double-tmpl').html()),
 				preproc_param_custom_width_chkbox_tmpl =
 					new Template($('#preprocessing-steps-parameters-custom-width-chkbox-tmpl').html()),
-				preproc_param_multiline_tmpl = new Template($('#preprocessing-steps-parameters-multiline-tmpl').html());
+				preproc_param_multiline_tmpl = new Template($('#preprocessing-steps-parameters-multiline-tmpl').html()),
+				preproc_param_prometheus_pattern_tmpl = new Template(
+					$('#preprocessing-steps-parameters-custom-prometheus-pattern').html()
+				);
 
 			switch (type) {
 				case '<?= ZBX_PREPROC_MULTIPLIER ?>':
@@ -185,16 +208,16 @@
 						label_after: '}',
 						grow: 'auto',
 						rows: 0,
-						maxlength: <?= (int) DB::getFieldLength('item_preproc', 'params') ?>
+						maxlength: <?= DB::getFieldLength('item_preproc', 'params') ?>
 					});
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_PATTERN ?>':
-					return $(preproc_param_double_tmpl.evaluate({
+					return $(preproc_param_prometheus_pattern_tmpl.evaluate({
 						rowNum: index,
 						placeholder_0: <?= json_encode(
 							_('<metric name>{<label name>="<label value>", ...} == <value>')
 						) ?>,
-						placeholder_1: <?= json_encode(_('<label name>')) ?>
+						placeholder_2: <?= json_encode(_('<label name>')) ?>
 					}));
 
 				case '<?= ZBX_PREPROC_PROMETHEUS_TO_JSON ?>':
@@ -272,7 +295,7 @@
 			$preprocessing = $(obj.querySelector('#preprocessing'));
 		}
 
-		var step_index = $preprocessing.find('li.sortable').length;
+		let step_index = $preprocessing.find('li.sortable').length;
 
 		$preprocessing.sortable({
 			disabled: $preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
@@ -282,21 +305,32 @@
 			cursor: 'grabbing',
 			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
-			opacity: 0.6
+			opacity: 0.6,
+			update: function() {
+				let i = 0;
+
+				$(this).find('li.sortable').each(function() {
+					$(this).find('[name*="sortorder"]').val(i++);
+				});
+			}
 		});
+
+		const change_event = new CustomEvent('item.preprocessing.change');
 
 		$preprocessing
 			.on('click', '.element-table-add', function() {
-				var preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html()),
-					$row = $(preproc_row_tmpl.evaluate({rowNum: step_index}));
-					type = $('z-select[name*="type"]', $row).val();
+				let sortable_count = $preprocessing.find('li.sortable').length;
+				const preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html());
+				const $row = $(preproc_row_tmpl.evaluate({
+					rowNum: step_index,
+					sortorder: sortable_count++
+				}));
+				const type = $('z-select[name*="type"]', $row).val();
 
 				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
 				$(this).closest('.preprocessing-list-foot').before($row);
 
 				$('.preprocessing-list-head').show();
-
-				var sortable_count = $preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 1) {
 					$('#preproc_test_all').show();
@@ -312,6 +346,7 @@
 						.removeClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 
+				$preprocessing[0].dispatchEvent(change_event);
 				updateTypeOptionsAvailability();
 				step_index++;
 			})
@@ -334,7 +369,7 @@
 			.on('click', '.element-table-remove', function() {
 				$(this).closest('li.sortable').remove();
 
-				var sortable_count = $preprocessing.find('li.sortable').length;
+				const sortable_count = $preprocessing.find('li.sortable').length;
 
 				if (sortable_count == 0) {
 					$('#preproc_test_all').hide();
@@ -346,6 +381,15 @@
 						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 
+				if (sortable_count > 0) {
+					let i = 0;
+
+					$preprocessing.find('li.sortable').each(function() {
+						$(this).find('[name*="sortorder"]').val(i++);
+					});
+				}
+
+				$preprocessing[0].dispatchEvent(change_event);
 				updateTypeOptionsAvailability();
 			})
 			.on('change', 'z-select[name*="type"]', function() {
@@ -422,6 +466,9 @@
 						.attr('placeholder', <?= json_encode(_('error message')) ?>)
 						.show();
 				}
+			})
+			.on('change', '.js-preproc-param-prometheus-pattern-function', function() {
+				$(this).next('input').prop('disabled', $(this).val() !== '<?= ZBX_PREPROC_PROMETHEUS_LABEL ?>');
 			});
 	});
 </script>

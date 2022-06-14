@@ -10,22 +10,15 @@ Released into the Public Domain by Ulrich Drepper <drepper@redhat.com>.  */
 #elif _AIX
 /* Nothing to do in AIX */
 #else
-	#if defined(DUK_F_OLD_SOLARIS)
+	#if defined(ZBX_OLD_SOLARIS)
 		#include <sys/isa_defs.h>
 	#else
 		#include <machine/endian.h>
 	#endif
 #endif
-#include <errno.h>
-#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
-#include <sys/types.h>
-
-#include "common.h"
 
 /* Structure to save state of computation between the single steps.  */
 struct sha512_ctx
@@ -251,7 +244,6 @@ sha512_finish_ctx (struct sha512_ctx *ctx, void *resbuf)
 
 	return resbuf;
 }
-
 
 static void
 sha512_process_bytes (const void *buffer, size_t len, struct sha512_ctx *ctx)

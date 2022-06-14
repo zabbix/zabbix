@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -450,8 +450,8 @@ class CControllerWidgetNavTreeView extends CControllerWidget {
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$this->problems_per_severity_tpl[$severity] = 0;
 			$severity_config[$severity] = [
-				'name' => getSeverityName($severity),
-				'style_class' => getSeverityStatusStyle($severity)
+				'name' => CSeverityHelper::getName($severity),
+				'style_class' => CSeverityHelper::getStatusStyle($severity)
 			];
 		}
 

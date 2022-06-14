@@ -1,0 +1,839 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:27:44Z'
+  groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    -
+      uuid: a6fe3640b23544e7ae15d438b38ce1cd
+      template: 'InfluxDB by HTTP'
+      name: 'InfluxDB by HTTP'
+      description: |
+        Get InfluxDB metrics by HTTP agent from Prometheus metrics endpoint.
+        For organization discovery template need to use Authorization via API token. See docs: https://docs.influxdata.com/influxdb/v2.0/security/tokens/
+        
+        Don't forget change macros {$INFLUXDB.URL}, {$INFLUXDB.API.TOKEN}.
+        Some metrics may not be collected depending on your InfluxDB instance version and configuration.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: Templates/Applications
+      items:
+        -
+          uuid: 286bb866060e47948c02408ebc841f1f
+          name: 'InfluxDB: Get instance metrics'
+          type: HTTP_AGENT
+          key: influx.get_metrics
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+            -
+              type: PROMETHEUS_TO_JSON
+              parameters:
+                - ''
+          url: '{$INFLUXDB.URL}/metrics'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: f8f514943c9040d7b41f14db92ca6c91
+          name: 'InfluxDB: Instance status'
+          type: HTTP_AGENT
+          key: influx.healthcheck
+          history: 7d
+          description: 'Get the health of an instance.'
+          valuemap:
+            name: 'InfluxDB healthcheck'
+          preprocessing:
+            -
+              type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '{"status":"fail"}]}'
+            -
+              type: JAVASCRIPT
+              parameters:
+                - 'return JSON.parse(value).status == ''pass'' ? 1: 0'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          url: '{$INFLUXDB.URL}/health'
+          tags:
+            -
+              tag: component
+              value: health
+          triggers:
+            -
+              uuid: de130833b4514481aa56d3ba06e648fc
+              expression: 'last(/InfluxDB by HTTP/influx.healthcheck)=0'
+              name: 'InfluxDB: Health check was failed'
+              priority: HIGH
+              description: 'The InfluxDB instance is not available or unhealthy.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: 56b1a9f2eb454a9b96a0e0a73d5439cf
+          name: 'InfluxDB: Boltdb reads, rate'
+          type: DEPENDENT
+          key: influxdb.boltdb_reads.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of boltdb reads per second.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="boltdb_reads_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: boltdb
+        -
+          uuid: 7bd505a8abb944c2bed17f8e4e5a8c84
+          name: 'InfluxDB: Boltdb writes, rate'
+          type: DEPENDENT
+          key: influxdb.boltdb_writes.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'Total number of boltdb writes per second.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="boltdb_writes_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: boltdb
+        -
+          uuid: 5d5e26ee272a4af6ac979e69a83de74d
+          name: 'InfluxDB: Buckets, total'
+          type: DEPENDENT
+          key: influxdb.buckets.total
+          delay: '0'
+          history: 7d
+          description: 'Number of total buckets on the server.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_buckets_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: buckets
+        -
+          uuid: 1c5931f514804a95ac4bfba3ec4a7d82
+          name: 'InfluxDB: Dashboards, total'
+          type: DEPENDENT
+          key: influxdb.dashboards.total
+          delay: '0'
+          history: 7d
+          description: 'Number of total dashboards on the server.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_dashboards_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: dashboards
+        -
+          uuid: 915f00d9dc9847bb8bc8007d034bb80d
+          name: 'InfluxDB: Organizations, total'
+          type: DEPENDENT
+          key: influxdb.organizations.total
+          delay: '0'
+          history: 7d
+          description: 'Number of total organizations on the server.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_organizations_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: organizations
+        -
+          uuid: e05aa2c424c140afa3794878ed2c3baa
+          name: 'InfluxDB: Scrapers, total'
+          type: DEPENDENT
+          key: influxdb.scrapers.total
+          delay: '0'
+          history: 7d
+          description: 'Number of total scrapers on the server.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_scrapers_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: scrapers
+        -
+          uuid: f77894d5ede9481381a268670bc88766
+          name: 'InfluxDB: Task runs failed, rate'
+          type: DEPENDENT
+          key: influxdb.task_executor_complete.failed.rate
+          delay: '0'
+          history: 7d
+          description: 'Total number of failure runs across all tasks.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="task_executor_total_runs_complete" && @.labels.status == "failed")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: tasks
+          triggers:
+            -
+              uuid: f0d2137905bc477f979d035c06111844
+              expression: 'min(/InfluxDB by HTTP/influxdb.task_executor_complete.failed.rate,5m)>{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}'
+              name: 'InfluxDB: Too many tasks failure runs'
+              event_name: 'InfluxDB: Too many tasks failure runs (over {$INFLUXDB.TASK.RUN.FAIL.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: '"Number of failure runs completed across all tasks is too high."'
+              tags:
+                -
+                  tag: scope
+                  value: performance
+        -
+          uuid: a0183b6d934c4612b358c027c75eda6e
+          name: 'InfluxDB: Task runs successful, rate'
+          type: DEPENDENT
+          key: influxdb.task_executor_complete.successful.rate
+          delay: '0'
+          history: 7d
+          description: 'Total number of runs successful completed across all tasks.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="task_executor_total_runs_complete" && @.labels.status == "success")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: tasks
+        -
+          uuid: c3f147a2afb3438d8bacbb41fac6b1d0
+          name: 'InfluxDB: Workers currently running'
+          type: DEPENDENT
+          key: influxdb.task_executor_runs_active.total
+          delay: '0'
+          history: 7d
+          description: 'Total number of workers currently running tasks.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="task_executor_total_runs_active")].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: tasks
+        -
+          uuid: 25595754557d49fca7c671df3f6a898c
+          name: 'InfluxDB: Workers busy, pct'
+          type: DEPENDENT
+          key: influxdb.task_executor_workers_busy.pct
+          delay: '0'
+          history: 7d
+          units: '%'
+          description: 'Percent of total available workers that are currently busy.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="task_executor_workers_busy")].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: tasks
+        -
+          uuid: 94d98714ecce4847be0bdb7b8802f1ec
+          name: 'InfluxDB: Telegrafs, total'
+          type: DEPENDENT
+          key: influxdb.telegrafs.total
+          delay: '0'
+          history: 7d
+          description: 'Number of total telegraf configurations on the server.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_telegrafs_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: telegraf
+        -
+          uuid: 23bad615af024a2e9f06d4541cf6f910
+          name: 'InfluxDB: Telegraf plugins, total'
+          type: DEPENDENT
+          key: influxdb.telegraf_plugins.total
+          delay: '0'
+          history: 7d
+          description: 'Number of individual telegraf plugins configured.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_telegraf_plugins_count")].value.sum()'
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: telegraf
+        -
+          uuid: 079c1eee7d93484b9126598b23921e9d
+          name: 'InfluxDB: Tokens, total'
+          type: DEPENDENT
+          key: influxdb.tokens.total
+          delay: '0'
+          history: 7d
+          description: 'Number of total tokens on the server.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_tokens_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: tokens
+        -
+          uuid: 8699e951b7944659993422334a4cddc0
+          name: 'InfluxDB: Uptime'
+          type: DEPENDENT
+          key: influxdb.uptime
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: 'InfluxDB process uptime in seconds.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_uptime_seconds")].value.first()'
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: uptime
+          triggers:
+            -
+              uuid: 335f27fb002544838f7150b11238d86b
+              expression: 'last(/InfluxDB by HTTP/influxdb.uptime)<10m'
+              name: 'InfluxDB: has been restarted'
+              event_name: 'InfluxDB: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 86357d43721f4e6aa6b1dd7e63dd2f47
+          name: 'InfluxDB: Users, total'
+          type: DEPENDENT
+          key: influxdb.users.total
+          delay: '0'
+          history: 7d
+          description: 'Number of total users on the server.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_users_total")].value.first()'
+              error_handler: DISCARD_VALUE
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 30m
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: tokens
+        -
+          uuid: d31e0d0823af4f6c999cae3d49b3815b
+          name: 'InfluxDB: Version'
+          type: DEPENDENT
+          key: influxdb.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of the InfluxDB instance.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - '$[?(@.name=="influxdb_info")].labels.version.first()'
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: influx.get_metrics
+          tags:
+            -
+              tag: component
+              value: version
+          triggers:
+            -
+              uuid: d2b02cc426c748608968ae08c0823461
+              expression: 'last(/InfluxDB by HTTP/influxdb.version,#1)<>last(/InfluxDB by HTTP/influxdb.version,#2) and length(last(/InfluxDB by HTTP/influxdb.version))>0'
+              name: 'InfluxDB: Version has changed'
+              event_name: 'InfluxDB: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'InfluxDB version has changed. Ack to close.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+      discovery_rules:
+        -
+          uuid: 41766fd081804c399c3a7e70dd1fbf03
+          name: 'Organizations discovery'
+          type: HTTP_AGENT
+          key: influxdb.orgs.discovery
+          delay: 10m
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ORG_NAME}'
+                value: '{$INFLUXDB.ORG_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#ORG_NAME}'
+                value: '{$INFLUXDB.ORG_NAME.MATCHES}'
+                formulaid: B
+          description: 'Discovery of organizations metrics.'
+          item_prototypes:
+            -
+              uuid: c84ae278bd7c4387873bc8bbf6d8ba8f
+              name: 'InfluxDB: [{#ORG_NAME}] Query response bytes, failed'
+              type: DEPENDENT
+              key: 'influxdb.org.http_query_response_bytes.failed.rate["{#ORG_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Count of bytes returned with status not 200 per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="http_query_response_bytes" && @.labels.status != "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: influx.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: organization
+                  value: '{#ORG_NAME}'
+            -
+              uuid: fb13e133cf054e8783ba6bf5deaf1686
+              name: 'InfluxDB: [{#ORG_NAME}] Query response bytes, success'
+              type: DEPENDENT
+              key: 'influxdb.org.http_query_response_bytes.success.rate["{#ORG_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Count of bytes returned with status 200 per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="http_query_response_bytes" && @.labels.status == "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: influx.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: organization
+                  value: '{#ORG_NAME}'
+            -
+              uuid: 9688861c4268455193772389a957264f
+              name: 'InfluxDB: [{#ORG_NAME}] Query requests, failed'
+              type: DEPENDENT
+              key: 'influxdb.org.query_request.failed.rate["{#ORG_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Rps
+              description: 'Total number of query requests with status not 200 per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="http_query_request_count" && @.labels.status != "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: influx.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: organization
+                  value: '{#ORG_NAME}'
+              trigger_prototypes:
+                -
+                  uuid: 893fa5755b514c36aa177c4f4e25b254
+                  expression: 'min(/InfluxDB by HTTP/influxdb.org.query_request.failed.rate["{#ORG_NAME}"],5m)>{$INFLUXDB.REQ.FAIL.MAX.WARN}'
+                  name: 'InfluxDB: [{#ORG_NAME}]: Too many requests failures'
+                  event_name: 'InfluxDB: [{#ORG_NAME}]: Too many requests failures (over {$INFLUXDB.REQ.FAIL.MAX.WARN} for 5m)'
+                  priority: WARNING
+                  description: 'Too many query requests failed.'
+                  tags:
+                    -
+                      tag: scope
+                      value: performance
+            -
+              uuid: da53d3185ba744c38fc264993c72b1b9
+              name: 'InfluxDB: [{#ORG_NAME}] Query requests, success'
+              type: DEPENDENT
+              key: 'influxdb.org.query_request.success.rate["{#ORG_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Rps
+              description: 'Total number of query requests with status 200 per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="http_query_request_count" && @.labels.status == "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: influx.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: organization
+                  value: '{#ORG_NAME}'
+            -
+              uuid: 4f8dbb16f7a842678e4fb4343c88b560
+              name: 'InfluxDB: [{#ORG_NAME}] Query requests bytes, failed'
+              type: DEPENDENT
+              key: 'influxdb.org.query_request_bytes.failed.rate["{#ORG_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Count of bytes received with status not 200 per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="http_query_request_bytes" && @.labels.status != "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: influx.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: organization
+                  value: '{#ORG_NAME}'
+            -
+              uuid: 6bbeb22e5c9b46a2bf480dcf41b4eb0e
+              name: 'InfluxDB: [{#ORG_NAME}] Query requests bytes, success'
+              type: DEPENDENT
+              key: 'influxdb.org.query_request_bytes.success.rate["{#ORG_NAME}"]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: Bps
+              description: 'Count of bytes received with status 200 per second.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$[?(@.name=="http_query_request_bytes" && @.labels.status == "200" && @.labels.endpoint == "/api/v2/query" && @.labels.org_id == "{#ORG_ID}") ].value.first()'
+                  error_handler: DISCARD_VALUE
+                -
+                  type: CHANGE_PER_SECOND
+                  parameters:
+                    - ''
+              master_item:
+                key: influx.get_metrics
+              tags:
+                -
+                  tag: component
+                  value: queries
+                -
+                  tag: organization
+                  value: '{#ORG_NAME}'
+          graph_prototypes:
+            -
+              uuid: 925d6b2f79b2479ab031118d795811fb
+              name: 'InfluxDB: [{#ORG_NAME}]: Query requests'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'InfluxDB by HTTP'
+                    key: 'influxdb.org.query_request.success.rate["{#ORG_NAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'InfluxDB by HTTP'
+                    key: 'influxdb.org.query_request.failed.rate["{#ORG_NAME}"]'
+            -
+              uuid: 01921ee545c540bd8c0d51429bcce11b
+              name: 'InfluxDB: [{#ORG_NAME}]: Query traffic'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'InfluxDB by HTTP'
+                    key: 'influxdb.org.http_query_response_bytes.success.rate["{#ORG_NAME}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'InfluxDB by HTTP'
+                    key: 'influxdb.org.http_query_response_bytes.failed.rate["{#ORG_NAME}"]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'InfluxDB by HTTP'
+                    key: 'influxdb.org.query_request_bytes.failed.rate["{#ORG_NAME}"]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'InfluxDB by HTTP'
+                    key: 'influxdb.org.query_request_bytes.success.rate["{#ORG_NAME}"]'
+          url: '{$INFLUXDB.URL}/api/v2/orgs'
+          headers:
+            -
+              name: Content-type
+              value: application/json
+            -
+              name: Authorization
+              value: 'Token {$INFLUXDB.API.TOKEN}'
+          preprocessing:
+            -
+              type: JAVASCRIPT
+              parameters:
+                - |
+                  var result = [];
+                  
+                  JSON.parse(value).orgs.forEach(function (e) {
+                      result.push({
+                          "{#ORG_ID}": e.id,
+                          "{#ORG_NAME}": e.name,
+                          "{#ORG_DESCRIPTION}": e.description
+                      });
+                  });
+                  
+                  return JSON.stringify(result)
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+      tags:
+        -
+          tag: class
+          value: database
+        -
+          tag: target
+          value: influxdb
+      macros:
+        -
+          macro: '{$INFLUXDB.API.TOKEN}'
+          description: 'InfluxDB API Authorization Token'
+        -
+          macro: '{$INFLUXDB.ORG_NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable organizations'
+        -
+          macro: '{$INFLUXDB.ORG_NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered organizations'
+        -
+          macro: '{$INFLUXDB.REQ.FAIL.MAX.WARN}'
+          value: '2'
+          description: 'Maximum number of query requests failures for trigger expression.'
+        -
+          macro: '{$INFLUXDB.TASK.RUN.FAIL.MAX.WARN}'
+          value: '2'
+          description: 'Maximum number of tasks runs failures for trigger expression.'
+        -
+          macro: '{$INFLUXDB.URL}'
+          value: 'http://localhost:8086'
+          description: 'InfluxDB instance URL'
+      valuemaps:
+        -
+          uuid: d1b4478bdfc44c6db79a4a262f605d92
+          name: 'InfluxDB healthcheck'
+          mappings:
+            -
+              value: '0'
+              newvalue: Failed
+            -
+              value: '1'
+              newvalue: Ok
+  graphs:
+    -
+      uuid: dd6b62b969594ddbb82895a8f8fc5623
+      name: 'InfluxDB: Tasks runs'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'InfluxDB by HTTP'
+            key: influxdb.task_executor_complete.failed.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'InfluxDB by HTTP'
+            key: influxdb.task_executor_complete.successful.rate

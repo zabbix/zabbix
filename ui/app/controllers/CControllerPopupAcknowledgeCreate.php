@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		while ($eventid_groups['readable']) {
 			$data = $this->getAcknowledgeOptions($eventid_groups);
 			/*
-			 * No actions to perform. This can happen only if user has selected action he have no permissions to do
+			 * No actions to perform. This can happen only if user has selected action he has no permissions to do
 			 * for any of selected events. This can happen, when you will perform one action on multiple problems,
 			 * where only some of these problems can perform this action (ex. close problem).
 			 */

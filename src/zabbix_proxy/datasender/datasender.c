@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,25 +17,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "datasender.h"
+
 #include "comms.h"
 #include "db.h"
 #include "log.h"
 #include "daemon.h"
-#include "zbxjson.h"
 #include "proxy.h"
 #include "zbxself.h"
-#include "dbcache.h"
 #include "zbxtasks.h"
-#include "dbcache.h"
-
-#include "datasender.h"
-#include "../servercomms.h"
 #include "zbxcrypto.h"
+#include "zbxcompress.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
+extern zbx_vector_ptr_t	zbx_addrs;
+extern char		*CONFIG_HOSTNAME;
+extern char		*CONFIG_SOURCE_IP;
+extern unsigned int	configured_tls_connect_mode;
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -50,8 +51,6 @@ extern int		server_num, process_num;
 					ZBX_DATASENDER_TASKS_RECV)
 
 /******************************************************************************
- *                                                                            *
- * Function: get_hist_upload_state                                            *
  *                                                                            *
  * Purpose: Get current history upload state (disabled/enabled)               *
  *                                                                            *
@@ -80,8 +79,6 @@ static void	get_hist_upload_state(const char *buffer, int *state)
 
 /******************************************************************************
  *                                                                            *
- * Function: proxy_data_sender                                                *
- *                                                                            *
  * Purpose: collects host availability, history, discovery, autoregistration  *
  *          data and sends 'proxy data' request                               *
  *                                                                            *
@@ -97,7 +94,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
-	char			*error = NULL;
+	char			*error = NULL, *buffer = NULL;
 	zbx_vector_ptr_t	tasks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -156,6 +153,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 	if (0 != flags)
 	{
+		size_t	buffer_size, reserved;
+
 		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 				ZBX_PROXY_DATA_MORE == more_areg)
 		{
@@ -165,10 +164,6 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
-		/* retry till have a connection */
-		if (FAIL == connect_to_server(&sock, 600, CONFIG_PROXYDATA_FREQUENCY))
-			goto clean;
-
 		zbx_timespec(&ts);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts.sec);
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts.ns);
@@ -176,7 +171,28 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = proxy_get_delay(history_lastid)))
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
-		upload_state = put_data_to_server(&sock, &j, &error);
+		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+		{
+			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+			goto clean;
+		}
+
+		reserved = j.buffer_size;
+		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
+
+		/* retry till have a connection */
+		if (FAIL == connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
+				configured_tls_connect_mode, CONFIG_PROXYDATA_FREQUENCY, LOG_LEVEL_WARNING))
+		{
+			update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+			goto clean;
+		}
+
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
+		upload_state = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
 		get_hist_upload_state(sock.buffer, hist_upload_state);
 
 		if (SUCCEED != upload_state)
@@ -236,6 +252,7 @@ clean:
 	zbx_vector_ptr_destroy(&tasks);
 
 	zbx_json_free(&j);
+	zbx_free(buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:0x" ZBX_FS_UX64, __func__,
 			zbx_result_string(upload_state), *more, flags);
@@ -244,8 +261,6 @@ clean:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_datasender_loop                                             *
  *                                                                            *
  * Purpose: periodically sends history and events to the server               *
  *                                                                            *

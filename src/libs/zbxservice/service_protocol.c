@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "service_protocol.h"
+
 #include "common.h"
 #include "zbxserialize.h"
 #include "db.h"
-#include "service_protocol.h"
-#include "dbcache.h"
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
 		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags)
@@ -298,7 +298,7 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 			continue;
 
 		if (NULL != service)
-			zbx_vector_uint64_reserve(&service->eventids, values_num);
+			zbx_vector_uint64_reserve(&service->eventids, (size_t)values_num);
 
 		for (i = 0; i < values_num; i++)
 		{
@@ -309,5 +309,87 @@ void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t s
 			if (NULL != service)
 				zbx_vector_uint64_append(&service->eventids, eventid);
 		}
+	}
+}
+
+zbx_uint32_t	zbx_service_serialize_parentids(unsigned char **data, const zbx_vector_uint64_t *ids)
+{
+	zbx_uint32_t	data_len = 0;
+	int		i;
+	unsigned char	*ptr;
+
+	zbx_serialize_prepare_value(data_len, ids->values_num);
+
+	for (i = 0; i < ids->values_num; i++)
+		zbx_serialize_prepare_value(data_len, ids->values[i]);
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr += zbx_serialize_value(ptr, ids->values_num);
+
+	for (i = 0; i < ids->values_num; i++)
+		ptr += zbx_serialize_value(ptr, ids->values[i]);
+
+	return data_len;
+}
+
+void	zbx_service_deserialize_parentids(const unsigned char *data, zbx_vector_uint64_t *ids)
+{
+	int		values_num, i;
+
+	data += zbx_deserialize_value(data, &values_num);
+
+	if (0 == values_num)
+		return;
+
+	zbx_vector_uint64_reserve(ids, values_num);
+
+	for (i = 0; i < values_num; i++)
+	{
+		zbx_uint64_t	id;
+
+		data += zbx_deserialize_value(data, &id);
+
+		zbx_vector_uint64_append(ids, id);
+	}
+}
+
+zbx_uint32_t	zbx_service_serialize_event_severities(unsigned char **data, const zbx_vector_ptr_t *event_severities)
+{
+	zbx_uint32_t		size;
+	unsigned char		*ptr;
+	int			i;
+	zbx_event_severity_t	*es;
+
+	size = sizeof(event_severities->values_num);
+	size += (zbx_uint32_t)event_severities->values_num * (sizeof(es->eventid) + sizeof(es->severity));
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, size);
+
+	ptr += zbx_serialize_value(ptr, event_severities->values_num);
+	for (i = 0; i < event_severities->values_num; i++)
+	{
+		es = (zbx_event_severity_t *)event_severities->values[i];
+
+		ptr += zbx_serialize_value(ptr, es->eventid);
+		ptr += zbx_serialize_value(ptr, es->severity);
+	}
+
+	return size;
+}
+
+void	zbx_service_deserialize_event_severities(const unsigned char *data, zbx_vector_ptr_t *event_severities)
+{
+	int			i, es_num;
+	zbx_event_severity_t	*es;
+
+	data += zbx_deserialize_value(data, &es_num);
+	zbx_vector_ptr_reserve(event_severities, (size_t)es_num);
+
+	for (i = 0; i < es_num; i++)
+	{
+		es = (zbx_event_severity_t *)zbx_malloc(NULL, sizeof(zbx_event_severity_t));
+		data += zbx_deserialize_value(data, &es->eventid);
+		data += zbx_deserialize_value(data, &es->severity);
+		zbx_vector_ptr_append(event_severities, es);
 	}
 }

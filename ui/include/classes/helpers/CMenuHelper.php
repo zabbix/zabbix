@@ -1,7 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,15 +48,6 @@ class CMenuHelper {
 						'httpdetails.php', 'host.dashboard.view'
 					])
 				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_OVERVIEW)
-				? (new CMenuItem(_('Overview')))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Trigger overview')))
-							->setUrl((new CUrl('overview.php'))->setArgument('type', 0), 'overview.php?type=0'),
-						(new CMenuItem(_('Data overview')))
-							->setUrl((new CUrl('overview.php'))->setArgument('type', 1), 'overview.php?type=1')
-					]))
-				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 				? (new CMenuItem(_('Latest data')))
 					->setAction('latest.view')
@@ -69,11 +60,6 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_DISCOVERY)
 				? (new CMenuItem(_('Discovery')))->setAction('discovery.view')
-				: null,
-			CWebUser::checkAccess(CRoleHelper::UI_MONITORING_SERVICES)
-				? (new CMenuItem(_('Services')))
-					->setAction('service.list')
-					->setAliases(['service.list.edit'])
 				: null
 		];
 		$submenu_monitoring = array_filter($submenu_monitoring);
@@ -84,6 +70,40 @@ class CMenuHelper {
 					->setId('view')
 					->setIcon('icon-monitoring')
 					->setSubMenu(new CMenu($submenu_monitoring))
+			);
+		}
+
+		$submenu_services = [
+			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SERVICES)
+				? (new CMenuItem(_('Services')))
+					->setAction('service.list')
+					->setAliases(['service.list.edit'])
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_ACTIONS)
+				? (new CMenuItem(_('Service actions')))
+					->setUrl(
+						(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_SERVICE),
+						'actionconf.php?eventsource='.EVENT_SOURCE_SERVICE
+					)
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SLA)
+				? (new CMenuItem(_('SLA')))
+					->setAction('sla.list')
+				: null,
+			CWebUser::checkAccess(CRoleHelper::UI_SERVICES_SLA_REPORT)
+				? (new CMenuItem(_('SLA report')))
+					->setAction('slareport.list')
+				: null
+		];
+
+		$submenu_services = array_filter($submenu_services);
+
+		if ($submenu_services) {
+			$menu->add(
+				(new CMenuItem(_('Services')))
+					->setId('services')
+					->setIcon('icon-services')
+					->setSubMenu(new CMenu($submenu_services))
 			);
 		}
 
@@ -162,12 +182,12 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				? (new CMenuItem(_('Hosts')))
-					->setUrl(new CUrl('hosts.php'), 'hosts.php')
+					->setAction('host.list')
 					->setAliases([
 						'items.php?context=host', 'triggers.php?context=host', 'graphs.php?context=host',
 						'host_discovery.php?context=host', 'disc_prototypes.php?context=host',
 						'trigger_prototypes.php?context=host', 'host_prototypes.php?context=host',
-						'httpconf.php?context=host'
+						'httpconf.php?context=host', 'host.edit'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_MAINTENANCE)
@@ -180,11 +200,6 @@ class CMenuHelper {
 							->setUrl(
 								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_TRIGGERS),
 								'actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS
-							),
-						(new CMenuItem(_('Service actions')))
-							->setUrl(
-								(new CUrl('actionconf.php'))->setArgument('eventsource', EVENT_SOURCE_SERVICE),
-								'actionconf.php?eventsource='.EVENT_SOURCE_SERVICE
 							),
 						(new CMenuItem(_('Discovery actions')))
 							->setUrl(
@@ -250,6 +265,8 @@ class CMenuHelper {
 							->setAction('macros.edit'),
 						(new CMenuItem(_('Trigger displaying options')))
 							->setAction('trigdisplay.edit'),
+						(new CMenuItem(_('Geographical maps')))
+							->setAction('geomaps.edit'),
 						(new CMenuItem(_('Modules')))
 							->setAction('module.list')
 							->setAliases(['module.edit', 'module.scan']),
@@ -331,19 +348,20 @@ class CMenuHelper {
 		$menu = new CMenu();
 
 		if (!CBrandHelper::isRebranded()) {
+			$lang = CWebUser::getLang();
 			$menu
 				->add(
 					(new CMenuItem(_('Support')))
 						->setIcon('icon-support')
-						->setUrl(new CUrl(getSupportUrl(CWebUser::getLang())))
+						->setUrl(new CUrl(getSupportUrl($lang)))
 						->setTitle(_('Zabbix Technical Support'))
 						->setTarget('_blank')
 				)
 				->add(
-					(new CMenuItem(_('Share')))
-						->setIcon('icon-share')
-						->setUrl(new Curl('https://share.zabbix.com/'))
-						->setTitle(_('Zabbix Share'))
+					(new CMenuItem(_('Integrations')))
+						->setIcon('icon-integrations')
+						->setUrl(new CUrl(getIntegrationsUrl($lang)))
+						->setTitle(_('Zabbix Integrations'))
 						->setTarget('_blank')
 				);
 		}

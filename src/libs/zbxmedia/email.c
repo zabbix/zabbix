@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,8 +39,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: str_base64_encode_rfc2047                                        *
- *                                                                            *
  * Purpose: Encode a string into a base64 string as required by rfc2047.      *
  *          Used for encoding e-mail headers.                                 *
  *                                                                            *
@@ -75,7 +73,7 @@ static void	str_base64_encode_rfc2047(const char *src, char **p_base64)
 		/* So, one "encoded-word" can hold up to 63 characters of Base64-encoded string. */
 		/* Encoding 45 bytes produces a 61 byte long Base64-encoded string which meets the limit. */
 		/* Encoding 46 bytes produces a 65 byte long Base64-encoded string which exceeds the limit. */
-		for (p1 = p0, c_len = 0; '\0' != *p1; p1 += c_len)
+		for (p1 = p0; '\0' != *p1; p1 += c_len)
 		{
 			/* an invalid UTF-8 character or length of a string more than 45 bytes */
 			if (0 == (c_len = zbx_utf8_char_len(p1)) || 45 < p1 - p0 + c_len)
@@ -121,8 +119,6 @@ static int	smtp_readln(zbx_socket_t *s, const char **buf)
 }
 
 /********************************************************************************
- *                                                                              *
- * Function: smtp_parse_mailbox                                                 *
  *                                                                              *
  * Purpose: 1. Extract a display name and an angle address from mailbox string  *
  *             for using in "MAIL FROM:", "RCPT TO:", "From:" and "To:" fields. *
@@ -715,6 +711,9 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		goto error;
 	}
 
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+		goto error;
+
 	for (i = 0; i < to_mails->values_num; i++)
 		recipients = curl_slist_append(recipients, ((zbx_mailaddr_t *)to_mails->values[i])->addr);
 
@@ -791,8 +790,6 @@ out:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_mailaddr_free                                                *
  *                                                                            *
  * Purpose: frees the mail address object                                     *
  *                                                                            *

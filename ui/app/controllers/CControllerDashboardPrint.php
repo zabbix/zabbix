@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ class CControllerDashboardPrint extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' => 'required|db dashboard.dashboardid',
-			'from' => 'range_time',
-			'to' => 'range_time'
+			'dashboardid' =>	'required|db dashboard.dashboardid',
+			'from' =>			'range_time',
+			'to' =>				'range_time'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();

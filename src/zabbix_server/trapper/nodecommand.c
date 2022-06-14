@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,23 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
+#include "nodecommand.h"
+
 #include "zbxserver.h"
-#include "db.h"
 #include "log.h"
+#include "trapper_auth.h"
+
 #include "../scripts/scripts.h"
 #include "../../libs/zbxaudit/audit.h"
-
-#include "trapper_auth.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 
-#include "nodecommand.h"
-
 /******************************************************************************
- *                                                                            *
- * Function: execute_remote_script                                            *
  *                                                                            *
  * Purpose: execute remote command and wait for the result                    *
  *                                                                            *
@@ -44,7 +39,7 @@
 static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host, char **info, char *error,
 		size_t max_error_len)
 {
-	int		ret = FAIL, time_start;
+	int		time_start;
 	zbx_uint64_t	taskid;
 	DB_RESULT	result = NULL;
 	DB_ROW		row;
@@ -67,6 +62,8 @@ static int	execute_remote_script(const zbx_script_t *script, const DC_HOST *host
 
 		if (NULL != (row = DBfetch(result)))
 		{
+			int	ret;
+
 			if (SUCCEED == (ret = atoi(row[0])))
 				*info = zbx_strdup(*info, row[1]);
 			else
@@ -185,8 +182,6 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_check_event_end_recovery_event                               *
- *                                                                            *
  * Purpose: check if the specified event id corresponds to a problem event    *
  *          caused by a trigger, find its recovery event (if it exists)       *
  *                                                                            *
@@ -222,8 +217,6 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: execute_script                                                   *
  *                                                                            *
  * Purpose: executing command                                                 *
  *                                                                            *
@@ -438,6 +431,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (SUCCEED == (ret = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
 	{
 		const char	*poutput = NULL, *perror = NULL;
+		int		audit_res;
 
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
@@ -453,8 +447,14 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		else
 			perror = error;
 
-		zbx_auditlog_global_script(script.type, script.execute_on, script.command_orig, host.hostid, host.name,
-				eventid, host.proxy_hostid, user->userid, user->username, clientip, poutput, perror);
+		audit_res = zbx_auditlog_global_script(script.type, script.execute_on, script.command_orig, host.hostid,
+				host.name, eventid, host.proxy_hostid, user->userid, user->username, clientip, poutput,
+				perror);
+
+		/* At the moment, there is no special processing of audit failures. */
+		/* It can fail only due to the DB errors and those are visible in   */
+		/* the log anyway */
+		ZBX_UNUSED(audit_res);
 	}
 fail:
 	if (SUCCEED != ret)
@@ -481,8 +481,6 @@ fail:
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: node_process_command                                             *
  *                                                                            *
  * Purpose: process command received from the frontend                        *
  *                                                                            *

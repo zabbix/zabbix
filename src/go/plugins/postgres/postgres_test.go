@@ -1,8 +1,9 @@
+//go:build postgres_tests
 // +build postgres_tests
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +27,9 @@ import (
 	"reflect"
 	"testing"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
 	"github.com/omeid/go-yarn"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
 )
 
 var testParamDatabase = map[string]string{"Database": "postgres"}

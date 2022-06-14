@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20200407';
-$browser-sprite-path: '../img/browser-sprite.png?20200407';
+$sprite-path: '../img/icon-sprite.svg?20211222';
+$browser-sprite-path: '../img/browser-sprite.png?20211222';
 
 @import "utils/mixins";
 
@@ -28,17 +28,27 @@ $browser-sprite-path: '../img/browser-sprite.png?20200407';
 @import "layout/form-grid";
 
 @import "components/buttons";
-@import "components/dashboard";
+@import "components/color-picker";
+@import "components/dashboard/dashboard";
+@import "components/dashboard/widget-item";
+@import "components/dashboard/widget-tophosts";
 @import "components/diff";
+@import "components/expandable-subfilter";
 @import "components/form-search";
+@import "components/inline-filter";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
 @import "components/radio-list-control";
 @import "components/service/info";
+@import "components/subfilter";
 @import "components/tabfilter";
 @import "components/toc";
+@import "components/z-bar-gauge";
 @import "components/z-select";
+
+@import "components/dashboard/widget-slareport";
+@import "components/dashboard/widget-svggraph";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -292,17 +302,38 @@ form {
 	.action-container {
 		display: flex;
 		width: 100%;
+		height: 18px;
+		line-height: 18px;
 
-		.label {
+		.link-action {
+			height: 16px;
+			min-width: 1em;
 			@extend %overflow-ellipsis;
-		}
-
-		.separator {
-			margin-right: 4px;
 		}
 
 		[class*='icon-'] {
 			flex-shrink: 0;
+		}
+
+		.rel-container {
+			display: flex;
+		}
+
+		.separator {
+			flex-shrink: 0;
+			margin-right: 4px;
+		}
+	}
+
+	td {
+		.icon-maintenance {
+			margin: 0 0 -3px 4px;
+		}
+
+		.icon-depend-up,
+		.icon-depend-down,
+		.icon-ackn {
+			margin: 0 4px -3px 0;
 		}
 	}
 
@@ -328,7 +359,7 @@ form {
 								background-color: rgba($font-color, .5);
 							}
 
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-position: -165px -624px;
 							}
 
@@ -354,7 +385,7 @@ form {
 								border-bottom-color: rgba(0, 0, 0, .5);
 							}
 
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-position: -165px -624px;
 							}
 
@@ -375,7 +406,7 @@ form {
 
 							[class*='icon-depend-'],
 							.icon-description,
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-color: transparent;
 							}
 						}
@@ -426,16 +457,12 @@ form {
 				&::after {
 					margin: 0;
 					line-height: 14px;
+					top: 0;
 				}
 
 				&:last-of-type {
 					margin-right: 0;
 				}
-			}
-
-			[class*='icon-depend-'] {
-				width: 12px;
-				margin-right: 0;
 			}
 
 			.rel-container {
@@ -464,21 +491,32 @@ form {
 				}
 			}
 
-			.icon-maint {
-				position: relative;
-				display: inline-block;
+			.icon-maintenance {
 				height: 12px;
 				width: 12px;
-				margin: 3px 1px 2px 2px !important;
+				margin: 3px 1px 2px 4px;
 
 				&::before {
 					height: 12px;
 					width: 12px;
-					background-position: -48px -804px;
+					background-position: -49px -805px;
 				}
 			}
 
-			.icon-wzrd-action {
+			.icon-depend-up,
+			.icon-depend-down {
+				width: 12px;
+			}
+
+			.icon-depend-up::before {
+				background-position: -49px -731px;
+			}
+
+			.icon-depend-down::before {
+				background-position: -49px -767px;
+			}
+
+			.icon-wizard-action {
 				background: url($sprite-path) no-repeat -6px -624px;
 				height: 12px;
 				min-height: 12px;
@@ -488,25 +526,6 @@ form {
 
 			.icon-description {
 				margin-left: 2px;
-			}
-		}
-
-		.action-container {
-			height: 18px;
-			line-height: 18px;
-
-			.rel-container {
-				display: flex;
-			}
-
-			.link-action {
-				height: 16px;
-				min-width: 1em;
-				@extend %overflow-ellipsis;
-			}
-
-			.separator {
-				flex-shrink: 0;
 			}
 		}
 	}
@@ -596,6 +615,11 @@ form {
 			}
 		}
 
+		.vertical {
+			writing-mode: vertical-lr;
+			transform: rotate(180deg);
+		}
+
 		a {
 			display: block;
 			position: relative;
@@ -667,6 +691,10 @@ form {
 		border-bottom: 1px solid $table-border-color;
 		line-height: 18px;
 		vertical-align: top;
+
+		&.table-info {
+			color: $font-alt-color;
+		}
 	}
 
 	tbody th {
@@ -692,6 +720,39 @@ form {
 	.list-table-actions {
 		text-align: right;
 		white-space: nowrap;
+	}
+
+	&.sticky-header {
+		thead {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+			background: $ui-bg-color;
+		}
+	}
+
+	&.sticky-footer {
+		tbody {
+			tr:last-of-type {
+				td, th {
+					border-bottom: none;
+				}
+			}
+		}
+
+		tfoot {
+			position: sticky;
+			bottom: 0;
+			z-index: 1;
+			background: $ui-bg-color;
+
+			tr:first-of-type {
+				td, th {
+					border-top: 2px solid darken($table-border-color, 5%);
+					border-bottom: 0;
+				}
+			}
+		}
 	}
 }
 
@@ -1039,43 +1100,6 @@ form {
 	}
 }
 
-.subfilter,
-.subfilter-enabled {
-	display: inline-block;
-	height: 18px;
-	position: relative;
-}
-
-.subfilter {
-	margin-right: 10px;
-}
-
-.subfilter-enabled {
-	background-color: $ui-bg-selected-color;
-	border-radius: 2px;
-	color: $font-selected-color;
-	padding: 0 4px;
-
-	.link-action {
-		color: $font-selected-color;
-		text-decoration: none;
-
-		&:focus {
-			color: $font-selected-color;
-			border-bottom: 2px solid rgba($font-selected-color, .7);
-		}
-
-		&:hover {
-			color: $font-selected-color;
-			border-bottom: 1px solid rgba($font-selected-color, .7);
-		}
-	}
-
-	sup {
-		color: lighten($ui-bg-selected-color, 25%);
-	}
-}
-
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
@@ -1330,7 +1354,8 @@ form {
 		}
 	}
 
-	tfoot {
+	tfoot,
+	.tfoot-buttons {
 		.table-forms-td-right {
 			padding-top: 5px;
 		}
@@ -1338,10 +1363,6 @@ form {
 		button {
 			margin: 0 10px 0 0;
 		}
-	}
-
-	.tfoot-buttons {
-		@extend tfoot;
 	}
 
 	td {
@@ -1422,12 +1443,6 @@ form {
 			.radio-segmented + .multiselect-wrapper {
 				margin-top: 5px;
 			}
-		}
-	}
-
-	.form-fields-inline {
-		label {
-			margin: 0 8px 0 3px;
 		}
 	}
 
@@ -1666,6 +1681,12 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
+	}
+}
+
+.form-fields-inline {
+	label {
+		margin: 0 8px 0 3px;
 	}
 }
 
@@ -1915,6 +1936,22 @@ button {
 	}
 }
 
+.btn-tag {
+	@extend .tag;
+
+	min-height: unset;
+	outline: none;
+	border: none;
+
+	&:hover {
+		text-decoration: underline;
+		background-color: $ui-bg-selected-color;
+	}
+	&:focus {
+		background-color: $ui-bg-selected-color;
+	}
+}
+
 .btn-grey {
 	color: $btn-form-font-color;
 	background-color: $btn-form-bg-color;
@@ -2130,7 +2167,7 @@ $icon-widget-btn: (
 		background-image: none;
 
 		&::after {
-			background: url($sprite-path) no-repeat -398px -407px;
+			background: url($sprite-path) no-repeat -431px -621px;
 		}
 	}
 
@@ -2179,7 +2216,7 @@ $icon-widget-btn: (
 
 		.btn-info {
 			&::after {
-				background-position: -398px -430px;
+				background-position: -279px -621px;
 				top: 1px;
 			}
 		}
@@ -2531,23 +2568,42 @@ button[disabled] {
 }
 
 $var-icons: (
-	maint: url($sprite-path) no-repeat -46px -802px,
-	depend-up: url($sprite-path) no-repeat -49px -729px,
-	depend-down: url($sprite-path) no-repeat -49px -765px,
-	ackn: url($sprite-path) no-repeat -45px -693px
+	maintenance: url($sprite-path) no-repeat -47px -803px,
+	depend-up: url($sprite-path) no-repeat -47px -731px,
+	depend-down: url($sprite-path) no-repeat -47px -767px,
+	ackn: url($sprite-path) no-repeat -47px -694px
 );
 
 // Dynamically generated classes:
-//  .icon-maint
+//  .icon-maintenance
 //  .icon-depend-up
 //  .icon-depend-down
 //  .icon-ackn
 @each $var-icons, $bgimage in $var-icons {
 	.icon-#{$var-icons} {
-		margin: 0 18px 0 0;
+		position: relative;
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border-radius: 2px;
+
 		&::before {
-			background: $bgimage;
 			@extend %var-icons;
+			background: $bgimage;
+			width: 14px;
+			height: 14px;
+			left: 1px;
+			top: 1px;
+		}
+
+		&:link,
+		&:hover,
+		&:focus {
+			border-bottom: none;
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 2px $btn-border-focus-color;
 		}
 	}
 }
@@ -2589,12 +2645,12 @@ $trigger-expression-tree-icons: (
 
 $form-icon-btn: (
 	cal: url($sprite-path) no-repeat -42px -834px,
-	wzrd-action: url($sprite-path) no-repeat -6px -617px
+	wizard-action: url($sprite-path) no-repeat -6px -617px
 );
 
 // Dynamically generated classes:
 //  .icon-cal
-//  .icon-wzrd-action
+//  .icon-wizard-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
@@ -2653,6 +2709,16 @@ $form-icon-btn: (
 	cursor: pointer;
 	margin: -12px 0 -4px;
 
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: 1px solid;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
+
 	&::before {
 		content: '';
 		display: inline-block;
@@ -2662,6 +2728,22 @@ $form-icon-btn: (
 		width: 14px;
 		height: 14px;
 		background: url($sprite-path) no-repeat -47px -659px;
+	}
+
+	&.status-red {
+		&:link,
+		&:hover,
+		&:focus {
+			border-color: darken(desaturate($alt-red, 10%), 9%);
+		}
+	}
+
+	&.status-yellow {
+		&:link,
+		&:hover,
+		&:focus {
+			border-color: darken(desaturate($alt-yellow, 9%), 20%);
+		}
 	}
 }
 
@@ -2980,10 +3062,10 @@ $form-icon-btn: (
 			overflow: auto;
 			overflow-x: hidden;
 			width: 100%;
-			max-height: calc(100vh - 190px);
+			max-height: calc(100vh - 220px);
 			max-width: inherit;
-			margin: 0 -10px 8px;
-			padding: 2px 10px;
+			margin: 0 -10px 10px;
+			padding: 0 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
 
@@ -3017,17 +3099,16 @@ $form-icon-btn: (
 			z-select {
 				text-align: left;
 				padding: inherit;
-			}
 
-			li {
-				display: inline;
-				padding-left: 10px;
-			}
-
-			z-select {
 				li {
 					display: block;
 					padding-left: 5px;
+				}
+			}
+
+			.inline-filter {
+				li {
+					padding-left: 0;
 				}
 			}
 		}
@@ -3040,20 +3121,25 @@ $form-icon-btn: (
 		}
 	}
 
-	&.sticked-to-top {
-		top: 50px;
-	}
-
 	&.modal-popup {
+		top: 50px;
 		max-width: 1024px;
+
+		&.modal-popup-small {
+			max-width: 450px;
+			width: 100%;
+		}
 
 		&.modal-popup-medium {
 			min-width: 450px;
 		}
 
-		&.modal-popup-small {
-			max-width: 450px;
+		&.modal-popup-large {
 			width: 100%;
+		}
+
+		&.modal-popup-generic {
+			min-width: 650px;
 		}
 
 		&.modal-popup-static {
@@ -3064,10 +3150,6 @@ $form-icon-btn: (
 		&.modal-popup-preprocessing {
 			max-width: 900px;
 			width: 100%;
-		}
-
-		&.modal-popup-generic {
-			min-width: 650px;
 		}
 
 		&.modal-popup-fullscreen {
@@ -3092,6 +3174,19 @@ $form-icon-btn: (
 		top: 0;
 		z-index: 4;
 		margin: 0 0 10px;
+	}
+
+	.form-grid {
+		// 100px label column width for use in popup forms.
+		grid-template-columns: minmax(100px, max-content) auto;
+
+		&.form-grid-1-1 {
+			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+		}
+
+		&.form-grid-3-1 {
+			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+		}
 	}
 
 	.list-table {
@@ -3123,7 +3218,7 @@ $form-icon-btn: (
 	}
 
 	.dashboard-widget-head {
-		margin: -10px -10px 4px;
+		margin: -10px -10px 6px;
 	}
 
 	.maps-container {
@@ -3263,7 +3358,7 @@ $form-icon-btn: (
 		}
 	}
 
-	.multilineinput-symbols-remaining {
+	.multilineinput-char-count {
 		color: $font-alt-color;
 		float: left;
 		line-height: 24px;
@@ -3517,7 +3612,6 @@ $form-icon-btn: (
 			}
 		}
 	}
-
 }
 
 .notif-body {
@@ -3559,19 +3653,6 @@ $form-icon-btn: (
 		float: left;
 		margin-top: 20px;
 		background: url($sprite-path) no-repeat -11px -587px;
-	}
-
-}
-
-.notif-indic-container {
-	border-top: 1px solid $table-border-color;
-	margin: 0 0 0 -19px;
-	padding: 14px 0 0;
-
-	.notif-indic {
-		float: none;
-		display: inline-block;
-		margin: 0 2px 0 0;
 	}
 }
 
@@ -4069,6 +4150,16 @@ a.link-action {
 	@extend %overflow-ellipsis;
 	border-radius: 2px;
 
+	a.link-action {
+		color: inherit !important;
+		border-bottom: none;
+
+		&:hover {
+			text-decoration: underline;
+			border-bottom: none;
+		}
+	}
+
 	&:last-child {
 		margin: 0;
 	}
@@ -4161,6 +4252,10 @@ a.link-action {
 	}
 }
 
+.normal-bg input[type="radio"]:checked + label {
+	background-color: darken($alt-green, 25%);
+}
+
 .na-bg,
 .normal-bg,
 .info-bg,
@@ -4244,64 +4339,6 @@ td.inactive-bg {
 	}
 }
 
-// Color picker.
-.color-picker {
-	height: 20px;
-	white-space: nowrap;
-
-	div {
-		display: inline-block;
-		width: 18px;
-		height: 18px;
-		border: 1px solid $ui-bg-color;
-
-		&:hover {
-			border-color: $alt-dark-blue;
-			box-shadow: inset 0 0 0 1px $ui-bg-color;
-			cursor: pointer;
-		}
-
-		&:active {
-			box-shadow: inset 0 0 0 2px $ui-bg-color;
-			cursor: pointer;
-		}
-	}
-}
-
-.input-color-picker {
-	position: relative;
-	display: inline-block;
-
-	div {
-		position: absolute;
-		top: 2px;
-		left: 2px;
-		width: 18px;
-		height: 18px;
-		border: 1px solid $form-border-color;
-		background: url($sprite-path) no-repeat -323px -411px;
-		cursor: pointer;
-	}
-
-	input[readonly],
-	input:disabled {
-		color: $form-disabled-font-color !important;
-
-		+ div {
-			cursor: default;
-		}
-	}
-
-	input:disabled + div {
-		background: $form-disabled-font-color !important;
-		border: 1px solid $form-disabled-font-color;
-	}
-
-	input[type="text"] {
-		padding-left: 25px;
-	}
-}
-
 // Preloader.
 @keyframes is-loading-kf {
 	to {
@@ -4371,6 +4408,23 @@ button {
 		&::before {
 			background: none;
 		}
+
+		&::after {
+			box-shadow: none;
+			background: none;
+			border: 1px solid $preloader-disabled-color;
+			border-bottom-color: $preloader-accent-color;
+			width: 12px;
+			height: 12px;
+		}
+	}
+}
+
+.link-action {
+	&.is-loading {
+		position: relative;
+		color: transparent !important;
+		border-bottom-color: transparent;
 
 		&::after {
 			box-shadow: none;
@@ -4481,6 +4535,8 @@ $browser-logos: (
 
 // TODO: Legacy
 %webkit-scrollbar {
+	scrollbar-width: thin;
+
 	&::-webkit-scrollbar {
 		width: 9px;
 	}
@@ -4719,6 +4775,7 @@ svg {
 		display: inline-block;
 		margin: 2px 7px 2px 0;
 		white-space: nowrap;
+		vertical-align: middle;
 
 		> div {
 			position: relative;
@@ -4745,6 +4802,15 @@ svg {
 				top: 0;
 				min-height: 24px;
 			}
+		}
+	}
+
+	.color-picker {
+		.color-picker-preview {
+			margin: 1px;
+			width: 20px;
+			min-height: 20px;
+			background-position: -323px -411px;
 		}
 	}
 }
@@ -4841,6 +4907,7 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+	align-items: start;
 
 	&.columns-nowrap {
 		flex-wrap: nowrap;
@@ -4925,7 +4992,6 @@ svg {
 		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
 
-	input[type=text],
 	.btn-link {
 		&:not(:last-of-type) {
 			margin-right: 10px;
@@ -4961,6 +5027,17 @@ svg {
 
 	.step-parameters {
 		flex: 1;
+
+		z-select {
+			flex: 0 0 auto;
+		}
+
+		> input[type=text],
+		z-select {
+			&:not(:last-child) {
+				margin-right: 5px;
+			}
+		}
 	}
 
 	.step-on-fail {
@@ -5210,25 +5287,39 @@ svg {
 			animation: fadein .5s;
 		}
 	}
+}
 
-	.problem-icon-list {
-		flex-wrap: nowrap;
+.problem-icon-link,
+.problem-icon-list {
+	display: inline-flex;
+	margin: 1px 0;
+
+	.problem-icon-list-item {
+		color: $btn-font-color;
+		font-size: 12px;
+		line-height: 1;
+		padding: 3px 5px 2px;
+	}
+}
+
+.problem-icon-link {
+	overflow: hidden;
+	border-radius: 3px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px rgba($blue, .35);
 	}
 }
 
 .problem-icon-list {
-	display: flex;
-	flex-wrap: wrap;
-
 	.problem-icon-list-item {
 		border-radius: 3px;
-		color: $btn-font-color;
-		display: inline-block;
-		flex: 0 0 7px;
-		font-size: 12px;
-		line-height: 1;
-		padding: 3px 4px 2px;
-		margin: 1px 0;
 
 		&:not(:last-of-type) {
 			margin-right: 5px;
@@ -5289,6 +5380,19 @@ svg {
 	}
 }
 
+.icon-invisible {
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+		border-radius: 2px;
+	}
+}
+
 button {
 	&.icon-action-command,
 	&.icon-action-close,
@@ -5299,7 +5403,6 @@ button {
 	&.icon-action-severity-changed,
 	&.icon-action-message,
 	&.icon-action-ack,
-	&.icon-invisible,
 	&.icon-problem-generated,
 	&.icon-problem-recovery,
 	&.icon-actions-number-gray,
@@ -5321,11 +5424,12 @@ button {
 [data-count][class*='icon-']::after,
 .icon-description::after {
 	position: absolute;
+	top: -2px;
 	content: attr(data-count);
 	text-align: center;
-	margin-top: -2px;
 	font-size: 9px;
 	letter-spacing: -.25px;
+	line-height: 18px;
 	width: 18px;
 }
 
@@ -5418,7 +5522,19 @@ button {
 }
 
 .icon-description {
-	margin: 0 0 0 5px;
+	margin: 0 0 -5px 5px;
+	vertical-align: baseline;
+	border-radius: 2px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
 
 	&::after {
 		content: '?';
@@ -5473,6 +5589,16 @@ button {
 		font-weight: bold;
 		color: $btn-font-color;
 	}
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
 }
 
 #expressions_list .ui-sortable-helper {
@@ -5510,7 +5636,8 @@ $range-input-width: 31px;
 		}
 
 		/* Special styling for WebKit/Blink */
-		&::-webkit-slider-thumb {
+		&::-webkit-slider-thumb,
+		&::-moz-range-thumb {
 			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
 			height: $range-thumb-size;
 			width: $range-thumb-size;
@@ -5622,6 +5749,13 @@ $range-input-width: 31px;
 		margin-right: 0;
 		margin-left: 0;
 	}
+
+	.ui-tabs-nav {
+		position: sticky;
+		top: 0;
+		background: $header-bg-color;
+		z-index: 3;
+	}
 }
 
 // Screen reader.
@@ -5715,10 +5849,9 @@ $range-input-width: 31px;
 
 // Input group
 
-.input-group {
+.macro-input-group {
 	position: relative;
 	display: flex;
-	flex-wrap: wrap;
 	align-items: stretch;
 	width: 100%;
 
@@ -6091,6 +6224,7 @@ $range-input-width: 31px;
 
 		&[data-type] .interface-cell-details {
 			display: none;
+			grid-column: 1/-1;
 		}
 
 		.interface-cell {
@@ -6177,7 +6311,7 @@ $range-input-width: 31px;
 	.table-col-function { width: 85px; }
 	.table-col-draw-style { width: 85px; }
 	.table-col-y-axis-side { width: 85px; }
-	.table-col-colour { width: 105px; }
+	.table-col-colour { width: 55px; }
 	.table-col-action { width: 55px; }
 }
 
@@ -6245,6 +6379,7 @@ z-select,
 }
 
 .modal-popup-medium,
+.modal-popup-large,
 .modal-popup-static,
 .modal-popup-preprocessing {
 	.table-forms-container {
@@ -6355,4 +6490,121 @@ z-select,
 			margin-left: -1em;
 		}
 	}
+}
+
+.overlay-dialogue #host-form {
+	#tagsFormList,
+	#macrosFormList,
+	#valuemap-formlist {
+		.table-forms-td-left {
+			display: none;
+		}
+
+		.table-forms-td-right {
+			width: 100%;
+		}
+	}
+}
+
+.linked-templates {
+	> .table-forms {
+		margin-bottom: 5px;
+		line-height: 24px;
+
+		td, th {
+			padding: 0 5px 0 0;
+
+			&:last-child {
+				width: 0;
+				padding-right: 0;
+			}
+		}
+	}
+}
+
+// Report -> Audit details styles.
+
+.audit-details-popup-wrapper {
+	margin: 5px 10px;
+
+	.audit-details-popup-textarea {
+		width: 100%;
+		height: 135px;
+	}
+}
+
+.audit-details-wrapper {
+	display: flex;
+	justify-content: space-between;
+
+	.audit-show-details-btn-wrapper {
+		margin: 0 5px 0 5px;
+	}
+}
+
+// Geomap widget.
+.geomap-filter-button,
+.navigate-home-button {
+	background-image: url($sprite-path);
+	background-repeat: no-repeat;
+}
+.geomap-filter-button {
+	background-position: -243px -543px !important;
+}
+.navigate-home-button {
+	background-position: -117px -506px !important;
+}
+.geomap-filter {
+	border: 2px solid rgba($ui-border-color, .4);
+	background-color: $ui-bg-color;
+	padding: 10px 30px 5px 10px;
+	position: absolute;
+	margin-right: -2px;
+	margin-top: 5px;
+	display: none;
+	right: 0;
+}
+.geomap-filter.collapsed {
+	display: table;
+}
+.geomap-filter li {
+	width: calc(100% + 20px);
+}
+.geomap-filter label {
+	white-space: nowrap;
+}
+
+.marker-cluster {
+	background: none;
+}
+.marker-cluster div {
+	text-align: center;
+	border-radius: 50%;
+	margin-left: 5px;
+	margin-top: 5px;
+	height: 30px;
+	width: 30px;
+}
+.leaflet-marker-icon:focus {
+	box-shadow: 0 0 0 2px $btn-border-focus-color;
+	border-radius: 2px;
+	outline: none;
+}
+.marker-cluster span {
+	line-height: 30px;
+}
+.leaflet-control {
+	&.disabled {
+		background-color: #ffffff;
+		opacity: 1;
+
+		.geomap-filter-button {
+			cursor: default;
+			opacity: .4;
+		}
+	}
+}
+.leaflet-container {
+	height: 100%;
+	z-index: 1;
 }

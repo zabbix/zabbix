@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,10 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "sysinfo.h"
-
-#include "cfg.h"
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
@@ -109,6 +105,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 #else
 #	include "zbxnix.h"
 #	include "sighandler.h"
+#	include "daemon.h"
 #endif
 #include "active.h"
 #include "listener.h"
@@ -187,6 +184,7 @@ const char	*help_message[] = {
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
+	"      " ZBX_USER_PARAMETERS_RELOAD "       Reload user parameters from the configuration file",
 	"      " ZBX_LOG_LEVEL_INCREASE "=target  Increase log level, affects all processes if",
 	"                                 target is not specified",
 	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
@@ -297,7 +295,7 @@ int	CONFIG_ALERTDB_FORKS		= 0;
 int	CONFIG_HISTORYPOLLER_FORKS	= 0;
 int	CONFIG_AVAILMAN_FORKS		= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 0;
-int	CONFIG_PROBLEMHOUSEKEEPER_FORKS = 0;
+int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 0;
 
 char	*opt = NULL;
 
@@ -363,7 +361,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->data))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, &t->data))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
@@ -467,7 +465,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* Option 'c' is always optional.	*/
 	/*   p  t  i  d  s  x  m    opt_mask	*/
 	/* ---------------------    --------	*/
-	/*   -  -  -  -  -  -  - 	0x00	*/
+	/*   -  -  -  -  -  -  -	0x00	*/
 	/*   p  -  -  -  -  -  -	0x40	*/
 	/*   -  t  -  -  -  -  -	0x20	*/
 	/*   -  -  i  -  -  -  -	0x10	*/
@@ -551,11 +549,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: set_defaults                                                     *
- *                                                                            *
  * Purpose: set configuration defaults                                        *
- *                                                                            *
- * Author: Vladimir Levijev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
 static void	set_defaults(void)
@@ -617,8 +611,6 @@ static void	set_defaults(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_validate_config_hostnames                                    *
- *                                                                            *
  * Purpose: validate listed host names                                        *
  *                                                                            *
  ******************************************************************************/
@@ -647,11 +639,7 @@ static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_validate_config                                              *
- *                                                                            *
  * Purpose: validate configuration parameters                                 *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
@@ -683,8 +671,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer than"
-				" %d characters", HOST_INTERFACE_LEN);
+		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer"
+				" than %d characters", HOST_INTERFACE_LEN);
 		err = 1;
 	}
 
@@ -733,28 +721,24 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = CONFIG_MAX_LINES_PER_SECOND;
 }
 
-static int	add_serveractive_host_cb(const char *host, unsigned short port, zbx_vector_str_t *hostnames)
+static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	int	i, forks, new_forks;
 
-	for (i = 0; i < CONFIG_ACTIVE_FORKS; i++)
-	{
-		if (0 == strcmp(CONFIG_ACTIVE_ARGS[i].host, host) && CONFIG_ACTIVE_ARGS[i].port == port)
-			return FAIL;
-	}
-
+	ZBX_UNUSED(data);
 	/* add at least one fork */
 	new_forks = 0 < hostnames->values_num ? hostnames->values_num : 1;
 
 	forks = CONFIG_ACTIVE_FORKS;
 	CONFIG_ACTIVE_FORKS += new_forks;
 	CONFIG_ACTIVE_ARGS = (ZBX_THREAD_ACTIVECHK_ARGS *)zbx_realloc(CONFIG_ACTIVE_ARGS,
-			sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * CONFIG_ACTIVE_FORKS);
+			sizeof(ZBX_THREAD_ACTIVECHK_ARGS) * (size_t)CONFIG_ACTIVE_FORKS);
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
-		CONFIG_ACTIVE_ARGS[forks].host = zbx_strdup(NULL, host);
-		CONFIG_ACTIVE_ARGS[forks].port = port;
+		zbx_vector_ptr_create(&CONFIG_ACTIVE_ARGS[forks].addrs);
+		zbx_addr_copy(&CONFIG_ACTIVE_ARGS[forks].addrs, addrs);
+
 		CONFIG_ACTIVE_ARGS[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
 				hostnames->values[i] : "");
 	}
@@ -795,8 +779,6 @@ static void	parse_hostnames(const char *hostname_param, zbx_vector_str_t *hostna
 
 /******************************************************************************
  *                                                                            *
- * Function: load_enable_remote_commands                                      *
- *                                                                            *
  * Purpose: aliases EnableRemoteCommands parameter to                         *
  *          Allow/DenyKey=system.run[*]                                       *
  *                                                                            *
@@ -827,8 +809,6 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_load_config                                                  *
- *                                                                            *
  * Purpose: load configuration from config file                               *
  *                                                                            *
  * Parameters: requirement - produce error if config file missing or not      *
@@ -836,8 +816,9 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
  ******************************************************************************/
 static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
-	static char		*active_hosts;
-	zbx_vector_str_t	hostnames;
+	static char			*active_hosts;
+	zbx_vector_str_t		hostnames;
+	cfg_custom_parameter_parser_t	parser_load_enable_remove_commands, parser_load_key_access_rule;
 
 	struct cfg_line	cfg[] =
 	{
@@ -889,7 +870,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	SEC_PER_MIN,		SEC_PER_HOUR},
 		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{"EnableRemoteCommands",	&load_enable_remote_commands,		TYPE_CUSTOM,
+		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	TYPE_CUSTOM,
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&CONFIG_LOG_REMOTE_COMMANDS,		TYPE_INT,
 			PARM_OPT,	0,			1},
@@ -949,14 +930,17 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"TLSCipherAll",		&CONFIG_TLS_CIPHER_ALL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"AllowKey",			load_key_access_rule,			TYPE_CUSTOM,
+		{"AllowKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
-		{"DenyKey",			load_key_access_rule,			TYPE_CUSTOM,
+		{"DenyKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
 		{NULL}
 	};
+
+	parser_load_enable_remove_commands.cfg_custom_parameter_parser_func = load_enable_remote_commands;
+	parser_load_key_access_rule.cfg_custom_parameter_parser_func = load_key_access_rule;
 
 	/* initialize multistrings */
 	zbx_strarr_init(&CONFIG_ALIASES);
@@ -968,7 +952,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS_EN);
 #endif
-	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
+	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
 	finalize_key_access_rules_configuration();
 
@@ -980,7 +964,16 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	parse_hostnames(CONFIG_HOSTNAMES, &hostnames);
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
-		zbx_set_data_destination_hosts(active_hosts, add_serveractive_host_cb, &hostnames);
+	{
+		char	*error;
+
+		if (FAIL == zbx_set_data_destination_hosts(active_hosts, ZBX_DEFAULT_SERVER_PORT, "ServerActive",
+				add_serveractive_host_cb, &hostnames, NULL, &error))
+		{
+			zbx_error("%s", error);
+			exit(EXIT_FAILURE);
+		}
+	}
 
 	zbx_free(active_hosts);
 
@@ -999,23 +992,19 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_free_config                                                  *
- *                                                                            *
  * Purpose: free configuration memory                                         *
- *                                                                            *
- * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_free_config(void)
 {
-	zbx_strarr_free(CONFIG_ALIASES);
-	zbx_strarr_free(CONFIG_USER_PARAMETERS);
+	zbx_strarr_free(&CONFIG_ALIASES);
+	zbx_strarr_free(&CONFIG_USER_PARAMETERS);
 #ifndef _WINDOWS
-	zbx_strarr_free(CONFIG_LOAD_MODULE);
+	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 #endif
 #ifdef _WINDOWS
-	zbx_strarr_free(CONFIG_PERF_COUNTERS);
-	zbx_strarr_free(CONFIG_PERF_COUNTERS_EN);
+	zbx_strarr_free(&CONFIG_PERF_COUNTERS);
+	zbx_strarr_free(&CONFIG_PERF_COUNTERS_EN);
 #endif
 }
 
@@ -1051,7 +1040,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	char		*error = NULL;
-	int		i, j = 0;
+	int		i, j = 0, ret = SUCCEED;
 #ifdef _WINDOWS
 	DWORD		res;
 #endif
@@ -1113,6 +1102,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
+
+	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
+		zbx_free(error);
+		zbx_free_service_resources(FAIL);
+		exit(EXIT_FAILURE);
+	}
+
 	if (0 != CONFIG_PASSIVE_FORKS)
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
@@ -1169,8 +1167,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, threads_num, sizeof(ZBX_THREAD_HANDLE));
-	threads_flags = (int *)zbx_calloc(threads_flags, threads_num, sizeof(int));
+	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, (size_t)threads_num, sizeof(ZBX_THREAD_HANDLE));
+	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #0 started [main process]");
 
@@ -1237,26 +1235,27 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 #else
-	while (-1 == wait(&i))	/* wait for any child to exit */
+	zbx_unset_exit_on_terminate();
+
+	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
 	{
 		if (EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			sig_exiting = ZBX_EXIT_FAILURE;
 			break;
 		}
 	}
 
-	/* all exiting child processes should be caught by signal handlers */
-	THIS_SHOULD_NEVER_HAPPEN;
+	ret = ZBX_EXIT_STATUS();
+
 #endif
-	zbx_on_exit(SUCCEED);
+	zbx_on_exit(ret);
 
 	return SUCCEED;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_free_service_resources                                       *
  *                                                                            *
  * Purpose: free service resources allocated by main thread                   *
  *                                                                            *
@@ -1265,7 +1264,7 @@ void	zbx_free_service_resources(int ret)
 {
 	if (NULL != threads)
 	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
+		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */
 		zbx_free(threads);
 		zbx_free(threads_flags);
 	}
@@ -1287,11 +1286,15 @@ void	zbx_free_service_resources(int ret)
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_close_log();
+
+#ifndef _WINDOWS
+	zbx_locks_destroy();
+#endif
 }
 
 void	zbx_on_exit(int ret)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called");
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
 	zbx_free_service_resources(ret);
 
@@ -1313,9 +1316,9 @@ void	zbx_on_exit(int ret)
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
+	char		*error = NULL;
 #ifdef _WINDOWS
 	int		ret;
-	char		*error;
 
 	/* Provide, so our process handles errors instead of the system itself. */
 	/* Attention!!! */
@@ -1414,7 +1417,14 @@ int	main(int argc, char **argv)
 			}
 #endif
 			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
-			load_user_parameters(CONFIG_USER_PARAMETERS);
+
+			if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
+				zbx_free(error);
+				exit(EXIT_FAILURE);
+			}
+
 			load_aliases(CONFIG_ALIASES);
 			zbx_free_config();
 			if (ZBX_TASK_TEST_METRIC == t.task)
@@ -1451,7 +1461,6 @@ int	main(int argc, char **argv)
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 			set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
-			load_user_parameters(CONFIG_USER_PARAMETERS);
 			load_aliases(CONFIG_ALIASES);
 			break;
 	}

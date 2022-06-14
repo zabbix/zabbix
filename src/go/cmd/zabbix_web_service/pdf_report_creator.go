@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@ import (
 	"strconv"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/chromedp/cdproto/emulation"
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/zbxerr"
 )
 
 type requestBody struct {
@@ -93,7 +93,16 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := chromedp.NewContext(context.Background())
+	opts := chromedp.DefaultExecAllocatorOptions[:]
+
+	if options.IgnoreURLCertErrors == 1 {
+		opts = append(opts, chromedp.Flag("ignore-certificate-errors", "1"))
+	}
+
+	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	defer cancel()
+
+	ctx, cancel := chromedp.NewContext(allocCtx)
 	defer cancel()
 
 	width, err := strconv.ParseInt(req.Parameters["width"], 10, 64)

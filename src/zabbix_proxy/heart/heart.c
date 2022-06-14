@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,30 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "heart.h"
+
 #include "daemon.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxself.h"
 
-#include "heart.h"
-#include "../servercomms.h"
 #include "zbxcrypto.h"
+#include "zbxcompress.h"
+#include "comms.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
-/******************************************************************************
- *                                                                            *
- * Function: send_heartbeat                                                   *
- *                                                                            *
- ******************************************************************************/
+extern zbx_vector_ptr_t	zbx_addrs;
+extern char		*CONFIG_HOSTNAME;
+extern char		*CONFIG_SOURCE_IP;
+extern int		CONFIG_TIMEOUT;
+extern unsigned int	configured_tls_connect_mode;
+
 static int	send_heartbeat(void)
 {
-	zbx_socket_t	sock;
-	struct zbx_json	j;
-	int		ret = SUCCEED;
-	char		*error = NULL;
+	zbx_socket_t		sock;
+	struct zbx_json		j;
+	int			ret = SUCCEED;
+	char			*error = NULL, *buffer = NULL;
+	size_t			buffer_size, reserved;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_heartbeat()");
 
@@ -49,25 +53,36 @@ static int	send_heartbeat(void)
 	zbx_json_addstring(&j, "host", CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
-	if (FAIL == connect_to_server(&sock, CONFIG_HEARTBEAT_FREQUENCY, 0)) /* do not retry */
-		return FAIL;
-
-	if (SUCCEED != put_data_to_server(&sock, &j, &error))
+	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send heartbeat message to server at \"%s\": %s",
-				sock.peer, error);
-		ret = FAIL;
+		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+		goto clean;
 	}
 
-	zbx_free(error);
+	reserved = j.buffer_size;
+
+	if (FAIL == (ret = connect_to_server(&sock, CONFIG_SOURCE_IP, &zbx_addrs, CONFIG_HEARTBEAT_FREQUENCY,
+			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, LOG_LEVEL_DEBUG))) /* do not retry */
+	{
+		goto clean;
+	}
+
+	if (SUCCEED != (ret = put_data_to_server(&sock, &buffer, buffer_size, reserved, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send heartbeat message to server at \"%s\": %s", sock.peer,
+				error);
+	}
+
 	disconnect_server(&sock);
+	zbx_free(error);
+clean:
+	zbx_free(buffer);
+	zbx_json_free(&j);
 
 	return ret;
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: main_heart_loop                                                  *
  *                                                                            *
  * Purpose: periodically send heartbeat message to the server                 *
  *                                                                            *

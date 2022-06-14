@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,11 +22,12 @@ package file
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"syscall"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
-	"zabbix.com/pkg/zbxerr"
 )
 
 type userInfo struct {
@@ -43,6 +44,14 @@ func getFileInfo(info *os.FileInfo, path string) (fileinfo *fileInfo, err error)
 	if !sd.IsValid() {
 		return nil, fmt.Errorf("Cannot obtain %s information: Invalid security descriptor.", path)
 	}
+
+	fi.Pathname, err = filepath.Abs(path)
+	if err != nil {
+		return nil, fmt.Errorf("Cannot obtain %s path name.", path)
+	}
+
+	fi.Basename = filepath.Base(path)
+	fi.Dirname = filepath.Dir(path)
 
 	sdOwner, _, err := sd.Owner()
 	if err != nil {

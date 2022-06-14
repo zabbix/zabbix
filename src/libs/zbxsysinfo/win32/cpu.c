@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,11 +28,9 @@ typedef PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX PSYS_LPI_EX;
 
 /* pointer to GetLogicalProcessorInformationEx(), it's not guaranteed to be available */
 typedef BOOL (WINAPI *GETLPIEX)(LOGICAL_PROCESSOR_RELATIONSHIP, PSYS_LPI_EX, PDWORD);
-ZBX_THREAD_LOCAL static GETLPIEX		get_lpiex;
+static GETLPIEX		get_lpiex;
 
 /******************************************************************************
- *                                                                            *
- * Function: get_cpu_num_win32                                                *
  *                                                                            *
  * Purpose: find number of active logical CPUs                                *
  *                                                                            *
@@ -127,8 +125,6 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Function: get_cpu_group_num_win32                                          *
- *                                                                            *
  * Purpose: returns the number of active processor groups                     *
  *                                                                            *
  * Return value: number of groups, 1 if groups are not supported              *
@@ -166,8 +162,6 @@ int	get_cpu_group_num_win32(void)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: get_numa_node_count_win32                                        *
  *                                                                            *
  * Purpose: returns the number of NUMA nodes                                  *
  *                                                                            *

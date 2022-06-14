@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 
 namespace Modules\Example_E;
 
@@ -16,7 +16,7 @@ class Module extends CModule {
 
 		$menu
 			->findOrAdd('Module 5 menu')
-			->setIcon('icon-share')
+			->setIcon('icon-integrations')
 			->getSubmenu()
 			->add(
 				(new \CMenuItem('пятый модуль'))->setAction('fifth.module')

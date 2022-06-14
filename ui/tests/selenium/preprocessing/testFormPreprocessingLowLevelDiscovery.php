@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	public $success_message = 'Discovery rule created';
 	public $fail_message = 'Cannot add discovery rule';
 
+	const IS_LLD = true;
 	const HOSTID = 40001;
 	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
 	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
@@ -274,20 +275,20 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 * @dataProvider getCustomOnFailValidationData
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CreateAllSteps($data) {
-		$this->checkCreate($data);
+		$this->checkCreate($data, self::IS_LLD);
 	}
 
 	/**
 	 * @dataProvider getCommonPreprocessingTrailingSpacesData
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_TrailingSpaces($data) {
-		$this->checkTrailingSpaces($data);
+		$this->checkTrailingSpaces($data, self::IS_LLD);
 	}
 
 	/**
 	 * Add preprocessing steps to templated LLD for cloning.
 	 */
-	public function prepareСloneTemplatedLLDPreprocessing() {
+	public function prepareCloneTemplatedLLDPreprocessing() {
 		CDataHelper::call('discoveryrule.update', [
 			'itemid' => '15011',
 			'preprocessing' => self::CLONE_PREPROCESSING
@@ -295,7 +296,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	}
 
 	/**
-	 * @onBefore prepareСloneTemplatedLLDPreprocessing
+	 * @onBefore prepareCloneTemplatedLLDPreprocessing
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CloneTemplatedLLD() {
 		$link = 'host_discovery.php?form=update&context=host&itemid='.self::INHERITANCE_LLDID;
@@ -324,7 +325,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	 * @dataProvider getCommonCustomOnFailData
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CustomOnFail($data) {
-		$this->checkCustomOnFail($data, true);
+		$this->checkCustomOnFail($data, self::IS_LLD);
 	}
 
 	/**
@@ -334,6 +335,6 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 		$this->link = 'host_discovery.php?filter_set=1&&context=template&filter_hostids%5B0%5D='.self::INHERITANCE_TEMPLATEID;
 		$host_link = 'host_discovery.php?filter_set=1&context=host&filter_hostids%5B0%5D='.self::INHERITANCE_HOSTID;
 
-		$this->checkPreprocessingInheritance($data, $host_link);
+		$this->checkPreprocessingInheritance($data, $host_link, self::IS_LLD);
 	}
 }

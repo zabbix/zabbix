@@ -1,7 +1,7 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,8 @@ class CControllerTabFilterProfileUpdate extends CController {
 
 	public static $namespaces = [
 		CControllerHost::FILTER_IDX => CControllerHost::FILTER_FIELDS_DEFAULT,
-		CControllerProblem::FILTER_IDX => CControllerProblem::FILTER_FIELDS_DEFAULT
+		CControllerProblem::FILTER_IDX => CControllerProblem::FILTER_FIELDS_DEFAULT,
+		CControllerLatest::FILTER_IDX => CControllerLatest::FILTER_FIELDS_DEFAULT
 	];
 
 	protected function checkPermissions() {

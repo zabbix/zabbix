@@ -1,0 +1,25 @@
+.inline-filter {
+	text-align: right;
+
+	> li {
+		display: inline-block;
+
+		&:not(:last-child) {
+			margin-right: 3px;
+		}
+
+		&.inline-filter-label {
+			margin-right: 10px;
+		}
+	}
+}
+
+.inline-filter-footer {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+
+	> li.inline-filter-stats {
+		color: $font-alt-color;
+	}
+}

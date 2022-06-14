@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,13 +24,14 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 	"time"
 
 	_ "zabbix.com/plugins"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/agent/remotecontrol"
@@ -40,13 +41,15 @@ import (
 	"zabbix.com/internal/agent/serverlistener"
 	"zabbix.com/internal/agent/statuslistener"
 	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
 	"zabbix.com/pkg/pidfile"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxlib"
 )
+
+type AgentUserParamOption struct {
+	UserParameter []string `conf:"optional"`
+}
 
 const remoteCommandSendingTimeout = time.Second
 
@@ -96,10 +99,35 @@ func processHelpCommand(c *remotecontrol.Client) (err error) {
 	help := `Remote control interface, available commands:
 	log_level_increase - Increase log level
 	log_level_decrease - Decrease log level
+	userparameter_reload - Reload user parameters
 	metrics - List available metrics
 	version - Display Agent version
 	help - Display this help message`
 	return c.Reply(help)
+}
+
+func processUserParamReloadCommand(c *remotecontrol.Client) (err error) {
+	var userparams AgentUserParamOption
+
+	if err = conf.LoadUserParams(&userparams); err != nil {
+		err = fmt.Errorf("Cannot load user parameters: %s", err)
+		log.Infof(err.Error())
+		return
+	}
+
+	agent.Options.UserParameter = userparams.UserParameter
+
+	if res := manager.QueryUserParams(); res != "ok" {
+		err = fmt.Errorf("Failed to reload user parameters: %s", res)
+		log.Infof(err.Error())
+		return
+	}
+
+	message := "User parameters reloaded"
+	log.Infof(message)
+	err = c.Reply(message)
+
+	return
 }
 
 func processRemoteCommand(c *remotecontrol.Client) (err error) {
@@ -123,6 +151,8 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 		err = processMetricsCommand(c)
 	case "version":
 		err = processVersionCommand(c)
+	case "userparameter_reload":
+		err = processUserParamReloadCommand(c)
 	default:
 		return errors.New("Unknown command")
 	}
@@ -132,8 +162,7 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 var pidFile *pidfile.File
 
 func run() (err error) {
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	sigs := createSigsChan()
 
 	var control *remotecontrol.Conn
 	if control, err = remotecontrol.New(agent.Options.ControlSocket, remoteCommandSendingTimeout); err != nil {
@@ -146,9 +175,7 @@ loop:
 	for {
 		select {
 		case sig := <-sigs:
-			switch sig {
-			case syscall.SIGINT, syscall.SIGTERM:
-				sendServiceStop()
+			if !handleSig(sig) {
 				break loop
 			}
 		case client := <-control.Client():
@@ -157,7 +184,7 @@ loop:
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
-			sendServiceStop()
+
 			client.Close()
 		case serviceStop := <-closeChan:
 			if serviceStop {
@@ -172,6 +199,7 @@ loop:
 var (
 	confDefault     string
 	applicationName string
+	pluginsocket    string
 
 	argConfig  bool
 	argTest    bool
@@ -273,7 +301,7 @@ func main() {
 	})
 
 	if argVersion {
-		version.Display()
+		version.Display([]string{fmt.Sprintf("Plugin support version %d.%d\n", comms.MajorVersion, comms.MinorVersion)})
 		os.Exit(0)
 	}
 
@@ -320,6 +348,11 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
+	if pluginsocket, err = initExternalPlugins(&agent.Options); err != nil {
+		fatalExit("cannot register plugins", err)
+	}
+	defer cleanUpExternal()
+
 	if argTest || argPrint {
 		var level int
 		if argVerbose {
@@ -335,7 +368,7 @@ func main() {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+		if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
 			agent.Options.UserParameterDir); err != nil {
 			fatalExit("cannot initialize user parameters", err)
 		}
@@ -344,7 +377,9 @@ func main() {
 		if m, err = scheduler.NewManager(&agent.Options); err != nil {
 			fatalExit("cannot create scheduling manager", err)
 		}
+
 		m.Start()
+
 		if err = configUpdateItemParameters(m, &agent.Options); err != nil {
 			fatalExit("cannot process configuration", err)
 		}
@@ -367,9 +402,12 @@ func main() {
 		}
 
 		m.Stop()
-		monitor.Wait(monitor.Scheduler)
-		os.Exit(0)
 
+		monitor.Wait(monitor.Scheduler)
+
+		cleanUpExternal()
+
+		os.Exit(0)
 	}
 
 	if argVerbose {
@@ -447,11 +485,11 @@ func main() {
 	log.Infof("using configuration file: %s", confFlag)
 
 	if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
-		log.Errf("Failed to load key access rules: %s", err.Error())
+		fatalExit("Failed to load key access rules", err)
 		os.Exit(1)
 	}
 
-	if err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
+	if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
 		agent.Options.UserParameterDir); err != nil {
 		fatalExit("cannot initialize user parameters", err)
 	}
@@ -550,6 +588,7 @@ func main() {
 	monitor.Wait(monitor.Input)
 
 	manager.Stop()
+
 	monitor.Wait(monitor.Scheduler)
 
 	// split shutdown in two steps to ensure that result cache is still running while manager is
@@ -565,11 +604,17 @@ func main() {
 	if foregroundFlag && agent.Options.LogType != "console" {
 		fmt.Println(farewell)
 	}
+
 	waitServiceClose()
 }
 
 func fatalExit(message string, err error) {
 	fatalCloseOSItems()
+
+	if pluginsocket != "" {
+		cleanUpExternal()
+	}
+
 	if len(message) == 0 {
 		message = err.Error()
 	} else {

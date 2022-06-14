@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
  * @var CView $this
  */
 
-$this->addJsFile('multiselect.js');
-$this->addJsFile('textareaflexible.js');
 $this->addJsFile('popup.condition.common.js');
 $this->includeJsFile('configuration.correlation.edit.js.php');
 
@@ -71,7 +69,7 @@ if ($data['conditions']) {
 			continue;
 		}
 
-		$label = isset($condition['formulaid']) ? $condition['formulaid'] : num2letter($i);
+		$label = ($data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? $condition['formulaid'] : num2letter($i);
 
 		$labelSpan = (new CSpan($label))
 			->addClass('label')
@@ -80,7 +78,7 @@ if ($data['conditions']) {
 
 		$condition_table->addRow([
 				$labelSpan,
-				(new CCol(getCorrConditionDescription($condition, $data['group_names'])))
+				(new CCol(CCorrelationHelper::getConditionDescription($condition, $data['group_names'])))
 					->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
@@ -99,9 +97,12 @@ if ($data['conditions']) {
 
 $condition_table->addRow([
 	(new CSimpleButton(_('Add')))
-		->onClick('return PopUp("popup.condition.event.corr",'.json_encode([
-			'type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR
-		]).', null, this);')
+		->onClick(
+			'return PopUp("popup.condition.event.corr", '.
+				json_encode(['type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR]).',
+				{dialogue_class: "modal-popup-medium"}
+			);'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK)
 ]);
 
@@ -134,7 +135,9 @@ $form_list
 
 $form_list
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	)
 	->addRow(
 		_('Operations'),

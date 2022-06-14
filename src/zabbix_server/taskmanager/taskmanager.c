@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,29 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "taskmanager.h"
+
 #include "daemon.h"
 #include "zbxself.h"
 #include "log.h"
-#include "db.h"
 #include "dbcache.h"
 #include "zbxtasks.h"
 #include "../events.h"
 #include "../actions.h"
 #include "export.h"
-#include "taskmanager.h"
 #include "zbxdiag.h"
+#include "service_protocol.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
 #define ZBX_TASKMANAGER_TIMEOUT		5
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_execute_task_close_problem                                    *
  *                                                                            *
  * Purpose: close the specified problem event and remove task                 *
  *                                                                            *
@@ -71,9 +70,7 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_try_task_close_problem                                        *
- *                                                                            *
- * Purpose: try to close problem by event acknowledgement action              *
+ * Purpose: try to close problem by event acknowledgment action               *
  *                                                                            *
  * Parameters: taskid - [IN] the task identifier                              *
  *                                                                            *
@@ -119,7 +116,8 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 			zbx_vector_uint64_append(&triggerids, triggerid);
 			DCconfig_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
 
-			/* only close the problem if source trigger was successfully locked */
+			/* close the problem if source trigger was successfully locked or */
+			/* if the trigger doesn't exist, but event still exists */
 			if (0 != locked_triggerids.values_num)
 			{
 				ZBX_STR2UINT64(userid, row[0]);
@@ -128,6 +126,12 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 
 				DCconfig_unlock_triggers(&locked_triggerids);
 
+				ret = SUCCEED;
+			}
+			else if (FAIL == DCconfig_trigger_exists(triggerid))
+			{
+				DBexecute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE,
+						taskid);
 				ret = SUCCEED;
 			}
 		}
@@ -143,8 +147,6 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_expire_remote_command                                         *
  *                                                                            *
  * Purpose: process expired remote command task                               *
  *                                                                            *
@@ -185,8 +187,6 @@ static void	tm_expire_remote_command(zbx_uint64_t taskid)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_process_remote_command_result                                 *
  *                                                                            *
  * Purpose: process remote command result task                                *
  *                                                                            *
@@ -260,8 +260,6 @@ static int	tm_process_remote_command_result(zbx_uint64_t taskid)
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_process_data_result                                           *
- *                                                                            *
  * Purpose: process data task result                                          *
  *                                                                            *
  ******************************************************************************/
@@ -299,17 +297,55 @@ static void	tm_process_data_result(zbx_uint64_t taskid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+/******************************************************************************
+ *                                                                            *
+ * Purpose: notify service manager about problem severity changes             *
+ *                                                                            *
+ ******************************************************************************/
+static void	notify_service_manager(const zbx_vector_ptr_t *ack_tasks)
+{
+	int			i;
+	zbx_vector_ptr_t	event_severities;
+
+	zbx_vector_ptr_create(&event_severities);
+
+	for (i = 0; i < ack_tasks->values_num; i++)
+	{
+		zbx_ack_task_t	*ack_task = (zbx_ack_task_t *)ack_tasks->values[i];
+
+		if (ack_task->old_severity != ack_task->new_severity)
+		{
+			zbx_event_severity_t	*es;
+
+			es = (zbx_event_severity_t *)zbx_malloc(NULL, sizeof(zbx_event_severity_t));
+			es->eventid = ack_task->eventid;
+			es->severity = ack_task->new_severity;
+			zbx_vector_ptr_append(&event_severities, es);
+		}
+	}
+
+	if (0 != event_severities.values_num)
+	{
+		unsigned char	*data;
+		zbx_uint32_t	size;
+
+		size = zbx_service_serialize_event_severities(&data, &event_severities);
+		zbx_service_send(ZBX_IPC_SERVICE_EVENT_SEVERITIES, data, size, NULL);
+		zbx_free(data);
+	}
+
+	zbx_vector_ptr_clear_ext(&event_severities, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&event_severities);
+}
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_process_acknowledgements                                      *
- *                                                                            *
- * Purpose: process acknowledgements for alerts sending                       *
+ * Purpose: process acknowledgments for alerts sending                        *
  *                                                                            *
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
+static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -326,7 +362,7 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 	zbx_vector_ptr_create(&ack_tasks);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select a.eventid,ta.acknowledgeid,ta.taskid"
+			"select a.eventid,ta.acknowledgeid,ta.taskid,a.old_severity,a.new_severity"
 			" from task_acknowledge ta"
 			" left join acknowledges a"
 				" on ta.acknowledgeid=a.acknowledgeid"
@@ -353,6 +389,8 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 		ZBX_STR2UINT64(ack_task->eventid, row[0]);
 		ZBX_STR2UINT64(ack_task->acknowledgeid, row[1]);
 		ZBX_STR2UINT64(ack_task->taskid, row[2]);
+		ack_task->old_severity = atoi(row[3]);
+		ack_task->new_severity = atoi(row[4]);
 		zbx_vector_ptr_append(&ack_tasks, ack_task);
 	}
 	DBfree_result(result);
@@ -360,7 +398,9 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 	if (0 < ack_tasks.values_num)
 	{
 		zbx_vector_ptr_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-		processed_num = process_actions_by_acknowledgements(&ack_tasks);
+		processed_num = process_actions_by_acknowledgments(&ack_tasks);
+
+		notify_service_manager(&ack_tasks);
 	}
 
 	sql_offset = 0;
@@ -379,8 +419,6 @@ static int	tm_process_acknowledgements(zbx_vector_uint64_t *ack_taskids)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_process_check_now                                             *
  *                                                                            *
  * Purpose: process check now tasks for item rescheduling                     *
  *                                                                            *
@@ -526,8 +564,6 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_process_diaginfo                                              *
- *                                                                            *
  * Purpose: process diaginfo task                                             *
  *                                                                            *
  ******************************************************************************/
@@ -554,8 +590,6 @@ static void	tm_process_diaginfo(zbx_uint64_t taskid, const char *data)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_process_data                                                  *
  *                                                                            *
  * Purpose: process data tasks                                                *
  *                                                                            *
@@ -634,8 +668,6 @@ static int	tm_process_data(zbx_vector_uint64_t *taskids)
 
 /******************************************************************************
  *                                                                            *
- * Function: tm_expire_generic_tasks                                          *
- *                                                                            *
  * Purpose: expires tasks that don't require specific expiration handling     *
  *                                                                            *
  * Return value: The number of successfully expired tasks                     *
@@ -655,8 +687,6 @@ static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_process_tasks                                                 *
  *                                                                            *
  * Purpose: process task manager tasks depending on task type                 *
  *                                                                            *
@@ -738,7 +768,7 @@ static int	tm_process_tasks(int now)
 	DBfree_result(result);
 
 	if (0 < ack_taskids.values_num)
-		processed_num += tm_process_acknowledgements(&ack_taskids);
+		processed_num += tm_process_acknowledgments(&ack_taskids);
 
 	if (0 < check_now_taskids.values_num)
 		processed_num += tm_process_check_now(&check_now_taskids);
@@ -758,8 +788,6 @@ static int	tm_process_tasks(int now)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: tm_remove_old_tasks                                              *
  *                                                                            *
  * Purpose: remove old done/expired tasks                                     *
  *                                                                            *

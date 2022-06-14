@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,7 +92,6 @@ else {
 }
 
 $form_grid = (new CFormGrid())
-	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_FIXED)
 	->addItem([
 		(new CLabel(_('Recipient'), 'recipientid'))->setAsteriskMark(),
 		new CFormField($recipient_multiselect->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))

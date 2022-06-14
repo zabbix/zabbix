@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,8 +38,8 @@ ZBX_Notifications.ALARM_ONCE_SERVER = 1;
  * these "actions" by passing the new received state value through a method prefixed with <consume> that will adjust
  * instance's internal state, that in turn can be dispatched as "action". Other methods prefixed with <handle> responds
  * to other events than localStorage change event - (poll, focus, timeout..) and still they would reuse <consume>
- * domain methods and issue an anction via <push> if needed and call to render method explicitly. The <handlePushed> is
- * not reused on the instance that produces the action. This is so to reduce complexity and increase maintainebility,
+ * domain methods and issue an action via <push> if needed and call to render method explicitly. The <handlePushed> is
+ * not reused on the instance that produces the action. This is so to reduce complexity and increase maintainability,
  * because when an action produces an action, logic diverges deep, instead <consume> various domain within logic
  * and call `render` once, then <push> into localStorage once.
  *
@@ -382,7 +382,7 @@ ZBX_Notifications.prototype.handlePushedActiveTabid = function(tabid) {
  * When active tab is unloaded, any sibling tab is set to become active. If single session, then we drop LS (privacy).
  * We cannot know if this unload will happen because of navigation, scripted reload or a tab was just closed.
  * Latter is always assumed, so when navigating active tab, focus is deligated onto to any tab if possible,
- * then this tab might reclaim focus again at construction if during during that time document has focus.
+ * then this tab might reclaim focus again at construction if during that time document has focus.
  * At slow connection during page navigation there will be another active tab polling for notifications (if multitab).
  * Here `tab` is referred as ZBX_Notifications instance and `focus` - whether instance is `active` (not focused).
  *
@@ -522,7 +522,7 @@ ZBX_Notifications.prototype.renderAudio = function() {
 
 /**
  * @param {string} resource  A value for 'action' parameter.
- * @param {object} params    Form data to be send.
+ * @param {object} params    Form data to be sent.
  *
  * @return {Promise}
  */

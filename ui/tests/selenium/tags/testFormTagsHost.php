@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,9 @@ class testFormTagsHost extends testFormTags {
 
 	public $update_name = 'Host with tags for updating';
 	public $clone_name = 'Host with tags for cloning';
-	public $link = 'hosts.php';
-	public $saved_link = 'hosts.php?form=update&hostid=';
+	public $remove_name = 'Host for removing tags';
+	public $link = 'zabbix.php?action=host.list';
+	public $saved_link = 'zabbix.php?action=host.edit&hostid=';
 
 	/**
 	 * Test creating of Host with tags.
@@ -61,5 +62,12 @@ class testFormTagsHost extends testFormTags {
 	 */
 	public function testFormTagsHost_FullClone() {
 		$this->executeCloning('host', 'Full clone');
+	}
+
+	/**
+	 * Test removing tags from Host.
+	 */
+	public function testFormTagsHost_RemoveTags() {
+		$this->clearTags('host');
 	}
 }

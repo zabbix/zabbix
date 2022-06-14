@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.clock.js');
 $this->addJsFile('class.widget.graph.js');
 $this->addJsFile('class.widget.graph-prototype.js');
+$this->addJsFile('class.widget.item.js');
 $this->addJsFile('class.widget.map.js');
 $this->addJsFile('class.widget.navtree.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
@@ -184,13 +185,13 @@ if (count($data['dashboard']['pages']) > 1
 		->show();
 
 	(new CScriptTag('
-		initializeView(
-			'.json_encode($data['host']).',
-			'.json_encode($data['dashboard']).',
-			'.json_encode($data['widget_defaults']).',
-			'.json_encode($data['time_period']).',
-			'.json_encode($web_layout_mode).'
-		);
+		view.init('.json_encode([
+			'host' => $data['host'],
+			'dashboard' => $data['dashboard'],
+			'widget_defaults' => $data['widget_defaults'],
+			'time_period' => $data['time_period'],
+			'web_layout_mode' => $web_layout_mode
+		]).');
 	'))
 		->setOnDocumentReady()
 		->show();

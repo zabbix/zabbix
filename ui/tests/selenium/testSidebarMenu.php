@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,17 +44,6 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Monitoring',
-					'page' => 'Overview',
-					'third_level' =>
-					[
-						'Trigger overview',
-						'Data overview'
-					]
-				]
-			],
-			[
-				[
-					'section' => 'Monitoring',
 					'page' => 'Latest data'
 				]
 			],
@@ -73,8 +62,26 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Monitoring',
+					'section' => 'Services',
 					'page' => 'Services'
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'Service actions'
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA'
+				]
+			],
+			[
+				[
+					'section' => 'Services',
+					'page' => 'SLA report'
 				]
 			],
 			[
@@ -291,10 +298,14 @@ class testSidebarMenu extends CWebTest {
 				return CElementQuery::getDriver()->executeScript('return arguments[0].clientHeight ==='.
 						' parseInt(arguments[0].style.maxHeight, 10)', [$element]);
 			});
+
+			$submenu = $element->query('link', $data['page'])->one();
+		}
+		else {
+			$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page'])->one();
 		}
 
-		// Second level menu.
-		$submenu = $main_section->one()->parents('tag:li')->query('link', $data['page'])->one();
+		// Open second level menu.
 		$submenu->waitUntilClickable()->click();
 
 		// Checking 3rd level menu.
@@ -348,7 +359,7 @@ class testSidebarMenu extends CWebTest {
 			// Checking that collapsed, hidden sidemenu appears on clicking.
 			$this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->one()->waitUntilVisible();
 
-			// Returning standart sidemenu view clicking on unhide, expand button.
+			// Returning standard sidemenu view clicking on unhide, expand button.
 			$this->query('button', $unhide)->one()->waitUntilClickable()->click();
 			$this->assertTrue($this->query('class:sidebar')->one()->isVisible());
 		}
@@ -364,8 +375,8 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
-					'section' => 'Share',
-					'link' => 'https://share.zabbix.com/'
+					'section' => 'Integrations',
+					'link' => 'https://www.zabbix.com/integrations'
 				]
 			],
 			[

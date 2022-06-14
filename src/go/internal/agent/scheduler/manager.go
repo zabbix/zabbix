@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,15 +27,17 @@ import (
 	"sort"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
 	"zabbix.com/internal/agent/keyaccess"
 	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/conf"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
+	"zabbix.com/plugins/external"
 )
 
 const (
@@ -60,10 +62,11 @@ type Manager struct {
 
 // updateRequest contains list of metrics monitored by a client and additional client configuration data.
 type updateRequest struct {
-	clientID uint64
-	sink     plugin.ResultWriter
-	requests []*plugin.Request
-	expressions []*glexpr.Expression
+	clientID                   uint64
+	sink                       plugin.ResultWriter
+	firstActiveChecksRefreshed bool
+	requests                   []*plugin.Request
+	expressions                []*glexpr.Expression
 }
 
 // queryRequest contains status/debug query request.
@@ -72,12 +75,18 @@ type queryRequest struct {
 	sink    chan string
 }
 
+// queryRequestUserParams contains status user parameters query request.
+type queryRequestUserParams struct {
+	sink chan string
+}
+
 type Scheduler interface {
-	UpdateTasks(clientID uint64, writer plugin.ResultWriter, expressions []*glexpr.Expression,
-		requests []*plugin.Request)
+	UpdateTasks(clientID uint64, writer plugin.ResultWriter, firstActiveChecksRefreshed bool,
+		expressions []*glexpr.Expression, requests []*plugin.Request)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
 	Query(command string) (status string)
+	QueryUserParams() (status string)
 }
 
 // cleanupClient performs deactivation of plugins the client is not using anymore.
@@ -97,7 +106,7 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 		for deactivate := true; deactivate; {
 			deactivate = false
 			for _, t := range p.tasks {
-				if t.isRecurring() {
+				if t.isActive() && t.isRecurring() {
 					t.deactivate()
 					// deactivation can change tasks ordering, so repeat the iteration if task was deactivated
 					deactivate = true
@@ -183,7 +192,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
-				err = c.addRequest(p, r, update.sink, now)
+				err = c.addRequest(p, r, update.sink, now, update.firstActiveChecksRefreshed)
 			}
 		}
 
@@ -239,6 +248,37 @@ func (m *Manager) processQueue(now time.Time) {
 			// plugins with empty task queue should not be in Manager queue
 			heap.Pop(&m.pluginQueue)
 		}
+	}
+}
+
+// processAndFlushUserParamQueue processes queued user parameters plugins/tasks and/or removes them
+func (m *Manager) processAndFlushUserParamQueue(now time.Time) {
+	seconds := now.Unix()
+	num := m.pluginQueue.Len()
+	var pluginsBuf []*pluginAgent
+
+	for p := m.pluginQueue.Peek(); p != nil && num > 0; p = m.pluginQueue.Peek() {
+		heap.Pop(&m.pluginQueue)
+		num--
+
+		if !p.usrprm {
+			pluginsBuf = append(pluginsBuf, p)
+			continue
+		}
+
+		if task := p.peekTask(); task != nil {
+			if !p.hasCapacity() || task.getScheduled().Unix() > seconds {
+				continue
+			}
+
+			m.activeTasksNum++
+			p.reserveCapacity(p.popTask())
+			task.perform(m)
+		}
+	}
+
+	for _, p := range pluginsBuf {
+		m.pluginQueue.Push(p)
 	}
 }
 
@@ -368,6 +408,53 @@ run:
 				} else {
 					v.sink <- response
 				}
+			case *queryRequestUserParams:
+				var keys []string
+				var rerr error
+
+				metrics := plugin.ClearUserParamMetrics()
+
+				if keys, rerr = agent.InitUserParameterPlugin(agent.Options.UserParameter,
+					agent.Options.UnsafeUserParameters, agent.Options.UserParameterDir); rerr != nil {
+					plugin.RestoreUserParamMetrics(metrics)
+					v.sink <- "cannot process user parameters request: " + rerr.Error()
+					continue
+				}
+
+				m.processAndFlushUserParamQueue(time.Now())
+
+				tasks := make(map[string]performerHeap)
+
+				for key, plg := range m.plugins {
+					if plg.usrprm {
+						tasks[key] = plg.tasks
+						delete(m.plugins, key)
+					}
+				}
+
+				for _, key := range keys {
+					m.addUserParamsPlugin(key)
+					m.plugins[key].refcount++
+				}
+
+				for pluginkey, ltasks := range tasks {
+					for task := peekTask(ltasks); task != nil; task = peekTask(ltasks) {
+						heap.Pop(&ltasks)
+
+						for _, key := range keys {
+							if task.isItemKeyEqual(key) {
+								task.setPlugin(m.plugins[pluginkey])
+								m.plugins[pluginkey].enqueueTask(task)
+							}
+						}
+					}
+				}
+
+				for _, key := range keys {
+					heap.Push(&m.pluginQueue, m.plugins[key])
+				}
+
+				v.sink <- "ok"
 			}
 		}
 	}
@@ -375,8 +462,12 @@ run:
 	monitor.Unregister(monitor.Scheduler)
 }
 
-type pluginCapacity struct {
+type pluginOptions struct {
 	Capacity int `conf:"optional"`
+	System   struct {
+		ForceActiveChecksOnStart *int `conf:"optional"`
+		Capacity                 int  `conf:"optional"`
+	} `conf:"optional"`
 }
 
 func (m *Manager) init() {
@@ -398,21 +489,7 @@ func (m *Manager) init() {
 	pagent := &pluginAgent{}
 	for _, metric := range metrics {
 		if metric.Plugin != pagent.impl {
-			capacity := metric.Plugin.Capacity()
-			var opts pluginCapacity
-			optsRaw := agent.Options.Plugins[metric.Plugin.Name()]
-			if optsRaw != nil {
-				if err := conf.Unmarshal(optsRaw, &opts, false); err != nil {
-					log.Warningf("invalid plugin %s configuration: %s", metric.Plugin.Name(), err)
-					log.Warningf("using default plugin capacity settings: %d", plugin.DefaultCapacity)
-					capacity = plugin.DefaultCapacity
-				} else {
-					if opts.Capacity != 0 {
-						capacity = opts.Capacity
-					}
-				}
-			}
-
+			capacity, forceActiveChecksOnStart := getPluginOptions(agent.Options.Plugins[metric.Plugin.Name()], metric.Plugin.Name())
 			if capacity > metric.Plugin.Capacity() {
 				log.Warningf("lowering the plugin %s capacity to %d as the configured capacity %d exceeds limits",
 					metric.Plugin.Name(), metric.Plugin.Capacity(), capacity)
@@ -420,12 +497,14 @@ func (m *Manager) init() {
 			}
 
 			pagent = &pluginAgent{
-				impl:         metric.Plugin,
-				tasks:        make(performerHeap, 0),
-				maxCapacity:  capacity,
-				usedCapacity: 0,
-				index:        -1,
-				refcount:     0,
+				impl:                     metric.Plugin,
+				tasks:                    make(performerHeap, 0),
+				maxCapacity:              capacity,
+				usedCapacity:             0,
+				forceActiveChecksOnStart: forceActiveChecksOnStart,
+				index:                    -1,
+				refcount:                 0,
+				usrprm:                   metric.UsrPrm,
 			}
 
 			interfaces := ""
@@ -445,12 +524,23 @@ func (m *Manager) init() {
 				interfaces += "configurator, "
 			}
 			interfaces = interfaces[:len(interfaces)-2]
-			log.Infof("using plugin '%s' providing following interfaces: %s", metric.Plugin.Name(), interfaces)
+
+			if metric.Plugin.IsExternal() {
+				ext := metric.Plugin.(*external.Plugin)
+				log.Infof("using plugin '%s' (%s) providing following interfaces: %s", metric.Plugin.Name(),
+					ext.Path, interfaces)
+			} else {
+				log.Infof("using plugin '%s' (built-in) providing following interfaces: %s", metric.Plugin.Name(),
+					interfaces)
+			}
 		}
 		m.plugins[metric.Key] = pagent
 	}
 }
+
 func (m *Manager) Start() {
+	log.Infof("%s", comms.GetPluginVersionMessage())
+
 	monitor.Register(monitor.Scheduler)
 	go m.run()
 }
@@ -459,13 +549,14 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, 
+func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, firstActiveChecksRefreshed bool,
 	expressions []*glexpr.Expression, requests []*plugin.Request) {
 
 	m.input <- &updateRequest{clientID: clientID,
-		sink:     writer,
-		requests: requests,
-		expressions: expressions,
+		sink:                       writer,
+		requests:                   requests,
+		expressions:                expressions,
+		firstActiveChecksRefreshed: firstActiveChecksRefreshed,
 	}
 }
 
@@ -492,7 +583,7 @@ func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64
 
 	w := make(resultWriter, 1)
 
-	m.UpdateTasks(clientID, w, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
 
 	select {
 	case r := <-w:
@@ -522,9 +613,15 @@ func (m *Manager) Query(command string) (status string) {
 	return <-request.sink
 }
 
+func (m *Manager) QueryUserParams() (status string) {
+	request := &queryRequestUserParams{sink: make(chan string)}
+	m.input <- request
+	return <-request.sink
+}
+
 func (m *Manager) validatePlugins(options *agent.AgentOptions) (err error) {
 	for _, p := range plugin.Plugins {
-		if c, ok := p.(plugin.Configurator); ok {
+		if c, ok := p.(plugin.Configurator); ok && !p.IsExternal() {
 			if err = c.Validate(options.Plugins[p.Name()]); err != nil {
 				return fmt.Errorf("invalid plugin %s configuration: %s", p.Name(), err)
 			}
@@ -545,4 +642,90 @@ func NewManager(options *agent.AgentOptions) (mannager *Manager, err error) {
 		return
 	}
 	return &m, m.configure(options)
+}
+
+func (m *Manager) addUserParamsPlugin(key string) {
+	var metric *plugin.Metric
+
+	for _, metric = range plugin.Metrics {
+		if metric.Key == key {
+			break
+		}
+	}
+
+	capacity := metric.Plugin.Capacity()
+
+	pagent := &pluginAgent{
+		impl:         metric.Plugin,
+		tasks:        make(performerHeap, 0),
+		maxCapacity:  capacity,
+		usedCapacity: 0,
+		index:        -1,
+		refcount:     0,
+		usrprm:       metric.UsrPrm,
+	}
+
+	m.plugins[key] = pagent
+}
+
+func peekTask(tasks performerHeap) performer {
+	if len(tasks) == 0 {
+		return nil
+	}
+
+	return tasks[0]
+}
+
+func getPluginOptions(optsRaw interface{}, name string) (capacity int, forceActiveChecksOnStart int) {
+	pluginCap, pluginSystemCap, pluginForceActiveChecksOnStart := getPluginOpts(optsRaw, name)
+
+	if pluginSystemCap > 0 {
+		if pluginCap > 0 {
+			log.Warningf("both Plugins.%s.Capacity and Plugins.%s.System.Capacity configuration parameters are set, using System.Capacity: %d",
+				name, name, pluginSystemCap)
+		}
+		capacity = pluginSystemCap
+	} else if pluginCap > 0 {
+		log.Warningf(
+			"plugin %s configuration parameter Plugins.%s.Capacity is deprecated, use Plugins.%s.System.Capacity instead",
+			name, name, name,
+		)
+		capacity = pluginCap
+	} else {
+		capacity = plugin.DefaultCapacity
+	}
+
+	if nil != pluginForceActiveChecksOnStart {
+		if *pluginForceActiveChecksOnStart > 1 || *pluginForceActiveChecksOnStart < 0 {
+			log.Warningf("invalid Plugins.%s.System.ForceActiveChecksOnStart configuration parameter: %d",
+				name, *pluginForceActiveChecksOnStart)
+			forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
+		} else {
+			forceActiveChecksOnStart = *pluginForceActiveChecksOnStart
+		}
+	} else {
+		forceActiveChecksOnStart = agent.Options.ForceActiveChecksOnStart
+	}
+
+	return
+}
+
+func getPluginOpts(optsRaw interface{}, name string) (pluginCap, pluginSystemCap int, forceActiveChecksOnStart *int) {
+	var opt pluginOptions
+
+	if optsRaw == nil {
+		return
+	}
+
+	if err := conf.Unmarshal(optsRaw, &opt, false); err != nil {
+		log.Warningf("invalid plugin %s configuration: %s", name, err)
+
+		return
+	}
+
+	pluginCap = opt.Capacity
+	pluginSystemCap = opt.System.Capacity
+	forceActiveChecksOnStart = opt.System.ForceActiveChecksOnStart
+
+	return
 }

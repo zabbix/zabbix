@@ -1,0 +1,325 @@
+zabbix_export:
+  version: '6.0'
+  date: '2021-09-29T15:51:36Z'
+  media_types:
+    -
+      name: Github
+      type: WEBHOOK
+      parameters:
+        0:
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        1:
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        14:
+          name: event_id
+          value: '{EVENT.ID}'
+        2:
+          name: event_recovery_value
+          value: '{EVENT.RECOVERY.VALUE}'
+        3:
+          name: event_severity
+          value: '{EVENT.SEVERITY}'
+        4:
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        5:
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        6:
+          name: event_value
+          value: '{EVENT.VALUE}'
+        11:
+          name: github_issue_number
+          value: '{EVENT.TAGS.__zbx_github_issue_number}'
+        7:
+          name: github_repo
+          value: '{ALERT.SENDTO}'
+        8:
+          name: github_token
+          value: '<PLACE GITHUB TOKEN>'
+        9:
+          name: github_url
+          value: 'https://api.github.com'
+        10:
+          name: github_user_agent
+          value: Zabbix/6.0
+        12:
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        13:
+          name: zabbix_url
+          value: '{$ZABBIX.URL}'
+      script: |
+        var Github = {
+            params: {},
+        
+            setParams: function (params) {
+                if (typeof params !== 'object') {
+                    return;
+                }
+                Github.params = params;
+            },
+        
+            setProxy: function (HTTPProxy) {
+                Github.HTTPProxy = HTTPProxy;
+            },
+        
+            urlCheckFormat: function (url) {
+        
+                if (typeof url === 'string' && !url.endsWith('/')) {
+                    url += '/';
+                }
+        
+                if (url.indexOf('http://') === -1 && url.indexOf('https://') === -1) {
+                    url = 'https://' + url;
+                }
+        
+                return url;
+            },
+        
+            createProblemURL: function (zabbix_url, triggerid, eventid, event_source) {
+                var problem_url = zabbix_url;
+        
+                if (event_source === '0') {
+                    problem_url += 'tr_events.php?triggerid=' + triggerid + '&eventid=' + eventid;
+                }
+        
+                return problem_url;
+            },
+        
+            request: function (method, url, data) {
+                ['token', 'user_agent'].forEach(function (field) {
+                    if (typeof Github.params !== 'object' || typeof Github.params[field] === 'undefined' || Github.params[field] === '') {
+                        throw 'Required Github param is not set: "' + field + '".';
+                    }
+                });
+        
+                var response,
+                    request = new HttpRequest();
+        
+                request.addHeader('User-Agent: ' + Github.params.user_agent);
+                request.addHeader('Accept: application/vnd.github.v3+json');
+                request.addHeader('Authorization: token ' + Github.params.token);
+        
+                if (typeof Github.HTTPProxy !== 'undefined' && Github.HTTPProxy !== '') {
+                    request.setProxy(Github.HTTPProxy);
+                }
+        
+                if (typeof data !== 'undefined') {
+                    data = JSON.stringify(data);
+                }
+        
+                Zabbix.log(4, '[ Github Webhook ] Sending request: ' + url + ((typeof data === 'string')
+                    ? ('\n' + data)
+                    : ''));
+        
+                switch (method) {
+                    case 'post':
+                        response = request.post(url, data);
+                        break;
+        
+                    case 'patch':
+                        response = request.patch(url, data);
+                        break;
+        
+                    default:
+                        throw 'Unsupported HTTP request method: ' + method;
+                }
+        
+                Zabbix.log(4, '[ Github Webhook ] Received response with status code ' +
+                    request.getStatus() + '\n' + response);
+        
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        Zabbix.log(4, '[ Github Webhook ] Failed to parse response received from Github');
+                        response = null;
+                    }
+                }
+        
+                if (typeof response !== 'object') {
+                    throw 'Failed to process response received from Github. Check debug log for more information.';
+                }
+        
+                if (request.getStatus() < 200 || request.getStatus() >= 300) {
+                    var message = 'Request failed with status code ' + request.getStatus();
+        
+                    if (response.message) {
+                        message += ': ' + response.message;
+                    }
+        
+                    throw message + ' Check debug log for more information.';
+                }
+        
+                return response;
+            }
+        };
+        
+        try {
+            var params = JSON.parse(value),
+                github = {},
+                url = '',
+                data = {},
+                comment_data,
+                result = { tags: {} },
+                required_params = [
+                    'alert_subject', 'alert_message', 'event_source', 'event_value',
+                    'event_update_status', 'event_recovery_value', 'event_severity',
+                    'event_id', 'trigger_id', 'zabbix_url',
+                    'github_token', 'github_url', 'github_user_agent'
+                ],
+                method = 'post',
+                process_tags = true;
+        
+            Object.keys(params)
+                .forEach(function (key) {
+                    if (key.startsWith('github_')) {
+                        github[key.substring(7)] = params[key];
+                    }
+                    else if (required_params.indexOf(key) !== -1 && params[key] === '') {
+                        throw 'Parameter "' + key + '" can\'t be empty.';
+                    }
+                });
+        
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
+            }
+        
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+        
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+            }
+        
+            if (params.event_source !== '0' && params.event_recovery_value === '0') {
+                throw 'Recovery operations are supported only for trigger-based actions.';
+            }
+        
+            if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '' || params.zabbix_url === '{$ZABBIX.URL}') {
+                throw 'Field "zabbix_url" cannot be empty.';
+            }
+        
+            // Check for backslash in the end of url and schema.
+            github.url = Github.urlCheckFormat(github.url);
+            params.zabbix_url = Github.urlCheckFormat(params.zabbix_url);
+        
+            // Default url for creating issue
+            url = github.url + 'repos/' + github.repo + '/issues';
+        
+            data.title = params.alert_subject;
+            data.body = params.alert_message;
+            data.labels = [
+                { name: "Zabbix" }
+            ];
+        
+            // Adding label corresponding to trigger severity in Zabbix.
+            if (params.event_severity !== 'undefined' && params.event_source === '0') {
+                data.labels.push({ name: params.event_severity });
+            }
+        
+            // In case of update or resolve event.
+            if (params.event_source === '0' && (params.event_value === '0' || params.event_update_status === '1')) {
+                process_tags = false;
+                method = 'patch';
+                url = github.url + 'repos/' + github.repo + '/issues/' + github.issue_number;
+                comment_data = Object.assign({}, data);
+                delete data.body;
+            } else {
+                problem_url = Github.createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source);
+                data.body += '\nEvent details in Zabbix: [' + problem_url + '](' + problem_url + ')';
+            }
+        
+            Github.setParams(github);
+            Github.setProxy(params.HTTPProxy);
+        
+            var response = Github.request(method, url, data);
+        
+            // Leave a comment if comment_data present.
+            if (typeof comment_data === 'object') {
+                url = github.url + 'repos/' + github.repo + '/issues/' + github.issue_number + '/comments';
+                Github.request("post", url, comment_data);
+            }
+        
+            if (process_tags) {
+                result.tags.__zbx_github_issue_number = response.number;
+                result.tags.__zbx_github_repo = github.repo;
+                result.tags.__zbx_github_link = response.html_url;
+            }
+        
+            Zabbix.log(4, '[ Github Webhook ] Result: ' + JSON.stringify(result));
+            return JSON.stringify(result);
+        }
+        catch (error) {
+            Zabbix.log(4, '[ Github Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      process_tags: 'YES'
+      show_event_menu: 'YES'
+      event_menu_url: '{EVENT.TAGS.__zbx_github_link}'
+      event_menu_name: 'Github: Issue {EVENT.TAGS.__zbx_github_issue_number}'
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+            
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+            
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+            
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}

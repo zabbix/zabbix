@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,14 +27,14 @@ class CControllerDashboardView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'dashboardid' => 'db dashboard.dashboardid',
-			'source_dashboardid' => 'db dashboard.dashboardid',
-			'hostid' => 'db hosts.hostid',
-			'new' => 'in 1',
-			'cancel' => 'in 1',
-			'from' => 'range_time',
-			'to' => 'range_time',
-			'slideshow' => 'in 1'
+			'dashboardid' =>		'db dashboard.dashboardid',
+			'source_dashboardid' =>	'db dashboard.dashboardid',
+			'hostid' =>				'db hosts.hostid',
+			'new' =>				'in 1',
+			'cancel' =>				'in 1',
+			'from' =>				'range_time',
+			'to' =>					'range_time',
+			'slideshow' =>			'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();

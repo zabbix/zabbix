@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ import (
 	"regexp"
 	"strings"
 
-	"zabbix.com/pkg/metric"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/uri"
+	"git.zabbix.com/ap/plugin-support/metric"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/uri"
 )
 
 const (
@@ -47,6 +47,7 @@ const (
 	keyLocks                           = "pgsql.locks"
 	keyOldestXid                       = "pgsql.oldest.xid"
 	keyPing                            = "pgsql.ping"
+	keyQueries                         = "pgsql.queries"
 	keyReplicationCount                = "pgsql.replication.count"
 	keyReplicationLagB                 = "pgsql.replication.lag.b"
 	keyReplicationLagSec               = "pgsql.replication.lag.sec"
@@ -107,7 +108,8 @@ func getHandlerFunc(key string) handlerFunc {
 		return locksHandler
 	case keyOldestXid:
 		return oldestXIDHandler
-
+	case keyQueries:
+		return queriesHandler
 	default:
 		return nil
 	}
@@ -173,10 +175,10 @@ var (
 			WithValidator(metric.LenValidator{Max: &maxPassLen})
 	paramDatabase = metric.NewConnParam("Database", "Database name to be used for connection.").
 			WithDefault("postgres").WithValidator(metric.LenValidator{Min: &minDBNameLen, Max: &maxDBNameLen})
-	paramTLSConnect  = metric.NewConnParam("TLSConnect", "DB connection encryption type.").WithDefault("").SessionOnly()
-	paramTLSCaFile   = metric.NewConnParam("TLSCAFile", "TLS ca file path.").WithDefault("").SessionOnly()
-	paramTLSCertFile = metric.NewConnParam("TLSCertFile", "TLS cert file path.").WithDefault("").SessionOnly()
-	paramTLSKeyFile  = metric.NewConnParam("TLSKeyFile", "TLS key file path.").WithDefault("").SessionOnly()
+	paramTLSConnect  = metric.NewSessionOnlyParam("TLSConnect", "DB connection encryption type.").WithDefault("")
+	paramTLSCaFile   = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
+	paramTLSCertFile = metric.NewSessionOnlyParam("TLSCertFile", "TLS cert file path.").WithDefault("")
+	paramTLSKeyFile  = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
 )
 
 var metrics = metric.MetricSet{
@@ -201,11 +203,10 @@ var metrics = metric.MetricSet{
 			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyCustomQuery: metric.New("Returns result of a custom query.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
-			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile,
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase,
 			metric.NewParam("QueryName", "Name of a custom query "+
 				"(must be equal to a name of an SQL file without an extension).").SetRequired(),
-		}, true),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, true),
 
 	keyDBStat: metric.New("Returns JSON for sum of each type of statistic.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
@@ -242,6 +243,11 @@ var metrics = metric.MetricSet{
 	keyPing: metric.New("Tests if connection is alive or not.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,
 			paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+
+	keyQueries: metric.New("Returns queries statistic.",
+		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase,
+			metric.NewParam("TimePeriod", "Execution time limit for count of slow queries.").SetRequired(),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyReplicationCount: metric.New("Returns number of standby servers.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramDatabase, paramTLSConnect,

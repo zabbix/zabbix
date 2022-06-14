@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ func TestReceive(t *testing.T) {
 			data, err := c.read(m, nil)
 			if err == nil {
 				if result.failed {
-					t.Errorf("Expcted error while got success")
+					t.Errorf("Expected error while got success")
 				} else {
 					var buffer bytes.Buffer
 					for j := 0; j < len(result.data); j++ {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ class CItemManager {
 	 * @param array $itemids
 	 */
 	public static function delete(array $itemids) {
+		global $DB;
+
 		$del_itemids = [];
 		$del_ruleids = [];
 		$del_item_prototypeids = [];
@@ -204,6 +206,22 @@ class CItemManager {
 		];
 
 		$ins_housekeeper = [];
+
+		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
+			if (CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB) {
+				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) != 0
+						&& CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
+					$table_names = array_diff($table_names,
+						['history', 'history_str', 'history_uint', 'history_log', 'history_text']
+					);
+				}
+
+				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) != 0
+						&& CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 1) {
+					$table_names = array_diff($table_names, ['trends', 'trends_uint']);
+				}
+			}
+		}
 
 		foreach ($del_itemids as $del_itemid) {
 			foreach ($table_names as $table_name) {

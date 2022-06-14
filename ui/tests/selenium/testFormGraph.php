@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -197,14 +197,16 @@ class testFormGraph extends CLegacyWebTest {
 		if (isset($data['template'])) {
 			$this->zbxTestLogin('templates.php');
 			$this->query('button:Reset')->one()->click();
-			$this->zbxTestClickLinkTextWait($data['template']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenGraph($data['template'], $form);
 			$hostid = 30000;
 		}
 
 		if (isset($data['host'])) {
-			$this->zbxTestLogin('hosts.php');
+			$this->zbxTestLogin(self::HOST_LIST_PAGE);
 			$this->query('button:Reset')->one()->click();
-			$this->zbxTestClickLinkTextWait($data['host']);
+			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$this->filterEntriesAndOpenGraph($data['host'], $form);
 			if (isset($data['templatedHost'])) {
 				$hostid = 30001;
 			}
@@ -212,8 +214,6 @@ class testFormGraph extends CLegacyWebTest {
 				$hostid = 40001;
 			}
 		}
-
-		$this->zbxTestClickXpathWait('//div[@class="header-navigation"]//a[text()="Graphs"]');
 
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
@@ -241,7 +241,6 @@ class testFormGraph extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='name']", 'readonly');
@@ -253,7 +252,6 @@ class testFormGraph extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Width');
 		$this->zbxTestAssertVisibleId('width');
 		$this->zbxTestAssertAttribute("//input[@id='width']", 'maxlength', 5);
-		$this->zbxTestAssertAttribute("//input[@id='width']", 'size', 20);
 		$this->zbxTestAssertElementValue('width', 900);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='width']", 'readonly');
@@ -265,7 +263,6 @@ class testFormGraph extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Height');
 		$this->zbxTestAssertVisibleId('height');
 		$this->zbxTestAssertAttribute("//input[@id='height']", 'maxlength', 5);
-		$this->zbxTestAssertAttribute("//input[@id='height']", 'size', 20);
 		$this->zbxTestAssertElementValue('height', 200);
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestAssertAttribute("//input[@id='height']", 'readonly');
@@ -471,7 +468,6 @@ class testFormGraph extends CLegacyWebTest {
 				case 'Fixed':
 					$this->zbxTestAssertVisibleId('yaxismin');
 					$this->zbxTestAssertAttribute("//input[@id='yaxismin']", 'maxlength', 255);
-					$this->zbxTestAssertAttribute("//input[@id='yaxismin']", 'size', 20);
 					$this->zbxTestAssertElementValue('yaxismin', 0);
 
 					$this->zbxTestAssertElementNotPresentId('ymin_name');
@@ -501,7 +497,6 @@ class testFormGraph extends CLegacyWebTest {
 				case 'Fixed':
 					$this->zbxTestAssertVisibleId('yaxismax');
 					$this->zbxTestAssertAttribute("//input[@id='yaxismax']", 'maxlength', 255);
-					$this->zbxTestAssertAttribute("//input[@id='yaxismax']", 'size', 20);
 					$this->zbxTestAssertElementValue('yaxismax', 100);
 
 					$this->zbxTestAssertElementNotPresentId('ymax_name');
@@ -846,7 +841,6 @@ class testFormGraph extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$this->zbxTestLogin('graphs.php?hostid=40001&context=host&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
@@ -1006,5 +1000,18 @@ class testFormGraph extends CLegacyWebTest {
 			$this->zbxTestAssertElementValue('width', $width);
 			$this->zbxTestAssertElementValue('height', $height);
 		}
+	}
+
+	/**
+	 * Function for filtering necessary hosts or templates and opening their Graphs.
+	 *
+	 * @param string         $name    name of a host
+	 * @param CFormELement   $form    filter form element
+	 */
+	private function filterEntriesAndOpenGraph($name, $form) {
+		$form->fill(['Name' => $name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+				->getColumn('Graphs')->query('link:Graphs')->one()->click();
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ class testJSONRPC extends CAPITest {
 					'error' => [
 						'code' => -32600,
 						'message' => 'Invalid request.',
-						'data' => 'Invalid parameter "/jsonrpc": value must be one of 2.0.'
+						'data' => 'Invalid parameter "/jsonrpc": value must be "2.0".'
 					],
 					'id' => null
 				]

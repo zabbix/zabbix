@@ -14,7 +14,7 @@ schema=$basedir/../src/schema.tmpl
 
 echo "--
 -- Zabbix
--- Copyright (C) 2001-2021 Zabbix SIA
+-- Copyright (C) 2001-2022 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -47,20 +47,33 @@ for tbl_line in `grep "^TABLE.*${dbflag}" "${schema}"`; do
 	refs=()
 	depth=()
 
-	for fld_line in `sed -n "/^TABLE|${table}|/,/^$/ p" "${schema}" | grep "^FIELD" | grep -v "ZBX_NODATA" | sed 's/[ \t]//g'`; do
+	for fld_line in `sed -n "/^TABLE|${table}|/,/^$/ p" "${schema}" | grep "^FIELD" | sed 's/[ \t]//g'`; do
 		fld_line=${fld_line#*|}		# FIELD
 		field=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <field_name>
+		field_type=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <field_type>
+		default_val=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <default>
 		fld_line=${fld_line#*|}		# <not_null>
+		flags=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <flags>
 		fld_line=${fld_line#*|}		# <index #>
 		ref_table=${fld_line%%|*}
 		fld_line=${fld_line#*|}		# <ref_table>
 		ref_field=${fld_line%%|*}
 
-		fields="${fields}${delim}replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;') as ${field}"
+		if [[ "$flags" =~ ZBX_NODATA ]]; then
+			if [[ "$field_type" =~ ^t_(shorttext|text|longtext)$ ]]; then
+				[[ -n "$default_val" ]] || default_val="''"
+
+				fields="${fields}${delim} $default_val as ${field}"
+			else
+				continue
+			fi
+		else
+			fields="${fields}${delim}replace(replace(replace(${field},'|','&pipe;'),'\r\n','&eol;'),'\n','&bsn;') as ${field}"
+		fi
 		delim=','
 
 		if [[ ${ref_table} == ${table} ]]; then

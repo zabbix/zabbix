@@ -1,6 +1,6 @@
 zabbix_export:
-  version: '5.4'
-  date: '2021-07-22T14:52:56Z'
+  version: '6.0'
+  date: '2022-04-06T19:36:14Z'
   groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
@@ -29,7 +29,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/422668-discussion-thread-for-official-zabbix-templates-for-zyxel
         
-        Template tooling version used: 0.38
+        Template tooling version used: 0.41
       groups:
         -
           name: 'Templates/Network devices'
@@ -49,8 +49,8 @@ zabbix_export:
                 - 1h
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: network
           triggers:
             -
               uuid: 3bf5d80d383e4e98853caa02063d69c9
@@ -59,6 +59,10 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: be1d951beb564638a6102fe4b35fede0
           name: 'ZYXEL MGS3520-28x: Contact'
@@ -82,8 +86,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: abdb31aeb0034998b91ab8f9b475409f
           name: 'ZYXEL MGS3520-28x: CPU utilization'
@@ -95,20 +99,25 @@ zabbix_export:
           units: '%'
           description: |
             MIB: ZYXEL-ES-COMMON
-            Show device CPU load in %, it's the snapshot of CPU load when 
+            Show device CPU load in %, it's the snapshot of CPU load when
             getting the values.
           tags:
             -
-              tag: Application
-              value: CPU
+              tag: component
+              value: cpu
           triggers:
             -
               uuid: 96ed7ee3906541ea9cb2c95cf4da1a62
               expression: 'min(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.cpuusage,5m)>{$CPU.UTIL.CRIT}'
-              name: 'ZYXEL MGS3520-28x: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              name: 'ZYXEL MGS3520-28x: High CPU utilization'
+              event_name: 'ZYXEL MGS3520-28x: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: dd0ab3fa502b43969eec05ffd687450e
           name: 'ZYXEL MGS3520-28x: ZyNOS F/W Version'
@@ -128,8 +137,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: 3785991565b948c2a1e1a2a140c42df4
@@ -139,6 +148,10 @@ zabbix_export:
               priority: INFO
               description: 'Firmware version has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: d9923ed59ef14cbebfe2f6d24c0d8414
           name: 'ZYXEL MGS3520-28x: Location'
@@ -161,8 +174,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 65116a646d734290926de9444a58ff2d
           name: 'ZYXEL MGS3520-28x: MAC address'
@@ -188,8 +201,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 89d6942524f84e6d80d02a80be25ce57
           name: 'ZYXEL MGS3520-28x: Memory utilization'
@@ -202,15 +215,23 @@ zabbix_export:
             Show device memory usage in %.
           tags:
             -
-              tag: Application
-              value: Memory
+              tag: component
+              value: memory
           triggers:
             -
               uuid: 1a999dff1dd9481083681741e71aba76
               expression: 'min(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.memusage,5m)>{$MEMORY.UTIL.MAX}'
-              name: 'ZYXEL MGS3520-28x: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              name: 'ZYXEL MGS3520-28x: High memory utilization'
+              event_name: 'ZYXEL MGS3520-28x: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
               priority: AVERAGE
               description: 'The system is running out of free memory.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 2dced10921704f8a9ccaabb2f951af15
           name: 'ZYXEL MGS3520-28x: Hardware model name'
@@ -237,8 +258,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: d72bc70a67014d818d593d6c484fc9ee
@@ -246,6 +267,10 @@ zabbix_export:
               name: 'ZYXEL MGS3520-28x: Template does not match hardware'
               priority: INFO
               description: 'This template is for Zyxel MGS3520-28x series, but connected to {ITEM.VALUE}'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: bccc98beb7ea45d6a7463de339e8877e
           name: 'ZYXEL MGS3520-28x: Host name'
@@ -269,8 +294,8 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
         -
           uuid: 095d82b3c92340debb324844a6c7f8a8
           name: 'ZYXEL MGS3520-28x: Hardware serial number'
@@ -292,16 +317,21 @@ zabbix_export:
                 - 6h
           tags:
             -
-              tag: Application
-              value: Inventory
+              tag: component
+              value: inventory
           triggers:
             -
               uuid: e953886c5a464fc18bb1e221d801901c
               expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber,#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.serialnumber))>0'
-              name: 'ZYXEL MGS3520-28x: Device has been replaced (new serial number received)'
+              name: 'ZYXEL MGS3520-28x: Device has been replaced'
+              event_name: 'ZYXEL MGS3520-28x: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Ack to close'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
         -
           uuid: 78959009721a453c8b8a2c49eb26c90c
           name: 'ZYXEL MGS3520-28x: Uptime'
@@ -324,16 +354,21 @@ zabbix_export:
                 - '0.01'
           tags:
             -
-              tag: Application
-              value: Status
+              tag: component
+              value: system
           triggers:
             -
               uuid: 308761b6dffb44c7b827f6ca76312233
               expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.uptime)<10m'
-              name: 'ZYXEL MGS3520-28x: has been restarted (uptime < 10m)'
+              name: 'ZYXEL MGS3520-28x: has been restarted'
+              event_name: 'ZYXEL MGS3520-28x: has been restarted (uptime < 10m)'
               priority: INFO
               description: 'Uptime is less than 10 minutes'
               manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
       discovery_rules:
         -
           uuid: e56b6958ca184f549d86502ad9aa10bc
@@ -362,8 +397,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Fans
+                  tag: component
+                  value: fan
+                -
+                  tag: component
+                  value: sensor
               trigger_prototypes:
                 -
                   uuid: 9eedeb7aaba943c0947896cd50b39c7f
@@ -372,6 +410,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 8599554de97e46e2bb7d3575d97f9453
@@ -410,7 +452,6 @@ zabbix_export:
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'An entry in fanRpmTable.'
           item_prototypes:
             -
               uuid: 43cf7ba65c39475b9614ed4b95e9b398
@@ -433,8 +474,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: de6bab43bf544489976261919ae52e98
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Interface name'
@@ -454,8 +501,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 01f3cc6551bb4703b199e6c996ad48ce
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link speed'
@@ -478,8 +531,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 68b987f900c0467ea77a8c8eb661f6d0
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming broadcast packages'
@@ -500,8 +559,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: ddcef9809ee34de5bec1acbdc8abc162
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming multicast packages'
@@ -523,8 +588,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: e8c2a3a8ba654311bc90901502983b7a
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming traffic'
@@ -548,8 +619,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 003eb52b5fe44f509b3c04eef9cc2aa7
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming unicast packages'
@@ -570,8 +647,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 8e060cde0fae44d792080fbc7da5a2a1
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Incoming utilization'
@@ -595,8 +678,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 15a2c17e0bba4f0d824790c3caa9840f
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Link type'
@@ -616,8 +705,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: f42c5604726d4d21a840418e5668287c
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Interface description'
@@ -637,8 +732,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: cfd32eee855647b79c95d6f151f13407
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Operational status'
@@ -660,8 +761,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: abb9d47ee9624d6f9805e6eedd5532c5
@@ -678,6 +785,10 @@ zabbix_export:
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 26f87786719c4192949536c74c146b4d
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing broadcast packages'
@@ -699,8 +810,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 4227a6eb8cce4dd8ab582ffce2788e6e
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing multicast packages'
@@ -723,8 +840,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 9a7eb0b7569d4111a33d84d03b5018e4
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing traffic'
@@ -749,8 +872,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 768be526caa345b2b23996016a19e217
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing unicast packages'
@@ -772,8 +901,14 @@ zabbix_export:
                     - ''
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: e2b22f4c39974628a4476120b310a6fb
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Outgoing utilization'
@@ -797,8 +932,14 @@ zabbix_export:
                     - 'return +parseFloat(value).toFixed(0);'
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 285f30d057f8438ab0d94367bcd6bdfc
               name: 'ZYXEL MGS3520-28x: Port {#SNMPINDEX}: Speed Duplex'
@@ -808,13 +949,13 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: ZYXEL-PORT-MIB
-                Select The speed and the duplex mode of the Ethernet connection on this port. Selecting Auto 
-                (auto-negotiation) allows one port to negotiate with a peer port automatically to obtain the 
-                connection speed and duplex mode that both ends support. When auto-negotiation is turned on, 
-                a port on the Switch negotiates with the peer automatically to determine the connection speed 
-                and duplex mode. If the peer port does not support auto-negotiation or turns off this feature, 
-                the Switch determines the connection speed by detecting the signal on the cable and using half 
-                duplex mode. Thus requiring you to make sure that the settings of the peer port are the same in 
+                Select The speed and the duplex mode of the Ethernet connection on this port. Selecting Auto
+                (auto-negotiation) allows one port to negotiate with a peer port automatically to obtain the
+                connection speed and duplex mode that both ends support. When auto-negotiation is turned on,
+                a port on the Switch negotiates with the peer automatically to determine the connection speed
+                and duplex mode. If the peer port does not support auto-negotiation or turns off this feature,
+                the Switch determines the connection speed by detecting the signal on the cable and using half
+                duplex mode. Thus requiring you to make sure that the settings of the peer port are the same in
                 order to connect.
               valuemap:
                 name: 'ZYXEL MGS3520-28x operational mode port speed duplex'
@@ -825,8 +966,14 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
           graph_prototypes:
             -
               uuid: a7a2aec27f0045eba26e86e8cb08853a
@@ -962,21 +1109,37 @@ zabbix_export:
                     - 6h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#ZYXEL.SFP.PORT}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: 27cd25ea30fa4f1c9b7b431218241d0c
                   expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}'
-                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The upper threshold value of the parameter is exceeded'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
                 -
                   uuid: 1188909e81c14c23aa9eefbb25a4c367
                   expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}'
-                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
+                  name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}'
+                  event_name: 'ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT})'
                   priority: WARNING
                   description: 'The parameter values are less than the lower threshold'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 5d6e873606684351a68d649a8f7cd5d4
@@ -1050,8 +1213,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 743a5eaf2c1049d4bf517c7e6f1f350d
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Part number'
@@ -1072,8 +1241,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: e40f07be73ca4e15acc109f8565f491b
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Revision'
@@ -1094,8 +1269,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 42db7a2affe54f059015adeae188efea
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Serial number'
@@ -1116,16 +1297,27 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
               trigger_prototypes:
                 -
                   uuid: b9c3894fed8140c684be7c1fe2bbca8d
                   expression: 'last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0'
-                  name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced (new serial number received)'
+                  name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced'
+                  event_name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX} has been replaced (new serial number received)'
                   priority: INFO
                   description: 'SFP {#SNMPINDEX} serial number has changed. Ack to close'
                   manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
             -
               uuid: 8ff52d1298f74fa0a211c80373c25f9b
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Status'
@@ -1146,8 +1338,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: b11f1d31e3a04b39b6e9ec40a800a7d5
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Transceiver'
@@ -1168,8 +1366,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
             -
               uuid: 2656c166a30d4ee19465c8e9b2986a10
               name: 'ZYXEL MGS3520-28x: SFP {#SNMPINDEX}: Vendor'
@@ -1190,8 +1394,14 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Port {#SNMPINDEX}'
+                  tag: component
+                  value: network
+                -
+                  tag: description
+                  value: '{#ZYXEL.IF.NAME}'
+                -
+                  tag: interface
+                  value: '{#SNMPINDEX}'
         -
           uuid: 0fa2bd401cc14847a8fd366b895a6a51
           name: 'Temperature discovery'
@@ -1219,8 +1429,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: Temperature
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: temperature
               trigger_prototypes:
                 -
                   uuid: c2d4142fb8934eb7b66f5a5e4fa04398
@@ -1229,6 +1442,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the temperature'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 96fcc6df9a324347a550dd0df84ac15a
@@ -1271,8 +1488,11 @@ zabbix_export:
                     - 1h
               tags:
                 -
-                  tag: Application
-                  value: 'Power supply'
+                  tag: component
+                  value: sensor
+                -
+                  tag: component
+                  value: voltage
               trigger_prototypes:
                 -
                   uuid: 22b6f2f48eae4167b31c8fe3ccbc138a
@@ -1281,6 +1501,10 @@ zabbix_export:
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
           graph_prototypes:
             -
               uuid: 74f0c4aba0db42869c1797c0631b7d03
@@ -1299,10 +1523,26 @@ zabbix_export:
                   var inArray = JSON.parse(value);
                   var outArr = []
                   inArray.forEach(function(item, i, arr) {
-                  item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000; 
+                  item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000;
                   outArr.push(item)
                   });
                   return JSON.stringify(outArr);
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: mgs3520-28
+        -
+          tag: target
+          value: mgs3520-28f
+        -
+          tag: target
+          value: switch
+        -
+          tag: target
+          value: zyxel
       macros:
         -
           macro: '{$CPU.UTIL.CRIT}'
@@ -1316,12 +1556,18 @@ zabbix_export:
           description: 'The time interval for SNMP agent availability trigger expression.'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.CONTROL.MATCHES}'
-          value: 'CHANGE_IF_NEEDED'
+          value: CHANGE_IF_NEEDED
           description: 'Triggers will be created only for interfaces whose description contains the value of this macro'
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
           value: 1|2|3|4
-          description: 'Filter of discoverable link types. 0 - Down link 1 - Cooper link 2 - Fiber link 3 - XFP 4 - CX4'
+          description: |
+            Filter of discoverable link types.
+            0 - Down link
+            1 - Cooper link
+            2 - Fiber link
+            3 - XFP
+            4 - CX4
         -
           macro: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
@@ -1337,7 +1583,11 @@ zabbix_export:
         -
           macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.MATCHES}'
           value: 1|2
-          description: 'Filter of discoverable status. 0 - OK with DDM 1 - OK without DDM 2 - nonoperational'
+          description: |
+            Filter of discoverable status.
+            0 - OK with DDM
+            1 - OK without DDM
+            2 - nonoperational
         -
           macro: '{$ZYXEL.LLD.FILTER.SFP.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED

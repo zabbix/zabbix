@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,11 +120,11 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 	}
 	$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
 
-	if ((defined('ZBX_PAGE_DO_REFRESH') || defined('ZBX_PAGE_DO_JS_REFRESH')) && CWebUser::getRefresh() != 0) {
+	if (defined('ZBX_PAGE_DO_JS_REFRESH') && CWebUser::getRefresh() != 0) {
 		$pageTitle .= ' ['._s('refreshed every %1$s sec.', CWebUser::getRefresh()).']';
 	}
 
-	$pageHeader = new CPageHeader($pageTitle);
+	$pageHeader = new CPageHeader($pageTitle, CWebUser::getLang());
 	$is_standard_page = (!defined('ZBX_PAGE_NO_MENU') || $page['web_layout_mode'] == ZBX_LAYOUT_KIOSKMODE);
 
 	$theme = ZBX_DEFAULT_THEME;
@@ -138,8 +138,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			$pageHeader->addStyle(getTriggerStatusCss());
 
 			// perform Zabbix server check only for standard pages
-			if ($is_standard_page && CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL) && !empty($ZBX_SERVER)
-					&& !empty($ZBX_SERVER_PORT)) {
+			if ($is_standard_page && CSettingsHelper::get(CSettingsHelper::SERVER_CHECK_INTERVAL)) {
 				$page['scripts'][] = 'servercheck.js';
 			}
 		}
@@ -178,7 +177,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 	$pageHeader->display();
 
-	echo '<body lang="'.CWebUser::getLang().'">';
+	echo '<body>';
 }
 
 define('PAGE_HEADER_LOADED', 1);

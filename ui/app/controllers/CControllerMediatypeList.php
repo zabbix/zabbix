@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ class CControllerMediatypeList extends CController {
 		if ($data['mediatypes']) {
 			// get media types used in actions
 			$actions = API::Action()->get([
-				'output' => ['actionid', 'name'],
+				'output' => ['actionid', 'name', 'eventsource'],
 				'selectOperations' => ['operationtype', 'opmessage'],
 				'mediatypeids' => array_keys($data['mediatypes'])
 			]);
@@ -116,7 +116,8 @@ class CControllerMediatypeList extends CController {
 
 							$mediaType['listOfActions'][$action['actionid']] = [
 								'actionid' => $action['actionid'],
-								'name' => $action['name']
+								'name' => $action['name'],
+								'eventsource' => $action['eventsource']
 							];
 						}
 					}

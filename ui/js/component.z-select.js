@@ -1,3 +1,23 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2021 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+
 class ZSelect extends HTMLElement {
 
 	constructor() {
@@ -6,6 +26,7 @@ class ZSelect extends HTMLElement {
 		this._options_map = new Map();
 
 		this._option_template = "#{label}";
+		this._selected_option_template = "#{label}";
 
 		this._highlighted_index = -1;
 		this._preselected_index = -1;
@@ -106,6 +127,11 @@ class ZSelect extends HTMLElement {
 		if (this.hasAttribute('option-template')) {
 			this._option_template = this.getAttribute('option-template');
 			this.removeAttribute('option-template');
+		}
+
+		if (this.hasAttribute('selected-option-template')) {
+			this._selected_option_template = this.getAttribute('selected-option-template');
+			this.removeAttribute('selected-option-template');
 		}
 
 		if (this.hasAttribute('data-options')) {
@@ -333,7 +359,9 @@ class ZSelect extends HTMLElement {
 		const option = this.getOptionByIndex(index);
 
 		if (option) {
-			this._button.innerText = option.label;
+			this._button.innerHTML = new Template(this._selected_option_template).evaluate(
+				Object.assign({label: option.label.trim()}, option.extra || {})
+			);
 			this._input.disabled = this.hasAttribute('disabled');
 		}
 		else {

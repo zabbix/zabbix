@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ class CTabFilter extends CBaseComponent {
 
 		for (const template of this._target.querySelectorAll('[type="text/x-jquery-tmpl"][data-template]')) {
 			this._templates[template.getAttribute('data-template')] = template;
-		};
+		}
 
 		for (const title of this._target.querySelectorAll('nav [data-target]')) {
 			item = this.create(title, options.data[index] || {});
@@ -279,7 +279,6 @@ class CTabFilter extends CBaseComponent {
 
 			if (item) {
 				item.updateCounter(value);
-				return;
 			}
 		});
 
@@ -295,6 +294,7 @@ class CTabFilter extends CBaseComponent {
 	 */
 	setSelectedItem(item) {
 		this._active_item = item;
+		this._active_item.unsetExpandedSubfilters();
 		item.setSelected();
 
 		if (item !== this._timeselector) {
@@ -327,6 +327,42 @@ class CTabFilter extends CBaseComponent {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Enable subfilter option by key and value.
+	 */
+	setSubfilter(key, value) {
+		this._active_item.setSubfilter(key, value);
+		this._active_item.updateUnsavedState();
+		this._active_item.updateApplyUrl();
+		this._active_item.setBrowserLocationToApplyUrl();
+	}
+
+	/**
+	 * Disable subfilter option by key and value.
+	 */
+	unsetSubfilter(key, value) {
+		this._active_item.unsetSubfilter(key, value);
+		this._active_item.updateUnsavedState();
+		this._active_item.updateApplyUrl();
+		this._active_item.setBrowserLocationToApplyUrl();
+	}
+
+	/**
+	 * Set expanded subfilter name.
+	 */
+	setExpandedSubfilters(name) {
+		return this._active_item.setExpandedSubfilters(name);
+	}
+
+	/**
+	 * Retrieve expanded subfilter names.
+	 *
+	 * @returns {array}
+	 */
+	getExpandedSubfilters() {
+		return this._active_item.getExpandedSubfilters();
 	}
 
 	/**
@@ -398,7 +434,9 @@ class CTabFilter extends CBaseComponent {
 				}
 
 				item.setExpanded();
-				this._target.querySelector('.tabfilter-content-container').classList.remove('display-none');
+
+				const tabfilter = this._target.querySelector('.tabfilter-content-container');
+				tabfilter.classList.remove('tabfilter-collapsed', 'display-none');
 			},
 
 			/**
@@ -412,7 +450,13 @@ class CTabFilter extends CBaseComponent {
 				}
 
 				item.removeExpanded();
-				this._target.querySelector('.tabfilter-content-container').classList.add('display-none');
+				const tabfilter = this._target.querySelector('.tabfilter-content-container');
+				if (tabfilter.querySelector('.tabfilter-subfilter')) {
+					tabfilter.classList.add('tabfilter-collapsed');
+				}
+				else {
+					tabfilter.classList.add('tabfilter-collapsed', 'display-none');
+				}
 			},
 
 			/**
@@ -600,6 +644,8 @@ class CTabFilter extends CBaseComponent {
 			 * Action on 'Apply' button press.
 			 */
 			buttonApplyAction: () => {
+				this._active_item.unsetExpandedSubfilters();
+				this._active_item.emptySubfilter();
 				this._active_item.updateUnsavedState();
 				this._active_item.updateApplyUrl();
 				this._active_item.setBrowserLocationToApplyUrl();
@@ -682,7 +728,7 @@ class CTabFilter extends CBaseComponent {
 				const $item = ui.item;
 
 				/**
-				 * Remove inline style positon, left and top that stay after sortable.
+				 * Remove inline style position, left and top that stay after sortable.
 				 * This styles broken tabs layout.
 				 */
 				if ($item.css('position') === 'relative') {

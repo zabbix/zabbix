@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ class testTriggerValidation extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot create circular dependencies.'
+				'expected_error' => 'Trigger "test-trigger-1" cannot depend on the trigger "test-trigger-2", because a circular linkage ("test-trigger-2" -> "test-trigger-1" -> "test-trigger-2") would occur.'
 			],
 			'delete trigger name' => [
 				'triggers' => [
@@ -129,7 +129,7 @@ class testTriggerValidation extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Cannot create dependency on trigger itself.'
+				'expected_error' => 'Trigger "test-trigger-1" cannot depend on the trigger "test-trigger-1", because a circular linkage ("test-trigger-1" -> "test-trigger-1") would occur.'
 			],
 			'update read-only properties' => [
 				'triggers' => [
@@ -292,7 +292,7 @@ class testTriggerValidation extends CAPITest {
 				],
 				'expected_error' => 'Incorrect value for field "recovery_expression": cannot be empty.'
 			],
-			'Trigger with invalid recovery exporession #1' => [
+			'Trigger with invalid recovery expression #1' => [
 				'triggers' => [
 					[
 						'description' => 'Trigger with expected recovery exporession',
@@ -303,7 +303,7 @@ class testTriggerValidation extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/recovery_expression": a character string is expected.'
 			],
-			'Trigger with invalid recovery exporession #2' => [
+			'Trigger with invalid recovery expression #2' => [
 				'triggers' => [
 					[
 						'description' => 'Trigger with expected recovery exporession',
@@ -392,7 +392,7 @@ class testTriggerValidation extends CAPITest {
 						]]
 					]
 				],
-				'expected_error' => 'Cannot add dependency from a host to a template.'
+				'expected_error' => 'Trigger "Trigger with invalid dependencies" cannot depend on the trigger "template-trigger", because dependencies of host triggers on template triggers are not allowed.'
 			],
 			'Trigger with invalid dependencies #3' => [
 				'triggers' => [

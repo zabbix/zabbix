@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 5.4 and higher  
+For Zabbix version: 6.0 and higher  
 The template to monitor TLS/SSL certificate on the website by Zabbix agent 2 that works without any external scripts.
 Zabbix agent 2 with the WebCertificate plugin requests certificate using the web.certificate.get key and returns
 JSON with certificate attributes.
@@ -58,19 +58,19 @@ There are no template links in this template.
 |General |Cert: Subject alternative name |<p>The subject alternative name extension allows identities to be bound to the subject of the certificate.  These identities may be included in addition to or in place of the identity in the subject field of the certificate.  Defined options include an Internet electronic mail address, a DNS name, an IP address, and a Uniform Resource Identifier (URI).</p> |DEPENDENT |cert.alternative_names<p>**Preprocessing**:</p><p>- JSONPATH: `$.x509.alternative_names`</p> |
 |General |Cert: Public key algorithm |<p>The digital signature algorithm is used to verify the signature of a certificate.</p> |DEPENDENT |cert.public_key_algorithm<p>**Preprocessing**:</p><p>- JSONPATH: `$.x509.public_key_algorithm`</p> |
 |General |Cert: Fingerprint |<p>The Certificate Signature (SHA1 Fingerprint or Thumbprint) is the hash of the entire certificate in DER form.</p> |DEPENDENT |cert.sha1_fingerprint<p>**Preprocessing**:</p><p>- JSONPATH: `$.sha1_fingerprint`</p> |
-|Zabbix_raw_items |Cert: Get |<p>Returns the JSON with attributes of a certificate of the requested site.</p> |ZABBIX_PASSIVE |web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
+|Zabbix raw items |Cert: Get |<p>Returns the JSON with attributes of a certificate of the requested site.</p> |ZABBIX_PASSIVE |web.certificate.get[{$CERT.WEBSITE.HOSTNAME},{$CERT.WEBSITE.PORT},{$CERT.WEBSITE.IP}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `6h`</p> |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Cert: SSL certificate is invalid |<p>SSL certificate has expired or it is issued for another domain.</p> |`find(/TEMPLATE_NAME/cert.validation,,"like","invalid")=1` |HIGH | |
-|Cert: SSL certificate expires soon (less than {$CERT.EXPIRY.WARN} days) |<p>The SSL certificate should be updated or it will become untrusted.</p> |`(last(/TEMPLATE_NAME/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}` |WARNING |<p>**Depends on**:</p><p>- Cert: SSL certificate is invalid</p> |
-|Cert: Fingerprint has changed (new version: {ITEM.VALUE}) |<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</p><p>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p> |`last(/TEMPLATE_NAME/cert.sha1_fingerprint) <> last(/TEMPLATE_NAME/cert.sha1_fingerprint,#2)` |INFO |<p>Manual close: YES</p> |
+|Cert: SSL certificate is invalid |<p>SSL certificate has expired or it is issued for another domain.</p> |`find(/Website certificate by Zabbix agent 2/cert.validation,,"like","invalid")=1` |HIGH | |
+|Cert: SSL certificate expires soon |<p>The SSL certificate should be updated or it will become untrusted.</p> |`(last(/Website certificate by Zabbix agent 2/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}` |WARNING |<p>**Depends on**:</p><p>- Cert: SSL certificate is invalid</p> |
+|Cert: Fingerprint has changed |<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Ack to close.</p><p>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p> |`last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint,#2)` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 
 Please report any issues with the template at https://support.zabbix.com
 
-You can also provide a feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring).
+You can also provide feedback, discuss the template or ask for help with it at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/428309-discussion-thread-for-official-zabbix-template-tls-ssl-certificates-monitoring).
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@ $this->includeJsFile(($data['action'] === 'user.edit')
 	? 'administration.user.edit.js.php'
 	: 'administration.userprofile.edit.js.php'
 );
-$this->addJsFile('multiselect.js');
-$this->addJsFile('class.tab-indicators.js');
 
 $widget = new CWidget();
 
@@ -206,7 +204,7 @@ if ($data['action'] === 'user.edit' && $data['db_user']['username'] === ZBX_GUES
 		->setReadonly();
 }
 else {
-	$has_unavailable_locale = false;
+	$all_locales_available = true;
 
 	foreach (getLocales() as $localeid => $locale) {
 		if (!$locale['display']) {
@@ -221,7 +219,9 @@ else {
 
 		$lang_select->addOption((new CSelectOption($localeid, $locale['name']))->setDisabled(!$locale_available));
 
-		$has_unavailable_locale |= !$locale_available;
+		if (!$locale_available) {
+			$all_locales_available = false;
+		}
 	}
 
 	// Restoring original locale.
@@ -231,7 +231,7 @@ else {
 		$language_error = 'Translations are unavailable because the PHP gettext module is missing.';
 		$lang_select->setReadonly();
 	}
-	elseif ($has_unavailable_locale) {
+	elseif (!$all_locales_available) {
 		$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 	}
 
@@ -293,7 +293,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 	$media_table_info = (new CTable())
 		->setId('media-table')
 		->setAttribute('style', 'width: 100%;')
-		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), ('Status'), _('Action')]);
+		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Action')]);
 
 	foreach ($data['medias'] as $index => $media) {
 		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
@@ -309,7 +309,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->addClass(ZBX_STYLE_RED);
 		}
 
-		$popup_options = [
+		$parameters = [
 			'dstfrm' => $user_form->getName(),
 			'media' => $index,
 			'mediatypeid' => $media['mediatypeid'],
@@ -318,18 +318,19 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			'severity' => $media['severity'],
 			'active' => $media['active']
 		];
-
-
 		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severity_name = getSeverityName($severity);
+			$severity_name = CSeverityHelper::getName($severity);
 
 			$media_active = ($media['severity'] & (1 << $severity));
 
 			$media_severity[$severity] = (new CSpan(mb_substr($severity_name, 0, 1)))
 				->setHint($severity_name.' ('.($media_active ? _('on') : _('off')).')', '', false)
-				->addClass($media_active ? getSeverityStatusStyle($severity) : ZBX_STYLE_STATUS_DISABLED_BG);
+				->addClass($media_active
+					? CSeverityHelper::getStatusStyle($severity)
+					: ZBX_STYLE_STATUS_DISABLED_BG
+				);
 		}
 
 		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
@@ -353,7 +354,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media",'.json_encode($popup_options).', null, this);'),
+							->onClick('return PopUp("popup.media", '.json_encode($parameters).');'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$index.');')
@@ -367,11 +368,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		(new CDiv([
 			$media_table_info,
 			(new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.media",'.
-					json_encode([
-						'dstfrm' => $user_form->getName()
-					]).', null, this);'
-				)
+				->onClick('return PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
 				->addClass(ZBX_STYLE_BTN_LINK)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -432,7 +429,7 @@ if ($data['action'] === 'user.edit') {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
 						? italic(_('All groups'))
-						: [$group_rights['name'], SPACE, italic('('._('including subgroups').')')];
+						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
 				}
 				else {
 					$group_name = $group_rights['name'];
@@ -448,6 +445,8 @@ if ($data['action'] === 'user.edit') {
 					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 			)
 			->addInfo(_('Permissions can be assigned for user groups only.'));
+
+		// UI elements section.
 
 		$permissions_form_list
 			->addRow((new CTag('h4', true, _('Access to UI elements')))->addClass('input-section-header'));
@@ -469,7 +468,107 @@ if ($data['action'] === 'user.edit') {
 			}
 		}
 
-		$permissions_form_list->addRow((new CTag('h4', true, _('Access to modules')))->addClass('input-section-header'));
+		// Services section.
+
+		$permissions_form_list->addRow(
+			(new CTag('h4', true, _('Access to services')))->addClass('input-section-header')
+		);
+
+		if ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_ALL) {
+			$permissions_form_list->addRow(
+				_('Read-write access to services'),
+				(new CDiv((new CSpan(_('All')))->addClass(ZBX_STYLE_STATUS_GREEN)))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+		elseif ($data['service_write_access'] == CRoleHelper::SERVICES_ACCESS_NONE) {
+			$permissions_form_list->addRow(
+				_('Read-write access to services'),
+				(new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY)))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+		elseif ($data['service_write_list']) {
+			$service_list = [];
+
+			foreach ($data['service_write_list'] as $service) {
+				$service_list[] = (new CSpan($service['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
+			}
+
+			$permissions_form_list->addRow(
+				_('Read-write access to services'),
+				(new CDiv($service_list))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+
+		if ($data['service_write_tag']['tag'] !== '') {
+			$permissions_form_list->addRow(
+				_('Read-write access to services with tag'),
+				(new CDiv(
+					(new CSpan([
+						$data['service_write_tag']['tag'],
+						$data['service_write_tag']['value'] !== '' ? ': '.$data['service_write_tag']['value'] : null
+					]))->addClass(ZBX_STYLE_TAG)
+				))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+
+		if ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_ALL) {
+			$permissions_form_list->addRow(
+				_('Read-only access to services'),
+				(new CDiv((new CSpan(_('All')))->addClass(ZBX_STYLE_STATUS_GREEN)))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+		elseif ($data['service_read_access'] == CRoleHelper::SERVICES_ACCESS_NONE) {
+			$permissions_form_list->addRow(
+				_('Read-only access to services'),
+				(new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY)))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+		elseif ($data['service_read_list']) {
+			$service_list = [];
+
+			foreach ($data['service_read_list'] as $service) {
+				$service_list[] = (new CSpan($service['name']))->addClass(ZBX_STYLE_STATUS_GREEN);
+			}
+
+			$permissions_form_list->addRow(
+				_('Read-only access to services'),
+				(new CDiv($service_list))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+
+		if ($data['service_read_tag']['tag'] !== '') {
+			$permissions_form_list->addRow(
+				_('Read-only access to services with tag'),
+				(new CDiv(
+					(new CSpan([
+						$data['service_read_tag']['tag'],
+						$data['service_read_tag']['value'] !== '' ? ': '.$data['service_read_tag']['value'] : null
+					]))->addClass(ZBX_STYLE_TAG)
+				))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->addClass('rules-status-container')
+			);
+		}
+
+		// Modules section.
+
+		$permissions_form_list->addRow(
+			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
+		);
 
 		if (!$data['modules']) {
 			$permissions_form_list->addRow(italic(_('No enabled modules found.')));
@@ -479,7 +578,7 @@ if ($data['action'] === 'user.edit') {
 
 			foreach ($data['modules'] as $moduleid => $module) {
 				$elements[] = (new CSpan($module['id']))->addClass(
-					CRoleHelper::checkAccess(CRoleHelper::MODULES_MODULE.$moduleid, $data['roleid'])
+					CRoleHelper::checkAccess('modules.module.'.$moduleid, $data['roleid'])
 						? ZBX_STYLE_STATUS_GREEN
 						: ZBX_STYLE_STATUS_GREY
 				);
@@ -493,7 +592,9 @@ if ($data['action'] === 'user.edit') {
 			}
 		}
 
-		$api_access_enabled = CRoleHelper::checkAccess(CRoleHelper::API_ACCESS, $data['roleid']);
+		// API section.
+
+		$api_access_enabled = CRoleHelper::checkAccess('api.access', $data['roleid']);
 		$permissions_form_list
 			->addRow((new CTag('h4', true, _('Access to API')))->addClass('input-section-header'))
 			->addRow((new CDiv((new CSpan($api_access_enabled ? _('Enabled') : _('Disabled')))->addClass(
@@ -506,7 +607,7 @@ if ($data['action'] === 'user.edit') {
 		$api_methods = CRoleHelper::getRoleApiMethods($data['roleid']);
 
 		if ($api_methods) {
-			$api_access_mode_allowed = CRoleHelper::checkAccess(CRoleHelper::API_MODE, $data['roleid']);
+			$api_access_mode_allowed = CRoleHelper::checkAccess('api.mode', $data['roleid']);
 			$elements = [];
 
 			foreach ($api_methods as $api_method) {
@@ -521,6 +622,8 @@ if ($data['action'] === 'user.edit') {
 					->addClass('rules-status-container')
 			);
 		}
+
+		// Actions section.
 
 		$permissions_form_list->addRow((new CTag('h4', true, _('Access to actions')))->addClass('input-section-header'));
 		$elements = [];
@@ -607,7 +710,7 @@ if ($data['action'] !== 'user.edit') {
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 		$triggers_table->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))
-				->setLabel(getSeverityName($severity))
+				->setLabel(CSeverityHelper::getName($severity))
 				->setChecked(array_key_exists($severity, $data['messages']['triggers.severities']))
 				->setUncheckedValue(0),
 			[

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -355,6 +355,11 @@
 #	include <pcre.h>
 #endif
 
+#ifdef HAVE_PCRE2_H
+#	define PCRE2_CODE_UNIT_WIDTH 8
+#	include <pcre2.h>
+#endif
+
 #ifdef HAVE_VM_VM_PARAM_H
 #	include <vm/vm_param.h>
 #endif
@@ -390,6 +395,11 @@
 #	endif
 #	if 0x071400 <= LIBCURL_VERSION_NUM	/* version 7.20.0 */
 #		define HAVE_SMTP_AUTHENTICATION	1
+#	endif
+#	if 0x071501 <= LIBCURL_VERSION_NUM	/* version 7.21.6 */
+#		define ZBX_CURLOPT_ACCEPT_ENCODING	CURLOPT_ACCEPT_ENCODING
+#	else
+#		define ZBX_CURLOPT_ACCEPT_ENCODING	CURLOPT_ENCODING
 #	endif
 #	define ZBX_CURLOPT_MAXREDIRS	10L
 #endif

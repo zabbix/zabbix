@@ -6,7 +6,7 @@ $menu-user-selected-arrow-bg-position: -606px -434px !default;
 
 $menu-user-icons: (
 	support: -247px -48px,
-	share: -90px -84px,
+	integrations: -90px -84px,
 	help: -90px -48px,
 	guest: -247px -156px,
 	profile: -90px -120px,
@@ -15,7 +15,7 @@ $menu-user-icons: (
 
 $menu-user-expanded-icons: (
 	support: -247px -48px,
-	share: -90px -84px,
+	integrations: -90px -84px,
 	help: -90px -48px,
 	guest: -247px -156px,
 	profile: -90px -120px,
@@ -33,7 +33,7 @@ $menu-user-expanded-icons: (
 
 // Dynamically generated classes for icons:
 //  .icon-support
-//  .icon-share
+//  .icon-integrations
 //  .icon-help
 //  .icon-guest
 //  .icon-profile
@@ -50,7 +50,7 @@ $menu-user-expanded-icons: (
 
 // Dynamically generated classes for icons:
 //  .icon-support
-//  .icon-share
+//  .icon-integrations
 //  .icon-help
 //  .icon-guest
 //  .icon-profile

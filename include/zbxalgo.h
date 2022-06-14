@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,8 +57,10 @@ int	zbx_default_int_compare_func(const void *d1, const void *d2);
 int	zbx_default_uint64_compare_func(const void *d1, const void *d2);
 int	zbx_default_uint64_ptr_compare_func(const void *d1, const void *d2);
 int	zbx_default_str_compare_func(const void *d1, const void *d2);
+int	zbx_natural_str_compare_func(const void *d1, const void *d2);
 int	zbx_default_ptr_compare_func(const void *d1, const void *d2);
 int	zbx_default_uint64_pair_compare_func(const void *d1, const void *d2);
+int	zbx_default_dbl_compare_func(const void *d1, const void *d2);
 
 #define ZBX_DEFAULT_INT_COMPARE_FUNC		zbx_default_int_compare_func
 #define ZBX_DEFAULT_UINT64_COMPARE_FUNC		zbx_default_uint64_compare_func
@@ -66,6 +68,7 @@ int	zbx_default_uint64_pair_compare_func(const void *d1, const void *d2);
 #define ZBX_DEFAULT_STR_COMPARE_FUNC		zbx_default_str_compare_func
 #define ZBX_DEFAULT_PTR_COMPARE_FUNC		zbx_default_ptr_compare_func
 #define ZBX_DEFAULT_UINT64_PAIR_COMPARE_FUNC	zbx_default_uint64_pair_compare_func
+#define ZBX_DEFAULT_DBL_COMPARE_FUNC		zbx_default_dbl_compare_func
 
 typedef void *(*zbx_mem_malloc_func_t)(void *old, size_t size);
 typedef void *(*zbx_mem_realloc_func_t)(void *old, size_t size);
@@ -87,6 +90,16 @@ typedef void (*zbx_clean_func_t)(void *data);
 		return -1;		\
 	if ((a) > (b))			\
 		return +1
+
+#define ZBX_RETURN_IF_DBL_NOT_EQUAL(a, b)	\
+						\
+	if (FAIL == zbx_double_compare(a, b))	\
+	{					\
+		if ((a) < (b))			\
+			return -1;		\
+		else				\
+			return +1;		\
+	}
 
 int	is_prime(int n);
 int	next_prime(int n);
@@ -459,5 +472,8 @@ void	zbx_list_iterator_clear(zbx_list_iterator_t *iterator);
 int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list_iterator_t *iterator2);
 int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
 void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
+void	*zbx_list_iterator_remove_next(zbx_list_iterator_t *iterator);
+
+ZBX_PTR_VECTOR_DECL(tags, zbx_tag_t*)
 
 #endif

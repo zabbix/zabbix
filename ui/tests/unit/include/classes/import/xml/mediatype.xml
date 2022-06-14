@@ -11,9 +11,19 @@
 			<smtp_email>zabbix@example.com</smtp_email>
 		</media_type>
 		<media_type>
-			<name>Script</name>
+			<name>Script without parameters</name>
 			<type>SCRIPT</type>
 			<script_name>script.sh</script_name>
+		</media_type>
+		<media_type>
+			<name>Script with parameters</name>
+			<type>SCRIPT</type>
+			<script_name>script.sh</script_name>
+			<parameters>
+				<parameter>100</parameter>
+				<parameter>200</parameter>
+				<parameter>300</parameter>
+			</parameters>
 		</media_type>
 		<media_type>
 			<name>SMS</name>
@@ -21,7 +31,12 @@
 			<gsm_modem>/dev/ttyS0</gsm_modem>
 		</media_type>
 		<media_type>
-			<name>Webhook</name>
+			<name>Webhook without parameters</name>
+			<type>WEBHOOK</type>
+			<script>return true;</script>
+		</media_type>
+		<media_type>
+			<name>Webhook with parameters</name>
 			<type>WEBHOOK</type>
 			<parameters>
 				<parameter>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -340,21 +340,22 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
  *
  * @param int $type
  *
- * @return null
+ * @return ?string
  */
 function interfaceType2str($type) {
 	$interfaceGroupLabels = [
+		INTERFACE_TYPE_OPT => _('None'),
 		INTERFACE_TYPE_AGENT => _('Agent'),
 		INTERFACE_TYPE_SNMP => _('SNMP'),
 		INTERFACE_TYPE_JMX => _('JMX'),
 		INTERFACE_TYPE_IPMI => _('IPMI')
 	];
 
-	return isset($interfaceGroupLabels[$type]) ? $interfaceGroupLabels[$type] : null;
+	return array_key_exists($type, $interfaceGroupLabels) ? $interfaceGroupLabels[$type] : null;
 }
 
 function itemTypeInterface($type = null) {
-	$types = [
+	static $types = [
 		ITEM_TYPE_SNMP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_SNMPTRAP => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_IPMI => INTERFACE_TYPE_IPMI,
@@ -364,17 +365,35 @@ function itemTypeInterface($type = null) {
 		ITEM_TYPE_SSH => INTERFACE_TYPE_ANY,
 		ITEM_TYPE_TELNET => INTERFACE_TYPE_ANY,
 		ITEM_TYPE_JMX => INTERFACE_TYPE_JMX,
-		ITEM_TYPE_HTTPAGENT => INTERFACE_TYPE_ANY
+		ITEM_TYPE_HTTPAGENT => INTERFACE_TYPE_OPT
 	];
+
 	if (is_null($type)) {
 		return $types;
 	}
-	elseif (isset($types[$type])) {
+	elseif (array_key_exists($type, $types)) {
 		return $types[$type];
 	}
-	else {
-		return false;
+
+	return false;
+}
+
+/**
+ * Convert a list of interfaces to an array of interface type => interfaceids.
+ *
+ * @param array $interfaces  List of (host) interfaces.
+ *
+ * @return array  Interface IDs grouped by type.
+ */
+
+function interfaceIdsByType(array $interfaces) {
+	$interface_ids_by_type = [];
+
+	foreach ($interfaces as $interface) {
+		$interface_ids_by_type[$interface['type']][] = $interface['interfaceid'];
 	}
+
+	return $interface_ids_by_type;
 }
 
 /**
@@ -482,7 +501,7 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 		$interfaceids = [];
 
 		foreach ($dstHost['interfaces'] as $interface) {
-			if ($interface['main'] == 1) {
+			if ($interface['main'] == INTERFACE_PRIMARY) {
 				$interfaceids[$interface['type']] = $interface['interfaceid'];
 			}
 		}
@@ -514,23 +533,26 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 				$type = itemTypeInterface($item['type']);
 
 				if ($type == INTERFACE_TYPE_ANY) {
-					foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $itype) {
-						if (isset($interfaceids[$itype])) {
+					foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $itype) {
+						if (array_key_exists($type, $interfaceids)) {
 							$item['interfaceid'] = $interfaceids[$itype];
 							break;
 						}
 					}
 				}
-				elseif ($type !== false) {
+				elseif ($type !== false && $type != INTERFACE_TYPE_OPT) {
 					if (!isset($interfaceids[$type])) {
 						error(_s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['host'],
 							$item['key_']
 						));
+
 						return false;
 					}
+
 					$item['interfaceid'] = $interfaceids[$type];
 				}
 			}
+
 			unset($item['itemid']);
 
 			if ($item['valuemapid'] != 0) {
@@ -587,12 +609,12 @@ function copyItemsToHosts($src_itemids, $dst_hostids) {
 	return true;
 }
 
-function copyItems($srcHostId, $dstHostId) {
+function copyItems($srcHostId, $dstHostId, $assign_opt_interface = false) {
 	$srcItems = API::Item()->get([
 		'output' => ['type', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
 			'trapper_hosts', 'units', 'logtimefmt', 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username',
-			'password', 'publickey', 'privatekey', 'flags', 'description', 'inventory_link', 'jmx_endpoint',
-			'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
+			'password', 'publickey', 'privatekey', 'flags', 'interfaceid', 'description', 'inventory_link',
+			'jmx_endpoint', 'master_itemid', 'templateid', 'url', 'query_fields', 'timeout', 'posts', 'status_codes',
 			'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
 			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
 			'allow_traps', 'parameters'
@@ -691,12 +713,17 @@ function copyItems($srcHostId, $dstHostId) {
 		}
 
 		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
-			// find a matching interface
 			$interface = CItem::findInterfaceForItem($srcItem['type'], $dstHost['interfaces']);
+
+			if ($interface === false && $assign_opt_interface
+					&& itemTypeInterface($srcItem['type']) == INTERFACE_TYPE_OPT
+					&& $srcItem['interfaceid'] != 0) {
+				$interface = CItem::findInterfaceByPriority($dstHost['interfaces']);
+			}
+
 			if ($interface) {
 				$srcItem['interfaceid'] = $interface['interfaceid'];
 			}
-			// no matching interface found, throw an error
 			elseif ($interface !== false) {
 				error(_s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
 			}
@@ -1107,24 +1134,27 @@ function getDataOverviewCellData(array $db_items, array $data, int $show_suppres
  *
  * @return array
  */
-function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?array $tags,
-		int $evaltype = TAG_EVAL_TYPE_AND_OR): array {
-
+function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, int $evaltype): array {
 	if ($hostids === null) {
-		$limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1;
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 		$db_hosts = API::Host()->get([
-			'output' => [],
+			'output' => ['name'],
 			'groupids' => $groupids,
 			'monitored_hosts' => true,
 			'with_monitored_items' => true,
-			'preservekeys' => true,
-			'limit' => $limit
+			'sortfield' => ['name'],
+			'limit' => $limit,
+			'preservekeys' => true
 		]);
+
+		CArrayHelper::sort($db_hosts, ['name']);
+		$db_hosts = array_slice($db_hosts, 0, CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE) + 1, true);
+
 		$hostids = array_keys($db_hosts);
 	}
 
 	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+		'output' => ['itemid', 'hostid', 'name', 'value_type', 'units', 'valuemapid'],
 		'selectHosts' => ['name'],
 		'selectValueMap' => ['mappings'],
 		'hostids' => $hostids,
@@ -1136,14 +1166,12 @@ function getDataOverviewItems(?array $groupids = null, ?array $hostids = null, ?
 		'preservekeys' => true
 	]);
 
-	$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
-
 	CArrayHelper::sort($db_items, [
-		['field' => 'name_expanded', 'order' => ZBX_SORT_UP],
+		['field' => 'name', 'order' => ZBX_SORT_UP],
 		['field' => 'itemid', 'order' => ZBX_SORT_UP]
 	]);
 
-	return [$db_items, $hostids];
+	return $db_items;
 }
 
 /**
@@ -1160,14 +1188,14 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	$tags = (array_key_exists('tags', $filter) && $filter['tags']) ? $filter['tags'] : null;
 	$evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
 
-	[$db_items, $hostids] = getDataOverviewItems($groupids, $hostids, $tags, $evaltype);
+	$db_items = getDataOverviewItems($groupids, $hostids, $tags, $evaltype);
 
 	$data = [];
 	$item_counter = [];
 	$db_hosts = [];
 
 	foreach ($db_items as $db_item) {
-		$item_name = $db_item['name_expanded'];
+		$item_name = $db_item['name'];
 		$host_name = $db_item['hosts'][0]['name'];
 		$db_hosts[$db_item['hostid']] = $db_item['hosts'][0];
 
@@ -1213,35 +1241,51 @@ function getDataOverview(?array $groupids, ?array $hostids, array $filter): arra
 	]);
 
 	$data_display_limit = (int) CSettingsHelper::get(CSettingsHelper::MAX_OVERVIEW_TABLE_SIZE);
-	$has_hidden_hosts = (count($db_hosts) > $data_display_limit);
+	$has_hidden_data = count($data) > $data_display_limit || count($db_hosts) > $data_display_limit;
 	$db_hosts = array_slice($db_hosts, 0, $data_display_limit, true);
+	$host_names = array_column($db_hosts, 'name', 'name');
 
-	$data = array_slice($data, 0, $data_display_limit, true);
-	$items_left = $data_display_limit;
 	$itemids = [];
-	array_walk($data, function (array &$item_columns) use ($data_display_limit, &$itemids, &$items_left) {
+	$items_left = $data_display_limit;
+
+	foreach ($data as &$item_columns) {
 		if ($items_left != 0) {
 			$item_columns = array_slice($item_columns, 0, min($data_display_limit, $items_left));
 			$items_left -= count($item_columns);
 		}
 		else {
 			$item_columns = null;
-			return;
+			break;
 		}
 
-		array_walk($item_columns, function (array &$item_column) use ($data_display_limit, &$itemids) {
+		foreach ($item_columns as &$item_column) {
+			CArrayHelper::ksort($item_column);
 			$item_column = array_slice($item_column, 0, $data_display_limit, true);
-			$itemids += array_column($item_column, 'itemid', 'itemid');
-		});
-	});
-	$data = array_filter($data);
 
-	$has_hidden_items = (count($db_items) != count($itemids));
+			foreach ($item_column as $host_name => $item) {
+				if (array_key_exists($host_name, $host_names)) {
+					$itemids[$item['itemid']] = true;
+				}
+				else {
+					unset($item_column[$host_name]);
+				}
+			}
+		}
+		unset($item_column);
+
+		$item_columns = array_filter($item_columns);
+	}
+	unset($item_columns);
+
+	$data = array_filter($data);
+	$data = array_slice($data, 0, $data_display_limit, true);
+
+	$has_hidden_data = $has_hidden_data || count($db_items) != count($itemids);
 
 	$db_items = array_intersect_key($db_items, $itemids);
 	$data = getDataOverviewCellData($db_items, $data, $filter['show_suppressed']);
 
-	return [$data, $db_hosts, ($has_hidden_items || $has_hidden_hosts)];
+	return [$data, $db_hosts, $has_hidden_data];
 }
 
 /**
@@ -1257,6 +1301,8 @@ function getInterfaceSelect(array $interfaces): CSelect {
 	/** @var CSelectOption[] $options_by_type */
 	$options_by_type = [];
 
+	$interface_select->addOption(new CSelectOption(INTERFACE_TYPE_OPT, interfaceType2str(INTERFACE_TYPE_OPT)));
+
 	foreach ($interfaces as $interface) {
 		$option = new CSelectOption($interface['interfaceid'], getHostInterface($interface));
 
@@ -1267,7 +1313,7 @@ function getInterfaceSelect(array $interfaces): CSelect {
 		$options_by_type[$interface['type']][] = $option;
 	}
 
-	foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $interface_type) {
+	foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
 		if (array_key_exists($interface_type, $options_by_type)) {
 			$interface_group = new CSelectOptionGroup((string) interfaceType2str($interface_type));
 
@@ -1368,7 +1414,7 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 	$value = UNKNOWN_VALUE;
 
 	if ($trigger && $trigger['value'] == TRIGGER_VALUE_TRUE) {
-		$css = getSeverityStyle($trigger['priority']);
+		$css = CSeverityHelper::getStyle((int) $trigger['priority']);
 
 		if ($trigger['problem']['acknowledged'] == 1) {
 			$ack = [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)];
@@ -1465,7 +1511,7 @@ function getItemFunctionalValue($item, $function, $parameter) {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
-	$number_parser = new CNumberParser(['with_suffix' => true]);
+	$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 	if ($number_parser->parse($parameter) != CParser::PARSE_SUCCESS) {
 		return UNRESOLVED_MACRO_STRING;
@@ -1975,7 +2021,6 @@ function quoteItemKeyParam($param, $forced = false) {
  * @return array
  */
 function expandItemNamesWithMasterItems($items, $data_source) {
-	$items = CMacrosResolverHelper::resolveItemNames($items);
 	$itemids = [];
 	$master_itemids = [];
 
@@ -1994,7 +2039,7 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 
 	if ($master_itemids) {
 		$options = [
-			'output' => ['itemid', 'type', 'hostid', 'name', 'key_'],
+			'output' => ['itemid', 'type', 'name'],
 			'itemids' => $master_itemids,
 			'editable' => true,
 			'preservekeys' => true
@@ -2013,26 +2058,18 @@ function expandItemNamesWithMasterItems($items, $data_source) {
 		}
 		unset($master_item_prototype);
 
-		$master_items = CMacrosResolverHelper::resolveItemNames($master_items + $master_item_prototypes);
+		$master_items += $master_item_prototypes;
 	}
 
 	foreach ($items as &$item) {
 		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_itemid = $item['master_itemid'];
 			$items_index = array_search($master_itemid, $itemids);
-
-			$item['master_item'] = [
-				'itemid' => $master_itemid,
-				'name_expanded' => ($items_index === false)
-					? $master_items[$master_itemid]['name_expanded']
-					: $items[$items_index]['name_expanded'],
-				'type' => ($items_index === false)
-					? $master_items[$master_itemid]['type']
-					: $items[$items_index]['type'],
-				'source' => ($items_index === false)
-					? $master_items[$master_itemid]['source']
-					: $items[$items_index]['source']
-			];
+			$item['master_item'] = array_fill_keys(['name', 'type', 'source'], '');
+			$item['master_item'] = ($items_index === false)
+				? array_intersect_key($master_items[$master_itemid], $item['master_item'])
+				: array_intersect_key($items[$items_index], $item['master_item']);
+			$item['master_item']['itemid'] = $master_itemid;
 		}
 	}
 	unset($item);
@@ -2118,4 +2155,91 @@ function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$err
 	}
 
 	return true;
+}
+
+/**
+ * Normalizes item preprocessing step parameters after item preprocessing form submit.
+ *
+ * @param array $preprocessing  Array of item preprocessing steps, as received from form submit.
+ *
+ * @return array
+ */
+function normalizeItemPreprocessingSteps(array $preprocessing): array {
+	foreach ($preprocessing as &$step) {
+		switch ($step['type']) {
+			case ZBX_PREPROC_MULTIPLIER:
+			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+				$step['params'] = trim($step['params'][0]);
+				break;
+
+			case ZBX_PREPROC_RTRIM:
+			case ZBX_PREPROC_LTRIM:
+			case ZBX_PREPROC_TRIM:
+			case ZBX_PREPROC_XPATH:
+			case ZBX_PREPROC_JSONPATH:
+			case ZBX_PREPROC_VALIDATE_REGEX:
+			case ZBX_PREPROC_VALIDATE_NOT_REGEX:
+			case ZBX_PREPROC_ERROR_FIELD_JSON:
+			case ZBX_PREPROC_ERROR_FIELD_XML:
+			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
+			case ZBX_PREPROC_SCRIPT:
+				$step['params'] = $step['params'][0];
+				break;
+
+			case ZBX_PREPROC_VALIDATE_RANGE:
+				foreach ($step['params'] as &$param) {
+					$param = trim($param);
+				}
+				unset($param);
+
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_PROMETHEUS_PATTERN:
+				foreach ($step['params'] as &$param) {
+					$param = trim($param);
+				}
+				unset($param);
+
+				if (in_array($step['params'][1], [ZBX_PREPROC_PROMETHEUS_SUM, ZBX_PREPROC_PROMETHEUS_MIN,
+						ZBX_PREPROC_PROMETHEUS_MAX, ZBX_PREPROC_PROMETHEUS_AVG, ZBX_PREPROC_PROMETHEUS_COUNT])) {
+					$step['params'][2] = $step['params'][1];
+					$step['params'][1] = ZBX_PREPROC_PROMETHEUS_FUNCTION;
+				}
+
+				if (!array_key_exists(2, $step['params'])) {
+					$step['params'][2] = '';
+				}
+
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_REGSUB:
+			case ZBX_PREPROC_ERROR_FIELD_REGEX:
+			case ZBX_PREPROC_STR_REPLACE:
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			case ZBX_PREPROC_CSV_TO_JSON:
+				if (!array_key_exists(2, $step['params'])) {
+					$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
+				}
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
+			default:
+				$step['params'] = '';
+		}
+
+		$step += [
+			'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+			'error_handler_params' => ''
+		];
+
+		// Remove fictional field that doesn't belong in DB and API.
+		unset($step['sortorder']);
+	}
+	unset($step);
+
+	return $preprocessing;
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,14 +17,195 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "comms.h"
+
+#include "common.h"
 #include "zbxjson.h"
 #include "log.h"
+#if !defined(_WINDOWS) && !defined(__MINGW32)
+#include "daemon.h"
+#endif
+#include "zbxalgo.h"
+#include "cfg.h"
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+extern char	*CONFIG_TLS_SERVER_CERT_ISSUER;
+extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
+extern char	*CONFIG_TLS_PSK_IDENTITY;
+#endif
+
+static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
+		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+		int loglevel)
+{
+	int	ret, i;
+
+	for (i = 0; i < addrs->values_num; i++)
+	{
+		zbx_addr_t	*addr;
+
+		addr = (zbx_addr_t *)addrs->values[0];
+
+		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, connect_timeout, tls_connect,
+				tls_arg1, tls_arg2)))
+		{
+			zbx_socket_timeout_set(s, timeout);
+			break;
+		}
+
+		zabbix_log(loglevel, "Unable to connect to [%s]:%d [%s]",
+				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+				zbx_socket_strerror());
+
+		zbx_vector_ptr_remove(addrs, 0);
+		zbx_vector_ptr_append(addrs, addr);
+	}
+
+	return ret;
+}
+
+int	connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_ptr_t *addrs, int timeout,
+		int connect_timeout, unsigned int tls_connect, int retry_interval, int level)
+{
+	int	res;
+	char	*tls_arg1, *tls_arg2;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d, connection timeout:%d]",
+			((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port, timeout,
+			connect_timeout);
+
+	switch (tls_connect)
+	{
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			tls_arg1 = NULL;
+			tls_arg2 = NULL;
+			break;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		case ZBX_TCP_SEC_TLS_CERT:
+			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+			break;
+		case ZBX_TCP_SEC_TLS_PSK:
+			tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
+			break;
+#endif
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, connect_timeout, tls_connect,
+			tls_arg1, tls_arg2, level)))
+	{
+		if (0 != retry_interval)
+		{
+#if !defined(_WINDOWS) && !defined(__MINGW32)
+			int	lastlogtime = (int)time(NULL);
+
+			zabbix_log(LOG_LEVEL_WARNING, "Will try to reconnect every %d second(s)",
+					retry_interval);
+
+			while (ZBX_IS_RUNNING() && FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs,
+					timeout, connect_timeout, tls_connect, tls_arg1, tls_arg2, LOG_LEVEL_DEBUG)))
+			{
+				int	now = (int)time(NULL);
+
+				if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
+					lastlogtime = now;
+				}
+
+				sleep((unsigned int)retry_interval);
+			}
+
+			if (FAIL != res)
+				zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
+#else
+			zabbix_log(LOG_LEVEL_WARNING, "Could not to connect to server.");
+#endif
+		}
+	}
+
+	return res;
+}
+
+void	disconnect_server(zbx_socket_t *sock)
+{
+	zbx_tcp_close(sock);
+}
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_send_response                                                *
+ * Purpose: get configuration and other data from server                      *
+ *                                                                            *
+ * Return value: SUCCEED - processed successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+{
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
+	{
+		*error = zbx_strdup(*error, zbx_socket_strerror());
+		goto exit;
+	}
+
+	zbx_free(*buffer);
+
+	if (SUCCEED != zbx_tcp_recv_large(sock))
+	{
+		*error = zbx_strdup(*error, zbx_socket_strerror());
+		goto exit;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server", sock->buffer);
+
+	ret = SUCCEED;
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send data to server                                               *
+ *                                                                            *
+ * Return value: SUCCEED - processed successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+{
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)buffer_size);
+
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
+	{
+		*error = zbx_strdup(*error, zbx_socket_strerror());
+		goto out;
+	}
+
+	zbx_free(*buffer);
+
+	if (SUCCEED != zbx_recv_response(sock, 0, error))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
  *                                                                            *
  * Purpose: send json SUCCEED or FAIL to socket along with an info message    *
  *                                                                            *
@@ -37,10 +218,6 @@
  *                                                                            *
  * Return value: SUCCEED - data successfully transmitted                      *
  *               NETWORK_ERROR - network related error occurred               *
- *                                                                            *
- * Author: Alexander Vladishev, Alexei Vladishev                              *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
@@ -66,7 +243,8 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __func__, json.buffer);
 
-	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), protocol, timeout)))
+	if (FAIL == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), 0, (unsigned char)protocol,
+			timeout)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Error sending result back: %s", zbx_socket_strerror());
 		ret = NETWORK_ERROR;
@@ -80,8 +258,6 @@ int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, cons
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: zbx_recv_response                                                *
  *                                                                            *
  * Purpose: read a response message (in JSON format) from socket, optionally  *
  *          extract "info" value.                                             *

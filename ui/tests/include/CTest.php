@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/../../include/defines.inc.php';
 require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
+require_once dirname(__FILE__).'/helpers/CConfigHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
 require_once dirname(__FILE__).'/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
@@ -37,7 +38,9 @@ define('USER_ACTION_REMOVE', 'remove');
 /**
  * Base class of php unit tests.
  */
-class CTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CTest extends TestCase {
 
 	// Table that should be backed up at the test suite level.
 	protected static $suite_backup = null;
@@ -45,14 +48,16 @@ class CTest extends PHPUnit_Framework_TestCase {
 	protected $case_backup = null;
 	// Table that should be backed up at the test case level once (for multiple case executions).
 	protected static $case_backup_once = null;
+	// zabbix.conf.php should be backed up at the test suite level.
+	protected static $suite_backup_config = false;
+	// zabbix.conf.php should be backed up at the test case level.
+	protected $case_backup_config = false;
 	// Name of the last executed test.
 	protected static $last_test_case = null;
 	// Test case data key.
 	protected $data_key = null;
 	// Lists of test case data set keys.
 	protected static $test_data_sets = [];
-	// List of backups to be performed.
-	protected $backup = [];
 	// Test case annotations.
 	protected $annotations = null;
 	// Test case warnings.
@@ -166,16 +171,23 @@ class CTest extends PHPUnit_Framework_TestCase {
 		}
 
 		foreach ($callbacks as $callback) {
-			$method = $class->getMethod($callback);
+			try {
+				$method = $class->getMethod($callback);
+			}
+			catch (ReflectionException $exception) {
+				$method = null;
+			}
 
 			if (!$method) {
 				$error = 'Callback "'.$callback.'" is not defined in requested context.';
 				if (!$required) {
-					self::addWarning($error);
+					self::zbxAddWarning($error);
 				}
 				else {
 					throw new Exception($error);
 				}
+
+				continue;
 			}
 
 			try {
@@ -183,7 +195,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 			} catch (Exception $e) {
 				$error = 'Failed to execute callback "'.$callback.'": '.$e->getMessage();
 				if (!$required) {
-					self::addWarning($error);
+					self::zbxAddWarning($error);
 				}
 				else {
 					throw new Exception($error);
@@ -217,6 +229,13 @@ class CTest extends PHPUnit_Framework_TestCase {
 			CDBHelper::backupTables(self::$suite_backup);
 		}
 
+		$suite_backup_config = $this->getAnnotationTokensByName($class_annotations, 'backupConfig');
+
+		if ($suite_backup_config) {
+			self::$suite_backup_config = true;
+			CConfigHelper::backupConfig();
+		}
+
 		self::$skip_suite = false;
 
 		// Callbacks to be performed before test suite execution.
@@ -224,8 +243,6 @@ class CTest extends PHPUnit_Framework_TestCase {
 		if (!self::executeCallbacks($this, $callbacks)) {
 			self::markTestSuiteSkipped();
 			throw new Exception(implode("\n", static::$warnings));
-
-			return;
 		}
 
 		// Store callback to be executed later.
@@ -245,7 +262,6 @@ class CTest extends PHPUnit_Framework_TestCase {
 		static $suite = null;
 		$class_name = get_class($this);
 		$case_name = $this->getName(false);
-		$this->backup = [];
 		self::$warnings = [];
 
 		// Clear contents of error log.
@@ -297,9 +313,16 @@ class CTest extends PHPUnit_Framework_TestCase {
 				CDBHelper::backupTables($this->case_backup);
 			}
 
+			$case_backup_config = $this->getAnnotationTokensByName($method_annotations, 'backupConfig');
+
+			if ($case_backup_config) {
+				$this->case_backup_config = true;
+				CConfigHelper::backupConfig();
+			}
+
 			if (self::$last_test_case !== $case_name) {
 				if (array_key_exists($case_name, self::$test_data_sets)) {
-					// Check for data data set limit.
+					// Check for data set limit.
 					$limit = $this->getAnnotationTokensByName($method_annotations, 'dataLimit');
 
 					if (count($limit) === 1 && is_numeric($limit[0]) && $limit[0] >= 1
@@ -355,6 +378,11 @@ class CTest extends PHPUnit_Framework_TestCase {
 	public function onAfterTestCase() {
 		$errors = @file_get_contents(PHPUNIT_ERROR_LOG);
 
+		if ($this->case_backup_config) {
+			CConfigHelper::restoreConfig();
+			$this->case_backup_config = false;
+		}
+
 		if ($this->case_backup !== null) {
 			CDBHelper::restoreTables();
 		}
@@ -383,6 +411,11 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 */
 	public static function onAfterTestSuite() {
 		global $DB;
+
+		if (self::$suite_backup_config) {
+			CConfigHelper::restoreConfig();
+			self::$suite_backup_config = false;
+		}
 
 		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['afterOnce']
 				&& !self::$suite_callbacks['after']) {
@@ -417,7 +450,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $warning    warning text
 	 */
-	public static function addWarning($warning) {
+	public static function zbxAddWarning($warning) {
 		if (!in_array($warning, self::$warnings)) {
 			self::$warnings[] = $warning;
 		}

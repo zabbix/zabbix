@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,9 @@ require_once dirname(__FILE__).'/testItem.php';
 require_once dirname(__FILE__).'/testItemPrototype.php';
 require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testProxy.php';
+require_once dirname(__FILE__).'/testServices.php';
 require_once dirname(__FILE__).'/testScripts.php';
+require_once dirname(__FILE__).'/testTemplate.php';
 require_once dirname(__FILE__).'/testTriggers.php';
 require_once dirname(__FILE__).'/testTriggerPermissions.php';
 require_once dirname(__FILE__).'/testTriggerValidation.php';
@@ -54,15 +56,17 @@ require_once dirname(__FILE__).'/testDiscoveryRule.php';
 require_once dirname(__FILE__).'/testDependentItems.php';
 require_once dirname(__FILE__).'/testAuthentication.php';
 
+use PHPUnit\Framework\TestSuite;
+
 class ApiJsonTests {
 	public static function suite() {
-		$suite = new PHPUnit_Framework_TestSuite('API_JSON');
+		$suite = new TestSuite('API_JSON');
 
 		$suite->addTestSuite('testJSONRPC');
 		$suite->addTestSuite('testAPIInfo');
 		$suite->addTestSuite('testAction');
 		$suite->addTestSuite('testConfiguration');
-//		$suite->addTestSuite('testDependentItems'); TODO: To be fix later
+//		$suite->addTestSuite('testDependentItems'); TODO: To be fixed later
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
 		$suite->addTestSuite('testGraphPrototype');
@@ -77,7 +81,9 @@ class ApiJsonTests {
 		$suite->addTestSuite('testItemPrototype');
 		$suite->addTestSuite('testMaintenance');
 		$suite->addTestSuite('testProxy');
+		$suite->addTestSuite('testServices');
 		$suite->addTestSuite('testScripts');
+		$suite->addTestSuite('testTemplate');
 		$suite->addTestSuite('testTriggers');
 		$suite->addTestSuite('testTriggerPermissions');
 		$suite->addTestSuite('testTriggerValidation');

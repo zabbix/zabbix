@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -458,7 +458,7 @@ class CMap extends CMapElement {
 	}
 
 	/**
-	 * Removes all inaccessible maps by inacessible elements.
+	 * Removes all inaccessible maps by inaccessible elements.
 	 *
 	 * @param array $sysmaps_rw[<sysmapids>]              The list of writable maps.
 	 * @param array $elements                             The map elements.
@@ -1843,7 +1843,7 @@ class CMap extends CMapElement {
 			$this->createShapes($shapes);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAP, $maps);
+		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_MAP, $maps);
 
 		return ['sysmapids' => $sysmapids];
 	}
@@ -2301,7 +2301,7 @@ class CMap extends CMapElement {
 			$this->updateLinkTriggers($link_triggers_to_update);
 		}
 
-		$this->addAuditBulk(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAP, $maps, $db_maps);
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAP, $maps, $db_maps);
 
 		return ['sysmapids' => $sysmapids];
 	}
@@ -2331,7 +2331,7 @@ class CMap extends CMapElement {
 		]);
 		DB::delete('sysmaps', ['sysmapid' => $sysmapids]);
 
-		$this->addAuditBulk(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAP, $db_maps);
+		$this->addAuditBulk(CAudit::ACTION_DELETE, CAudit::RESOURCE_MAP, $db_maps);
 
 		return ['sysmapids' => $sysmapids];
 	}

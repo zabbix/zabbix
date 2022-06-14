@@ -1,0 +1,220 @@
+---
+test case: Status -1 as is
+in:
+  services:
+  - name: Service
+    status: -1
+    propagation: {"action": KEEP}
+  service: Service
+out:
+  return: SUCCEED
+  status: -1
+---
+test case: Status 0 as is
+in:
+  services:
+  - name: Service
+    status: 0
+    propagation: {"action": KEEP}
+  service: Service
+out:
+  return: SUCCEED
+  status: 0
+---
+test case: Status 1 as is
+in:
+  services:
+  - name: Service
+    status: 1
+    propagation: {"action": KEEP}
+  service: Service
+out:
+  return: SUCCEED
+  status: 1
+---
+test case: Status 2 as is
+in:
+  services:
+  - name: Service
+    status: 2
+    propagation: {"action": KEEP}
+  service: Service
+out:
+  return: SUCCEED
+  status: 2
+---
+test case: Status 3 as is
+in:
+  services:
+  - name: Service
+    status: 3
+    propagation: {"action": KEEP}
+  service: Service
+out:
+  return: SUCCEED
+  status: 3
+---
+test case: Status 4 as is
+in:
+  services:
+  - name: Service
+    status: 4
+    propagation: {"action": KEEP}
+  service: Service
+out:
+  return: SUCCEED
+  status: 4
+---
+test case: Status 5 as is
+in:
+  services:
+  - name: Service
+    status: 5
+    propagation: {"action": KEEP}
+  service: Service
+out:
+  return: SUCCEED
+  status: 5
+---
+test case: Status -1 increase 1
+in:
+  services:
+  - name: Service
+    status: -1
+    propagation: {"action": INCREASE, "value": 1}
+  service: Service
+out:
+  return: SUCCEED
+  status: -1
+---
+test case: Status 0 increase 1
+in:
+  services:
+  - name: Service
+    status: 0
+    propagation: {"action": INCREASE, "value": 1}
+  service: Service
+out:
+  return: SUCCEED
+  status: 1
+---
+test case: Status 1 increase 2
+in:
+  services:
+  - name: Service
+    status: 1
+    propagation: {"action": INCREASE, "value": 2}
+  service: Service
+out:
+  return: SUCCEED
+  status: 3
+---
+test case: Status 1 increase 20
+in:
+  services:
+  - name: Service
+    status: 1
+    propagation: {"action": INCREASE, "value": 20}
+  service: Service
+out:
+  return: SUCCEED
+  status: 5
+---
+test case: Status -1 decrease 1
+in:
+  services:
+  - name: Service
+    status: -1
+    propagation: {"action": DECREASE, "value": 1}
+  service: Service
+out:
+  return: SUCCEED
+  status: -1
+---
+test case: Status 0 decrease 1
+in:
+  services:
+  - name: Service
+    status: 0
+    propagation: {"action": DECREASE, "value": 1}
+  service: Service
+out:
+  return: SUCCEED
+  status: 0
+---
+test case: Status 5 decrease 3
+in:
+  services:
+  - name: Service
+    status: 5
+    propagation: {"action": DECREASE, "value": 3}
+  service: Service
+out:
+  return: SUCCEED
+  status: 2
+---
+test case: Status 3 decrease 10
+in:
+  services:
+  - name: Service
+    status: 3
+    propagation: {"action": DECREASE, "value": 10}
+  service: Service
+out:
+  return: SUCCEED
+  status: 0
+---
+test case: Status 1 ignore
+in:
+  services:
+  - name: Service
+    status: 1
+    propagation: {"action": IGNORE}
+  service: Service
+out:
+  return: FAIL
+---
+test case: Status -1 ignore
+in:
+  services:
+  - name: Service
+    status: -1
+    propagation: {"action": IGNORE}
+  service: Service
+out:
+  return: FAIL
+---
+test case: Status -1 set 0
+in:
+  services:
+  - name: Service
+    status: -1
+    propagation: {"action": SET, "value": 0}
+  service: Service
+out:
+  return: SUCCEED
+  status: -1
+---
+test case: Status 1 set 0
+in:
+  services:
+  - name: Service
+    status: 1
+    propagation: {"action": SET, "value": 0}
+  service: Service
+out:
+  return: SUCCEED
+  status: 0
+---
+test case: Status 1 set -1
+in:
+  services:
+  - name: Service
+    status: 1
+    propagation: {"action": SET, "value": -1}
+  service: Service
+out:
+  return: SUCCEED
+  status: -1
+...
+

@@ -1,0 +1,2316 @@
+zabbix_export:
+  version: '6.0'
+  date: '2022-04-06T19:35:49Z'
+  groups:
+    -
+      uuid: 36bff6c29af64692839d077febfc7079
+      name: 'Templates/Network devices'
+  templates:
+    -
+      uuid: e1ca624566424496bff9d90c261ab37b
+      template: 'VMWare SD-WAN VeloCloud by HTTP'
+      name: 'VMWare SD-WAN VeloCloud by HTTP'
+      description: |
+        Template for monitoring VMWare SD-WAN VeloCloud https://www.vmware.com/products/sd-wan.html
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Template tooling version used: 0.41
+      groups:
+        -
+          name: 'Templates/Network devices'
+      items:
+        -
+          uuid: 3d96f6e755934bc8a4ee7300a165adae
+          name: 'Velocloud: Get data'
+          type: SCRIPT
+          key: velocloud.get
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          params: |
+            var params = JSON.parse(value);
+            
+            var request = new HttpRequest();
+            
+            request.addHeader('Content-Type: application/json');
+            request.addHeader('Authorization: Token ' + params.token);
+            
+            var response,
+                output,
+                error_msg = '',
+                enterprises = [],
+                edges = [],
+                links = [],
+                gateways = [],
+                version = [],
+                apps = [],
+                appsLinks = [],
+                edgeSDWan = [],
+                edgeSDWanPath = [];
+            
+            function getHttpData(url, body) {
+                response = request.post(url, body);
+                Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                if (response !== null) {
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from SD-WAN API. Check debug log for more information.';
+                    }
+                }
+            
+                if (request.getStatus() !== 200) {
+                    if (response.error && response.error.message) {
+                        throw response.error.message;
+                    } else {
+                        throw 'Failed to receive data: invalid response status code.';
+                    }
+                }
+            
+                if (typeof (response) !== 'object' || response === null) {
+                    throw 'Cannot process response data: received data is not an object.';
+                }
+            
+                return response;
+            };
+            
+            try {
+            
+                if (params.token === '{' + '$VELOCLOUD.TOKEN}') {
+                    throw 'Please change {' + '$VELOCLOUD.TOKEN} macro with the proper value.';
+                }
+            
+                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+                    params.url = 'https://' + params.url;
+                }
+            
+                if (!params.url.endsWith('/')) {
+                    params.url += '/';
+                }
+            
+                enterprises = getHttpData(params.url + 'portal/rest/monitoring/getAggregates', '{}').enterprises;
+            
+                if (!Array.isArray(enterprises)) {
+                    throw 'Cannot process edges: enterprises is not an array.';
+                }
+            
+                links = getHttpData(params.url + 'portal/rest/monitoring/getAggregateEdgeLinkMetrics', '{}');
+                gateways = getHttpData(params.url + 'portal/rest/network/getNetworkGateways', JSON.stringify({ with: ['site'] }));
+                version = getHttpData(params.url + 'portal/rest/system/getVersionInfo', '{}');
+            
+                for (var i in enterprises) {
+                    responseEdges = getHttpData(params.url + 'portal/rest/enterprise/getEnterpriseEdges', JSON.stringify({ enterpriseId: enterprises[i].id, with: ['site'] }));
+                    edges = edges.concat(responseEdges);
+                }
+            
+                if (!Array.isArray(edges)) {
+                    throw 'Cannot process edges SDWans: edges is not an array.';
+                }
+            
+                for (var i in edges) {
+                    responseEdgeSDWan = getHttpData(params.url + 'portal/rest/edge/getEdgeSDWANPeers', JSON.stringify({ enterpriseId: edges[i].enterpriseId, edgeId: edges[i].id }));
+            
+                    if (!Array.isArray(responseEdgeSDWan)) {
+                        throw 'Cannot process edges SDWan Path: edges SDWans is not an array.';
+                    }
+            
+                    for (var e in responseEdgeSDWan) {
+                        data = {
+                            'enterpriseId': edges[i].enterpriseId,
+                            'edgeId': edges[i].id,
+                            'peerLogicalId': responseEdgeSDWan[e].deviceLogicalId
+                        };
+                        responseEdgeSDWanPath = getHttpData(params.url + 'portal/rest/metrics/getEdgeSDWANPeerPathMetrics', JSON.stringify(data));
+                        edgeSDWanPath = edgeSDWanPath.concat(responseEdgeSDWanPath);
+            
+                        responseEdgeSDWan[e].edgeId = edges[i].id;
+                        responseEdgeSDWan[e].edgeName = edges[i].name;
+                        responseEdgeSDWan[e].enterpriseId = edges[i].enterpriseId;
+                    }
+            
+                    edgeSDWan = edgeSDWan.concat(responseEdgeSDWan);
+                }
+            
+            } catch (error) {
+                error_msg = error;
+            };
+            
+            return JSON.stringify({
+                'enterprises': enterprises,
+                'edges': edges,
+                'links': links,
+                'gateways': gateways,
+                'edgeSDWan': edgeSDWan,
+                'edgeSDWanPath': edgeSDWanPath,
+                'info': version,
+                'error': error_msg.toString()
+            });
+          description: 'The JSON with result of Velocloud API requests.'
+          timeout: 10s
+          parameters:
+            -
+              name: token
+              value: '{$VELOCLOUD.TOKEN}'
+            -
+              name: url
+              value: '{$VELOCLOUD.URL}'
+          tags:
+            -
+              tag: component
+              value: raw
+        -
+          uuid: 9df4ba5324d94d0fb54d3231311016a6
+          name: 'Velocloud: Clear data'
+          type: DEPENDENT
+          key: velocloud.get.clear_metrics
+          delay: '0'
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Clear metrics for data without errors.'
+          preprocessing:
+            -
+              type: CHECK_JSON_ERROR
+              parameters:
+                - $.error
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: velocloud.get
+          tags:
+            -
+              tag: component
+              value: orchestrator
+        -
+          uuid: 8a54309d8abc4fc7816b168329243de4
+          name: 'Velocloud: Get data collection errors'
+          type: DEPENDENT
+          key: velocloud.get.error
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'Errors of aggregate script item.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.error
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: velocloud.get
+          tags:
+            -
+              tag: component
+              value: application
+          triggers:
+            -
+              uuid: a0623655a2fa4f60962ad560b8bb5a13
+              expression: 'length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0'
+              name: 'Velocloud: There are errors in aggregate script item'
+              priority: WARNING
+              description: 'There are errors in aggregate script item.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 3f589e2191c5419fb89cc33639595ae9
+          name: 'Velocloud: Orchestrator API version'
+          type: DEPENDENT
+          key: velocloud.orchestrator.api_version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'Version of VMware SD-WAN Orchestrator API.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.info.apiVersion
+          master_item:
+            key: velocloud.get.clear_metrics
+          tags:
+            -
+              tag: component
+              value: orchestrator
+          triggers:
+            -
+              uuid: 5a95d9c614e74c2c8b6181fc8dff2226
+              expression: 'nodata(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.api_version,30m)=1'
+              name: 'Velocloud: Failed to fetch aggregate data'
+              event_name: 'Velocloud: Failed to fetch aggregate data (or no data for 30m)'
+              priority: AVERAGE
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+        -
+          uuid: ab24d8fc4c2a4130bca1b4b6d4f311ae
+          name: 'Velocloud: Orchestrator build'
+          type: DEPENDENT
+          key: velocloud.orchestrator.build
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Build of VMware SD-WAN Orchestrator API.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.info.build
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          master_item:
+            key: velocloud.get.clear_metrics
+          tags:
+            -
+              tag: component
+              value: orchestrator
+          triggers:
+            -
+              uuid: 37c16b3cbd8b4680ab85a1fea819611f
+              expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build))>0'
+              name: 'Velocloud: Orchestrator build has been changed'
+              priority: INFO
+              description: 'Velocloud Orchestrator build has been changed.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 1f60b61051494ab495de4dfe2cd83450
+          name: 'Velocloud: Orchestrator version'
+          type: DEPENDENT
+          key: velocloud.orchestrator.version
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Version of VMware SD-WAN Orchestrator API.'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.info.version
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          master_item:
+            key: velocloud.get.clear_metrics
+          tags:
+            -
+              tag: component
+              value: orchestrator
+          triggers:
+            -
+              uuid: a1d8e4d61a804c8fb11b33f590f0885c
+              expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version))>0'
+              name: 'Velocloud: Orchestrator version has been changed'
+              priority: INFO
+              description: 'Velocloud Orchestrator version has been changed.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+        -
+          uuid: 1206789df5b44af7ba1c5416662344dd
+          name: 'Velocloud: System properties'
+          type: HTTP_AGENT
+          key: velocloud.system.properties
+          delay: 6h
+          history: 7d
+          trends: '0'
+          value_type: TEXT
+          description: 'System properties of VMware SD-WAN.'
+          preprocessing:
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
+          url: 'https://{$VELOCLOUD.URL}/portal/rest/systemProperty/getSystemProperties'
+          posts: '{ "normalize": true }'
+          headers:
+            -
+              name: Content-Type
+              value: application/json
+            -
+              name: Authorization
+              value: 'Token {$VELOCLOUD.TOKEN}'
+          request_method: POST
+          tags:
+            -
+              tag: component
+              value: application
+          triggers:
+            -
+              uuid: 58541dfe798843fa822276e84a32b919
+              expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#2)'
+              name: 'Velocloud: System properties have changed'
+              priority: INFO
+              description: 'System properties have changed.'
+              manual_close: 'YES'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+      discovery_rules:
+        -
+          uuid: 522ba6551cc64094b60a136d07c9921d
+          name: 'Edges metrics discovery'
+          type: DEPENDENT
+          key: velocloud.edges.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.EDGES.FILTER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.EDGES.FILTER.MATCHES}'
+                formulaid: B
+          description: 'Metrics for edges statistics.'
+          item_prototypes:
+            -
+              uuid: 79aa9ebb1ce64944a78a7c8d7603f53b
+              name: 'Edge [{#NAME}]: Activation state'
+              type: DEPENDENT
+              key: 'velocloud.edge.activation[{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Edge activation state.'
+              valuemap:
+                name: 'Edge activation state'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edges[?(@.id==''{#ID}'')].activationState.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch (value) {
+                          case 'PENDING':
+                              return 0
+                          case 'ACTIVATED':
+                              return 1
+                          default:
+                              return 10
+                      }
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: edge
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: cecb2a3698704c4c89ef12eb3bb39222
+              name: 'Edge [{#NAME}]: Description'
+              type: DEPENDENT
+              key: 'velocloud.edge.description[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Edge description.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edges[?(@.id==''{#ID}'')].description.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: edge
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: 490afb422d0f457595343d49536470b7
+              name: 'Edge [{#NAME}]: HA state'
+              type: DEPENDENT
+              key: 'velocloud.edge.ha_state[{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Edge high availability state.'
+              valuemap:
+                name: 'Edge HA status'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edges[?(@.id==''{#ID}'')].haState.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch (value) {
+                          case 'UNCONFIGURED':
+                              return 0
+                          case 'READY':
+                              return 1
+                          case 'PENDING_INIT':
+                              return 2
+                          case 'FAILED':
+                              return 3
+                          default:
+                              return 10
+                      }
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: edge
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+              trigger_prototypes:
+                -
+                  uuid: 075d35e3ed074b9daf01864b111945c7
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])=3'
+                  name: 'Edge [{#NAME}]: HA state is in "FAILED" state'
+                  priority: WARNING
+                  description: 'High availability state is "FAILED".'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: fdb55947147249109da453009d6bd443
+              name: 'Edge [{#NAME}]: Model number'
+              type: DEPENDENT
+              key: 'velocloud.edge.model[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Edge model number.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edges[?(@.id==''{#ID}'')].modelNumber.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: edge
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: 0af44b485ae54de49a0385923c897bee
+              name: 'Edge [{#NAME}]: Service uptime'
+              type: DEPENDENT
+              key: 'velocloud.edge.service_uptime[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: uptime
+              description: 'Edge service uptime.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edges[?(@.id==''{#ID}'')].serviceUpSince.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
+                      return value
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: edge
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: e12fe7584fbd40268e7c16ed044aa4db
+              name: 'Edge [{#NAME}]: Software version'
+              type: DEPENDENT
+              key: 'velocloud.edge.software_version[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Edge software version.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edges[?(@.id==''{#ID}'')].softwareVersion.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: edge
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: 74b49eac72574daab1b727045be118ca
+              name: 'Edge [{#NAME}]: State'
+              type: DEPENDENT
+              key: 'velocloud.edge.state[{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Edge state.'
+              valuemap:
+                name: 'Edge states'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edges[?(@.id==''{#ID}'')].edgeState.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch (value) {
+                          case 'OFFLINE':
+                              return 0
+                          case 'CONNECTED':
+                              return 1
+                          case 'NEVER_ACTIVATED':
+                              return 2
+                          default:
+                              return 10
+                      }
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: edge
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+              trigger_prototypes:
+                -
+                  uuid: 962d2d0c6f124424b2e5a7aca89d293f
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0'
+                  name: 'Edge [{#NAME}]: Edge is in "OFFLINE" state'
+                  priority: WARNING
+                  description: 'Edge state is "OFFLINE".'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: a86c1fa26d4d4481bdfb099338c27989
+              name: 'Edge [{#NAME}]: System uptime'
+              type: DEPENDENT
+              key: 'velocloud.edge.system_uptime[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: uptime
+              description: 'Edge system uptime.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edges[?(@.id==''{#ID}'')].systemUpSince.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
+                      return value
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: edge
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+              trigger_prototypes:
+                -
+                  uuid: 156d96052fd54606828cc53484794bb2
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600'
+                  name: 'Edge [{#NAME}]: Edge has been restarted'
+                  event_name: 'Edge [{#NAME}]: Edge has been restarted (uptime < 10m)'
+                  priority: WARNING
+                  description: 'Edge was restarted.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+          master_item:
+            key: velocloud.get.clear_metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#CITY}'
+              path: $.site.city
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#STATE}'
+              path: $.site.state
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.edges
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          uuid: e2879e0ce6e44203b0615c36ba626cc0
+          name: 'Gateways metrics discovery'
+          type: DEPENDENT
+          key: velocloud.gateways.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.GATEWAYS.FILTER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#NAME}'
+                value: '{$VELOCLOUD.LLD.GATEWAYS.FILTER.MATCHES}'
+                formulaid: B
+          description: 'Metrics for gateways statistics.'
+          item_prototypes:
+            -
+              uuid: 52859166849d4cdf860664f8d3b8088d
+              name: 'Gateway [{#NAME}]: Connected edges'
+              type: DEPENDENT
+              key: 'velocloud.gateway.connected_edges[{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Gateway connected edges.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].connectedEdges.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+              trigger_prototypes:
+                -
+                  uuid: f0d7bdb2ac3540258ab6a276b43a382c
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#2)'
+                  name: 'Gateway [{#NAME}]: The number of connected edges is changed'
+                  priority: WARNING
+                  description: 'The number of connected edges is changed.'
+                  manual_close: 'YES'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 5e588efb83be4dc2bc29eaa0a6630718
+              name: 'Gateway [{#NAME}]: Description'
+              type: DEPENDENT
+              key: 'velocloud.gateway.description[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Gateway description.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].description.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: 7f2a0a68386744cb84fab35df8c55a07
+              name: 'Gateway [{#NAME}]: IP address'
+              type: DEPENDENT
+              key: 'velocloud.gateway.ip_address[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Gateway ip address.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].ipAddress.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: b304460854f0485189f88df12483b5ac
+              name: 'Gateway [{#NAME}]: Service uptime'
+              type: DEPENDENT
+              key: 'velocloud.gateway.service_uptime[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: uptime
+              description: 'Gateway service uptime.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].serviceUpSince.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
+                      return value
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: 91784583eda943a7ace430413450391c
+              name: 'Gateway [{#NAME}]: State'
+              type: DEPENDENT
+              key: 'velocloud.gateway.state[{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Gateway state.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].gatewayState.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: d902600ef51640ffaaa4384ce505bcc2
+              name: 'Gateway [{#NAME}]: System uptime'
+              type: DEPENDENT
+              key: 'velocloud.gateway.system_uptime[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: uptime
+              description: 'Gateway system uptime.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].systemUpSince.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
+                      return value
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+              trigger_prototypes:
+                -
+                  uuid: e51ea2da27284067bd3ec8fa4faffdde
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600'
+                  name: 'Gateway [{#NAME}]: Gateway has been restarted'
+                  event_name: 'Gateway [{#NAME}]: Gateway has been restarted (uptime < 10m)'
+                  priority: WARNING
+                  description: 'Gateway was restarted.'
+                  tags:
+                    -
+                      tag: scope
+                      value: notice
+            -
+              uuid: 66c8fe8095724fb38966b05ef5d77a37
+              name: 'Gateway [{#NAME}]: Utilization CPU'
+              type: DEPENDENT
+              key: 'velocloud.gateway.utilization.cpu[{#ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Gateway CPU utilization.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].utilizationDetail.cpu.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: b510c38771464024a66dc20ce9d75505
+              name: 'Gateway [{#NAME}]: Utilization load'
+              type: DEPENDENT
+              key: 'velocloud.gateway.utilization.load[{#ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Gateway load.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].utilizationDetail.load.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: ad83565ae40f480dacd56e63bd475ddc
+              name: 'Gateway [{#NAME}]: Utilization memory'
+              type: DEPENDENT
+              key: 'velocloud.gateway.utilization.memory[{#ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Gateway memory utilization.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].utilizationDetail.memory.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: component
+                  value: memory
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+            -
+              uuid: b10c51350f604a8195e9c0176ca2de85
+              name: 'Gateway [{#NAME}]: Utilization overall'
+              type: DEPENDENT
+              key: 'velocloud.gateway.utilization.overall[{#ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Gateway overall utilization.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.gateways[?(@.id==''{#ID}'')].utilizationDetail.overall.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: city
+                  value: '{#CITY}'
+                -
+                  tag: component
+                  value: gateway
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: state
+                  value: '{#STATE}'
+          graph_prototypes:
+            -
+              uuid: d8d9b176f439436ba6fe69ec8bc6409e
+              name: 'Gateway [{#NAME}]: Utilization'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.gateway.utilization.cpu[{#ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.gateway.utilization.load[{#ID}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.gateway.utilization.memory[{#ID}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.gateway.utilization.overall[{#ID}]'
+          master_item:
+            key: velocloud.get.clear_metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#CITY}'
+              path: $.site.city
+            -
+              lld_macro: '{#ID}'
+              path: $.id
+            -
+              lld_macro: '{#NAME}'
+              path: $.name
+            -
+              lld_macro: '{#STATE}'
+              path: $.site.state
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.gateways
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          uuid: b951193feec6495cbd446f6d5097a868
+          name: 'Links metrics discovery'
+          type: DEPENDENT
+          key: velocloud.links.discovery
+          delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              -
+                macro: '{#ID}'
+                value: '{$VELOCLOUD.LLD.LINKS.FILTER.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
+              -
+                macro: '{#ID}'
+                value: '{$VELOCLOUD.LLD.LINKS.FILTER.MATCHES}'
+                formulaid: B
+          description: 'Metrics for links statistics.'
+          item_prototypes:
+            -
+              uuid: 6b3351b9187d47ba804e5fcd8c6f474f
+              name: 'Link [{#NAME}]:[{#IP}]: Best loss rx, %'
+              type: DEPENDENT
+              key: 'velocloud.link.best_loss_rx.pct[{#ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Link receive best loss.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].bestLossPctRx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+            -
+              uuid: 897c9055d51a4e75ba7bae1160c7303e
+              name: 'Link [{#NAME}]:[{#IP}]: Best loss tx, %'
+              type: DEPENDENT
+              key: 'velocloud.link.best_loss_tx.pct[{#ID}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'Link transmit best loss.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].bestLossPctTx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+            -
+              uuid: 5602191f2e0f4cb2b2340a4cfc77cfc7
+              name: 'Link [{#NAME}]:[{#IP}]: Bytes in'
+              type: DEPENDENT
+              key: 'velocloud.link.bytes_rx[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Link received bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].bytesRx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+            -
+              uuid: 758b71f1692c46a8bb0611566b00031b
+              name: 'Link [{#NAME}]:[{#IP}]: Bytes out'
+              type: DEPENDENT
+              key: 'velocloud.link.bytes_tx[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Link transmitted bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].bytesTx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+            -
+              uuid: 3320d368036b460091b3f20e3c5cebd9
+              name: 'Link [{#NAME}]:[{#IP}]: Last active'
+              type: DEPENDENT
+              key: 'velocloud.link.last_active[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: s
+              description: 'Link last active in seconds ago.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].link.linkLastActive.first()'
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.round((Date.now() - new Date(value).valueOf()) / 1000)'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+            -
+              uuid: cf66e401adc6432e8052baf0128d6877
+              name: 'Link [{#NAME}]:[{#IP}]: Packets in'
+              type: DEPENDENT
+              key: 'velocloud.link.packets_rx[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: '!packets'
+              description: 'Link received packets.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId== ''{#ID}'')].packetsRx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+            -
+              uuid: 152d25185f3e4e8b80ffea7d8ba25775
+              name: 'Link [{#NAME}]:[{#IP}]: Packets out'
+              type: DEPENDENT
+              key: 'velocloud.link.packets_tx[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: '!packets'
+              description: 'Link transmitted packets.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].packetsTx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+            -
+              uuid: b1d5964d030841e28a8b9e80c8152e7a
+              name: 'Link [{#NAME}]:[{#IP}]: State'
+              type: DEPENDENT
+              key: 'velocloud.link.state[{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Link state.'
+              valuemap:
+                name: 'Link states'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].link.linkState.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+                -
+                  type: JAVASCRIPT
+                  parameters:
+                    - |
+                      switch (value) {
+                          case 'UNSTABLE':
+                              return 0
+                          case 'STABLE':
+                              return 1
+                          case 'DISCONNECTED':
+                              return 2
+                          default:
+                              return 10
+                      }
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+              trigger_prototypes:
+                -
+                  uuid: abceaab09aea4cb482dc4b554502429b
+                  expression: 'last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.link.state[{#ID}])<>1'
+                  name: 'Link [{#NAME}]:[{#IP}]: Link state is not "STABLE"'
+                  priority: WARNING
+                  description: 'Link state is not "STABLE".'
+                  tags:
+                    -
+                      tag: scope
+                      value: availability
+            -
+              uuid: 43deb16e85644937a182b01eadb875d0
+              name: 'Link [{#NAME}]:[{#IP}]: Total bytes'
+              type: DEPENDENT
+              key: 'velocloud.link.total_bytes[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Link Total bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].totalBytes.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+            -
+              uuid: 622408bd703040339d1b4bdebed3280e
+              name: 'Link [{#NAME}]:[{#IP}]: Total packets'
+              type: DEPENDENT
+              key: 'velocloud.link.total_packets[{#ID}]'
+              delay: '0'
+              history: 7d
+              units: '!packets'
+              description: 'Link total packets.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.links[?(@.linkId==''{#ID}'')].totalPackets.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: link
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: enterprise
+                  value: '{#ENTERPRISE}'
+                -
+                  tag: interface
+                  value: '{#IF}'
+                -
+                  tag: ip
+                  value: '{#IP}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+          graph_prototypes:
+            -
+              uuid: d117ffc6c5f245099209ca3a471cc63f
+              name: 'Link [{#NAME}]:[{#IP}]: Best loss'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.best_loss_rx.pct[{#ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.best_loss_tx.pct[{#ID}]'
+            -
+              uuid: 951febf02caa4d4aa1417f8b8d11d89c
+              name: 'Link [{#NAME}]:[{#IP}]: Bytes summary'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.bytes_rx[{#ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.bytes_tx[{#ID}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.total_bytes[{#ID}]'
+            -
+              uuid: c656365e5c77496fac4c0a7d80d6cfd3
+              name: 'Link [{#NAME}]:[{#IP}]: Packets summary'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.packets_rx[{#ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.packets_tx[{#ID}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.link.total_packets[{#ID}]'
+          master_item:
+            key: velocloud.get.clear_metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#EDGE}'
+              path: $.link.edgeName
+            -
+              lld_macro: '{#ENTERPRISE}'
+              path: $.link.enterpriseName
+            -
+              lld_macro: '{#ID}'
+              path: $.link.linkId
+            -
+              lld_macro: '{#IF}'
+              path: $.link.interface
+            -
+              lld_macro: '{#IP}'
+              path: $.link.linkIpAddress
+            -
+              lld_macro: '{#NAME}'
+              path: $.link.displayName
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.links
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          uuid: 23ae8832dee54e7087b8c4d3c970a9ea
+          name: 'SDWAN peers path metrics discovery'
+          type: DEPENDENT
+          key: velocloud.sdwanpath.discovery
+          delay: '0'
+          description: 'Metrics for SDWAN peers path.'
+          item_prototypes:
+            -
+              uuid: 2fafb7d1b4c1429381f2f46c60dafa28
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Bytes in'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.bytes_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Bytes received of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.bytesRx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: source
+                  value: '{#SOURCE}'
+            -
+              uuid: 2fa176affa6b46ffae3682ea7cb96866
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Bytes out'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.bytes_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Bytes transmitted of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.bytesTx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: source
+                  value: '{#SOURCE}'
+            -
+              uuid: cf8f3d0c61994e49b493d79160da27bf
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packets in'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.packets_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: '!packets'
+              description: 'Packets received of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetsRx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: source
+                  value: '{#SOURCE}'
+            -
+              uuid: 49fc4e85c5a5415793fc89f2c3cdec8f
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packets out'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.packets_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: '!packets'
+              description: 'Packets transmitted of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetsTx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: source
+                  value: '{#SOURCE}'
+            -
+              uuid: 98a0c2c3a3be47e9bd32cf719069cad2
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packet Loss in'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.packet_loss_rx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Received packet loss of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetLossRx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: source
+                  value: '{#SOURCE}'
+            -
+              uuid: 0f2ef8113a3644feae7b827675362485
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Packet Loss out'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.packet_loss_tx[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: 'Transmitted packet loss of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.packetLossTx.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: source
+                  value: '{#SOURCE}'
+            -
+              uuid: 3a7ed14c13874c3088f28253a25a0c10
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Bytes total'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.total_bytes[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total bytes of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.totalBytes.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: source
+                  value: '{#SOURCE}'
+            -
+              uuid: 1f7bbdd7c1e24429878538b3b6bbddc4
+              name: 'Path [{#NAME}]:[{#SOURCE} => {#DESTINATION}]: Total packets'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpath.total_packets[{#NAME}/{#SOURCE}/{#DESTINATION}]'
+              delay: '0'
+              history: 7d
+              units: '!packets'
+              description: 'Total packets of SDWAN peer path.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWanPath[?(@.source.linkName==''{#NAME}'' && @.source.deviceName==''{#SOURCE}'' && @.destination.deviceName==''{#DESTINATION}'')].metrics.totalPackets.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-path
+                -
+                  tag: destination
+                  value: '{#DESTINATION}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: source
+                  value: '{#SOURCE}'
+          master_item:
+            key: velocloud.get.clear_metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#DESTINATION}'
+              path: $.destination.deviceName
+            -
+              lld_macro: '{#NAME}'
+              path: $.source.linkName
+            -
+              lld_macro: '{#SOURCE}'
+              path: $.source.deviceName
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.edgeSDWanPath
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        -
+          uuid: 5695baeff9f64b9b8850dbc6f98566ef
+          name: 'SDWAN peers metrics discovery'
+          type: DEPENDENT
+          key: velocloud.sdwanpeers.discovery
+          delay: '0'
+          description: 'Metrics for SDWAN peers.'
+          item_prototypes:
+            -
+              uuid: 25f6dc87f6014502a5eeb36ed3ddd7ed
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Dead path'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpeer.dead_path[{#EDGE.ID}/{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of dead path of SDWAN peer.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.dead.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-peer
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+            -
+              uuid: 08fb5b9cf8464e4382224515ba75953d
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Description'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpeer.description[{#EDGE.ID}/{#ID}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: TEXT
+              description: 'Description of SDWAN peer.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].description.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-peer
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+            -
+              uuid: ece78f083d55413ab82a33f03c0204ef
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Stable path'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpeer.stable_path[{#EDGE.ID}/{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of stable path of SDWAN peer.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.stable.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-peer
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+            -
+              uuid: 3884e4bf4e8a46508c04a6cd06ae1513
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Standby path'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpeer.standby_path[{#EDGE.ID}/{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of standby path of SDWAN peer.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.standby.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-peer
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+            -
+              uuid: 39389b7b594e4b5da678ff985da0ba2a
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Total path'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpeer.total_path[{#EDGE.ID}/{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of total path of SDWAN peer.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.total.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-peer
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+            -
+              uuid: 474e118fa98340f68c73f4ddc5f54f5e
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Unknown path'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpeer.unknown_path[{#EDGE.ID}/{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of unknown path of SDWAN peer.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.unknown.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-peer
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+            -
+              uuid: 4e93b5e2f88747b093aba97d94d433f2
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: Unstable path'
+              type: DEPENDENT
+              key: 'velocloud.sdwanpeer.unstable_path[{#EDGE.ID}/{#ID}]'
+              delay: '0'
+              history: 7d
+              description: 'Count of unstable path of SDWAN peer.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.edgeSDWan[?(@.deviceLogicalId==''{#ID}'' && @.edgeId==''{#EDGE.ID}'')].pathStatusCount.unstable.first()'
+              master_item:
+                key: velocloud.get.clear_metrics
+              tags:
+                -
+                  tag: component
+                  value: sdwan-peer
+                -
+                  tag: edge
+                  value: '{#EDGE}'
+                -
+                  tag: name
+                  value: '{#NAME}'
+                -
+                  tag: type
+                  value: '{#TYPE}'
+          graph_prototypes:
+            -
+              uuid: 36438b5369794ea8a9147ec7675bc1a6
+              name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: {#EDGE.ID}: Path overview'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.sdwanpeer.stable_path[{#EDGE.ID}/{#ID}]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.sdwanpeer.dead_path[{#EDGE.ID}/{#ID}]'
+                -
+                  sortorder: '2'
+                  color: F63100
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.sdwanpeer.standby_path[{#EDGE.ID}/{#ID}]'
+                -
+                  sortorder: '3'
+                  color: A54F10
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.sdwanpeer.unknown_path[{#EDGE.ID}/{#ID}]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'VMWare SD-WAN VeloCloud by HTTP'
+                    key: 'velocloud.sdwanpeer.unstable_path[{#EDGE.ID}/{#ID}]'
+          master_item:
+            key: velocloud.get.clear_metrics
+          lld_macro_paths:
+            -
+              lld_macro: '{#EDGE.ID}'
+              path: $.edgeId
+            -
+              lld_macro: '{#EDGE}'
+              path: $.edgeName
+            -
+              lld_macro: '{#ID}'
+              path: $.deviceLogicalId
+            -
+              lld_macro: '{#NAME}'
+              path: $.peerName
+            -
+              lld_macro: '{#TYPE}'
+              path: $.peerType
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.edgeSDWan
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+      tags:
+        -
+          tag: class
+          value: network
+        -
+          tag: target
+          value: vmware-sd-wan-velocloud
+      macros:
+        -
+          macro: '{$VELOCLOUD.LLD.EDGES.FILTER.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable edges.'
+        -
+          macro: '{$VELOCLOUD.LLD.EDGES.FILTER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered edges.'
+        -
+          macro: '{$VELOCLOUD.LLD.GATEWAYS.FILTER.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable gateways.'
+        -
+          macro: '{$VELOCLOUD.LLD.GATEWAYS.FILTER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered gateways.'
+        -
+          macro: '{$VELOCLOUD.LLD.LINKS.FILTER.MATCHES}'
+          value: '.*'
+          description: 'Filter for discoverable links.'
+        -
+          macro: '{$VELOCLOUD.LLD.LINKS.FILTER.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered links.'
+        -
+          macro: '{$VELOCLOUD.TOKEN}'
+          description: 'VMware SD-WAN Orchestrator API Token.'
+        -
+          macro: '{$VELOCLOUD.URL}'
+          description: 'VMware SD-WAN Orchestrator URL. e.g vco.velocloud.net.'
+      valuemaps:
+        -
+          uuid: 6ac13cd1206145919ae7c9776ef5e76b
+          name: 'Edge activation state'
+          mappings:
+            -
+              value: '0'
+              newvalue: PENDING
+            -
+              value: '1'
+              newvalue: ACTIVATED
+            -
+              value: '10'
+              newvalue: UNKNOWN
+        -
+          uuid: cd8d83dc329144d9925a5c52db95df96
+          name: 'Edge HA status'
+          mappings:
+            -
+              value: '0'
+              newvalue: UNCONFIGURED
+            -
+              value: '1'
+              newvalue: READY
+            -
+              value: '2'
+              newvalue: PENDING_INIT
+            -
+              value: '3'
+              newvalue: FAILED
+            -
+              value: '10'
+              newvalue: UNKNOWN
+        -
+          uuid: 87f150cd23e14448b35980b546dc2cd8
+          name: 'Edge states'
+          mappings:
+            -
+              value: '0'
+              newvalue: OFFLINE
+            -
+              value: '1'
+              newvalue: CONNECTED
+            -
+              value: '2'
+              newvalue: NEVER_ACTIVATED
+            -
+              value: '10'
+              newvalue: UNKNOWN
+        -
+          uuid: 249b93828946422c9ef8870a915661ca
+          name: 'Link states'
+          mappings:
+            -
+              value: '0'
+              newvalue: UNSTABLE
+            -
+              value: '1'
+              newvalue: STABLE
+            -
+              value: '2'
+              newvalue: DISCONNECTED
+            -
+              value: '10'
+              newvalue: UNKNOWN

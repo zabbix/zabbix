@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,8 +72,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)']
-//						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
 					]
 				]
 			],
@@ -126,8 +126,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP1 (IP1)'],
 						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets GP2 (I1, IP1, H1I2)'],
-						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)']
-//						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP3 (H1IP1)'],
+						['type' => 'Graph prototype', 'header' => 'Dynamic widgets H1: Dynamic widgets H1 GP4 (H1IP1 and H2I1)']
 					]
 				]
 			],
@@ -280,7 +280,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	 * @dataProvider getWidgetsData
 	 */
 	public function testDashboardDynamicItemWidgets_Layout($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=105');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1050');
 		$dashboard = CDashboardElement::find()->one();
 
 		if (CTestArrayHelper::get($data, 'host_filter', false)) {
@@ -301,6 +301,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 		);
 
 		$this->assertWidgetContent($data['widgets']);
+
 		// Check that after page refresh widgets remain the same.
 		$this->page->refresh();
 		$this->page->waitUntilReady();
@@ -310,8 +311,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 	private function assertWidgetContent($data) {
 		$dashboard = CDashboardElement::find()->one();
 		$widgets = $dashboard->getWidgets();
-//		TODO: uncomment "count" and widget name in 1 and 2 test case of data provider after fix ZBX-18271
-//		$this->assertEquals(count($data), $widgets->count());
+		$this->assertEquals(count($data), $widgets->count());
 
 		foreach ($data as $key => $expected) {
 			$widget = $widgets->get($key);

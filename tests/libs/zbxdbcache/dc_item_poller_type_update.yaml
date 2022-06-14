@@ -1102,84 +1102,91 @@ in:
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 206
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 207
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_ODBC
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 208
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_ODBC
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 209
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 210
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 211
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 212
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 213
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 214
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 215
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_ODBC
+  - ref: 2151
+    access: DIRECT
+    type: ITEM_TYPE_DB_MONITOR
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 216
     access: DIRECT
     type: ITEM_TYPE_DB_MONITOR
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_ODBC
   - ref: 217
     access: DIRECT
     type: ITEM_TYPE_IPMI

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
-$page['scripts'] = ['multiselect.js', 'textareaflexible.js', 'class.tab-indicators.js', 'class.tagfilteritem.js'];
+$page['scripts'] = ['class.tagfilteritem.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -137,6 +137,7 @@ $fields = [
 	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
 	'checkbox_hash' =>							[T_ZBX_STR, O_OPT, null,	null,		null],
+	'backurl' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
 	// Sort and sortorder.
 	'sort' =>									[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
 	'sortorder' =>								[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -180,6 +181,11 @@ if ($triggerIds) {
 }
 
 if (getRequest('hostid') && !isWritableHostTemplates([getRequest('hostid')])) {
+	access_deny();
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
 	access_deny();
 }
 
@@ -293,7 +299,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		$result = (bool) API::Trigger()->create($trigger);
 
-		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Trigger added'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot add trigger'));
+		}
 	}
 	else {
 		$db_triggers = API::Trigger()->get([
@@ -398,22 +409,40 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$result = true;
 		}
 
-		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
+		if ($result) {
+			CMessageHelper::setSuccessTitle(_('Trigger updated'));
+		}
+		else {
+			CMessageHelper::setErrorTitle(_('Cannot update trigger'));
+		}
 	}
 
 	if ($result) {
 		unset($_REQUEST['form']);
 		uncheckTableRows(getRequest('checkbox_hash'));
+
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 	$result = API::Trigger()->delete([getRequest('triggerid')]);
 
 	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Trigger deleted'));
 		unset($_REQUEST['form'], $_REQUEST['triggerid']);
 		uncheckTableRows(getRequest('checkbox_hash'));
+
+		if (hasRequest('backurl')) {
+			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response->redirect();
+		}
 	}
-	show_messages($result, _('Trigger deleted'), _('Cannot delete trigger'));
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot delete trigger'));
+	}
 }
 elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])) {
 	if (!isset($_REQUEST['dependencies'])) {
@@ -494,7 +523,7 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' &&
 
 		DBstart();
 
-		$result = copyTriggersToHosts(getRequest('g_triggerid'), $hosts_ids, getRequest('hostid'));
+		$result = copyTriggersToHosts($hosts_ids, getRequest('hostid'), getRequest('g_triggerid'));
 		$result = DBend($result);
 
 		$triggers_count = count(getRequest('g_triggerid'));
@@ -560,7 +589,8 @@ if (isset($_REQUEST['form'])) {
 		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
 		'correlation_tag' => getRequest('correlation_tag', ''),
 		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
-		'context' => getRequest('context')
+		'context' => getRequest('context'),
+		'backurl' => getRequest('backurl')
 	];
 
 	// render view

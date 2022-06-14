@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "zbxhistory.h"
-#include "zbxself.h"
+
 #include "history.h"
 
 /* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
@@ -195,11 +195,10 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 {
 	char		http_status[MAX_STRING_LEN];
 	long int	http_code;
-	CURLcode	curl_err;
 
 	if (CURLE_HTTP_RETURNED_ERROR == error)
 	{
-		if (CURLE_OK == (curl_err = curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code)))
+		if (CURLE_OK == curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_code))
 			zbx_snprintf(http_status, sizeof(http_status), "HTTP status code: %ld", http_code);
 		else
 			zbx_strlcpy(http_status, "unknown HTTP status code", sizeof(http_status));
@@ -221,8 +220,6 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_close                                                          *
- *                                                                                  *
  * Purpose: closes connection and releases allocated resources                      *
  *                                                                                  *
  * Parameters:  hist - [IN] the history storage interface                           *
@@ -230,7 +227,7 @@ static void	elastic_log_error(CURL *handle, CURLcode error, const char *errbuf)
  ************************************************************************************/
 static void	elastic_close(zbx_history_iface_t *hist)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->data.elastic_data;
 
 	zbx_free(data->buf);
 	zbx_free(data->post_url);
@@ -247,9 +244,7 @@ static void	elastic_close(zbx_history_iface_t *hist)
 
 /******************************************************************************
  *                                                                            *
- * Function: elastic_is_error_present                                         *
- *                                                                            *
- * Purpose: check a error from Elastic json response                          *
+ * Purpose: check an error from Elastic json response                         *
  *                                                                            *
  * Parameters: page - [IN]  the buffer with json response                     *
  *             err  - [OUT] the parse error message. If the error value is    *
@@ -321,11 +316,7 @@ static int	elastic_is_error_present(zbx_httppage_t *page, char **err)
  *                                                                                                                *
  ******************************************************************************************************************/
 
-
-
 /************************************************************************************
- *                                                                                  *
- * Function: elastic_writer_init                                                    *
  *                                                                                  *
  * Purpose: initializes elastic writer for a new batch of history values            *
  *                                                                                  *
@@ -348,8 +339,6 @@ static void	elastic_writer_init(void)
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_writer_release                                                 *
- *                                                                                  *
  * Purpose: releases initialized elastic writer by freeing allocated resources and  *
  *          setting its state to uninitialized.                                     *
  *                                                                                  *
@@ -371,8 +360,6 @@ static void	elastic_writer_release(void)
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_writer_add_iface                                               *
- *                                                                                  *
  * Purpose: adds history storage interface to be flushed later                      *
  *                                                                                  *
  * Parameters: db_insert - [IN] bulk insert data                                    *
@@ -380,7 +367,7 @@ static void	elastic_writer_release(void)
  ************************************************************************************/
 static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->data.elastic_data;
 	CURLoption		opt;
 	CURLcode		err;
 
@@ -401,7 +388,8 @@ static void	elastic_writer_add_iface(zbx_history_iface_t *hist)
 					&page_w[hist->value_type].page)) ||
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_FAILONERROR, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_ERRORBUFFER,
-					page_w[hist->value_type].errbuf)))
+					page_w[hist->value_type].errbuf)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
 		goto out;
@@ -431,8 +419,6 @@ out:
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_writer_flush                                                   *
- *                                                                                  *
  * Purpose: posts historical data to elastic storage                                *
  *                                                                                  *
  ************************************************************************************/
@@ -459,7 +445,7 @@ static int	elastic_writer_flush(void)
 	for (i = 0; i < writer.ifaces.values_num; i++)
 	{
 		zbx_history_iface_t	*hist = (zbx_history_iface_t *)writer.ifaces.values[i];
-		zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+		zbx_elastic_data_t	*data = hist->data.elastic_data;
 
 		if (CURLE_OK != (err = curl_easy_setopt(data->handle, CURLOPT_HTTPHEADER, curl_headers)))
 		{
@@ -602,8 +588,6 @@ end:
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_destroy                                                        *
- *                                                                                  *
  * Purpose: destroys history storage interface                                      *
  *                                                                                  *
  * Parameters:  hist - [IN] the history storage interface                           *
@@ -611,7 +595,7 @@ end:
  ************************************************************************************/
 static void	elastic_destroy(zbx_history_iface_t *hist)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->data.elastic_data;
 
 	elastic_close(hist);
 
@@ -620,8 +604,6 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: elastic_get_values                                                     *
  *                                                                                  *
  * Purpose: gets item history data from history storage                             *
  *                                                                                  *
@@ -642,7 +624,7 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
 static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int start, int count, int end,
 		zbx_vector_history_record_t *values)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->data.elastic_data;
 	size_t			url_alloc = 0, url_offset = 0, id_alloc = 0, scroll_alloc = 0, scroll_offset = 0;
 	int			total, empty, ret;
 	CURLcode		err;
@@ -717,7 +699,8 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_WRITEDATA, &page_r)) ||
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_HTTPHEADER, curl_headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_FAILONERROR, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_ERRORBUFFER, errbuf)))
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_ERRORBUFFER, errbuf)) ||
+			CURLE_OK != (err = curl_easy_setopt(data->handle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
 		goto out;
@@ -841,7 +824,6 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 			goto out;
 		}
 
-
 		zabbix_log(LOG_LEVEL_DEBUG, "elasticsearch closing scroll %s", data->post_url);
 
 		page_r.offset = 0;
@@ -869,8 +851,6 @@ out:
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_add_values                                                     *
- *                                                                                  *
  * Purpose: sends history data to the storage                                       *
  *                                                                                  *
  * Parameters:  hist    - [IN] the history storage interface                        *
@@ -879,7 +859,7 @@ out:
  ************************************************************************************/
 static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t *history)
 {
-	zbx_elastic_data_t	*data = (zbx_elastic_data_t *)hist->data;
+	zbx_elastic_data_t	*data = hist->data.elastic_data;
 	int			i, num = 0;
 	ZBX_DC_HISTORY		*h;
 	struct zbx_json		json_idx, json;
@@ -955,8 +935,6 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_ptr_t 
 
 /************************************************************************************
  *                                                                                  *
- * Function: elastic_flush                                                          *
- *                                                                                  *
  * Purpose: flushes the history data to storage                                     *
  *                                                                                  *
  * Parameters:  hist    - [IN] the history storage interface                        *
@@ -973,8 +951,6 @@ static int	elastic_flush(zbx_history_iface_t *hist)
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: zbx_history_elastic_init                                               *
  *                                                                                  *
  * Purpose: initializes history storage interface                                   *
  *                                                                                  *
@@ -1005,7 +981,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	data->handle = NULL;
 
 	hist->value_type = value_type;
-	hist->data = data;
+	hist->data.elastic_data = data;
 	hist->destroy = elastic_destroy;
 	hist->add_values = elastic_add_values;
 	hist->flush = elastic_flush;
@@ -1016,8 +992,6 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 }
 
 /************************************************************************************
- *                                                                                  *
- * Function: zbx_elastic_version_extract                                            *
  *                                                                                  *
  * Purpose: queries elastic search version and extracts the numeric version from    *
  *          the response string                                                     *
@@ -1034,8 +1008,9 @@ void	zbx_elastic_version_extract(struct zbx_json *json)
 	CURL				*handle;
 	size_t				version_len = 0;
 	char				*version_friendly = NULL, errbuf[CURL_ERROR_SIZE];
-	int				flag, major_num, minor_num, increment_num, ret = FAIL;
+	int				major_num, minor_num, increment_num, ret = FAIL;
 	zbx_uint32_t			version;
+	struct zbx_db_version_info_t	db_version_info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1060,7 +1035,8 @@ void	zbx_elastic_version_extract(struct zbx_json *json)
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_WRITEDATA, &page)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_HTTPHEADER, curl_headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_FAILONERROR, 1L)) ||
-			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_ERRORBUFFER, errbuf)))
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_ERRORBUFFER, errbuf)) ||
+			CURLE_OK != (err = curl_easy_setopt(handle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: [%s]", (int)opt, curl_easy_strerror(err));
 		goto clean;
@@ -1111,8 +1087,16 @@ out:
 		}
 	}
 
-	flag = zbx_db_version_check("ElasticDB", version, ZBX_ELASTIC_MIN_VERSION, ZBX_DBVERSION_UNDEFINED);
-	zbx_db_version_json_create(json, "ElasticDB", version_friendly, ZBX_ELASTIC_MIN_VERSION_FRIENDLY, "", flag);
+	db_version_info.database = "ElasticDB";
+	db_version_info.friendly_current_version = version_friendly;
+	db_version_info.friendly_min_version = ZBX_ELASTIC_MIN_VERSION_FRIENDLY;
+	db_version_info.friendly_max_version = "";
+	db_version_info.friendly_min_supported_version = NULL;
+	db_version_info.flag = zbx_db_version_check(db_version_info.database, version, ZBX_ELASTIC_MIN_VERSION,
+			ZBX_DBVERSION_UNDEFINED, ZBX_DBVERSION_UNDEFINED);
+	db_version_info.history_pk = 0;
+
+	zbx_db_version_json_create(json, &db_version_info);
 	ZBX_ELASTIC_SVERSION = version;
 	zbx_free(version_friendly);
 	zbx_free(page.data);

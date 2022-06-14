@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,7 +102,7 @@ class CPagerHelper {
 	 * @return array
 	 */
 	protected static function prepareData($page, $num_rows) {
-		$rows_per_page = (int) CWebUser::$data['rows_per_page'];
+		$rows_per_page = CWebUser::$data['rows_per_page'];
 
 		$offset_down = 0;
 		$limit_exceeded = ($num_rows > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));

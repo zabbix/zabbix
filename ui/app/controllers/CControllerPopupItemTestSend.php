@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -224,7 +224,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 		/*
 		 * Define values used to test preprocessing steps.
-		 * Steps array can be empty if only value convertation is tested.
+		 * Steps array can be empty if only value conversion is tested.
 		 */
 		$preproc_test_data = [
 			'value' => $this->getInput('value', ''),

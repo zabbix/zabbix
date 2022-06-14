@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,8 +64,8 @@ class CWidgetSvgGraph extends CWidget {
 	_getUpdateRequestData() {
 		return {
 			...super._getUpdateRequestData(),
-			from_ts: this._time_period.from_ts,
-			to_ts: this._time_period.to_ts
+			from: this._time_period.from,
+			to: this._time_period.to
 		};
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,10 @@
 #ifndef ZABBIX_JSON_PARSER_H
 #define ZABBIX_JSON_PARSER_H
 
-int	zbx_json_validate(const char *start, char **error);
+#include "zbxtypes.h"
 
-int	json_parse_value(const char *start, char **error);
+zbx_int64_t	zbx_json_validate(const char *start, char **error);
+
+zbx_int64_t	json_parse_value(const char *start, char **error);
 
 #endif

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,20 +37,18 @@ if (array_key_exists('source', $data)) {
 	$form->addVar('source', $data['source']);
 }
 
-$condition_type = $data['last_type'];
+$condition_type = (int) $data['last_type'];
 
 $form_list = (new CFormList())->cleanItems();
 
 switch ($data['type']) {
 	case ZBX_POPUP_CONDITION_TYPE_EVENT_CORR:
-		require_once dirname(__FILE__).'/../../include/correlation.inc.php';
-
 		// Type select.
 		$form_list->addRow(new CLabel(_('Type'), 'label-condition-type'), (new CSelect('condition_type'))
 			->setFocusableElementId('label-condition-type')
 			->setValue($condition_type)
 			->setId('condition-type')
-			->addOptions(CSelect::createOptionsFromArray(corrConditionTypes()))
+			->addOptions(CSelect::createOptionsFromArray(CCorrelationHelper::getConditionTypes()))
 		);
 
 		$inline_js .= '$(() => $("#condition-type").on("change",'
@@ -62,9 +60,9 @@ switch ($data['type']) {
 			case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 				$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 					->setModern(true)
-					->addValue(corrConditionOperatorToString(
-						getOperatorsByCorrConditionType(ZBX_CORR_CONDITION_OLD_EVENT_TAG)[0]
-					), getOperatorsByCorrConditionType(ZBX_CORR_CONDITION_OLD_EVENT_TAG)[0]);
+					->addValue(CCorrelationHelper::getLabelByOperator(
+						CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_OLD_EVENT_TAG)[0]
+					), CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_OLD_EVENT_TAG)[0]);
 				$new_condition_tag = (new CTextAreaFlexible('tag'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 				$inline_js .= $new_condition_tag->getPostJS();
@@ -77,8 +75,9 @@ switch ($data['type']) {
 			// New event host group form elements.
 			case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach (getOperatorsByCorrConditionType(ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP) as $value) {
-					$operator->addValue(corrConditionOperatorToString($value), $value);
+				foreach (CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP)
+						as $value) {
+					$operator->addValue(CCorrelationHelper::getLabelByOperator($value), $value);
 				}
 
 				$hostgroup_multiselect = (new CMultiSelect([
@@ -106,9 +105,9 @@ switch ($data['type']) {
 			case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 				$operator = (new CRadioButtonList('', CONDITION_OPERATOR_EQUAL))
 					->setModern(true)
-					->addValue(corrConditionOperatorToString(
-						getOperatorsByCorrConditionType(ZBX_CORR_CONDITION_EVENT_TAG_PAIR)[0]
-					), getOperatorsByCorrConditionType(ZBX_CORR_CONDITION_EVENT_TAG_PAIR)[0]);
+					->addValue(CCorrelationHelper::getLabelByOperator(
+						CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_EVENT_TAG_PAIR)[0]
+					), CCorrelationHelper::getOperatorsByConditionType(ZBX_CORR_CONDITION_EVENT_TAG_PAIR)[0]);
 				$new_condition_oldtag = (new CTextAreaFlexible('oldtag'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 				$new_condition_newtag = (new CTextAreaFlexible('newtag'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
@@ -125,8 +124,8 @@ switch ($data['type']) {
 			case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 			case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 				$operator = (new CRadioButtonList('operator', CONDITION_OPERATOR_EQUAL))->setModern(true);
-				foreach (getOperatorsByCorrConditionType($condition_type) as $value) {
-					$operator->addValue(corrConditionOperatorToString($value), $value);
+				foreach (CCorrelationHelper::getOperatorsByConditionType($condition_type) as $value) {
+					$operator->addValue(CCorrelationHelper::getLabelByOperator($value), $value);
 				}
 
 				$new_condition_tag = (new CTextAreaFlexible('tag'))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
@@ -218,9 +217,7 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Severity'), new CSeverity([
-						'name' => 'value', 'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED
-					]));
+					->addRow(_('Severity'), new CSeverity('value', TRIGGER_SEVERITY_NOT_CLASSIFIED));
 				break;
 
 			// Host form elements.
@@ -405,8 +402,8 @@ switch ($data['type']) {
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('btn1', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
-						->onClick('return PopUp("popup.generic",'.
-							json_encode([
+						->onClick(
+							'return PopUp("popup.generic", '. json_encode([
 								'srctbl' => 'dchecks',
 								'srcfld1' => 'dcheckid',
 								'srcfld2' => 'name',
@@ -414,7 +411,7 @@ switch ($data['type']) {
 								'dstfld1' => 'dcheck_new_condition_value',
 								'dstfld2' => 'dcheck',
 								'writeonly' => '1'
-							]).', null, this);'
+							]).', {dialogue_class: "modal-popup-generic"});'
 						)
 				];
 
