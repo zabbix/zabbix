@@ -44,6 +44,8 @@ class CDBHelper {
 	 */
 	static $backups = [];
 
+	static $db_extension;
+
 	/**
 	 * Perform select query and check the result.
 	 *
@@ -261,15 +263,13 @@ class CDBHelper {
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
 			$cmd = '';
-			$db_extension = '';
 
-			$sql = 'SELECT db_extension'.
-				' FROM config';
+			if (self::$db_extension == null) {
+				$res = DBfetch(DBselect('SELECT db_extension FROM config'));
 
-			$res = DBfetch(DBselect($sql));
-
-			if ($res) {
-				$db_extension = $res['db_extension'];
+				if ($res) {
+					self::$db_extension = $res['db_extension'];
+				}
 			}
 
 			if ($DB['PASSWORD'] !== '') {
@@ -288,7 +288,7 @@ class CDBHelper {
 
 			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 -t'.implode(' -t', $tables).' -d'.$db_name.' -f'.$file;
 
-			if ($db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
 				$cmd .= ' 2>/dev/null';
 			}
 
@@ -323,16 +323,6 @@ class CDBHelper {
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
 			$cmd = '';
 			$cmd_tdb = '';
-			$db_extension = '';
-
-			$sql = 'SELECT db_extension'.
-				' FROM config';
-
-			$res = DBfetch(DBselect($sql));
-
-			if ($res) {
-				$db_extension = $res['db_extension'];
-			}
 
 			if ($DB['PASSWORD'] !== '') {
 				putenv('PGPASSWORD='.$DB['PASSWORD']);
@@ -352,7 +342,7 @@ class CDBHelper {
 
 			$cmd .= ' -U'.$DB['USER'].' -Fd -j5 --clean -d'.$db_name.' '.$file;
 
-			if ($db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
 				$cmd_tdb .= 'psql -U '.$DB['USER'].$server.$port.' -d'.$db_name.' -c "SELECT timescaledb_pre_restore();"; ';
 				$cmd_tdb .= $cmd .' 2>/dev/null; ';
 				$cmd_tdb .= 'psql -U '.$DB['USER'].$server.$port.' -d'.$db_name.' -c "SELECT timescaledb_post_restore();" ';

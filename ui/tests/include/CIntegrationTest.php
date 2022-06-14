@@ -814,6 +814,21 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Execute housekeeper.
+	 *
+	 * @param string $component    component name or null for active component
+	 */
+	protected function executeHousekeeper($component = null) {
+		if ($component === null) {
+			$component = $this->getActiveComponent();
+		}
+
+		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'housekeeper_execute']);
+
+		sleep(self::CACHE_RELOAD_DELAY);
+	}
+
+	/**
 	 * Request data from API until data is present (@see call).
 	 *
 	 * @param string   $method        API method to be called

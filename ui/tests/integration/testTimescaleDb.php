@@ -32,9 +32,10 @@ class testTimescaleDb extends CIntegrationTest {
 
 	const HOSTNAME = 'test_timescale';
 	const TRAPNAME = 'trap_timescale';
+	const TABLENAME = 'history_uint';
 	const HIST_COUNT = 3000;
-	const COMPRESSION_OLDER_THAN = 7 * 24 * 3600; /* 7d */
-	const TOLERANCE_PERIOD = 60;
+	const COMPRESSION_OLDER_THAN = 20 * 24 * 3600; /* more than 7d */
+	static $db_extension = '';
 
 	/**
 	 * Component configuration provider.
@@ -51,26 +52,45 @@ class testTimescaleDb extends CIntegrationTest {
 	}
 
 	/**
+	 * Component configuration provider.
+	 *
+	 * @return array
+	 */
+	public function serverConfigurationProvider2() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 3,
+				'LogFileSize' => 0,
+			]
+		];
+	}
+
+	/**
 	 * Test TimescaleDb extension.
 	 */
-	public function checkTimescale() {
+	public function setExtension() {
 		global $DB;
-		$db_extension = '';
+		self::$db_extension = '';
 
-			$sql = 'SELECT db_extension'.
-				' FROM config';
+		$sql = 'SELECT db_extension'.
+			' FROM config';
 
-			$res = DBfetch(DBselect($sql));
+		$res = DBfetch(DBselect($sql));
 
-			if ($res) {
-				$db_extension = $res['db_extension'];
-			}
+		if ($res) {
+			self::$db_extension = $res['db_extension'];
+		}
+	}
 
-			if ($db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
-				return true;
-			}
+		/**
+	 * Test TimescaleDb extension.
+	 */
+	public function clearChunks() {
+		global $DB;
 
-			return false;
+		$sql = 'SELECT drop_chunks(\''.self::TABLENAME.'\', older_than => '.time().')';
+
+		$res = DBfetch(DBselect($sql));
 	}
 
 	/**
@@ -80,7 +100,7 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkServerUp() {
-		if ($this->checkTimescale()) {
+		if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
 			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'commit;');
 		}
 	}
@@ -89,6 +109,11 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+
+		$this->setExtension();
+		if (self::$db_extension  != ZBX_DB_EXTENSION_TIMESCALEDB) {
+			return true;
+		}
 
 		// Create host "test_timescale"
 		$response = $this->call('host.create', [
@@ -121,6 +146,13 @@ class testTimescaleDb extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
+		$response = $this->call('housekeeping.update',
+			['compression_status' => 0]
+		);
+		$this->assertArrayHasKey(0, $response['result']);
+
+		$this->clearChunks();
+
 		return true;
 	}
 
@@ -131,16 +163,36 @@ class testTimescaleDb extends CIntegrationTest {
 	public function getHistoryCount() {
 		global $DB;
 
-		$sql = 'SELECT count(*)'.
-			' FROM history_uint';
+		$res = DBfetch(DBselect('SELECT count(*) FROM '.self::TABLENAME));
 
-			$res = DBfetch(DBselect($sql));
+		if ($res) {
+			return $res['count'];
+		}
 
-			if ($res) {
-				return $res['count'];
-			}
+		return -1;
+	}
 
-			return -1;
+	/**
+	 * Check compression of the chunk.
+	 */
+	public function getCheckCompression() {
+		global $DB;
+
+		$compres = DBfetch(DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')'));
+		$this->assertArrayHasKey('number_compressed_chunks', $compres);
+		if ($compres['number_compressed_chunks'] == 0) {
+
+			$res = DBfetch(DBselect('SELECT show_chunks(\''.self::TABLENAME.'\')'));
+			$this->assertArrayHasKey('show_chunks', $res);
+
+			$chunk = $res['show_chunks'];
+			$res_compr = DBfetch(DBselect('SELECT compress_chunk(\''.$chunk.'\')'));
+			$this->assertArrayHasKey('compress_chunk', $res_compr);
+
+			$res2 = DBfetch(DBselect('SELECT number_compressed_chunks FROM hypertable_compression_stats(\''.self::TABLENAME.'\')'));
+			$this->assertArrayHasKey('number_compressed_chunks', $res2);
+			$this->assertEquals($res2['number_compressed_chunks'], count($res));
+		}
 	}
 
 /**
@@ -150,25 +202,46 @@ class testTimescaleDb extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testTimescaleDb_checkHistoryRecords() {
-		if ($this->checkTimescale()) {
+		if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
 			$this->reloadConfigurationCache();
 
 			$count_start = $this->getHistoryCount();
 			$this->assertNotEquals(-1, $count_start);
 
-			$c = time() - self::COMPRESSION_OLDER_THAN + self ::TOLERANCE_PERIOD;
+			$c = time() - self::COMPRESSION_OLDER_THAN;
 			$n = 1;
 			for ($i = 0; $i < self::HIST_COUNT; $i++) {
 				$sender_data[$i] = ['value' => $c, 'clock' => $c, 'ns' => $n, 'host' => self::HOSTNAME, 'key' => self::TRAPNAME];
 				$n += 10;
-				////$c = $c + $n;
 			}
 			$this->sendDataValues('sender', $sender_data , self::COMPONENT_SERVER);
 
 			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
-			sleep(self ::TOLERANCE_PERIOD);
+
 			$count_end = $this->getHistoryCount();
 			$this->assertEquals($count_end - $count_start, self::HIST_COUNT);
+
+			$response = $this->call('housekeeping.update',
+				['compression_status' => 1]
+			);
+			$this->assertArrayHasKey(0, $response['result']);
+			$this->reloadConfigurationCache();
+			$this->executeHousekeeper();
+		}
+	}
+
+/**
+	 * Test compression TimescaleDb.
+	 *
+	 * @required-components server
+	 * @configurationDataProvider serverConfigurationProvider2
+	 */
+	public function testTimescaleDb_checkCompression() {
+		if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+			$this->executeHousekeeper();
+
+			$this->getCheckCompression();
+
 		}
 	}
 }
