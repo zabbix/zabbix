@@ -733,8 +733,6 @@ window.widget_svggraph_form = new class {
 		const row_num = this.getDataSetNumber();
 		const approximation_select = document.getElementById('ds_' + row_num + '_approximation');
 
-	console.log(obj);
-
 		switch (jQuery(":checked", jQuery(obj)).val()) {
 			case "<?= SVG_GRAPH_TYPE_POINTS ?>":
 				jQuery("#ds_" + row_num + "_width").rangeControl("disable");
