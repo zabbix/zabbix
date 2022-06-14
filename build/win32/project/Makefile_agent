@@ -54,7 +54,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcrypto\base64.o \
 	..\..\..\src\libs\zbxgetopt\getopt.o \
 	..\..\..\src\libs\zbxhash\md5.o \
-	..\..\..\src\libs\zbxcrypto\sha256crypt.o \
+	..\..\..\src\libs\zbxhash\sha256crypt.o \
 	..\..\..\src\libs\zbxcrypto\crypto.o \
 	..\..\..\src\libs\zbxjson\json.o \
 	..\..\..\src\libs\zbxjson\json_parser.o \
@@ -88,6 +88,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\win32\memory.o \
 	..\..\..\src\libs\zbxsysinfo\win32\net.o \
 	..\..\..\src\libs\zbxsysinfo\win32\pdhmon.o \
+	..\..\..\src\libs\zbxsysinfo\win32\registry.o \
 	..\..\..\src\libs\zbxsysinfo\win32\proc.o \
 	..\..\..\src\libs\zbxsysinfo\win32\services.o \
 	..\..\..\src\libs\zbxsysinfo\win32\swap.o \

@@ -19,11 +19,12 @@
 
 #include "zbxcomms.h"
 #include "comms.h"
-
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#include "tls.h"
+#endif
 #include "common.h"
 #include "base64.h"
 #include "log.h"
-#include "../zbxcrypto/tls_tcp.h"
 #include "zbxcompress.h"
 #include "zbxxml.h"
 #include "zbxstr.h"

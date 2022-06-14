@@ -550,14 +550,11 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
  * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
  */
 function reloadPopup(form, action) {
-	var dialogueid = form.closest('[data-dialogueid]').dataset.dialogueid,
-		dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class'),
-		action = action || 'popup.generic',
-		parameters = {};
+	const dialogueid = form.closest('[data-dialogueid]').dataset.dialogueid;
+	const dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class');
+	const parameters = getFormFields(form);
 
-	for (const input of form.elements) {
-		parameters[input.name] = input.value;
-	};
+	action = action || 'popup.generic';
 
 	PopUp(action, parameters, {dialogueid, dialogue_class});
 }
@@ -614,11 +611,11 @@ function addValues(frame, values) {
 			frm_storage = document.getElementById(key);
 		}
 
-		if (jQuery(frm_storage).is('span')) {
-			jQuery(frm_storage).html(values[key]);
+		if (jQuery(frm_storage).is(':input')) {
+			jQuery(frm_storage).val(values[key]).change();
 		}
 		else {
-			jQuery(frm_storage).val(values[key]).change();
+			jQuery(frm_storage).html(values[key]);
 		}
 	}
 }

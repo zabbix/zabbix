@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-13T22:55:23Z'
-  groups:
+  date: '2022-06-07T19:36:28Z'
+  template_groups:
     -
       uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -3005,6 +3005,7 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           filter:
+            evaltype: AND
             conditions:
               -
                 macro: '{#JOBNAME}'

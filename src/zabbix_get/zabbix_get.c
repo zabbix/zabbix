@@ -372,11 +372,15 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -437,7 +441,7 @@ int	main(int argc, char **argv)
 				break;
 #endif
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -454,7 +458,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == host || NULL == key)
 	{
-		usage();
+		zbx_usage();
 		ret = FAIL;
 	}
 

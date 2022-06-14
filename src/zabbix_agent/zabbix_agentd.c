@@ -517,7 +517,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 		default:
 			zbx_error("mutually exclusive options used");
-			usage();
+			zbx_usage();
 			ret = FAIL;
 			goto out;
 	}
@@ -1372,7 +1372,7 @@ int	main(int argc, char **argv)
 	switch (t.task)
 	{
 		case ZBX_TASK_SHOW_USAGE:
-			usage();
+			zbx_usage();
 			exit(EXIT_FAILURE);
 			break;
 #ifndef _WINDOWS
@@ -1467,7 +1467,11 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_VERSION:
-			version();
+			zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			printf("\n");
+			zbx_tls_version();
+#endif
 #ifdef _AIX
 			printf("\n");
 			tl_version();
@@ -1475,7 +1479,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
-			help();
+			zbx_help();
 			exit(EXIT_SUCCESS);
 			break;
 		default:

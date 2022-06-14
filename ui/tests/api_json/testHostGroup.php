@@ -22,6 +22,8 @@
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
+ * @onBefore prepareTestData
+ *
  * @backup hstgrp
  */
 class testHostGroup extends CAPITest {
@@ -51,9 +53,9 @@ class testHostGroup extends CAPITest {
 			// Check for duplicated host groups names.
 			[
 				'hostgroup' => [
-					'name' => 'Templates'
+					'name' => 'Zabbix servers'
 				],
-				'expected_error' => 'Host group "Templates" already exists.'
+				'expected_error' => 'Host group "Zabbix servers" already exists.'
 			],
 			[
 				'hostgroup' => [
@@ -61,21 +63,21 @@ class testHostGroup extends CAPITest {
 						'name' => 'One host group with existing name'
 					],
 					[
-						'name' => 'Templates'
+						'name' => 'Zabbix servers'
 					]
 				],
-				'expected_error' => 'Host group "Templates" already exists.'
+				'expected_error' => 'Host group "Zabbix servers" already exists.'
 			],
 			[
 				'hostgroup' => [
 					[
-						'name' => 'Host groups with two identical name'
+						'name' => 'Host groups with two identical names'
 					],
 					[
-						'name' => 'Host groups with two identical name'
+						'name' => 'Host groups with two identical names'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/2": value (name)=(Host groups with two identical name) already exists.'
+				'expected_error' => 'Invalid parameter "/2": value (name)=(Host groups with two identical names) already exists.'
 			],
 			// Check successfully create.
 			[
@@ -126,12 +128,10 @@ class testHostGroup extends CAPITest {
 		$result = $this->call('hostgroup.create', $hostgroup, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
-				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $hostgroup[$key]['name']);
+			foreach ($result['result']['groupids'] as $index => $groupid) {
+				$dbRow = CDBHelper::getRow('SELECT name,flags FROM hstgrp WHERE groupid='.$groupid);
+				$this->assertEquals($dbRow['name'], $hostgroup[$index]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
-				$this->assertEquals($dbRow['internal'], 0);
 			}
 		}
 	}
@@ -216,10 +216,10 @@ class testHostGroup extends CAPITest {
 				'hostgroup' => [
 					[
 					'groupid' => '50005',
-					'name' => 'Templates'
+					'name' => 'Zabbix servers'
 					]
 				],
-				'expected_error' => 'Host group "Templates" already exists.'
+				'expected_error' => 'Host group "Zabbix servers" already exists.'
 			],
 			[
 				'hostgroup' => [
@@ -289,17 +289,18 @@ class testHostGroup extends CAPITest {
 		$result = $this->call('hostgroup.update', $hostgroups, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['groupids'] as $key => $id) {
-				$dbResult = DBSelect('select * from hstgrp where groupid='.zbx_dbstr($id));
-				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $hostgroups[$key]['name']);
+			foreach ($result['result']['groupids'] as $index => $groupid) {
+				$dbRow = CDBHelper::getRow('SELECT name,flags FROM hstgrp WHERE groupid='.$groupid);
+				$this->assertEquals($dbRow['name'], $hostgroups[$index]['name']);
 				$this->assertEquals($dbRow['flags'], 0);
 			}
 		}
 		else {
 			foreach ($hostgroups as $hostgroup) {
-				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] !== 'Templates'){
-					$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($hostgroup['name'])));
+				if (array_key_exists('name', $hostgroup) && $hostgroup['name'] !== 'Zabbix servers'){
+					$this->assertEquals(0,
+						CDBHelper::getCount('SELECT * FROM hstgrp WHERE name='.zbx_dbstr($hostgroup['name']))
+					);
 				}
 			}
 		}
@@ -347,7 +348,7 @@ class testHostGroup extends CAPITest {
 			],
 			[
 				'hostgroup' => [
-					'5008',
+					'50008',
 					''
 				],
 				'expected_error' => 'Invalid parameter "/2": a number is expected.'
@@ -361,21 +362,9 @@ class testHostGroup extends CAPITest {
 			],
 			[
 				'hostgroup' => [
-					'50007'
-				],
-				'expected_error' => 'Host group "API host group delete internal" is internal and cannot be deleted.'
-			],
-			[
-				'hostgroup' => [
 					'50014'
 				],
 				'expected_error' => 'Group "API group for host prototype" cannot be deleted, because it is used by a host prototype.'
-			],
-			[
-				'hostgroup' => [
-					'50013'
-				],
-				'expected_error' => 'Template "API Template" cannot be without host group.'
 			],
 			[
 				'hostgroup' => [
@@ -441,7 +430,7 @@ class testHostGroup extends CAPITest {
 
 		if ($expected_error === null) {
 			foreach ($result['result']['groupids'] as $id) {
-				$this->assertEquals(0, CDBHelper::getCount('select * from hstgrp where groupid='.zbx_dbstr($id)));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM hstgrp WHERE groupid='.zbx_dbstr($id)));
 			}
 		}
 	}
@@ -507,5 +496,291 @@ class testHostGroup extends CAPITest {
 	public function testHostGroup_UserPermissions($method, $user, $hostgroups, $expected_error) {
 		$this->authorize($user['user'], $user['password']);
 		$this->call($method, $hostgroups, $expected_error);
+	}
+
+	public static function hostgroup_get() {
+		return [
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'monitored_hosts' => true,
+					'with_monitored_hosts' => true
+				],
+				'expected_result' => false,
+				'expected_error' =>
+					'Deprecated parameter "/monitored_hosts" cannot be used with "/with_monitored_hosts".'
+			],
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'real_hosts' => true,
+					'with_hosts' => true
+				],
+				'expected_result' => false,
+				'expected_error' => 'Deprecated parameter "/real_hosts" cannot be used with "/with_hosts".'
+			],
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'templated_hosts' => true
+				],
+				'expected_result' => false,
+				'expected_error' => 'Invalid parameter "/": unexpected parameter "templated_hosts".'
+			],
+			[
+				'params' => [
+					'output' => ['groupid'],
+					'groupids' => ['50005', '50006'],
+					'with_hosts_and_templates' => true
+				],
+				'expected_result' => false,
+				'expected_error' => 'Invalid parameter "/": unexpected parameter "with_hosts_and_templates".'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider hostgroup_get
+	 */
+	public function testHostGroup_Get($params, $expected_result, $expected_error) {
+		$result = $this->call('hostgroup.get', $params, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result'] as $hostgroup) {
+				foreach ($expected_result as $field => $expected_value){
+					$this->assertArrayHasKey($field, $hostgroup, 'Field should be present.');
+					$this->assertEquals($hostgroup[$field], $expected_value, 'Returned value should match.');
+				}
+			}
+		}
+	}
+
+	public static function hostgroup_Propagate() {
+		return [
+			// Check groupid
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'permissions' => true
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'hostgroup' => [
+					'permissions' => true
+				],
+				'expected_error' => 'Invalid parameter "/": the parameter "groups" is missing.'
+			],
+			[
+				'hostgroup' => [
+					'groups' => [],
+					'permissions' => true
+				],
+				'expected_error' => 'Invalid parameter "/groups": cannot be empty.'
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => ''
+					],
+					'permissions' => true
+				],
+				'expected_error' => 'Invalid parameter "/groups/1/groupid": a number is expected.'
+			],
+			// Check permissions parameter
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'permissions' => false
+				],
+				'expected_error' => 'At least one parameter "permissions" or "tag_filters" must be enabled.'
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					]
+				],
+				'expected_error' => 'At least one parameter "permissions" or "tag_filters" must be enabled.'
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'permissions' => ''
+				],
+				'expected_error' => 'Invalid parameter "/permissions": a boolean is expected.'
+			],
+			// Check tag_filters parameter
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'tag_filters' => false
+				],
+				'expected_error' => 'At least one parameter "permissions" or "tag_filters" must be enabled.'
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						'groupid' => '12345'
+					],
+					'tag_filters' => ''
+				],
+				'expected_error' => 'Invalid parameter "/tag_filters": a boolean is expected.'
+			],
+			// Check successful propagation
+			[
+				'hostgroup' => [
+					'groups' => [
+						['groupid' => 'groupid_1']
+					],
+					'permissions' => true
+				],
+				'expected_error' => null
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						['groupid' => 'groupid_1']
+					],
+					'tag_filters' => true
+				],
+				'expected_error' => null
+			],
+			[
+				'hostgroup' => [
+					'groups' => [
+						['groupid' => 'groupid_3'],
+						['groupid' => 'groupid_5']
+					],
+					'permissions' => true,
+					'tag_filters' => true
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider hostgroup_propagate
+	 */
+	public function testHostGroup_propagate($hostgroups, $expected_error) {
+		if ($expected_error === null) {
+			foreach($hostgroups['groups'] as &$hostgroup) {
+				$hostgroup['groupid'] = self::$data['groupids'][$hostgroup['groupid']];
+			}
+			unset($hostgroup);
+		}
+
+		$result = $this->call('hostgroup.propagate', $hostgroups, $expected_error);
+
+		if ($expected_error === null) {
+			foreach ($result['result']['groupids'] as $groupid) {
+				$db_host_groups_row = CDBHelper::getRow('SELECT groupid,name FROM hstgrp WHERE groupid='.$groupid);
+				$group_name = $db_host_groups_row['name'].'/%';
+				$db_subgroups_row = CDBHelper::getAll(
+					'SELECT groupid FROM hstgrp WHERE name LIKE '.zbx_dbstr($group_name)
+				);
+				$groupids = [];
+				$groupids[] = $db_host_groups_row['groupid'];
+				$groupids = array_merge($groupids, array_column($db_subgroups_row, 'groupid'));
+			}
+
+			if (array_key_exists('permissions', $hostgroups)) {
+				$db_rights_row = CDBHelper::getAll('SELECT id FROM rights WHERE groupid='.self::$data['usrgrpid']);
+				$rights_groupids = array_flip(array_column($db_rights_row, 'id'));
+				foreach ($groupids as $groupid) {
+					$this->assertArrayHasKey($groupid, $rights_groupids);
+				}
+			}
+
+			if (array_key_exists('tag_filters', $hostgroups)) {
+				$db_tag_filters_row = CDBHelper::getAll(
+					'SELECT * FROM tag_filter WHERE usrgrpid='.self::$data['usrgrpid']
+				);
+				$tag_filters_groupids = array_flip(array_column($db_tag_filters_row, 'groupid'));
+				foreach ($groupids as $groupid) {
+					$this->assertArrayHasKey($groupid, $tag_filters_groupids);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Test data used by tests.
+	 */
+	protected static $data = [
+		'groupids' => ['groupid_1', 'groupid_2', 'groupid_3', 'groupid_4', 'groupid_5', 'groupid_6'],
+		'usrgrpid' => null
+	];
+
+	/**
+	 * Prepare data for tests. Set permissions to host groups.
+	 */
+	public function prepareTestData() {
+		$response = CDataHelper::call('hostgroup.create', [
+			['name' => 'Propagate group 1'],
+			['name' => 'Propagate group 1/Group 1'],
+			['name' => 'Propagate group 2'],
+			['name' => 'Propagate group 2/Group 1'],
+			['name' => 'Propagate group 3'],
+			['name' => 'Propagate group 3/Group 1']
+		]);
+		$this->assertArrayHasKey('groupids', $response);
+		self::$data['groupids'] = array_combine(self::$data['groupids'], $response['groupids']);
+
+		$response = CDataHelper::call('usergroup.create', [
+			['name' => 'API host group propagate test']
+		]);
+		$this->assertArrayHasKey('usrgrpids', $response);
+		self::$data['usrgrpid'] = $response['usrgrpids'][0];
+
+		$response = CDataHelper::call('usergroup.update', [
+			[
+				'usrgrpid' => self::$data['usrgrpid'],
+				'hostgroup_rights' => [
+					[
+						'id' => self::$data['groupids']['groupid_1'],
+						'permission' => 3
+					],
+					[
+						'id' => self::$data['groupids']['groupid_3'],
+						'permission' => 3
+					],
+					[
+						'id' => self::$data['groupids']['groupid_5'],
+						'permission' => 3
+					]
+				],
+				'tag_filters' => [
+					[
+						'groupid' => self::$data['groupids']['groupid_1'],
+						'tag' => 'Tag',
+						'value' => 'Value'
+					],
+					[
+						'groupid' => self::$data['groupids']['groupid_3'],
+						'tag' => 'Tag',
+						'value' => 'Value'
+					],
+					[
+						'groupid' => self::$data['groupids']['groupid_5'],
+						'tag' => 'Tag',
+						'value' => 'Value'
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('usrgrpids', $response);
 	}
 }

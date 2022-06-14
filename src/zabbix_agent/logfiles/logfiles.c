@@ -236,8 +236,8 @@ out:
  *     f        - [IN] file descriptor                                        *
  *     offset   - [IN] start position of the part                             *
  *     length   - [IN] length of the part in bytes. Maximum is 512 bytes.     *
- *     md5buf   - [OUT] output buffer, MD5_DIGEST_SIZE-bytes long, where the  *
- *                calculated MD5 sum is placed                                *
+ *     md5buf   - [OUT] output buffer, ZBX_MD5_DIGEST_SIZE-bytes long, where  *
+ *                the calculated MD5 sum is placed                            *
  *     filename - [IN] file name, used in error logging                       *
  *     err_msg  - [IN/OUT] error message why FAIL-ed                          *
  *                                                                            *
@@ -634,7 +634,7 @@ static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct s
 			(old_file->md5_block_size == new_file->md5_block_size &&
 			old_file->last_block_offset != new_file->last_block_offset))
 	{
-		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
+		md5_byte_t	md5tmp[ZBX_MD5_DIGEST_SIZE];
 
 		if (-1 == (f = open_file_helper(new_file->filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
@@ -685,7 +685,7 @@ clean1:
 
 	for (i = 0; i < num_new; i++)
 	{
-		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
+		md5_byte_t	md5tmp[ZBX_MD5_DIGEST_SIZE];
 
 		if ((zbx_uint64_t)new_file->md5_block_size > new_files[i].size)
 			continue;
@@ -741,7 +741,7 @@ clean2:
 
 	if (0 == found_matching_md5 && 0 == same_name_in_new_list)
 	{
-		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
+		md5_byte_t	md5tmp[ZBX_MD5_DIGEST_SIZE];
 
 		/* last try - opening file with the name from the old list */
 
@@ -949,7 +949,7 @@ static int	is_same_file_logrt(const struct st_logfile *old_file, const struct st
 		/* with a different offset than for the new file */
 
 		int		f, ret;
-		md5_byte_t	md5tmp[MD5_DIGEST_SIZE];
+		md5_byte_t	md5tmp[ZBX_MD5_DIGEST_SIZE];
 
 		if (-1 == (f = open_file_helper(new_file->filename, err_msg)))
 			return ZBX_SAME_FILE_ERROR;
@@ -2596,7 +2596,7 @@ static int	files_have_same_blocks_md5(const struct st_logfile *log1, const struc
 		const struct st_logfile	*file_smaller, *file_larger;
 		int			fd, ret = FAIL;
 		char			*err_msg = NULL;		/* required, but not used */
-		md5_byte_t		md5tmp[MD5_DIGEST_SIZE];
+		md5_byte_t		md5tmp[ZBX_MD5_DIGEST_SIZE];
 
 		if (log1->md5_block_size < log2->md5_block_size)
 		{
@@ -3566,8 +3566,8 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 			{
 				int		f, new_md5_block_size = (int)MIN(MAX_LEN_MD5, logfiles[k].size);
 				size_t		new_last_block_offset;
-				md5_byte_t	new_first_block_md5[MD5_DIGEST_SIZE],
-						new_last_block_md5[MD5_DIGEST_SIZE];
+				md5_byte_t	new_first_block_md5[ZBX_MD5_DIGEST_SIZE],
+						new_last_block_md5[ZBX_MD5_DIGEST_SIZE];
 
 				if (-1 == (f = zbx_open(logfiles[k].filename, O_RDONLY)))
 					continue;

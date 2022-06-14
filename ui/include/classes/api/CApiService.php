@@ -894,7 +894,7 @@ class CApiService {
 	 * @param string $error		error text
 	 */
 	protected function deprecated($error) {
-		trigger_error($error, E_USER_NOTICE);
+		trigger_error($error, E_USER_DEPRECATED);
 	}
 
 	/**

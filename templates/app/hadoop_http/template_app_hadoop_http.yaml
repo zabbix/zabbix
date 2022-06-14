@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:29Z'
-  groups:
+  date: '2022-06-07T19:33:23Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -463,7 +463,7 @@ zabbix_export:
               name: 'NameNode: Service has been restarted'
               event_name: 'NameNode: Service has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -765,7 +765,7 @@ zabbix_export:
               name: 'ResourceManager: Service has been restarted'
               event_name: 'ResourceManager: Service has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1141,7 +1141,7 @@ zabbix_export:
                   name: '{#HOSTNAME}: Service has been restarted'
                   event_name: '{#HOSTNAME}: Service has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -1461,7 +1461,7 @@ zabbix_export:
                   name: '{#HOSTNAME}: Service has been restarted'
                   event_name: '{#HOSTNAME}: Service has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -

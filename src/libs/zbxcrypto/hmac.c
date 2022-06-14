@@ -17,16 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 #include "zbxcrypto.h"
+
 #include "zbxhash.h"
-#include "sha256crypt.h"
-
-#define ZBX_MD5_BLOCK_SIZE	64
-#define ZBX_MD5_DIGEST_SIZE	16
-
-#define ZBX_SHA256_BLOCK_SIZE	64
-#define ZBX_SHA256_DIGEST_SIZE	32
+#include "common.h"
 
 static void	*hmac_hash_init(zbx_crypto_hash_t type)
 {
@@ -91,7 +85,6 @@ static void	hmac_hash(zbx_crypto_hash_t type, const char *left, size_t left_len,
 	if (0 != right_len)
 		hmac_hash_append(type, ctx, right, right_len);
 	hmac_hash_finish(type, ctx, out);
-
 }
 
 int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const char *text, size_t text_len,
@@ -99,21 +92,23 @@ int	zbx_hmac(zbx_crypto_hash_t hash_type, const char *key, size_t key_len, const
 {
 	size_t	block_size, digest_size, out_len, i;
 	char	*key_block, *key_ipad, *key_opad, *ihash, *ohash;
-
+#define MD5_BLOCK_SIZE		64
+#define SHA256_BLOCK_SIZE	64
 	switch (hash_type)
 	{
 		case ZBX_HASH_MD5:
-			block_size = ZBX_MD5_BLOCK_SIZE;
+			block_size = MD5_BLOCK_SIZE;
 			digest_size = ZBX_MD5_DIGEST_SIZE;
 			break;
 		case ZBX_HASH_SHA256:
-			block_size = ZBX_SHA256_BLOCK_SIZE;
+			block_size = SHA256_BLOCK_SIZE;
 			digest_size = ZBX_SHA256_DIGEST_SIZE;
 			break;
 		default:
 			return FAIL;
 	}
-
+#undef MD5_BLOCK_SIZE
+#undef SHA256_BLOCK_SIZE
 	key_block = (char *)zbx_malloc(NULL, block_size);
 	key_ipad = (char *)zbx_malloc(NULL, block_size);
 	key_opad = (char *)zbx_malloc(NULL, block_size);

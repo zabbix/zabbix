@@ -22,7 +22,7 @@
 #include <string.h>
 #include "zbxdbhigh.h"
 #include "log.h"
-#include "sha512crypt.h"
+#include "zbxhash.h"
 
 #define	ZBX_SID_AUTH_TOKEN_LENGTH	64
 

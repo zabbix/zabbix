@@ -210,14 +210,14 @@ class ExecuteNowAction {
 		CDataHelper::call('usergroup.create', [
 			[
 				'name' => 'UG1-rw',
-				'rights' => [
+				'hostgroup_rights' => [
 					'permission' => 3,
 					'id' => $hostgroupids['HG-for-executenow']
 				]
 			],
 			[
 				'name' => 'UG2-r',
-				'rights' => [
+				'hostgroup_rights' => [
 					'permission' => 2,
 					'id' => $hostgroupids['HG-for-executenow']
 				]

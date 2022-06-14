@@ -514,9 +514,6 @@ typedef enum
 }
 zbx_group_status_type_t;
 
-/* group internal flag */
-#define ZBX_INTERNAL_GROUP		1
-
 /* program type */
 #define ZBX_PROGRAM_TYPE_SERVER		0x01
 #define ZBX_PROGRAM_TYPE_PROXY_ACTIVE	0x02
@@ -638,6 +635,10 @@ zbx_prototype_discover_t;
 /*#define HOST_STATUS_DELETED		4*/
 #define HOST_STATUS_PROXY_ACTIVE	5
 #define HOST_STATUS_PROXY_PASSIVE	6
+
+/* host group types */
+#define HOSTGROUP_TYPE_HOST		0
+#define HOSTGROUP_TYPE_TEMPLATE		1
 
 /* host maintenance status */
 #define HOST_MAINTENANCE_STATUS_OFF	0
@@ -798,8 +799,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
 #define ZBX_PROBLEM_UPDATE_SEVERITY		0x0008
 #define ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE	0x0010
+#define ZBX_PROBLEM_UPDATE_SUPPRESS		0x0020
+#define ZBX_PROBLEM_UPDATE_UNSUPPRESS		0x0040
 
-#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	5
+#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	7
 
 /* database double precision upgrade states */
 #define ZBX_DB_DBL_PRECISION_DISABLED	0
@@ -952,9 +955,9 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	usage(void);
-void	help(void);
-void	version(void);
+void	zbx_help(void);
+void	zbx_usage(void);
+void	zbx_version(void);
 
 const char	*get_program_name(const char *path);
 

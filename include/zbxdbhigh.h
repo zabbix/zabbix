@@ -392,6 +392,7 @@ typedef struct
 	int		action;
 	int		old_severity;
 	int		new_severity;
+	int		suppress_until;
 }
 DB_ACKNOWLEDGE;
 
@@ -736,7 +737,7 @@ typedef struct
 #define ZBX_FLAG_DB_TAG_UPDATE_TAG		__UINT64_C(0x00000001)
 #define ZBX_FLAG_DB_TAG_UPDATE_VALUE		__UINT64_C(0x00000002)
 #define ZBX_FLAG_DB_TAG_REMOVE			__UINT64_C(0x80000000)
-#define ZBX_FLAG_DB_TAG_UPDATE			(ZBX_FLAG_DB_TAG_UPDATE_TAG | ZBX_FLAG_DB_TAG_UPDATE_VALUE)
+#define ZBX_FLAG_DB_TAG_UPDATE	(ZBX_FLAG_DB_TAG_UPDATE_TAG | ZBX_FLAG_DB_TAG_UPDATE_VALUE)
 	zbx_uint64_t	flags;
 }
 zbx_db_tag_t;

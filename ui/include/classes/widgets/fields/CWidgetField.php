@@ -25,17 +25,17 @@ class CWidgetField {
 	const FLAG_LABEL_ASTERISK = 0x04;
 	const FLAG_DISABLED = 0x08;
 
-	protected	$name;
-	protected	$full_name;
-	protected	$label;
-	protected	$value;
-	protected	$default;
-	protected	$save_type;
-	protected	$action;
-	private		$validation_rules = [];
-	private		$strict_validation_rules = null;
-	private		$ex_validation_rules = [];
-	private		$flags;
+	protected $name;
+	protected $full_name;
+	protected $label;
+	protected $value;
+	protected $default;
+	protected $save_type;
+	protected $action;
+	protected $validation_rules = [];
+	protected $strict_validation_rules = null;
+	protected $ex_validation_rules = [];
+	protected $flags;
 
 	/**
 	 * Create widget field (general)

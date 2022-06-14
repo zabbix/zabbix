@@ -26,9 +26,8 @@
 #include "zbxmutexs.h"
 #include "zbxcrypto.h"
 #include "zbxstr.h"
-#if defined(_WINDOWS)
-#	include "../libs/zbxcrypto/tls.h"
-#else
+
+#if !defined(_WINDOWS)
 #	include "zbxnix.h"
 #endif
 
@@ -1030,11 +1029,15 @@ static void	parse_commandline(int argc, char **argv)
 					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 			case 'I':
@@ -1148,7 +1151,7 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #endif
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -1387,7 +1390,7 @@ static void	parse_commandline(int argc, char **argv)
 	if (0 == opt_count['c'] + opt_count['z'])
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
-		usage();
+		zbx_usage();
 		printf("Try '%s --help' for more information.\n", progname);
 		exit(EXIT_FAILURE);
 	}
@@ -1439,7 +1442,7 @@ static void	parse_commandline(int argc, char **argv)
 					(0x7c0 <= opt_mask && opt_mask <= 0x7c3))))
 	{
 		zbx_error("too few or mutually exclusive options used");
-		usage();
+		zbx_usage();
 		exit(EXIT_FAILURE);
 	}
 

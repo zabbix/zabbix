@@ -38,6 +38,7 @@
 #define	ZBX_TYPE_SHORTTEXT	7
 #define	ZBX_TYPE_LONGTEXT	8
 #define ZBX_TYPE_CUID		9
+#define	ZBX_TYPE_SERIAL		10
 
 #define ZBX_MAX_FIELDS		117 /* maximum number of fields in a table plus one for null terminator in dbschema.c */
 #define ZBX_TABLENAME_LEN	26
@@ -68,9 +69,17 @@ typedef struct
 }
 ZBX_TABLE;
 
-extern const ZBX_TABLE	tables[];
-extern const char	*const db_schema;
-extern const char	*const db_schema_fkeys[];
-extern const char	*const db_schema_fkeys_drop[];
+typedef struct
+{
+	const char	*table;
+	int		object;
+}
+zbx_db_table_changelog_t;
+
+extern const ZBX_TABLE			tables[];
+extern const zbx_db_table_changelog_t	changelog_tables[];
+extern const char			*const db_schema;
+extern const char			*const db_schema_fkeys[];
+extern const char			*const db_schema_fkeys_drop[];
 
 #endif

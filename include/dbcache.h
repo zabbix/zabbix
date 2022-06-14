@@ -673,7 +673,9 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 #define ZBX_DBSYNC_INIT		0
 /* update sync, get changed data */
 #define ZBX_DBSYNC_UPDATE	1
-#define ZBX_SYNC_SECRETS	2
+
+#define ZBX_DBSYNC_STATUS_INITIALIZED	0
+#define ZBX_DBSYNC_STATUS_UNKNOWN	-1
 
 typedef enum
 {
@@ -1083,9 +1085,9 @@ zbx_dc_um_handle_t	*zbx_dc_open_user_macros(void);
 zbx_dc_um_handle_t	*zbx_dc_open_user_macros_secure(void);
 zbx_dc_um_handle_t	*zbx_dc_open_user_macros_masked(void);
 
-void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *handle);
+void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle);
 
-void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *handle, const char *macro, const zbx_uint64_t *hostids,
+void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value);
 
 int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,

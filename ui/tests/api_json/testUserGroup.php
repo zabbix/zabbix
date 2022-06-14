@@ -125,9 +125,11 @@ class testUserGroup extends CAPITest {
 		$result = $this->call('usergroup.create', $group, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['usrgrpids'] as $key => $id) {
-				$dbResult = DBSelect('select * from usrgrp where usrgrpid='.zbx_dbstr($id));
-				$dbRow = DBFetch($dbResult);
+			foreach ($result['result']['usrgrpids'] as $key => $usrgrpid) {
+				$dbRow = CDBHelper::getRow(
+					'SELECT name,gui_access,users_status,debug_mode'.
+					' FROM usrgrp'.
+					' WHERE usrgrpid='.$usrgrpid);
 				$this->assertEquals($dbRow['name'], $group[$key]['name']);
 				$this->assertEquals($dbRow['gui_access'], GROUP_GUI_ACCESS_SYSTEM);
 				$this->assertEquals($dbRow['users_status'], 0);
@@ -281,7 +283,7 @@ class testUserGroup extends CAPITest {
 					[
 						'usrgrpid' => '14',
 						'name' => 'API user group updated with rights',
-						'rights' =>[
+						'templategroup_rights' =>[
 							[
 								'id' => '50013',
 								'permission' => '2'
@@ -296,7 +298,7 @@ class testUserGroup extends CAPITest {
 					[
 					'usrgrpid' => '13',
 					'name' => 'API update user group one',
-						'rights' =>[
+						'templategroup_rights' =>[
 							[
 								'id' => '50013',
 								'permission' => '2'
@@ -306,7 +308,7 @@ class testUserGroup extends CAPITest {
 					[
 					'usrgrpid' => '14',
 					'name' => 'API update user group two',
-						'rights' =>[
+						'hostgroup_rights' =>[
 							[
 								'id' => '50012',
 								'permission' => '0'
@@ -326,20 +328,42 @@ class testUserGroup extends CAPITest {
 		$result = $this->call('usergroup.update', $groups, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['usrgrpids'] as $key => $id) {
-				$dbResult = DBSelect('select * from usrgrp where usrgrpid='.zbx_dbstr($id));
-				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $groups[$key]['name']);
-				$this->assertEquals($dbRow['gui_access'], GROUP_GUI_ACCESS_SYSTEM);
-				$this->assertEquals($dbRow['users_status'], 0);
-				$this->assertEquals($dbRow['debug_mode'], 0);
+			foreach ($result['result']['usrgrpids'] as $key => $usrgrpid) {
+				$db_usrgrp = CDBHelper::getRow(
+					'SELECT name,gui_access,users_status,debug_mode'.
+					' FROM usrgrp'.
+					' WHERE usrgrpid='.$usrgrpid
+				);
+				$this->assertSame($db_usrgrp['name'], $groups[$key]['name']);
+				$this->assertSame($db_usrgrp['gui_access'], (string) GROUP_GUI_ACCESS_SYSTEM);
+				$this->assertSame($db_usrgrp['users_status'], '0');
+				$this->assertSame($db_usrgrp['debug_mode'], '0');
 
-				if (array_key_exists('rights', $groups[$key])){
-					foreach ($groups[$key]['rights'] as $rights) {
-						$dbRight = DBSelect('select * from rights where groupid='.zbx_dbstr($id));
-						$dbRowRight = DBFetch($dbRight);
-						$this->assertEquals($dbRowRight['id'], $rights['id']);
-						$this->assertEquals($dbRowRight['permission'], $rights['permission']);
+				if (array_key_exists('hostgroup_rights', $groups[$key])){
+					foreach ($groups[$key]['hostgroup_rights'] as $rights) {
+						$db_right = CDBHelper::getRow(
+							'SELECT r.id,r.permission'.
+							' FROM rights r,hstgrp hg'.
+							' WHERE r.id=hg.groupid'.
+								' AND r.groupid='.$usrgrpid.
+								' AND hg.type='.HOST_GROUP_TYPE_HOST_GROUP
+						);
+						$this->assertSame($db_right['id'], $rights['id']);
+						$this->assertSame($db_right['permission'], $rights['permission']);
+					}
+				}
+
+				if (array_key_exists('templategroup_rights', $groups[$key])){
+					foreach ($groups[$key]['templategroup_rights'] as $rights) {
+						$db_right = CDBHelper::getRow(
+							'SELECT r.id,r.permission'.
+							' FROM rights r,hstgrp hg'.
+							' WHERE r.id=hg.groupid'.
+								' AND r.groupid='.$usrgrpid.
+								' AND hg.type='.HOST_GROUP_TYPE_TEMPLATE_GROUP
+						);
+						$this->assertSame($db_right['id'], $rights['id']);
+						$this->assertSame($db_right['permission'], $rights['permission']);
 					}
 				}
 			}
@@ -347,8 +371,9 @@ class testUserGroup extends CAPITest {
 		else {
 			foreach ($groups as $group) {
 				if (array_key_exists('name', $group) && $group['name'] != 'Zabbix administrators'){
-					$dbResult = 'select * from usrgrp where name='.zbx_dbstr($group['name']);
-					$this->assertEquals(0, CDBHelper::getCount($dbResult));
+					$this->assertEquals(0,
+						CDBHelper::getCount('SELECT * FROM usrgrp WHERE name='.zbx_dbstr($group['name']))
+					);
 				}
 			}
 		}
@@ -431,46 +456,65 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					'name' => 'Check rights, without host group id',
-					'rights' => [
+					'hostgroup_rights' => [
 						'permission' => '0'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1": the parameter "id" is missing.'
+				'expected_error' => 'Invalid parameter "/1/hostgroup_rights/1": the parameter "id" is missing.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, without host group id',
+					'templategroup_rights' => [
+						'permission' => '0'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/templategroup_rights/1": the parameter "id" is missing.'
 			],
 			[
 				'group' => [
 					'name' => 'Check rights, with empty host group id',
-					'rights' => [
+					'hostgroup_rights' => [
 						'id' => '',
 						'permission' => '0'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/hostgroup_rights/1/id": a number is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Check rights, with empty host group id',
+					'templategroup_rights' => [
+						'id' => '',
+						'permission' => '0'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/templategroup_rights/1/id": a number is expected.'
 			],
 			[
 				'group' => [
 					'name' => 'Check rights, id not number',
-					'rights' => [
+					'hostgroup_rights' => [
 						'id' => 'abc',
 						'permission' => '0'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/hostgroup_rights/1/id": a number is expected.'
 			],
 			[
 				'group' => [
 					'name' => 'Check rights, id not valid',
-					'rights' => [
+					'hostgroup_rights' => [
 						'id' => '1.1',
 						'permission' => '0'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1/id": a number is expected.'
+				'expected_error' => 'Invalid parameter "/1/hostgroup_rights/1/id": a number is expected.'
 			],
 			[
 				'group' => [
 					'name' => 'Check rights, non existen host group id',
-					'rights' => [
+					'hostgroup_rights' => [
 						'id' => '123456',
 						'permission' => '0'
 					]
@@ -480,63 +524,63 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [
 					'name' => 'Check rights, unexpected parameter',
-					'rights' => [
+					'hostgroup_rights' => [
 						'id' => '4',
 						'permission' => '0',
 						'usrgrpid' => '7'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1": unexpected parameter "usrgrpid".'
+				'expected_error' => 'Invalid parameter "/1/hostgroup_rights/1": unexpected parameter "usrgrpid".'
 			],
 			// Check user group permissions, host group permission.
 			[
 				'group' => [
 					'name' => 'Check rights, without permission',
-					'rights' => [
+					'hostgroup_rights' => [
 						'id' => '4'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1": the parameter "permission" is missing.'
+				'expected_error' => 'Invalid parameter "/1/hostgroup_rights/1": the parameter "permission" is missing.'
 			],
 			[
 				'group' => [
 					'name' => 'Check rights, with empty permission',
-					'rights' => [
+					'hostgroup_rights' => [
 						'id' => '4',
 						'permission' => ''
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/hostgroup_rights/1/permission": an integer is expected.'
 			],
 			[
 				'group' => [
 					'name' => 'Check rights, permission not valid number',
-					'rights' => [
+					'hostgroup_rights' => [
 						'id' => '4',
 						'permission' => '1.1'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": an integer is expected.'
+				'expected_error' => 'Invalid parameter "/1/hostgroup_rights/1/permission": an integer is expected.'
 			],
 			[
 				'group' => [
 					'name' => 'Check rights, incorrect permission value',
-					'rights' => [
+					'hostgroup_rights' => [
 						'id' => '4',
 						'permission' => '1'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": value must be one of 0, 2, 3.'
+				'expected_error' => 'Invalid parameter "/1/hostgroup_rights/1/permission": value must be one of 0, 2, 3.'
 			],
 			[
 				'group' => [
 					'name' => 'Check rights, incorrect permission value',
-					'rights' => [
+					'templategroup_rights' => [
 						'id' => '4',
 						'permission' => '4'
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/rights/1/permission": value must be one of 0, 2, 3.'
+				'expected_error' => 'Invalid parameter "/1/templategroup_rights/1/permission": value must be one of 0, 2, 3.'
 			]
 		];
 	}
@@ -556,7 +600,7 @@ class testUserGroup extends CAPITest {
 
 			if ($expected_error === null) {
 				$db_group = CDBHelper::getRow(
-					'SELECT * FROM usrgrp WHERE usrgrpid='.zbx_dbstr($result['result']['usrgrpids'][0])
+					'SELECT * FROM usrgrp WHERE usrgrpid='.$result['result']['usrgrpids'][0]
 				);
 				$this->assertSame($group['name'], $db_group['name']);
 				$this->assertEquals($group['gui_access'], $db_group['gui_access']);
@@ -566,7 +610,7 @@ class testUserGroup extends CAPITest {
 				$this->assertEquals(count($group['users']), CDBHelper::getCount(
 					'SELECT NULL'.
 					' FROM users_groups'.
-					' WHERE usrgrpid='.zbx_dbstr($result['result']['usrgrpids'][0])
+					' WHERE usrgrpid='.$result['result']['usrgrpids'][0]
 				));
 
 				$db_right = CDBHelper::getRow('SELECT * FROM rights WHERE groupid='.$result['result']['usrgrpids'][0]);
@@ -578,7 +622,7 @@ class testUserGroup extends CAPITest {
 					$this->assertEquals(0, CDBHelper::getCount(
 						'SELECT NULL'.
 						' FROM usrgrp'.
-						' WHERE usrgrpid='.zbx_dbstr($group['usrgrpid']).
+						' WHERE usrgrpid='.$group['usrgrpid'].
 							' AND name='.zbx_dbstr($group['name'])
 					));
 				}
@@ -665,9 +709,8 @@ class testUserGroup extends CAPITest {
 		$result = $this->call('usergroup.delete', $group, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['usrgrpids'] as $id) {
-				$dbResult = 'select * from usrgrp where usrgrpid='.zbx_dbstr($id);
-				$this->assertEquals(0, CDBHelper::getCount($dbResult));
+			foreach ($result['result']['usrgrpids'] as $usrgrpid) {
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM usrgrp WHERE usrgrpid='.$usrgrpid));
 			}
 		}
 	}
