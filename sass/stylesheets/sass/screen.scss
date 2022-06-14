@@ -757,6 +757,12 @@ form {
 			}
 		}
 	}
+
+	td {
+		.checkbox-radio + label span {
+			bottom: 0;
+		}
+	}
 }
 
 .table-paging {
@@ -1443,6 +1449,10 @@ form {
 				margin-top: 5px;
 			}
 		}
+
+		.checkbox-radio + label span {
+			bottom: -3px;
+		}
 	}
 
 	h4 {
@@ -1669,6 +1679,7 @@ select {
 		padding: 4px 5px;
 		width: 300px;
 		height: 150px;
+		vertical-align: top;
 
 		option {
 			padding: 0;
@@ -1694,7 +1705,7 @@ select {
 
 .form-input-margin {
 	display: inline-block;
-	margin: 0 4px 0 0;
+	margin: 0 3px 0 0;
 }
 
 .checkbox-radio {
@@ -1783,8 +1794,8 @@ select {
 		display: inline-block;
 		width: 14px;
 		height: 14px;
-		margin: -4px 4px 0 0;
-		bottom: -3px;
+		margin-right: 4px;
+		bottom: -4px;
 		border: 1px solid $form-border-color;
 		background-color: $form-bg-color;
 
@@ -2436,6 +2447,13 @@ $icon-widget-btn: (
 			background-color: $ui-bg-selected-color;
 			border-bottom: 0;
 		}
+	}
+}
+
+.calendar-control {
+	.icon-cal {
+		position: relative;
+		top: -1px;
 	}
 }
 

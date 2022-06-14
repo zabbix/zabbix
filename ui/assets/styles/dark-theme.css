@@ -705,6 +705,7 @@ footer {
   .form-grid .form-field td {
     padding: 0 5px 5px 0; }
   .form-grid .form-field .list-check-radio {
+    margin: -.3em 0;
     line-height: 1.4em; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
@@ -3381,6 +3382,8 @@ form.is-loading {
     .list-table.sticky-footer tfoot tr:first-of-type td, .list-table.sticky-footer tfoot tr:first-of-type th {
       border-top: 2px solid #2b2b2b;
       border-bottom: 0; }
+  .list-table td .checkbox-radio + label span {
+    bottom: 0; }
 
 .table-paging {
   text-align: center;
@@ -3838,6 +3841,8 @@ form.is-loading {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
+    .table-forms .table-forms-td-right .checkbox-radio + label span {
+      bottom: -3px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -3938,7 +3943,8 @@ select {
   select[multiple] {
     padding: 4px 5px;
     width: 300px;
-    height: 150px; }
+    height: 150px;
+    vertical-align: top; }
     select[multiple] option {
       padding: 0; }
   select[readonly] {
@@ -3950,7 +3956,7 @@ select {
 
 .form-input-margin {
   display: inline-block;
-  margin: 0 4px 0 0; }
+  margin: 0 3px 0 0; }
 
 .checkbox-radio {
   position: absolute !important;
@@ -4003,8 +4009,8 @@ select {
     display: inline-block;
     width: 14px;
     height: 14px;
-    margin: -4px 4px 0 0;
-    bottom: -3px;
+    margin-right: 4px;
+    bottom: -4px;
     border: 1px solid #4f4f4f;
     background-color: #383838; }
     .checkbox-radio + label span:active {
@@ -4469,6 +4475,10 @@ button {
       color: #f2f2f2;
       background-color: #4f4f4f;
       border-bottom: 0; }
+
+.calendar-control .icon-cal {
+  position: relative;
+  top: -1px; }
 
 .header-kioskmode-controls {
   position: fixed;
