@@ -425,7 +425,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	for (i = 0; i < triggers_tags.values_num; i++)
 	{
 		trigger_tags = triggers_tags.values[i];
-		zbx_db_tag_merge(&trigger_tags->tags, &trigger_tags->new_tags);
+		zbx_merge_tags(&trigger_tags->tags, &trigger_tags->new_tags);
 
 		for (j = 0; j < trigger_tags->tags.values_num; j++)
 		{

@@ -1883,7 +1883,7 @@ static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_pro
 				NULL, 0);
 	}
 
-	zbx_db_tag_merge(&trigger->tags, &new_tags);
+	zbx_merge_tags(&trigger->tags, &new_tags);
 	zbx_vector_db_tag_ptr_destroy(&new_tags);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2073,7 +2073,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		lld_validate_trigger_field(trigger, &trigger->url, &trigger->url_orig,
 				ZBX_FLAG_LLD_TRIGGER_UPDATE_URL, TRIGGER_URL_LEN, error);
 		lld_validate_trigger_field(trigger, &trigger->correlation_tag, &trigger->correlation_tag_orig,
-				ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG, TAG_NAME_LEN, error);
+				ZBX_FLAG_LLD_TRIGGER_UPDATE_CORRELATION_TAG, ZBX_DB_TAG_NAME_LEN, error);
 		lld_validate_trigger_field(trigger, &trigger->opdata, &trigger->opdata_orig,
 				ZBX_FLAG_LLD_TRIGGER_UPDATE_OPDATA, TRIGGER_OPDATA_LEN, error);
 		lld_validate_trigger_field(trigger, &trigger->event_name, &trigger->event_name_orig,
@@ -2282,9 +2282,9 @@ static int	lld_trigger_tags_validate(zbx_lld_trigger_t *trigger, char **error)
 			continue;
 
 		if (SUCCEED != lld_validate_trigger_tag_field(tag, tag->tag, ZBX_FLAG_DB_TAG_UPDATE_TAG,
-				TAG_NAME_LEN, error) ||
+				ZBX_DB_TAG_NAME_LEN, error) ||
 				SUCCEED != lld_validate_trigger_tag_field(tag, tag->value, ZBX_FLAG_DB_TAG_UPDATE_VALUE,
-				TAG_VALUE_LEN, error))
+				ZBX_DB_TAG_VALUE_LEN, error))
 		{
 			if (SUCCEED != zbx_db_tag_rollback(tag))
 			{

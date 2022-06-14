@@ -135,6 +135,10 @@ zbx_host_template_link_type;
 #define ZBX_ITEM_PARAMETER_VALUE_LEN		2048
 #define ZBX_ITEM_TAG_FIELD_LEN			255
 
+/* common tag/value field lengths for all tags */
+#define ZBX_DB_TAG_NAME_LEN			255
+#define ZBX_DB_TAG_VALUE_LEN			255
+
 #define ZBX_HISTORY_STR_VALUE_LEN		255
 #define ZBX_HISTORY_TEXT_VALUE_LEN		65535
 #define ZBX_HISTORY_LOG_VALUE_LEN		65535
@@ -755,7 +759,8 @@ void		zbx_db_tag_free(zbx_db_tag_t *tag);
 int		zbx_db_tag_compare_func(const void *d1, const void *d2);
 int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
-void	zbx_db_tag_merge(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src);
+void	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src);
+int	zbx_validate_tags(zbx_vector_db_tag_ptr_t *tags, const char *owner, char **error);
 int	zbx_db_tag_rollback(zbx_db_tag_t *tag);
 
 typedef enum

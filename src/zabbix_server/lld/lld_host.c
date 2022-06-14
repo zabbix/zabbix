@@ -630,6 +630,21 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
+	/* check host tag validness */
+	for (i = 0; i < hosts->values_num; i++)
+	{
+		host = (zbx_lld_host_t *)hosts->values[i];
+
+		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		if (SUCCEED != zbx_validate_tags(&host->tags, "host", error) && 0 == host->hostid)
+		{
+			*error = zbx_strdcatf(*error, "Cannot create host \"%s\" because of tag errors.\n", host->host);
+			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+		}
+	}
+
 	/* checking duplicated host names */
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -992,7 +1007,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 					NULL, 0);
 		}
 
-		zbx_db_tag_merge(&host->tags, &new_tags);
+		zbx_merge_tags(&host->tags, &new_tags);
 
 		/* sort existing tags by their ids for update operations */
 		zbx_vector_db_tag_ptr_sort(&host->tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
