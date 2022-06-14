@@ -314,7 +314,10 @@ static int	vmware_service_rest_authenticate(zbx_vmware_service_t *service, CURL 
 	}
 
 	if ('"' != page->data[0] && FAIL == vmware_rest_response_open(page->data, NULL, error))
+	{
+		*error = zbx_dsprintf(*error, "Authentication fail, %s.", *error);
 		goto out;
+	}
 
 	zbx_ltrim(page->data, "\"");
 	zbx_rtrim(page->data, "\"");
@@ -331,6 +334,28 @@ out:
 	return ret;
 }
 
+static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE *page)
+{
+	char		tmp[VMWARE_SHORT_STR_LEN];
+	CURLcode	err;
+	CURLoption	opt;
+
+	zbx_snprintf(tmp, sizeof(tmp),"%s/session", page->url);
+
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_CUSTOMREQUEST, "DELETE")) ||
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, tmp)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot set cURL option %d: %s.",
+				__func__, (int)opt, curl_easy_strerror(err));
+	}
+	else
+	{
+		page->offset = 0;
+
+		if (CURLE_OK != (err = curl_easy_perform(easyhandle)))
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() error:%s", __func__, curl_easy_strerror(err));
+	}
+}
 
 /******************************************************************************
  *                                                                            *
@@ -631,6 +656,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 		found_tags += vmware_tags_get(entity_tags.values[i], &tags, &categories, easyhandle);
 	}
 
+	vmware_service_rest_logout(easyhandle, &page);
 	zbx_vmware_shared_tags_replace(&entity_tags, &service->data_tags.entity_tags);
 
 	ret = SUCCEED;
