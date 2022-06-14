@@ -690,6 +690,10 @@ footer {
     width: 100%; }
     .form-grid .form-field table.table-initial-width {
       width: auto; }
+    .form-grid .form-field table .sortable td {
+      padding-bottom: 0;
+      vertical-align: middle;
+      line-height: 24px; }
   .form-grid .form-field th {
     padding: 0 5px 0 0;
     color: #333333; }
@@ -1778,9 +1782,9 @@ form.dashboard-widget-svggraph .no-items-message {
   color: #333333; }
 
 form.dashboard-widget-tophosts #list_columns .text {
-  max-width: 150px; }
+  max-width: 250px; }
 form.dashboard-widget-tophosts #column {
-  max-width: 150px; }
+  max-width: 250px; }
 
 div.dashboard-widget-tophosts .list-table th.center {
   text-align: center; }

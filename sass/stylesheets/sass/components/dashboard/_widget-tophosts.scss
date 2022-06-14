@@ -1,7 +1,7 @@
 // Widget configuration.
 
 form.dashboard-widget-tophosts {
-	$width-small: 150px;
+	$width-small: 250px;
 
 	#list_columns .text {
 		@extend %overflow-ellipsis;

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -31,46 +31,61 @@ $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();
 
-$rf_rate_field = ($data['templateid'] === null) ? $fields['rf_rate'] : null;
-
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
-	$data['dialogue']['view_mode'], $data['known_widget_types'], $rf_rate_field
-);
-
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.tophosts.form.view.js.php')];
+
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
+	$data['dialogue']['view_mode'], $data['known_widget_types'],
+	$data['templateid'] === null ? $fields['rf_rate'] : null
+);
 
 // Host groups.
 $field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['ms']['groups']['groupids'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['groupids']),
+	new CFormField($field_groupids)
+]);
 $scripts[] = $field_groupids->getPostJS();
 
 // Hosts.
-$field_hostids = CWidgetHelper::getHost($fields['hostids'],
-	$data['captions']['ms']['hosts']['hostids'],
+$field_hostids = CWidgetHelper::getHost($fields['hostids'], $data['captions']['ms']['hosts']['hostids'],
 	$form->getName()
 );
-$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
+$form_grid->addItem([
+	CWidgetHelper::getMultiselectLabel($fields['hostids']),
+	new CFormField($field_hostids)
+]);
 $scripts[] = $field_hostids->getPostJS();
 
-// Tags.
-$form_list->addRow(CWidgetHelper::getLabel($fields['evaltype']), CWidgetHelper::getRadioButtonList($fields['evaltype']));
-
-// Tags filter list.
-$form_list->addRow(CWidgetHelper::getLabel($fields['tags']), CWidgetHelper::getTags($fields['tags']));
+// Host tags.
+$form_grid
+	->addItem([
+		CWidgetHelper::getLabel($fields['evaltype']),
+		new CFormField(CWidgetHelper::getRadioButtonList($fields['evaltype']))
+	])
+	->addItem(
+		new CFormField(CWidgetHelper::getTags($fields['tags']))
+	);
 $scripts[] = $fields['tags']->getJavascript();
 $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
-// Columns definition table.
-$form_list->addRow(CWidgetHelper::getLabel($fields['columns']), CWidgetHelper::getWidgetColumns($fields['columns']));
+// Columns.
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['columns']),
+	(new CFormField(
+		CWidgetHelper::getWidgetColumns($fields['columns'])
+	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+]);
 
 // Order.
-$form_list->addRow(CWidgetHelper::getLabel($fields['order']), CWidgetHelper::getRadioButtonList($fields['order']));
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['order']),
+	new CFormField(CWidgetHelper::getRadioButtonList($fields['order']))
+]);
 
 // Order column.
 $column = CWidgetHelper::getSelect($fields['column']);
-
 if (!$fields['column']->getValues()) {
 	$column = (new CDiv(_('Add item column')))->addClass(
 		($fields['column']->getFlags() & CWidgetField::FLAG_DISABLED)
@@ -78,20 +93,26 @@ if (!$fields['column']->getValues()) {
 			: null
 	);
 }
-
-$form_list->addRow(CWidgetHelper::getLabel($fields['column']), $column);
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['column']),
+	new CFormField($column)
+]);
 
 // Hosts count.
-$form_list->addRow(CWidgetHelper::getLabel($fields['count']), CWidgetHelper::getIntegerBox($fields['count']));
+$form_grid->addItem([
+	CWidgetHelper::getLabel($fields['count']),
+	new CFormField(CWidgetHelper::getIntegerBox($fields['count']))
+]);
 
-$form->addItem($form_list);
-$form->addItem(
-	(new CScriptTag('
-		widget_tophosts_form.init('.json_encode([
-			'form_id' => $form->getId()
-		]).');
-	'))->setOnDocumentReady()
-);
+$form
+	->addItem($form_grid)
+	->addItem(
+		(new CScriptTag('
+			widget_tophosts_form.init('.json_encode([
+				'form_id' => $form->getId()
+			]).');
+		'))->setOnDocumentReady()
+	);
 
 return [
 	'form' => $form,

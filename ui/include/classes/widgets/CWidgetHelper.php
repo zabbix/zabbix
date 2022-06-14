@@ -672,9 +672,7 @@ class CWidgetHelper {
 			))->setColSpan(count($header))
 		);
 
-		return (new CDiv($table))
-			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+		return $table;
 	}
 
 	/**
