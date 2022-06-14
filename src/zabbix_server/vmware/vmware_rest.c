@@ -634,11 +634,17 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 	static ZBX_HTTPPAGE		page;
 	char				*error = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vc version:%s", __func__, service->version);
 
 	zbx_vector_vmware_tag_create(&tags);
 	zbx_vector_vmware_key_value_create(&categories);
 	zbx_vector_vmware_entity_tags_create(&entity_tags);
+
+	if (65 > service->major_version * 10 + service->minor_version)
+	{
+		error = zbx_strdup(error, "Tags are supported since vmware version 6.5.");
+		goto clean;
+	}
 
 	zbx_vmware_lock();
 	vmware_entry_tags_init(service->data, &entity_tags);
