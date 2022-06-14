@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-10T10:37:00Z'
+  date: '2022-06-14T07:40:02Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -1107,7 +1107,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           description: |
-            The number of times the instance metadata service was succesfully accessed using a method that does not use a token.
+            The number of times the instance metadata service was successfully accessed using a method that does not use a token.
             This metric is used to determine if there are any processes accessing instance metadata that are using Instance Metadata Service Version 1, which does not use a token.
             If all requests use token-backed sessions, i.e., Instance Metadata Service Version 2, the value is 0.
           preprocessing:
@@ -1452,7 +1452,7 @@ zabbix_export:
                       value: notice
             -
               uuid: 92a33b49f010464db7e6c7ef586240e9
-              name: 'AWS EC2 Alarm: ["{#ALARM_NAME}"]: State reason'
+              name: 'AWS EC2 Alarms: ["{#ALARM_NAME}"]: State reason'
               type: DEPENDENT
               key: 'aws.ec2.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -1862,10 +1862,6 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.Label == "VolumeReadBytes")].Values.first().first()'
                   error_handler: DISCARD_VALUE
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return value / 300'
               master_item:
                 key: 'aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]'
               tags:
@@ -1894,10 +1890,6 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.Label == "VolumeReadOps")].Values.first().first()'
                   error_handler: DISCARD_VALUE
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return value / 300'
               master_item:
                 key: 'aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]'
               tags:
@@ -2028,10 +2020,6 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.Label == "VolumeWriteBytes")].Values.first().first()'
                   error_handler: DISCARD_VALUE
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return value / 300'
               master_item:
                 key: 'aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]'
               tags:
@@ -2060,10 +2048,6 @@ zabbix_export:
                   parameters:
                     - '$.[?(@.Label == "VolumeWriteOps")].Values.first().first()'
                   error_handler: DISCARD_VALUE
-                -
-                  type: JAVASCRIPT
-                  parameters:
-                    - 'return value / 300'
               master_item:
                 key: 'aws.ec2.get_ebs_metrics["{#VOLUME_ID}"]'
               tags:
@@ -2319,6 +2303,52 @@ zabbix_export:
                 -
                   tag: volume
                   value: '{#VOLUME_ID}'
+          graph_prototypes:
+            -
+              uuid: dbf87c66b9034e1ab40f3a2d4adb1a5a
+              name: 'AWS EBS: ["{#VOLUME_ID}"]: Volume read/write bytes'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'AWS EC2 by HTTP'
+                    key: 'aws.ec2.ebs.volume.write_bytes["{#VOLUME_ID}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'AWS EC2 by HTTP'
+                    key: 'aws.ec2.ebs.volume.read_bytes["{#VOLUME_ID}"]'
+            -
+              uuid: 97faf8177efd46f2b90a7078e532f623
+              name: 'AWS EBS: ["{#VOLUME_ID}"]: Volume read/write ops'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'AWS EC2 by HTTP'
+                    key: 'aws.ec2.ebs.volume.write_ops["{#VOLUME_ID}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'AWS EC2 by HTTP'
+                    key: 'aws.ec2.ebs.volume.read_ops["{#VOLUME_ID}"]'
+            -
+              uuid: c27e794ff80a4335874ae9b58c8ce6b8
+              name: 'AWS EBS: ["{#VOLUME_ID}"]: Volume read/write time'
+              graph_items:
+                -
+                  color: 1A7C11
+                  item:
+                    host: 'AWS EC2 by HTTP'
+                    key: 'aws.ec2.ebs.volume.total_write_time["{#VOLUME_ID}"]'
+                -
+                  sortorder: '1'
+                  color: 2774A4
+                  item:
+                    host: 'AWS EC2 by HTTP'
+                    key: 'aws.ec2.ebs.volume.total_read_time["{#VOLUME_ID}"]'
           master_item:
             key: aws.ec2.get_volumes
           preprocessing:
@@ -2389,7 +2419,7 @@ zabbix_export:
           description: 'Amazon EC2 Region code.'
         -
           macro: '{$AWS.SECRET.ACCESS.KEY}'
-          type: SECRET_TEXT
+          type: SECRET_TEXT    
           description: 'Secret access key.'
       valuemaps:
         -
@@ -2505,3 +2535,18 @@ zabbix_export:
           item:
             host: 'AWS EC2 by HTTP'
             key: aws.ec2.packets_out.rate
+    -
+      uuid: 45e96dbc8dff48eeadd18c69b085863f
+      name: 'AWS EC2: Network traffic'
+      graph_items:
+        -
+          color: 1A7C11
+          item:
+            host: 'AWS EC2 by HTTP'
+            key: aws.ec2.network_in.rate
+        -
+          sortorder: '1'
+          color: 2774A4
+          item:
+            host: 'AWS EC2 by HTTP'
+            key: aws.ec2.network_out.rate
