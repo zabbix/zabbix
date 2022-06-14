@@ -92,7 +92,7 @@ static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, int time_now)
 	zbx_binary_heap_remove_min(&vmw->jobs_queue);
 	job->nextcheck = 0;
 
-	if (time_now - job->service->lastaccess < ZBX_VMWARE_SERVICE_TTL)
+	if (0 != job->service->lastaccess && time_now - job->service->lastaccess > ZBX_VMWARE_SERVICE_TTL)
 		job->expired = SUCCEED;
 unlock:
 	zbx_vmware_unlock();
