@@ -689,6 +689,7 @@ class CWidgetHelper {
 
 		$tags_table = (new CTable())
 			->setId('tags_table_'.$field->getName())
+			->addClass('table-tags')
 			->addClass('table-initial-width');
 
 		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);

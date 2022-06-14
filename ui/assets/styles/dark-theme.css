@@ -1491,6 +1491,9 @@ footer {
   .dashboard-widget-form .form-field-show-header {
     position: absolute;
     right: 5px; }
+  .dashboard-widget-form .table-tags tr:last-of-type td {
+    padding-bottom: 0;
+    line-height: 1.4; }
 
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
