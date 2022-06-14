@@ -56,14 +56,13 @@ typedef struct
 	char	*value;
 }
 zbx_vmware_key_value_t;
-ZBX_PTR_VECTOR_DECL(vmware_key_value, zbx_vmware_key_value_t *)
-ZBX_PTR_VECTOR_IMPL(vmware_key_value, zbx_vmware_key_value_t *)
+ZBX_PTR_VECTOR_DECL(vmware_key_value, zbx_vmware_key_value_t)
+ZBX_PTR_VECTOR_IMPL(vmware_key_value, zbx_vmware_key_value_t)
 
-static void	vmware_key_value_free(zbx_vmware_key_value_t *value)
+static void	vmware_key_value_free(zbx_vmware_key_value_t value)
 {
-	zbx_str_free(value->key);
-	zbx_str_free(value->value);
-	zbx_free(value);
+	zbx_str_free(value.key);
+	zbx_str_free(value.value);
 }
 
 ZBX_PTR_VECTOR_IMPL(vmware_entity_tags, zbx_vmware_entity_tags_t *)
@@ -501,9 +500,9 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 
 	cat_cmp.key = cid;
 
-	if (FAIL == (i = zbx_vector_vmware_key_value_bsearch(categories, &cat_cmp, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+	if (FAIL == (i = zbx_vector_vmware_key_value_bsearch(categories, cat_cmp, ZBX_DEFAULT_STR_COMPARE_FUNC)))
 	{
-		zbx_vmware_key_value_t	*category;
+		zbx_vmware_key_value_t	category;
 		char			value[MAX_STRING_LEN];
 
 		if (FAIL == vmware_rest_get(__func__, easyhandle, "/cis/tagging/category/", cid, &jp, error))
@@ -515,9 +514,8 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 			return FAIL;
 		}
 
-		category = (zbx_vmware_key_value_t *)zbx_malloc(NULL, sizeof(zbx_vmware_key_value_t));
-		category->key = zbx_strdup(NULL, cid);
-		category->value = zbx_strdup(NULL, value);
+		category.key = zbx_strdup(NULL, cid);
+		category.value = zbx_strdup(NULL, value);
 		zbx_vector_vmware_key_value_append(categories, category);
 		zbx_vector_vmware_key_value_sort(categories, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
@@ -533,7 +531,7 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 	tag->id = zbx_strdup(NULL, tag_id);
 	tag->name = zbx_strdup(NULL, name);
 	tag->description = zbx_strdup(NULL, desc);
-	tag->category  = zbx_strdup(NULL, categories->values[i]->value);
+	tag->category  = zbx_strdup(NULL, categories->values[i].value);
 	zbx_vector_vmware_tag_append(tags, tag);
 	zbx_vector_vmware_tag_sort(tags, zbx_vmware_tag_id_compare);
 

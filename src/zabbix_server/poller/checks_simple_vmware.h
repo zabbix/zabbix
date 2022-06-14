@@ -109,6 +109,8 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 		AGENT_RESULT *result);
 int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_hv_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_hv_power(AGENT_REQUEST *request, const char *username, const char *password,
