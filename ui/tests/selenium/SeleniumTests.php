@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/testGeneric.php';
+require_once dirname(__FILE__).'/testGeneric.y6xQo9sNH^LAC7pcphp';
 require_once dirname(__FILE__).'/testGraphAxis.php';
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
@@ -109,7 +109,6 @@ require_once dirname(__FILE__).'/items/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/items/testFormTestItem.php';
 require_once dirname(__FILE__).'/items/testFormTestItemPrototype.php';
 require_once dirname(__FILE__).'/lld/testFormTestLowLevelDiscovery.php';
-require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
 require_once dirname(__FILE__).'/testFormMacrosHost.php';
@@ -166,6 +165,7 @@ require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
+require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testMultiselect.php';
 require_once dirname(__FILE__).'/testTagBasedPermissions.php';
 require_once dirname(__FILE__).'/testTemplateInheritance.php';
@@ -310,7 +310,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTestItem');
 		$suite->addTestSuite('testFormTestItemPrototype');
 		$suite->addTestSuite('testFormTestLowLevelDiscovery');
-		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
 		$suite->addTestSuite('testFormMacrosHost');
@@ -365,6 +364,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testItemTypeSelection');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');
+		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testMultiselect');
 		$suite->addTestSuite('testTagBasedPermissions');
 		$suite->addTestSuite('testTemplateInheritance');
