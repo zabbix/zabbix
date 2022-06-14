@@ -5,7 +5,7 @@ form.dashboard-widget-clock {
 	.fields-group-time,
 	.fields-group-tzone {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(60px, max-content) auto);
+		grid-template-columns: 60px 120px repeat(2, minmax(60px, max-content) auto);
 		align-items: center;
 		column-gap: 10px;
 		row-gap: 5px;

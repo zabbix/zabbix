@@ -22,6 +22,10 @@
 		line-height: 24px;
 		text-align: right;
 		word-wrap: break-word;
+
+		&.fields-group-label {
+			padding-top: 5px;
+		}
 	}
 
 	> .form-field,

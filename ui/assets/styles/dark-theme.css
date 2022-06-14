@@ -683,6 +683,8 @@ footer {
     line-height: 24px;
     text-align: right;
     word-wrap: break-word; }
+    .form-grid > label.fields-group-label {
+      padding-top: 5px; }
   .form-grid > .form-field,
   .form-grid > .field-fluid,
   .form-grid .form-actions {
@@ -1493,7 +1495,7 @@ form.dashboard-widget-clock .fields-group-date,
 form.dashboard-widget-clock .fields-group-time,
 form.dashboard-widget-clock .fields-group-tzone {
   display: grid;
-  grid-template-columns: repeat(3, minmax(60px, max-content) auto);
+  grid-template-columns: 60px 120px repeat(2, minmax(60px, max-content) auto);
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
@@ -1592,8 +1594,6 @@ form.dashboard-widget-item .fields-group-change-indicator {
   grid-template-columns: repeat(3, max-content 96px); }
 form.dashboard-widget-item .fields-group-change-indicator .input-color-picker {
   display: block; }
-form.dashboard-widget-item .table-forms .table-forms-td-left label.widget-item-label {
-  margin-top: 6px; }
 
 div.dashboard-widget-item {
   box-sizing: border-box;
