@@ -2749,17 +2749,6 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 	return index;
 }
 
-int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value)
-{
-	int	index;
-
-	index = get_nearestindex(values, sizeof(zbx_uint64_t), num, value);
-	if (index < num && values[index] == value)
-		return SUCCEED;
-
-	return FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: remove uint64 values from array                                   *

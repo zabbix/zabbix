@@ -1270,7 +1270,6 @@ zbx_uint64_t	iprange_volume(const zbx_iprange_t *iprange);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
-int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_values, int rm_num);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
