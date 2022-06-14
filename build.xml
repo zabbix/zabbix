@@ -17,6 +17,7 @@
 	<target name="create-frontend-configs">
 		<property name="dbtype" value="${DBTYPE}"/>
 		<property name="dbhost" value="${DBHOST}"/>
+		<property name="dbport" value="${DBPORT}"/>
 		<property name="dbname" value="${DBNAME}"/>
 		<property name="dbuser" value="${DBUSER}"/>
 		<property name="dbpassword" value="${DBPASSWORD}"/>
@@ -27,6 +28,7 @@
 		<copy overwrite="true" file="ui/tests/templates/zabbix.conf.php" tofile="ui/conf/zabbix.conf.php"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="{DBPORT}" value="${dbport}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
