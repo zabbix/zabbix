@@ -792,40 +792,6 @@ static int	lld_validate_item_param(zbx_uint64_t itemid, int type, size_t len, ch
 	return SUCCEED;
 }
 
-static int	lld_validate_item_tag(zbx_uint64_t itemid, int type, char *tag, char **error)
-{
-	size_t	len;
-	if (SUCCEED != zbx_is_utf8(tag))
-	{
-		char	*tag_utf8;
-
-		tag_utf8 = zbx_strdup(NULL, tag);
-		zbx_replace_invalid_utf8(tag_utf8);
-		*error = zbx_strdcatf(*error, "Cannot %s item: tag's %s \"%s\" has invalid UTF-8 sequence.\n",
-				(0 != itemid ? "update" : "create"),
-				(ZBX_ITEM_TAG_FIELD_TAG != type ? "tag" : "value"), tag_utf8);
-		zbx_free(tag_utf8);
-		return FAIL;
-	}
-
-	len = zbx_strlen_utf8(tag);
-
-	if (ITEM_TAG_FIELD_LEN < len)
-	{
-		*error = zbx_strdcatf(*error, "Cannot %s item: tag's %s \"%s\" is too long.\n",
-				(0 != itemid ? "update" : "create"),
-				(ZBX_ITEM_TAG_FIELD_TAG != type ? "tag" : "value"), tag);
-		return FAIL;
-	}
-	else if (0 == len && ZBX_ITEM_TAG_FIELD_TAG == type)
-	{
-		*error = zbx_strdcatf(*error, "Cannot %s item: empty tag name.\n", (0 != itemid ? "update" : "create"));
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 static void	lld_validate_item_field(zbx_lld_item_t *item, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
@@ -1445,66 +1411,6 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate item tags and remove invalid                             *
- *                                                                            *
- * Parameters: item  - [IN/OUT] a item with existing tags                     *
- *             error - [OUT] error information                                *
- *                                                                            *
- * Return value: SUCCEED - all tags are valid                                 *
- *               FAIL    - at least one invalid tag was detected and removed  *
- *                                                                            *
- ******************************************************************************/
-static int	lld_item_tags_validate(zbx_lld_item_t *item, char **error)
-{
-	int	i, ret = SUCCEED;
-
-	for (i = 0; i < item->item_tags.values_num; i++)
-	{
-		zbx_db_tag_t	*item_tag = item->item_tags.values[i], *tag_dup;
-		int		j;
-
-		if (0 != (item_tag->flags & ZBX_FLAG_DB_TAG_REMOVE))
-			continue;
-
-		if (SUCCEED != lld_validate_item_tag(item->itemid, ZBX_ITEM_TAG_FIELD_TAG, item_tag->tag,
-				error) || SUCCEED != lld_validate_item_tag(item->itemid,
-				ZBX_ITEM_TAG_FIELD_VALUE, item_tag->value, error))
-		{
-			if (SUCCEED != zbx_db_tag_rollback(item_tag))
-			{
-				zbx_db_tag_free(item_tag);
-				zbx_vector_db_tag_ptr_remove_noorder(&item->item_tags, i--);
-			}
-			ret = FAIL;
-			continue;
-		}
-
-		/* check for duplicated tag */
-		for (j = 0; j < i; j++)
-		{
-			tag_dup = item->item_tags.values[j];
-
-			if (0 == strcmp(item_tag->tag, tag_dup->tag) && 0 == strcmp(item_tag->value, tag_dup->value))
-			{
-				*error = zbx_strdcatf(*error, "Cannot create item tag: tag \"%s\","
-					"\"%s\" already exists.\n", item_tag->tag, item_tag->value);
-
-				if (SUCCEED != zbx_db_tag_rollback(item_tag))
-				{
-					zbx_db_tag_free(item_tag);
-					zbx_vector_db_tag_ptr_remove_noorder(&item->item_tags, i--);
-				}
-				ret = FAIL;
-				break;
-			}
-		}
-	}
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Parameters: hostid            - [IN] host id                               *
  *             items             - [IN] list of items                         *
  *             item_prototypes   - [IN] the item prototypes                   *
@@ -1666,8 +1572,11 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 			continue;
 
-		if (SUCCEED != lld_item_tags_validate(item, error) && 0 == item->itemid)
+		if (SUCCEED != zbx_validate_tags(&item->item_tags, "item", error) && 0 == item->itemid)
+		{
 			item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+			*error = zbx_strdcatf(*error, "Cannot create item because of tag errors.\n");
+		}
 
 		zbx_vector_db_tag_ptr_sort(&item->item_tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
@@ -4109,7 +4018,7 @@ static int	lld_items_tags_save(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int
 	{
 		item = (zbx_lld_item_t *)items->values[i];
 
-		if (0 != (item->flags & ZBX_FLAG_DB_TAG_REMOVE))
+		if (0 == (item->flags & ZBX_FLAG_DISCOVERY_CREATED))
 			continue;
 
 		for (j = 0; j < item->item_tags.values_num; j++)
