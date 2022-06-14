@@ -45,9 +45,7 @@ class testAlertingForServices extends CIntegrationTest {
 		$response = $this->call('service.create', [
 			'name' => $name,
 			'algorithm' => 1,
-			'showsla' => 1,
 			'goodsla' => 99.0,
-			'sortorder' => 1,
 			'problem_tags' => $problem_tags
 		]);
 		$this->assertArrayHasKey('serviceids', $response['result']);
