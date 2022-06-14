@@ -103,6 +103,9 @@ class testTimescaleDb extends CIntegrationTest {
 		if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
 			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'commit;');
 		}
+		else {
+			$this->assertNotEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
+		}
 	}
 
 	/**
@@ -228,6 +231,9 @@ class testTimescaleDb extends CIntegrationTest {
 			$this->reloadConfigurationCache();
 			$this->executeHousekeeper();
 		}
+		else {
+			$this->assertNotEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
+		}
 	}
 
 /**
@@ -241,7 +247,9 @@ class testTimescaleDb extends CIntegrationTest {
 			$this->executeHousekeeper();
 
 			$this->getCheckCompression();
-
+		}
+		else {
+			$this->assertNotEquals(self::$db_extension, ZBX_DB_EXTENSION_TIMESCALEDB);
 		}
 	}
 }
