@@ -91,7 +91,7 @@ $form_grid
 $scripts[] = $fields['tags']->getJavascript();
 $jq_templates['tag-row-tmpl'] = CWidgetHelper::getTagsTemplate($fields['tags']);
 
-// Show type.
+// Show.
 $form_grid->addItem([
 	CWidgetHelper::getLabel($fields['show_type']),
 	new CFormField(CWidgetHelper::getRadioButtonList($fields['show_type']))

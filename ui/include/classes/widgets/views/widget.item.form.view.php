@@ -20,7 +20,7 @@
 
 
 /**
- * Single item widget.
+ * Item value widget.
  *
  * @var CView $this
  * @var array $data
@@ -63,7 +63,7 @@ $form_grid->addItem([
 // Advanced configuration.
 $form_grid->addItem([
 	CWidgetHelper::getLabel($fields['adv_conf']),
-	new  CFormField(CWidgetHelper::getCheckBox($fields['adv_conf']))
+	new CFormField(CWidgetHelper::getCheckBox($fields['adv_conf']))
 ]);
 
 // Description.

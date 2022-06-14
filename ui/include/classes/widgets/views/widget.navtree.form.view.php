@@ -20,7 +20,7 @@
 
 
 /**
- * Map navigation widget form view.
+ * Map navigation tree widget form view.
  *
  * @var CView $this
  * @var array $data
@@ -59,7 +59,7 @@ foreach ($fields['navtree']->getValue() as $i => $navtree_item) {
 	}
 }
 
-// Show unavailable maps
+// Show unavailable maps.
 $form_grid->addItem([
 	CWidgetHelper::getLabel($fields['show_unavailable']),
 	new CFormField(CWidgetHelper::getCheckBox($fields['show_unavailable']))

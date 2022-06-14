@@ -42,20 +42,11 @@ $form->addVar($fields[CWidgetFieldReference::FIELD_NAME]->getName(),
 	$fields[CWidgetFieldReference::FIELD_NAME]->getValue()
 );
 
-// Source.
+// Source type.
 $form_grid->addItem([
 	CWidgetHelper::getLabel($fields['source_type']),
 	new CFormField(CWidgetHelper::getRadioButtonList($fields['source_type']))
 ]);
-
-// Filter.
-if (array_key_exists('filter_widget_reference', $fields)) {
-	$form_grid->addItem([
-		CWidgetHelper::getLabel($fields['filter_widget_reference']),
-		new CFormField(CWidgetHelper::getEmptySelect($fields['filter_widget_reference']))
-	]);
-	$scripts[] = $fields['filter_widget_reference']->getJavascript();
-}
 
 // Map.
 if (array_key_exists('sysmapid', $fields)) {
@@ -75,6 +66,15 @@ if (array_key_exists('sysmapid', $fields)) {
 			)
 		)
 	]);
+}
+
+// Filter.
+if (array_key_exists('filter_widget_reference', $fields)) {
+	$form_grid->addItem([
+		CWidgetHelper::getLabel($fields['filter_widget_reference']),
+		new CFormField(CWidgetHelper::getEmptySelect($fields['filter_widget_reference']))
+	]);
+	$scripts[] = $fields['filter_widget_reference']->getJavascript();
 }
 
 $form->addItem($form_grid);
