@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-14T07:40:02Z'
+  date: '2022-06-14T12:31:47Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -85,6 +85,19 @@ zabbix_export:
             -
               tag: component
               value: credit
+          triggers:
+            -
+              uuid: 4e67cac1f58a478fb0e47c52b402fd92
+              expression: 'max(/AWS EC2 by HTTP/aws.ec2.cpu.credit_balance,5m)<{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}'
+              name: 'AWS EC2: Instance CPU Credit balance is too low'
+              event_name: 'AWS EC2: Instance CPU Credit balance is too low (less {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The number of earned CPU credits has been less than {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: b445a56de3194f6f9b4bf9dd85fcbe52
           name: 'AWS EC2: Credit CPU: Usage'
@@ -167,6 +180,19 @@ zabbix_export:
             -
               tag: component
               value: credit
+          triggers:
+            -
+              uuid: 644ace5510164f329d9af65bd0ed4f34
+              expression: 'last(/AWS EC2 by HTTP/aws.ec2.cpu.surplus_credit_charged)>{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}'
+              name: 'AWS EC2: Instance has spent too many CPU surplus credits'
+              event_name: 'AWS EC2: Instance has spent too many CPU surplus credits (over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN} for 15m)'''
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The number of spent surplus credits that are not paid down and which thus incur an additional charge is over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 7fd871e7eed54845ad069c3e7d3cad56
           name: 'AWS EC2: CPU: Utilization'
@@ -178,7 +204,6 @@ zabbix_export:
           units: '%'
           description: |
             The percentage of allocated EC2 compute units that are currently in use on the instance. This metric identifies the processing power required to run an application on a selected instance.
-            
             Depending on the instance type, tools in your operating system can show a lower percentage than CloudWatch when the instance is not allocated a full processor core.
           preprocessing:
             -
@@ -192,6 +217,22 @@ zabbix_export:
             -
               tag: component
               value: cpu
+          triggers:
+            -
+              uuid: ea74d00067874b609e4846847033058f
+              expression: 'min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}'
+              name: 'AWS EC2: High CPU utilization'
+              event_name: 'AWS EC2: High CPU utilization (over {$AWS.EC2.CPU.UTIL.WARN.MAX}% for 15m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                -
+                  tag: scope
+                  value: capacity
+                -
+                  tag: scope
+                  value: performance
         -
           uuid: 49aecab5c7df407b9cbfe80ad8790492
           name: 'AWS EC2: Disk: Read bytes, rate'
@@ -330,6 +371,18 @@ zabbix_export:
             -
               tag: component
               value: ebs
+          triggers:
+            -
+              uuid: 27f3b00e295d4aeb9a2d0519e95da4e0
+              expression: 'max(/AWS EC2 by HTTP/aws.ec2.ebs.byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}'
+              name: 'AWS EC2: Byte Credit balance is too low'
+              event_name: 'AWS EC2: Byte Credit balance is too low (less {$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}% for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 7b8a2b6941d04cde8edc511752755c8f
           name: 'AWS EC2: EBS: IO balance'
@@ -352,6 +405,18 @@ zabbix_export:
             -
               tag: component
               value: ebs
+          triggers:
+            -
+              uuid: f4b9c2238b5443eab31255422bc22d7d
+              expression: 'max(/AWS EC2 by HTTP/aws.ec2.ebs.io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}'
+              name: 'AWS EC2: I/O Credit balance is too low'
+              event_name: 'AWS EC2: I/O Credit balance is too low (less {$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}% for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              tags:
+                -
+                  tag: scope
+                  value: capacity
         -
           uuid: 251c9a3b0afd4930b822f7310f3fda43
           name: 'AWS EC2: EBS: Read bytes, rate'
@@ -1317,6 +1382,25 @@ zabbix_export:
             -
               tag: component
               value: instance
+          triggers:
+            -
+              uuid: 0fdd6b02eea948d3a6c958af7f195dc3
+              expression: 'last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_instance)=1'
+              name: 'AWS EC2: Instance status check failed'
+              priority: AVERAGE
+              description: |
+                These check detect problems that require your involvement to repair.
+                The following are examples of problems that can cause instance status checks to fail:
+                
+                Failed system status checks
+                Incorrect networking or startup configuration
+                Exhausted memory
+                Corrupted file system
+                Incompatible kernel
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: c7063824e3a74e6fa55ba21ecba35ca1
           name: 'AWS EC2: Status: Check failed, system'
@@ -1341,6 +1425,24 @@ zabbix_export:
             -
               tag: component
               value: instance
+          triggers:
+            -
+              uuid: 723a254ffd72404ea0cc2366ff186c1c
+              expression: 'last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_system)=1'
+              name: 'AWS EC2: System status check failed'
+              priority: AVERAGE
+              description: |
+                These checks detect underlying problems with your instance that require AWS involvement to repair.
+                The following are examples of problems that can cause system status checks to fail:
+                
+                Loss of network connectivity
+                Loss of system power
+                Software issues on the physical host
+                Hardware issues on the physical host that impact network reachability
+              tags:
+                -
+                  tag: scope
+                  value: availability
         -
           uuid: 3c819ed899c044ae8455266292f65632
           name: 'AWS EC2: Get volumes info check'
@@ -1415,7 +1517,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               description: |
-                The state value for the alarm.
+                The state value for the alarm. Possible values: 0 (OK), 1 (INSUFFICIENT_DATA), 2 (ALARM).
                 Alarm description:
                 {#ALARM_DESCRIPTION}
               valuemap:
@@ -1545,7 +1647,7 @@ zabbix_export:
               key: 'aws.ec2.ebs.attachment_status["{#VOLUME_ID}"]'
               delay: '0'
               history: 7d
-              description: 'The attachment state of the volume (attaching | attached | detaching).'
+              description: 'The attachment state of the volume. Possible values: 0 (attaching), 1 (attached), 2 (detaching).'
               valuemap:
                 name: 'Volume attachment state'
               preprocessing:
@@ -1682,7 +1784,9 @@ zabbix_export:
               key: 'aws.ec2.ebs.status["{#VOLUME_ID}"]'
               delay: '0'
               history: 7d
-              description: 'The state of the volume (creating | available | in-use | deleting | deleted | error).'
+              description: |
+                The state of the volume.
+                Possible values: 0 (creating), 1 (available), 2 (in-use), 3 (deleting), 4 (deleted), 5 (error).
               valuemap:
                 name: 'Volume status'
               preprocessing:
@@ -1755,6 +1859,18 @@ zabbix_export:
                 -
                   tag: volume
                   value: '{#VOLUME_ID}'
+              trigger_prototypes:
+                -
+                  uuid: eb3129f1668549ca974893f7f1838bb8
+                  expression: 'max(/AWS EC2 by HTTP/aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"],5m)<{$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}'
+                  name: 'AWS EBS: Burst balance is too low'
+                  event_name: 'AWS EBS: Burst balance is too low (less {$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}% for 5m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  tags:
+                    -
+                      tag: scope
+                      value: capacity
             -
               uuid: 8b936cef38294799a6826764eae68850
               name: 'AWS EBS: ["{#VOLUME_ID}"]: Consumed Read/Write, ops'
@@ -2387,6 +2503,30 @@ zabbix_export:
           macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
         -
+          macro: '{$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}'
+          value: '20'
+          description: 'Minimum percentage of Byte credits remaining for trigger expression.'
+        -
+          macro: '{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}'
+          value: '20'
+          description: 'Minimum percentage of Byte credits remaining for trigger expression.'
+        -
+          macro: '{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}'
+          value: '20'
+          description: 'Minimum percentage of I/O credits remaining for trigger expression.'
+        -
+          macro: '{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}'
+          value: '50'
+          description: 'Minimum number of free earned CPU credits for trigger expression.'
+        -
+          macro: '{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}'
+          value: '100'
+          description: 'Maximum number of spent CPU Surplus credits for trigger expression.'
+        -
+          macro: '{$AWS.EC2.CPU.UTIL.WARN.MAX}'
+          value: '85'
+          description: 'The warning threshold of the CPU utilization in %.'
+        -
           macro: '{$AWS.EC2.INSTANCE.ID}'
           description: 'EC2 instance ID.'
         -
@@ -2419,7 +2559,7 @@ zabbix_export:
           description: 'Amazon EC2 Region code.'
         -
           macro: '{$AWS.SECRET.ACCESS.KEY}'
-          type: SECRET_TEXT    
+          type: SECRET_TEXT
           description: 'Secret access key.'
       valuemaps:
         -
