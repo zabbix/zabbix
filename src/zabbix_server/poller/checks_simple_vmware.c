@@ -610,6 +610,44 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update json document with tags info                               *
+ *                                                                            *
+ * Parameters: entity_tags - [IN] the all tags and linked objects             *
+ *             uuid        - [IN] the vmware object uuid                      *
+ *             json_data   - [OUT] the json document                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_tags_json(const zbx_vector_vmware_entity_tags_t *entity_tags, const char *uuid,
+		struct zbx_json *json_data)
+{
+	int				i;
+	zbx_vmware_entity_tags_t	entity_cmp;
+	zbx_vector_vmware_tag_t		*tags;
+
+	entity_cmp.uuid = (char *)uuid;
+
+	if (FAIL == (i = zbx_vector_vmware_entity_tags_search(entity_tags, &entity_cmp,
+			ZBX_DEFAULT_STR_COMPARE_FUNC)))
+	{
+		return;
+	}
+
+	tags = &entity_tags->values[i]->tags;
+
+	for (i = 0; i < tags->values_num; i++)
+	{
+		zbx_vmware_tag_t	*tag = tags->values[i];
+
+		zbx_json_addobject(json_data, NULL);
+		zbx_json_addstring(json_data, "name", tag->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json_data, "description", tag->description, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json_data, "category", tag->category, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(json_data);
+	}
+}
+
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
@@ -3573,6 +3611,12 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			}
 
 			zbx_json_close(&json_data);
+			zbx_json_addarray(&json_data, "tags");
+
+			if (NULL != service->data_tags.error)
+				vmware_tags_json(&service->data_tags.entity_tags, vm->uuid, &json_data);
+
+			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
 	}
@@ -4052,10 +4096,8 @@ int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, cons
 {
 	zbx_vmware_service_t		*service;
 	zbx_vmware_vm_t			*vm = NULL;
-	int				i, ret = SYSINFO_RET_FAIL;
+	int				ret = SYSINFO_RET_FAIL;
 	const char			*url, *uuid;
-	zbx_vmware_entity_tags_t	entity_cmp;
-	zbx_vector_vmware_tag_t		*tags;
 	struct zbx_json			json_data;
 
 	if (2 != request->nparam)
@@ -4090,31 +4132,8 @@ int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, cons
 		goto unlock;
 	}
 
-	entity_cmp.uuid = vm->uuid;
-
-	if (FAIL == (i = zbx_vector_vmware_entity_tags_search(&service->data_tags.entity_tags, &entity_cmp,
-			ZBX_DEFAULT_STR_COMPARE_FUNC)))
-	{
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
-		ret = SYSINFO_RET_OK;
-		goto unlock;
-	}
-
-	tags = &service->data_tags.entity_tags.values[i]->tags;
-
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
-
-	for (i = 0; i < tags->values_num; i++)
-	{
-		zbx_vmware_tag_t	*tag = tags->values[i];
-
-		zbx_json_addobject(&json_data, NULL);
-		zbx_json_addstring(&json_data, "name", tag->name, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "description", tag->description, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "category", tag->category, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(&json_data);
-	}
-
+	vmware_tags_json(&service->data_tags.entity_tags, vm->uuid, &json_data);
 	zbx_json_close(&json_data);
 	ret = SYSINFO_RET_OK;
 unlock:
