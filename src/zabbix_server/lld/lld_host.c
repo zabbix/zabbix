@@ -639,10 +639,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 			continue;
 
 		if (SUCCEED != zbx_validate_tags(&host->tags, "host", error) && 0 == host->hostid)
-		{
-			*error = zbx_strdcatf(*error, "Cannot create host \"%s\" because of tag errors.\n", host->host);
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
-		}
 	}
 
 	/* checking duplicated host names */

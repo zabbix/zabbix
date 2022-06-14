@@ -200,7 +200,7 @@ void	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src)
  *               FAIL    - new tag, rollback impossible                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_tag_rollback(zbx_db_tag_t *tag)
+static int	db_tag_rollback(zbx_db_tag_t *tag)
 {
 	if (0 == tag->tagid)
 		return FAIL;
@@ -335,7 +335,7 @@ static int	check_tag_fields(zbx_vector_db_tag_ptr_t *tags, const char *owner, ch
 
 		if (0 > errors)
 		{
-			if (SUCCEED != zbx_db_tag_rollback(tag))
+			if (SUCCEED != db_tag_rollback(tag))
 			{
 				zbx_db_tag_free(tag);
 				zbx_vector_db_tag_ptr_remove_noorder(tags, i--);
@@ -379,7 +379,7 @@ static int	check_duplicate_tags(zbx_vector_db_tag_ptr_t *tags, const char *owner
 				*error = zbx_strdcatf(*error, "Cannot %s %s tag: \"%s: %s\" already exists.\n",
 						ZBX_TAG_OP(left), owner, left->tag, right->value);
 
-				if (SUCCEED != zbx_db_tag_rollback(left))
+				if (SUCCEED != db_tag_rollback(left))
 				{
 					zbx_db_tag_free(left);
 					zbx_vector_db_tag_ptr_remove_noorder(tags, i--);

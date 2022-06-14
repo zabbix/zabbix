@@ -119,6 +119,7 @@ zbx_host_template_link_type;
 #define ZBX_ITEM_SSL_CERT_FILE_LEN_MAX		(ZBX_ITEM_SSL_CERT_FILE_LEN + 1)
 #define ZBX_ITEM_SSL_KEY_FILE_LEN		255
 #define ZBX_ITEM_SSL_KEY_FILE_LEN_MAX		(ZBX_ITEM_SSL_KEY_FILE_LEN + 1)
+
 #if defined(HAVE_ORACLE)
 #	define ZBX_ITEM_PARAM_LEN		2048
 #	define ZBX_ITEM_DESCRIPTION_LEN		2048
@@ -761,7 +762,6 @@ int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
 void	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src);
 int	zbx_validate_tags(zbx_vector_db_tag_ptr_t *tags, const char *owner, char **error);
-int	zbx_db_tag_rollback(zbx_db_tag_t *tag);
 
 typedef enum
 {
