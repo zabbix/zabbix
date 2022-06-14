@@ -106,66 +106,6 @@ class CWidgetHelper {
 	}
 
 	/**
-	 * Create CFormList for widget configuration form with default fields in it.
-	 *
-	 * @param string  $name
-	 * @param string  $type
-	 * @param int     $view_mode  ZBX_WIDGET_VIEW_MODE_NORMAL | ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
-	 * @param array   $known_widget_types
-	 * @param CWidgetFieldSelect|null  $field_rf_rate
-	 */
-	public static function createFormList($name, $type, $view_mode, $known_widget_types, $field_rf_rate) {
-		$deprecated_types = array_intersect_key(
-			$known_widget_types,
-			array_flip(CWidgetConfig::DEPRECATED_WIDGETS)
-		);
-		$known_widget_types = array_diff_key($known_widget_types, $deprecated_types);
-		$types_select = (new CSelect('type'))
-			->setFocusableElementId('label-type')
-			->setId('type')
-			->setValue($type)
-			->setAttribute('autofocus', 'autofocus')
-			->addOptions(CSelect::createOptionsFromArray($known_widget_types));
-
-		if ($deprecated_types) {
-			$types_select->addOptionGroup(
-				(new CSelectOptionGroup(_('Deprecated')))->addOptions(
-					CSelect::createOptionsFromArray($deprecated_types)
-			));
-		}
-
-		if (array_key_exists($type, $deprecated_types)) {
-			$types_select = [$types_select, ' ', makeWarningIcon(_('Widget is deprecated.'))];
-		}
-
-		$form_list = (new CFormList())
-			->addItem((new CListItem([
-					(new CDiv(new CLabel(_('Type'), 'label-type')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-					(new CDiv([
-						(new CDiv((new CCheckBox('show_header'))
-							->setLabel(_('Show header'))
-							->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
-							->setId('show_header')
-							->setChecked($view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL)
-						))->addClass(ZBX_STYLE_TABLE_FORMS_SECOND_COLUMN),
-						$types_select
-					]))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
-				]))->addClass('table-forms-row-with-second-field')
-			)
-			->addRow(_('Name'),
-				(new CTextBox('name', $name))
-					->setAttribute('placeholder', _('default'))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			);
-
-		if ($field_rf_rate !== null) {
-			$form_list->addRow(self::getLabel($field_rf_rate), self::getSelect($field_rf_rate));
-		}
-
-		return $form_list;
-	}
-
-	/**
 	 * Creates label linked to the field.
 	 *
 	 * @param CWidgetField $field

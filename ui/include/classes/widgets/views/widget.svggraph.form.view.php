@@ -33,7 +33,7 @@ $form = CWidgetHelper::createForm();
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.svggraph.form.view.js.php')];
 $jq_templates = [];
 
-$form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dialogue']['type'],
+$form_grid = CWidgetHelper::createFormGrid($data['dialogue']['name'], $data['dialogue']['type'],
 	$data['dialogue']['view_mode'], $data['known_widget_types'],
 	$data['templateid'] === null ? $fields['rf_rate'] : null
 );
@@ -65,7 +65,7 @@ $form_tabs = (new CTabView())
 $scripts[] = $form_tabs->makeJavascript();
 
 $form
-	->addItem($form_list)
+	->addItem($form_grid)
 	->addItem($graph_preview)
 	->addItem($form_tabs)
 	->addItem(
