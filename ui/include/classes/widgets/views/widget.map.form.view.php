@@ -59,15 +59,17 @@ if (array_key_exists('filter_widget_reference', $fields)) {
 
 // Map.
 if (array_key_exists('sysmapid', $fields)) {
-	$form->addVar($fields['sysmapid']->getName(), $fields['sysmapid']->getValue());
+	$field = $fields['sysmapid'];
+
+	$form->addVar($field->getName(), $field->getValue());
 
 	$form_grid->addItem([
-		CWidgetHelper::getLabel($fields['sysmapid']),
+		CWidgetHelper::getLabel($field),
 		new CFormField(
 			CWidgetHelper::getSelectResource(
-				$fields['sysmapid'],
-				$fields['sysmapid']->getValue() != 0
-					? $data['captions']['simple'][$fields['sysmapid']->getResourceType()][$fields['sysmapid']->getValue()]
+				$field,
+				$field->getValue() != 0
+					? $data['captions']['simple'][$field->getResourceType()][$field->getValue()]
 					: '',
 				$form->getName()
 			)

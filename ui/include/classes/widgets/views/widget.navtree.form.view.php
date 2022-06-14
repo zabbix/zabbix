@@ -53,7 +53,9 @@ foreach ($fields['navtree']->getValue() as $i => $navtree_item) {
 		$form->addItem((new CVar($fields['navtree']->getName().'.parent.'.$i, $navtree_item['parent']))->removeId());
 	}
 	if (array_key_exists('sysmapid', $navtree_item)) {
-		$form->addItem((new CVar($fields['navtree']->getName().'.sysmapid.'.$i, $navtree_item['sysmapid']))->removeId());
+		$form->addItem(
+			(new CVar($fields['navtree']->getName().'.sysmapid.'.$i, $navtree_item['sysmapid']))->removeId()
+		);
 	}
 }
 
