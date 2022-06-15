@@ -705,7 +705,6 @@ footer {
   .form-grid .form-field td {
     padding: 0 5px 5px 0; }
   .form-grid .form-field .list-check-radio {
-    margin: -.3em 0;
     line-height: 1.4em; }
   .form-grid.form-grid-1-1 {
     grid-template-columns: repeat(2, minmax(15%, max-content) auto); }
@@ -3383,7 +3382,7 @@ form.is-loading {
       border-top: 2px solid #2b2b2b;
       border-bottom: 0; }
   .list-table td .checkbox-radio + label span {
-    bottom: 0; }
+    top: -2px; }
 
 .table-paging {
   text-align: center;
@@ -3842,7 +3841,9 @@ form.is-loading {
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
     .table-forms .table-forms-td-right .checkbox-radio + label span {
-      bottom: -3px; }
+      top: -1px; }
+    .table-forms .table-forms-td-right .checkbox-list .checkbox-radio + label span {
+      top: -3px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -4010,7 +4011,8 @@ select {
     width: 14px;
     height: 14px;
     margin-right: 4px;
-    bottom: -4px;
+    top: -2px;
+    vertical-align: middle;
     border: 1px solid #4f4f4f;
     background-color: #383838; }
     .checkbox-radio + label span:active {
