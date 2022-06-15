@@ -206,6 +206,36 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_DS, ds->id, ds->uuid));
 	}
 
+	for (i = 0; i < data->datacenters.values_num; i++)
+	{
+		zbx_vmware_datacenter_t	*dc = data->datacenters.values[i];
+		char			uuid[VMWARE_SHORT_STR_LEN];
+
+		zbx_snprintf(uuid, sizeof(uuid),"%s:%s", ZBX_VMWARE_SOAP_DC, dc->id);
+		zbx_vector_vmware_entity_tags_append(entity_tags,
+				vmware_entity_tag_create(ZBX_VMWARE_SOAP_DC, dc->id, uuid));
+	}
+
+	for (i = 0; i < data->clusters.values_num; i++)
+	{
+		zbx_vmware_cluster_t	*cl = (zbx_vmware_cluster_t *)data->clusters.values[i];
+		char			uuid[VMWARE_SHORT_STR_LEN];
+
+		zbx_snprintf(uuid, sizeof(uuid),"%s:%s", ZBX_VMWARE_SOAP_CLUSTER, cl->id);
+		zbx_vector_vmware_entity_tags_append(entity_tags,
+				vmware_entity_tag_create(ZBX_VMWARE_SOAP_CLUSTER, cl->id, uuid));
+	}
+
+	for (i = 0; i < data->resourcepools.values_num; i++)
+	{
+		zbx_vmware_resourcepool_t	*rp = data->resourcepools.values[i];
+		char				uuid[VMWARE_SHORT_STR_LEN];
+
+		zbx_snprintf(uuid, sizeof(uuid),"%s:%s", ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id);
+		zbx_vector_vmware_entity_tags_append(entity_tags,
+				vmware_entity_tag_create(ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id, uuid));
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity tags:%d", __func__, entity_tags->values_num);
 
 }

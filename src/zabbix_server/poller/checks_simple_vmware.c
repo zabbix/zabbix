@@ -620,30 +620,36 @@ out:
  *             error       - [OUT] the error of tags receiving (optional)     *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_tags_json(const zbx_vector_vmware_entity_tags_t *entity_tags, const char *uuid,
+static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const char *uuid,
 		struct zbx_json *json_data, char **error)
 {
 	int				i;
 	zbx_vmware_entity_tags_t	entity_cmp;
 	zbx_vector_vmware_tag_t		*tags;
 
+	if (NULL != data_tags->error)
+	{
+		if (NULL != error)
+			*error = zbx_strdup(NULL, data_tags->error);
+
+		return;
+	}
+
 	entity_cmp.uuid = (char *)uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_entity_tags_search(entity_tags, &entity_cmp,
+	if (FAIL == (i = zbx_vector_vmware_entity_tags_search(&data_tags->entity_tags, &entity_cmp,
 			ZBX_DEFAULT_STR_COMPARE_FUNC)))
 	{
 		return;
 	}
 
-	if (NULL != error && NULL != entity_tags->values[i]->error)
+	if (NULL != error && NULL != data_tags->entity_tags.values[i]->error)
 	{
-		*error = zbx_strdup(NULL, entity_tags->values[i]->error);
+		*error = zbx_strdup(NULL, data_tags->entity_tags.values[i]->error);
 		return;
 	}
 
-	tags = &entity_tags->values[i]->tags;
-
-
+	tags = &data_tags->entity_tags.values[i]->tags;
 
 	for (i = 0; i < tags->values_num; i++)
 	{
@@ -655,6 +661,26 @@ static void	vmware_tags_json(const zbx_vector_vmware_entity_tags_t *entity_tags,
 		zbx_json_addstring(json_data, "category", tag->category, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(json_data);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update json document with tags info by object id                  *
+ *                                                                            *
+ * Parameters: entity_tags - [IN] the all tags and linked objects             *
+ *             type        - [IN] the HostSystem, VirtualMachine etc          *
+ *             id          - [IN] the id of hv, vm etc                        *
+ *             json_data   - [OUT] the json document                          *
+ *             error       - [OUT] the error of tags receiving (optional)     *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_tags_id_json(const zbx_vmware_data_tags_t *data_tags, const char *type,
+		const char *id, struct zbx_json *json_data, char **error)
+{
+	char	uuid[MAX_STRING_LEN / 8];
+
+	zbx_snprintf(uuid, sizeof(uuid),"%s:%s", type, id);
+	vmware_tags_uuid_json(data_tags, uuid, json_data, error);
 }
 
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
@@ -704,8 +730,17 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&json_data, "vm_count", rp->vm_num);
 			zbx_json_close(&json_data);
+			zbx_json_addarray(&json_data, "tags");
+			vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id, &json_data,
+					NULL);
+			zbx_json_close(&json_data);
+			zbx_json_close(&json_data);
 		}
 
+		zbx_json_close(&json_data);
+		zbx_json_close(&json_data);
+		zbx_json_addarray(&json_data, "tags");
+		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_RESOURCEPOOL, cluster->id, &json_data, NULL);
 		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
@@ -774,6 +809,69 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 	else
 		ret = SYSINFO_RET_FAIL;
 
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_cluster_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_cluster_t		*cl = NULL;
+	int				ret = SYSINFO_RET_FAIL;
+	const char			*url, *id;
+	struct zbx_json			json_data;
+	char				*error = NULL;
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	id = get_rparam(request, 1);
+
+	if ('\0' == *id)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (NULL == (cl = cluster_get(&service->data->clusters, id)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown cluster id."));
+		goto unlock;
+	}
+
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
+		goto unlock;
+	}
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, cl->id, &json_data, &error);
+	zbx_json_close(&json_data);
+
+	if (NULL == error)
+	{
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
+	else
+		SET_STR_RESULT(result, error);
+
+	zbx_json_free(&json_data);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -1254,15 +1352,16 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addstring(&json_data, "rpid", rp->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&json_data, "vm_count", rp->vm_num);
+			zbx_json_addarray(&json_data, "tags");
+			vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id, &json_data,
+					NULL);
+			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
 
 		zbx_json_close(&json_data);
 		zbx_json_addarray(&json_data, "tags");
-
-		if (NULL == service->data_tags.error)
-			vmware_tags_json(&service->data_tags.entity_tags, hv->uuid, &json_data, NULL);
-
+		vmware_tags_uuid_json(&service->data_tags, hv->uuid, &json_data, NULL);
 		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
@@ -1933,7 +2032,7 @@ int	check_vcenter_hv_tags_get(AGENT_REQUEST *request, const char *username, cons
 	}
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
-	vmware_tags_json(&service->data_tags.entity_tags, hv->uuid, &json_data, &error);
+	vmware_tags_uuid_json(&service->data_tags, hv->uuid, &json_data, &error);
 	zbx_json_close(&json_data);
 
 	if (NULL == error)
@@ -2041,10 +2140,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}",
 				(unsigned int)dsname->hvdisks.values_num);
 		zbx_json_addarray(&json_data, "tags");
-
-		if (NULL == service->data_tags.error)
-			vmware_tags_json(&service->data_tags.entity_tags, dsname->uuid, &json_data, NULL);
-
+		vmware_tags_uuid_json(&service->data_tags, dsname->uuid, &json_data, NULL);
 		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
@@ -3070,10 +3166,7 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 
 		zbx_json_close(&json_data);
 		zbx_json_addarray(&json_data, "tags");
-
-		if (NULL == service->data_tags.error)
-			vmware_tags_json(&service->data_tags.entity_tags, datastore->uuid, &json_data, NULL);
-
+		vmware_tags_uuid_json(&service->data_tags, datastore->uuid, &json_data, NULL);
 		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
@@ -3129,14 +3222,8 @@ int	check_vcenter_datastore_tags_get(AGENT_REQUEST *request, const char *usernam
 		goto unlock;
 	}
 
-	if (NULL != service->data_tags.error)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
-		goto unlock;
-	}
-
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
-	vmware_tags_json(&service->data_tags.entity_tags, ds->uuid, &json_data, &error);
+	vmware_tags_uuid_json(&service->data_tags, ds->uuid, &json_data, &error);
 	zbx_json_close(&json_data);
 
 	if (NULL == error)
@@ -3765,10 +3852,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 			zbx_json_close(&json_data);
 			zbx_json_addarray(&json_data, "tags");
-
-			if (NULL == service->data_tags.error)
-				vmware_tags_json(&service->data_tags.entity_tags, vm->uuid, &json_data, NULL);
-
+			vmware_tags_uuid_json(&service->data_tags, vm->uuid, &json_data, NULL);
 			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
@@ -4280,14 +4364,8 @@ int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, cons
 		goto unlock;
 	}
 
-	if (NULL != service->data_tags.error)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
-		goto unlock;
-	}
-
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
-	vmware_tags_json(&service->data_tags.entity_tags, vm->uuid, &json_data, &error);
+	vmware_tags_uuid_json(&service->data_tags, vm->uuid, &json_data, &error);
 	zbx_json_close(&json_data);
 
 	if (NULL == error)
@@ -4651,6 +4729,10 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#DATACENTER}", datacenter->name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#DATACENTERID}", datacenter->id, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
+		zbx_json_addarray(&json_data, "tags");
+		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_DC, datacenter->id, &json_data, NULL);
+		zbx_json_close(&json_data);
+		zbx_json_close(&json_data);
 	}
 
 	zbx_json_close(&json_data);
@@ -4660,6 +4742,78 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_json_free(&json_data);
 
 	ret = SYSINFO_RET_OK;
+unlock:
+	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_datacenter_t		*dc = NULL;
+	int				i, ret = SYSINFO_RET_FAIL;
+	const char			*url, *id;
+	struct zbx_json			json_data;
+	char				*error = NULL;
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	id = get_rparam(request, 1);
+
+	if ('\0' == *id)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	for (i = 0; i < service->data->datacenters.values_num; i++)
+	{
+		if (0 == strcmp(service->data->datacenters.values[i]->id, id))
+		{
+			dc = service->data->datacenters.values[i];
+			break;
+		}
+	}
+
+	if (NULL == dc)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datacenter id."));
+		goto unlock;
+	}
+
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
+		goto unlock;
+	}
+
+	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
+	vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, dc->id, &json_data, &error);
+	zbx_json_close(&json_data);
+
+	if (NULL == error)
+	{
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
+	else
+		SET_STR_RESULT(result, error);
+
+	zbx_json_free(&json_data);
 unlock:
 	zbx_vmware_unlock();
 out:

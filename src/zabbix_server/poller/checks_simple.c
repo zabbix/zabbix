@@ -45,6 +45,7 @@ static zbx_vmcheck_t	vmchecks[] =
 {
 	{"cluster.discovery", VMCHECK_FUNC(check_vcenter_cluster_discovery)},
 	{"cluster.status", VMCHECK_FUNC(check_vcenter_cluster_status)},
+	{"cluster.tags.get", VMCHECK_FUNC(check_vcenter_cluster_tags_get)},
 	{"version", VMCHECK_FUNC(check_vcenter_version)},
 	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
 	{"datastore.discovery", VMCHECK_FUNC(check_vcenter_datastore_discovery)},
@@ -146,6 +147,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.vfs.fs.size", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_size)},
 
 	{"dc.discovery", VMCHECK_FUNC(check_vcenter_dc_discovery)},
+	{"dc.tags.get", VMCHECK_FUNC(check_vcenter_dc_tags_get)},
 
 	{"cl.perfcounter", VMCHECK_FUNC(check_vcenter_cl_perfcounter)},
 
