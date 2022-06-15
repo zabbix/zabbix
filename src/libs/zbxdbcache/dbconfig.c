@@ -5906,6 +5906,9 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	update_sec = zbx_time() - sec;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
+			__func__, changelog_sec, changelog_num);
+
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec + dsec + fsec + expr_sec +
@@ -5917,7 +5920,7 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec;
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
