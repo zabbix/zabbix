@@ -798,7 +798,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 1,
 										'name' => 'tag_priority',
-										'value' => 'test5, test6',
+										'value' => 'test5, test6'
 									],
 									[
 										'type' => 1,
@@ -1078,7 +1078,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 0,
 										'name' => 'show_opdata',
-										'value' => 2,
+										'value' => 2
 									],
 									[
 										'type' => 0,
