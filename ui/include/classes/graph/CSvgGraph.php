@@ -1435,14 +1435,20 @@ class CSvgGraph extends CSvg {
 				$gap_interval = floor(($clock - $prev_clock) / $threshold);
 
 				if ($missingdatafunc == SVG_GRAPH_MISSING_DATA_NONE) {
-					$missing_points[$prev_clock + $gap_interval] = null;
+					$value = ['min' => null, 'avg' => null, 'max' => null];
+
+					$missing_points[$prev_clock + $gap_interval] = $value;
 				}
 				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
-					$missing_points[$prev_clock + $gap_interval] = 0;
-					$missing_points[$clock - $gap_interval] = 0;
+					$value = ['min' => 0, 'avg' => 0, 'max' => 0];
+
+					$missing_points[$prev_clock + $gap_interval] = $value;
+					$missing_points[$clock - $gap_interval] = $value;
 				}
 				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_LAST_KNOWN) {
-					$missing_points[$clock - $gap_interval] = $prev_point;
+					$value = ['min' => $prev_point, 'avg' => $prev_point, 'max' => $prev_point];
+
+					$missing_points[$clock - $gap_interval] = $value;
 				}
 			}
 
