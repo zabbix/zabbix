@@ -225,6 +225,8 @@ if (hasRequest('form')) {
 		$groups = API::HostGroup()->get([
 			'output' => ['name', 'flags'],
 			'groupids' => $data['groupid'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectHostPrototype' => ['hostid'],
 			'editable' => true
 		]);
 
@@ -324,6 +326,7 @@ else {
 		'selectTemplates' => ['templateid', 'name'],
 		'selectGroupDiscovery' => ['ts_delete'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
+		'selectHostPrototype' => ['hostid'],
 		'limitSelects' => $limit
 	]);
 	order_result($data['groups'], $sortField, $sortOrder);

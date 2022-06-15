@@ -93,6 +93,7 @@ class CHostGroup extends CApiService {
 			'selectTemplates'						=> null,
 			'selectGroupDiscovery'					=> null,
 			'selectDiscoveryRule'					=> null,
+			'selectHostPrototype'					=> null,
 			'countOutput'							=> false,
 			'groupCount'							=> false,
 			'preservekeys'							=> false,
@@ -1728,6 +1729,33 @@ class CHostGroup extends CApiService {
 				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding host prototype
+		if ($options['selectHostPrototype'] !== null) {
+			$db_links = DBFetchArray(DBselect(
+				'SELECT gd.groupid,gp.hostid'.
+					' FROM group_discovery gd,group_prototype gp'.
+					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' AND gd.parent_group_prototypeid=gp.group_prototypeid'
+			));
+
+			$host_prototypes = API::HostPrototype()->get([
+				'output' => $options['selectHostPrototype'],
+				'hostids' => array_column($db_links, 'hostid'),
+				'preservekeys' => true
+			]);
+
+			foreach ($result as &$row) {
+				$row['hostPrototype'] = [];
+			}
+			unset($row);
+
+			foreach ($db_links as $row) {
+				if (array_key_exists($row['hostid'], $host_prototypes)) {
+					$result[$row['groupid']]['hostPrototype'] = $host_prototypes[$row['hostid']];
+				}
+			}
 		}
 
 		// adding group discovery

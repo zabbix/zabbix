@@ -31,8 +31,22 @@ $form = (new CForm())
 	->addVar('groupid', $data['groupid'])
 	->addVar('form', $data['form']);
 
-$form_list = (new CFormList('hostgroupFormList'))
-	->addRow(
+$form_list = (new CFormList('hostgroupFormList'));
+
+if ($data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	$form_list->addRow(_('Discovered by'), $data['group']['discoveryRule']
+		? new CLink($data['group']['discoveryRule']['name'],
+			(new CUrl('host_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $data['group']['discoveryRule']['itemid'])
+				->setArgument('hostid', $data['group']['hostPrototype']['hostid'])
+				->setArgument('context', 'host')
+		)
+		: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY)
+	);
+}
+
+$form_list->addRow(
 		(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['name'], $data['groupid'] && $data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED))
 			->setAttribute('autofocus', 'autofocus')
