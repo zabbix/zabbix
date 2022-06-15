@@ -1918,11 +1918,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @param array $form		CFormElement
 	 */
 	private function fillForm($data, $form) {
-		// TODO: after DEV-2200 change to $form->fill(CTestArrayHelper::get($data, 'main_fields', []));
-		if (CTestArrayHelper::get($data, 'main_fields')) {
-			$this->query('id:widget-dialogue-form')->asForm(['detectType' => false])->one()->waitUntilVisible()->fill($data['main_fields']);
-		}
-
+		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDatasets(CTestArrayHelper::get($data, 'Data set', []));
 
 		$tabs = ['Displaying options', 'Time period', 'Axes', 'Legend', 'Problems', 'Overrides'];
