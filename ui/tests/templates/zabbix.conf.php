@@ -4,7 +4,7 @@ global $DB;
 
 $DB['TYPE']				= '{DBTYPE}';
 $DB['SERVER']			= '{DBHOST}';
-$DB['PORT']				= {DBPORT};
+$DB['PORT']				= '{DBPORT}';
 $DB['DATABASE']			= '{DBNAME}';
 $DB['USER']				= '{DBUSER}';
 $DB['PASSWORD']			= '{DBPASSWORD}';
