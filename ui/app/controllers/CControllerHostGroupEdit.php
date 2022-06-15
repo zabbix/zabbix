@@ -71,11 +71,16 @@ class CControllerHostGroupEdit extends CController{
 			$groups = API::HostGroup()->get([
 				'output' => ['name', 'flags'],
 				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid', 'name'],
+				'selectHostPrototype' => ['hostid'],
 				'groupids' => $data['groupid']
 			]);
 			$group = $groups[0];
 			$data['name'] = $group['name'];
 			$data['flags'] = $group['flags'];
+			$data['hosts'] = $group['hosts'];
+			$data['discoveryRule'] = $group['discoveryRule'];
+			$data['hostPrototype'] = $group['hostPrototype'];
 		}
 
 		// For clone action.

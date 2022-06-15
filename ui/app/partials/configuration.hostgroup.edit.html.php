@@ -31,8 +31,26 @@ $form = (new CForm())
 	->addVar('groupid', $data['groupid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-$form_grid = (new CFormGrid())
-	->addItem([
+$form_grid = new CFormGrid();
+
+$discovery_rule = null;
+
+if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+	$discovery_rule =  $data['discoveryRule']
+		? new CLink($data['discoveryRule']['name'],
+			(new CUrl('host_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+				->setArgument('hostid', $data['hostPrototype']['hostid'])
+				->setArgument('context', 'host')
+		)
+		: (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
+	$discovered_by = [new CLabel(_('Discovered by')), new CFormField($discovery_rule)];
+}
+
+$form_grid->addItem([[new CLabel(_('Discovered by')), new CFormField($discovery_rule)]]);
+
+$form_grid->addItem([
 		(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('name', $data['name'], $data['groupid'] != 0 && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED))

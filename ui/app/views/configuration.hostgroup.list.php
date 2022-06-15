@@ -118,7 +118,9 @@ foreach ($data['groups'] as $group) {
 		if ($data['allowed_ui_conf_hosts']) {
 			$lld_name = (new CLink($group['discoveryRule']['name'],
 				(new CUrl('host_prototypes.php'))
+					->setArgument('form', 'update')
 					->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
+					->setArgument('hostid', $group['hostPrototype']['hostid'])
 					->setArgument('context', 'host')
 			));
 		}
@@ -127,6 +129,10 @@ foreach ($data['groups'] as $group) {
 		}
 
 		$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
+		$name[] = NAME_DELIMITER;
+	}
+	elseif ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = (new CLink(CHtml::encode($group['name']),

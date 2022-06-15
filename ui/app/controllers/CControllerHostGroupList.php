@@ -111,6 +111,7 @@ class CControllerHostGroupList extends CController {
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectGroupDiscovery' => ['ts_delete'],
 			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectHostPrototype' => ['hostid'],
 			'groupids' => $groupids,
 			'limitSelects' => $limit
 		]);

@@ -63,6 +63,9 @@ class CHostGroup extends CApiService {
 			'parameters', 'params', 'delay', 'master_itemid', 'lifetime', 'trapper_hosts', 'allow_traps', 'description',
 			'status', 'state', 'error', 'templateid'
 		];
+		$host_prototype_fields = ['hostid', 'host', 'name', 'status', 'templateid', 'inventory_mode', 'discover',
+			'custom_interfaces', 'uuid'
+		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
@@ -104,6 +107,7 @@ class CHostGroup extends CApiService {
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
 			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
 			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
+			'selectHostPrototype' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>							['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -1522,6 +1526,34 @@ class CHostGroup extends CApiService {
 				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+
+		}
+
+		// adding host prototype
+		if ($options['selectHostPrototype'] !== null) {
+			$db_links = DBFetchArray(DBselect(
+				'SELECT gd.groupid,gp.hostid'.
+					' FROM group_discovery gd,group_prototype gp'.
+					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' AND gd.parent_group_prototypeid=gp.group_prototypeid'
+			));
+
+			$host_prototypes = API::HostPrototype()->get([
+				'output' => $options['selectHostPrototype'],
+				'hostids' => array_column($db_links, 'hostid'),
+				'preservekeys' => true
+			]);
+
+			foreach ($result as &$row) {
+				$row['hostPrototype'] = [];
+			}
+			unset($row);
+
+			foreach ($db_links as $row) {
+				if (array_key_exists($row['hostid'], $host_prototypes)) {
+					$result[$row['groupid']]['hostPrototype'] = $host_prototypes[$row['hostid']];
+				}
+			}
 		}
 
 		// adding group discovery
