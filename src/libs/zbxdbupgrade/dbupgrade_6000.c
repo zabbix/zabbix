@@ -20,11 +20,6 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
-#include "module.h"
-#include "sysinfo.h"
-#include "zbxdb.h"
-#include "log.h"
-#include "db.h"
 
 extern unsigned char	program_type;
 
