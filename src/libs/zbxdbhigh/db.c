@@ -906,6 +906,8 @@ void	zbx_db_check_tsdb_capabilities(void)
 
 	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT > version)
 	{
+		zabbix_log(LOG_LEVEL_WARNING, "Current TimescaleDB version is %d. TimescaleDB license and compression"
+				" availability detection is possible starting from TimescaleDB 2.0.", version);
 		compression_available = ON;
 		goto clean;
 	}
