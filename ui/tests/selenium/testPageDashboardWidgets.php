@@ -193,7 +193,7 @@ class testPageDashboardWidgets extends CWebTest {
 		$this->assertTrue($dashboard->isEmpty());
 
 		// Open a new widget form.
-		$overlay = $dashboard->edit()->addWidget();
+		$overlay = $dashboard->addWidget();
 		// Wait until add widget dialog is shown and close it.
 		$overlay->close();
 
