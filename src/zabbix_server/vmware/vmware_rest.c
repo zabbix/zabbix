@@ -32,6 +32,11 @@ typedef struct
 }
 ZBX_HTTPPAGE;
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cURL service function                                             *
+ *                                                                            *
+ ******************************************************************************/
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t		r_size = size * nmemb;
@@ -42,6 +47,11 @@ static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata
 	return r_size;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cURL service function                                             *
+ *                                                                            *
+ ******************************************************************************/
 static size_t	curl_header_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	ZBX_UNUSED(ptr);
@@ -59,6 +69,11 @@ zbx_vmware_key_value_t;
 ZBX_PTR_VECTOR_DECL(vmware_key_value, zbx_vmware_key_value_t)
 ZBX_PTR_VECTOR_IMPL(vmware_key_value, zbx_vmware_key_value_t)
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees resources allocated to store zbx_vmware_key_value_t         *
+ *                                                                            *
+ ******************************************************************************/
 static void	vmware_key_value_free(zbx_vmware_key_value_t value)
 {
 	zbx_str_free(value.key);
@@ -94,6 +109,11 @@ static int	zbx_vmware_tag_name_compare(const void *p1, const void *p2)
 	return strcmp(v1->name, v2->name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees resources allocated to store zbx_vmware_tag_t               *
+ *                                                                            *
+ ******************************************************************************/
 static void	vmware_tag_free(zbx_vmware_tag_t *value)
 {
 	zbx_str_free(value->id);
@@ -103,6 +123,11 @@ static void	vmware_tag_free(zbx_vmware_tag_t *value)
 	zbx_free(value);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: frees resources allocated to store vmware_entity_tags_free        *
+ *                                                                            *
+ ******************************************************************************/
 static void	vmware_entity_tags_free(zbx_vmware_entity_tags_t *value)
 {
 
@@ -116,6 +141,17 @@ static void	vmware_entity_tags_free(zbx_vmware_entity_tags_t *value)
 	zbx_free(value);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create entity tag object                                          *
+ *                                                                            *
+ * Parameters: type - [IN] VirtualMachine, HostSystem etc                     *
+ *             id   - [IN] the id of vm, hv or ds                             *
+ *             uuid - [IN] the uuid of vm, hv or ds                           *
+ *                                                                            *
+ * Return value: pointer to tag object                                        *
+ *                                                                            *
+ ******************************************************************************/
 static zbx_vmware_entity_tags_t	*vmware_entity_tag_create(const char *type, const char *id, const char *uuid)
 {
 	zbx_vmware_entity_tags_t	*entry_tag;
@@ -135,7 +171,8 @@ static zbx_vmware_entity_tags_t	*vmware_entity_tag_create(const char *type, cons
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service data     *
  *                                                                            *
- * Parameters: data   - [IN] the vmware service data                          *
+ * Parameters: data        - [IN] the vmware service data                     *
+ *             entity_tags - [OUT] set of query tags objects                  *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_entity_tags_t *entity_tags)
@@ -173,6 +210,19 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: cURL handle prepare                                               *
+ *                                                                            *
+ * Parameters: url        - [IN] the vmware service url                       *
+ *             easyhandle - [OUT] cURL handle                                 *
+ *             page       - [OUT] the response buffer for cURL                *
+ *             headers    - [OUT] the request headers for cURL                *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: SUCCEED if the cURL prepared, FAIL otherwise                 *
+ *                                                                            *
+ ******************************************************************************/
 static int	vmware_curl_init(const char *url, CURL **easyhandle, ZBX_HTTPPAGE *page, struct curl_slist **headers,
 		char **error)
 {
@@ -237,6 +287,17 @@ out:
 #	undef ZBX_XML_HEADER2
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: open the json document and check the errors                       *
+ *                                                                            *
+ * Parameters: data  - [IN] the json data                                     *
+ *             jp    - [OUT] the prepared json document (optional)            *
+ *             error - [OUT] the error message in the case of failure         *
+ *                                                                            *
+ * Return value: SUCCEED if the json prepared, FAIL otherwise                 *
+ *                                                                            *
+ ******************************************************************************/
 static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp, char **error)
 {
 	struct zbx_json_parse	jp_loc, jp_data;
@@ -284,7 +345,20 @@ static int	vmware_rest_response_open(const char *data, struct zbx_json_parse *jp
 	return SUCCEED;
 }
 
-static int	vmware_service_rest_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
+/******************************************************************************
+ *                                                                            *
+ * Purpose: authenticate rest service                                         *
+ *                                                                            *
+ * Parameters: service    - [IN] the vmware service                           *
+ *             easyhandle - [IN/OUT] cURL handle                              *
+ *             headers    - [IN/OUT] the request headers for cURL             *
+ *             page       - [IN/OUT] the response buffer for cURL             *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: SUCCEED if the rest authenticated, FAIL otherwise            *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_service_rest_authenticate(const zbx_vmware_service_t *service, CURL *easyhandle,
 		struct curl_slist *headers, ZBX_HTTPPAGE *page, char **error)
 {
 	int		ret = FAIL;
@@ -334,6 +408,14 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: logout rest service                                               *
+ *                                                                            *
+ * Parameters: easyhandle - [IN/OUT] cURL handle                              *
+ *             page       - [IN/OUT] the response buffer for cURL             *
+ *                                                                            *
+ ******************************************************************************/
 static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE *page)
 {
 	char		tmp[VMWARE_SHORT_STR_LEN];
@@ -361,13 +443,14 @@ static void	vmware_service_rest_logout(CURL *easyhandle, ZBX_HTTPPAGE *page)
  *                                                                            *
  * Purpose: unification of vmware web service call with REST error validation *
  *                                                                            *
- * Parameters: easyhandle - [IN] the CURL handle                              *
+ * Parameters: fn_parent  - [IN] the parent function name                     *
+ *             easyhandle - [IN] the CURL handle                              *
  *             url_suffix - [IN] the second part of url request               *
- *             page       - [OUT] the http response                           *
+ *             jp         - [OUT] the json response document                  *
  *             error      - [OUT] the error message in the case of failure    *
  *                                                                            *
- * Return value: SUCCEED - the SOAP request was completed successfully        *
- *               FAIL    - the SOAP request has failed                        *
+ * Return value: SUCCEED - the REST request was completed successfully        *
+ *               FAIL    - the REST request has failed                        *
  ******************************************************************************/
 static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const char *url_suffix,
 		struct zbx_json_parse *jp, char **error)
@@ -410,12 +493,13 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose: vmware web service GET call with REST error validation           *
+ * Purpose: vmware web service GET call with REST error validation            *
  *                                                                            *
  * Parameters: fn_parent  - [IN] the parent function name for Log records     *
  *             easyhandle - [IN] the CURL handle                              *
- *             request    - [IN] the http request                             *
- *             jdoc       - [OUT] the json document response                  *
+ *             url_suffix - [IN] the second part of url request               *
+ *             param      - [IN] the url parameter                            *
+ *             jp         - [OUT] the json document response                  *
  *             error      - [OUT] the error message in the case of failure    *
  *                                                                            *
  * Return value: SUCCEED - the SOAP request was completed successfully        *
@@ -446,8 +530,8 @@ static int	vmware_rest_get(const char *fn_parent, CURL *easyhandle, const char *
  *             jdoc       - [OUT] the json document response                  *
  *             error      - [OUT] the error message in the case of failure    *
  *                                                                            *
- * Return value: SUCCEED - the SOAP request was completed successfully        *
- *               FAIL    - the SOAP request has failed                        *
+ * Return value: SUCCEED - the POST rest request was completed successfully   *
+ *               FAIL    - the POST rest request has failed                   *
  ******************************************************************************/
 static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char *url_suffix, const char *request,
 		struct zbx_json_parse *jp, char **error)
@@ -467,7 +551,19 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
 	return vmware_http_request(fn_parent, easyhandle, url_suffix, jp, error);
 }
 
-static int	vmware_tags_linked_id(zbx_vmware_obj_id_t *obj_id, CURL *easyhandle, zbx_vector_str_t *ids,
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get list of tags linked with object                               *
+ *                                                                            *
+ * Parameters: obj_id     - [IN] the parent function name for Log records     *
+ *             easyhandle - [IN] the CURL handle                              *
+ *             ids        - [OUT] the vector with tags id                     *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: SUCCEED if the receive list of tags id, FAIL otherwise       *
+ *                                                                            *
+ ******************************************************************************/
+static int	vmware_tags_linked_id(const zbx_vmware_obj_id_t *obj_id, CURL *easyhandle, zbx_vector_str_t *ids,
 		char **error)
 {
 	int			ret = FAIL;
@@ -491,6 +587,19 @@ static int	vmware_tags_linked_id(zbx_vmware_obj_id_t *obj_id, CURL *easyhandle, 
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get tag details and save to cache vectors                         *
+ *                                                                            *
+ * Parameters: tag_id     - [IN] the tag id                                   *
+ *             easyhandle - [IN] the CURL handle                              *
+ *             tags       - [OUT] the vector with tags info                   *
+ *             categories - [OUT] the vector with categories info             *
+ *             error      - [OUT] the error message in the case of failure    *
+ *                                                                            *
+ * Return value: SUCCEED if the receive tag details, FAIL otherwise           *
+ *                                                                            *
+ ******************************************************************************/
 static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vector_vmware_tag_t *tags,
 		zbx_vector_vmware_key_value_t *categories, char **error)
 {
@@ -572,6 +681,18 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, zbx_vecto
 	return i;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create vector with tags details                                   *
+ *                                                                            *
+ * Parameters: entity_tags - [IN/OUT] the tag entity                          *
+ *             tags        - [IN/OUT] the vector with tags info               *
+ *             categories  - [IN/OUT] the vector with categories info         *
+ *             easyhandle  - [IN/OUT] the CURL handle                         *
+ *                                                                            *
+ * Return value: SUCCEED if the create tags vector, FAIL otherwise            *
+ *                                                                            *
+ ******************************************************************************/
 static int	vmware_tags_get(zbx_vmware_entity_tags_t *entity_tags, zbx_vector_vmware_tag_t *tags,
 		zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
 {

@@ -8235,6 +8235,14 @@ int	zbx_vmware_job_remove(zbx_vmware_job_t *job)
 	return 0 == jobs_num ? 1 : 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set shared error of vmware job tags update                        *
+ *                                                                            *
+ * Parameters: error     - [IN] the error message of failure                  *
+ *             data_tags - [OUT] the data_tags container                      *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags)
 {
 	zbx_vmware_lock();
@@ -8243,6 +8251,14 @@ void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t 
 	zbx_vmware_unlock();
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replace shared tags info                                          *
+ *                                                                            *
+ * Parameters: src - [IN] the collected tags info                             *
+ *             dst - [OUT] the shared tags container                          *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vector_vmware_entity_tags_t *dst)
 {
 	int	i, j;
