@@ -2861,7 +2861,8 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 			version_info->ext_min_version, version_info->ext_max_version,
 			version_info->ext_min_supported_version);
 
-	version_info->ext_lic = zbx_tsdb_get_license();
+	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT <= tsdb_ver)
+		version_info->ext_lic = zbx_tsdb_get_license();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: [%d], license: [%s]", tsdb_ver,
 		ZBX_NULL2EMPTY_STR(version_info->ext_lic));

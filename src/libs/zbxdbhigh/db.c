@@ -912,7 +912,7 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 
 	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info->ext_flag)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %d is not officially supported. Recommended version",
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %u is not officially supported. Recommended version"
 				" should be at least %s %s.", db_version_info->ext_current_version,
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED;
@@ -924,8 +924,6 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 		}
 
 		db_version_info->ext_flag = DB_VERSION_NOT_SUPPORTED_WARNING;
-		zbx_tsdb_set_compression_availability(ON);
-		goto out;
 	}
 
 	if (DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info->ext_flag)
@@ -942,6 +940,15 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 		}
 
 		db_version_info->ext_flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
+	}
+
+	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT > db_version_info->ext_current_version)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Current TimescaleDB version is %u. TimescaleDB license and compression"
+				" availability detection is possible starting from TimescaleDB 2.0.",
+				db_version_info->ext_current_version);
+		zbx_tsdb_set_compression_availability(ON);
+		goto out;
 	}
 
 	if (0 != zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
