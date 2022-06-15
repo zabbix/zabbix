@@ -2259,7 +2259,10 @@ static void	lld_triggers_tags_validate(zbx_vector_ptr_t *triggers, char **error)
 			continue;
 
 		if (SUCCEED != zbx_validate_tags(&trigger->tags, "trigger", error) && 0 == trigger->triggerid)
+		{
 			trigger->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
+			*error = zbx_strdcatf(*error, "Cannot create trigger: tag validation failed.\n");
+		}
 	}
 }
 
