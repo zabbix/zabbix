@@ -598,7 +598,7 @@ class CWidgetHelper {
 		];
 		$table = (new CTable())
 			->setId('list_'.$field->getName())
-			->setHeader((new CRowHeader($header))->addClass($columns ? null : ZBX_STYLE_DISPLAY_NONE));
+			->setHeader($header);
 		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
 
 		foreach ($columns as $column_index => $column) {
