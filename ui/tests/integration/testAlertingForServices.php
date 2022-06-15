@@ -204,9 +204,9 @@ class testAlertingForServices extends CIntegrationTest {
 	}
 
 	/**
-	 * Test suite for alerting for services.
+	 * Check alerting based on service action.
 	 *
-	 * @backup actions,alerts,history,events,problem,service_problem,triggers,escalations
+	 * @backup actions,alerts,history_uint,events,problem,service_problem,triggers,escalations
 	 */
 	public function testAlertingForServices_checkServiceStatusChange() {
 		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
@@ -292,7 +292,133 @@ class testAlertingForServices extends CIntegrationTest {
 	}
 
 	/**
-	 * Test suite for alerting for services.
+	 * Check alerting based on service action (without update operation, but with updated severity).
+	 *
+	 * @backup actions,alerts,history_uint,events,problem,service_problem,triggers,escalations
+	 */
+	public function testAlertingForServices_checkServiceStatusChangeWoUpdate() {
+		$response = $this->call('action.update', [
+			'actionid' => self::$actionid,
+			'esc_period' => '1m',
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => 0,
+						'message' => 'Problem',
+						'subject' => 'Problem'
+					],
+					'opmessage_grp' => [['usrgrpid' => 7]]
+				]
+			],
+			'recovery_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_MESSAGE,
+					'opmessage' => [
+						'default_msg' => 0,
+						'mediatypeid' => 0,
+						'message' => 'Recovery',
+						'subject' => 'Recovery'
+					],
+					'opmessage_grp' => [['usrgrpid' => 7]]
+				]
+			],
+			'update_operations' => [
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['actionids']);
+
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 1);
+
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'output' => 'extend',
+			'actionsids' => self::$actionid,
+			'eventsource' => EVENT_SOURCE_SERVICE,
+			'eventobject' => EVENT_OBJECT_SERVICE
+		], 25, 2);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('Problem', $response['result'][0]['message']);
+		$this->assertEquals('Problem', $response['result'][0]['subject']);
+		$this->assertEquals(0, $response['result'][0]['p_eventid']);
+
+		$response = $this->callUntilDataIsPresent('event.get', [
+			'objectids' => self::$triggerid,
+		], 25, 2);
+		$this->assertArrayHasKey(0, $response['result']);
+		$eventid = $response['result'][0]['eventid'];
+
+		$response = $this->call('event.acknowledge', [
+			'eventids' => $eventid,
+			'action' => ZBX_PROBLEM_UPDATE_SEVERITY,
+			'message' => 'disaster',
+			'severity' => TRIGGER_SEVERITY_DISASTER
+		]);
+		$this->assertArrayHasKey('eventids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['eventids']);
+
+		sleep(10);
+
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'output' => 'extend',
+			'actionsids' => self::$actionid,
+			'eventsource' => EVENT_SOURCE_SERVICE,
+			'eventobject' => EVENT_OBJECT_SERVICE
+		], 25, 2);
+		$this->assertCount(1, $response['result']);
+
+		// Check if new problem event was added
+		$response = $this->call('problem.get', [
+			'output' => 'extend',
+			'source' => EVENT_SOURCE_SERVICE,
+			'object' => EVENT_OBJECT_SERVICE
+		]
+		);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals(TRIGGER_SEVERITY_HIGH, $response['result'][0]['severity']);
+		$expected_eventname = 'Status of service "' . self::SERVICENAME . '" changed to High';
+		$this->assertEquals($expected_eventname, $response['result'][0]['name']);
+
+		$this->sendSenderValue(self::HOSTNAME, self::TRAPPER_KEY, 0);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
+
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'output' => 'extend',
+			'actionsids' => self::$actionid,
+			'eventsource' => EVENT_SOURCE_SERVICE,
+			'eventobject' => EVENT_OBJECT_SERVICE,
+			'sortfield' => 'alertid'
+		], 25, 3);
+		$this->assertCount(2, $response['result']);
+		$this->assertEquals('Recovery', $response['result'][1]['message']);
+		$this->assertEquals('Recovery', $response['result'][1]['subject']);
+		$this->assertNotEquals(0, $response['result'][1]['p_eventid']);
+
+		// Check recovery event
+		$response = $this->callUntilDataIsPresent('event.get', [
+			'output' => 'extend',
+			'source' => EVENT_SOURCE_SERVICE,
+			'object' => EVENT_OBJECT_SERVICE,
+			'value' => 0
+		], 25, 3);
+		$this->assertArrayHasKey(0, $response['result']);
+		$this->assertEquals(ZBX_SEVERITY_OK, $response['result'][0]['severity']);
+		$expected_eventname = 'Status of service "' . self::SERVICENAME . '" changed to OK';
+		$this->assertEquals($expected_eventname, $response['result'][0]['name']);
+
+		return true;
+	}
+
+	/**
+	 * Check SERVICE.* macros.
 	 *
 	 * @backup alerts,history,events,triggers,services
 	 */
@@ -350,7 +476,7 @@ class testAlertingForServices extends CIntegrationTest {
 	}
 
 	/**
-	 * Test suite for alerting for services.
+	 * Check escalation steps.
 	 *
 	 * @backup alerts,history,events,triggers,services
 	 */
