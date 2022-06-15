@@ -28,7 +28,7 @@
 		<copy overwrite="true" file="ui/tests/templates/zabbix.conf.php" tofile="ui/conf/zabbix.conf.php"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
-		<replace file="ui/conf/zabbix.conf.php" token="{DBPORT}" value="${dbport}"/>
+		<replace file="ui/conf/zabbix.conf.php" token="'{DBPORT}'" value="${dbport}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
 		<replace file="ui/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
