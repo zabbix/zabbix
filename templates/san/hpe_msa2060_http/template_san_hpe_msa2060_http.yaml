@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T19:33:26Z'
+  date: '2022-06-15T11:16:08Z'
   template_groups:
     -
       uuid: 7c2cb727f85b492d88cd56e17127c64d
@@ -22,7 +22,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/SAN
@@ -2162,7 +2162,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last(//hpe.msa.disks.groups.space["{#NAME}",free])/last(//hpe.msa.disks.groups.space["{#NAME}",total])*100'
+              params: '100-last(//hpe.msa.disks.groups.space["{#NAME}",free])/last(//hpe.msa.disks.groups.space["{#NAME}",total])*100'
               description: 'The space utilization percentage in the disk group.'
               preprocessing:
                 -
@@ -3273,7 +3273,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: 'last(//hpe.msa.pools.space["{#NAME}",free])/last(//hpe.msa.pools.space["{#NAME}",total])*100'
+              params: '100-last(//hpe.msa.pools.space["{#NAME}",free])/last(//hpe.msa.pools.space["{#NAME}",total])*100'
               description: 'The space utilization percentage in the pool.'
               preprocessing:
                 -
@@ -4300,7 +4300,7 @@ zabbix_export:
         -
           macro: '{$HPE.MSA.API.SCHEME}'
           value: https
-          description: 'Connection scheme timeout for API.'
+          description: 'Connection scheme for API.'
         -
           macro: '{$HPE.MSA.API.USERNAME}'
           value: zabbix
