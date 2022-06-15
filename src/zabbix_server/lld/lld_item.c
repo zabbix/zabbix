@@ -1573,7 +1573,10 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 			continue;
 
 		if (SUCCEED != zbx_validate_tags(&item->item_tags, "item", error) && 0 == item->itemid)
+		{
 			item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+			*error = zbx_strdcatf(*error, "Cannot create item: tag validation failed.\n");
+		}
 
 		zbx_vector_db_tag_ptr_sort(&item->item_tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
