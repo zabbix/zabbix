@@ -760,6 +760,7 @@ window.widget_svggraph_form = new class {
 				jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);
 				jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
 				jQuery("#ds_" + row_num + "_missingdatafunc_3").prop("disabled", true);
+				jQuery("#ds_" + row_num + "_stacked").prop("disabled", false);
 
 				approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = true;
 				if (approximation_select.value == <?= APPROXIMATION_ALL ?>) {
