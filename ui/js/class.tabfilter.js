@@ -781,6 +781,12 @@ class CTabFilter extends CBaseComponent {
 		this.on('keydown', this._events.keydown);
 		this.on(TABFILTERITEM_EVENT_UPDATE, this._events.updateActiveFilterTab);
 		this.on(TABFILTERITEM_EVENT_DELETE, this._events.deleteFilterTab);
+		this.on('keypress', (ev) => {
+			if (ev.keyCode == KEY_ENTER) {
+				ev.preventDefault();
+				this._filters_footer.querySelector('[name="filter_apply"]').dispatchEvent(new CustomEvent('click'));
+			}
+		});
 		this.on('submit', (ev) => {
 			ev.preventDefault();
 			this._filters_footer.querySelector('[name="filter_apply"]').dispatchEvent(new CustomEvent('click'));
