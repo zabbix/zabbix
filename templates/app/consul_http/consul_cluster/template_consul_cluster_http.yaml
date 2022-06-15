@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-07T20:23:01Z'
+  date: '2022-06-15T13:00:07Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -23,7 +23,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -48,6 +48,9 @@ zabbix_export:
             -
               name: X-Consul-Token
               value: '{$CONSUL.API.TOKEN}'
+            -
+              name: X-Consul-Namespace
+              value: '{$CONSUL.NAMESPACE}'
           tags:
             -
               tag: component
@@ -72,6 +75,9 @@ zabbix_export:
             -
               name: X-Consul-Token
               value: '{$CONSUL.API.TOKEN}'
+            -
+              name: X-Consul-Namespace
+              value: '{$CONSUL.NAMESPACE}'
           tags:
             -
               tag: component
@@ -467,6 +473,9 @@ zabbix_export:
                 -
                   name: X-Consul-Token
                   value: '{$CONSUL.API.TOKEN}'
+                -
+                  name: X-Consul-Namespace
+                  value: '{$CONSUL.NAMESPACE}'
               tags:
                 -
                   tag: component
@@ -522,7 +531,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$[?(@.Node == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''passing'')].length()'
+                    - '$[?(@.Service.Service == "{#SERVICE_NAME}")].Checks[?(@.CheckID == "serfHealth" && @.Status == ''passing'')].length()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -615,6 +624,9 @@ zabbix_export:
           macro: '{$CONSUL.LLD.FILTER.SERVICE_NAME.NOT_MATCHES}'
           value: 'CHANGE IF NEEDED'
           description: 'Filter to exclude discovered services.'
+        -
+          macro: '{$CONSUL.NAMESPACE}'
+          description: 'Consul service namespace. Enterprise only, in case Open Source version don''t leave this macro empty. Do not specify this macro to get all of services.'
         -
           macro: '{$CONSUL.SERVICE_NODES.CRITICAL.MAX.AVG}'
           value: '0'
