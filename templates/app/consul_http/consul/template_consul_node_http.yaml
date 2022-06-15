@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-15T13:15:44Z'
+  date: '2022-06-15T14:36:14Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -1885,10 +1885,6 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(result)
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 3h
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

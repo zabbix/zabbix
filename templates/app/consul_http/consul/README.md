@@ -28,7 +28,12 @@ Template need to use Authorization via API token.
 
 Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.TOKEN}.  
 Also, see the Macros section for a list of macros used to set trigger values.  
+
+This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macros {$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}, {$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES} if you want to filter discovered services by namespace.  
+In case Open Source version service namespace will be set to 'None'.
+
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
+*NOTE.* You may be interested in Envoy Proxy by HTTP [template]([Readme](../envoy_proxy_http).
 
 
 ## Zabbix configuration
