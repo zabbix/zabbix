@@ -217,7 +217,7 @@ class CSvgGraph extends CSvg {
 				'options' => ['order' => $index] + $metric['options']
 			];
 
-			if (!array_key_exists('points', $metric)) {
+			if (!$metric['points']) {
 				continue;
 			}
 
