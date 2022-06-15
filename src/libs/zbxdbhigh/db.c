@@ -912,9 +912,8 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 
 	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info->ext_flag)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %d is not officially supported.",
-					db_version_info->ext_current_version);
-		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should be at least %s %s.",
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version %d is not officially supported. Recommended version",
+				" should be at least %s %s.", db_version_info->ext_current_version,
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY, ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_FRIENDLY);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED;
 
@@ -947,9 +946,8 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 
 	if (0 != zbx_strcmp_null(db_version_info->ext_lic, ZBX_TIMESCALE_LICENSE_COMMUNITY))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "[%s] license does not support TimescaleDB compression.",
-				ZBX_NULL2EMPTY_STR(db_version_info->ext_lic));
-		zabbix_log(LOG_LEVEL_WARNING, "%s is required to use TimescaleDB compression.",
+		zabbix_log(LOG_LEVEL_WARNING, "Detected license [%s] does not support compression. Compression is"
+				" supported in %s.", ZBX_NULL2EMPTY_STR(db_version_info->ext_lic),
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_LICENSE_NOT_COMMUNITY;
 		goto out;
