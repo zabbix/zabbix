@@ -102,11 +102,9 @@ typedef struct
 	int		ppid;
 	int		tid;
 	int		jid;
-#if HAVE_LIBJAIL
-	char		*jname;
-#endif
 
 	char		*name;
+	char		*jname;
 	char		*tname;
 	char		*cmdline;
 	char		*state;
@@ -147,6 +145,7 @@ ZBX_PTR_VECTOR_IMPL(proc_data_ptr, proc_data_t *)
 static void	proc_data_free(proc_data_t *proc_data)
 {
 	zbx_free(proc_data->name);
+	zbx_free(proc_data->jname);
 	zbx_free(proc_data->tname);
 	zbx_free(proc_data->cmdline);
 	zbx_free(proc_data->state);
@@ -813,6 +812,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->jid = proc_thread[k].ZBX_PROC_JID;
 #if HAVE_LIBJAIL
 				proc_data->jname = jail_getname(proc_thread[k].ZBX_PROC_JID);
+#else
+				proc_data->jname = NULL;
 #endif
 				proc_data->name = zbx_strdup(NULL, proc_thread[k].ZBX_PROC_COMM);
 				proc_data->state = get_state(&proc_thread[k]);
@@ -875,6 +876,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				proc_data->jid = proc[i].ZBX_PROC_JID;
 #if HAVE_LIBJAIL
 				proc_data->jname = jail_getname(proc[i].ZBX_PROC_JID);
+#else
+				proc_data->jname = NULL;
 #endif
 				proc_data->cmdline = zbx_strdup(NULL, args);
 				proc_data->state = get_state(&proc[i]);
@@ -956,9 +959,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "pid", pdata->pid);
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
-#if HAVE_LIBJAIL
-			zbx_json_addstring(&j, "jname", ZBX_NULL2EMPTY_STR(pdata->jname), ZBX_JSON_TYPE_STRING);
-#endif
+			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", ZBX_NULL2EMPTY_STR(pdata->cmdline), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
@@ -987,9 +988,7 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "pid", pdata->pid);
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addint64(&j, "jid", pdata->jid);
-#if HAVE_LIBJAIL
-			zbx_json_addstring(&j, "jname", ZBX_NULL2EMPTY_STR(pdata->jname), ZBX_JSON_TYPE_STRING);
-#endif
+			zbx_json_addstring(&j, "jname", pdata->jname, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "name", ZBX_NULL2EMPTY_STR(pdata->name), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "user", ZBX_NULL2EMPTY_STR(pdata->user), ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "group", ZBX_NULL2EMPTY_STR(pdata->group), ZBX_JSON_TYPE_STRING);
