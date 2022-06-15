@@ -351,7 +351,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_trigger_tags_create(&triggers_tags);
-	zbx_vector_trigger_tags_reserve(&triggers_tags, triggerids.values_alloc);
+	zbx_vector_trigger_tags_reserve(&triggers_tags, (size_t)triggerids.values_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select tt.triggertagid,t.triggerid,t.flags,tt.tag,tt.value"
@@ -458,7 +458,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 	if (0 != delete_num)
 	{
 		zbx_vector_uint64_create(&del_tagids);
-		zbx_vector_uint64_reserve(&del_tagids, delete_num);
+		zbx_vector_uint64_reserve(&del_tagids, (size_t)delete_num);
 	}
 
 	for (i = 0; i < triggers_tags.values_num; i++)
