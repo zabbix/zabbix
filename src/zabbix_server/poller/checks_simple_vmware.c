@@ -1937,13 +1937,14 @@ int	check_vcenter_hv_tags_get(AGENT_REQUEST *request, const char *username, cons
 	zbx_json_close(&json_data);
 
 	if (NULL == error)
+	{
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
 	else
 		SET_STR_RESULT(result, error);
 
 	zbx_json_free(&json_data);
-
-	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -3139,13 +3140,14 @@ int	check_vcenter_datastore_tags_get(AGENT_REQUEST *request, const char *usernam
 	zbx_json_close(&json_data);
 
 	if (NULL == error)
+	{
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
 	else
 		SET_STR_RESULT(result, error);
 
 	zbx_json_free(&json_data);
-
-	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -4289,13 +4291,15 @@ int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, cons
 	zbx_json_close(&json_data);
 
 	if (NULL == error)
+	{
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+		ret = SYSINFO_RET_OK;
+	}
 	else
 		SET_STR_RESULT(result, error);
 
 	zbx_json_free(&json_data);
 
-	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:
