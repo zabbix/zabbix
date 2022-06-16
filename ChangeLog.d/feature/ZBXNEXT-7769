@@ -1,1 +1,1 @@
-..F....... [ZBXNEXT-7769] updated LDAP to support PHP 8.1 (gcalenko)
+..F....... [ZBXNEXT-7769] added support of PHP 8.1 to LDAP authentication (gcalenko)
