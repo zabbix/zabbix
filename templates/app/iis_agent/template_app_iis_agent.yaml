@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:41Z'
-  groups:
+  date: '2022-06-07T19:33:33Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -448,7 +448,7 @@ zabbix_export:
               name: 'IIS: has been restarted'
               event_name: 'IIS: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -723,7 +723,7 @@ zabbix_export:
                   name: 'IIS: {#APPPOOL} has been restarted'
                   event_name: 'IIS: {#APPPOOL} has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -
@@ -829,7 +829,7 @@ zabbix_export:
         -
           macro: '{$IIS.SERVICE}'
           value: http
-          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/simple_checks'
+          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/6.2/manual/config/items/itemtypes/simple_checks'
       valuemaps:
         -
           uuid: 63d1ad6b4cf643da870b14c53da6c52f

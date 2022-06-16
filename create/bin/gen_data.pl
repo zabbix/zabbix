@@ -297,6 +297,8 @@ sub main
 		}
 	}
 
+	print "DELETE FROM changelog$output{'exec_cmd'}";
+
 	print $output{"after"};
 }
 

@@ -81,7 +81,7 @@ $template_tab->addRow(
 $template_tab
 	->addRow(
 		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
-			->setLabel(_('Host groups'))
+			->setLabel(_('Template groups'))
 			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv([
 			(new CRadioButtonList('mass_update_groups', ZBX_ACTION_ADD))
@@ -92,12 +92,12 @@ $template_tab
 				->addStyle('margin-bottom: 5px;'),
 			(new CMultiSelect([
 				'name' => 'groups[]',
-				'object_name' => 'hostGroup',
+				'object_name' => 'templateGroup',
 				'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
 				'data' => [],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'host_groups',
+						'srctbl' => 'template_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'groups_',

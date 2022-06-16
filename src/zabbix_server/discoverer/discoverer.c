@@ -21,7 +21,7 @@
 
 #include "log.h"
 #include "zbxicmpping.h"
-#include "discovery.h"
+#include "zbxdiscovery.h"
 #include "zbxserver.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
@@ -29,7 +29,7 @@
 #include "zbxnix.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
-#include "zbxcrypto.h"
+#include "zbxcomms.h"
 #include "../events.h"
 
 extern int				CONFIG_DISCOVERER_FORKS;
@@ -38,6 +38,23 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
+
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	char		*ports;
+	char		*key_;
+	char		*snmp_community;
+	char		*snmpv3_securityname;
+	char		*snmpv3_authpassphrase;
+	char		*snmpv3_privpassphrase;
+	char		*snmpv3_contextname;
+	int		type;
+	unsigned char	snmpv3_securitylevel;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
+}
+DB_DCHECK;
 
 /******************************************************************************
  *                                                                            *
@@ -99,7 +116,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 {
 	int		ret = SUCCEED;
 	const char	*service = NULL;
-	AGENT_RESULT 	result;
+	AGENT_RESULT	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -159,7 +176,7 @@ static int	discover_service(const DB_DCHECK *dcheck, char *ip, int port, char **
 		size_t		value_offset = 0;
 		ZBX_FPING_HOST	host;
 		DC_ITEM		item;
-		char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
+		char		key[MAX_STRING_LEN], error[ZBX_ITEM_ERROR_LEN_MAX];
 
 		zbx_alarm_on(CONFIG_TIMEOUT);
 
@@ -370,7 +387,7 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 			service->dcheckid = dcheck->dcheckid;
 			service->itemtime = (time_t)now;
 			service->port = port;
-			zbx_strlcpy_utf8(service->value, value, MAX_DISCOVERED_VALUE_SIZE);
+			zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 			zbx_vector_ptr_append(services, service);
 
 			/* update host status */
@@ -391,7 +408,7 @@ static void	process_check(const DB_DCHECK *dcheck, int *host_status, char *ip, i
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	process_checks(const DB_DRULE *drule, int *host_status, char *ip, int unique, int now,
+static void	process_checks(const ZBX_DB_DRULE *drule, int *host_status, char *ip, int unique, int now,
 		zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	DB_RESULT	result;
@@ -442,8 +459,8 @@ static void	process_checks(const DB_DRULE *drule, int *host_status, char *ip, in
 	DBfree_result(result);
 }
 
-static int	process_services(const DB_DRULE *drule, DB_DHOST *dhost, const char *ip, const char *dns, int now,
-		const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
+static int	process_services(const ZBX_DB_DRULE *drule, ZBX_DB_DHOST *dhost, const char *ip, const char *dns,
+		int now, const zbx_vector_ptr_t *services, zbx_vector_uint64_t *dcheckids)
 {
 	int	i, ret;
 
@@ -463,7 +480,7 @@ static int	process_services(const DB_DRULE *drule, DB_DHOST *dhost, const char *
 
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
-			discovery_update_service(drule, service->dcheckid, dhost, ip, dns, service->port,
+			zbx_discovery_update_service(drule, service->dcheckid, dhost, ip, dns, service->port,
 					service->status, service->value, now);
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
@@ -483,11 +500,11 @@ fail:
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-static void	process_rule(DB_DRULE *drule)
+static void	process_rule(ZBX_DB_DRULE *drule)
 {
-	DB_DHOST		dhost;
+	ZBX_DB_DHOST		dhost;
 	int			host_status, now;
-	char			ip[INTERFACE_IP_LEN_MAX], *start, *comma, dns[INTERFACE_DNS_LEN_MAX];
+	char			ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma, dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	int			ipaddress[8];
 	zbx_iprange_t		iprange;
 	zbx_vector_ptr_t	services;
@@ -590,7 +607,7 @@ static void	process_rule(DB_DRULE *drule)
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
-				discovery_update_host(&dhost, host_status, now);
+				zbx_discovery_update_host(&dhost, host_status, now);
 				zbx_process_events(NULL, NULL);
 				zbx_clean_events();
 			}
@@ -732,10 +749,11 @@ out:
 
 static int	process_discovery(void)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		rule_count = 0;
-	char		*delay_str = NULL;
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			rule_count = 0;
+	char			*delay_str = NULL;
+	zbx_dc_um_handle_t	*um_handle;
 
 	result = DBselect(
 			"select distinct r.druleid,r.iprange,r.name,c.dcheckid,r.proxy_hostid,r.delay"
@@ -750,6 +768,8 @@ static int	process_discovery(void)
 			(int)time(NULL),
 			CONFIG_DISCOVERER_FORKS,
 			process_num - 1);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	while (ZBX_IS_RUNNING() && NULL != (row = DBfetch(result)))
 	{
@@ -779,7 +799,7 @@ static int	process_discovery(void)
 
 		if (SUCCEED == DBis_null(row[4]))
 		{
-			DB_DRULE	drule;
+			ZBX_DB_DRULE	drule;
 
 			memset(&drule, 0, sizeof(drule));
 
@@ -805,6 +825,8 @@ static int	process_discovery(void)
 			DBexecute("update drules set nextcheck=%d where druleid=" ZBX_FS_UI64, now + delay, druleid);
 	}
 	DBfree_result(result);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zbx_free(delay_str);
 

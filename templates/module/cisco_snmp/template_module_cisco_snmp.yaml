@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:38Z'
-  groups:
+  date: '2022-06-07T19:36:46Z'
+  template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -391,7 +391,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}])/(last(//vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}])+last(//vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]))*100'
-              description: 'Memory utilization in %'
+              description: 'Memory utilization in %.'
               tags:
                 -
                   tag: component

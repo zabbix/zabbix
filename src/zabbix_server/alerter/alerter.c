@@ -106,7 +106,7 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 	const char	*hex = "0123456789abcdef";
 	char		*str = NULL;
 	md5_state_t	state;
-	md5_byte_t	hash[MD5_DIGEST_SIZE];
+	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
 	int		i;
 	size_t		str_alloc = 0, str_offset = 0;
 
@@ -116,7 +116,7 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 
 	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, ZBX_FS_UI64 ".", eventid);
 
-	for (i = 0; i < MD5_DIGEST_SIZE; i++)
+	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
 	{
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, hex[hash[i] >> 4]);
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, hex[hash[i] & 15]);
