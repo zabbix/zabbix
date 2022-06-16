@@ -1,3 +1,30 @@
+Changes for 6.0.6rc1
+
+New features:
+...G.....T [ZBXNEXT-6891] removed mongodb implementation, updated template to work with new plugin (esneiders, ychukina)
+.........T [ZBXNEXT-7632] added template for HPE Primera (vkhaliev)
+.........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
+
+Bug fixes:
+.........T [ZBX-21143] changed API URL in Express.ms media type to a new version (drasihov)
+........S. [ZBX-20914] fixed wrong calculation of calculated item formulas (akozlovs)
+.........T [ZBX-20875] fixed filter condition for job discovery rule in MSSQL by ODBC template (drasihov)
+.........T [ZBX-21146] fixed item key in NTP service template (drasihov)
+..F....... [ZBX-20565] fixed visibility of placeholder text in host prototype edit form (kkuzmina)
+.........T [ZBX-20985] fixed notifications summary for MS Teams media type (drasihov)
+.......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
+.........T [ZBX-20628] removed system metrics from PFSense template (vkhaliev)
+.........T [ZBX-21136] fixed value type for checksum of /etc/passwd item in FreeBSD template (vkhaliev)
+.........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+........S. [ZBX-21111] fixed HA manager stopping (kprutkovs)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.5
+
+6.0.5rc1 was released as 6.0.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.5rc1
 
 New features:
@@ -100,7 +127,7 @@ New features:
 A.F....... [ZBXNEXT-7478] fixed optional parameters before required issue (acikuns, ashubin)
 
 Bug fixes:
-A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
+..F....... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
 A.F.....S. [ZBX-20650] fixed performance issue with importing templates and hosts (Sasha)
 .......... [ZBX-20747] fixed service algorithm update in 6.0 database upgrade patch (wiper)
 A.F....... [ZBX-19118] made Host interface field non-required for HTTP agent items (jfreibergs)
@@ -1900,6 +1927,25 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.25rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-21143] changed API URL in Express.ms media type to a new version (drasihov)
+.........T [ZBX-20875] fixed filter condition for job discovery rule in MSSQL by ODBC template (drasihov)
+.......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
+.........T [ZBX-20985] fixed notifications summary for MS Teams media type (drasihov)
+.........T [ZBX-20628] removed system metrics from PFSense template (vkhaliev)
+.........T [ZBX-20903] removed duplicate in Windows services discovery filter regexp (drasihov)
+..F....... [ZBX-18652] fixed data overview discrepancy between host location top and left (agriscenko)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.24
+
+5.0.24rc1 was released as 5.0.24 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.24rc1
 
 New features:
@@ -1957,7 +2003,7 @@ A.F....... [ZBXNEXT-7485] fixed debug_backtrace function usage for PHP8 (acikuns
 .........T [ZBXNEXT-7493] added garbage collector and memory pool discovery to generic Java template (vkhaliev)
 
 Bug fixes:
-A......... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
+..F....... [ZBX-20681] fixed undefined index error when accessing module page with guest user (rlataria)
 .......PS. [ZBX-20518] fixed lastaccess update during proxy throttling (dgoloscapov)
 ...G...... [ZBX-20634] fixed handling of multiline FTP response (ssimonenko)
 ...G...... [ZBX-20528] fixed issue with pgsql.custom.query JSON response failing for Zabbix agent 2 (esneiders)
@@ -4393,6 +4439,19 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.42rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.41
+
+4.0.41rc1 was released as 4.0.41 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.41rc1

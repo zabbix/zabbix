@@ -13044,6 +13044,10 @@ msgstr "Număr de itemuri in baza de date Zabbix."
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Număr de itemuri în istoricul proxy care nu au fost încă trimise către server"
 
+#: include/classes/data/CItemData.php:1668
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Număr de itemi in coadă care sunt întârziați de la pâna la secunde, inclusiv."
