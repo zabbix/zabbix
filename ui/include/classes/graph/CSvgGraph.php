@@ -60,11 +60,23 @@ class CSvgGraph extends CSvg {
 	private $stacked_points = [];
 
 	/**
+	 * Bar graph points data. Calculated from metrics data.
+	 *
+	 * @var array
+	 */
+	private array $bar_data = [];
+
+	/**
 	 * Array of metric paths. Key is metric index from $metrics array.
 	 *
 	 * @var array
 	 */
 	private $paths = [];
+
+	/**
+	 * @var array
+	 */
+	private array $bar_paths = [];
 
 	/**
 	 * Array of stacked metric paths. Key is metric index from $metrics array.
@@ -278,10 +290,12 @@ class CSvgGraph extends CSvg {
 		$this->recalculatePoints();
 
 		$this->calculateStackedPoints();
+		$this->prepareBarData();
 		$this->calculateDimensions();
 
 		if ($this->canvas_width > 0 && $this->canvas_height > 0) {
 			$this->calculatePaths();
+			$this->calculateBarPaths();
 			$this->calculateStackedPaths();
 
 			$this->drawWorkingTime();
@@ -371,7 +385,9 @@ class CSvgGraph extends CSvg {
 		$surface = [];
 
 		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['stacked'] != SVG_GRAPH_STACKED_ON || !array_key_exists($index, $this->points)) {
+			if ($metric['options']['type'] != SVG_GRAPH_TYPE_LINE
+					|| $metric['options']['stacked'] != SVG_GRAPH_STACKED_ON
+					|| !array_key_exists($index, $this->points)) {
 				continue;
 			}
 
@@ -382,19 +398,32 @@ class CSvgGraph extends CSvg {
 				];
 			}
 
+			switch ($metric['options']['approximation']) {
+				case APPROXIMATION_MIN:
+					$approximation = 'min';
+					break;
+				case APPROXIMATION_MAX:
+					$approximation = 'max';
+					break;
+				default:
+					$approximation = 'avg';
+			}
+
 			foreach ($this->points[$index] as $points) {
 				$side_fragments = ['top' => [], 'bottom' => []];
 
 				$side_fragment_points = [];
-				$is_top = reset($points)['avg'] >= 0;
+				$is_top = reset($points)[$approximation] >= 0;
 				$line_break = false;
 				$prev_point = null;
 
 				foreach ($points as $clock => $point) {
-					if ($is_top != $point['avg'] >= 0 && $point['avg'] != 0) {
+					$point_value = $point[$approximation];
+
+					if ($is_top != $point_value >= 0 && $point_value != 0) {
 						$break_point = [
 							$prev_point[0]
-								+ ($clock - $prev_point[0]) * $prev_point[1] / ($prev_point[1] - $point['avg']),
+								+ ($clock - $prev_point[0]) * $prev_point[1] / ($prev_point[1] - $point_value),
 							0, false
 						];
 
@@ -414,7 +443,7 @@ class CSvgGraph extends CSvg {
 						$is_top = !$is_top;
 					}
 
-					$prev_point = [$clock, $point['avg'], true];
+					$prev_point = [$clock, $point_value, true];
 					$side_fragment_points[] = $prev_point;
 				}
 
@@ -519,7 +548,8 @@ class CSvgGraph extends CSvg {
 	private function calculateDimensions(): void {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
-				if (!array_key_exists($index, $this->stacked_points)) {
+				if ($metric['options']['type'] != SVG_GRAPH_TYPE_LINE
+						|| !array_key_exists($index, $this->stacked_points)) {
 					continue;
 				}
 
@@ -591,6 +621,41 @@ class CSvgGraph extends CSvg {
 				}
 				if ($this->max_value_right === null || $this->max_value_right < $max_value) {
 					$this->max_value_right = $max_value;
+				}
+			}
+		}
+
+		foreach ($this->bar_data as $side => $side_bar_data) {
+			foreach ($side_bar_data as $bar_group) {
+				foreach ($bar_group as $bar_stack) {
+					$bar_stack_min = 0;
+					$bar_stack_max = 0;
+
+					foreach ($bar_stack as $bar) {
+						if ($bar[1] >= 0) {
+							$bar_stack_max += $bar[1];
+						}
+						else {
+							$bar_stack_min += $bar[1];
+						}
+					}
+
+					if ($side == GRAPH_YAXIS_SIDE_LEFT) {
+						if ($this->min_value_left === null || $this->min_value_left > $bar_stack_min) {
+							$this->min_value_left = $bar_stack_min;
+						}
+						if ($this->max_value_left === null || $this->max_value_left < $bar_stack_max) {
+							$this->max_value_left = $bar_stack_max;
+						}
+					}
+					else {
+						if ($this->min_value_right === null || $this->min_value_right > $bar_stack_min) {
+							$this->min_value_right = $bar_stack_min;
+						}
+						if ($this->max_value_right === null || $this->max_value_right < $bar_stack_max) {
+							$this->max_value_right = $bar_stack_max;
+						}
+					}
 				}
 			}
 		}
@@ -743,7 +808,10 @@ class CSvgGraph extends CSvg {
 		$y_min = -$y_max;
 
 		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON || !array_key_exists($index, $this->points)) {
+			if (!in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE,
+				SVG_GRAPH_TYPE_POINTS])
+					|| $metric['options']['stacked'] == SVG_GRAPH_STACKED_ON
+					|| !array_key_exists($index, $this->points)) {
 				continue;
 			}
 
@@ -818,8 +886,7 @@ class CSvgGraph extends CSvg {
 		$y_min = -$y_max;
 
 		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['stacked'] != SVG_GRAPH_STACKED_ON
-					|| !array_key_exists($index, $this->stacked_points)) {
+			if (!array_key_exists($index, $this->stacked_points)) {
 				continue;
 			}
 
@@ -874,6 +941,182 @@ class CSvgGraph extends CSvg {
 				];
 			}
 		}
+	}
+
+	private function prepareBarData(): void {
+		$stacked_dataset_groups = [];
+
+		foreach ($this->metrics as $index => $metric) {
+			if ($metric['options']['type'] != SVG_GRAPH_TYPE_BAR || !array_key_exists($index, $this->points)) {
+				continue;
+			}
+
+			if (!array_key_exists($metric['options']['axisy'], $this->bar_data)) {
+				$this->bar_data[$metric['options']['axisy']] = [];
+			}
+
+			switch ($metric['options']['approximation']) {
+				case APPROXIMATION_MIN:
+					$approximation = 'min';
+					break;
+				case APPROXIMATION_MAX:
+					$approximation = 'max';
+					break;
+				default:
+					$approximation = 'avg';
+			}
+
+			foreach ($this->points[$index] as $points) {
+				foreach ($points as $clock => $point) {
+					$clock += $metric['options']['timeshift'];
+
+					if (!array_key_exists($clock, $this->bar_data[$metric['options']['axisy']])) {
+						$this->bar_data[$metric['options']['axisy']][$clock] = [];
+					}
+
+					if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
+						if (!array_key_exists($clock, $stacked_dataset_groups)) {
+							$stacked_dataset_groups[$clock] = [];
+						}
+
+						$group_index = array_key_exists($metric['data_set'], $stacked_dataset_groups[$clock])
+							? $stacked_dataset_groups[$clock][$metric['data_set']]
+							: count($this->bar_data[$metric['options']['axisy']][$clock]);
+
+						$stacked_dataset_groups[$clock][$metric['data_set']] = $group_index;
+					}
+					else {
+						$group_index = count($this->bar_data[$metric['options']['axisy']][$clock]);
+					}
+
+					$this->bar_data[$metric['options']['axisy']][$clock][$group_index][] = [
+						$index,
+						$point[$approximation]
+					];
+				}
+			}
+		}
+
+		foreach ($this->bar_data as &$side_bar_data) {
+			ksort($side_bar_data, SORT_NUMERIC);
+		}
+		unset($side_bar_data);
+	}
+
+	private function calculateBarPaths(): void {
+		// Metric having very big values of y outside visible area will fail to render.
+		$y_max = 2 ** 16;
+		$y_min = -$y_max;
+
+		$time_range = ($this->time_till - $this->time_from) ?: 1;
+		$time_per_px = $time_range / $this->canvas_width;
+
+		foreach ($this->bar_data as $side => $side_bar_data) {
+			$min_value = $side == GRAPH_YAXIS_SIDE_RIGHT ? $this->right_y_min : $this->left_y_min;
+			$max_value = $side == GRAPH_YAXIS_SIDE_RIGHT ? $this->right_y_max : $this->left_y_max;
+
+			$clock_min_diff = max(1, round(($this->time_till - $this->time_from) * .25));
+
+			$clock_min_last = [];
+
+			foreach ($side_bar_data as $clock => $bar_group) {
+				foreach ($bar_group as $bar_stack) {
+					foreach ($bar_stack as [$metric_index, $point_value]) {
+						if (array_key_exists($metric_index, $clock_min_last)) {
+							$clock_min_diff = min($clock_min_diff, $clock - $clock_min_last[$metric_index]);
+						}
+
+						$clock_min_last[$metric_index] = $clock;
+					}
+				}
+			}
+
+			$group_width = $clock_min_diff / $time_range * $this->canvas_width;
+
+			if ($group_width > 10) {
+				$group_width *= .75;
+			}
+
+			$bar_groups = [];
+
+			$last_clock = null;
+			$last_clock_index = null;
+
+			foreach ($side_bar_data as $clock => $bar_group) {
+				if ($last_clock !== null && $clock - $last_clock < $time_per_px) {
+					$bar_groups[$last_clock_index] = array_merge($bar_groups[$last_clock_index], $bar_group);
+				}
+				else {
+					$bar_groups[$clock] = $bar_group;
+					$last_clock_index = $clock;
+				}
+
+				$last_clock = $clock;
+			}
+
+			foreach ($bar_groups as $clock_px => $bar_group) {
+				$metric_width = max(1, $group_width / count($bar_group));
+
+				$group_x1 = ($clock_px - $this->time_from) / $time_range * $this->canvas_width - $group_width / 2;
+				$bar_stack_x1 = $group_x1;
+
+				foreach ($bar_group as $bar_group_index => $bar_stack) {
+					$sum_positive = 0;
+					$sum_negative = 0;
+
+					$bar_stack_x2 = $group_x1 + ($bar_group_index + 1) * $metric_width;
+
+					foreach ($bar_stack as [$metric_index, $point_value]) {
+						if ($point_value >= 0) {
+							$value_from = $sum_positive;
+							$value_to = $sum_positive + $point_value;
+							$sum_positive += $point_value;
+						}
+						else {
+							$value_from = $point_value + $point_value;
+							$value_to = $point_value;
+							$sum_negative += $point_value;
+						}
+
+						if ($max_value - $min_value == INF) {
+							$bar_y1 = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+								$max_value / 10 - $value_from / 10, 1 / ($max_value / 10 - $min_value / 10)
+							]);
+							$bar_y2 = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+								$max_value / 10 - $value_to / 10, 1 / ($max_value / 10 - $min_value / 10)
+							]);
+						}
+						else {
+							$bar_y1 = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+								$max_value - $value_from, 1 / ($max_value - $min_value)
+							]);
+							$bar_y2 = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+								$max_value - $value_to, 1 / ($max_value - $min_value)
+							]);
+						}
+
+						$bar_y1 = min($y_max, max($y_min, $bar_y1));
+						$bar_y2 = min($y_max, max($y_min, $bar_y2));
+
+						$this->bar_paths[$metric_index][] = [
+							(int) round($this->canvas_x + $bar_stack_x1),
+							(int) round($this->canvas_x + $bar_stack_x2),
+							(int) $bar_y1,
+							(int) $bar_y2,
+							convertUnits([
+								'value' => $point_value,
+								'units' => $this->metrics[$metric_index]['units']
+							]),
+							(int) round($this->canvas_x + $group_x1)
+						];
+					}
+
+					$bar_stack_x1 = $bar_stack_x2;
+				}
+			}
+		}
+
+		ksort($this->bar_paths, SORT_NUMERIC);
 	}
 
 	private function drawWorkingTime(): void {
@@ -1100,97 +1343,8 @@ class CSvgGraph extends CSvg {
 	}
 
 	private function drawMetricsBar(): void {
-		$bar_min_width = [
-			GRAPH_YAXIS_SIDE_LEFT => $this->canvas_width * .25,
-			GRAPH_YAXIS_SIDE_RIGHT => $this->canvas_width * .25
-		];
-		$bar_groups_indexes = [];
-		$bar_groups_position = [];
-
-		foreach ($this->paths as $index => $path) {
-			if ($this->metrics[$index]['options']['type'] == SVG_GRAPH_TYPE_BAR) {
-				switch ($this->metrics[$index]['options']['approximation']) {
-					case APPROXIMATION_MIN:
-						$approximation = 'min';
-						break;
-					case APPROXIMATION_MAX:
-						$approximation = 'max';
-						break;
-					default:
-						$approximation = 'avg';
-				}
-
-				// If one second in displayed over multiple pixels, this shows number of px in second.
-				$sec_per_px = ceil(($this->time_till - $this->time_from) / $this->canvas_width);
-				$px_per_sec = ceil($this->canvas_width / ($this->time_till - $this->time_from));
-
-				$y_axis_side = $this->metrics[$index]['options']['axisy'];
-				$time_points = array_keys(reset($this->points[$index]));
-				$last_point = 0;
-				$path = reset($path);
-
-				foreach ($path as $point_index => $point) {
-					$time_point = ($sec_per_px > $px_per_sec)
-						? floor($time_points[$point_index] / $sec_per_px) * $sec_per_px
-						: $time_points[$point_index];
-					$bar_groups_indexes[$y_axis_side][$time_point][$index] = $point_index;
-					$bar_groups_position[$y_axis_side][$time_point][$point_index] = $point[$approximation][0];
-
-					if ($last_point > 0) {
-						$bar_min_width[$y_axis_side] = min($point[$approximation][0] - $last_point, $bar_min_width[$y_axis_side]);
-					}
-					$last_point = $point[$approximation][0];
-				}
-			}
-		}
-
-		foreach ($bar_groups_indexes as $y_axis => $points) {
-			foreach ($points as $time_point => $paths) {
-				$group_count = count($paths);
-				$group_width = $bar_min_width[$y_axis];
-				$bar_width = ceil($group_width / $group_count * .75);
-				$group_index = 0;
-				foreach ($paths as $path_index => $point_index) {
-					switch ($this->metrics[$path_index]['options']['approximation']) {
-						case APPROXIMATION_MIN:
-							$point = $this->paths[$path_index][0][$point_index]['min'];
-							break;
-						case APPROXIMATION_MAX:
-							$point = $this->paths[$path_index][0][$point_index]['max'];
-							break;
-						default:
-							$point = $this->paths[$path_index][0][$point_index]['avg'];
-					}
-
-					$group_x = $bar_groups_position[$y_axis][$time_point][$point_index];
-
-					if ($group_count > 1) {
-						$point[0] = $group_x
-							// Calculate the leftmost X-coordinate including gap size.
-							- $group_width * .375
-							// Calculate the X-offset for each bar in the group.
-							+ ceil($bar_width * ($group_index + .5));
-						$group_index++;
-					}
-
-					$point[3] = max(1, $bar_width);
-					// X position for bars group.
-					$point[4] = $group_x - $group_width * .375;
-
-					$this->paths[$path_index][0][$point_index] = $point;
-				}
-			}
-		}
-
-		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['type'] == SVG_GRAPH_TYPE_BAR && array_key_exists($index, $this->paths)) {
-				$metric['options']['y_zero'] = ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT)
-					? $this->right_y_zero
-					: $this->left_y_zero;
-				$metric['options']['bar_width'] = $bar_min_width[$metric['options']['axisy']];
-
-				$this->addItem(new CSvgGraphMetricsBar(reset($this->paths[$index]), $metric));
-			}
+		foreach ($this->bar_paths as $metric_index => $path) {
+			$this->addItem(new CSvgGraphMetricsBar($path, $this->metrics[$metric_index]));
 		}
 	}
 
