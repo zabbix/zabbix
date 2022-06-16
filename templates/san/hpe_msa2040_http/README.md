@@ -36,10 +36,10 @@ No specific Zabbix configuration is required.
 |{$HPE.MSA.API.USERNAME} |<p>Specify user name for API.</p> |`zabbix` |
 |{$HPE.MSA.CONTROLLER.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
 |{$HPE.MSA.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`30s` |
-|{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT} |<p>The critical threshold of the disk group space utilization in percent.</p> |`90` |
-|{$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN} |<p>The warning threshold of the disk group space utilization in percent.</p> |`80` |
-|{$HPE.MSA.POOL.PUSED.MAX.CRIT} |<p>The critical threshold of the pool space utilization in percent.</p> |`90` |
-|{$HPE.MSA.POOL.PUSED.MAX.WARN} |<p>The warning threshold of the pool space utilization in percent.</p> |`80` |
+|{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT} |<p>The critical threshold of the disk group space utilization in %.</p> |`90` |
+|{$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN} |<p>The warning threshold of the disk group space utilization in %.</p> |`80` |
+|{$HPE.MSA.POOL.PUSED.MAX.CRIT} |<p>The critical threshold of the pool space utilization in %.</p> |`90` |
+|{$HPE.MSA.POOL.PUSED.MAX.WARN} |<p>The warning threshold of the pool space utilization in %.</p> |`80` |
 
 ## Template links
 
