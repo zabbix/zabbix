@@ -747,8 +747,9 @@ static int	vmware_tags_get(zbx_vmware_entity_tags_t *entity_tags, zbx_vector_vmw
 				FAIL == (j = vmware_vectors_update(tag_ids.values[i], easyhandle, tags, categories,
 				&entity_tags->error)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() skip tag_id:%s", __func__, tag_ids.values[i]);
-			continue;
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() skip tag_id:%s error:%s", __func__, tag_ids.values[i],
+					entity_tags->error);
+			break;
 		}
 
 		tag = (zbx_vmware_tag_t *) zbx_malloc(NULL, sizeof(zbx_vmware_tag_t));

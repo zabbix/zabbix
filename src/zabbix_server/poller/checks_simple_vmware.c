@@ -3222,6 +3222,12 @@ int	check_vcenter_datastore_tags_get(AGENT_REQUEST *request, const char *usernam
 		goto unlock;
 	}
 
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
+		goto unlock;
+	}
+
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	vmware_tags_uuid_json(&service->data_tags, ds->uuid, &json_data, &error);
 	zbx_json_close(&json_data);
@@ -4361,6 +4367,12 @@ int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, cons
 	if (NULL == (vm = service_vm_get(service, uuid)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	if (NULL != service->data_tags.error)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, service->data_tags.error));
 		goto unlock;
 	}
 
