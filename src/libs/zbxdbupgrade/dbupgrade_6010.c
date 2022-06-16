@@ -451,6 +451,7 @@ static int	DBpatch_6010025(void)
 						"Response code for step \"%s\" of scenario \"%s\".", row[2], row[3]);
 				break;
 		}
+
 		esc = DBdyn_escape_field("items", "name", out);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set name='%s' where itemid="
 				ZBX_FS_UI64 ";\n", esc, itemid);
@@ -473,6 +474,12 @@ static int	DBpatch_6010025(void)
 
 	return ret;
 }
+
+#undef HTTPSTEP_ITEM_TYPE_RSPCODE
+#undef HTTPSTEP_ITEM_TYPE_TIME
+#undef HTTPSTEP_ITEM_TYPE_IN
+#undef HTTPSTEP_ITEM_TYPE_LASTSTEP
+#undef HTTPSTEP_ITEM_TYPE_LASTERROR
 
 static int	DBpatch_6010026(void)
 {
@@ -1283,6 +1290,7 @@ static int	DBpatch_6010097(void)
 {
 	return DBdrop_field("hosts", "lastaccess");
 }
+
 #endif
 
 DBPATCH_START(6010)
