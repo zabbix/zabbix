@@ -107,7 +107,7 @@ else {
 		}
 
 		if (!$data['readonly']) {
-			// Buttons
+			// buttons
 			$action_buttons = [];
 			if ($macro['inherited_type'] & ZBX_PROPERTY_OWN) {
 				if ($macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING) {
