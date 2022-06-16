@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
    <version>5.0</version>
-   <date>2022-03-03T14:22:07Z</date>
+   <date>2022-06-14T13:19:24Z</date>
    <groups>
       <group>
          <name>Templates/Applications</name>
@@ -56,7 +56,7 @@ Template tooling version used: 0.39</description>
                      <dependencies>
                         <dependency>
                            <name>IIS: The World Wide Web Publishing Service (W3SVC) is not running</name>
-                           <expression>{Template App IIS by Zabbix agent active:service_state[W3SVC].last()}&lt;&gt;0</expression>
+                           <expression>{Template App IIS by Zabbix agent active:service.info[W3SVC].last()}&lt;&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -522,7 +522,7 @@ Template tooling version used: 0.39</description>
                      <expression>{last()}&lt;10m</expression>
                      <name>IIS: has been restarted (uptime &lt; 10m)</name>
                      <priority>INFO</priority>
-                     <description>Uptime is less than 10 minutes</description>
+                     <description>Uptime is less than 10 minutes.</description>
                      <manual_close>YES</manual_close>
                   </trigger>
                </triggers>
@@ -682,7 +682,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>IIS: World Wide Web Publishing Service (W3SVC) state</name>
                <type>ZABBIX_ACTIVE</type>
-               <key>service_state[W3SVC]</key>
+               <key>service.info[W3SVC]</key>
                <history>7d</history>
                <description>The World Wide Web Publishing Service (W3SVC) provides web connectivity and administration of websites through the IIS snap-in. If the World Wide Web Publishing Service stops, the operating system cannot serve any form of web request. This service was dependent on "Windows Process Activation Service".</description>
                <applications>
@@ -704,11 +704,11 @@ Template tooling version used: 0.39</description>
                      <expression>{last()}&lt;&gt;0</expression>
                      <name>IIS: The World Wide Web Publishing Service (W3SVC) is not running</name>
                      <priority>HIGH</priority>
-                     <description>The World Wide Web Publishing Service (W3SVC) is not in running state. IIS cannot start.</description>
+                     <description>The World Wide Web Publishing Service (W3SVC) is not in the running state. IIS cannot start.</description>
                      <dependencies>
                         <dependency>
-                           <name>IIS: Windows process Activation Service (WAS) is not the running</name>
-                           <expression>{Template App IIS by Zabbix agent active:service_state[WAS].last()}&lt;&gt;0</expression>
+                           <name>IIS: Windows process Activation Service (WAS) is not running</name>
+                           <expression>{Template App IIS by Zabbix agent active:service.info[WAS].last()}&lt;&gt;0</expression>
                         </dependency>
                      </dependencies>
                   </trigger>
@@ -717,7 +717,7 @@ Template tooling version used: 0.39</description>
             <item>
                <name>IIS: Windows Process Activation Service (WAS) state</name>
                <type>ZABBIX_ACTIVE</type>
-               <key>service_state[WAS]</key>
+               <key>service.info[WAS]</key>
                <history>7d</history>
                <description>Windows Process Activation Service (WAS) is a tool for managing worker processes that contain applications that host Windows Communication Foundation (WCF) services. Worker processes handle requests that are sent to a Web Server for specific application pools. Each application pool sets boundaries for the applications it contains.</description>
                <applications>
@@ -737,7 +737,7 @@ Template tooling version used: 0.39</description>
                <triggers>
                   <trigger>
                      <expression>{last()}&lt;&gt;0</expression>
-                     <name>IIS: Windows process Activation Service (WAS) is not the running</name>
+                     <name>IIS: Windows process Activation Service (WAS) is not running</name>
                      <priority>HIGH</priority>
                      <description>Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.</description>
                   </trigger>
@@ -813,7 +813,7 @@ Template tooling version used: 0.39</description>
                            <expression>{last()}&lt;10m</expression>
                            <name>IIS: {#APPPOOL} has been restarted (uptime &lt; 10m)</name>
                            <priority>INFO</priority>
-                           <description>Uptime is less than 10 minutes</description>
+                           <description>Uptime is less than 10 minutes.</description>
                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                      </trigger_prototypes>
