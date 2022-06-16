@@ -4738,7 +4738,6 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATACENTER}", datacenter->name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#DATACENTERID}", datacenter->id, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(&json_data);
 		zbx_json_addarray(&json_data, "tags");
 		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_DC, datacenter->id, &json_data, NULL);
 		zbx_json_close(&json_data);
