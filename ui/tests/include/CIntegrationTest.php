@@ -170,7 +170,7 @@ class CIntegrationTest extends CAPITest {
 	 * Clear changelog table
 	 */
 	protected static function clearChangelog() {
-		DBexecute('TRUNCATE changelog');
+		DBexecute('TRUNCATE TABLE changelog');
 	}
 
 	/**
