@@ -962,7 +962,8 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s was detected. TimescaleDB compression is supported.",
 			ZBX_TIMESCALE_LICENSE_COMMUNITY_FRIENDLY);
-	db_version_info->ext_err_code = ZBX_EXT_SUCCEED;
+	if (ZBX_EXT_ERR_UNDEFINED == db_version_info->ext_err_code)
+		db_version_info->ext_err_code = ZBX_EXT_SUCCEED;
 	zbx_tsdb_set_compression_availability(ON);
 out:
 	return ret;
