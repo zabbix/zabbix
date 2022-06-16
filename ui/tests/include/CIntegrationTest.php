@@ -167,13 +167,6 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
-	 * Clear changelog table
-	 */
-	protected static function clearChangelog() {
-		DBexecute('TRUNCATE TABLE changelog');
-	}
-
-	/**
 	 * @inheritdoc
 	 */
 	protected function onBeforeTestSuite() {
@@ -238,8 +231,6 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_MONITORED);
-
-		self::clearChangelog();
 
 		foreach ($this->case_components as $component) {
 			if (in_array($component, self::$suite_components)) {
