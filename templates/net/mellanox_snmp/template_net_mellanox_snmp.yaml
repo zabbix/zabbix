@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-10T20:41:37Z'
-  groups:
+  date: '2022-06-07T19:37:29Z'
+  template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1677,8 +1677,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Mellanox SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: e41382f2a3394e52b885bb6a70df35ff
           name: 'System performance'
@@ -1698,8 +1698,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU utilization'
                         host: 'Mellanox SNMP'
+                        name: 'CPU utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '5'
@@ -1722,8 +1722,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#MEMNAME}: Memory utilization'
                         host: 'Mellanox SNMP'
+                        name: '{#MEMNAME}: Memory utilization'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -1746,8 +1746,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
                         host: 'Mellanox SNMP'
+                        name: '{#FSNAME}: Disk space usage'
       valuemaps:
         -
           uuid: d42214398aea4362b4fc61a090f188e1

@@ -142,7 +142,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime])<10m` |INFO |<p>Manual close: YES</p> |
+|Ignite [{#JMXIGNITEINSTANCENAME}]: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime])<10m` |INFO |<p>Manual close: YES</p> |
 |Ignite [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data |<p>Zabbix has not received data for items for the last 10 minutes.</p> |`nodata(/Ignite by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1` |WARNING |<p>Manual close: YES</p> |
 |Ignite [{#JMXIGNITEINSTANCENAME}]: Version has changed |<p>Ignite [{#JMXIGNITEINSTANCENAME}] version has changed. Ack to close.</p> |`last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/Ignite by JMX/jmx["{#JMXOBJ}",FullVersion]))>0` |INFO |<p>Manual close: YES</p> |
 |Ignite [{#JMXIGNITEINSTANCENAME}]: Server node left the topology |<p>One or more server node left the topology. Ack to close.</p> |`change(/Ignite by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0` |WARNING |<p>Manual close: YES</p> |

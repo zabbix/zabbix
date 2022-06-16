@@ -211,6 +211,85 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/color": invalid byte sequence in UTF-8.'
 			],
 			[
+				['type' => API_COLOR],
+				'COLOR',
+				'/1/color',
+				'Invalid parameter "/1/color": a hexadecimal color code (6 symbols) is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				['ffffff'],
+				'/1/colors',
+				['ffffff']
+			],
+			[
+				['type' => API_COLORS],
+				['037ACF'],
+				'/1/colors',
+				['037ACF']
+			],
+			[
+				['type' => API_COLORS],
+				['000000'],
+				'/1/colors',
+				['000000']
+			],
+			[
+				['type' => API_COLORS],
+				[],
+				'/1/colors',
+				[]
+			],
+			[
+				['type' => API_COLORS],
+				['ffffff', '037ACF', '000000'],
+				'/1/colors',
+				['ffffff', '037ACF', '000000']
+			],
+			[
+				['type' => API_COLORS, 'flags' => API_NOT_EMPTY],
+				[],
+				'/1/colors',
+				'Invalid parameter "/1/colors": cannot be empty.'
+			],
+			[
+				['type' => API_COLORS],
+				'',
+				'/1/colors',
+				'Invalid parameter "/1/colors": an array is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				true,
+				'/1/colors',
+				'Invalid parameter "/1/colors": an array is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				null,
+				'/1/colors',
+				'Invalid parameter "/1/colors": an array is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				// broken UTF-8 byte sequence
+				["\xd1".'12345'],
+				'/1/colors',
+				'Invalid parameter "/1/colors/1": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_COLORS],
+				['COLOR'],
+				'/1/colors',
+				'Invalid parameter "/1/colors/1": a hexadecimal color code (6 symbols) is expected.'
+			],
+			[
+				['type' => API_COLORS],
+				['000000', 'WRONG'],
+				'/1/colors',
+				'Invalid parameter "/1/colors/2": a hexadecimal color code (6 symbols) is expected.'
+			],
+			[
 				['type' => API_COND_FORMULA],
 				'A and B',
 				'/1/formula',

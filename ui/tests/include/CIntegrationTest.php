@@ -341,7 +341,7 @@ class CIntegrationTest extends CAPITest {
 					case self::COMPONENT_SERVER:
 					case self::COMPONENT_PROXY:
 						$line = empty($waitLogLineOverride) ? 'started [trapper #1]' : $waitLogLineOverride;
-						self::waitForLogLineToBePresent($component, $line, false, 5, 1);
+						self::waitForLogLineToBePresent($component, $line, false, 10, 1);
 						break;
 					case self::COMPONENT_AGENT:
 						self::waitForLogLineToBePresent($component, 'started [listener #1]', false, 5, 1);
@@ -361,6 +361,25 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Checks absence of pid file after kill.
+	 *
+	 * @param string $component    component name
+	 *
+	 */
+	private static function checkPidKilled($component) {
+
+		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+			if (!file_exists(self::getPidPath($component))) {
+				return true;
+			}
+
+			sleep(self::WAIT_ITERATION_DELAY);
+		}
+
+		return false;
+	}
+
+	/**
 	 * Wait for component to stop.
 	 *
 	 * @param string $component    component name
@@ -370,12 +389,44 @@ class CIntegrationTest extends CAPITest {
 	protected static function waitForShutdown($component) {
 		self::validateComponent($component);
 
-		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
-			if (!file_exists(self::getPidPath($component))) {
+		if (self::checkPidKilled($component)) {
+			return;
+		}
+
+		$pid = @file_get_contents(self::getPidPath($component));
+
+		$pids = explode("\n", shell_exec('pgrep -P '.$pid));
+		$pids_count = count($pids);
+		$iterations = 0;
+
+		do {
+			for ($i = count($pids) -1; $i >= 0; $i--) {
+				$child_pid = $pids[$i];
+
+				if  (is_numeric($child_pid) && posix_kill($child_pid, 0)) {
+					posix_kill($child_pid, SIGKILL);
+					sleep(10 * self::WAIT_ITERATION_DELAY);
+
+					if (!posix_kill($child_pid, 0)) {
+						break;
+					}
+				}
+			}
+
+			if (self::checkPidKilled($component)) {
 				return;
 			}
 
-			sleep(self::WAIT_ITERATION_DELAY);
+			$pids = explode("\n", shell_exec('pgrep -P '.$pid));
+			$iterations++;
+		} while (count($pids) > 0 && $iterations < $pids_count );
+
+		if  (is_numeric($pid) && posix_kill($pid, 0)) {
+			posix_kill($pid, SIGKILL);
+
+			if (self::checkPidKilled($component)) {
+				return;
+			}
 		}
 
 		throw new Exception('Failed to wait for component "'.$component.'" to stop.');

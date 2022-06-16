@@ -114,7 +114,7 @@ There are no template links in this template.
 |ZYXEL MGS3520-28x: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} |<p>The parameter values are less than the lower threshold</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}` |WARNING | |
 |ZYXEL MGS3520-28x: Voltage {#ZYXEL.DESCRIPTION} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
 |ZYXEL MGS3520-28x: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL MGS3520-28x SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL MGS3520-28x: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|ZYXEL MGS3520-28x: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |ZYXEL MGS3520-28x: Temperature {#ZYXEL.TEMPDESCRIPTION} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL MGS3520-28x SNMP/zyxel.3520_28.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
 
 ## Feedback

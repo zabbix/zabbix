@@ -75,6 +75,9 @@ class CApiInputValidator {
 			case API_COLOR:
 				return self::validateColor($rule, $data, $path, $error);
 
+			case API_COLORS:
+				return self::validateColors($rule, $data, $path, $error);
+
 			case API_COND_FORMULA:
 				return self::validateCondFormula($rule, $data, $path, $error);
 
@@ -273,6 +276,7 @@ class CApiInputValidator {
 		switch ($rule['type']) {
 			case API_CALC_FORMULA:
 			case API_COLOR:
+			case API_COLORS:
 			case API_COND_FORMULA:
 			case API_COND_FORMULAID:
 			case API_STRING_UTF8:
@@ -481,6 +485,58 @@ class CApiInputValidator {
 			);
 			return false;
 		}
+
+		return true;
+	}
+
+
+	/**
+	 * Array of colors validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateColors($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (($flags & API_NORMALIZE) && self::validateStringUtf8([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && !$data) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = ['type' => API_COLOR];
+
+		if (array_key_exists('in', $rule)) {
+			$rules['in'] = $rule['in'];
+		}
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
 
 		return true;
 	}
@@ -2717,14 +2773,14 @@ class CApiInputValidator {
 			return true;
 		}
 
-		[$year, $month, $day] = sscanf($data, '%d-%d-%d');
+		$date = DateTime::createFromFormat(ZBX_DATE, $data);
 
-		if (!checkdate($month, $day, $year)) {
+		if (!$date || $date->format(ZBX_DATE) !== $data) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a date in YYYY-MM-DD format is expected'));
 			return false;
 		}
 
-		if (!validateDateInterval($year, $month, $day)) {
+		if (!validateDateInterval($date->format('Y'), $date->format('m'), $date->format('d'))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
 			);

@@ -108,7 +108,7 @@ There are no template links in this template.
 |Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the vmware cache |<p>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix proxy health/vmware.buffer.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}` |AVERAGE | |
 |Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history cache |<p>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix proxy health/wcache.history.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}` |AVERAGE | |
 |Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history index cache |<p>Consider increasing HistoryIndexCacheSize in the zabbix_server.conf configuration file.</p> |`max(/Remote Zabbix proxy health/wcache.index.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}` |AVERAGE | |
-|Remote Zabbix proxy: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/Remote Zabbix proxy health/uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Remote Zabbix proxy: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Remote Zabbix proxy health/uptime)<10m` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 

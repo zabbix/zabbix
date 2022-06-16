@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'6.2.0rc1');
 define('ZABBIX_API_VERSION',	'6.2.0');
 define('ZABBIX_EXPORT_VERSION',	'6.2');
 
-define('ZABBIX_DB_VERSION',		6010040);
+define('ZABBIX_DB_VERSION',		6010097);
 
 define('DB_VERSION_SUPPORTED',				0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',		1);
@@ -1018,12 +1018,17 @@ define('ZBX_ACKNOWLEDGE_PROBLEM',	1);
 define('ZBX_PROBLEM_SUPPRESSED_FALSE',	0);
 define('ZBX_PROBLEM_SUPPRESSED_TRUE',	1);
 
+define('ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE',	0);
+define('ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE',	1);
+
 define('ZBX_PROBLEM_UPDATE_NONE',			0x00);
 define('ZBX_PROBLEM_UPDATE_CLOSE',			0x01);
 define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',	0x02);
 define('ZBX_PROBLEM_UPDATE_MESSAGE',		0x04);
 define('ZBX_PROBLEM_UPDATE_SEVERITY',		0x08);
 define('ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE',	0x10);
+define('ZBX_PROBLEM_UPDATE_SUPPRESS',	    0x20);
+define('ZBX_PROBLEM_UPDATE_UNSUPPRESS',	    0x40);
 
 define('ZBX_EVENT_HISTORY_PROBLEM_EVENT',		0);
 define('ZBX_EVENT_HISTORY_RECOVERY_EVENT',		1);
@@ -1038,8 +1043,12 @@ define('ZBX_TM_TASK_DATA',			7);
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);
 
+define('ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS', 'suppress');
+define('ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS', 'unsuppress');
+
 define('ZBX_TM_DATA_TYPE_DIAGINFO',			1);
 define('ZBX_TM_DATA_TYPE_PROXY_HOSTIDS',	2);
+define('ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION', 5);
 define('ZBX_TM_DATA_TYPE_CHECK_NOW',		6);
 
 define('EVENT_SOURCE_TRIGGERS',			0);
@@ -1086,6 +1095,11 @@ define('AGGREGATE_SUM',		5);
 define('AGGREGATE_FIRST',	6);
 define('AGGREGATE_LAST',	7);
 
+define('APPROXIMATION_MIN',	1);
+define('APPROXIMATION_AVG',	2);
+define('APPROXIMATION_MAX',	4);
+define('APPROXIMATION_ALL',	7);
+
 define('GRAPH_AGGREGATE_BY_ITEM',		0);
 define('GRAPH_AGGREGATE_BY_DATASET',	1);
 
@@ -1116,21 +1130,43 @@ define('SVG_GRAPH_TYPE_POINTS',		1);
 define('SVG_GRAPH_TYPE_STAIRCASE',	2);
 define('SVG_GRAPH_TYPE_BAR',		3);
 
-define('SVG_GRAPH_MISSING_DATA_NONE',			 0);
-define('SVG_GRAPH_MISSING_DATA_CONNECTED',		 1);
-define('SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO',	 2);
+define('SVG_GRAPH_STACKED_OFF',	0);
+define('SVG_GRAPH_STACKED_ON',	1);
+
+define('SVG_GRAPH_MISSING_DATA_NONE',			0);
+define('SVG_GRAPH_MISSING_DATA_CONNECTED',		1);
+define('SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO',	2);
+define('SVG_GRAPH_MISSING_DATA_LAST_KNOWN',		3);
 
 define('SVG_GRAPH_DATA_SOURCE_AUTO',	0);
 define('SVG_GRAPH_DATA_SOURCE_HISTORY',	1);
 define('SVG_GRAPH_DATA_SOURCE_TRENDS',	2);
 
-define('SVG_GRAPH_CUSTOM_TIME',	1);
+define('SVG_GRAPH_SIMPLE_TRIGGERS_OFF',	0);
+define('SVG_GRAPH_SIMPLE_TRIGGERS_ON',	1);
 
-define('SVG_GRAPH_LEGEND_TYPE_NONE', 0);
-define('SVG_GRAPH_LEGEND_TYPE_SHORT', 1);
+define('SVG_GRAPH_WORKING_TIME_OFF',	0);
+define('SVG_GRAPH_WORKING_TIME_ON',		1);
 
-define('SVG_GRAPH_LEGEND_LINES_MIN', 1);
-define('SVG_GRAPH_LEGEND_LINES_MAX', 5);
+define('SVG_GRAPH_PERCENTILE_LEFT_OFF',		0);
+define('SVG_GRAPH_PERCENTILE_LEFT_ON',		1);
+
+define('SVG_GRAPH_PERCENTILE_RIGHT_OFF',	0);
+define('SVG_GRAPH_PERCENTILE_RIGHT_ON',		1);
+
+define('SVG_GRAPH_CUSTOM_TIME', 1);
+
+define('SVG_GRAPH_LEGEND_OFF',	0);
+define('SVG_GRAPH_LEGEND_ON',	1);
+
+define('SVG_GRAPH_LEGEND_STATISTIC_OFF',	0);
+define('SVG_GRAPH_LEGEND_STATISTIC_ON',		1);
+
+define('SVG_GRAPH_LEGEND_LINES_MIN',	1);
+define('SVG_GRAPH_LEGEND_LINES_MAX',	10);
+
+define('SVG_GRAPH_LEGEND_COLUMNS_MIN',	1);
+define('SVG_GRAPH_LEGEND_COLUMNS_MAX',	4);
 
 define('SVG_GRAPH_PROBLEMS_SHOW', 1);
 
@@ -1138,15 +1174,15 @@ define('SVG_GRAPH_SELECTED_ITEM_PROBLEMS', 1);
 
 define('SVG_GRAPH_AXIS_SHOW', 1);
 
-define('SVG_GRAPH_AXIS_UNITS_AUTO', 0);
-define('SVG_GRAPH_AXIS_UNITS_STATIC', 1);
+define('SVG_GRAPH_AXIS_UNITS_AUTO',		0);
+define('SVG_GRAPH_AXIS_UNITS_STATIC',	1);
 
 define('SVG_GRAPH_MAX_NUMBER_OF_METRICS', 50);
 
-define('SVG_GRAPH_DEFAULT_WIDTH',         1);
-define('SVG_GRAPH_DEFAULT_POINTSIZE',     3);
-define('SVG_GRAPH_DEFAULT_TRANSPARENCY',  5);
-define('SVG_GRAPH_DEFAULT_FILL',          3);
+define('SVG_GRAPH_DEFAULT_WIDTH',			1);
+define('SVG_GRAPH_DEFAULT_POINTSIZE',		3);
+define('SVG_GRAPH_DEFAULT_TRANSPARENCY',	5);
+define('SVG_GRAPH_DEFAULT_FILL',			3);
 
 define('BR_DISTRIBUTION_MULTIPLE_PERIODS',	1);
 define('BR_DISTRIBUTION_MULTIPLE_ITEMS',	2);
@@ -1417,13 +1453,14 @@ define('API_INT32_RANGES',			53);
 define('API_LAT_LNG_ZOOM',			54);
 define('API_TIMESTAMP',				55);
 define('API_TG_NAME',				56);
-define('API_ITEM_KEY',				57);
-define('API_ITEM_DELAY',			58);
-define('API_JSON',					59);
-define('API_XML',					60);
-define('API_PREPROC_PARAMS',		61);
-define('API_PROMETHEUS_PATTERN',	62);
-define('API_PROMETHEUS_LABEL',		63);
+define('API_COLORS',				57);
+define('API_ITEM_KEY',				58);
+define('API_ITEM_DELAY',			59);
+define('API_JSON',					60);
+define('API_XML',					61);
+define('API_PREPROC_PARAMS',		62);
+define('API_PROMETHEUS_PATTERN',	63);
+define('API_PROMETHEUS_LABEL',		64);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1744,7 +1781,7 @@ define('TAB_INDICATOR_FILTERS', 'filters');
 define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
 define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
 define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
-define('TAB_INDICATOR_GRAPH_OPTIONS', 'graph-options');
+define('TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS', 'graph-display-options');
 define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
 define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
 define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
@@ -1932,6 +1969,8 @@ define('ZBX_STYLE_ACTION_ICON_SEV_CHANGED', 'icon-action-severity-changed');
 define('ZBX_STYLE_ACTION_MESSAGE', 'icon-action-message');
 define('ZBX_STYLE_ACTION_ICON_ACK', 'icon-action-ack');
 define('ZBX_STYLE_ACTION_ICON_UNACK', 'icon-action-unack');
+define('ZBX_STYLE_ACTION_ICON_SUPPRESS', 'icon-action-suppress');
+define('ZBX_STYLE_ACTION_ICON_UNSUPPRESS', 'icon-action-unsuppress');
 define('ZBX_STYLE_PROBLEM_GENERATED', 'icon-problem-generated');
 define('ZBX_STYLE_PROBLEM_RECOVERY', 'icon-problem-recovery');
 define('ZBX_STYLE_ACTIONS_NUM_GRAY', 'icon-actions-number-gray');
@@ -1963,6 +2002,7 @@ define('ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED', 'list-accordion-item-opened');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED', 'list-accordion-item-closed');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD', 'list-accordion-item-head');
 define('ZBX_STYLE_LIST_ACCORDION_ITEM_BODY', 'list-accordion-item-body');
+define('ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE', 'list-accordion-item-toggle');
 define('ZBX_STYLE_LOCAL_CLOCK', 'local-clock');
 define('ZBX_STYLE_LOG_NA_BG', 'log-na-bg');
 define('ZBX_STYLE_LOG_INFO_BG', 'log-info-bg');
@@ -2099,6 +2139,10 @@ define('ZBX_STYLE_WIDGET_ITEM_LABEL', 'widget-item-label');
 define('ZBX_STYLE_DEFAULT_OPTION', 'default-option');
 
 // HTML column layout.
+define('ZBX_STYLE_GRID_COLUMNS', 'grid-columns');
+define('ZBX_STYLE_GRID_COLUMNS_2', 'columns-2');
+define('ZBX_STYLE_GRID_COLUMNS_3', 'columns-3');
+
 define('ZBX_STYLE_COLUMNS', 'columns-wrapper');
 define('ZBX_STYLE_COLUMNS_NOWRAP', 'columns-nowrap');
 define('ZBX_STYLE_COLUMNS_2', 'columns-2');

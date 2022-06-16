@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-01T14:33:25Z'
-  groups:
+  date: '2022-06-07T19:37:57Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -1726,8 +1726,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Windows by Zabbix agent'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: 5f494fac9dc94bf3827b67ea212240f2
           name: 'System performance'
@@ -1747,8 +1747,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'CPU usage'
                         host: 'Windows by Zabbix agent'
+                        name: 'CPU usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1763,8 +1763,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: 'perf_counter_en["\System\Processor Queue Length"]'
                         host: 'Windows by Zabbix agent'
+                        key: 'perf_counter_en["\System\Processor Queue Length"]'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1779,8 +1779,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory utilization'
                         host: 'Windows by Zabbix agent'
+                        name: 'Memory utilization'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1796,8 +1796,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'Windows by Zabbix agent'
+                        name: 'Swap usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -1820,8 +1820,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSLABEL}({#FSNAME}): Disk space usage'
                         host: 'Windows by Zabbix agent'
+                        name: '{#FSLABEL}({#FSNAME}): Disk space usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -1844,8 +1844,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk read/write rates'
                         host: 'Windows by Zabbix agent'
+                        name: '{#DEVNAME}: Disk read/write rates'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '20'
@@ -1868,8 +1868,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk utilization and queue'
                         host: 'Windows by Zabbix agent'
+                        name: '{#DEVNAME}: Disk utilization and queue'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '25'
@@ -1892,8 +1892,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Windows by Zabbix agent'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 9b087b9bfa09434ea0d0b5c32577abcc

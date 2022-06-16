@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->addJsFile('class.calendar.js');
+
 (new CWidget())->show();
 
 (new CScriptTag(

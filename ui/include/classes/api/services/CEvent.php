@@ -514,30 +514,39 @@ class CEvent extends CApiService {
 	/**
 	 * Acknowledges the given events and closes them if necessary.
 	 *
-	 * @param array  $data                  And array of operation data.
-	 * @param mixed  $data['eventids']      An event ID or an array of event IDs.
-	 * @param string $data['message']       Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param string $data['severity']      New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param int    $data['action']        Flags of performed operations combined:
-	 *                                       - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
-	 *                                       - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-	 *                                       - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
-	 *                                       - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
-	 *                                       - 0x10 - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+	 * @param array  $data                  	And array of operation data.
+	 * @param mixed  $data['eventids']      	An event ID or an array of event IDs.
+	 * @param string $data['message']      		Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param string $data['severity']      	New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param string $data['suppress_until']	Suppress until time if ZBX_PROBLEM_UPDATE_SUPPRESS flag is passed.
+	 * @param int    $data['action']        	Flags of performed operations combined:
+	 *                                       	 - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
+	 *                                       	 - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+	 *                                       	 - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
+	 *                                       	 - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
+	 *                                       	 - 0x10 - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+	 *                                       	 - 0x20 - ZBX_PROBLEM_UPDATE_SUPPRESS
+	 *                                       	 - 0x40 - ZBX_PROBLEM_UPDATE_UNSUPPRESS
 	 *
 	 * @return array
 	 */
 	public function acknowledge(array $data) {
-		$this->validateAcknowledge($data);
+		$time = time();
+		$this->validateAcknowledge($data, $time);
 
 		$data['eventids'] = zbx_toArray($data['eventids']);
 		$data['eventids'] = array_keys(array_flip($data['eventids']));
 
 		$has_close_action = (($data['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE);
+		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
+		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
 
 		$events = $this->get([
 			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid'],
-			'select_acknowledges' => $has_close_action? ['action'] : null,
+			'select_acknowledges' => $has_close_action || $has_suppress_action || $has_unsuppress_action
+				? ['action']
+				: null,
+			'selectSuppressionData' => $has_unsuppress_action ? ['maintenanceid'] : null,
 			'eventids' => $data['eventids'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -549,13 +558,15 @@ class CEvent extends CApiService {
 		$unack_eventids = [];
 		$sev_change_eventids = [];
 		$acknowledges = [];
-		$time = time();
+		$suppress_eventids = [];
+		$unsuppress_eventids = [];
 
 		foreach ($events as $eventid => $event) {
 			$action = ZBX_PROBLEM_UPDATE_NONE;
 			$old_severity = 0;
 			$new_severity = 0;
 			$message = '';
+			$suppress_until = 0;
 
 			// Perform ZBX_PROBLEM_UPDATE_CLOSE action flag.
 			if ($has_close_action && !$this->isEventClosed($event)) {
@@ -582,13 +593,26 @@ class CEvent extends CApiService {
 				$message = $data['message'];
 			}
 
-			// Perform ZBX_PROBLEM_UPDATE_MESSAGE action flag.
+			// Perform ZBX_PROBLEM_UPDATE_SEVERITY action flag.
 			if (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY
 					&& $data['severity'] != $event['severity']) {
 				$action |= ZBX_PROBLEM_UPDATE_SEVERITY;
 				$old_severity = $event['severity'];
 				$new_severity = $data['severity'];
 				$sev_change_eventids[] = $eventid;
+			}
+
+			// Perform ZBX_PROBLEM_UPDATE_SUPPRESS action flag.
+			if ($has_suppress_action && !$this->isEventClosed($event)) {
+				$action |= ZBX_PROBLEM_UPDATE_SUPPRESS;
+				$suppress_until = $data['suppress_until'];
+				$suppress_eventids[] = $eventid;
+			}
+
+			// Perform ZBX_PROBLEM_UPDATE_UNSUPPRESS action flag.
+			if ($has_unsuppress_action && $this->isEventSuppressed($event) && !$this->isEventClosed($event)) {
+				$action |= ZBX_PROBLEM_UPDATE_UNSUPPRESS;
+				$unsuppress_eventids[] = $eventid;
 			}
 
 			// For some of selected events action might not be performed, as event is already with given change.
@@ -600,7 +624,8 @@ class CEvent extends CApiService {
 					'message' => $message,
 					'action' => $action,
 					'old_severity' => $old_severity,
-					'new_severity' => $new_severity
+					'new_severity' => $new_severity,
+					'suppress_until' => $suppress_until
 				];
 			}
 		}
@@ -675,6 +700,59 @@ class CEvent extends CApiService {
 				DB::insertBatch('task_close_problem', $task_close, false);
 			}
 
+			// Create tasks for suppress/unsuppress actions.
+			$tasks = [];
+			$task_suppress = [];
+
+			foreach ($acknowledgeids as $k => $id) {
+				$acknowledgement = $acknowledges[$k];
+
+				// Create tasks to suppress problems manually.
+				if (($acknowledgement['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
+					$tasks[$k] = [
+						'type' => ZBX_TM_TASK_DATA ,
+						'status' => ZBX_TM_STATUS_NEW,
+						'clock' => $time
+					];
+
+					$task_suppress[$k] = [
+						'taskid' => $id,
+						'type' => ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION,
+						'data' => json_encode([
+							'eventid' => strval($suppress_eventids[$k]),
+							'action' => ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS,
+							'userid' => $acknowledgement['userid'],
+							'suppress_until' => $suppress_until
+						])
+					];
+				}
+
+				// Create tasks to unsuppress problems manually.
+				if (($acknowledgement['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
+					$tasks[$k] = [
+						'type' => ZBX_TM_TASK_DATA ,
+						'status' => ZBX_TM_STATUS_NEW,
+						'clock' => $time
+					];
+
+					$task_suppress[$k] = [
+						'taskid' => $id,
+						'type' => ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION,
+						'data' => json_encode([
+							'eventid' => strval($unsuppress_eventids[$k]),
+							'action' => ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS,
+							'userid' => $acknowledgement['userid']
+						])
+					];
+				}
+			}
+
+			if ($tasks) {
+				$taskids = DB::insertBatch('task', $tasks);
+				$task_suppress = array_replace_recursive($task_suppress, zbx_toObject($taskids, 'taskid', true));
+				DB::insertBatch('task_data', $task_suppress, false);
+			}
+
 			// Create tasks to perform server-side acknowledgement operations.
 			$tasks = [];
 			$tasks_ack = [];
@@ -707,37 +785,39 @@ class CEvent extends CApiService {
 	/**
 	 * Validates the input parameters for the acknowledge() method.
 	 *
-	 * @param array         $data              And array of operation data.
-	 * @param string|array  $data['eventids']  An event ID or an array of event IDs.
-	 * @param string        $data['message']   Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param string        $data['severity']  New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
-	 * @param int           $data['action']    Flags of performed operations combined:
-	 *                                           - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
-	 *                                           - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
-	 *                                           - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
-	 *                                           - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
-	 *                                           - 0x10 - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+	 * @param array         $data                    And array of operation data.
+	 * @param string|array  $data['eventids']        An event ID or an array of event IDs.
+	 * @param string        $data['message']         Message if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param string        $data['severity']        New severity level if ZBX_PROBLEM_UPDATE_SEVERITY flag is passed.
+	 * @param int           $data['suppress_until']  Suppress until time if ZBX_PROBLEM_UPDATE_SUPPRESS flag is passed.
+	 * @param int           $data['action']          Flags of performed operations combined:
+	 *                                                - 0x01 - ZBX_PROBLEM_UPDATE_CLOSE
+	 *                                                - 0x02 - ZBX_PROBLEM_UPDATE_ACKNOWLEDGE
+	 *                                                - 0x04 - ZBX_PROBLEM_UPDATE_MESSAGE
+	 *                                                - 0x08 - ZBX_PROBLEM_UPDATE_SEVERITY
+	 *                                                - 0x10 - ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE
+	 *                                                - 0x20 - ZBX_PROBLEM_UPDATE_SUPPRESS
+	 *                                                - 0x40 - ZBX_PROBLEM_UPDATE_UNSUPPRESS
 	 *
-	 * @throws APIException                    If the input is invalid.
+	 * @throws APIException                          If the input is invalid.
 	 */
-	protected function validateAcknowledge(array $data) {
-		$db_fields = [
-			'eventids' => null,
-			'action' => null,
-			'message' => '',
-			'severity' => ''
-		];
+	protected function validateAcknowledge(array $data, int $time) {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'eventids' =>		['type' => API_IDS, 'flags' => API_REQUIRED | API_NORMALIZE],
+			'action' =>			['type' => API_INT32, 'flags' => API_REQUIRED],
+			'message' =>		['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL, 'default' => DB::getDefault('acknowledges', 'message'), 'length' => DB::getFieldLength('acknowledges', 'message')],
+			'severity' =>		['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => DB::getDefault('acknowledges', 'new_severity')],
+			'suppress_until' =>	['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null]
+		]];
 
-		if (!check_db_fields($db_fields, $data)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$data['eventids'] = zbx_toArray($data['eventids']);
-		$data['eventids'] = array_keys(array_flip($data['eventids']));
 
 		// Check that at least one valid flag is set.
 		$action_mask = ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE
-				| ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE;
+				| ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS
+				| ZBX_PROBLEM_UPDATE_UNSUPPRESS;
 
 		if (($data['action'] & $action_mask) != $data['action']) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
@@ -750,6 +830,8 @@ class CEvent extends CApiService {
 		$has_message_action = (($data['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE);
 		$has_severity_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY);
 		$has_unack_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE);
+		$has_suppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS);
+		$has_unsuppress_action = (($data['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS);
 
 		// Check access rules.
 		if ($has_close_action && !self::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)) {
@@ -774,6 +856,14 @@ class CEvent extends CApiService {
 					: _('no permissions to unacknowledge problems')
 			));
 		}
+		if (($has_suppress_action || $has_unsuppress_action)
+				&& !self::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				$has_suppress_action
+					? _('no permissions to suppress problems')
+					: _('no permissions to unsuppress problems')
+			));
+		}
 
 		if ($has_ack_action && $has_unack_action) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
@@ -783,8 +873,24 @@ class CEvent extends CApiService {
 			));
 		}
 
+		if ($has_suppress_action && $has_unsuppress_action) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_SUPPRESS,
+					ZBX_PROBLEM_UPDATE_UNSUPPRESS
+				]))
+			));
+		}
+
+		if ($has_close_action && ($has_suppress_action || $has_unsuppress_action)) {
+			$action = $has_suppress_action ? ZBX_PROBLEM_UPDATE_SUPPRESS : ZBX_PROBLEM_UPDATE_UNSUPPRESS;
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'action',
+				_s('value must be one of %1$s', implode(', ', [ZBX_PROBLEM_UPDATE_CLOSE, $action
+				]))
+			));
+		}
+
 		$events = $this->get([
-			'output' => [],
+			'output' => ['r_eventid'],
 			'selectRelatedObject' => $has_close_action ? ['manual_close'] : null,
 			'eventids' => $data['eventids'],
 			'source' => EVENT_SOURCE_TRIGGERS,
@@ -823,6 +929,10 @@ class CEvent extends CApiService {
 
 		if ($has_severity_action) {
 			$this->checkCanChangeSeverity($data['eventids'], $editable_events_count, $data['severity']);
+		}
+
+		if($has_suppress_action) {
+			$this->CheckIfValidTime($data, $time);
 		}
 	}
 
@@ -881,7 +991,43 @@ class CEvent extends CApiService {
 	}
 
 	/**
-	 * Checks if events are closed.
+	 * Checks if time is valid future time.
+	 *
+	 * @param array $data                    Input data.
+	 * @param array $data['suppress_until']  Suppress until unix time. O for Indefinite time.
+	 * @param int   $time                    Current unix time.
+	 */
+	protected function CheckIfValidTime(array $data, $time) {
+		if ($data['suppress_until'] <= $time && $data['suppress_until'] != 0) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'suppress_until',
+					_s('unexpected value "%1$s"', $data['suppress_until'])
+				)
+			);
+		}
+	}
+
+	/**
+	 * Checks if unsuppress action can be executed for given event.
+	 *
+	 * @param array $event                                         Event object.
+	 * @param array $event['suppression_data']                     List of problem suppression data.
+	 * @param array $event['suppression_data'][]['maintenanceid']  Problem maintenanceid.
+	 *
+	 * @return bool
+	 */
+	protected function isEventSuppressed(array $event) {
+		foreach ($event['suppression_data'] as $suppression) {
+			if($suppression['maintenanceid'] == 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if event are closed.
 	 *
 	 * @param array $event                              Event object.
 	 * @param array $event['r_eventid']                 OK event id. 0 if not resolved.
@@ -902,6 +1048,8 @@ class CEvent extends CApiService {
 				}
 			}
 		}
+
+		return false;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {

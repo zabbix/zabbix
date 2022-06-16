@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-14T11:07:02Z'
-  groups:
+  date: '2022-06-07T19:37:31Z'
+  template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1332,8 +1332,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Netgear Fastpath SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 3046d246b1064c749c1c9144442c0fac

@@ -1022,6 +1022,16 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	for (i = 0; i < triggerids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from trigger_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from functions where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
 			" where");
@@ -1269,6 +1279,56 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get linked (discovered, dependent, etc) items                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	db_get_linked_items(zbx_vector_uint64_t *itemids, const char *filter, const char *field)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0, sql_mark = 0;
+	zbx_vector_uint64_t	itemids_tmp, *pitemids = itemids;
+	int			ret;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_vector_uint64_create(&itemids_tmp);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct i.itemid,i.name,i.flags from ");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, filter);
+
+	sql_mark = sql_offset;
+
+	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for(;;)
+	{
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, field, pitemids->values, pitemids->values_num);
+		zbx_vector_uint64_clear(&itemids_tmp);
+
+		if (FAIL == (ret = zbx_audit_DBselect_delete_for_item(sql, &itemids_tmp)))
+			break;
+
+		if (0 == itemids_tmp.values_num)
+			break;
+
+		sql_offset = sql_mark;
+
+		zbx_vector_uint64_sort(&itemids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&itemids_tmp, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_append_array(itemids, itemids_tmp.values, itemids_tmp.values_num);
+		pitemids = &itemids_tmp;
+	}
+
+	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_destroy(&itemids_tmp);
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: delete items from database                                        *
  *                                                                            *
  * Parameters: itemids - [IN] array of item identifiers from database         *
@@ -1279,7 +1339,6 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
 	zbx_vector_uint64_t	profileids;
-	int			num;
 	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
 	unsigned char		history_mode, trends_mode;
@@ -1289,25 +1348,17 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	if (0 == itemids->values_num)
 		goto out;
 
+	if (SUCCEED != db_get_linked_items(itemids, "item_discovery id,items i where id.itemid=i.itemid and",
+			"id.parent_itemid"))
+	{
+		goto out;
+	}
+
+	if (SUCCEED != db_get_linked_items(itemids, "items i where", "i.master_itemid"))
+		goto out;
+
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_vector_uint64_create(&profileids);
-
-	do	/* add child items (auto-created and prototypes) */
-	{
-		num = itemids->values_num;
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct id.itemid,i.name,i.flags from"
-				" item_discovery id,items i where id.itemid=i.itemid and ");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_itemid",
-				itemids->values, itemids->values_num);
-
-		if (FAIL == zbx_audit_DBselect_delete_for_item(sql, itemids))
-			goto clean;
-
-		zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	}
-	while (num != itemids->values_num);
 
 	DBdelete_graphs_by_itemids(itemids);
 	DBdelete_triggers_by_itemids(itemids);
@@ -1352,7 +1403,29 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
+	/* delete from item tags */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+	/* delete from item preprocessing */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from item_preproc where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+	/* delete from functions */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from functions where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
 	/* delete from items */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update items set master_itemid=null where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and master_itemid is not null;\n");
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from items where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids->values, itemids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
@@ -1360,7 +1433,6 @@ void	DBdelete_items(zbx_vector_uint64_t *itemids)
 	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
-clean:
 	zbx_vector_uint64_destroy(&profileids);
 
 	zbx_free(sql);
@@ -1519,9 +1591,20 @@ static void	DBdelete_host_prototypes(const zbx_vector_uint64_t *host_prototype_i
 	/* delete host prototypes */
 
 	sql_offset = 0;
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
+			host_prototype_ids->values, host_prototype_ids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 			host_prototype_ids->values, host_prototype_ids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBexecute("%s", sql);
 
@@ -5820,6 +5903,12 @@ void	DBdelete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_str_t *
 	/* delete action conditions */
 	for (i = 0; i < hostids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_HOST, hostids->values[i]);
+
+	/* delete host tags */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 	/* delete host */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hosts where");
