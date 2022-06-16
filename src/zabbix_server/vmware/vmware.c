@@ -8271,6 +8271,9 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, 
 	{
 		zbx_vmware_entity_tags_t	*to_entity, *from_entity = src->values[i];
 
+		if (0 == from_entity->tags.values_num)
+			continue;
+
 		to_entity = (zbx_vmware_entity_tags_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_entity_tags_t));
 		VMWARE_VECTOR_CREATE(&to_entity->tags, vmware_tag);
 		to_entity->uuid = vmware_shared_strdup(from_entity->uuid);

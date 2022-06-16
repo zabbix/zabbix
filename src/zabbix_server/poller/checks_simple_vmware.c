@@ -740,7 +740,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 		zbx_json_addarray(&json_data, "tags");
-		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_RESOURCEPOOL, cluster->id, &json_data, NULL);
+		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, &json_data, NULL);
 		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
@@ -4802,7 +4802,7 @@ int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, cons
 	}
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
-	vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, dc->id, &json_data, &error);
+	vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_DC, dc->id, &json_data, &error);
 	zbx_json_close(&json_data);
 
 	if (NULL == error)
