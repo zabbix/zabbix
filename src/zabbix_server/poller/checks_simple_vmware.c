@@ -729,7 +729,6 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 			zbx_json_addstring(&json_data, "rpid", rp->id, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
 			zbx_json_adduint64(&json_data, "vm_count", rp->vm_num);
-			zbx_json_close(&json_data);
 			zbx_json_addarray(&json_data, "tags");
 			vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id, &json_data,
 					NULL);
@@ -737,7 +736,6 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 			zbx_json_close(&json_data);
 		}
 
-		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 		zbx_json_addarray(&json_data, "tags");
 		vmware_tags_id_json(&service->data_tags, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, &json_data, NULL);
