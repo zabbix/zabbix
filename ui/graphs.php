@@ -336,72 +336,6 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
 }
-elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('copy')
-		&& hasRequest('group_graphid')) {
-	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		$result = true;
-
-		$options = [
-			'output' => ['hostid'],
-			'editable' => true,
-			'templated_hosts' => true
-		];
-
-		// hosts or templates
-		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$options['hostids'] = getRequest('copy_targetids');
-		}
-		// host groups
-		else {
-			$groupids = getRequest('copy_targetids');
-			zbx_value2array($groupids);
-
-			$dbGroups = API::HostGroup()->get([
-				'output' => ['groupid'],
-				'groupids' => $groupids,
-				'editable' => true
-			]);
-			$dbGroups = zbx_toHash($dbGroups, 'groupid');
-
-			foreach ($groupids as $groupid) {
-				if (!isset($dbGroups[$groupid])) {
-					access_deny();
-				}
-			}
-
-			$options['groupids'] = $groupids;
-		}
-
-		$dbHosts = API::Host()->get($options);
-
-		DBstart();
-		foreach (getRequest('group_graphid') as $graphid) {
-			foreach ($dbHosts as $host) {
-				if (!copyGraphToHost($graphid, $host['hostid'])) {
-					$result = false;
-				}
-			}
-		}
-		$result = DBend($result);
-
-		$graphs_count = count(getRequest('group_graphid'));
-
-		if ($result) {
-			uncheckTableRows(
-				(getRequest('parent_discoveryid') == 0) ? $hostid : getRequest('parent_discoveryid')
-			);
-			unset($_REQUEST['group_graphid']);
-		}
-		show_messages($result,
-			_n('Graph copied', 'Graphs copied', $graphs_count),
-			_n('Cannot copy graph', 'Cannot copy graphs', $graphs_count)
-		);
-	}
-	else {
-		error(_('No target selected.'));
-	}
-	show_messages();
-}
 
 $prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
 
@@ -489,9 +423,6 @@ if ($hostid == 0 && count($filter['hosts']) == 1) {
 if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('group_graphid')) {
 	$data = getCopyElementsFormData('group_graphid', _('Graphs'));
 	$data['action'] = 'graph.masscopyto';
-
-	// render view
-	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [

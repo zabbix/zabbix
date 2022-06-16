@@ -73,6 +73,18 @@
 			}, {once: true});
 		},
 
+		openCopyPopup(button) {
+			const form = button.closest('form');
+			const parameters = {};
+			parameters.context = form.querySelector('#form_context').value;
+			parameters.triggerids = Object.keys(chkbxRange.getSelectedIds());
+
+			return PopUp('popup.copy.triggers', parameters, {
+				dialogueid: 'copy',
+				dialogue_class: 'modal-popup-static'
+			});
+		},
+
 		events: {
 			hostSuccess(e) {
 				const data = e.detail;

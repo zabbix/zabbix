@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
@@ -323,7 +324,10 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'item.masscopyto' => ['name' => _('Copy')],
+	'item.masscopyto' => [	'content' => (new CButton('', _('Copy')))
+		->onClick("view.openCopyPopup(this);")
+		->addClass(ZBX_STYLE_BTN_ALT)
+		->removeAttribute('id')],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(

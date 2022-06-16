@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('configuration.graph.list.js.php');
@@ -139,7 +140,8 @@ $url = (new CUrl('graphs.php'))
 // create form
 $graphForm = (new CForm('post', $url))
 	->setName('graphForm')
-	->addVar('hostid', $data['hostid']);
+	->addVar('hostid', $data['hostid'])
+	->addVar('context', $data['context'], 'form_context');
 
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
@@ -250,7 +252,12 @@ foreach ($data['graphs'] as $graph) {
 // buttons
 $buttonsArray = [];
 if (!$this->data['parent_discoveryid']) {
-	$buttonsArray['graph.masscopyto'] = ['name' => _('Copy')];
+	$buttonsArray += [
+		'graph.masscopyto' => [	'content' => (new CButton('', _('Copy')))
+			->onClick("view.openCopyPopup(this);")
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->removeAttribute('id')]
+	];
 }
 $buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
 	? _('Delete selected graph prototypes?')

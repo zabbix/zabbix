@@ -36,11 +36,6 @@ $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 $fields = [
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
-	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,
-										IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
-										'isset({copy})'
-									],
-	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
 	'itemid' =>						[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})',
 										_('Name')
@@ -139,7 +134,6 @@ $fields = [
 									],
 	'preprocessing' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'group_itemid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_targetids' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'visible' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_history' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -221,7 +215,7 @@ $fields = [
 	'context' =>					[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
+										IN('"item.massclearhistory","item.massdelete",'.
 											'"item.massdisable","item.massenable"'
 										),
 										null
@@ -229,7 +223,6 @@ $fields = [
 	'add' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'copy' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
@@ -903,49 +896,6 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
-		&& hasRequest('group_itemid')) {
-	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		// hosts or templates
-		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetids');
-		}
-		// host groups
-		else {
-			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetids');
-
-			$db_hosts = DBselect(
-				'SELECT DISTINCT h.hostid'.
-				' FROM hosts h,hosts_groups hg'.
-				' WHERE h.hostid=hg.hostid'.
-					' AND '.dbConditionInt('hg.groupid', $group_ids)
-			);
-			while ($db_host = DBfetch($db_hosts)) {
-				$hosts_ids[] = $db_host['hostid'];
-			}
-		}
-
-		DBstart();
-
-		$result = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
-		$result = DBend($result);
-
-		$items_count = count(getRequest('group_itemid'));
-
-		if ($result) {
-			uncheckTableRows(getRequest('checkbox_hash'));
-			unset($_REQUEST['group_itemid']);
-		}
-		show_messages($result,
-			_n('Item copied', 'Items copied', $items_count),
-			_n('Cannot copy item', 'Cannot copy items', $items_count)
-		);
-	}
-	else {
-		show_error_message(_('No target selected.'));
-	}
-}
 // clean history for selected items
 elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		&& hasRequest('group_itemid') && is_array(getRequest('group_itemid'))) {
@@ -1112,13 +1062,6 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 	if (!$has_errors) {
 		echo (new CView('configuration.item.edit', $data))->getOutput();
 	}
-}
-elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('group_itemid')) {
-	$data = getCopyElementsFormData('group_itemid', _('Items'));
-	$data['action'] = 'item.masscopyto';
-
-	// render view
-	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 // list of items
 else {

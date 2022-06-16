@@ -496,52 +496,6 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('copy')
-		&& hasRequest('g_triggerid')) {
-
-	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-
-		// Hosts or templates.
-		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetids');
-		}
-		// Host groups.
-		else {
-			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetids');
-			$db_hosts = DBselect(
-				'SELECT DISTINCT h.hostid'.
-				' FROM hosts h,hosts_groups hg'.
-				' WHERE h.hostid=hg.hostid'.
-					' AND '.dbConditionInt('hg.groupid', $group_ids)
-			);
-
-			while ($db_host = DBfetch($db_hosts)) {
-				$hosts_ids[] = $db_host['hostid'];
-			}
-		}
-
-		DBstart();
-
-		$result = copyTriggersToHosts($hosts_ids, getRequest('hostid'), getRequest('g_triggerid'));
-		$result = DBend($result);
-
-		$triggers_count = count(getRequest('g_triggerid'));
-
-		if ($result) {
-			uncheckTableRows(getRequest('checkbox_hash'));
-			unset($_REQUEST['g_triggerid']);
-		}
-
-		show_messages($result,
-			_n('Trigger copied', 'Triggers copied', $triggers_count),
-			_n('Cannot copy trigger', 'Cannot copy triggers', $triggers_count)
-		);
-	}
-	else {
-		show_error_message(_('No target selected'));
-	}
-}
 elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
@@ -599,9 +553,6 @@ if (isset($_REQUEST['form'])) {
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('g_triggerid')) {
 	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
 	$data['action'] = 'trigger.masscopyto';
-
-	// render view
-	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
 else {
 	$data = [

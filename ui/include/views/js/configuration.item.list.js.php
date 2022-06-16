@@ -80,6 +80,18 @@
 			}, {once: true});
 		},
 
+		openCopyPopup(button) {
+			const form = button.closest('form');
+			const parameters = {};
+			parameters.context = form.querySelector('#form_context').value;
+			parameters.itemids = Object.keys(chkbxRange.getSelectedIds());
+
+			return PopUp('popup.copy.items', parameters, {
+				dialogueid: 'copy',
+				dialogue_class: 'modal-popup-static'
+			});
+		},
+
 		massCheckNow(button) {
 			button.classList.add('is-loading');
 
