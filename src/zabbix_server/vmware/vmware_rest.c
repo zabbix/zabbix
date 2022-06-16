@@ -98,19 +98,6 @@ static int	zbx_vmware_tag_id_compare(const void *p1, const void *p2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort zbx_vmware_tag_t vector by name          *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_vmware_tag_name_compare(const void *p1, const void *p2)
-{
-	const zbx_vmware_tag_t	*v1 = *(const zbx_vmware_tag_t * const *)p1;
-	const zbx_vmware_tag_t	*v2 = *(const zbx_vmware_tag_t * const *)p2;
-
-	return strcmp(v1->name, v2->name);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: frees resources allocated to store zbx_vmware_tag_t               *
  *                                                                            *
  ******************************************************************************/
@@ -761,7 +748,7 @@ static int	vmware_tags_get(zbx_vmware_entity_tags_t *entity_tags, zbx_vector_vmw
 		found_tags++;
 	}
 
-	zbx_vector_vmware_tag_sort(&entity_tags->tags, zbx_vmware_tag_name_compare);
+	zbx_vector_vmware_tag_sort(&entity_tags->tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 out:
 	zbx_vector_str_clear_ext(&tag_ids, zbx_str_free);
 	zbx_vector_str_destroy(&tag_ids);
