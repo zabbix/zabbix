@@ -5,7 +5,7 @@
 
 For Zabbix version: 6.2 and higher  
 The template to monitor HPE MSA 2060 by HTTP.
-It works without any external scripts and uses the script items.
+It works without any external scripts and uses the script item.
 
 
 This template was tested on:
@@ -16,9 +16,9 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-1. Create user "zabbix" with monitor role on the storage .
+1. Create user "zabbix" with monitor role on the storage.
 2. Link the template to a host.
-3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which API is accessible if not specified.
+3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which API is accessible.
 4. Change {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
 
 
