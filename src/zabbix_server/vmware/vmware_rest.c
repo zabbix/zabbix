@@ -236,6 +236,8 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id, uuid));
 	}
 
+	zbx_vector_vmware_entity_tags_sort(entity_tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity tags:%d", __func__, entity_tags->values_num);
 
 }

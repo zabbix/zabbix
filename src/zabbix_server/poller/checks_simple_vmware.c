@@ -637,8 +637,8 @@ static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const
 
 	entity_cmp.uuid = (char *)uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_entity_tags_search(&data_tags->entity_tags, &entity_cmp,
-			ZBX_DEFAULT_STR_COMPARE_FUNC)))
+	if (FAIL == (i = zbx_vector_vmware_entity_tags_bsearch(&data_tags->entity_tags, &entity_cmp,
+			ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 	{
 		return;
 	}
