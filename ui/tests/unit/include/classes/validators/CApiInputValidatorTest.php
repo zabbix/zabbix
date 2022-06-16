@@ -5021,6 +5021,24 @@ class CApiInputValidatorTest extends TestCase {
 				'{"key": "value"}'
 			],
 			[
+				['type' => API_JSON],
+				'{"key": false}',
+				'/1/json',
+				'{"key": false}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": null}',
+				'/1/json',
+				'{"key": null}'
+			],
+			[
+				['type' => API_JSON],
+				'{"key": NaN}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.'
+			],
+			[
 				['type' => API_JSON, 'length' => 15],
 				'{"key": "value"}',
 				'/1/json',
@@ -5122,6 +5140,73 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/json',
 				'{"key1": {HOST.IP1}, "key2": {HOST.IP2}}',
 			],
+			[
+				['type' => API_JSON],
+				'[]',
+				'/1/json',
+				'[]',
+			],
+			[
+				['type' => API_JSON],
+				'[[]]',
+				'/1/json',
+				'[[]]'
+			],
+			[
+				['type' => API_JSON],
+				'[[], []]',
+				'/1/json',
+				'[[], []]'
+			],
+			[
+				['type' => API_JSON],
+				'[[1]]',
+				'/1/json',
+				'[[1]]'
+			],
+			[
+				['type' => API_JSON],
+				'[1, 2, 3]',
+				'/1/json',
+				'[1, 2, 3]',
+			],
+			[
+				['type' => API_JSON],
+				'[[true]]',
+				'/1/json',
+				'[[true]]',
+			],
+			[
+				['type' => API_JSON],
+				'[[null]]',
+				'/1/json',
+				'[[null]]',
+			],
+			[
+				['type' => API_JSON],
+				'{null: "value"}',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.',
+			],
+			[
+				['type' => API_JSON],
+				'[{"key": "value"}]',
+				'/1/json',
+				'[{"key": "value"}]',
+			],
+			[
+				['type' => API_JSON],
+				'[{"key": "value"}, {"key": "value"}]',
+				'/1/json',
+				'[{"key": "value"}, {"key": "value"}]',
+			],
+			[
+				['type' => API_JSON],
+				'["key": "value"]',
+				'/1/json',
+				'Invalid parameter "/1/json": JSON is expected.',
+			],
+
 			[
 				['type' => API_JSONRPC_PARAMS],
 				[],
@@ -5937,6 +6022,7 @@ class CApiInputValidatorTest extends TestCase {
 				true,
 				'Parameter "/real_hosts" is deprecated.'
 			],
+
 			[
 				['type' => API_ITEM_KEY],
 				'key',
@@ -6159,6 +6245,7 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_key',
 				'Invalid parameter "/1/item_key": incorrect syntax near "+)", \1)}, b, c]".'
 			],
+
 			[
 				['type' => API_ITEM_DELAY],
 				null,
@@ -6169,13 +6256,19 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ITEM_DELAY],
 				'abc',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": invalid delay.'
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
 			],
 			[
 				['type' => API_ITEM_DELAY],
 				123,
 				'/1/item_delay',
 				'123'
+			],
+			'Delay less than zero' => [
+				['type' => API_ITEM_DELAY],
+				-1,
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": value must be one of 0:'.SEC_PER_DAY.'.'
 			],
 			[
 				['type' => API_ITEM_DELAY],
@@ -6189,11 +6282,11 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_delay',
 				'Invalid parameter "/1/item_delay": value is too long.'
 			],
-			[
+			'Zero delay without intervals' => [
 				['type' => API_ITEM_DELAY],
 				0,
 				'/1/item_delay',
-				'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+				'Invalid parameter "/1/item_delay": cannot be equal to zero without custom intervals set.'
 			],
 			[
 				['type' => API_ITEM_DELAY],
@@ -6201,11 +6294,11 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_delay',
 				'0;1m/1-5,10:00-18:00'
 			],
-			[
+			'Delay too big' => [
 				['type' => API_ITEM_DELAY],
 				SEC_PER_DAY + 1,
 				'/1/item_delay',
-				'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+				'Invalid parameter "/1/item_delay": value must be one of 0:'.SEC_PER_DAY.'.'
 			],
 			[
 				['type' => API_ITEM_DELAY],
@@ -6219,17 +6312,35 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_delay',
 				'1m;h9m/30'
 			],
-			[
+			'No user macro flag' => [
 				['type' => API_ITEM_DELAY],
+				'{$MACRO}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
+			],
+			'User macro allowed' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO}',
 				'/1/item_delay',
 				'{$MACRO}'
 			],
-			[
+			'User macro allowed, but LLD macro entered' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'{#LLD}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
+			],
+			'No LLD macro flag' => [
 				['type' => API_ITEM_DELAY],
 				'{#LLD}',
 				'/1/item_delay',
-				'Invalid parameter "/1/item_delay": invalid delay.'
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
+			],
+			'LLD macro allowed, but user macro entered' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_LLD_MACRO],
+				'{$MACRO}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": a time unit is expected.'
 			],
 			[
 				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_LLD_MACRO],
@@ -6237,6 +6348,127 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/item_delay',
 				'{#LLD}'
 			],
+			'User macros in a flexible interval' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;{$M}/{$M}',
+				'/1/item_delay',
+				'0;{$M}/{$M}'
+			],
+			'User macros in a scheduled interval' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;{$M}',
+				'/1/item_delay',
+				'0;{$M}'
+			],
+			'Zero delay and blocking zero-interval' => [
+				['type' => API_ITEM_DELAY],
+				'0;50s/1-6,09:00-18:00;0/1-6,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+			],
+			'Zero delay and multiple combined blocking zero-intervals' => [
+				['type' => API_ITEM_DELAY],
+				'0;50s/1-6,09:00-18:00;0/1-3,00:00-24:00;0/4-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": cannot have flexible intervals with zero interval for all times.'
+			],
+			'Non-convertable due to macro in Period' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;50s/1-6,09:00-18:00;0/1-5,00:00-24:00;0/{$M}',
+				'/1/item_delay',
+				'0;50s/1-6,09:00-18:00;0/1-5,00:00-24:00;0/{$M}'
+			],
+			'Non-zero delay, but whole week consists of blocking interval' => [
+				['type' => API_ITEM_DELAY],
+				'1m;0/1-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": cannot have flexible intervals with zero interval for all times.'
+			],
+			'Non-zero delay, but whole week combined of blocking intervals' => [
+				['type' => API_ITEM_DELAY],
+				'1m;0/1-4,00:00-24:00;0/3-7,00:00-23:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+			],
+			'Macro used, but delay and intervals are all zero-blocking' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;0/1-6,09:00-12:00;0/{$M}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": cannot have only zero intervals.'
+			],
+			'Macro in Period, but zero-week block' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;0/1-7,00:00-24:00;1/{$M}',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": cannot have flexible intervals with zero interval for all times.'
+			],
+			'Macro in Interval, but zero-week block' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'0;0/1-7,00:00-24:00;{$M}/1-7,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": cannot have flexible intervals with zero interval for all times.'
+			],
+			'Non-zero delay, macro in Interval' => [
+				['type' => API_ITEM_DELAY, 'flags' => API_ALLOW_USER_MACRO],
+				'1m;{$M}/1-4,00:00-24:00;0/3-7,00:00-23:00',
+				'/1/item_delay',
+				'1m;{$M}/1-4,00:00-24:00;0/3-7,00:00-23:00'
+			],
+			'Polling overlapped by zero-interval as a whole' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/2-4,00:00-24:00;0/1-5,00:00-24:00',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+			],
+			'Polling chunk overlapped by zero-interval as a whole, but has another active interval' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/2-4,00:00-24:00;0/1-5,00:00-24:00;50s/6,09:30-12:00',
+				'/1/item_delay',
+				'1m;50s/2-4,00:00-24:00;0/1-5,00:00-24:00;50s/6,09:30-12:00'
+			],
+			'Overlap by zero-interval, but polling window available before' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/1-6,09:00-12:00;0/2-6,00:00-24:00',
+				'/1/item_delay',
+				'1m;50s/1-6,09:00-12:00;0/2-6,00:00-24:00'
+			],
+			'Zero-interval, but polling active outside' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/1-6,09:00-12:00;0/2-3,00:00-24:00',
+				'/1/item_delay',
+				'1m;50s/1-6,09:00-12:00;0/2-3,00:00-24:00'
+			],
+			'Polling window available between side-overlapping zero chunks' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/1-6,09:00-12:00;0/1-3,00:00-24:00;0/5-6,00:00-24:00',
+				'/1/item_delay',
+				'1m;50s/1-6,09:00-12:00;0/1-3,00:00-24:00;0/5-6,00:00-24:00'
+			],
+			'Polling window available between side-overlapping zero chunks' => [
+				['type' => API_ITEM_DELAY],
+				'1m;50s/1-6,09:00-12:00;0/1-3,00:00-24:00;0/5-6,00:00-24:00',
+				'/1/item_delay',
+				'1m;50s/1-6,09:00-12:00;0/1-3,00:00-24:00;0/5-6,00:00-24:00'
+			],
+			'Polling window available too small for interval' => [
+				['type' => API_ITEM_DELAY],
+				'0;2h/1-6,09:00-12:00;0/1-6,09:00-10:30',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+			],
+			'Polling window available equal to interval' => [
+				['type' => API_ITEM_DELAY],
+				'0;90m/1-6,09:00-12:00;0/1-6,09:00-10:30',
+				'/1/item_delay',
+				'Invalid parameter "/1/item_delay": must have at least one interval with active period.'
+			],
+			'Polling window just less than available interval (90m-1s)' => [
+				['type' => API_ITEM_DELAY],
+				'0;5399/1-6,09:00-12:00;0/1-6,09:00-10:30',
+				'/1/item_delay',
+				'0;5399/1-6,09:00-12:00;0/1-6,09:00-10:30'
+			],
+
 			[
 				['type' => API_XML],
 				null,
@@ -6279,6 +6511,91 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/xml',
 				'Invalid parameter "/1/xml": value is too long.'
 			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="123">value</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="123">value</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="string">value</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="string">value</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop=string>value</node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (39) AttValue: " or \' expected [Line: 1 | Column: 50].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="string>value</node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (38) Unescaped \'<\' not allowed in attributes values [Line: 1 | Column: 63].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="<">value</node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (38) Unescaped \'<\' not allowed in attributes values [Line: 1 | Column: 51].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="&lt;">value</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node prop="&lt;">value</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node><script></node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: script line 1 and node [Line: 1 | Column: 60].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node><script/></node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node><script/></node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node></></node>',
+				'/1/xml',
+				'Invalid parameter "/1/xml": (76) Opening and ending tag mismatch: node line 1 and unparseable [Line: 1 | Column: 48].'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>/></node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>/></node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>/&gt;</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>/&gt;</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>"</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>"</node>'
+			],
+			[
+				['type' => API_XML],
+				'<?xml version="1.0" encoding="UTF-8"?><node>&quot;</node>',
+				'/1/xml',
+				'<?xml version="1.0" encoding="UTF-8"?><node>&quot;</node>'
+			],
+
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_MULTIPLIER]],
 				'1',

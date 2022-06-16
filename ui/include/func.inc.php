@@ -2637,3 +2637,44 @@ function getTileProviders(): array {
 		]
 	];
 }
+
+/**
+ * Combine overlapping segments of time to their longest forms.
+ * ```
+ * In:
+ * [segment]-----[segment]
+ * ---[segment]-----------
+ * Out:
+ * [segment---]--[segment]
+ * ````
+ * @param array $array  Entries containing time from/to information.
+ *                      Earlier segment is used to carry other data contained in the overlapping segment arrays.
+ * @param int $array['time_from']  timestamp
+ * @param int $array['time_to']    timestamp
+ *
+ * @return array
+ */
+function mergeTimeSegments(array $array): array {
+	CArrayHelper::sort($array, ['time_from']);
+	$result = [array_shift($array)];
+
+	while ($segment = array_shift($array)) {
+		$last_segment = end($result);
+
+		// Already contained?
+		if ($segment['time_to'] < $last_segment['time_to']) {
+			continue;
+		}
+
+		// Starts after end of last segment?
+		if ($segment['time_from'] > $last_segment['time_to']) {
+			$result[] = $segment;
+			continue;
+		}
+
+		// Merge segments; time_to greater or equal to last segment's at this point.
+		$result[count($result) - 1]['time_to'] = $segment['time_to'];
+	}
+
+	return $result;
+}

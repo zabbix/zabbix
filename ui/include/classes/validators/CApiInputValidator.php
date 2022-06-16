@@ -3251,7 +3251,8 @@ class CApiInputValidator {
 
 	/**
 	 * @param array  $rule
-	 * @param int    $rule['length']  (optional) API_REQUIRED_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param int    $rule['flags']   (optional) API_REQUIRED_LLD_MACRO
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -3309,6 +3310,47 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Convert a flexible schedule interval to a list of from/to timestamped entries for each day involved.
+	 *
+	 * @param array $interval
+	 * @param string|int $interval[<update_interval>]  Interval/time unit.
+	 * @param string $interval[<time_period>]          Period, e.g. '1-6,09:00-10:30'.
+	 *
+	 * @return array A schedule of polling times within a week.
+	 */
+	private static function extractFlexibleIntervals(array $interval): array {
+		$result = [];
+		$update_interval = timeUnitToSeconds($interval['update_interval']);
+		// [1-7],[00:00-24:00]
+		[$day_period, $time_period] = explode(',', $interval['time_period']);
+		// [1]-[7] || [1]-[1]
+		[$day_from, $day_to] = strpos($day_period, '-') === false
+			? [$day_period, $day_period]
+			: explode('-', $day_period);
+		// 00:00[-]24:00 => 00:00[:]24:00
+		$time_period = str_replace('-', ':', $time_period);
+		[$time_from_hours, $time_from_minutes, $time_to_hours, $time_to_minutes] = explode(':', $time_period);
+		$time_from = $time_from_hours * SEC_PER_HOUR + $time_from_minutes * SEC_PER_MIN;
+		$time_to = $time_to_hours * SEC_PER_HOUR + $time_to_minutes * SEC_PER_MIN;
+
+		for ($day = $day_from; $day <= $day_to; $day++) {
+			$result[] = [
+				'update_interval' => $update_interval,
+				'time_from' => ($day - 1) * SEC_PER_DAY + $time_from,
+				'time_to' => ($day - 1) * SEC_PER_DAY + $time_to,
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Try to parse delay/interval information and check that some polling can be performed during the schedule-week.
+	 *
+	 * Note: It is mainly assumed for macros to contain non-zero/empty values aimed at enabling polling.
+	 * In case of non-convertable entries (containing macros), we can only check for the edge case where
+	 * the whole week is blocked by convertable periods with an update interval of 0 ('zero-week' edge case).
+	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO
 	 * @param int    $rule['length']  (optional)
@@ -3341,28 +3383,29 @@ class CApiInputValidator {
 		]);
 
 		if ($update_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			if (strpos($data, ';') === false) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'));
+			if (is_numeric($data)) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('value must be one of %1$s', implode(':', [0, SEC_PER_DAY]))
+				);
 			}
 			else {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, $update_interval_parser->getError());
+				$error = strpos($data, ';') === false
+					? _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'))
+					:  _s('Invalid parameter "%1$s": %2$s.', $path, $update_interval_parser->getError());
 			}
 
 			return false;
 		}
 
 		$delay = $update_interval_parser->getDelay();
+		$macro_delay = ($delay[0] === '{');
 
-		if ($delay[0] !== '{') {
+		if ($macro_delay) {
+			// Only check for 'zero-week' block.
+			$delay_sec = -1;
+		}
+		else {
 			$delay_sec = timeUnitToSeconds($delay);
-			$intervals = $update_interval_parser->getIntervals();
-
-			// If delay is 0, there must be at least one either flexible or scheduling interval.
-			if ($delay_sec == 0 && !$intervals) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be equal to zero without custom intervals set'));
-
-				return false;
-			}
 
 			if ($delay_sec < 0 || $delay_sec > SEC_PER_DAY) {
 				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
@@ -3371,109 +3414,135 @@ class CApiInputValidator {
 
 				return false;
 			}
+		}
 
-			$flexible_intervals = [];
+		$intervals = $update_interval_parser->getIntervals();
 
-			foreach ($intervals as $interval) {
-				if (strpos($interval['interval'], '{') !== false || $interval['type'] != ITEM_DELAY_FLEXIBLE) {
-					$flexible_intervals = [];
+		// If delay is 0, there must be at least one either flexible or scheduling interval.
+		if ($delay_sec == 0 && !$intervals) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+				_('cannot be equal to zero without custom intervals set')
+			);
+
+			return false;
+		}
+
+		// "Blocking" periods entered.
+		$zero_intervals = [];
+		// Non-macro intervals, where polling should be run.
+		$flexible_intervals = [];
+		// Is there a non-convertable flexible polling interval, assumed to enable polling?
+		$has_macro_interval = false;
+
+		foreach ($intervals as $interval) {
+			if ($interval['type'] == ITEM_DELAY_SCHEDULING) {
+				return true;
+			}
+
+			// Macro in Interval or Period.
+			// If delay or update interval is "positive", only check for zero-week case further along.
+			if (strpos($interval['interval'], '{') !== false) {
+				if (!$has_macro_interval) {
+					$has_macro_interval = $delay_sec > 0 || $macro_delay
+						|| strpos($interval['update_interval'], '{') !== false
+						|| timeUnitToSeconds($interval['update_interval']) > 0;
+				}
+
+				if ($has_macro_interval) {
 					break;
 				}
 
-				$update_interval = timeUnitToSeconds($interval['update_interval']);
-
-				if ($delay_sec != 0 && $update_interval != 0) {
-					continue;
-				}
-
-				[$day_period, $time_period] = explode(',', $interval['time_period']);
-
-				[$day_from, $day_to] = (strpos($day_period, '-') === false)
-					? [$day_period, $day_period]
-					: explode('-', $day_period);
-
-				[$time_from, $time_to] = explode('-', $time_period);
-
-				[$time_from_hours, $time_from_minutes] = explode(':', $time_from);
-				[$time_to_hours, $time_to_minutes] = explode(':', $time_to);
-
-				$time_from = $time_from_hours * SEC_PER_HOUR + $time_from_minutes * SEC_PER_MIN;
-				$time_to = $time_to_hours * SEC_PER_HOUR + $time_to_minutes * SEC_PER_MIN;
-
-				$time_from_hours = (strlen($time_from_hours) == 1) ? '0'.$time_from_hours : $time_from_hours;
-				$time_to_hours = (strlen($time_to_hours) == 1) ? '0'.$time_to_hours : $time_to_hours;
-
-				for ($day = $day_from; $day <= $day_to; $day++) {
-					$_interval = [
-						'update_interval' => $update_interval,
-						'time_from' => ($day - 1) * SEC_PER_DAY + $time_from,
-						'time_to' => ($day - 1) * SEC_PER_DAY + $time_to,
-					];
-
-					$key = $_interval['update_interval'].'/'.$day.','.$time_from_hours.':'.$time_from_minutes.'-'.
-						$time_to_hours.':'.$time_to_minutes;
-
-					$flexible_intervals[$key] = $_interval;
-				}
+				continue;
 			}
 
-			if ($flexible_intervals) {
-				ksort($flexible_intervals);
+			$_intervals = self::extractFlexibleIntervals($interval);
 
-				$zero_periods = [];
-				$has_active_period = false;
-
-				foreach ($flexible_intervals as $key => $interval) {
-					if ($interval['update_interval'] == 0) {
-						unset($flexible_intervals[$key]);
-						$last_period = end($zero_periods);
-
-						if ($last_period === false || $interval['time_from'] > $last_period['time_to']) {
-							$zero_periods[] = [
-								'time_from' => $interval['time_from'],
-								'time_to' => $interval['time_to']
-							];
-						}
-						elseif ($interval['time_from'] == $last_period['time_to']
-								|| $interval['time_to'] > $last_period['time_to']) {
-							$zero_periods[key($zero_periods)]['time_to'] = $interval['time_to'];
-						}
-					}
-					else {
-						foreach ($zero_periods as $zero_period) {
-							if ($interval['time_from'] < $zero_period['time_from']
-									|| $interval['time_to'] > $zero_period['time_to']) {
-								$has_active_period = true;
-								break 2;
-							}
-						}
-					}
+			foreach ($_intervals as $_interval) {
+				if ($_interval['update_interval'] == 0) {
+					$zero_intervals[] = $_interval;
 				}
-
-				if ($delay_sec == 0 && !$flexible_intervals) {
-					$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot have only zero intervals'));
-
-					return false;
-				}
-				elseif ($delay_sec == 0 && !$has_active_period) {
-					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-						_('must have at least one flexible interval with active period')
-					);
-
-					return false;
-				}
-				elseif ($delay_sec != 0 && $zero_periods && $zero_periods[0]['time_from'] == 0
-						&& $zero_periods[0]['time_to'] == 7 * SEC_PER_DAY) {
-					$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-						_('cannot have flexible intervals with zero interval for all times')
-					);
-
-					return false;
+				else {
+					$flexible_intervals[] = $_interval;
 				}
 			}
 		}
 
-		return true;
+		if ($delay_sec == 0 && !($flexible_intervals || $has_macro_interval)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot have only zero intervals'));
+
+			return false;
+		}
+		elseif (!$zero_intervals) {
+			return true;
+		}
+
+		$end_of_week =  7 * SEC_PER_DAY;
+		$zero_segments = mergeTimeSegments($zero_intervals);
+
+		// Check for 'zero-week' edge case - where the whole week was spanned by zero intervals.
+		if (count($zero_segments) == 1) {
+			$last_segment = $zero_segments[0];
+
+			if ($last_segment['time_from'] == 0 && $last_segment['time_to'] == $end_of_week) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+					_('cannot have flexible intervals with zero interval for all times')
+				);
+
+				return false;
+			}
+		}
+
+		if ($has_macro_interval) {
+			return true;
+		}
+
+		// Only convertable (non-macro) flexible intervals left here,
+		// check if any fits in a window inbetween/outside of $zero_segments.
+		CArrayHelper::sort($flexible_intervals, ['time_from']);
+
+		foreach ($flexible_intervals as $interval) {
+			// Add zero-intervals outside of polling time.
+			$zero_intervals = array_merge($zero_segments, [
+				[
+					'update_interval' => 0,
+					'time_from' => 0,
+					'time_to' => $interval['time_from']
+				],
+				[
+					'update_interval' => 0,
+					'time_from' => $interval['time_to'],
+					'time_to' => $end_of_week
+				]
+			]);
+			CArrayHelper::sort($zero_intervals, ['time_from']);
+
+			// Merge overlapping zero-intervals, check leftover segments.
+			$current_blocker = array_shift($zero_intervals);
+
+			while ($next_blocker = array_shift($zero_intervals)) {
+				// 09:00-10:30, 10:00-12:00 => 09:00-12:00
+				if ($current_blocker['time_to'] >= $next_blocker['time_from']) {
+					// 15:00-17:00, 15:00-18:00 => 15:00-18:00
+					$current_blocker['time_to'] = max($current_blocker['time_to'], $next_blocker['time_to']);
+					continue;
+				}
+				// 09:00-10:30, 12:00-14:15 => 10:30-12:00 window; 12:00 - 10:30 = 90m inbetween
+				elseif (($next_blocker['time_from'] - $current_blocker['time_to']) > $interval['update_interval']) {
+					if (intdiv($current_blocker['time_to'], SEC_PER_DAY)
+							!= intdiv($next_blocker['time_from'], SEC_PER_DAY)) {
+						break;
+					}
+
+					return true;
+				}
+			}
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+			_('must have at least one interval with active period')
+		);
+
+		return false;
 	}
 
 	/**

@@ -132,26 +132,25 @@ class CUpdateIntervalParser extends CParser {
 	}
 
 	/**
-	 * Get all intervals or specifically flexible or scheduling intervals.
+	 * Get all intervals, or specifically flexible or scheduling ones.
 	 *
-	 * @param int $type			If null get both types, else either ITEM_DELAY_FLEXIBLE or ITEM_DELAY_SCHEDULING
+	 * @param int|null $type  ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING, or null for both.
 	 *
 	 * @return array
 	 */
-	public function getIntervals($type = null) {
+	public function getIntervals(?int $type = null) {
 		if ($type === null) {
 			return $this->intervals;
 		}
-		else {
-			$intervals = [];
 
-			foreach ($this->intervals as $interval) {
-				if ($interval['type'] == $type) {
-					$intervals[] = $interval['interval'];
-				}
+		$intervals = [];
+
+		foreach ($this->intervals as $interval) {
+			if ($interval['type'] == $type) {
+				$intervals[] = $interval['interval'];
 			}
-
-			return $intervals;
 		}
+
+		return $intervals;
 	}
 }

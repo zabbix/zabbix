@@ -2450,6 +2450,7 @@ abstract class CItemGeneral extends CApiService {
 	protected static function addAffectedObjects(array $items, array &$db_items): void {
 		self::addAffectedParameters($items, $db_items);
 		self::addAffectedPreprocessing($items, $db_items);
+		self::addAffectedTags($items, $db_items);
 	}
 
 	/**
