@@ -75,6 +75,9 @@ class CApiInputValidator {
 			case API_COLOR:
 				return self::validateColor($rule, $data, $path, $error);
 
+			case API_COLORS:
+				return self::validateColors($rule, $data, $path, $error);
+
 			case API_COND_FORMULA:
 				return self::validateCondFormula($rule, $data, $path, $error);
 
@@ -227,6 +230,9 @@ class CApiInputValidator {
 
 			case API_TIMESTAMP:
 				return self::validateTimestamp($rule, $data, $path, $error);
+
+			case API_TG_NAME:
+				return self::validateTemplateGroupName($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -249,6 +255,7 @@ class CApiInputValidator {
 		switch ($rule['type']) {
 			case API_CALC_FORMULA:
 			case API_COLOR:
+			case API_COLORS:
 			case API_COND_FORMULA:
 			case API_COND_FORMULAID:
 			case API_STRING_UTF8:
@@ -294,6 +301,7 @@ class CApiInputValidator {
 			case API_UNEXPECTED:
 			case API_LAT_LNG_ZOOM:
 			case API_TIMESTAMP:
+			case API_TG_NAME:
 				return true;
 
 			case API_OBJECT:
@@ -449,6 +457,58 @@ class CApiInputValidator {
 			);
 			return false;
 		}
+
+		return true;
+	}
+
+
+	/**
+	 * Array of colors validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateColors($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (($flags & API_NORMALIZE) && self::validateStringUtf8([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) && !$data) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
+			return false;
+		}
+
+		$data = array_values($data);
+		$rules = ['type' => API_COLOR];
+
+		if (array_key_exists('in', $rule)) {
+			$rules['in'] = $rule['in'];
+		}
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+			if (!self::validateData($rules, $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
 
 		return true;
 	}
@@ -1159,6 +1219,9 @@ class CApiInputValidator {
 	 * @param array  $rule['fields']
 	 * @param int    $rule['fields'][<field_name>]['flags']           (optional) API_REQUIRED, API_DEPRECATED,
 	 *                                                                           API_ALLOW_UNEXPECTED
+	 * @param string $rule['fields'][<field_name>]['replacement']     (optional) Parameter name which replaces the
+	 *                                                                           deprecated one. Can be used with
+	 *                                                                           API_DEPRECATED flag.
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
 	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
 	 * @param mixed  $data
@@ -1231,6 +1294,24 @@ class CApiInputValidator {
 
 			$flags = array_key_exists('flags', $field_rule) ? $field_rule['flags'] : 0x00;
 
+			if (array_key_exists($field_name, $data) && ($flags & API_DEPRECATED)) {
+				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
+
+				if (array_key_exists('replacement', $field_rule)) {
+					if (array_key_exists($field_rule['replacement'], $data)) {
+						$error = _s('Deprecated parameter "%1$s" cannot be used with "%2$s".', $subpath,
+							($path === '/' ? $path : $path.'/').$field_rule['replacement']
+						);
+						return false;
+					}
+
+					$data[$field_rule['replacement']] = $data[$field_name];
+					unset($data[$field_name]);
+				}
+
+				trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_DEPRECATED);
+			}
+
 			if (array_key_exists('default', $field_rule) && !array_key_exists($field_name, $data)) {
 				$data[$field_name] = $field_rule['default'];
 			}
@@ -1248,9 +1329,6 @@ class CApiInputValidator {
 				$subpath = ($path === '/' ? $path : $path.'/').$field_name;
 				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
 					return false;
-				}
-				if ($flags & API_DEPRECATED) {
-					trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_NOTICE);
 				}
 			}
 			elseif ($flags & API_REQUIRED) {
@@ -2554,14 +2632,14 @@ class CApiInputValidator {
 			return true;
 		}
 
-		[$year, $month, $day] = sscanf($data, '%d-%d-%d');
+		$date = DateTime::createFromFormat(ZBX_DATE, $data);
 
-		if (!checkdate($month, $day, $year)) {
+		if (!$date || $date->format(ZBX_DATE) !== $data) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a date in YYYY-MM-DD format is expected'));
 			return false;
 		}
 
-		if (!validateDateInterval($year, $month, $day)) {
+		if (!validateDateInterval($date->format('Y'), $date->format('m'), $date->format('d'))) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_s('value must be between "%1$s" and "%2$s"', '1970-01-01', '2038-01-18')
 			);
@@ -2969,6 +3047,40 @@ class CApiInputValidator {
 		}
 
 		return $valid;
+	}
+
+	/**
+	 * Template group name validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_REQUIRED_LLD_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateTemplateGroupName($rule, &$data, $path, &$error) {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
+			return false;
+		}
+
+		$template_group_name_parser = new CHostGroupNameParser();
+
+		if ($template_group_name_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('invalid template group name'));
+
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

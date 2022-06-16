@@ -1132,7 +1132,7 @@ class CDashboard extends CBaseComponent {
 			...properties
 		}, {
 			dialogueid: 'widget_properties',
-			dialogue_class: 'modal-popup-generic'
+			dialogue_class: 'modal-widget-configuration'
 		});
 
 		overlay.xhr.then(() => {

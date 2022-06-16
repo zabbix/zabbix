@@ -4,3 +4,6 @@ noinst_LIBRARIES = libzbxicmpping.a
 
 libzbxicmpping_a_SOURCES = \
 	icmpping.c
+
+libzbxicmpping_a_CFLAGS = \
+	$(TLS_CFLAGS)

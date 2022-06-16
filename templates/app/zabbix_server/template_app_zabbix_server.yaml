@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T20:01:50Z'
-  groups:
+  date: '2022-06-07T19:38:01Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1537,8 +1537,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix server performance'
-                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1553,8 +1553,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix data gathering process busy %'
-                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1569,8 +1569,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix internal process busy %'
-                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1586,8 +1586,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Zabbix cache usage, % free'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Zabbix cache usage, % free'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -1602,8 +1602,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Value cache effectiveness'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Value cache effectiveness'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1619,8 +1619,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Zabbix internal queues'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Zabbix internal queues'
         -
           uuid: 32994a87287449eab12bed911880ef13
           name: 'Zabbix server processes'
@@ -1640,8 +1640,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Data handling processes'
-                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1656,8 +1656,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Zabbix server health'
                         name: 'Zabbix server: Reporting processes'
-                        host: 'Zabbix server health'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -1672,8 +1672,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Internal processes'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Internal processes'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -1689,8 +1689,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Zabbix server: Data gathering processes'
                         host: 'Zabbix server health'
+                        name: 'Zabbix server: Data gathering processes'
       valuemaps:
         -
           uuid: cee1681b12ff49b6b7d442a851e870b4

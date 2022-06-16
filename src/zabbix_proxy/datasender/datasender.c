@@ -26,7 +26,6 @@
 #include "proxy.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
-#include "zbxcrypto.h"
 #include "zbxcompress.h"
 #include "zbxavailability.h"
 

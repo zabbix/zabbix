@@ -63,7 +63,6 @@ $web_layout_mode = $this->getLayoutMode();
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_groupids_',
 								'with_httptests' => true,
-								'real_hosts' => true,
 								'enrich_parent_groups' => true
 							]
 						]

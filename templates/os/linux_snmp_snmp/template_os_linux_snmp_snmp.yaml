@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-10T20:21:14Z'
-  groups:
+  date: '2022-06-07T19:33:45Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -2092,8 +2092,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Linux SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
         -
           uuid: 59f09fada3ab43d1bdb70091f92e77f1
           name: 'System performance'
@@ -2113,8 +2113,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'System load'
                         host: 'Linux SNMP'
+                        name: 'System load'
                 -
                   type: GRAPH_PROTOTYPE
                   x: '12'
@@ -2137,8 +2137,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'CPU usage{#SINGLETON}'
                         host: 'Linux SNMP'
+                        name: 'CPU usage{#SINGLETON}'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -2153,8 +2153,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'Linux SNMP'
+                        name: 'Memory usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -2170,8 +2170,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'Linux SNMP'
+                        name: 'Swap usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '10'
@@ -2194,8 +2194,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#FSNAME}: Disk space usage'
                         host: 'Linux SNMP'
+                        name: '{#FSNAME}: Disk space usage'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '15'
@@ -2218,8 +2218,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: '{#DEVNAME}: Disk read/write rates'
                         host: 'Linux SNMP'
+                        name: '{#DEVNAME}: Disk read/write rates'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '20'
@@ -2242,8 +2242,8 @@ zabbix_export:
                       type: ITEM_PROTOTYPE
                       name: itemid
                       value:
-                        key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
                         host: 'Linux SNMP'
+                        key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
                 -
                   type: GRAPH_PROTOTYPE
                   'y': '25'
@@ -2266,8 +2266,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
                         host: 'Linux SNMP'
+                        name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
       valuemaps:
         -
           uuid: 1fe48656fa5e4a23903921a5b0f2aac4

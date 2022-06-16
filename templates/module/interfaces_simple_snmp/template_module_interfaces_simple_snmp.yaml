@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:45Z'
-  groups:
+  date: '2022-06-07T19:36:49Z'
+  template_groups:
     -
       uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -565,8 +565,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFDESCR}: Network traffic'
                         host: 'Interfaces Simple SNMP'
+                        name: 'Interface {#IFDESCR}: Network traffic'
       valuemaps:
         -
           uuid: 4578589110ec40e19297e1d35d17c82f

@@ -18,7 +18,6 @@
 **/
 
 #include "dbupgrade.h"
-#include "zbxdbhigh.h"
 
 extern unsigned char	program_type;
 
@@ -33,31 +32,6 @@ static int	DBpatch_6000000(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6000001(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("delete from profiles where idx='web.auditlog.filter.action' and value_int=-1"))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-static int	DBpatch_6000002(void)
-{
-	if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > DBexecute("update profiles set idx='web.auditlog.filter.actions' where"
-			" idx='web.auditlog.filter.action'"))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 #endif
 
 DBPATCH_START(6000)
@@ -65,7 +39,5 @@ DBPATCH_START(6000)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(6000000, 0, 1)
-DBPATCH_ADD(6000001, 0, 0)
-DBPATCH_ADD(6000002, 0, 0)
 
 DBPATCH_END()

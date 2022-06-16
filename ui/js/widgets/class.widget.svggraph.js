@@ -80,6 +80,7 @@ class CWidgetSvgGraph extends CWidget {
 			this._initGraph({
 				sbox: false,
 				show_problems: true,
+				show_simple_triggers: true,
 				hint_max_rows: 20,
 				min_period: 60,
 				...response.svg_options.data

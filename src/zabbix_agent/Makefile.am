@@ -35,7 +35,8 @@ libzbxagent_a_SOURCES = \
 	zbxkstat.h
 
 libzbxagent_a_CFLAGS = \
-	-DZABBIX_DAEMON
+	-DZABBIX_DAEMON \
+	$(TLS_CFLAGS)
 
 zabbix_agentd_SOURCES = zabbix_agentd.c
 
@@ -77,7 +78,8 @@ zabbix_agentd_LDFLAGS = $(AGENT_LDFLAGS)
 zabbix_agentd_CFLAGS = \
 	-DZABBIX_DAEMON \
 	-DDEFAULT_CONFIG_FILE="\"$(AGENT_CONFIG_FILE)\"" \
-	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\""
+	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \
+	$(TLS_CFLAGS)
 
 install-data-hook:
 	$(MKDIR_P) "$(DESTDIR)$(AGENT_CONFIG_FILE).d"

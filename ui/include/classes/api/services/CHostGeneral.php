@@ -35,7 +35,7 @@ abstract class CHostGeneral extends CHostBase {
 	];
 
 	/**
-	 * Check for valid host groups.
+	 * Check for valid host groups and template groups.
 	 *
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
@@ -71,7 +71,8 @@ abstract class CHostGeneral extends CHostBase {
 			return;
 		}
 
-		$count = API::HostGroup()->get([
+		$entity = $this instanceof CTemplate ? API::TemplateGroup() : API::HostGroup();
+		$count = $entity->get([
 			'countOutput' => true,
 			'groupids' => array_keys($edit_groupids),
 			'editable' => true
@@ -158,11 +159,13 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array  $templateids
 	 * @param array  $db_hosts
 	 */
-	protected function massCheckTemplatesLinks(string $method, array $templateids, array $db_hosts): void {
+	protected function massCheckTemplatesLinks(string $method, array $templateids, array $db_hosts,
+			array $templateids_clear = []): void {
 		$ins_templates = [];
 		$del_links = [];
 		$check_double_linkage = false;
 		$del_templates = [];
+		$del_links_clear  = [];
 
 		foreach ($db_hosts as $hostid => $db_host) {
 			$db_templateids = array_column($db_host['templates'], 'templateid');
@@ -211,12 +214,19 @@ abstract class CHostGeneral extends CHostBase {
 				if ($upd_templateids) {
 					$del_templates[$db_templateid][$hostid] = $upd_templateids;
 				}
+
+				if (array_key_exists($db_templateid, $templateids_clear)) {
+					$del_links_clear[$db_templateid][$hostid] = true;
+				}
 			}
 		}
 
 		if ($del_templates) {
-			$this->checkTriggerDependenciesOfUpdTemplates($del_templates);
 			$this->checkTriggerExpressionsOfDelTemplates($del_templates);
+		}
+
+		if ($del_links_clear) {
+			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
 		}
 
 		if ($ins_templates) {
@@ -760,11 +770,7 @@ abstract class CHostGeneral extends CHostBase {
 
 		API::Graph()->syncTemplates($link_request);
 
-		API::Trigger()->syncTemplateDependencies($link_request);
-
-		if ($ruleids) {
-			API::TriggerPrototype()->syncTemplateDependencies($link_request);
-		}
+		CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
 	}
 
 	/**
@@ -998,8 +1004,7 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		foreach ($link_requests as $link_request){
-			API::Trigger()->syncTemplateDependencies($link_request);
-			API::TriggerPrototype()->syncTemplateDependencies($link_request);
+			CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
 		}
 
 		return $hosts_linkage_inserts;
@@ -1369,17 +1374,6 @@ abstract class CHostGeneral extends CHostBase {
 
 		$hostids = array_keys($result);
 
-		// adding groups
-		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
-			$groups = API::HostGroup()->get([
-				'output' => $options['selectGroups'],
-				'groupids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-			$result = $relationMap->mapMany($result, $groups, 'groups');
-		}
-
 		// Add templates.
 		if ($options['selectParentTemplates'] !== null) {
 			if ($options['selectParentTemplates'] != API_OUTPUT_COUNT) {
@@ -1493,7 +1487,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding items
 		if ($options['selectItems'] !== null) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
 				$items = API::Item()->get([
@@ -1526,7 +1519,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding discoveries
 		if ($options['selectDiscoveries'] !== null) {
 			if ($options['selectDiscoveries'] != API_OUTPUT_COUNT) {
 				$items = API::DiscoveryRule()->get([
@@ -1561,7 +1553,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding triggers
 		if ($options['selectTriggers'] !== null) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
 				$triggers = [];
@@ -1608,7 +1599,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding graphs
 		if ($options['selectGraphs'] !== null) {
 			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
 				$graphs = [];
@@ -1654,7 +1644,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding http tests
 		if ($options['selectHttpTests'] !== null) {
 			if ($options['selectHttpTests'] != API_OUTPUT_COUNT) {
 				$httpTests = API::HttpTest()->get([
@@ -1689,32 +1678,6 @@ abstract class CHostGeneral extends CHostBase {
 			}
 		}
 
-		// adding tags
-		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$options['selectTags'] = ['tag', 'value'];
-			}
-
-			$tags_options = [
-				'output' => $this->outputExtend($options['selectTags'], ['hostid']),
-				'filter' => ['hostid' => $hostids]
-			];
-
-			foreach ($result as &$host) {
-				$host['tags'] = [];
-			}
-			unset($host);
-
-			$tags = DBselect(DB::makeSql('host_tag', $tags_options));
-
-			while ($tag = DBfetch($tags)) {
-				$hostid = $tag['hostid'];
-				unset($tag['hosttagid'], $tag['hostid']);
-				$result[$hostid]['tags'][] = $tag;
-			}
-		}
-
-		// Add value mapping.
 		if ($options['selectValueMaps'] !== null) {
 			if ($options['selectValueMaps'] === API_OUTPUT_EXTEND) {
 				$options['selectValueMaps'] = ['valuemapid', 'name', 'mappings'];
@@ -1761,35 +1724,7 @@ abstract class CHostGeneral extends CHostBase {
 	}
 
 	/**
-	 * Validates tags.
-	 *
-	 * @param array  $host
-	 * @param int    $host['evaltype']
-	 * @param array  $host['tags']
-	 * @param string $host['tags'][]['tag']
-	 * @param string $host['tags'][]['value']
-	 *
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function validateTags(array $host) {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'evaltype'	=> ['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR])],
-			'tags'		=> ['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag'		=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('host_tag', 'tag')],
-				'value'		=> ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('host_tag', 'value'), 'default' => DB::getDefault('host_tag', 'value')]
-			]]
-		]];
-
-		// Keep values only for fields with defined validation rules.
-		$host = array_intersect_key($host, $api_input_rules['fields']);
-
-		if (!CApiInputValidator::validate($api_input_rules, $host, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-	}
-
-	/**
-	 * Add the existing host groups, templates, tags, macros.
+	 * Add the existing host or template groups, templates, tags, macros.
 	 *
 	 * @param array $hosts
 	 * @param array $db_hosts
@@ -1822,11 +1757,20 @@ abstract class CHostGeneral extends CHostBase {
 		$filter = ['hostid' => $hostids];
 
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-			$db_groups = API::HostGroup()->get([
-				'output' => [],
-				$id_field_name.'s' => $hostids,
-				'preservekeys' => true
-			]);
+			if ($this instanceof CTemplate) {
+				$db_groups = API::TemplateGroup()->get([
+					'output' => [],
+					'templateids' => $hostids,
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$db_groups = API::HostGroup()->get([
+					'output' => [],
+					'hostids' => $hostids,
+					'preservekeys' => true
+				]);
+			}
 
 			$filter += ['groupid' => array_keys($db_groups)];
 		}
@@ -1865,11 +1809,20 @@ abstract class CHostGeneral extends CHostBase {
 				$filter += ['groupid' => $objectids];
 			}
 			elseif (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-				$db_groups = API::HostGroup()->get([
-					'output' => [],
-					$id_field_name.'s' => array_keys($db_hosts),
-					'preservekeys' => true
-				]);
+				if ($this instanceof CTemplate) {
+					$db_groups = API::TemplateGroup()->get([
+						'output' => [],
+						'templateids' => array_keys($db_hosts),
+						'preservekeys' => true
+					]);
+				}
+				else {
+					$db_groups = API::HostGroup()->get([
+						'output' => [],
+						'hostids' => array_keys($db_hosts),
+						'preservekeys' => true
+					]);
+				}
 
 				$filter += ['groupid' => array_keys($db_groups)];
 			}
