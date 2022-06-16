@@ -5906,9 +5906,6 @@ void	DCsync_configuration(unsigned char mode, zbx_synced_new_config_t synced)
 
 	update_sec = zbx_time() - sec;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
-			__func__, changelog_sec, changelog_num);
-
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + idsec + isec +  tisec + pisec + tsec + dsec + fsec + expr_sec +
