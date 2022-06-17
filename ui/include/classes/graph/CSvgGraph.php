@@ -968,7 +968,7 @@ class CSvgGraph extends CSvg {
 
 			foreach ($this->points[$index] as $points) {
 				foreach ($points as $clock => $point) {
-					$clock += $metric['options']['timeshift'];
+					$clock -= $metric['options']['timeshift'];
 
 					if (!array_key_exists($clock, $this->bar_data[$metric['options']['axisy']])) {
 						$this->bar_data[$metric['options']['axisy']][$clock] = [];
@@ -1031,11 +1031,7 @@ class CSvgGraph extends CSvg {
 				}
 			}
 
-			$group_width = $clock_min_diff / $time_range * $this->canvas_width;
-
-			if ($group_width > 10) {
-				$group_width *= .75;
-			}
+			$group_width = $clock_min_diff / $time_range * $this->canvas_width * .75;
 
 			$bar_groups = [];
 
@@ -1055,7 +1051,7 @@ class CSvgGraph extends CSvg {
 			}
 
 			foreach ($bar_groups as $clock_px => $bar_group) {
-				$metric_width = max(1, $group_width / count($bar_group));
+				$metric_width = max(1, round($group_width / count($bar_group)));
 
 				$group_x1 = ($clock_px - $this->time_from) / $time_range * $this->canvas_width - $group_width / 2;
 				$bar_stack_x1 = $group_x1;
