@@ -1114,15 +1114,7 @@ static void	zbx_check_db(void)
 
 	DBextract_version_info(&db_version_info);
 
-	if (db_version_info.current_version < db_version_info.min_version)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Error! Current %s database version is too old (%s)",
-				db_version_info.database, db_version_info.friendly_current_version);
-		zabbix_log(LOG_LEVEL_ERR, "Must be a least %s", db_version_info.friendly_min_version);
-
-		exit(EXIT_FAILURE);
-	}
-	else if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag ||
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == db_version_info.flag ||
 			DB_VERSION_HIGHER_THAN_MAXIMUM == db_version_info.flag)
 	{
 		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
@@ -1148,6 +1140,7 @@ static void	zbx_check_db(void)
 					" in Zabbix proxy configuration file at your own risk.");
 			zabbix_log(LOG_LEVEL_ERR, " ");
 
+			zbx_free(db_version_info.friendly_current_version);
 			exit(EXIT_FAILURE);
 		}
 		else
@@ -1170,6 +1163,15 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
 			zabbix_log(LOG_LEVEL_ERR, " ");
 		}
+	}
+	else if (DB_VERSION_LOWER_THAN_MINIMUM == db_version_info.flag && 1 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Error! Current %s database version is too old (%s)",
+				db_version_info.database, db_version_info.friendly_current_version);
+		zabbix_log(LOG_LEVEL_ERR, "Must be a least %s", db_version_info.friendly_min_version);
+
+		zbx_free(db_version_info.friendly_current_version);
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_free(db_version_info.friendly_current_version);
