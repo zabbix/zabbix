@@ -302,7 +302,7 @@ typedef struct
 zbx_lld_group_rights_t;
 
 static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
-		const zbx_vector_ptr_t *lld_macros);
+		const zbx_vector_ptr_t *lld_macros, char **error);
 
 typedef struct
 {
@@ -629,21 +629,6 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
-	/* check host tag validness */
-	for (i = 0; i < hosts->values_num; i++)
-	{
-		host = (zbx_lld_host_t *)hosts->values[i];
-
-		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
-			continue;
-
-		if (SUCCEED != zbx_validate_tags(&host->tags, "host", error) && 0 == host->hostid)
-		{
-			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
-			*error = zbx_strdcatf(*error, "Cannot create host: tag validation failed.\n");
-		}
-	}
-
 	/* checking duplicated host names */
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -835,7 +820,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros,
-		unsigned char custom_iface)
+		unsigned char custom_iface, char **error)
 {
 	char			*buffer = NULL;
 	int			i, host_found = 0;
@@ -983,7 +968,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 	{
 		zbx_vector_db_tag_ptr_append_array(&tmp_tags, tags->values, tags->values_num);
-		lld_host_update_tags(host, &tmp_tags, lld_macros);
+		lld_host_update_tags(host, &tmp_tags, lld_macros, error);
 
 		if (0 != lnk_templateids.values_num)
 		{
@@ -2242,7 +2227,7 @@ static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr
  *                                                                            *
  ******************************************************************************/
 static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
-		const zbx_vector_ptr_t *lld_macros)
+		const zbx_vector_ptr_t *lld_macros, char **error)
 {
 	int			i;
 	zbx_db_tag_t		*proto_tag;
@@ -2268,7 +2253,14 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 		zbx_free(value);
 	}
 
-	zbx_merge_tags(&host->tags, &new_tags);
+	if (SUCCEED != zbx_merge_tags(&host->tags, &new_tags, "host", error))
+	{
+		if (0 == host->hostid)
+		{
+			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+			*error = zbx_strdcatf(*error, "Cannot create host: tag validation failed.\n");
+		}
+	}
 
 	zbx_free(tag);
 	zbx_free(value);
@@ -4434,7 +4426,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
-					status, discover, &tags, lld_row, lld_macro_paths, use_custom_interfaces)))
+					status, discover, &tags, lld_row, lld_macro_paths, use_custom_interfaces,
+					error)))
 			{
 				continue;
 			}
