@@ -1294,11 +1294,11 @@ class CWidgetHelper {
 							new CLabel(_('Draw')),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][type]', (int) $value['type']))
+									->addClass('js-type')
 									->addValue(_('Line'), SVG_GRAPH_TYPE_LINE)
 									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
 									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
 									->addValue(_('Bar'), SVG_GRAPH_TYPE_BAR)
-									->onChange('widget_svggraph_form.changeDataSetDrawType(this)')
 									->setModern(true)
 							)
 						])
@@ -1307,9 +1307,9 @@ class CWidgetHelper {
 							new CFormField([
 								(new CVar($field_name.'['.$row_num.'][stacked]', '0'))->removeId(),
 								(new CCheckBox($field_name.'['.$row_num.'][stacked]'))
+									->addClass('js-stacked')
 									->setChecked((bool) $value['stacked'])
 									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
-									->onChange('widget_svggraph_form.changeStackedState(this)')
 							])
 						])
 						->addItem([

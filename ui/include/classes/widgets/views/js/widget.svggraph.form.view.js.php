@@ -123,6 +123,10 @@ window.widget_svggraph_form = new class {
 			})
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
 
+		for (const element of this.dataset_wrapper.querySelectorAll('.js-type, .js-stacked')) {
+			element.addEventListener('change', () => this.updatedForm());
+		}
+
 		// Initialize rangeControl UI elements.
 		jQuery('.<?= CRangeControl::ZBX_STYLE_CLASS ?>', jQuery(this.dataset_wrapper)).rangeControl();
 
@@ -740,67 +744,75 @@ window.widget_svggraph_form = new class {
 		this.rewriteNameLinks();
 	}
 
-
-	changeDataSetDrawType(obj) {
+	updatedForm() {
 		const row_num = this.getDataSetNumber();
-		const approximation_select = document.getElementById('ds_' + row_num + '_approximation');
 
-		switch (jQuery(':checked', jQuery(obj)).val()) {
+		const draw_type = document.querySelector(`#ds_${row_num}_type :checked`).value;
+		const is_stacked = document.getElementById(`ds_${row_num}_stacked`).checked;
+
+		const aggregate_function_select = document.getElementById(`ds_${row_num}_aggregate_function`);
+		const approximation_select = document.getElementById(`ds_${row_num}_approximation`);
+
+		let stacked_enabled = true;
+		let width_enabled = true;
+		let pointsize_enabled = true;
+		let fill_enabled = true;
+		let missingdata_enabled = true;
+		let aggregate_none_enabled = true;
+		let approximation_all_enabled = true;
+
+		switch (draw_type) {
+			case '<?= SVG_GRAPH_TYPE_LINE ?>':
+				pointsize_enabled = false;
+				if (is_stacked) {
+					approximation_all_enabled = false;
+				}
+				break;
+
 			case '<?= SVG_GRAPH_TYPE_POINTS ?>':
-				jQuery(`#ds_${row_num}_width`).rangeControl('disable');
-				jQuery(`#ds_${row_num}_pointsize`).rangeControl('enable');
-				jQuery(`#ds_${row_num}_transparency`).rangeControl('enable');
-				jQuery(`#ds_${row_num}_fill`).rangeControl('disable');
-				jQuery(`#ds_${row_num}_missingdatafunc_0`).prop('disabled', true);
-				jQuery(`#ds_${row_num}_missingdatafunc_1`).prop('disabled', true);
-				jQuery(`#ds_${row_num}_missingdatafunc_2`).prop('disabled', true);
-				jQuery(`#ds_${row_num}_missingdatafunc_3`).prop('disabled', true);
-				jQuery(`#ds_${row_num}_stacked`).prop('disabled', true);
-
-				approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = true;
-				if (approximation_select.value == <?= APPROXIMATION_ALL ?>) {
-					approximation_select.value = <?= APPROXIMATION_AVG ?>;
-				}
+				stacked_enabled = false;
+				width_enabled = false;
+				fill_enabled = false;
+				missingdata_enabled = false;
+				approximation_all_enabled = false;
 				break;
+
+			case '<?= SVG_GRAPH_TYPE_STAIRCASE ?>':
+				pointsize_enabled = false;
+				approximation_all_enabled = false;
+				break;
+
 			case '<?= SVG_GRAPH_TYPE_BAR ?>':
-				jQuery(`#ds_${row_num}_width`).rangeControl('disable');
-				jQuery(`#ds_${row_num}_pointsize`).rangeControl('disable');
-				jQuery(`#ds_${row_num}_transparency`).rangeControl('enable');
-				jQuery(`#ds_${row_num}_fill`).rangeControl('disable');
-				jQuery(`#ds_${row_num}_missingdatafunc_1`).prop('disabled', true);
-				jQuery(`#ds_${row_num}_missingdatafunc_2`).prop('disabled', true);
-				jQuery(`#ds_${row_num}_missingdatafunc_3`).prop('disabled', true);
-				jQuery(`#ds_${row_num}_missingdatafunc_3`).prop('disabled', true);
-				jQuery(`#ds_${row_num}_missingdatafunc_0`).prop('disabled', true);
-				jQuery(`#ds_${row_num}_stacked`).prop('disabled', false);
+				width_enabled = false;
+				pointsize_enabled = false;
+				fill_enabled = false;
+				missingdata_enabled = false;
 
-				approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = true;
-				if (approximation_select.value == <?= APPROXIMATION_ALL ?>) {
-					approximation_select.value = <?= APPROXIMATION_AVG ?>;
+				if (is_stacked) {
+					aggregate_none_enabled = false;
 				}
+
+				approximation_all_enabled = false;
 				break;
-			default:
-				jQuery(`#ds_${row_num}_width`).rangeControl('enable');
-				jQuery(`#ds_${row_num}_pointsize`).rangeControl('disable');
-				jQuery(`#ds_${row_num}_transparency`).rangeControl('enable');
-				jQuery(`#ds_${row_num}_fill`).rangeControl('enable');
-				jQuery(`#ds_${row_num}_missingdatafunc_0`).prop('disabled', false);
-				jQuery(`#ds_${row_num}_missingdatafunc_1`).prop('disabled', false);
-				jQuery(`#ds_${row_num}_missingdatafunc_2`).prop('disabled', false);
-				jQuery(`#ds_${row_num}_missingdatafunc_3`).prop('disabled', false);
-				jQuery(`#ds_${row_num}_stacked`).prop('disabled', false);
+		}
 
-				if (!jQuery(`#ds_${row_num}_stacked`).is(':checked')) {
-					approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = false;
-				}
+		document.getElementById(`ds_${row_num}_stacked`).disabled = !stacked_enabled;
+		jQuery(`#ds_${row_num}_width`).rangeControl(width_enabled ? 'enable' : 'disable');
+		jQuery(`#ds_${row_num}_pointsize`).rangeControl(pointsize_enabled ? 'enable' : 'disable');
+		jQuery(`#ds_${row_num}_fill`).rangeControl(fill_enabled ? 'enable' : 'disable');
+		document.getElementById(`ds_${row_num}_missingdatafunc_0`).disabled = !missingdata_enabled;
+		document.getElementById(`ds_${row_num}_missingdatafunc_1`).disabled = !missingdata_enabled;
+		document.getElementById(`ds_${row_num}_missingdatafunc_2`).disabled = !missingdata_enabled;
+		document.getElementById(`ds_${row_num}_missingdatafunc_3`).disabled = !missingdata_enabled;
 
-				if (obj.querySelector(':checked').value == '<?= SVG_GRAPH_TYPE_STAIRCASE ?>') {
-					approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = true;
-					if (approximation_select.value == <?= APPROXIMATION_ALL ?>) {
-						approximation_select.value = <?= APPROXIMATION_AVG ?>;
-					}
-				}
-				break;
+		aggregate_function_select.getOptionByValue(<?= AGGREGATE_NONE ?>).disabled = !aggregate_none_enabled;
+		if (!aggregate_none_enabled && aggregate_function_select.value == <?= AGGREGATE_NONE ?>) {
+			aggregate_function_select.value = <?= AGGREGATE_AVG ?>;
+		}
+
+		approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = !approximation_all_enabled;
+		if (!approximation_all_enabled && approximation_select.value == <?= APPROXIMATION_ALL ?>) {
+			approximation_select.value = <?= APPROXIMATION_AVG ?>;
 		}
 	}
 
@@ -811,23 +823,6 @@ window.widget_svggraph_form = new class {
 		jQuery(`#ds_${row_num}_aggregate_interval`).prop('disabled', no_aggregation);
 		jQuery(`#ds_${row_num}_aggregate_grouping0`).prop('disabled', no_aggregation);
 		jQuery(`#ds_${row_num}_aggregate_grouping1`).prop('disabled', no_aggregation);
-	}
-
-	changeStackedState(obj) {
-		const row_num = this.getDataSetNumber();
-		const approximation_select = document.getElementById('ds_' + row_num + '_approximation');
-
-		if (this.dataset_wrapper.querySelector(`#ds_${row_num}_type :checked`).value  == '<?= SVG_GRAPH_TYPE_LINE ?>') {
-			approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = false;
-		}
-
-		if (obj.checked) {
-			approximation_select.getOptionByValue(<?= APPROXIMATION_ALL ?>).disabled = true;
-
-			if (approximation_select.value == <?= APPROXIMATION_ALL ?>) {
-				approximation_select.value = <?= APPROXIMATION_AVG ?>;
-			}
-		}
 	}
 };
 
