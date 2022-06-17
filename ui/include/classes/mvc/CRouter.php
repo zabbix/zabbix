@@ -165,7 +165,6 @@ class CRouter {
 		'popup.condition.actions'					=> ['CControllerPopupConditionActions',					'layout.json',			'popup.condition.common'],
 		'popup.condition.event.corr'				=> ['CControllerPopupConditionEventCorr',				'layout.json',			'popup.condition.common'],
 		'popup.condition.operations'				=> ['CControllerPopupConditionOperations',				'layout.json',			'popup.condition.common'],
-		'popup.element.copy'						=> ['CControllerPopupElementCopy',						'layout.json',			'popup.element.copy'],
 		'popup.copy.items'		    				=> ['CControllerPopupCopy',								'layout.json',			'popup.copy'],
 		'popup.copy.triggers'						=> ['CControllerPopupCopy',								'layout.json',			'popup.copy'],
 		'popup.copy.graphs'					    	=> ['CControllerPopupCopy',								'layout.json',			'popup.copy'],
