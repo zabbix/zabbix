@@ -395,8 +395,8 @@ class CSvgGraph extends CSvg {
 
 			if (!array_key_exists($metric['data_set'], $surface)) {
 				$surface[$metric['data_set']] = [
-					'top' => [[$this->time_from, 0], [$this->time_till, 0]],
-					'bottom' => [[$this->time_from, 0], [$this->time_till, 0]]
+					'positive' => [[$this->time_from, 0], [$this->time_till, 0]],
+					'negative' => [[$this->time_from, 0], [$this->time_till, 0]]
 				];
 			}
 
@@ -412,17 +412,17 @@ class CSvgGraph extends CSvg {
 			}
 
 			foreach ($this->points[$index] as $points) {
-				$side_fragments = ['top' => [], 'bottom' => []];
+				$side_fragments = ['positive' => [], 'negative' => []];
 
 				$side_fragment_points = [];
-				$is_top = reset($points)[$approximation] >= 0;
+				$is_positive = reset($points)[$approximation] >= 0;
 				$line_break = false;
 				$prev_point = null;
 
 				foreach ($points as $clock => $point) {
 					$point_value = $point[$approximation];
 
-					if ($is_top != $point_value >= 0 && $point_value != 0) {
+					if ($is_positive != $point_value >= 0 && $point_value != 0) {
 						$break_point = [
 							$prev_point[0]
 								+ ($clock - $prev_point[0]) * $prev_point[1] / ($prev_point[1] - $point_value),
@@ -433,7 +433,7 @@ class CSvgGraph extends CSvg {
 							$side_fragment_points[] = $break_point;
 						}
 
-						$side_fragments[$is_top ? 'top' : 'bottom'][] = [
+						$side_fragments[$is_positive ? 'positive' : 'negative'][] = [
 							'points' => $side_fragment_points,
 							'line_cont_start' => $line_break,
 							'line_cont_end' => true
@@ -442,20 +442,20 @@ class CSvgGraph extends CSvg {
 						$line_break = true;
 
 						$side_fragment_points = [$break_point];
-						$is_top = !$is_top;
+						$is_positive = !$is_positive;
 					}
 
 					$prev_point = [$clock, $point_value, true];
 					$side_fragment_points[] = $prev_point;
 				}
 
-				$side_fragments[$is_top ? 'top' : 'bottom'][] = [
+				$side_fragments[$is_positive ? 'positive' : 'negative'][] = [
 					'points' => $side_fragment_points,
 					'line_cont_start' => $line_break,
 					'line_cont_end' => false
 				];
 
-				foreach (['top', 'bottom'] as $side) {
+				foreach (['positive', 'negative'] as $side) {
 					foreach ($side_fragments[$side] as $side_fragment) {
 						$this->stacked_points[$index][] = self::calculateStackedFragment($side_fragment,
 							$surface[$metric['data_set']][$side]
@@ -497,7 +497,7 @@ class CSvgGraph extends CSvg {
 
 		$area = [];
 
-		for ($pi = 0; $pi < count($points); $pi++) {
+		for ($pi = 0, $count = count($points); $pi < $count; $pi++) {
 			while ($si < count($surface) - 1 && $surface[$si + 1][0] < $points[$pi][0]) {
 				$si++;
 
