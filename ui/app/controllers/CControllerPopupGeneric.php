@@ -1126,7 +1126,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'items':
 				foreach ($records as $itemid => $row) {
-					$records[$row['name']] = ['itemid' => $row['name']] + $row;
+					$records[$row['name']] = ['pattern' => $row['name']] + $row;
 					unset($records[$itemid]);
 				}
 				break;
