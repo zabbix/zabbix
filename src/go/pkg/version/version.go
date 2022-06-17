@@ -26,10 +26,10 @@ import (
 )
 
 const (
-	ZABBIX_REVDATE          = "3 May 2022"
+	ZABBIX_REVDATE          = "30 May 2022"
 	ZABBIX_VERSION_MAJOR    = 6
 	ZABBIX_VERSION_MINOR    = 0
-	ZABBIX_VERSION_PATCH    = 5
+	ZABBIX_VERSION_PATCH    = 6
 	ZABBIX_VERSION_RC       = "rc1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
@@ -140,9 +140,15 @@ func TitleMessage() string {
 	return title
 }
 
-func Display() {
+func Display(additionalMessages []string) {
 	fmt.Printf("%s (Zabbix) %s\n", TitleMessage(), Long())
-	fmt.Printf("Revision %s %s, compilation time: %s %s\n\n", Revision(), RevDate(), CompileDate(), CompileTime())
+	fmt.Printf("Revision %s %s, compilation time: %s %s\n", Revision(), RevDate(), CompileDate(), CompileTime())
+
+	for _, msg := range additionalMessages {
+		fmt.Println(msg)
+	}
+
+	fmt.Println()
 	fmt.Println(CopyrightMessage())
 }
 

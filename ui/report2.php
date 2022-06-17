@@ -462,7 +462,7 @@ else {
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
 			->addRow(
-				(new CLabel(_('Hosts'), 'filter_hostid__ms')),
+				(new CLabel(_('Hosts'), 'filter_hostids__ms')),
 				(new CMultiSelect([
 					'name' => 'filter_hostids[]',
 					'object_name' => 'hosts',

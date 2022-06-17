@@ -1486,12 +1486,13 @@ class testPageServicesServices extends CWebTest {
 			// Remove the additional rules from previous test cases.
 			$form->getFieldContainer('Additional rules')->query('button:Remove')->all(false)->click();
 
-			// Fill in configuration of each Addirional rule separately.
+			// Fill in configuration of each Additional rule separately.
 			foreach ($data['parent']['Additional rules'] as $rule_fields) {
 				$form->getFieldContainer('Additional rules')->query('button:Add')->waitUntilClickable()->one()->click();
 				$rules_form = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 				$rules_form->fill($rule_fields);
 				$rules_form->submit();
+				$rules_form->waitUntilNotVisible();
 			}
 		}
 
