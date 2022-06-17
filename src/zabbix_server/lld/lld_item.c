@@ -1566,23 +1566,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, zbx
 		}
 	}
 
-	/* check item tags for new and updated discovered items */
-	for (i = 0; i < items->values_num; i++)
-	{
-		item = (zbx_lld_item_t *)items->values[i];
-
-		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-			continue;
-
-		if (SUCCEED != zbx_validate_tags(&item->item_tags, "item", error) && 0 == item->itemid)
-		{
-			item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-			*error = zbx_strdcatf(*error, "Cannot create item: tag validation failed.\n");
-		}
-
-		zbx_vector_db_tag_ptr_sort(&item->item_tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	}
-
 	/* check preprocessing steps for new and updated discovered items */
 	for (i = 0; i < items->values_num; i++)
 	{
@@ -2769,7 +2752,7 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_macro_paths,
-		zbx_vector_ptr_t *items)
+		zbx_vector_ptr_t *items, char **error)
 {
 	int				i, j, index;
 	zbx_lld_item_t			*item;
@@ -2817,7 +2800,14 @@ static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const z
 					ZBX_MACRO_ANY, NULL, 0);
 		}
 
-		zbx_merge_tags(&item->item_tags, &new_tags);
+		if (SUCCEED != zbx_merge_tags(&item->item_tags, &new_tags, "item", error))
+		{
+			if (0 == item->itemid)
+			{
+				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+				*error = zbx_strdcatf(*error, "Cannot create item: tag validation failed.\n");
+			}
+		}
 	}
 
 	zbx_vector_db_tag_ptr_destroy(&new_tags);
@@ -4447,7 +4437,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_pt
 	lld_items_make(&item_prototypes, lld_rows, lld_macro_paths, &items, &items_index, error);
 	lld_items_preproc_make(&item_prototypes, lld_macro_paths, &items);
 	lld_items_param_make(&item_prototypes, lld_macro_paths, &items);
-	lld_items_tags_make(&item_prototypes, lld_macro_paths, &items);
+	lld_items_tags_make(&item_prototypes, lld_macro_paths, &items, error);
 
 	lld_link_dependent_items(&items, &items_index);
 

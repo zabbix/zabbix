@@ -630,21 +630,6 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
 	}
 
-	/* check host tag validness */
-	for (i = 0; i < hosts->values_num; i++)
-	{
-		host = (zbx_lld_host_t *)hosts->values[i];
-
-		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
-			continue;
-
-		if (SUCCEED != zbx_validate_tags(&host->tags, "host", error) && 0 == host->hostid)
-		{
-			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
-			*error = zbx_strdcatf(*error, "Cannot create host: tag validation failed.\n");
-		}
-	}
-
 	/* checking duplicated host names */
 	for (i = 0; i < hosts->values_num; i++)
 	{
@@ -836,7 +821,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros,
-		unsigned char custom_iface)
+		unsigned char custom_iface, char **error)
 {
 	char			*buffer = NULL;
 	int			i, host_found = 0;
@@ -1007,7 +992,14 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 					NULL, 0);
 		}
 
-		zbx_merge_tags(&host->tags, &new_tags);
+		if (SUCCEED != zbx_merge_tags(&host->tags, &new_tags, "host", error))
+		{
+			if (0 == host->hostid)
+			{
+				host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+				*error = zbx_strdcatf(*error, "Cannot create host: tag validation failed.\n");
+			}
+		}
 
 		/* sort existing tags by their ids for update operations */
 		zbx_vector_db_tag_ptr_sort(&host->tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -4447,7 +4439,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
-					status, discover, &tags, lld_row, lld_macro_paths, use_custom_interfaces)))
+					status, discover, &tags, lld_row, lld_macro_paths, use_custom_interfaces,
+					error)))
 			{
 				continue;
 			}

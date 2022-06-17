@@ -760,8 +760,7 @@ void		zbx_db_tag_free(zbx_db_tag_t *tag);
 int		zbx_db_tag_compare_func(const void *d1, const void *d2);
 int		zbx_db_tag_compare_func_template(const void *d1, const void *d2);
 
-void	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src);
-int	zbx_validate_tags(zbx_vector_db_tag_ptr_t *tags, const char *owner, char **error);
+int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
 
 typedef enum
 {

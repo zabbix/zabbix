@@ -1847,7 +1847,8 @@ static void	lld_trigger_dependencies_make(const zbx_vector_ptr_t *trigger_protot
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
-		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
+		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths,
+		char **error)
 {
 	zbx_lld_trigger_t	*trigger;
 	int			i;
@@ -1883,7 +1884,12 @@ static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_pro
 				NULL, 0);
 	}
 
-	zbx_merge_tags(&trigger->tags, &new_tags);
+	if (SUCCEED != zbx_merge_tags(&trigger->tags, &new_tags, "trigger", error) && 0 == trigger->triggerid)
+	{
+		trigger->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
+		*error = zbx_strdcatf(*error, "Cannot create trigger: tag validation failed.\n");
+	}
+
 	zbx_vector_db_tag_ptr_destroy(&new_tags);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1895,7 +1901,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_tags_make(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
-		const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths)
+		const zbx_vector_ptr_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths, char **error)
 {
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	int				i, j;
@@ -1933,7 +1939,7 @@ static void	lld_trigger_tags_make(const zbx_vector_ptr_t *trigger_prototypes, zb
 		{
 			zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[j];
 
-			lld_trigger_tag_make(trigger_prototype, &items_triggers, lld_row, lld_macro_paths);
+			lld_trigger_tag_make(trigger_prototype, &items_triggers, lld_row, lld_macro_paths, error);
 		}
 	}
 
@@ -2239,31 +2245,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 	zbx_vector_uint64_destroy(&triggerids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: validate created or updated trigger tags                          *
- *                                                                            *
- ******************************************************************************/
-static void	lld_triggers_tags_validate(zbx_vector_ptr_t *triggers, char **error)
-{
-	int			i;
-	zbx_lld_trigger_t	*trigger;
-
-	for (i = 0; i < triggers->values_num; i++)
-	{
-		trigger = (zbx_lld_trigger_t *)triggers->values[i];
-
-		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
-			continue;
-
-		if (SUCCEED != zbx_validate_tags(&trigger->tags, "trigger", error) && 0 == trigger->triggerid)
-		{
-			trigger->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
-			*error = zbx_strdcatf(*error, "Cannot create trigger: tag validation failed.\n");
-		}
-	}
 }
 
 /******************************************************************************
@@ -3623,8 +3604,7 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_triggers_validate(hostid, &triggers, error);
 	lld_trigger_dependencies_make(&trigger_prototypes, &triggers, lld_rows, error);
 	lld_trigger_dependencies_validate(&triggers, error);
-	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows, lld_macro_paths);
-	lld_triggers_tags_validate(&triggers, error);
+	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows, lld_macro_paths, error);
 	ret = lld_triggers_save(hostid, &trigger_prototypes, &triggers);
 	lld_remove_lost_objects("trigger_discovery", "triggerid", &triggers, lifetime, lastcheck, DBdelete_triggers,
 			get_trigger_info);
