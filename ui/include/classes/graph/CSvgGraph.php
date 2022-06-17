@@ -39,51 +39,53 @@ class CSvgGraph extends CSvg {
 	private $graph_theme;
 
 	/**
-	 * Array of graph metrics data.
+	 * Graph metrics.
 	 *
 	 * @var array
 	 */
-	private $metrics = [];
+	private array $metrics = [];
 
 	/**
-	 * Array of graph points data. Calculated from metrics data.
+	 * Original graph points, calculated from metrics.
 	 *
 	 * @var array
 	 */
-	private $points = [];
+	private array $points = [];
 
 	/**
-	 * Array of stacked graph points data. Calculated from metrics data.
+	 * Graph points for stacked lines and stacked staircases, calculated from metrics and original graph points.
 	 *
 	 * @var array
 	 */
-	private $stacked_points = [];
+	private array $stacked_points = [];
 
 	/**
-	 * Bar graph points data. Calculated from metrics data.
+	 * Bar points for stacked and unstacked bars, calculated from metrics and original graph points.
 	 *
 	 * @var array
 	 */
-	private array $bar_data = [];
+	private array $bar_points = [];
 
 	/**
-	 * Array of metric paths. Key is metric index from $metrics array.
+	 * Metric paths for points, unstacked lines and unstacked staircases, calculated from original points.
 	 *
 	 * @var array
 	 */
-	private $paths = [];
+	private array $paths = [];
 
 	/**
+	 * Metric paths for stacked lines and stacked staircases, calculated from stacked points.
+	 *
+	 * @var array
+	 */
+	private array $stacked_paths = [];
+
+	/**
+	 * Metric paths for stacked and unstacked bars, calculated from bar points.
+	 *
 	 * @var array
 	 */
 	private array $bar_paths = [];
-
-	/**
-	 * Array of stacked metric paths. Key is metric index from $metrics array.
-	 *
-	 * @var array
-	 */
-	private $stacked_paths = [];
 
 	private $show_working_time;
 	private $show_percentile_left;
@@ -288,15 +290,15 @@ class CSvgGraph extends CSvg {
 	public function draw(): self {
 		$this->applyMissingDataFunc();
 		$this->recalculatePoints();
-
 		$this->calculateStackedPoints();
-		$this->prepareBarData();
+		$this->calculateBarPoints();
+
 		$this->calculateDimensions();
 
 		if ($this->canvas_width > 0 && $this->canvas_height > 0) {
 			$this->calculatePaths();
-			$this->calculateBarPaths();
 			$this->calculateStackedPaths();
+			$this->calculateBarPaths();
 
 			$this->drawWorkingTime();
 
@@ -455,7 +457,7 @@ class CSvgGraph extends CSvg {
 
 				foreach (['top', 'bottom'] as $side) {
 					foreach ($side_fragments[$side] as $side_fragment) {
-						$this->stacked_points[$index][] = self::calculateStackedData($side_fragment,
+						$this->stacked_points[$index][] = self::calculateStackedFragment($side_fragment,
 							$surface[$metric['data_set']][$side]
 						);
 					}
@@ -478,7 +480,7 @@ class CSvgGraph extends CSvg {
 	 *
 	 * @return array
 	 */
-	private static function calculateStackedData(array $fragment, array &$surface): array {
+	private static function calculateStackedFragment(array $fragment, array &$surface): array {
 		[
 			'points' => $points,
 			'line_cont_start' => $line_cont_start,
@@ -540,6 +542,66 @@ class CSvgGraph extends CSvg {
 	 */
 	private static function calculatePointOnLine(array $start, array $end, array $at): array {
 		return [$at[0], $start[1] + $at[1] + ($at[0] - $start[0]) / ($end[0] - $start[0]) * ($end[1] - $start[1])];
+	}
+
+	private function calculateBarPoints(): void {
+		$stacked_dataset_groups = [];
+
+		foreach ($this->metrics as $index => $metric) {
+			if ($metric['options']['type'] != SVG_GRAPH_TYPE_BAR || !array_key_exists($index, $this->points)) {
+				continue;
+			}
+
+			if (!array_key_exists($metric['options']['axisy'], $this->bar_points)) {
+				$this->bar_points[$metric['options']['axisy']] = [];
+			}
+
+			switch ($metric['options']['approximation']) {
+				case APPROXIMATION_MIN:
+					$approximation = 'min';
+					break;
+				case APPROXIMATION_MAX:
+					$approximation = 'max';
+					break;
+				default:
+					$approximation = 'avg';
+			}
+
+			foreach ($this->points[$index] as $points) {
+				foreach ($points as $clock => $point) {
+					$clock -= $metric['options']['timeshift'];
+
+					if (!array_key_exists($clock, $this->bar_points[$metric['options']['axisy']])) {
+						$this->bar_points[$metric['options']['axisy']][$clock] = [];
+					}
+
+					if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
+						if (!array_key_exists($clock, $stacked_dataset_groups)) {
+							$stacked_dataset_groups[$clock] = [];
+						}
+
+						$group_index = array_key_exists($metric['data_set'], $stacked_dataset_groups[$clock])
+							? $stacked_dataset_groups[$clock][$metric['data_set']]
+							: count($this->bar_points[$metric['options']['axisy']][$clock]);
+
+						$stacked_dataset_groups[$clock][$metric['data_set']] = $group_index;
+					}
+					else {
+						$group_index = count($this->bar_points[$metric['options']['axisy']][$clock]);
+					}
+
+					$this->bar_points[$metric['options']['axisy']][$clock][$group_index][] = [
+						$index,
+						$point[$approximation]
+					];
+				}
+			}
+		}
+
+		foreach ($this->bar_points as &$side_bar_data) {
+			ksort($side_bar_data, SORT_NUMERIC);
+		}
+		unset($side_bar_data);
 	}
 
 	/**
@@ -625,7 +687,7 @@ class CSvgGraph extends CSvg {
 			}
 		}
 
-		foreach ($this->bar_data as $side => $side_bar_data) {
+		foreach ($this->bar_points as $side => $side_bar_data) {
 			foreach ($side_bar_data as $bar_group) {
 				foreach ($bar_group as $bar_stack) {
 					$bar_stack_min = 0;
@@ -943,66 +1005,6 @@ class CSvgGraph extends CSvg {
 		}
 	}
 
-	private function prepareBarData(): void {
-		$stacked_dataset_groups = [];
-
-		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['type'] != SVG_GRAPH_TYPE_BAR || !array_key_exists($index, $this->points)) {
-				continue;
-			}
-
-			if (!array_key_exists($metric['options']['axisy'], $this->bar_data)) {
-				$this->bar_data[$metric['options']['axisy']] = [];
-			}
-
-			switch ($metric['options']['approximation']) {
-				case APPROXIMATION_MIN:
-					$approximation = 'min';
-					break;
-				case APPROXIMATION_MAX:
-					$approximation = 'max';
-					break;
-				default:
-					$approximation = 'avg';
-			}
-
-			foreach ($this->points[$index] as $points) {
-				foreach ($points as $clock => $point) {
-					$clock -= $metric['options']['timeshift'];
-
-					if (!array_key_exists($clock, $this->bar_data[$metric['options']['axisy']])) {
-						$this->bar_data[$metric['options']['axisy']][$clock] = [];
-					}
-
-					if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
-						if (!array_key_exists($clock, $stacked_dataset_groups)) {
-							$stacked_dataset_groups[$clock] = [];
-						}
-
-						$group_index = array_key_exists($metric['data_set'], $stacked_dataset_groups[$clock])
-							? $stacked_dataset_groups[$clock][$metric['data_set']]
-							: count($this->bar_data[$metric['options']['axisy']][$clock]);
-
-						$stacked_dataset_groups[$clock][$metric['data_set']] = $group_index;
-					}
-					else {
-						$group_index = count($this->bar_data[$metric['options']['axisy']][$clock]);
-					}
-
-					$this->bar_data[$metric['options']['axisy']][$clock][$group_index][] = [
-						$index,
-						$point[$approximation]
-					];
-				}
-			}
-		}
-
-		foreach ($this->bar_data as &$side_bar_data) {
-			ksort($side_bar_data, SORT_NUMERIC);
-		}
-		unset($side_bar_data);
-	}
-
 	private function calculateBarPaths(): void {
 		// Metric having very big values of y outside visible area will fail to render.
 		$y_max = 2 ** 16;
@@ -1011,11 +1013,11 @@ class CSvgGraph extends CSvg {
 		$time_range = ($this->time_till - $this->time_from) ?: 1;
 		$time_per_px = $time_range / $this->canvas_width;
 
-		foreach ($this->bar_data as $side => $side_bar_data) {
+		foreach ($this->bar_points as $side => $side_bar_data) {
 			$min_value = $side == GRAPH_YAXIS_SIDE_RIGHT ? $this->right_y_min : $this->left_y_min;
 			$max_value = $side == GRAPH_YAXIS_SIDE_RIGHT ? $this->right_y_max : $this->left_y_max;
 
-			$clock_min_diff = max(1, round(($this->time_till - $this->time_from) * .25));
+			$clock_min_diff = max(1, round($time_range * .25));
 
 			$clock_min_last = [];
 
@@ -1051,9 +1053,9 @@ class CSvgGraph extends CSvg {
 			}
 
 			foreach ($bar_groups as $clock_px => $bar_group) {
-				$metric_width = max(1, round($group_width / count($bar_group)));
+				$metric_width = max(1, ceil($group_width / count($bar_group)));
 
-				$group_x1 = ($clock_px - $this->time_from) / $time_range * $this->canvas_width - $group_width / 2;
+				$group_x1 = ceil(($clock_px - $this->time_from) / $time_range * $this->canvas_width - $group_width / 2);
 				$bar_stack_x1 = $group_x1;
 
 				foreach ($bar_group as $bar_group_index => $bar_stack) {
@@ -1095,15 +1097,15 @@ class CSvgGraph extends CSvg {
 						$bar_y2 = min($y_max, max($y_min, $bar_y2));
 
 						$this->bar_paths[$metric_index][] = [
-							(int) round($this->canvas_x + $bar_stack_x1),
-							(int) round($this->canvas_x + $bar_stack_x2),
+							(int) ($this->canvas_x + $bar_stack_x1),
+							(int) ($this->canvas_x + $bar_stack_x2),
 							(int) $bar_y1,
 							(int) $bar_y2,
 							convertUnits([
 								'value' => $point_value,
 								'units' => $this->metrics[$metric_index]['units']
 							]),
-							(int) round($this->canvas_x + $group_x1)
+							(int) ($this->canvas_x + $group_x1)
 						];
 					}
 
