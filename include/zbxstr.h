@@ -91,7 +91,6 @@ int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);
-wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
 char	*zbx_unicode_to_utf8(const wchar_t *wide_string);
 char	*zbx_unicode_to_utf8_static(const wchar_t *wide_string, char *utf8_string, int utf8_size);
 #endif
@@ -152,9 +151,4 @@ void	zbx_rtrim_utf8(char *str, const char *charlist);
 zbx_uint64_t	suffix2factor(char c);
 
 int	is_double_suffix(const char *str, unsigned char flags);
-
-#if defined(_WINDOWS)
-int	__zbx_stat(const char *path, zbx_stat_t *buf);
-#endif	/* _WINDOWS */
-
 #endif /* ZABBIX_STR_H */

@@ -1276,10 +1276,14 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 const OSVERSIONINFOEX	*zbx_win_getversion(void);
 void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeout, char **utf8_value);
 int	_wis_uint(const wchar_t *wide_string);
+wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
+wchar_t	*zbx_acp_to_unicode(const char *acp_string);
+wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 #endif
 
 #if defined(_WINDOWS)
 typedef struct __stat64	zbx_stat_t;
+int	__zbx_stat(const char *path, zbx_stat_t *buf);
 int	__zbx_open(const char *pathname, int flags);
 #else
 typedef struct stat	zbx_stat_t;

@@ -1059,6 +1059,39 @@ int	_wis_uint(const wchar_t *wide_string)
 
 	return SUCCEED;
 }
+
+/* convert from selected code page to unicode */
+static wchar_t	*zbx_to_unicode(unsigned int codepage, const char *cp_string)
+{
+	wchar_t	*wide_string = NULL;
+	int	wide_size;
+
+	wide_size = MultiByteToWideChar(codepage, 0, cp_string, -1, NULL, 0);
+	wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
+
+	/* convert from cp_string to wide_string */
+	MultiByteToWideChar(codepage, 0, cp_string, -1, wide_string, wide_size);
+
+	return wide_string;
+}
+
+/* convert from UTF-8 to unicode */
+wchar_t	*zbx_utf8_to_unicode(const char *utf8_string)
+{
+	return zbx_to_unicode(CP_UTF8, utf8_string);
+}
+
+/* convert from Windows ANSI code page to unicode */
+wchar_t	*zbx_acp_to_unicode(const char *acp_string)
+{
+	return zbx_to_unicode(CP_ACP, acp_string);
+}
+
+/* convert from Windows OEM code page to unicode */
+wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string)
+{
+	return zbx_to_unicode(CP_OEMCP, oemcp_string);
+}
 #endif
 
 static int	is_double_valid_syntax(const char *str)
