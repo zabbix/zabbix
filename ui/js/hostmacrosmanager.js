@@ -34,7 +34,8 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({parent_hostid}) {
+	constructor({readonly, parent_hostid}) {
+		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
 		this.$container = $('#macros_container .table-forms-td-right');
 	}
@@ -75,7 +76,13 @@ class HostMacrosManager {
 
 					this.$container.append(response.body);
 
-					this.initMacroTable(show_inherited_macros);
+					// Initialize macros.
+					if (this.readonly) {
+						$('.' + HostMacrosManager.ZBX_STYLE_TEXTAREA_FLEXIBLE, this.getMacroTable()).textareaFlexible();
+					}
+					else {
+						this.initMacroTable(show_inherited_macros);
+					}
 
 					// Display debug after loaded content if it is enabled for user.
 					if (typeof response.debug !== 'undefined') {
