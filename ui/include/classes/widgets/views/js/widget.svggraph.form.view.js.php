@@ -650,7 +650,7 @@ window.widget_svggraph_form = new class {
 
 			jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input', $obj)
 				.attr('id', `items_${dataset_number}_${i + 1}_color`)
-				.colorpicker({appendTo: ".overlay-dialogue-body"});
+				.colorpicker({appendTo: '.overlay-dialogue-body'});
 		});
 
 		widget_svggraph_form.rewriteNameLinks();
