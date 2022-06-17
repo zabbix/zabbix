@@ -607,6 +607,22 @@ elseif (isset($_REQUEST['form'])) {
 		$data['show_triggers'] = $_REQUEST['show_triggers'] = 1;
 	}
 
+	if (array_key_exists('ymax_itemid', $data) || array_key_exists('ymin_itemid', $data)) {
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_'],
+			'selectHosts' => ['name'],
+			'itemids' => [
+				array_key_exists('ymax_itemid', $data) ? $data['ymax_itemid'] : '',
+				array_key_exists('ymin_itemid', $data) ? $data['ymin_itemid'] : ''
+			],
+			'webitems' => true,
+			'preservekeys' => true
+		]);
+		$data['yaxis_items'] = CMacrosResolverHelper::resolveItemNames($items);
+
+		unset($items);
+	}
+
 	// items
 	if ($data['items']) {
 		$items = API::Item()->get([

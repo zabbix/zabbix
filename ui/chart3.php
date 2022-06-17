@@ -194,4 +194,4 @@ else {
 	$graph->draw();
 }
 
-require_once dirname(__FILE__).'/include/page_footer.php';
+require_once __DIR__.'/include/page_footer.php';
