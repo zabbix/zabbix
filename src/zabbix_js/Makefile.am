@@ -26,6 +26,6 @@ zabbix_js_LDADD = \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a
 
-zabbix_js_LDADD += @ZBXJS_LIBS@
+zabbix_js_LDADD += @ZBXJS_LIBS@ $(LIBXML2_LIBS)
 
-zabbix_js_LDFLAGS = @ZBXJS_LDFLAGS@
+zabbix_js_LDFLAGS = @ZBXJS_LDFLAGS@ $(LIBXML2_LDFLAGS)
