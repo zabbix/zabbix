@@ -1253,11 +1253,6 @@ void	xml_free_data_dyn(char **data);
 char	*xml_escape_dyn(const char *data);
 void	xml_escape_xpath(char **data);
 
-int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
-		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
-		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
-		char *severity, size_t severity_len);
-
 /* misc functions */
 int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);

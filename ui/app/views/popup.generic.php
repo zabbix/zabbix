@@ -455,14 +455,14 @@ switch ($data['popup_type']) {
 
 				$table->addRow([
 					$data['multiselect']
-						? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid'])
+						? new CCheckBox('item['.$item['itemid'].']', $item['pattern'])
 						: null,
 					(new CLink($item['name'], 'javascript:void(0);'))
 						->onClick('javascript: addValue('.
 							json_encode($options['reference']).', '.
-							json_encode($item['itemid']).', '.
+							json_encode($item['pattern']).', '.
 							$options['parentid'].
-							');'.$js_action_onclick),
+						');'.$js_action_onclick),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
@@ -473,7 +473,7 @@ switch ($data['popup_type']) {
 				]);
 
 				$item = [
-					'id' => $item['itemid'],
+					'id' => $item['pattern'],
 					'itemid' => $item['itemid'],
 					'name' => $options['patternselect']
 						? $item['name']

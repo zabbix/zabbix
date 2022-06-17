@@ -5,7 +5,7 @@
 
 For Zabbix version: 6.0 and higher  
 The template to monitor HPE MSA 2060 by HTTP.
-It works without any external scripts and uses the script items.
+It works without any external scripts and uses the script item.
 
 
 This template was tested on:
@@ -16,9 +16,9 @@ This template was tested on:
 
 > See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
 
-1. Create user "zabbix" on the storage with monitor role.
-2. Link template to the host.
-3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which one API is accessible if not specified.
+1. Create user "zabbix" with monitor role on the storage.
+2. Link the template to a host.
+3. Configure {$HPE.MSA.API.PASSWORD} and an interface with address through which API is accessible.
 4. Change {$HPE.MSA.API.SCHEME} and {$HPE.MSA.API.PORT} macros if needed.
 
 
@@ -32,14 +32,14 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$HPE.MSA.API.PASSWORD} |<p>Specify password for API.</p> |`` |
 |{$HPE.MSA.API.PORT} |<p>Connection port for API.</p> |`443` |
-|{$HPE.MSA.API.SCHEME} |<p>Connection scheme timeout for API.</p> |`https` |
+|{$HPE.MSA.API.SCHEME} |<p>Connection scheme for API.</p> |`https` |
 |{$HPE.MSA.API.USERNAME} |<p>Specify user name for API.</p> |`zabbix` |
 |{$HPE.MSA.CONTROLLER.CPU.UTIL.CRIT} |<p>The critical threshold of the CPU utilization in %.</p> |`90` |
 |{$HPE.MSA.DATA.TIMEOUT} |<p>Response timeout for API.</p> |`30s` |
-|{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT} |<p>The critical threshold of the disk group space utilization in percent.</p> |`90` |
-|{$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN} |<p>The warning threshold of the disk group space utilization in percent.</p> |`80` |
-|{$HPE.MSA.POOL.PUSED.MAX.CRIT} |<p>The critical threshold of the pool space utilization in percent.</p> |`90` |
-|{$HPE.MSA.POOL.PUSED.MAX.WARN} |<p>The warning threshold of the pool space utilization in percent.</p> |`80` |
+|{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT} |<p>The critical threshold of the disk group space utilization in %.</p> |`90` |
+|{$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN} |<p>The warning threshold of the disk group space utilization in %.</p> |`80` |
+|{$HPE.MSA.POOL.PUSED.MAX.CRIT} |<p>The critical threshold of the pool space utilization in %.</p> |`90` |
+|{$HPE.MSA.POOL.PUSED.MAX.WARN} |<p>The warning threshold of the pool space utilization in %.</p> |`80` |
 
 ## Template links
 
@@ -104,7 +104,7 @@ There are no template links in this template.
 |HPE |Disk group [{#NAME}]: Blocks total |<p>Total space in blocks.</p> |DEPENDENT |hpe.msa.disks.groups.blocks["{#NAME}",total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disk-groups'][?(@['name'] == "{#NAME}")].['blocks'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |HPE |Disk group [{#NAME}]: Space free |<p>The free space in the disk group.</p> |CALCULATED |hpe.msa.disks.groups.space["{#NAME}",free]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`last(//hpe.msa.disks.groups.blocks["{#NAME}",size])*last(//hpe.msa.disks.groups.blocks["{#NAME}",free])` |
 |HPE |Disk group [{#NAME}]: Space total |<p>The capacity of the disk group.</p> |CALCULATED |hpe.msa.disks.groups.space["{#NAME}",total]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`last(//hpe.msa.disks.groups.blocks["{#NAME}",size])*last(//hpe.msa.disks.groups.blocks["{#NAME}",total])` |
-|HPE |Disk group [{#NAME}]: Space utilization |<p>The space utilization percentage in the disk group.</p> |CALCULATED |hpe.msa.disks.groups.space["{#NAME}",util]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`last(//hpe.msa.disks.groups.space["{#NAME}",free])/last(//hpe.msa.disks.groups.space["{#NAME}",total])*100` |
+|HPE |Disk group [{#NAME}]: Space utilization |<p>The space utilization percentage in the disk group.</p> |CALCULATED |hpe.msa.disks.groups.space["{#NAME}",util]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`100-last(//hpe.msa.disks.groups.space["{#NAME}",free])/last(//hpe.msa.disks.groups.space["{#NAME}",total])*100` |
 |HPE |Disk group [{#NAME}]: RAID type |<p>The RAID level of the disk group.</p> |DEPENDENT |hpe.msa.disks.groups.raid["{#NAME}",type]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disk-groups'][?(@['name'] == "{#NAME}")].['raidtype-numeric'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |HPE |Disk group [{#NAME}]: Status |<p>The status of the disk group:</p><p>- CRIT: Critical. The disk group is online but isn't fault tolerant because some of it's disks are down.</p><p>- DMGD: Damaged. The disk group is online and fault tolerant, but some of it's disks are damaged.</p><p>- FTDN: Fault tolerant with a down disk.The disk group is online and fault tolerant, but some of it's disks are down.</p><p>- FTOL: Fault tolerant.</p><p>- MSNG: Missing. The disk group is online and fault tolerant, but some of it's disks are missing.</p><p>- OFFL: Offline. Either the disk group is using offline initialization, or it's disks are down and data may be lost.</p><p>- QTCR: Quarantined critical. The disk group is critical with at least one inaccessible disk. For example, two disks are inaccessible in a RAID 6 disk group or one disk is inaccessible for other fault-tolerant RAID levels. If the inaccessible disks come online or if after 60 seconds from being quarantined the disk group is QTCRor QTDN, the disk group is automatically dequarantined.</p><p>- QTDN: Quarantined with a down disk. The RAID6 disk group has one inaccessible disk. The disk group is fault tolerant but degraded. If the inaccessible disks come online or if after 60 seconds from being quarantined the disk group is QTCRor QTDN, the disk group is automatically dequarantined.</p><p>- QTOF: Quarantined offline. The disk group is offline with multiple inaccessible disks causing user data to be incomplete, or is an NRAID or RAID 0 disk group.</p><p>- QTUN: Quarantined unsupported. The disk group contains data in a format that is not supported by this system. For example, this system does not support linear disk groups.</p><p>- STOP: The disk group is stopped.</p><p>- UNKN: Unknown.</p><p>- UP: Up. The disk group is online and does not have fault-tolerant attributes.</p> |DEPENDENT |hpe.msa.disks.groups["{#NAME}",status]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disk-groups'][?(@['name'] == "{#NAME}")].['status-numeric'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |HPE |Disk group [{#NAME}]: IOPS, total rate |<p>Input/output operations per second, calculated over the interval since these statistics were last requested or reset. This value will be zero if it has not been requested or reset since a controller restart.</p> |DEPENDENT |hpe.msa.disks.groups.iops.total["{#NAME}",rate]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['disk-group-statistics'][?(@['name'] == "{#NAME}")].['iops'].first()`</p> |
@@ -122,7 +122,7 @@ There are no template links in this template.
 |HPE |Pool [{#NAME}]: Blocks total |<p>Total space in blocks.</p> |DEPENDENT |hpe.msa.pools.blocks["{#NAME}",total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['pools'][?(@['name'] == "{#NAME}")].['total-size-numeric'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |HPE |Pool [{#NAME}]: Space free |<p>The free space in the pool.</p> |CALCULATED |hpe.msa.pools.space["{#NAME}",free]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`last(//hpe.msa.pools.blocks["{#NAME}",size])*last(//hpe.msa.pools.blocks["{#NAME}",available])` |
 |HPE |Pool [{#NAME}]: Space total |<p>The capacity of the pool.</p> |CALCULATED |hpe.msa.pools.space["{#NAME}",total]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`last(//hpe.msa.pools.blocks["{#NAME}",size])*last(//hpe.msa.pools.blocks["{#NAME}",total])` |
-|HPE |Pool [{#NAME}]: Space utilization |<p>The space utilization percentage in the pool.</p> |CALCULATED |hpe.msa.pools.space["{#NAME}",util]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`last(//hpe.msa.pools.space["{#NAME}",free])/last(//hpe.msa.pools.space["{#NAME}",total])*100` |
+|HPE |Pool [{#NAME}]: Space utilization |<p>The space utilization percentage in the pool.</p> |CALCULATED |hpe.msa.pools.space["{#NAME}",util]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p><p>**Expression**:</p>`100-last(//hpe.msa.pools.space["{#NAME}",free])/last(//hpe.msa.pools.space["{#NAME}",total])*100` |
 |HPE |Volume [{#NAME}]: Blocks size |<p>The size of a block, in bytes.</p> |DEPENDENT |hpe.msa.volumes.blocks["{#NAME}",size]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['volumes'][?(@['volume-name'] == "{#NAME}")].['blocksize'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |HPE |Volume [{#NAME}]: Blocks allocated |<p>The amount of blocks currently allocated to the volume.</p> |DEPENDENT |hpe.msa.volumes.blocks["{#NAME}",allocated]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['volumes'][?(@['volume-name'] == "{#NAME}")].['allocated-size-numeric'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
 |HPE |Volume [{#NAME}]: Blocks total |<p>Total space in blocks.</p> |DEPENDENT |hpe.msa.volumes.blocks["{#NAME}",total]<p>**Preprocessing**:</p><p>- JSONPATH: `$.['volumes'][?(@['volume-name'] == "{#NAME}")].['blocks'].first()`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1h`</p> |
