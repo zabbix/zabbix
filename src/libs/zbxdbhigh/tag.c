@@ -212,7 +212,15 @@ static int	db_tag_rollback(zbx_db_tag_t *tag)
 		tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC);
 	}
 	else
+	{
+		if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+			zbx_free(tag->tag_orig);
+
+		if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
+			zbx_free(tag->value_orig);
+
 		tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
+	}
 
 	return SUCCEED;
 }
@@ -341,19 +349,22 @@ static int	check_tag_fields(zbx_vector_db_tag_ptr_t *tags, const char *owner, ch
 	return ret;
 }
 
-static int	db_compare_by_changes(const zbx_db_tag_t **tag1, const zbx_db_tag_t **tag2)
+static int	db_compare_by_changes(const void *d1, const void *d2)
 {
+	const zbx_db_tag_t	*tag1 = *(const zbx_db_tag_t **)d1;
+	const zbx_db_tag_t	*tag2 = *(const zbx_db_tag_t **)d2;
+
 	/* new tags have 'most' changes - move them to the end */
-	if (0 == (*tag2)->tagid)
+	if (0 == tag2->tagid)
 	{
-		if (0 != (*tag1)->tagid)
+		if (0 != tag1->tagid)
 			return -1;
 	}
-	else if (0 == (*tag1)->tagid)
+	else if (0 == tag1->tagid)
 		return 1;
 
 	/* the update flags are already sorted by change importance */
-	ZBX_RETURN_IF_DBL_NOT_EQUAL((*tag1)->flags, (*tag2)->flags);
+	ZBX_RETURN_IF_DBL_NOT_EQUAL(tag1->flags, tag2->flags);
 
 	return 0;
 }
