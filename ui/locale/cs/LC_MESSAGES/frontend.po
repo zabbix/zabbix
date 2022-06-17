@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-09 22:08+0000\n"
+"PO-Revision-Date: 2022-06-14 18:56+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -915,11 +915,11 @@ msgstr "Přidat hostitele"
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "Přidat spouštěč hostitele"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Přidat sloupec položky"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
@@ -3845,6 +3845,10 @@ msgstr "Kruhové odkazování šablon není povolené."
 #: include/classes/core/ZBase.php:494
 #, c-format
 msgid "Class %1$s not found for action %2$s."
+msgstr ""
+
+#: include/classes/core/ZBase.php:563
+msgid "Class not found."
 msgstr ""
 
 #: include/views/configuration.httpconf.list.php:221
