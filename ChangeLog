@@ -2515,8 +2515,10 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.42rc1
 
 New features:
+A......PS. [ZBXNEXT-7694] added "utf8mb3" character set support for MySQL database (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-21123] fixed crash when vmware vc was not available at the first moment when starting zabbix_server (MVekslers)
 .......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
 
 --------------------------------------------------------------------------------
