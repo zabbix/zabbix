@@ -1491,6 +1491,10 @@ function formatFloat(float $number, int $precision = null, int $decimals = null,
 * @return float
 */
 function truncateFloat(float $number): float {
+	if ($number == INF) {
+		return INF;
+	}
+
 	return (float) sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number);
 }
 
