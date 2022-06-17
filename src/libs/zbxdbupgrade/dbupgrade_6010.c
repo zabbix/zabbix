@@ -762,7 +762,7 @@ static int	DBpatch_6010033_split_groups(void)
 	}
 	DBfree_result(result);
 
-	/* 0 - SYSMAP_ELEMENT_TYPE_HOST_GROUP */
+	/* 3 - SYSMAP_ELEMENT_TYPE_HOST_GROUP */
 	result = DBselect("select distinct elementid from sysmaps_elements where elementtype=3");
 
 	while (NULL != (row = DBfetch(result)))
