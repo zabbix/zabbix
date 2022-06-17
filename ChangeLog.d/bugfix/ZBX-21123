@@ -1,0 +1,1 @@
+.......PS. [ZBX-21123] fixed crash when vmware vc was not available at the first moment when starting zabbix_server (MVekslers)
