@@ -762,6 +762,16 @@ static int	DBpatch_6010033_split_groups(void)
 	}
 	DBfree_result(result);
 
+	/* 0 - SYSMAP_ELEMENT_TYPE_HOST_GROUP */
+	result = DBselect("select distinct elementid from sysmaps_elements where elementtype=3");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(groupid, row[0]);
+		zbx_vector_uint64_append(&host_groupids, groupid);
+	}
+	DBfree_result(result);
+
 	result = DBselect(
 			"select distinct g.groupid"
 			" from hstgrp g,hosts_groups hg,hosts h"
