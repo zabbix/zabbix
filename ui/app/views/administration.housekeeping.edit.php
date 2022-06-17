@@ -185,7 +185,7 @@ $house_keeper_tab = (new CFormList())
 				break;
 
 			case ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM:
-				$timescaledb_error = _s('Unsupported TimescaleDB version. Must not be higher than %1$s.',
+				$timescaledb_error = _s('Unsupported TimescaleDB version. Should not be higher than %1$s.',
 					$data['timescaledb_max_version']
 				);
 				break;
