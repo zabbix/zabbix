@@ -387,7 +387,7 @@ class CSvgGraph extends CSvg {
 		$surface = [];
 
 		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['type'] != SVG_GRAPH_TYPE_LINE
+			if (!in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])
 					|| $metric['options']['stacked'] != SVG_GRAPH_STACKED_ON
 					|| !array_key_exists($index, $this->points)) {
 				continue;
@@ -430,6 +430,10 @@ class CSvgGraph extends CSvg {
 						];
 
 						if ($break_point != $prev_point) {
+							if ($metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE) {
+								$side_fragment_points[] = [$break_point[0], $prev_point[1], false];
+							}
+
 							$side_fragment_points[] = $break_point;
 						}
 
@@ -443,6 +447,10 @@ class CSvgGraph extends CSvg {
 
 						$side_fragment_points = [$break_point];
 						$is_positive = !$is_positive;
+					}
+
+					if ($metric['options']['type'] == SVG_GRAPH_TYPE_STAIRCASE && $prev_point !== null) {
+						$side_fragment_points[] = [$clock, $prev_point[1], false];
 					}
 
 					$prev_point = [$clock, $point_value, true];
@@ -610,7 +618,7 @@ class CSvgGraph extends CSvg {
 	private function calculateDimensions(): void {
 		foreach ($this->metrics as $index => $metric) {
 			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
-				if ($metric['options']['type'] != SVG_GRAPH_TYPE_LINE
+				if (!in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])
 						|| !array_key_exists($index, $this->stacked_points)) {
 					continue;
 				}
@@ -1235,14 +1243,9 @@ class CSvgGraph extends CSvg {
 
 	private function drawMetricsLine(): void {
 		foreach ($this->metrics as $index => $metric) {
-			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
-				continue;
-			}
-
-			if (!array_key_exists($index, $this->paths)) {
-				continue;
-			}
-			if (!in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])) {
+			if (!in_array($metric['options']['type'], [SVG_GRAPH_TYPE_LINE, SVG_GRAPH_TYPE_STAIRCASE])
+					|| $metric['options']['stacked'] == SVG_GRAPH_STACKED_ON
+					|| !array_key_exists($index, $this->paths)) {
 				continue;
 			}
 
