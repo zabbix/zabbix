@@ -87,6 +87,7 @@ static void	db_tag_merge_automatic(zbx_db_tag_t *dst, zbx_db_tag_t *src)
 	dst->flags |= ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC;
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Purpose: merge new tags into existing                                      *
@@ -205,27 +206,13 @@ static int	db_tag_rollback(zbx_db_tag_t *tag)
 	if (0 == tag->tagid)
 		return FAIL;
 
-	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
-	{
-		zbx_free(tag->tag);
-		tag->tag = tag->tag_orig;
-		tag->tag_orig = NULL;
-		tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_TAG);
-	}
-
-	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
-	{
-		zbx_free(tag->value);
-		tag->value = tag->value_orig;
-		tag->value_orig = NULL;
-		tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_VALUE);
-	}
-
-	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC))
+	if (ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC == tag->flags)
 	{
 		tag->automatic = tag->automatic_orig;
 		tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC);
 	}
+	else
+		tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
 
 	return SUCCEED;
 }
@@ -354,18 +341,48 @@ static int	check_tag_fields(zbx_vector_db_tag_ptr_t *tags, const char *owner, ch
 	return ret;
 }
 
+static int	db_compare_by_changes(const zbx_db_tag_t **tag1, const zbx_db_tag_t **tag2)
+{
+	/* new tags have 'most' changes - move them to the end */
+	if (0 == (*tag2)->tagid)
+	{
+		if (0 != (*tag1)->tagid)
+			return -1;
+	}
+	else if (0 == (*tag1)->tagid)
+		return 1;
+
+	/* the update flags are already sorted by change importance */
+	ZBX_RETURN_IF_DBL_NOT_EQUAL((*tag1)->flags, (*tag2)->flags);
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: check tags for duplicate tag+value combinations                   *
  *                                                                            *
+ * Parameters: tags  - [IN/OUT] the tags to check                             *
+ *             owner - [IN] the owned object (host, item, trigger)            *
+ *             error - [OUT] the error message                                *
+ *                                                                            *
  * Return value: SUCCEED - tags have no duplicates                            *
  *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Existing tags are rolled back to their original values, while    *
+ *           new tags are removed.                                            *
  *                                                                            *
  ******************************************************************************/
 static int	check_duplicate_tags(zbx_vector_db_tag_ptr_t *tags, const char *owner, char **error)
 {
 	int	i, j, ret = SUCCEED;
 
+	/* sort tags by changes - so tags with least modifications */
+	/* will have less probability to be rolled back/discarded  */
+	zbx_vector_db_tag_ptr_sort(tags, db_compare_by_changes);
+
+	/* iterate from the end of tag array because tags are sorted by tagid */
+	/* so the new tags are in the beginning                               */
 	for (i = 0; i < tags->values_num; i++)
 	{
 		zbx_db_tag_t	*left = tags->values[i];
@@ -396,6 +413,8 @@ static int	check_duplicate_tags(zbx_vector_db_tag_ptr_t *tags, const char *owner
 		}
 	}
 
+	zbx_vector_db_tag_ptr_sort(tags, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	return ret;
 }
 
@@ -423,11 +442,12 @@ int	zbx_validate_tags(zbx_vector_db_tag_ptr_t *tags, const char *owner, char **e
 	int	errors = 0;
 
 	errors += check_tag_fields(tags, owner, error);
-	errors += check_duplicate_tags(tags, owner, error);
+
+	while (SUCCEED != check_duplicate_tags(tags, owner, error))
+		errors += FAIL;
 
 	if (0 > errors)
 		return FAIL;
 
 	return SUCCEED;
 }
-
