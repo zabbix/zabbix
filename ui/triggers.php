@@ -106,7 +106,7 @@ $fields = [
 	'filter_tags' =>							[T_ZBX_STR, O_OPT, null,	null,			null],
 	// Action related fields.
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-													IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
+													IN('"trigger.massdelete","trigger.massdisable",'.
 														'"trigger.massenable"'
 													),
 													null
@@ -549,10 +549,6 @@ if (isset($_REQUEST['form'])) {
 
 	// render view
 	echo (new CView('configuration.triggers.edit', getTriggerFormData($data)))->getOutput();
-}
-elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('g_triggerid')) {
-	$data = getCopyElementsFormData('g_triggerid', _('Triggers'));
-	$data['action'] = 'trigger.masscopyto';
 }
 else {
 	$data = [

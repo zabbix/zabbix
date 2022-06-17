@@ -63,7 +63,7 @@ $fields = [
 	'copy_targetids' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			null],
 	'context' =>			[T_ZBX_STR, O_MAND, P_SYS,		IN('"host", "template"'),	null],
 	// actions
-	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.masscopyto","graph.massdelete","graph.updatediscover"'),	null],
+	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"graph.massdelete","graph.updatediscover"'),	null],
 	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
 	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
@@ -422,7 +422,6 @@ if ($hostid == 0 && count($filter['hosts']) == 1) {
 
 if (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('group_graphid')) {
 	$data = getCopyElementsFormData('group_graphid', _('Graphs'));
-	$data['action'] = 'graph.masscopyto';
 }
 elseif (isset($_REQUEST['form'])) {
 	$data = [
