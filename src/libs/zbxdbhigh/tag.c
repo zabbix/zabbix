@@ -221,6 +221,12 @@ static int	db_tag_rollback(zbx_db_tag_t *tag)
 		tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_VALUE);
 	}
 
+	if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC))
+	{
+		tag->automatic = tag->automatic_orig;
+		tag->flags &= (~ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC);
+	}
+
 	return SUCCEED;
 }
 
