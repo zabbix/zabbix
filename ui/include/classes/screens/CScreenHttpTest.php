@@ -53,9 +53,6 @@ class CScreenHttpTest extends CScreenBase {
 		$sort_field = $this->data['sort'];
 		$sort_order = $this->data['sortorder'];
 
-		$httptests = [];
-		$paging = [];
-
 		$options = [
 			'output' => ['httptestid', 'name', 'hostid'],
 			'selectHosts' => ['name', 'status'],
