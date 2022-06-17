@@ -21,6 +21,7 @@
 #include "log.h"
 
 #include "zbxdb.h"
+#include "db.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
@@ -64,15 +65,18 @@ struct zbx_db_result
 #endif
 };
 
-static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
-static int	txn_error = ZBX_DB_OK;	/* failed transaction */
-static int	txn_end_error = ZBX_DB_OK;	/* transaction result */
+static int		txn_level = 0;	/* transaction level, nested transactions are not supported */
+static int		txn_error = ZBX_DB_OK;	/* failed transaction */
+static int		txn_end_error = ZBX_DB_OK;	/* transaction result */
 
-static char	*last_db_strerror = NULL;	/* last database error message */
+static char		*last_db_strerror = NULL;	/* last database error message */
 
-extern int	CONFIG_LOG_SLOW_QUERIES;
+extern int		CONFIG_LOG_SLOW_QUERIES;
+extern int		CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS;
 
-static int	db_auto_increment;
+static int		db_auto_increment;
+
+extern unsigned char	program_type;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
@@ -2494,6 +2498,78 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
 		flag = DB_VERSION_SUPPORTED;
 
 	return flag;
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: verify that Zabbix server/proxy will start with provided DB version  *
+ *          and configuration                                                    *
+ *                                                                               *
+ *********************************************************************************/
+int	zbx_check_db_version_info(struct zbx_db_version_info_t *info)
+{
+	DBextract_version_info(info);
+
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == info->flag ||
+			DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag || DB_VERSION_LOWER_THAN_MINIMUM == info->flag)
+	{
+		const char	*program_type_s;
+
+		program_type_s = get_program_type_string(program_type);
+
+		if (0 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS || (DB_VERSION_LOWER_THAN_MINIMUM == info->flag &&
+					0 == (program_type & ZBX_PROGRAM_TYPE_PROXY)
+					&& 1 == CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS))
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix %s due to unsupported %s database"
+					" version (%s).", program_type_s, info->database,
+					info->friendly_current_version);
+
+			if (DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Must not be higher than (%s).",
+						info->friendly_max_version);
+				info->flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s).",
+						info->friendly_min_supported_version);
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
+					" in Zabbix %s configuration file at your own risk.", program_type_s);
+			zabbix_log(LOG_LEVEL_ERR, " ");
+
+			return FAIL;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database version (%s).",
+					info->database, info->friendly_current_version);
+
+			if (DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Should not be higher than (%s).",
+						info->friendly_max_version);
+				info->flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s).",
+						info->friendly_min_supported_version);
+				info->flag = DB_VERSION_NOT_SUPPORTED_WARNING;
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, " ");
+		}
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
