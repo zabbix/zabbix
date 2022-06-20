@@ -836,12 +836,14 @@ int	DBcheck_version_info(struct zbx_db_version_info_t *info, int allow_unsupport
 			DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag || DB_VERSION_LOWER_THAN_MINIMUM == info->flag)
 	{
 		const char	*program_type_s;
+		int		server_db_deprecated;
 
 		program_type_s = get_program_type_string(program_type);
 
-		if (0 == allow_unsupported || (DB_VERSION_LOWER_THAN_MINIMUM == info->flag &&
-					0 == (program_type & ZBX_PROGRAM_TYPE_PROXY)
-					&& 1 == allow_unsupported))
+		server_db_deprecated = (DB_VERSION_LOWER_THAN_MINIMUM == info->flag &&
+				0 == (program_type & ZBX_PROGRAM_TYPE_PROXY));
+
+		if (0 == allow_unsupported || 0 != server_db_deprecated)
 		{
 			zabbix_log(LOG_LEVEL_ERR, " ");
 			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix %s due to unsupported %s database"
@@ -861,8 +863,13 @@ int	DBcheck_version_info(struct zbx_db_version_info_t *info, int allow_unsupport
 			}
 
 			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
-			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
-					" in Zabbix %s configuration file at your own risk.", program_type_s);
+
+			if (0 == server_db_deprecated)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
+						" in Zabbix %s configuration file at your own risk.", program_type_s);
+			}
+
 			zabbix_log(LOG_LEVEL_ERR, " ");
 
 			return FAIL;
