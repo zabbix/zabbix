@@ -420,6 +420,8 @@ class CSvgGraph extends CSvg {
 				$prev_point = null;
 
 				foreach ($points as $clock => $point) {
+					$clock -= $metric['options']['timeshift'];
+
 					$point_value = $point[$approximation];
 
 					if ($is_positive != $point_value >= 0 && $point_value != 0) {
@@ -955,6 +957,8 @@ class CSvgGraph extends CSvg {
 		$y_max = 2 ** 16;
 		$y_min = -$y_max;
 
+		$time_range = ($this->time_till - $this->time_from) ?: 1;
+
 		foreach ($this->metrics as $index => $metric) {
 			if (!array_key_exists($index, $this->stacked_points)) {
 				continue;
@@ -969,15 +973,12 @@ class CSvgGraph extends CSvg {
 				$max_value = $this->left_y_max;
 			}
 
-			$time_range = ($this->time_till - $this->time_from) ?: 1;
-			$timeshift = $metric['options']['timeshift'];
-
 			foreach ($this->stacked_points[$index] as $fragment_index => $fragment) {
 				$stacked_path = [];
 
 				foreach ($fragment['area'] as $stacked_point) {
 					$x = $this->canvas_x + $this->canvas_width
-						- $this->canvas_width * ($this->time_till - $stacked_point[0] + $timeshift) / $time_range;
+						- $this->canvas_width * ($this->time_till - $stacked_point[0]) / $time_range;
 
 					if ($max_value - $min_value == INF) {
 						$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
