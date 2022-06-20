@@ -101,7 +101,7 @@ class CControllerCopy extends CController {
 		}
 
 		// Trigger copy
-		elseif($this->getAction() === 'copy.triggers'){
+		elseif($this->getAction() === 'copy.triggers') {
 			$output = $this->copyTriggers();
 		}
 
@@ -196,7 +196,8 @@ class CControllerCopy extends CController {
 					if ($messages = get_and_clear_messages()) {
 						$output['success']['messages'] = array_column($messages, 'message');
 					}
-				} else {
+				}
+				else {
 					$output['error'] = [
 						'title' => _n('Cannot copy trigger', 'Cannot copy triggers', $triggers_count),
 						'messages' => array_column(get_and_clear_messages(), 'message')
@@ -218,7 +219,6 @@ class CControllerCopy extends CController {
 			$copy_targetids = $this->getInput('copy_targetids');
 			$copy_type = $this->getInput('copy_type');
 			$graphids = $this->getInput('graphids');
-
 			$result = true;
 
 			$options = [
