@@ -1809,6 +1809,36 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/": cannot be empty.'
 			],
 			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[],
+				'/',
+				[]
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				'object',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[[]],
+				'/',
+				'Invalid parameter "/": should be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[['field1' => 'value1']],
+				'/',
+				'Invalid parameter "/": should be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[[], [], []],
+				'/',
+				'Invalid parameter "/": should be empty.'
+			],
+			[
 				['type' => API_OBJECTS, 'length' => 2, 'fields' => []],
 				[[], [], []],
 				'/',
@@ -2541,30 +2571,6 @@ class CApiInputValidatorTest extends TestCase {
 				],
 				'/',
 				'Invalid parameter "/2": unexpected parameter "ruleid".'
-			],
-			[
-				['type' => API_OBJECTS, 'flags' => API_EMPTY],
-				[],
-				'/',
-				[]
-			],
-			[
-				['type' => API_OBJECTS, 'flags' => API_EMPTY],
-				123,
-				'/',
-				'Invalid parameter "/": an array is expected.'
-			],
-			[
-				['type' => API_OBJECTS, 'flags' => API_EMPTY],
-				null,
-				'/',
-				'Invalid parameter "/": an array is expected.'
-			],
-			[
-				['type' => API_OBJECTS, 'flags' => API_EMPTY],
-				['field' => true],
-				'/',
-				'Invalid parameter "/": should be empty.'
 			],
 			[
 				['type' => API_HG_NAME, 'length' => 16],

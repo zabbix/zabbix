@@ -1442,9 +1442,9 @@ class CApiInputValidator {
 	 *
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS,
-	 *                                           API_ALLOW_UNEXPECTED, API_EMPTY
-	 * @param array  $rule['fields']             Optional in case of API_EMPTY.
-	 * @param int    $rule['length']  (optional)
+	 *                                           API_ALLOW_UNEXPECTED
+	 * @param array  $rule['fields']  Rules of the objects fields. Optional in case if length is zero.
+	 * @param int    $rule['length']  (optional) Allowed count of objects.
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1463,24 +1463,16 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if ($flags & API_EMPTY) {
-			if ($data === []) {
-				return true;
-			}
-			else {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('should be empty'));
-
-				return false;
-			}
-		}
-
 		if (($flags & API_NOT_EMPTY) && !$data) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'));
 			return false;
 		}
 
 		if (array_key_exists('length', $rule) && count($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			$error = ($rule['length'] == 0)
+				? _s('Invalid parameter "%1$s": %2$s.', $path, _('should be empty'))
+				: _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+
 			return false;
 		}
 

@@ -756,10 +756,10 @@ class CHostPrototype extends CHostBase {
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('interface_snmp', 'privpassphrase')]
 						]]
 					]],
-					['else' => true, 'type' => API_OBJECTS, 'flags' => API_EMPTY]
+					['else' => true, 'type' => API_OBJECT, 'fields' => []]
 				]]
 			]],
-			['else' => true, 'type' => API_OBJECTS, 'flags' => API_EMPTY]
+			['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 		]];
 	}
 
