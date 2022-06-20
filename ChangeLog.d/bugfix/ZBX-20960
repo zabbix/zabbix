@@ -1,1 +1,1 @@
-..F....... [ZBX-20960] fixed SVG graph widget throws error when attempting to plot item with valid user macro defined in history storage period (agriscenko)
+..F....... [ZBX-20960] fixed SVG graph widget throwing error when attempting to plot item with valid user macro defined in history storage period (agriscenko)
