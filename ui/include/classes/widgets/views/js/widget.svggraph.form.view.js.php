@@ -72,6 +72,8 @@ window.widget_svggraph_form = new class {
 		this._legendTabInit();
 		this._problemsTabInit();
 
+		this.updatedForm();
+
 		this.onGraphConfigChange();
 	}
 
