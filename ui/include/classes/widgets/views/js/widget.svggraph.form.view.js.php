@@ -59,7 +59,7 @@ window.widget_svggraph_form = new class {
 		jQuery('.overlay-dialogue').on('overlay-dialogue-resize', (event, size_new, size_old) => {
 			if (jQuery('#svg-graph-preview').length) {
 				if (size_new.width != size_old.width) {
-					this.onGraphConfigChange();
+					this._updatePreview();
 				}
 			} else {
 				jQuery('.overlay-dialogue').off('overlay-dialogue-resize');
@@ -322,9 +322,9 @@ window.widget_svggraph_form = new class {
 		).rangeControl();
 
 		this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
-		this.onGraphConfigChange();
 
 		this.initDataSetSortable();
+		this.onGraphConfigChange();
 	}
 
 	removeDataSet(obj) {
@@ -336,7 +336,9 @@ window.widget_svggraph_form = new class {
 
 		this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 		this.recalculateSortOrder();
+
 		this.initDataSetSortable();
+		this.onGraphConfigChange();
 	}
 
 	recalculateDataSetAttribute() {
@@ -414,7 +416,7 @@ window.widget_svggraph_form = new class {
 			start: function() { // Workaround to fix wrong scrolling at initial sort.
 				jQuery(this).sortable('refreshPositions');
 			},
-			stop: () => widget_svggraph_form.onGraphConfigChange(),
+			stop: () => widget_svggraph_form._updatePreview(),
 			update: function() {
 				widget_svggraph_form.updateVariableOrder(jQuery('#data_sets'), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>',
 					'ds'
@@ -504,7 +506,9 @@ window.widget_svggraph_form = new class {
 		table_row.remove();
 
 		this.recalculateSortOrder();
+
 		this.initSingleItemSortable();
+		this.onGraphConfigChange();
 	}
 
 	recalculateSortOrder() {
@@ -608,8 +612,8 @@ window.widget_svggraph_form = new class {
 			}
 		});
 
-		this.onGraphConfigChange();
 		this.rewriteNameLinks();
+		this.onGraphConfigChange();
 	}
 
 	_updatedForm() {
@@ -854,4 +858,5 @@ window.addPopupValues = (list) => {
 
 	widget_svggraph_form.rewriteNameLinks();
 	widget_svggraph_form.initSingleItemSortable();
+	widget_svggraph_form.onGraphConfigChange();
 }
