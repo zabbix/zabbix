@@ -23,14 +23,27 @@ class CControllerPopupCopy extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'authtype' => 'string',
 			'context' => 'required|in host,template',
 			'itemids' => 'array_id',
 			'triggerids' => 'array_id',
-			'graphids' => 'array_id'
+			'graphids' => 'array_id',
+			'allowed_ui_conf_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+			'allowed_ui_conf_templates' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
 
-		return $this->validateInput($fields);
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions() {
