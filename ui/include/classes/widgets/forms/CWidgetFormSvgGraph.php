@@ -54,33 +54,45 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 		// Percentiles
-		if ($strict && $this->fields['percentile_left']->getValue() == SVG_GRAPH_PERCENTILE_LEFT_ON) {
-			$percentile_left_value = $number_parser->parse($this->fields['percentile_left_value']->getValue()) == CParser::PARSE_SUCCESS
-				? $number_parser->calcValue()
-				: null;
+		if ($this->fields['percentile_left']->getValue() == SVG_GRAPH_PERCENTILE_LEFT_ON) {
+			$percentile_left_value = $this->fields['percentile_left_value']->getValue();
 
-			if ($percentile_left_value < self::WIDGET_ITEM_PERCENTILE_MIN
-					|| $percentile_left_value > self::WIDGET_ITEM_PERCENTILE_MAX) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (left)'),
-					_s('value must be between "%1$s" and "%2$s"', self::WIDGET_ITEM_PERCENTILE_MIN,
-						self::WIDGET_ITEM_PERCENTILE_MAX
-					)
-				);
+			if ($percentile_left_value !== '') {
+				$percentile_left_value_calculated =
+						$number_parser->parse($percentile_left_value) == CParser::PARSE_SUCCESS
+					? $number_parser->calcValue()
+					: null;
+
+				if ($percentile_left_value_calculated === null
+						|| $percentile_left_value_calculated < self::WIDGET_ITEM_PERCENTILE_MIN
+						|| $percentile_left_value_calculated > self::WIDGET_ITEM_PERCENTILE_MAX) {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (left)'),
+						_s('value must be between "%1$s" and "%2$s"', self::WIDGET_ITEM_PERCENTILE_MIN,
+							self::WIDGET_ITEM_PERCENTILE_MAX
+						)
+					);
+				}
 			}
 		}
 
-		if ($strict && $this->fields['percentile_right']->getValue() == SVG_GRAPH_PERCENTILE_RIGHT_ON) {
-			$percentile_right_value = $number_parser->parse($this->fields['percentile_right_value']->getValue()) == CParser::PARSE_SUCCESS
-				? $number_parser->calcValue()
-				: null;
+		if ($this->fields['percentile_right']->getValue() == SVG_GRAPH_PERCENTILE_RIGHT_ON) {
+			$percentile_right_value = $this->fields['percentile_right_value']->getValue();
 
-			if ($percentile_right_value < self::WIDGET_ITEM_PERCENTILE_MIN
-					|| $percentile_right_value > self::WIDGET_ITEM_PERCENTILE_MAX) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (right)'),
-					_s('value must be between "%1$s" and "%2$s"', self::WIDGET_ITEM_PERCENTILE_MIN,
-						self::WIDGET_ITEM_PERCENTILE_MAX
-					)
-				);
+			if ($percentile_right_value !== '') {
+				$percentile_right_value_calculated =
+						$number_parser->parse($percentile_right_value) == CParser::PARSE_SUCCESS
+					? $number_parser->calcValue()
+					: null;
+
+				if ($percentile_right_value_calculated === null
+						|| $percentile_right_value_calculated < self::WIDGET_ITEM_PERCENTILE_MIN
+						|| $percentile_right_value_calculated > self::WIDGET_ITEM_PERCENTILE_MAX) {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Percentile line (right)'),
+						_s('value must be between "%1$s" and "%2$s"', self::WIDGET_ITEM_PERCENTILE_MIN,
+							self::WIDGET_ITEM_PERCENTILE_MAX
+						)
+					);
+				}
 			}
 		}
 
