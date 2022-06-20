@@ -20,8 +20,7 @@
 #ifndef ZABBIX_ACTIONS_H
 #define ZABBIX_ACTIONS_H
 
-#include "common.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 #define ZBX_ACTION_RECOVERY_NONE	0
 #define ZBX_ACTION_RECOVERY_OPERATIONS	1
@@ -58,7 +57,7 @@ typedef struct
 }
 zbx_condition_t;
 
-int	check_action_condition(const DB_EVENT *event, zbx_condition_t *condition);
+int	check_action_condition(const ZBX_DB_EVENT *event, zbx_condition_t *condition);
 void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pair_t *closed_events);
 int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks);
 void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actions);

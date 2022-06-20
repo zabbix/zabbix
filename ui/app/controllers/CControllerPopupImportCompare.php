@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -38,12 +38,13 @@ class CControllerPopupImportCompare extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -63,7 +64,8 @@ class CControllerPopupImportCompare extends CController {
 
 	protected function doAction(): void {
 		$rules = [
-			'groups' => ['updateExisting' => false, 'createMissing' => false],
+			'host_groups' => ['updateExisting' => false, 'createMissing' => false],
+			'template_groups' => ['updateExisting' => false, 'createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
 			'templates' => ['updateExisting' => false, 'createMissing' => false],
 			'templateDashboards' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
@@ -82,7 +84,8 @@ class CControllerPopupImportCompare extends CController {
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
 			case 'template':
-				$rules['groups'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['host_groups'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['template_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
 					'deleteMissing' => false
@@ -130,7 +133,6 @@ class CControllerPopupImportCompare extends CController {
 
 		$data = [
 			'title' => _('Templates'),
-			'errors' => null,
 			'import_overlayid' => $this->getInput('import_overlayid'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -138,9 +140,10 @@ class CControllerPopupImportCompare extends CController {
 		];
 
 		if ($result === false) {
-			CMessageHelper::setErrorTitle(_('Import failed'));
-			$data['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-				->toString();
+			$data['error'] = [
+				'title' => _('Import failed'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 		else {
 			$data['diff'] = $this->blocksToDiff($result, 1);
@@ -161,7 +164,8 @@ class CControllerPopupImportCompare extends CController {
 			'added' => _('Added')
 		];
 		$names = [
-			'groups' => _('Groups'),
+			'host_groups' => _('Host groups'),
+			'template_groups' => _('Template groups'),
 			'templates' => _('Templates'),
 			'triggers' => _('Triggers'),
 			'graphs' => _('Graphs'),

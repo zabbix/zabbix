@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -43,7 +43,7 @@ $left_column = (new CFormList())
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'groupids_',
-					'real_hosts' => true,
+					'with_hosts' => true,
 					'enrich_parent_groups' => true
 				]
 			]
@@ -86,8 +86,7 @@ $left_column = (new CFormList())
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'triggerids_',
 					'monitored_hosts' => true,
-					'with_monitored_triggers' => true,
-					'noempty' => true
+					'with_monitored_triggers' => true
 				]
 			]
 		]))
@@ -504,7 +503,7 @@ if (array_key_exists('render_html', $data)) {
 			name: 'groupids[]',
 			data: data.filter_view_data.groups || [],
 			objectOptions: {
-				real_hosts: 1,
+				with_hosts: 1,
 				enrich_parent_groups: 1
 			},
 			popup: {
@@ -514,7 +513,6 @@ if (array_key_exists('render_html', $data)) {
 					dstfrm: 'zbx_filter',
 					dstfld1: 'groupids_' + data.uniqid,
 					multiselect: 1,
-					noempty: 1,
 					real_hosts: 1,
 					enrich_parent_groups: 1
 				}
@@ -557,7 +555,6 @@ if (array_key_exists('render_html', $data)) {
 					dstfrm: 'zbx_filter',
 					dstfld1: 'triggerids_' + data.uniqid,
 					multiselect: 1,
-					noempty: 1,
 					monitored_hosts: 1,
 					with_monitored_triggers: 1
 				}

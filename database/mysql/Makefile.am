@@ -5,7 +5,8 @@ data.sql: $(top_srcdir)/create/src/data.tmpl $(top_srcdir)/create/src/templates.
 	$(top_srcdir)/create/bin/gen_data.pl $(DATABASE) > data.sql
 
 schema.sql: $(top_srcdir)/create/src/schema.tmpl $(top_srcdir)/create/bin/gen_schema.pl
-	$(top_srcdir)/create/bin/gen_schema.pl $(DATABASE) > schema.sql
+	$(top_srcdir)/create/bin/gen_schema.pl $(DATABASE) > schema.sql || (rm -rf schema.sql && exit 1)
+
 endif
 
 EXTRA_DIST = \
@@ -14,3 +15,6 @@ EXTRA_DIST = \
 	schema.sql \
 	double.sql \
 	history_pk_prepare.sql
+
+clean:
+	rm -f schema.sql data.sql

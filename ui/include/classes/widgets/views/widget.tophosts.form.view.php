@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2022 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,8 +74,9 @@ $column = CWidgetHelper::getSelect($fields['column']);
 if (!$fields['column']->getValues()) {
 	$column = (new CDiv(_('Add item column')))->addClass(
 		($fields['column']->getFlags() & CWidgetField::FLAG_DISABLED)
-		? ZBX_STYLE_DISABLED
-		: null);
+			? ZBX_STYLE_DISABLED
+			: null
+	);
 }
 
 $form_list->addRow(CWidgetHelper::getLabel($fields['column']), $column);

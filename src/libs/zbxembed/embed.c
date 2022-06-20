@@ -24,7 +24,7 @@
 #include "zabbix.h"
 #include "global.h"
 #include "console.h"
-#include "xml.h"
+#include "embed_xml.h"
 #include "embed.h"
 
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 64)
@@ -214,7 +214,7 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 		return FAIL;
 	}
 
-	/* initialize HttpRequest and CurlHttpRequest prototypes */
+	/* initialize HttpRequest prototype */
 	if (FAIL == zbx_es_init_httprequest(es, error))
 		goto out;
 

@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/FilterTrait.php';
+require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardGraphWidget extends CWebTest {
 
-	use FilterTrait;
+	use TagTrait;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -174,11 +174,13 @@ class testDashboardGraphWidget extends CWebTest {
 		}
 
 		sleep(2);
+		$form->submit();
+
 		if (array_key_exists('color_error', $data)) {
 			// Check colorpick error message.
 			$this->assertMessage(TEST_BAD, null, $data['color_error']);
 		}
-		$form->submit();
+
 		COverlayDialogElement::find()->one()->waitUntilReady()->query('xpath:div[@class="overlay-dialogue-footer"]'.
 				'//button[@class="dialogue-widget-save"]')->waitUntilClickable()->one();
 
@@ -1916,7 +1918,10 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @param array $form		CFormElement
 	 */
 	private function fillForm($data, $form) {
-		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
+		// TODO: after DEV-2200 change to $form->fill(CTestArrayHelper::get($data, 'main_fields', []));
+		if (CTestArrayHelper::get($data, 'main_fields')) {
+			$this->query('id:widget-dialogue-form')->asForm(['detectType' => false])->one()->waitUntilVisible()->fill($data['main_fields']);
+		}
 
 		$this->fillDatasets(CTestArrayHelper::get($data, 'Data set', []));
 
@@ -1931,7 +1936,7 @@ class testDashboardGraphWidget extends CWebTest {
 				case 'Problems':
 					$form->fill(CTestArrayHelper::get($data['Problems'], 'fields', []));
 					if (array_key_exists('tags', $data['Problems'])) {
-						$this->setFilterSelector('id:tags_table_tags');
+						$this->setTagSelector('id:tags_table_tags');
 						$this->setTags($data['Problems']['tags']);
 					}
 					break;
@@ -2226,7 +2231,8 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
-		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
+		// TODO: after DEV-2200 change to $form->fill(CTestArrayHelper::get($data, 'main_fields', []));
+		$this->query('id:widget-dialogue-form')->asForm(['detectType' => false])->one()->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDataSets($data['Data set']);
 		$form->submit();
 
@@ -2280,7 +2286,8 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
-		$form->fill($data['main_fields']);
+		// TODO: after DEV-2200 change to $form->fill($data['main_fields']);
+		$this->query('id:widget-dialogue-form')->asForm(['detectType' => false])->one()->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
 		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
 						->asOverlayDialog()->one();

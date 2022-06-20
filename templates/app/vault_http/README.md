@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor HashiCorp Vault by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -18,7 +18,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Configure Vault API. See [Vault Configuration](https://www.vaultproject.io/docs/configuration).
 Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
@@ -92,7 +92,7 @@ There are no template links in this template.
 |Vault |Vault: Cache hit, rate |<p>Number of times a value was retrieved from the LRU cache.</p> |DEPENDENT |vault.metrics.cache.hit.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_cache_hit`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Cache miss, rate |<p>Number of times a value was not in the LRU cache. The results in a read from the configured storage.</p> |DEPENDENT |vault.metrics.cache.miss.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_cache_miss`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Cache write, rate |<p>Number of times a value was written to the LRU cache.</p> |DEPENDENT |vault.metrics.cache.write.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_cache_write`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
-|Vault |Vault: Check token, rate |<p>Number of token checks handled by Vault corecore.</p> |DEPENDENT |vault.metrics.core.check.token.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_check_token_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
+|Vault |Vault: Check token, rate |<p>Number of token checks handled by Vault core.</p> |DEPENDENT |vault.metrics.core.check.token.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_check_token_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Fetch ACL and token, rate |<p>Number of ACL and corresponding token entry fetches handled by Vault core.</p> |DEPENDENT |vault.metrics.core.fetch.acl_and_token<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_fetch_acl_and_token_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Requests, rate |<p>Number of requests handled by Vault core.</p> |DEPENDENT |vault.metrics.core.handle.request<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `vault_core_handle_request_count`</p><p>⛔️ON_FAIL: `DISCARD_VALUE -> `</p><p>- CHANGE_PER_SECOND</p> |
 |Vault |Vault: Leadership setup failed, counter |<p>Cluster leadership setup failures which have occurred in a highly available Vault cluster.</p> |DEPENDENT |vault.metrics.core.leadership.setup_failed<p>**Preprocessing**:</p><p>- PROMETHEUS_TO_JSON: `vault_core_leadership_setup_failed`</p><p>- JSONPATH: `$[?(@.name=="vault_core_leadership_setup_failed")].value.sum()`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p> |
@@ -174,17 +174,17 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Vault: Vault server is sealed |<p>https://www.vaultproject.io/docs/concepts/seal</p> |`last(/HashiCorp Vault by HTTP/vault.health.sealed)=1` |AVERAGE | |
-|Vault: Version has changed (new version: {ITEM.VALUE}) |<p>Vault version has changed. Ack to close.</p> |`last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2) and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0` |INFO |<p>Manual close: YES</p> |
+|Vault: Version has changed |<p>Vault version has changed. Ack to close.</p> |`last(/HashiCorp Vault by HTTP/vault.health.version,#1)<>last(/HashiCorp Vault by HTTP/vault.health.version,#2) and length(last(/HashiCorp Vault by HTTP/vault.health.version))>0` |INFO |<p>Manual close: YES</p> |
 |Vault: Vault server is not responding |<p>-</p> |`last(/HashiCorp Vault by HTTP/vault.health.check)=0` |HIGH | |
-|Vault: Failed to get metrics (error: {ITEM.VALUE}) |<p>-</p> |`length(last(/HashiCorp Vault by HTTP/vault.get_metrics.error))>0` |WARNING |<p>**Depends on**:</p><p>- Vault: Vault server is sealed</p> |
-|Vault: Current number of open files is too high (over {$VAULT.OPEN.FDS.MAX.WARN}% for 5m) |<p>-</p> |`min(/HashiCorp Vault by HTTP/vault.metrics.process.open.fds,5m)/last(/HashiCorp Vault by HTTP/vault.metrics.process.max.fds)*100>{$VAULT.OPEN.FDS.MAX.WARN}` |WARNING | |
-|Vault: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/HashiCorp Vault by HTTP/vault.metrics.process.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Vault: High frequency of leadership setup failures (over {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} for 1h) |<p>There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h.</p> |`(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}` |AVERAGE | |
-|Vault: High frequency of leadership losses (over {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} for 1h) |<p>There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h.</p> |`(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}` |AVERAGE | |
-|Vault: High frequency of leadership step downs (over {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} for 1h) |<p>There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h.</p> |`(max(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h))>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}` |AVERAGE | |
+|Vault: Failed to get metrics |<p>-</p> |`length(last(/HashiCorp Vault by HTTP/vault.get_metrics.error))>0` |WARNING |<p>**Depends on**:</p><p>- Vault: Vault server is sealed</p> |
+|Vault: Current number of open files is too high |<p>-</p> |`min(/HashiCorp Vault by HTTP/vault.metrics.process.open.fds,5m)/last(/HashiCorp Vault by HTTP/vault.metrics.process.max.fds)*100>{$VAULT.OPEN.FDS.MAX.WARN}` |WARNING | |
+|Vault: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/HashiCorp Vault by HTTP/vault.metrics.process.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Vault: High frequency of leadership setup failures |<p>There have been more than {$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN} Vault leadership setup failures in the past 1h.</p> |`(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership.setup_failed,1h))>{$VAULT.LEADERSHIP.SETUP.FAILED.MAX.WARN}` |AVERAGE | |
+|Vault: High frequency of leadership losses |<p>There have been more than {$VAULT.LEADERSHIP.LOSSES.MAX.WARN} Vault leadership losses in the past 1h.</p> |`(max(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.leadership_lost,1h))>{$VAULT.LEADERSHIP.LOSSES.MAX.WARN}` |AVERAGE | |
+|Vault: High frequency of leadership step downs |<p>There have been more than {$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN} Vault leadership step downs in the past 1h.</p> |`(max(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h)-min(/HashiCorp Vault by HTTP/vault.metrics.core.step_down,1h))>{$VAULT.LEADERSHIP.STEPDOWNS.MAX.WARN}` |AVERAGE | |
 |Vault: Token [{#TOKEN_NAME}] lookup error occurred |<p>-</p> |`length(last(/HashiCorp Vault by HTTP/vault.token_via_accessor.error["{#ACCESSOR}"]))>0` |WARNING |<p>**Depends on**:</p><p>- Vault: Vault server is sealed</p> |
-|Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT}) |<p>-</p> |`last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}` |AVERAGE | |
-|Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.WARN}) |<p>-</p> |`last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Vault: Token [{#TOKEN_NAME}] will expire soon (less than {$VAULT.TOKEN.TTL.MIN.CRIT})</p> |
+|Vault: Token [{#TOKEN_NAME}] will expire soon |<p>-</p> |`last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.CRIT}` |AVERAGE | |
+|Vault: Token [{#TOKEN_NAME}] will expire soon |<p>-</p> |`last(/HashiCorp Vault by HTTP/vault.token_via_accessor.has_ttl["{#ACCESSOR}"])=1 and last(/HashiCorp Vault by HTTP/vault.token_via_accessor.ttl["{#ACCESSOR}"])<{$VAULT.TOKEN.TTL.MIN.WARN}` |WARNING |<p>**Depends on**:</p><p>- Vault: Token [{#TOKEN_NAME}] will expire soon</p> |
 
 ## Feedback
 

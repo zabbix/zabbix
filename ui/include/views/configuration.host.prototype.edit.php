@@ -31,6 +31,7 @@ $parent_host = $data['parent_host'];
 
 $widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_PROTOTYPE_EDIT))
 	->setNavigation(getHostNavigation('hosts', $data['discovery_rule']['hostid'], $data['discovery_rule']['itemid']));
 
 $tabs = new CTabView();
@@ -137,17 +138,14 @@ else {
 				$template_link = new CSpan($template['name']);
 			}
 
-			$unlink_parameters = array_map('json_encode', [
-				$form->getName(),
-				'unlink['.$template['templateid'].']',
-				'1'
-			]);
-
 			$linked_templates->addRow([
 				$template_link->addClass(ZBX_STYLE_WORDWRAP),
 				(new CCol(
 					(new CSimpleButton(_('Unlink')))
-						->onClick('submitFormWithParam('.implode(', ', $unlink_parameters).');')
+						->setAttribute('data-templateid', $template['templateid'])
+						->onClick('
+							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
+						')
 						->addClass(ZBX_STYLE_BTN_LINK)
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]);
@@ -182,7 +180,7 @@ $host_tab
 
 // Existing groups.
 $host_tab->addRow(
-	(new CLabel(_('Groups'), 'group_links__ms'))->setAsteriskMark(),
+	(new CLabel(_('Host groups'), 'group_links__ms'))->setAsteriskMark(),
 	(new CMultiSelect([
 		'name' => 'group_links[]',
 		'object_name' => 'hostGroup',

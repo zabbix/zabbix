@@ -18,7 +18,7 @@
 **/
 
 #include "common.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "zbxgetopt.h"
 #include "zbxcrypto.h"
 
@@ -324,7 +324,11 @@ int	main(int argc, char **argv)
 #if defined(_WINDOWS)
 	char		*error = NULL;
 #endif
+	/* see description of 'optarg' in 'man 3 getopt' */
+	char		*zbx_optarg = NULL;
 
+	/* see description of 'optind' in 'man 3 getopt' */
+	int		zbx_optind = 0;
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
 	{
@@ -335,7 +339,8 @@ int	main(int argc, char **argv)
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		opt_count[(unsigned char)ch]++;
 
@@ -367,11 +372,15 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -432,7 +441,7 @@ int	main(int argc, char **argv)
 				break;
 #endif
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -449,7 +458,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == host || NULL == key)
 	{
-		usage();
+		zbx_usage();
 		ret = FAIL;
 	}
 

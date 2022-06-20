@@ -20,7 +20,8 @@
 #ifndef ZABBIX_POLLER_H
 #define ZABBIX_POLLER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
+#include "dbcache.h"
 
 extern int	CONFIG_TIMEOUT;
 extern int	CONFIG_UNAVAILABLE_DELAY;

@@ -1,10 +1,14 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-02-18T10:53:23Z'
-  groups:
+  version: '6.2'
+  date: '2022-06-07T19:37:54Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
+  host_groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Applications
   templates:
     -
       uuid: ca02e82e6c414d0aa7aedc8d78468a49
@@ -28,7 +32,7 @@ zabbix_export:
           value_type: LOG
           username: '{$VMWARE.USERNAME}'
           password: '{$VMWARE.PASSWORD}'
-          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/6.0/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
+          description: 'Collect VMware event log. See also: https://www.zabbix.com/documentation/6.2/manual/config/items/preprocessing/examples#filtering_vmware_event_log_records'
           tags:
             -
               tag: component
@@ -199,7 +203,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Applications
               group_prototypes:
                 -
                   name: '{#CLUSTER.NAME}'
@@ -242,7 +246,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Applications
               group_prototypes:
                 -
                   name: '{#CLUSTER.NAME} (vm)'
@@ -488,9 +492,10 @@ zabbix_export:
             -
               uuid: da703e83e2e146569c173fd9bc6988dd
               expression: 'last(/VMware Guest/vmware.vm.guest.osuptime[{$VMWARE.URL},{$VMWARE.VM.UUID}])<10m'
-              name: 'VMware: VM has been restarted (uptime < 10m)'
+              name: 'VMware: VM has been restarted'
+              event_name: 'VMware: VM has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -1544,9 +1549,10 @@ zabbix_export:
             -
               uuid: 01d316b0a8cf4998b344f0c4ef1daa32
               expression: 'last(/VMware Hypervisor/vmware.hv.uptime[{$VMWARE.URL},{$VMWARE.HV.UUID}])<10m'
-              name: 'VMware: Hypervisor has been restarted (uptime < 10m)'
+              name: 'VMware: Hypervisor has been restarted'
+              event_name: 'VMware: Hypervisor has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -

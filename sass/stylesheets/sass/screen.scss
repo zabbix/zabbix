@@ -6,8 +6,8 @@ $ui-transitions: true !default;
 $ui-transition-duration: .3s !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20211222';
-$browser-sprite-path: '../img/browser-sprite.png?20211222';
+$sprite-path: '../img/icon-sprite.svg?20220519';
+$browser-sprite-path: '../img/browser-sprite.png?20220519';
 
 @import "utils/mixins";
 
@@ -21,33 +21,37 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "utils/scrollable";
 @import "utils/sortable";
 
-@import "layout/grid";
+@import "layout/layout";
 @import "layout/header";
 @import "layout/footer";
 @import "layout/sidebar";
+@import "layout/grid-columns";
 @import "layout/form-grid";
 
 @import "components/buttons";
 @import "components/color-picker";
 @import "components/dashboard/dashboard";
+@import "components/dashboard/widget-clock";
 @import "components/dashboard/widget-item";
+@import "components/dashboard/widget-slareport";
+@import "components/dashboard/widget-svggraph";
 @import "components/dashboard/widget-tophosts";
 @import "components/diff";
+@import "components/expandable-subfilter";
 @import "components/form-search";
 @import "components/inline-filter";
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
 @import "components/radio-list-control";
+@import "components/range-control";
 @import "components/service/info";
 @import "components/subfilter";
+@import "components/svg-graph";
 @import "components/tabfilter";
 @import "components/toc";
 @import "components/z-bar-gauge";
 @import "components/z-select";
-
-@import "components/dashboard/widget-slareport";
-@import "components/dashboard/widget-svggraph";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -358,7 +362,7 @@ form {
 								background-color: rgba($font-color, .5);
 							}
 
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-position: -165px -624px;
 							}
 
@@ -384,7 +388,7 @@ form {
 								border-bottom-color: rgba(0, 0, 0, .5);
 							}
 
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-position: -165px -624px;
 							}
 
@@ -405,7 +409,7 @@ form {
 
 							[class*='icon-depend-'],
 							.icon-description,
-							.icon-wzrd-action {
+							.icon-wizard-action {
 								background-color: transparent;
 							}
 						}
@@ -515,7 +519,7 @@ form {
 				background-position: -49px -767px;
 			}
 
-			.icon-wzrd-action {
+			.icon-wizard-action {
 				background: url($sprite-path) no-repeat -6px -624px;
 				height: 12px;
 				min-height: 12px;
@@ -1401,10 +1405,6 @@ form {
 		width: 85%;
 		position: relative;
 
-		&.has-before {
-			padding-top: 0;
-		}
-
 		td {
 			padding: 5px 5px 5px 0;
 			position: relative;
@@ -1691,7 +1691,7 @@ select {
 
 .form-input-margin {
 	display: inline-block;
-	margin: 0 3px 0 0;
+	margin: 0 4px 0 0;
 }
 
 .checkbox-radio {
@@ -1932,6 +1932,22 @@ button {
 				background-color: $btn-font-color;
 			}
 		}
+	}
+}
+
+.btn-tag {
+	@extend .tag;
+
+	min-height: unset;
+	outline: none;
+	border: none;
+
+	&:hover {
+		text-decoration: underline;
+		background-color: $ui-bg-selected-color;
+	}
+	&:focus {
+		background-color: $ui-bg-selected-color;
 	}
 }
 
@@ -2628,12 +2644,12 @@ $trigger-expression-tree-icons: (
 
 $form-icon-btn: (
 	cal: url($sprite-path) no-repeat -42px -834px,
-	wzrd-action: url($sprite-path) no-repeat -6px -617px
+	wizard-action: url($sprite-path) no-repeat -6px -617px
 );
 
 // Dynamically generated classes:
 //  .icon-cal
-//  .icon-wzrd-action
+//  .icon-wizard-action
 @each $form-icon-btn, $bgimage in $form-icon-btn {
 	.icon-#{$form-icon-btn} {
 		background: $transparent $bgimage;
@@ -3030,16 +3046,46 @@ $form-icon-btn: (
 	display: table;
 	position: absolute;
 	z-index: 1000;
-	padding: 15px 10px 10px;
+	padding: 13px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
 
+	.dashboard-widget-head {
+		margin: -8px -10px 6px -10px;
+		padding: 8px 10px;
+
+		.icon-doc-link {
+			width: 18px;
+			height: 18px;
+			margin: -9px -6px 0 30px;
+			line-height: 18px;
+
+			&::after {
+				font-size: 14px;
+			}
+		}
+	}
+
 	&.modal {
 		position: fixed;
 		overflow: hidden;
 		margin: 0 10px;
+
+		.dashboard-widget-head {
+			margin-bottom: 14px;
+
+			.icon-doc-link {
+				margin-right: -26px;
+			}
+
+			.overlay-close-btn {
+				position: static;
+				margin: -9px -6px 0 30px;
+				font-size: 25px;
+			}
+		}
 
 		.overlay-dialogue-body {
 			overflow: auto;
@@ -3094,13 +3140,6 @@ $form-icon-btn: (
 					padding-left: 0;
 				}
 			}
-		}
-
-		> .overlay-close-btn {
-			position: relative;
-			float: right;
-			top: -13px;
-			right: -8px;
 		}
 	}
 
@@ -3198,10 +3237,6 @@ $form-icon-btn: (
 				display: block;
 			}
 		}
-	}
-
-	.dashboard-widget-head {
-		margin: -10px -10px 6px;
 	}
 
 	.maps-container {
@@ -3355,6 +3390,15 @@ $form-icon-btn: (
 
 		&.textarea-flexible-parent {
 			vertical-align: top;
+		}
+
+		&.macro-textarea-parent {
+			textarea {
+				float: left;
+			}
+			span {
+				margin-left: 10px;
+			}
 		}
 
 		button {
@@ -3571,26 +3615,18 @@ $form-icon-btn: (
 	}
 }
 
-.calendar-control {
-	input {
-		vertical-align: middle;
-	}
-}
-
 // Problem notification overlay.
 .notif {
 	width: 250px;
 
 	.dashboard-widget-head {
-		margin: -11px 0 7px -9px;
+		margin: -13px -10px 7px;
 		padding: 0;
 
 		ul {
-			position: relative;
-			display: inline-block;
+			margin: 4px 0 0 1px;
 
 			li {
-				float: none;
 				display: inline-block;
 			}
 		}
@@ -3695,14 +3731,12 @@ $form-icon-btn: (
 	stroke: $red;
 	stroke-width: 2px;
 }
-.svg-point-highlight {
-	fill: $font-color !important;
-	fill-opacity: .5 !important;
-}
 
 .svg-graph-preview {
 	margin-top: 10px;
-	min-width: 960px;
+	// min-width: 960px;
+	// max-width: 1080px;
+	width: 1080px;
 	height: 300px;
 	position: relative;
 
@@ -3715,55 +3749,6 @@ $form-icon-btn: (
 		top: 0;
 		z-index: 3; // More than z-index of form controls, less than z-index of .msg-*.
 	}
-}
-
-.svg-graph {
-	display: block;
-}
-
-.svg-single-item-graph-legend,
-.svg-single-two-items-graph-legend,
-.svg-graph-legend {
-	// Legend single line height is 18. Value should be synchronized with $legend_height in 'CSvgGraphHelper.php'.
-	$svg-legend-line-height: 18px;
-	$svg-legend-handle-height: 4px;
-
-	overflow-y: hidden;
-	white-space: normal;
-	margin: 0 10px;
-	line-height: $svg-legend-line-height;
-
-	div {
-		display: inline-block;
-		margin: 0 4px;
-		font-size: 12px;
-		line-height: 1.1;
-		vertical-align: bottom;
-		min-width: 120px;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		border: 0 none transparent;
-	}
-
-	div::before {
-		content: ' ';
-		display: inline-block;
-		margin-right: 4px;
-		width: 10px;
-		height: 0;
-		vertical-align: middle;
-		margin-top: -$svg-legend-handle-height;
-		border-top-width: $svg-legend-handle-height;
-		border-top-style: solid;
-		border-top-color: inherit;
-	}
-}
-.svg-graph-legend div {
-	max-width: 30%;
-}
-.svg-single-two-items-graph-legend div {
-	max-width: 50%;
 }
 
 .svg-graph-hintbox {
@@ -3791,12 +3776,17 @@ $form-icon-btn: (
 	li {
 		padding-left: 23px;
 
-		.svg-graph-hintbox-item-color {
+		.svg-graph-hintbox-item-color,
+		.svg-graph-hintbox-trigger-color {
 			margin: 3px 10px 3px -20px;
 			width: 10px;
 			height: 10px;
 			float: left;
 			display: block;
+		}
+
+		.svg-graph-hintbox-trigger-color {
+			border-radius: 50%;
 		}
 	}
 
@@ -4816,13 +4806,10 @@ svg {
 }
 
 .list-vertical-accordion {
-	display: table;
 	padding-left: 15px;
 	width: calc(100% - 15px);
 
 	.list-accordion-item {
-		display: table-row;
-
 		.btn-remove {
 			position: relative;
 			right: -10px;
@@ -4835,19 +4822,30 @@ svg {
 		padding-bottom: 2px;
 	}
 
+	.list-accordion-item-opened {
+		.list-accordion-item-body {
+			display: block;
+		}
+
+		.list-accordion-item-toggle {
+			@extend .btn-widget-collapse;
+			margin: 0;
+		}
+	}
+
 	.list-accordion-item-closed {
-		.multiselect {
-			height: 24px;
-			overflow: hidden;
-		}
-
-		.list-accordion-item-head {
-			margin-bottom: 5px;
-		}
-
 		.list-accordion-item-body {
 			display: none;
 		}
+
+		.list-accordion-item-toggle {
+			@extend .btn-widget-expand;
+			margin: 0;
+		}
+	}
+
+	.list-accordion-item-toggle {
+		text-indent: -9999px;
 	}
 }
 
@@ -4898,6 +4896,7 @@ svg {
 
 	display: flex;
 	flex-wrap: wrap;
+	align-items: start;
 
 	&.columns-nowrap {
 		flex-wrap: nowrap;
@@ -5279,6 +5278,28 @@ svg {
 	}
 }
 
+.icon-count {
+	font-size: 12px;
+	padding: 3px 5px 2px;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	border-radius: 3px;
+
+	&:link,
+	&:hover,
+	&:focus {
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px rgba($blue, .35);
+	}
+}
+
+a.icon-count {
+	color: $font-selected-color;
+}
+
 .problem-icon-link,
 .problem-icon-list {
 	display: inline-flex;
@@ -5339,6 +5360,8 @@ svg {
 .icon-action-message,
 .icon-action-ack,
 .icon-action-unack,
+.icon-action-suppress,
+.icon-action-unsuppress,
 .icon-invisible,
 .icon-problem-generated,
 .icon-problem-recovery,
@@ -5370,6 +5393,8 @@ svg {
 	}
 }
 
+.icon-action-suppress,
+.icon-action-unsuppress,
 .icon-invisible {
 	&:link,
 	&:hover,
@@ -5393,6 +5418,8 @@ button {
 	&.icon-action-severity-changed,
 	&.icon-action-message,
 	&.icon-action-ack,
+	&.icon-action-suppress,
+	&.icon-action-unsuppress,
 	&.icon-problem-generated,
 	&.icon-problem-recovery,
 	&.icon-actions-number-gray,
@@ -5457,6 +5484,14 @@ button {
 
 .icon-action-unack::before {
 	background-position: -173px -245px;
+}
+
+.icon-action-suppress::before {
+	background-position: -89px -803px;
+}
+
+.icon-action-unsuppress::before {
+	background-position: -89px -836px;
 }
 
 .icon-invisible::before {
@@ -5591,136 +5626,45 @@ button {
 	}
 }
 
-#expressions_list .ui-sortable-helper {
-	display: table;
+.icon-doc-link {
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	text-align: center;
+	line-height: 24px;
+	border-radius: 2px;
+
+	&::after {
+		content: '?';
+		position: relative;
+		font-size: 18px;
+		font-weight: bold;
+		color: $font-alt-color;
+		opacity: 0.5;
+		transition: opacity .2s ease-out;
+	}
+
+	&:active,
+	&:hover,
+	&:link,
+	&:visited {
+		border-bottom: 0;
+	}
+
+	&:hover,
+	&:focus {
+		&::after {
+			opacity: 1;
+		}
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-border-focus-color;
+	}
 }
 
-// Range control.
-$range-track-color: #c0c0c0;
-$range-progress-color: $link-color;
-$range-thumb-color: $link-color;
-$range-thumb-color-focus: $link-active-color;
-$range-progress-color-focus: $link-active-color;
-$range-thumb-size: 10px;
-$range-track-height: 2px;
-$range-input-width: 31px;
-
-.range-control {
-	position: relative;
-	display: inline-block;
-	vertical-align: middle;
-
-	input[type=range] {
-		cursor: pointer;
-		-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
-		-moz-appearance: none; /* Hides the slider so that custom slider can be made */
-		width: calc(100% + 10px);
-		opacity: 0;
-		vertical-align: middle;
-		margin: 0 -5px;
-		padding: 0;
-		height: 20px;
-
-		&:focus {
-			outline: none;
-		}
-
-		/* Special styling for WebKit/Blink */
-		&::-webkit-slider-thumb {
-			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
-			height: $range-thumb-size;
-			width: $range-thumb-size;
-			opacity: 0;
-		}
-
-		&::-webkit-slider-runnable-track {
-			height: $range-thumb-size;
-			opacity: 0;
-		}
-	}
-
-	input[type=text] {
-		width: $range-input-width;
-		float: right;
-	}
-
-	> div {
-		position: relative;
-		width: calc(100% - 10px - #{$range-input-width});
-		margin: 2px $range-thumb-size 0 0;
-		float: left;
-	}
-
-	.range-control-track,
-	.range-control-progress {
-		position: absolute;
-		top: 50%;
-		margin-top: -$range-track-height / 2;
-		left: 0;
-		height: $range-track-height;
-		cursor: pointer;
-	}
-
-	.range-control-track {
-		width: 100%;
-		background: $range-track-color;
-	}
-
-	.range-control-progress {
-		background: $range-progress-color;
-	}
-
-	.range-control-thumb {
-		position: absolute;
-		top: 50%;
-		margin-top: -$range-thumb-size / 2;
-		margin-left: -$range-thumb-size / 2;
-		width: $range-thumb-size;
-		height: $range-thumb-size;
-		border-radius: 50%;
-		background: $range-thumb-color;
-	}
-
-	&.range-control-focus {
-		.range-control-thumb {
-			margin-top: -$range-thumb-size / 1.5;
-			margin-left: -$range-thumb-size / 1.5;
-			background: $range-thumb-color-focus;
-			border: 2px solid lighten($btn-bg-color, 10%);
-		}
-
-		.range-control-progress {
-			background: $range-progress-color-focus;
-		}
-	}
-
-	&.disabled {
-		opacity: 1;
-
-		input[type=range] {
-			cursor: default;
-		}
-		.range-control-progress,
-		.range-control-thumb {
-			background: #c0c0c0;
-		}
-	}
-
-	datalist {
-		position: absolute;
-		display: flex;
-		width: 100%;
-		top: 50%;
-		margin-top: -$range-track-height / 2;
-
-		option {
-			padding: 0;
-			font-size: 0;
-			flex: 1 0 0;
-			height: $range-track-height;
-			border-left: 1px solid $body-bg-color;
-		}
-	}
+#expressions_list .ui-sortable-helper {
+	display: table;
 }
 
 .graph-legend {
@@ -5728,23 +5672,6 @@ $range-input-width: 31px;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
-}
-
-.graph-widget-config-tabs {
-	padding: 10px 0;
-
-	> .tabs-nav {
-		padding-left: calc(15% + 10px);
-		margin-right: 0;
-		margin-left: 0;
-	}
-
-	.ui-tabs-nav {
-		position: sticky;
-		top: 0;
-		background: $header-bg-color;
-		z-index: 3;
-	}
 }
 
 // Screen reader.
@@ -6044,6 +5971,7 @@ $range-input-width: 31px;
 
 .btn-toggle-chevron {
 	position: relative;
+	text-indent: -9999px;
 
 	&[aria-expanded="true"] {
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
@@ -6242,10 +6170,6 @@ $range-input-width: 31px;
 	&.list-accordion-item-closed {
 		.interface-btn-toggle {
 			@extend .btn-widget-expand;
-		}
-
-		.list-accordion-item-body {
-			display: none;
 		}
 	}
 
@@ -6573,6 +6497,11 @@ z-select,
 	margin-top: 5px;
 	height: 30px;
 	width: 30px;
+}
+.leaflet-marker-icon:focus {
+	box-shadow: 0 0 0 2px $btn-border-focus-color;
+	border-radius: 2px;
+	outline: none;
 }
 .marker-cluster span {
 	line-height: 30px;

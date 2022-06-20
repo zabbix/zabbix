@@ -27,15 +27,21 @@ require_once dirname(__FILE__).'/js/configuration.host.prototype.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_PROTOTYPE_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATES_PROTOTYPE_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(new CRedirectButton(_('Create host prototype'),
-				(new CUrl('host_prototypes.php'))
-					->setArgument('form', 'create')
-					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-					->setArgument('context', $data['context'])
-					->getUrl()
-			))
+			(new CList())
+				->addItem(
+					new CRedirectButton(_('Create host prototype'),
+						(new CUrl('host_prototypes.php'))
+							->setArgument('form', 'create')
+							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+							->setArgument('context', $data['context'])
+					)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->setNavigation(

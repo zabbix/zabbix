@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -31,13 +31,33 @@ class CControllerTokenUpdate extends CController {
 			'name'          => 'db token.name|required|not_empty',
 			'description'   => 'db token.description',
 			'expires_state' => 'in 0,1|required',
-			'expires_at'    => 'range_time',
+			'expires_at'    => 'abs_time',
 			'status'        => 'db token.status|required|in '.ZBX_AUTH_TOKEN_ENABLED.','.ZBX_AUTH_TOKEN_DISABLED,
 			'admin_mode'    => 'required|in 0,1',
 			'regenerate'    => 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$fields = [];
+
+			if ($this->getInput('expires_state') == 1) {
+				$fields['expires_at'] = 'required';
+			}
+
+			if ($fields) {
+				$validator = new CNewValidator($this->getInputAll(), $fields);
+
+				foreach ($validator->getAllErrors() as $error) {
+					info($error);
+				}
+
+				if ($validator->isErrorFatal() || $validator->isError()) {
+					$ret = false;
+				}
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -61,27 +81,36 @@ class CControllerTokenUpdate extends CController {
 		return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS);
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	protected function doAction() {
 		$this->getInputs($token, ['tokenid', 'name', 'description', 'expires_at', 'status']);
 
-		$token['expires_at'] = $this->getInput('expires_state')
-			? (new DateTime($token['expires_at']))->getTimestamp()
-			: 0;
+		if ($this->getInput('expires_state')) {
+			$parser = new CAbsoluteTimeParser();
+			$parser->parse($token['expires_at']);
+
+			$token['expires_at'] = $parser
+				->getDateTime(true)
+				->getTimestamp();
+		}
+		else {
+			$token['expires_at'] = 0;
+		}
+
 		$result = API::Token()->update($token);
 
 		$output = [];
 
 		if ($result) {
-			$success = ['title' => _('API token updated')];
+			$output['success']['title'] = _('API token updated');
 
 			if ($messages = get_and_clear_messages()) {
-				$success['messages'] = array_column($messages, 'message');
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
 
-			$output['success'] = $success;
-
 			if ($this->hasInput('regenerate')) {
-
 				['tokenids' => $tokenids] = $result;
 				[['userid' => $userid]] = API::Token()->get([
 					'output' => ['userid'],
@@ -96,7 +125,7 @@ class CControllerTokenUpdate extends CController {
 					])
 					: [CWebUser::$data];
 
-				$data = [
+				$output['data'] = [
 					'name' => $token['name'],
 					'user_name' => getUserFullname($user),
 					'auth_token' => $auth_token,
@@ -106,8 +135,6 @@ class CControllerTokenUpdate extends CController {
 					'message' => _('API token updated'),
 					'admin_mode' => $this->getInput('admin_mode')
 				];
-
-				$output['data'] = $data;
 			}
 		}
 		else {

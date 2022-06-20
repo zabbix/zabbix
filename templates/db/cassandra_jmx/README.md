@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 Official JMX Template for Apache Cassandra DBSM.
 
 
@@ -13,7 +13,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/jmx) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/jmx) for basic instructions.
 
 This template works with standalone and cluster instances.
 Metrics are collected by JMX.
@@ -155,11 +155,11 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |There are down nodes in cluster |<p>-</p> |`last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"])>0` |AVERAGE | |
-|Version has changed (new version: {ITEM.VALUE}) |<p>Cassandra version has changed. Ack to close.</p> |`last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#1)<>last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#2) and length(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]))>0` |INFO |<p>Manual close: YES</p> |
-|Failed to fetch info data (or no data for 15m) |<p>Zabbix has not received data for items for the last 15 minutes</p> |`nodata(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"],15m)=1` |WARNING | |
+|Version has changed |<p>Cassandra version has changed. Ack to close.</p> |`last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#1)<>last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#2) and length(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]))>0` |INFO |<p>Manual close: YES</p> |
+|Failed to fetch info data |<p>Zabbix has not received data for items for the last 15 minutes</p> |`nodata(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"],15m)=1` |WARNING | |
 |Too many storage exceptions |<p>-</p> |`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Exceptions","Count"],5m)>0` |WARNING | |
-|Many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.WARN} for 15m) |<p>-</p> |`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m)</p> |
-|Too many pending tasks (over {$CASSANDRA.PENDING_TASKS.MAX.HIGH} for 15m) |<p>-</p> |`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}` |AVERAGE | |
+|Many pending tasks |<p>-</p> |`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.WARN}` |WARNING |<p>**Depends on**:</p><p>- Too many pending tasks</p> |
+|Too many pending tasks |<p>-</p> |`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}` |AVERAGE | |
 
 ## Feedback
 

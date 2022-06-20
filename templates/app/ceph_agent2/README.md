@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor Ceph cluster by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1. Setup and configure zabbix-agent2 compiled with the Ceph monitoring plugin.
 2. Set the {$CEPH.CONNSTRING} such as <protocol(host:port)> or named session.
@@ -127,7 +127,7 @@ There are no template links in this template.
 |Ceph: Can not connect to cluster |<p>Connection to Ceph RESTful module is broken (if there is any error presented including AUTH and configuration issues).</p> |`last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0` |AVERAGE | |
 |Ceph: Cluster in ERROR state |<p>-</p> |`last(/Ceph by Zabbix agent 2/ceph.overall_status)=2` |AVERAGE |<p>Manual close: YES</p> |
 |Ceph: Cluster in WARNING state |<p>-</p> |`last(/Ceph by Zabbix agent 2/ceph.overall_status)=1`<p>Recovery expression:</p>`last(/Ceph by Zabbix agent 2/ceph.overall_status)=0` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Ceph: Cluster in ERROR state</p> |
-|Ceph: Minimum monitor release version has changed (new version: {ITEM.VALUE}) |<p>Ceph version has changed. Ack to close.</p> |`last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0` |INFO |<p>Manual close: YES</p> |
+|Ceph: Minimum monitor release version has changed |<p>Ceph version has changed. Ack to close.</p> |`last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0` |INFO |<p>Manual close: YES</p> |
 |Ceph: OSD osd.{#OSDNAME} is down |<p>OSD osd.{#OSDNAME} is marked "down" in the osdmap.</p><p>The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</p> |`last(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},up]) = 0` |AVERAGE | |
 |Ceph: OSD osd.{#OSDNAME} is full |<p>-</p> |`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100` |AVERAGE | |
 |Ceph: Ceph OSD osd.{#OSDNAME} is near full |<p>-</p> |`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_nearfull_ratio)*100` |WARNING |<p>**Depends on**:</p><p>- Ceph: OSD osd.{#OSDNAME} is full</p> |

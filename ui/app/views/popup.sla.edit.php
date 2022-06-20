@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -113,8 +113,8 @@ $sla_tab = (new CFormGrid())
 		(new CLabel(_('Effective date'), 'effective_date'))->setAsteriskMark(),
 		new CFormField(
 			(new CDateSelector('effective_date', $data['form']['effective_date']))
-				->setDateFormat(DATE_FORMAT)
-				->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+				->setDateFormat(ZBX_DATE)
+				->setPlaceholder(_('YYYY-MM-DD'))
 				->setAriaRequired()
 		)
 	])
@@ -222,16 +222,7 @@ $form
 			sla_edit_popup.init('.json_encode([
 				'slaid' => $data['slaid'],
 				'service_tags' => $data['form']['service_tags'],
-				'excluded_downtimes' => $data['form']['excluded_downtimes'],
-				'create_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'sla.create')
-					->getUrl(),
-				'update_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'sla.update')
-					->getUrl(),
-				'delete_url' => (new CUrl('zabbix.php'))
-					->setArgument('action', 'sla.delete')
-					->getUrl()
+				'excluded_downtimes' => $data['form']['excluded_downtimes']
 			]).');
 		'))->setOnDocumentReady()
 	);
@@ -264,7 +255,8 @@ if ($data['slaid'] !== null) {
 					[
 						'title' => _('Cancel'),
 						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true
+						'cancel' => true,
+						'action' => ''
 					]
 				]
 			]).');'
@@ -294,6 +286,7 @@ else {
 
 $output = [
 	'header' => $title,
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_SLA_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().

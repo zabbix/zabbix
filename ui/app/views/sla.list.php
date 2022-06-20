@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -183,11 +183,15 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 
 (new CWidget())
 	->setTitle(_('SLA'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::SLA_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CSimpleButton(_('Create SLA')))
-				->addClass('js-create-sla')
-				->setEnabled($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA])
+			(new CList())
+				->addItem(
+					(new CSimpleButton(_('Create SLA')))
+						->addClass('js-create-sla')
+						->setEnabled($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA])
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter)
@@ -195,20 +199,7 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 	->show();
 
 (new CScriptTag('
-	view.init('.json_encode([
-		'enable_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'sla.enable')
-			->setArgumentSID()
-			->getUrl(),
-		'disable_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'sla.disable')
-			->setArgumentSID()
-			->getUrl(),
-		'delete_url' => (new CUrl('zabbix.php'))
-			->setArgument('action', 'sla.delete')
-			->setArgumentSID()
-			->getUrl()
-	]).');
+	view.init();
 '))
 	->setOnDocumentReady()
 	->show();

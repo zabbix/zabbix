@@ -166,7 +166,7 @@ class testDashboardGeomapWidget extends CWebTest {
 
 		// Check operator's dropdown options presence.
 		$this->assertEquals(['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal',
-				'Does not contain'], $form->getField('id:tags_0_operator')->asZDropdown()->getOptions()->asText()
+				'Does not contain'], $form->getField('id:tags_0_operator')->asDropdown()->getOptions()->asText()
 		);
 
 		$hint_text = "Comma separated center coordinates and zoom level to display when the widget is initially loaded.".
@@ -177,7 +177,7 @@ class testDashboardGeomapWidget extends CWebTest {
 				"\nThe maximum zoom level is \"0\".".
 				"\nInitial view is ignored if the default view is set.";
 
-		$form->query('xpath:.//label[text()="Initial view"]//span')->one()->click();
+		$form->query('xpath:.//label[text()="Initial view"]/a')->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
 		$this->assertEquals($hint_text, $hint->one()->getText());
 		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();

@@ -17,19 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "comms.h"
-#include "zbxserver.h"
-#include "db.h"
-#include "log.h"
-#include "../scripts/scripts.h"
-#include "../../libs/zbxaudit/audit.h"
+#include "nodecommand.h"
 
+#include "zbxserver.h"
+#include "log.h"
 #include "trapper_auth.h"
+
+#include "../scripts/scripts.h"
+#include "audit/zbxaudit.h"
 #include "../../libs/zbxserver/get_host_from_event.h"
 #include "../../libs/zbxserver/zabbix_users.h"
-
-#include "nodecommand.h"
 
 /******************************************************************************
  *                                                                            *
@@ -248,7 +245,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_vector_ptr_t	events;
 	zbx_vector_ptr_pair_t	webhook_params;
 	char			*user_timezone = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
-	DB_EVENT		*problem_event = NULL, *recovery_event = NULL;
+	ZBX_DB_EVENT		*problem_event = NULL, *recovery_event = NULL;
+	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
 			" userid:" ZBX_FS_UI64 " clientip:%s",
@@ -325,7 +323,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		switch (events.values_num)
 		{
 			case 1:
-				if (eventid == ((DB_EVENT *)(events.values[0]))->eventid)
+				if (eventid == ((ZBX_DB_EVENT *)(events.values[0]))->eventid)
 				{
 					problem_event = events.values[0];
 				}
@@ -336,7 +334,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				}
 				break;
 			case 2:
-				if (r_eventid == ((DB_EVENT *)(events.values[0]))->eventid)
+				if (r_eventid == ((ZBX_DB_EVENT *)(events.values[0]))->eventid)
 				{
 					problem_event = events.values[1];
 					recovery_event = events.values[0];
@@ -395,16 +393,18 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	else
 		macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
 
+	um_handle = zbx_dc_open_user_macros();
+
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
-		if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
+		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
 				NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command, macro_type,
 				error, sizeof(error)))
 		{
 			goto fail;
 		}
 
-		if (SUCCEED != substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL, &host,
+		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL, &host,
 				NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type, error,
 				sizeof(error)))
 		{
@@ -419,7 +419,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 		for (i = 0; i < webhook_params.values_num; i++)
 		{
-			if (SUCCEED != substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
+			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
 					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone,
 					(char **)&webhook_params.values[i].second, macro_type, error,
 					sizeof(error)))
@@ -460,6 +460,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		ZBX_UNUSED(audit_res);
 	}
 fail:
+	if (NULL != um_handle)
+		zbx_dc_close_user_macros(um_handle);
+
 	if (SUCCEED != ret)
 		*result = zbx_strdup(*result, error);
 

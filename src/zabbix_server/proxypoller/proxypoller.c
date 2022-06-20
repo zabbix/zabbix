@@ -17,21 +17,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "daemon.h"
-#include "comms.h"
-#include "zbxself.h"
-
 #include "proxypoller.h"
+
+#include "common.h"
+#include "zbxnix.h"
+#include "zbxself.h"
 #include "zbxserver.h"
-#include "dbcache.h"
-#include "db.h"
-#include "zbxjson.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "proxy.h"
 #include "zbxcrypto.h"
 #include "../trapper/proxydata.h"
 #include "zbxcompress.h"
+#include "zbxrtc.h"
+#include "zbxcommshigh.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -496,9 +495,10 @@ out:
  ******************************************************************************/
 static int	process_proxy(void)
 {
-	DC_PROXY	proxy, proxy_old;
-	int		num, i;
-	time_t		now;
+	DC_PROXY		proxy, proxy_old;
+	int			num, i;
+	time_t			now;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -506,6 +506,8 @@ static int	process_proxy(void)
 		goto exit;
 
 	now = time(NULL);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	for (i = 0; i < num; i++)
 	{
@@ -532,7 +534,7 @@ static int	process_proxy(void)
 			proxy.addr = proxy.addr_orig;
 
 			port = zbx_strdup(port, proxy.port_orig);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 					&port, MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == is_ushort(port, &proxy.port))
 			{
@@ -576,6 +578,7 @@ static int	process_proxy(void)
 			}
 		}
 error:
+
 		if (proxy_old.version != proxy.version || proxy_old.auto_compress != proxy.auto_compress ||
 				proxy_old.lastaccess != proxy.lastaccess)
 		{
@@ -584,6 +587,8 @@ error:
 
 		DCrequeue_proxy(proxy.hostid, update_nextcheck, ret);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -592,9 +597,10 @@ exit:
 
 ZBX_THREAD_ENTRY(proxypoller_thread, args)
 {
-	int	nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
-	double	sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t	last_stat_time;
+	int			nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
+	double			sec, total_sec = 0.0, old_total_sec = 0.0;
+	time_t			last_stat_time;
+	zbx_ipc_async_socket_t	rtc;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -616,8 +622,13 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
+	zbx_rtc_subscribe(&rtc, process_type, process_num);
+
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_uint32_t	rtc_cmd;
+		unsigned char	*rtc_data;
+
 		sec = zbx_time();
 		zbx_update_env(sec);
 
@@ -655,7 +666,11 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 			last_stat_time = time(NULL);
 		}
 
-		zbx_sleep_loop(sleeptime);
+		if (SUCCEED == zbx_rtc_wait(&rtc, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		{
+			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				break;
+		}
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

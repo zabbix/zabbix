@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-01-26T10:48:34Z'
-  groups:
+  version: '6.2'
+  date: '2022-06-07T19:36:32Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -40,7 +40,8 @@ zabbix_export:
             -
               uuid: f5db329410a14609a5f3e883ca493cc8
               expression: 'min(/Nginx by Zabbix agent/net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN}'
-              name: 'Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)'
+              name: 'Nginx: Service response time is too high'
+              event_name: 'Nginx: Service response time is too high (over {$NGINX.RESPONSE_TIME.MAX.WARN}s for 5m)'
               priority: WARNING
               manual_close: 'YES'
               dependencies:
@@ -165,7 +166,8 @@ zabbix_export:
             -
               uuid: f2d431fa9bc446608caa3f80ef27c41b
               expression: 'min(/Nginx by Zabbix agent/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN}'
-              name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
+              name: 'Nginx: High connections drop rate'
+              event_name: 'Nginx: High connections drop rate (more than {$NGINX.DROP_RATE.MAX.WARN} for 5m)'
               opdata: 'Current rate: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'The dropping rate connections is greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.'
@@ -339,7 +341,8 @@ zabbix_export:
             -
               uuid: 7ad80c508f2f48b59f7659c673db9f36
               expression: 'last(/Nginx by Zabbix agent/nginx.version,#1)<>last(/Nginx by Zabbix agent/nginx.version,#2) and length(last(/Nginx by Zabbix agent/nginx.version))>0'
-              name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
+              name: 'Nginx: Version has changed'
+              event_name: 'Nginx: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Nginx version has changed. Ack to close.'
               manual_close: 'YES'
@@ -431,7 +434,8 @@ zabbix_export:
               expression: |
                 find(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],,"like","HTTP/1.1 200")=0 or
                  nodata(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],30m)=1
-              name: 'Nginx: Failed to fetch stub status page (or no data for 30m)'
+              name: 'Nginx: Failed to fetch stub status page'
+              event_name: 'Nginx: Failed to fetch stub status page (or no data for 30m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 30 minutes.'
               manual_close: 'YES'
@@ -494,8 +498,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Nginx: Connections by state'
                         host: 'Nginx by Zabbix agent'
+                        name: 'Nginx: Connections by state'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -510,8 +514,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Nginx: Requests per second'
                         host: 'Nginx by Zabbix agent'
+                        name: 'Nginx: Requests per second'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -526,8 +530,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Nginx: Connections per second'
                         host: 'Nginx by Zabbix agent'
+                        name: 'Nginx: Connections per second'
       valuemaps:
         -
           uuid: 53c8528c18814f30a45d1540ab9e5c00

@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 https://service-provider.zyxel.com/global/en/products/carrier-and-access-switches/access-switches/mgs-3712f
 
 This template was tested on:
@@ -12,7 +12,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/network_devices) for basic instructions.
 
 Refer to the vendor documentation.
 
@@ -99,18 +99,18 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|ZYXEL MGS-3712F: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m) |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/ZYXEL MGS-3712F SNMP/zyxel.3712f.cpuusage,5m)>{$CPU.UTIL.CRIT}` |WARNING | |
+|ZYXEL MGS-3712F: High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/ZYXEL MGS-3712F SNMP/zyxel.3712f.cpuusage,5m)>{$CPU.UTIL.CRIT}` |WARNING | |
 |ZYXEL MGS-3712F: FAN{#SNMPINDEX} is in critical state |<p>Please check the fan unit</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}` |AVERAGE | |
 |ZYXEL MGS-3712F: Template does not match hardware |<p>This template is for Zyxel MGS-3712F, but connected to {ITEM.VALUE}</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.model)<>"MGS-3712F"` |INFO | |
 |ZYXEL MGS-3712F: Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.fwversion,#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.fwversion,#2) and length(last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.fwversion))>0` |INFO |<p>Manual close: YES</p> |
-|ZYXEL MGS-3712F: Device has been replaced (new serial number received) |<p>Device serial number has changed. Ack to close</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.serialnumber,#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.serialnumber,#2) and length(last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.serialnumber))>0` |INFO |<p>Manual close: YES</p> |
+|ZYXEL MGS-3712F: Device has been replaced |<p>Device serial number has changed. Ack to close</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.serialnumber,#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.serialnumber,#2) and length(last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.serialnumber))>0` |INFO |<p>Manual close: YES</p> |
 |ZYXEL MGS-3712F: Port {#SNMPINDEX}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}],#2)`<p>Recovery expression:</p>`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.net.if.operstatus[{#SNMPINDEX}])<>2` |AVERAGE |<p>Manual close: YES</p> |
-|ZYXEL MGS-3712F: SFP {#SNMPINDEX} has been replaced (new serial number received) |<p>SFP {#SNMPINDEX} serial number has changed. Ack to close</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
-|ZYXEL MGS-3712F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} (over {#ZYXEL.SFP.WARN.MAX}{#ZYXEL.SFP.UNIT}) |<p>The upper threshold value of the parameter is exceeded</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}` |WARNING | |
-|ZYXEL MGS-3712F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} (less than {#ZYXEL.SFP.WARN.MIN}{#ZYXEL.SFP.UNIT}) |<p>The parameter values are less than the lower threshold</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}` |WARNING | |
+|ZYXEL MGS-3712F: SFP {#SNMPINDEX} has been replaced |<p>SFP {#SNMPINDEX} serial number has changed. Ack to close</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.serialnumber[{#SNMPINDEX}]))>0` |INFO |<p>Manual close: YES</p> |
+|ZYXEL MGS-3712F: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION} |<p>The upper threshold value of the parameter is exceeded</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}` |WARNING | |
+|ZYXEL MGS-3712F: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION} |<p>The parameter values are less than the lower threshold</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}` |WARNING | |
 |ZYXEL MGS-3712F: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state |<p>Please check the power supply</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}` |AVERAGE | |
 |ZYXEL MGS-3712F: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/ZYXEL MGS-3712F SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|ZYXEL MGS-3712F: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|ZYXEL MGS-3712F: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |ZYXEL MGS-3712F: Temperature {#ZYXEL.TEMP.ID} is in critical state |<p>Please check the temperature</p> |`last(/ZYXEL MGS-3712F SNMP/zyxel.3712f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}` |AVERAGE | |
 
 ## Feedback

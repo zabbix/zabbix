@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-01-26T10:42:06Z'
-  groups:
+  version: '6.2'
+  date: '2022-06-07T19:36:44Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -72,7 +72,7 @@ zabbix_export:
           key: kernel.maxproc
           delay: 1h
           history: 7d
-          description: 'It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.'
+          description: 'It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.'
           tags:
             -
               tag: component
@@ -496,7 +496,8 @@ zabbix_export:
             -
               uuid: 4ca39fa4a86c45e19e03eff89edd239b
               expression: 'max(/Solaris/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0'
-              name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
+              name: 'Zabbix agent is not available'
+              event_name: 'Zabbix agent is not available (for {$AGENT.TIMEOUT})'
               priority: AVERAGE
               description: 'For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.'
               manual_close: 'YES'
@@ -743,8 +744,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: Solaris
                         name: 'CPU load'
-                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -759,8 +760,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: Solaris
                         name: 'CPU utilization'
-                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -775,8 +776,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: Solaris
                         name: 'Memory usage'
-                        host: Solaris
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -792,8 +793,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: Solaris
+                        name: 'Swap usage'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -808,8 +809,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: 'proc.num[]'
                         host: Solaris
+                        key: 'proc.num[]'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -825,8 +826,8 @@ zabbix_export:
                       type: ITEM
                       name: itemid
                       value:
-                        key: 'proc.num[,,run]'
                         host: Solaris
+                        key: 'proc.num[,,run]'
       valuemaps:
         -
           uuid: 2a704279b6e946a99b88bdebd4f99653

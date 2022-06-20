@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-01-26T10:48:22Z'
-  groups:
+  version: '6.2'
+  date: '2022-06-07T19:36:28Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -144,14 +144,14 @@ zabbix_export:
               name: root
               value: '{$SHAREPOINT.ROOT}'
             -
-              name: password
-              value: '{$SHAREPOINT.PASSWORD}'
-            -
               name: url
               value: '{$SHAREPOINT.URL}'
             -
               name: user
               value: '{$SHAREPOINT.USER}'
+            -
+              name: password
+              value: '{$SHAREPOINT.PASSWORD}'
           tags:
             -
               tag: component

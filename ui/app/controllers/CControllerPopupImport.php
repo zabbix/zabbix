@@ -31,14 +31,12 @@ class CControllerPopupImport extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
 			);
 		}
 
@@ -68,7 +66,7 @@ class CControllerPopupImport extends CController {
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
 			case 'host':
-				$rules['groups'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['host_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['hosts'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateLinkage'] = ['createMissing' => true, 'deleteMissing' => false];
@@ -82,7 +80,8 @@ class CControllerPopupImport extends CController {
 				break;
 
 			case 'template':
-				$rules['groups'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['host_groups'] = ['updateExisting' => true, 'createMissing' => true];
+				$rules['template_groups'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['templates'] = ['updateExisting' => true, 'createMissing' => true];
 				$rules['valueMaps'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 				$rules['templateDashboards'] = ['updateExisting' => true, 'createMissing' => true,
@@ -144,21 +143,20 @@ class CControllerPopupImport extends CController {
 			$output = [];
 
 			if ($result) {
-				$messages = CMessageHelper::getMessages();
-				$output = ['title' => _('Imported successfully')];
-				if (count($messages)) {
-					$output['messages'] = array_column($messages, 'message');
+				$output['success']['title'] = _('Imported successfully');
+
+				if ($messages = get_and_clear_messages()) {
+					$output['success']['messages'] = array_column($messages, 'message');
 				}
 			}
 			else {
-				CMessageHelper::setErrorTitle(_('Import failed'));
-				$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-					->toString();
+				$output['error'] = [
+					'title' => _('Import failed'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				];
 			}
 
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-			);
+			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
 		}
 		else {
 			$this->setResponse(new CControllerResponseData([

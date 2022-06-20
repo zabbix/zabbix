@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "symbols.h"
+#include "zbxsymbols.h"
 
 int	VM_VMEMORY_SIZE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

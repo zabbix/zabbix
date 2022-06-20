@@ -30,12 +30,13 @@ class CControllerMenuPopup extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
+			);
 		}
 
 		return $ret;
@@ -240,13 +241,23 @@ class CControllerMenuPopup extends CController {
 		if ($db_items) {
 			$db_item = $db_items[0];
 			$is_writable = false;
+			$is_executable = false;
 
-			if ($db_item['type'] != ITEM_TYPE_HTTPTEST && CWebUser::getType() > USER_TYPE_ZABBIX_USER) {
-				$is_writable = (bool) API::Host()->get([
-					'output' => [],
-					'hostids' => $db_item['hostid'],
-					'editable' => true
-				]);
+			if ($db_item['type'] != ITEM_TYPE_HTTPTEST) {
+				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+					$is_writable = true;
+				}
+				elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN) {
+					$is_writable = (bool) API::Host()->get([
+						'output' => [],
+						'hostids' => $db_item['hostid'],
+						'editable' => true
+					]);
+				}
+			}
+
+			if (in_array($db_item['type'], checkNowAllowedTypes())) {
+				$is_executable = $is_writable ? true : CWebUser::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW);
 			}
 
 			return [
@@ -259,6 +270,7 @@ class CControllerMenuPopup extends CController {
 				'history' => $db_item['history'] != 0,
 				'trends' => $db_item['trends'] != 0,
 				'isWriteable' => $is_writable,
+				'isExecutable' => $is_executable,
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			];
 		}
@@ -663,16 +675,8 @@ class CControllerMenuPopup extends CController {
 				if ($events) {
 					$event = $events[0];
 
-					if ($event['r_eventid'] != 0) {
-						$can_be_closed = false;
-					}
-					else {
-						foreach ($event['acknowledges'] as $acknowledge) {
-							if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-								$can_be_closed = false;
-								break;
-							}
-						}
+					if ($can_be_closed) {
+						$can_be_closed = !isEventClosed($event);
 					}
 
 					foreach ($event['urls'] as $url) {
@@ -704,6 +708,7 @@ class CControllerMenuPopup extends CController {
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY)
 							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS)
 							|| $can_be_closed
+							|| CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 						)
 				);
 			}
@@ -826,8 +831,8 @@ class CControllerMenuPopup extends CController {
 			$output['data'] = $menu_data;
 		}
 
-		if (($messages = getMessages()) !== null) {
-			$output['errors'] = $messages->toString();
+		if ($messages = get_and_clear_messages()) {
+			$output['error']['messages'] = array_column($messages, 'message');
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

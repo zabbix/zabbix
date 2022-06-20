@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -40,8 +40,8 @@ class CControllerHintboxActionlist extends CController {
 		if ($ret) {
 			$events = API::Event()->get([
 				'output' => ['eventid', 'r_eventid', 'clock'],
-				'select_acknowledges' => ['userid', 'action', 'message', 'clock', 'new_severity',
-					'old_severity'
+				'select_acknowledges' => ['userid', 'action', 'message', 'clock', 'new_severity', 'old_severity',
+					'suppress_until'
 				],
 				'eventids' => (array) $this->getInput('eventid')
 			]);
@@ -56,7 +56,13 @@ class CControllerHintboxActionlist extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData([]));
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;

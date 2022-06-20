@@ -53,6 +53,19 @@
 
 		table {
 			width: 100%;
+
+			&.table-initial-width {
+				width: auto;
+			}
+		}
+
+		th {
+			padding: 0 5px 0 0;
+			color: $font-alt-color;
+
+			&:last-child {
+				padding: 0;
+			}
 		}
 
 		td {

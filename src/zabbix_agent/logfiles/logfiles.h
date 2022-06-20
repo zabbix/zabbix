@@ -20,11 +20,10 @@
 #ifndef ZABBIX_LOGFILES_H
 #define ZABBIX_LOGFILES_H
 
-#include "md5.h"
 #include "../metrics.h"
 #include "persistent_state.h"
 
-#define ZBX_MD5_PRINT_BUF_LEN	((MD5_DIGEST_SIZE) * 2 + 1)	/* for MD5 sum representation with hex-digits */
+#define ZBX_MD5_PRINT_BUF_LEN	((ZBX_MD5_DIGEST_SIZE) * 2 + 1)	/* for MD5 sum representation with hex-digits */
 
 typedef enum
 {
@@ -52,9 +51,9 @@ struct	st_logfile
 	zbx_uint64_t	processed_size;	/* how far the Zabbix agent has analyzed the file */
 	int		md5_block_size;	/* size of the first and last blocks of file for which the md5 sum is */
 					/* calculated (in 'first_block_md5') */
-	md5_byte_t	first_block_md5[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
+	md5_byte_t	first_block_md5[ZBX_MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
 	zbx_uint64_t	last_block_offset;		/* position of the last block from the beginning of file */
-	md5_byte_t	last_block_md5[MD5_DIGEST_SIZE];	/* md5 sum of the last block */
+	md5_byte_t	last_block_md5[ZBX_MD5_DIGEST_SIZE];	/* md5 sum of the last block */
 };
 
 typedef int 	(*zbx_process_value_func_t)(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,

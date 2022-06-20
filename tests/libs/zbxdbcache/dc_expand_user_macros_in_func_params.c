@@ -26,7 +26,7 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "dbconfig.h"
 
 #include "configcache_mock.h"
@@ -43,7 +43,7 @@ void	zbx_mock_test_entry(void **state)
 
 	params = zbx_mock_get_parameter_string("in.params");
 	expected_params = zbx_mock_get_parameter_string("out.params");
-	returned_params = dc_expand_user_macros_in_func_params(params, 1);
+	returned_params = zbx_dc_expand_user_macros_in_func_params(params, 1);
 	zbx_mock_assert_str_eq("Expanded parameters", expected_params, returned_params);
 
 	zbx_free(returned_params);

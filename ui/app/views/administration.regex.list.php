@@ -24,20 +24,20 @@
  */
 
 if ($data['uncheck']) {
-	uncheckTableRows();
+	uncheckTableRows('regex');
 }
 
 $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
-	->setControls((new CTag('nav', true,
-		(new CForm())
-			->cleanItems()
-			->addItem(new CRedirectButton(_('New regular expression'),
-				(new CUrl('zabbix.php'))->setArgument('action', 'regex.edit')
-			))
-		))
-			->setAttribute('aria-label', _('Content controls'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_LIST))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('New regular expression'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'regex.edit')
+				))
+		))->setAttribute('aria-label', _('Content controls'))
 	);
 
 $form = (new CForm())->setName('regularExpressionsForm');
@@ -79,7 +79,7 @@ $form->addItem([
 	$table,
 	new CActionButtonList('action', 'regexids', [
 		'regex.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected regular expressions?')]
-	])
+	], 'regex')
 ]);
 
 $widget->addItem($form)->show();

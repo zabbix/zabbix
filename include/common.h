@@ -20,11 +20,9 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
-#include "sysinc.h"
-#include "zbxtypes.h"
+#include "zbxsysinc.h"
 #include "module.h"
 #include "version.h"
-#include "md5.h"
 
 #if defined(__MINGW32__)
 #	define __try
@@ -99,17 +97,20 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 #define	AGENT_ERROR	-5
 #define	GATEWAY_ERROR	-6
 #define	CONFIG_ERROR	-7
+#define	SIG_ERROR	-8
 
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
 
-#define MAX_ID_LEN		21
-#define MAX_STRING_LEN		2048
-#define MAX_BUFFER_LEN		65536
-#define MAX_ZBX_HOSTNAME_LEN	128
-#define MAX_ZBX_DNSNAME_LEN	255	/* maximum host DNS name length from RFC 1035 (without terminating '\0') */
-#define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
+#define MAX_ID_LEN			21
+#define MAX_STRING_LEN			2048
+#define MAX_BUFFER_LEN			65536
+#define ZBX_MAX_HOSTNAME_LEN		128
+#define ZBX_HOSTNAME_BUF_LEN	(ZBX_MAX_HOSTNAME_LEN + 1)
+#define ZBX_MAX_DNSNAME_LEN		255	/* maximum host DNS name length from RFC 1035 */
+						/*(without terminating '\0') */
+#define MAX_EXECUTE_OUTPUT_LEN		(512 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
@@ -188,6 +189,7 @@ typedef enum
 	INTERFACE_TYPE_SNMP,
 	INTERFACE_TYPE_IPMI,
 	INTERFACE_TYPE_JMX,
+	INTERFACE_TYPE_OPT = 254,
 	INTERFACE_TYPE_ANY = 255
 }
 zbx_interface_type_t;
@@ -452,6 +454,7 @@ zbx_graph_yaxis_types_t;
 #define ZBX_HA_REMOVE_NODE		"ha_remove_node"
 #define ZBX_HA_SET_FAILOVER_DELAY	"ha_set_failover_delay"
 #define ZBX_USER_PARAMETERS_RELOAD	"userparameter_reload"
+#define ZBX_PROXY_CONFIG_CACHE_RELOAD	"proxy_config_cache_reload"
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
@@ -518,9 +521,6 @@ typedef enum
 	GROUP_STATUS_DISABLED
 }
 zbx_group_status_type_t;
-
-/* group internal flag */
-#define ZBX_INTERNAL_GROUP		1
 
 /* program type */
 #define ZBX_PROGRAM_TYPE_SERVER		0x01
@@ -644,6 +644,10 @@ zbx_prototype_discover_t;
 /*#define HOST_STATUS_DELETED		4*/
 #define HOST_STATUS_PROXY_ACTIVE	5
 #define HOST_STATUS_PROXY_PASSIVE	6
+
+/* host group types */
+#define HOSTGROUP_TYPE_HOST		0
+#define HOSTGROUP_TYPE_TEMPLATE		1
 
 /* host maintenance status */
 #define HOST_MAINTENANCE_STATUS_OFF	0
@@ -804,8 +808,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
 #define ZBX_PROBLEM_UPDATE_SEVERITY		0x0008
 #define ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE	0x0010
+#define ZBX_PROBLEM_UPDATE_SUPPRESS		0x0020
+#define ZBX_PROBLEM_UPDATE_UNSUPPRESS		0x0040
 
-#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	5
+#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	7
 
 /* database double precision upgrade states */
 #define ZBX_DB_DBL_PRECISION_DISABLED	0
@@ -958,9 +964,9 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	help(void);
-void	usage(void);
-void	version(void);
+void	zbx_help(void);
+void	zbx_usage(void);
+void	zbx_version(void);
 
 const char	*get_program_name(const char *path);
 
@@ -998,6 +1004,8 @@ zbx_task_t;
 #define ZBX_RTC_HA_REMOVE_NODE			15
 #define ZBX_RTC_HA_SET_FAILOVER_DELAY		16
 #define ZBX_RTC_USER_PARAMETERS_RELOAD		17
+#define ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD	18
+#define ZBX_RTC_PROXYPOLLER_PROCESS		19
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -1159,6 +1167,7 @@ typedef struct zbx_custom_interval	zbx_custom_interval_t;
 int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
 		char **error);
 int	zbx_validate_interval(const char *str, char **error);
+int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_intervals);
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
 int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
 		const zbx_custom_interval_t *custom_intervals, time_t now);
@@ -1232,7 +1241,8 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
 void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str);
 
-void	zbx_strsplit(const char *src, char delimiter, char **left, char **right);
+void	zbx_strsplit_first(const char *src, char delimiter, char **left, char **right);
+void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **right);
 
 /* secure string copy */
 #define strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
@@ -1247,16 +1257,6 @@ char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3
 char	*zbx_strdcat(char *dest, const char *src);
 char	*zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
-int	xml_get_data_dyn(const char *xml, const char *tag, char **data);
-void	xml_free_data_dyn(char **data);
-char	*xml_escape_dyn(const char *data);
-void	xml_escape_xpath(char **data);
-
-int	comms_parse_response(char *xml, char *host, size_t host_len, char *key, size_t key_len,
-		char *data, size_t data_len, char *lastlogsize, size_t lastlogsize_len,
-		char *timestamp, size_t timestamp_len, char *source, size_t source_len,
-		char *severity, size_t severity_len);
-
 /* misc functions */
 int	is_ip6(const char *ip);
 int	is_ip4(const char *ip);
@@ -1265,7 +1265,6 @@ int	is_ip(const char *ip);
 
 int	zbx_validate_hostname(const char *hostname);
 
-void	zbx_on_exit(int ret); /* calls exit() at the end! */
 void	zbx_backtrace(void);
 
 int	int_in_list(char *list, int value);
@@ -1694,8 +1693,6 @@ int	zbx_validate_value_dbl(double value, int dbl_precision);
 void	zbx_update_env(double time_now);
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
 		int *nextcheck, int *scheduling, char **error);
-#define ZBX_DATA_SESSION_TOKEN_SIZE	(MD5_DIGEST_SIZE * 2)
-char	*zbx_create_token(zbx_uint64_t seed);
 
 #define ZBX_MAINTENANCE_IDLE		0
 #define ZBX_MAINTENANCE_RUNNING		1
@@ -1748,13 +1745,6 @@ zbx_function_type_t;
 
 zbx_function_type_t	zbx_get_function_type(const char *func);
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
-int	zbx_xmlnode_to_json(void *xml_node, char **jstr);
-int	zbx_xml_to_json(char *xml_data, char **jstr, char **errmsg);
-int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg);
-#ifdef HAVE_LIBXML2
-int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);
-int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg);
-#endif
 
 /* audit logging mode */
 #define ZBX_AUDITLOG_DISABLED	0
@@ -1804,6 +1794,4 @@ typedef enum
 }
 zbx_err_codes_t;
 
-void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
-int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len);
 #endif

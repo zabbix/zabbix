@@ -21,21 +21,23 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
 
-$hg_ms_params = ($data['context'] === 'host') ? ['real_hosts' => 1] : ['templated_hosts' => 1];
+$hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_templates' => true];
 
 $filter_column1 = (new CFormList())
-	->addRow((new CLabel(_('Host groups'), 'filter_groupids')),
+	->addRow(
+		new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'), 'filter_groupids'),
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
-			'object_name' => 'hostGroup',
+			'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
 			'data' => $data['filter_groupids_ms'],
 			'popup' => [
 				'parameters' => [
-					'srctbl' => 'host_groups',
+					'srctbl' =>  $data['context'] === 'host' ? 'host_groups' : 'template_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'groupids',
 					'dstfld1' => 'filter_groupids_',
@@ -45,17 +47,18 @@ $filter_column1 = (new CFormList())
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	)
-	->addRow((new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids')),
+	->addRow(
+		new CLabel($data['context'] === 'host' ? _('Hosts') : _('Templates'), 'filter_hostids'),
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
-			'object_name' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter_hostids_ms'],
 			'popup' => [
-				'filter_preselect_fields' => [
-					'hostgroups' => 'filter_groupids_'
-				],
+				'filter_preselect_fields' => $data['context'] === 'host'
+					? ['hostgroups' => 'filter_groupids_']
+					: ['templategroups' => 'filter_groupids_'],
 				'parameters' => [
-					'srctbl' => ($data['context'] === 'host') ? 'hosts' : 'templates',
+					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'hostids',
 					'dstfld1' => 'filter_hostids_',
@@ -145,26 +148,34 @@ $filter = (new CFilter())
 	->setResetUrl((new CUrl('triggers.php'))->setArgument('context', $data['context']))
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addvar('context', $data['context'])
+	->addvar('context', $data['context'], 'filter_context')
 	->addFilterTab(_('Filter'), [$filter_column1, $filter_column2]);
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
-	->setControls(new CList([
-		(new CTag('nav', true, ($data['single_selected_hostid'] != 0)
-			? new CRedirectButton(_('Create trigger'), (new CUrl('triggers.php'))
-				->setArgument('hostid', $data['single_selected_hostid'])
-				->setArgument('form', 'create')
-				->setArgument('context', $data['context'])
-				->getUrl()
-			)
-			: (new CButton('form',
-				($data['context'] === 'host')
-					? _('Create trigger (select host first)')
-					: _('Create trigger (select template first)')
-			))->setEnabled(false)
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_TRIGGERS_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATE_TRIGGERS_LIST
+	))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(
+					$data['single_selected_hostid'] != 0
+						? new CRedirectButton(_('Create trigger'),
+							(new CUrl('triggers.php'))
+								->setArgument('hostid', $data['single_selected_hostid'])
+								->setArgument('form', 'create')
+								->setArgument('context', $data['context'])
+						)
+						: (new CButton('form',
+							$data['context'] === 'host'
+								? _('Create trigger (select host first)')
+								: _('Create trigger (select template first)')
+						))->setEnabled(false)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
-	]));
+	);
 
 if ($data['single_selected_hostid'] != 0) {
 	$widget->setNavigation(getHostNavigation('triggers', $data['single_selected_hostid']));
@@ -180,7 +191,7 @@ $url = (new CUrl('triggers.php'))
 $triggers_form = (new CForm('post', $url))
 	->setName('triggersForm')
 	->addVar('checkbox_hash', $data['checkbox_hash'])
-	->addVar('context', $data['context']);
+	->addVar('context', $data['context'], 'form_context');
 
 // create table
 $triggers_table = (new CTableInfo())->setHeader([

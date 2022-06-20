@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-01-26T14:54:37Z'
-  groups:
+  version: '6.2'
+  date: '2022-06-07T19:37:18Z'
+  template_groups:
     -
       uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -229,7 +229,8 @@ zabbix_export:
             -
               uuid: 5f11afa80f534add85dd03e06466fbc9
               expression: 'last(/Network Generic Device SNMP/system.name,#1)<>last(/Network Generic Device SNMP/system.name,#2) and length(last(/Network Generic Device SNMP/system.name))>0'
-              name: 'System name has changed (new name: {ITEM.VALUE})'
+              name: 'System name has changed'
+              event_name: 'System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'System name has changed. Ack to close.'
               manual_close: 'YES'
@@ -288,9 +289,10 @@ zabbix_export:
             -
               uuid: 536fafc0bb664fcb8b4c8acc18fe5c29
               expression: 'last(/Network Generic Device SNMP/system.uptime[sysUpTime.0])<10m'
-              name: '{HOST.NAME} has been restarted (uptime < 10m)'
+              name: 'has been restarted'
+              event_name: '{HOST.NAME} has been restarted (uptime < 10m)'
               priority: WARNING
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               dependencies:
                 -
@@ -462,7 +464,7 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -549,7 +551,7 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occurat re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -585,7 +587,7 @@ zabbix_export:
                 For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,
                 this object should contain the nominal bandwidth.
                 If the bandwidth of the interface is greater than the maximum value reportable by this object then
-                this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interace's speed.
+                this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interface's speed.
                 For a sub-layer which has no concept of bandwidth, this object should be zero.
               tags:
                 -
@@ -659,7 +661,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The type of interface.
-                Additional values for ifType are assigned by the Internet Assigned NumbersAuthority (IANA),
+                Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),
                 through updating the syntax of the IANAifType textual convention.
               valuemap:
                 name: 'IF-MIB::ifType'
@@ -721,7 +723,8 @@ zabbix_export:
               recovery_expression: |
                 avg(/Network Generic Device SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
                 avg(/Network Generic Device SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Network Generic Device SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
-              name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
+              name: 'Interface {#IFDESCR}: High bandwidth usage'
+              event_name: 'Interface {#IFDESCR}: High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'The network interface utilization is close to its estimated maximum bandwidth.'
@@ -744,7 +747,8 @@ zabbix_export:
               recovery_expression: |
                 max(/Network Generic Device SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
                 and max(/Network Generic Device SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-              name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
+              name: 'Interface {#IFDESCR}: High error rate'
+              event_name: 'Interface {#IFDESCR}: High error rate (>{$IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
               priority: WARNING
               description: 'Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold'
@@ -987,8 +991,8 @@ zabbix_export:
                       type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        name: 'Interface {#IFDESCR}: Network traffic'
                         host: 'Network Generic Device SNMP'
+                        name: 'Interface {#IFDESCR}: Network traffic'
       valuemaps:
         -
           uuid: df2e3dab72d94efba9a85bfd7d1c3148

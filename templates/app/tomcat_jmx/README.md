@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 Official JMX Template for Apache Tomcat.
 
 
@@ -13,7 +13,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/jmx) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/jmx) for basic instructions.
 
 Metrics are collected by JMX.
 
@@ -47,7 +47,7 @@ There are no template links in this template.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|----|
 |Contexts discovery |<p>Discovery for contexts</p> |JMX |jmx.discovery[beans,"Catalina:type=Manager,host=*,context=*"]<p>**Filter**:</p>AND <p>- {#JMXHOST} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"Manager"}`</p><p>- {#JMXHOST} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"Manager"}`</p> |
-|Global request processors discovery |<p>Discovery for GlobalRequesProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequesProcessor"}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequesProcessor"}`</p> |
+|Global request processors discovery |<p>Discovery for GlobalRequestProcessor</p> |JMX |jmx.discovery[beans,"Catalina:type=GlobalRequestProcessor,name=*"]<p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"GlobalRequestProcessor"}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"GlobalRequestProcessor"}`</p> |
 |Protocol handlers discovery |<p>Discovery for ProtocolHandler</p> |JMX |jmx.discovery[attributes,"Catalina:type=ProtocolHandler,port=*"]<p>**Filter**:</p>AND <p>- {#JMXATTR} MATCHES_REGEX `^name$`</p> |
 |Thread pools discovery |<p>Discovery for ThreadPool</p> |JMX |jmx.discovery[beans,"Catalina:type=ThreadPool,name=*"]<p>**Filter**:</p>AND <p>- {#JMXNAME} MATCHES_REGEX `{$TOMCAT.LLD.FILTER.MATCHES:"ThreadPool"}`</p><p>- {#JMXNAME} NOT_MATCHES_REGEX `{$TOMCAT.LLD.FILTER.NOT_MATCHES:"ThreadPool"}`</p> |
 
@@ -77,7 +77,7 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Tomcat: Version has been changed |<p>Tomcat version has changed. Ack to close.</p> |`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0` |INFO |<p>Manual close: YES</p> |
 |{#JMXVALUE}: Gzip compression is disabled |<p>gzip compression is disabled for connector {#JMXVALUE}.</p> |`find(/Apache Tomcat by JMX/jmx[{#JMXOBJ},compression],,"like","off") = 1` |INFO |<p>Manual close: YES</p> |
-|{#JMXNAME}: Busy worker threads count are more than {$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}% of the limit for {$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"} |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`min(/Apache Tomcat by JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat by JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
+|{#JMXNAME}: Busy worker threads count is high |<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p> |`min(/Apache Tomcat by JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat by JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100` |HIGH | |
 
 ## Feedback
 

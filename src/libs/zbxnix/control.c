@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxnix.h"
 #include "control.h"
 
 #include "common.h"
@@ -121,7 +122,7 @@ static int	parse_log_level_options(const char *opt, size_t len, unsigned int *sc
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	parse_rtc_options(const char *opt, int *message)
+int	zbx_parse_rtc_options(const char *opt, int *message)
 {
 	unsigned int	scope, data, command;
 

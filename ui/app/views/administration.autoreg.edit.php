@@ -27,7 +27,8 @@ $this->includeJsFile('administration.autoreg.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Autoregistration'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_AUTOREG_EDIT));
 
 $autoreg_form = (new CForm())
 	->setId('autoreg-form')

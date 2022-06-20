@@ -59,9 +59,10 @@ class Manager extends CRegistryFactory {
 
 			$dbversion_status = CSettingsHelper::getGlobal(CSettingsHelper::DBVERSION_STATUS);
 
-			if ($dbversion_status !== '') {
+			if ($dbversion_status !== null && $dbversion_status !== '') {
 				$dbversion_status = json_decode($dbversion_status, true);
-				if (array_key_exists('history_pk', $dbversion_status) && $dbversion_status['history_pk'] == 1) {
+				if ($dbversion_status !== null && array_key_exists('history_pk', $dbversion_status)
+						&& $dbversion_status['history_pk'] == 1) {
 					$instance->setPrimaryKeysEnabled();
 				}
 			}

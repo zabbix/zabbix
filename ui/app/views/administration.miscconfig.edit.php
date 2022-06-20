@@ -21,13 +21,15 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.miscconfig.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Other configuration parameters'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MISCCONFIG_EDIT));
 
 $from_list = (new CFormList())
 	->addRow(new CLabel(_('Frontend URL'), 'url'),
@@ -48,8 +50,7 @@ $from_list = (new CFormList())
 					'srcfld1' => 'name',
 					'dstfrm' => 'otherForm',
 					'dstfld1' => 'discovery_groupid',
-					'normal_only' => '1',
-					'editable' => true
+					'normal_only' => '1'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -94,6 +95,13 @@ $from_list = (new CFormList())
 		(new CTextBox('login_block', $data['login_block'], false, DB::getFieldLength('config', 'login_block')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
+	)
+	->addRow((new CTag('h4', true, _('Storage of secrets')))->addClass('input-section-header'))
+	->addRow(_('Vault provider'),
+		(new CRadioButtonList('vault_provider', (int) $data['vault_provider']))
+			->addValue(_('HashiCorp Vault'), ZBX_VAULT_TYPE_HASHICORP)
+			->addValue(_('CyberArk Vault'), ZBX_VAULT_TYPE_CYBERARK)
+			->setModern(true)
 	)
 	->addRow((new CTag('h4', true, _('Security')))->addClass('input-section-header'))
 	->addRow(_('Validate URI schemes'),
@@ -193,4 +201,28 @@ $form = (new CForm())
 
 $widget
 	->addItem($form)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'connect_timeout' => DB::getDefault('config', 'connect_timeout'),
+		'default_inventory_mode' => DB::getDefault('config', 'default_inventory_mode'),
+		'iframe_sandboxing_enabled' => DB::getDefault('config', 'iframe_sandboxing_enabled'),
+		'iframe_sandboxing_exceptions' => DB::getDefault('config', 'iframe_sandboxing_exceptions'),
+		'item_test_timeout' => DB::getDefault('config', 'item_test_timeout'),
+		'login_attempts' => DB::getDefault('config', 'login_attempts'),
+		'login_block' => DB::getDefault('config', 'login_block'),
+		'media_type_test_timeout' => DB::getDefault('config', 'media_type_test_timeout'),
+		'report_test_timeout' => DB::getDefault('config', 'report_test_timeout'),
+		'script_timeout' => DB::getDefault('config', 'script_timeout'),
+		'snmptrap_logging' => DB::getDefault('config', 'snmptrap_logging'),
+		'socket_timeout' => DB::getDefault('config', 'socket_timeout'),
+		'uri_valid_schemes' => DB::getDefault('config', 'uri_valid_schemes'),
+		'url' => DB::getDefault('config', 'url'),
+		'validate_uri_schemes' => DB::getDefault('config', 'validate_uri_schemes'),
+		'vault_provider' => DB::getDefault('config', 'vault_provider'),
+		'x_frame_options' => DB::getDefault('config', 'x_frame_options')
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

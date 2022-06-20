@@ -1182,6 +1182,7 @@ class CControllerPopupTriggerExpr extends CController {
 		$fields = [
 			'dstfrm' =>				'string|fatal',
 			'dstfld1' =>			'string|not_empty',
+			'context' =>			'required|string|in host,template',
 			'expression' =>			'string',
 			'itemid' =>				'db items.itemid',
 			'parent_discoveryid' =>	'db items.itemid',
@@ -1195,22 +1196,17 @@ class CControllerPopupTriggerExpr extends CController {
 			'add' =>				'in 1'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) || !$this->hasInput('add');
 
 		if (!$ret) {
-			$output = [];
-			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
-			}
-
-			if ($this->hasInput('add')) {
-				$this->setResponse(
-					(new CControllerResponseData(['main_block' => json_encode($output)]))->disableView()
-				);
-			}
-			else {
-				$ret = true;
-			}
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot insert trigger expression'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -1426,6 +1422,7 @@ class CControllerPopupTriggerExpr extends CController {
 			'parent_discoveryid' => $this->getInput('parent_discoveryid', ''),
 			'dstfrm' => $this->getInput('dstfrm'),
 			'dstfld1' => $dstfld1,
+			'context' => $this->getInput('context'),
 			'itemid' => $itemid,
 			'value' => $value,
 			'params' => $params,
@@ -1578,12 +1575,14 @@ class CControllerPopupTriggerExpr extends CController {
 			}
 			catch (Exception $e) {
 				error($e->getMessage());
-				error(_('Cannot insert trigger expression'));
 			}
 
-			if (($messages = getMessages()) !== null) {
+			if ($messages = get_and_clear_messages()) {
 				$output = [
-					'errors' => $messages->toString()
+					'error' => [
+						'title' => _('Cannot insert trigger expression'),
+						'messages' => array_column($messages, 'message')
+					]
 				];
 			}
 			else {
@@ -1602,7 +1601,7 @@ class CControllerPopupTriggerExpr extends CController {
 			$this->setResponse(new CControllerResponseData(
 				$data + [
 					'title' => _('Condition'),
-					'errors' => hasErrorMessages() ? getMessages() : null,
+					'messages' => hasErrorMessages() ? getMessages() : null,
 					'user' => [
 						'debug_mode' => $this->getDebugMode()
 					]

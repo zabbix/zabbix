@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-01-26T10:46:41Z'
-  groups:
+  version: '6.2'
+  date: '2022-06-07T19:33:11Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -83,7 +83,8 @@ zabbix_export:
             -
               uuid: acf573785c394924aae8ef74b2683fd1
               expression: 'max(/Cloudflare by HTTP/cloudflare.bandwidth.cache_hit_ratio,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}'
-              name: 'Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
+              name: 'Cloudflare: Cached bandwidth is too low'
+              event_name: 'Cloudflare: Cached bandwidth is too low (less than {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}% for 3 last measurements)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
               tags:
@@ -554,7 +555,8 @@ zabbix_export:
             -
               uuid: e76f4a61dd094419b6e0af706758e545
               expression: 'min(/Cloudflare by HTTP/cloudflare.requests.others_ratio,#3) > {$CLOUDFLARE.ERRORS.MAX.WARN}'
-              name: 'Cloudflare: Ratio of non-2xx responses is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements)'
+              name: 'Cloudflare: Ratio of non-2xx responses is too high'
+              event_name: 'Cloudflare: Ratio of non-2xx responses is too high (more than {$CLOUDFLARE.ERRORS.MAX.WARN}% for 3 last measurements)'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'A large number of errors can indicate a malfunction of the site.'
@@ -788,7 +790,7 @@ zabbix_export:
           value: service
         -
           tag: target
-          value: claudflare
+          value: cloudflare
       macros:
         -
           macro: '{$CLOUDFLARE.API.TOKEN}'
@@ -834,8 +836,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Bandwidth'
-                        host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -850,8 +852,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Web requests'
-                        host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -866,8 +868,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: DNS requests'
-                        host: 'Cloudflare by HTTP'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -883,8 +885,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Cloudflare: Caching'
                         host: 'Cloudflare by HTTP'
+                        name: 'Cloudflare: Caching'
                 -
                   type: GRAPH_CLASSIC
                   'y': '10'
@@ -899,8 +901,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Cloudflare: HTTP responses ratio over time'
                         host: 'Cloudflare by HTTP'
+                        name: 'Cloudflare: HTTP responses ratio over time'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -916,8 +918,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Cloudflare: IPs and threats'
                         host: 'Cloudflare by HTTP'
+                        name: 'Cloudflare: IPs and threats'
                 -
                   type: GRAPH_CLASSIC
                   'y': '15'
@@ -932,8 +934,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Cloudflare: HTTP response codes over time'
                         host: 'Cloudflare by HTTP'
+                        name: 'Cloudflare: HTTP response codes over time'
   graphs:
     -
       uuid: 09e113216680490c9dd15805474bcac7

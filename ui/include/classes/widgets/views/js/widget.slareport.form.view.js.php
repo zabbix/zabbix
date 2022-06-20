@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -17,45 +17,37 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-
-/**
- * @var CView $this
- */
 ?>
 
-window.widget_slareport = {
 
-	$service: null,
+window.widget_slareport_form = new class {
 
 	init({serviceid_field_id}) {
 		this.$service = jQuery(`#${serviceid_field_id}`);
-		this.$service.multiSelect('getSelectButton').addEventListener('click', this.events.selectService);
-	},
+		this.$service.multiSelect('getSelectButton').addEventListener('click', () => this.selectService());
+	}
 
-	events: {
-		selectService: () => {
-			const exclude_serviceids = [];
+	selectService() {
+		const exclude_serviceids = [];
 
-			for (const service of widget_slareport.$service.multiSelect('getData')) {
-				exclude_serviceids.push(service.id);
+		for (const service of this.$service.multiSelect('getData')) {
+			exclude_serviceids.push(service.id);
+		}
+
+		const overlay = PopUp('popup.services', {
+			title: <?= json_encode(_('Service')) ?>,
+			exclude_serviceids,
+			multiple: 0
+		}, {dialogueid: 'services'});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			const data = [];
+
+			for (const service of e.detail) {
+				data.push({id: service.serviceid, name: service.name});
 			}
 
-			const overlay = PopUp('popup.services', {
-				title: <?= json_encode(_('Service')) ?>,
-				exclude_serviceids,
-				multiple: 0
-			}, {dialogueid: 'services'});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const data = [];
-
-				for (const service of e.detail) {
-					data.push({id: service.serviceid, name: service.name});
-				}
-
-				widget_slareport.$service.multiSelect('addData', data);
-			});
-		}
+			this.$service.multiSelect('addData', data);
+		});
 	}
 };

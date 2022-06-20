@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor Docker engine by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 Setup and configure zabbix-agent2 compiled with the Docker monitoring plugin.
 
@@ -141,8 +141,8 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Docker: Service is down |<p>-</p> |`last(/Docker by Zabbix agent 2/docker.ping)=0` |AVERAGE |<p>Manual close: YES</p> |
-|Docker: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Docker: Service is down</p> |
-|Docker: Version has changed (new version: {ITEM.VALUE}) |<p>Docker version has changed. Ack to close.</p> |`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0` |INFO |<p>Manual close: YES</p> |
+|Docker: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes</p> |`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Docker: Service is down</p> |
+|Docker: Version has changed |<p>Docker version has changed. Ack to close.</p> |`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0` |INFO |<p>Manual close: YES</p> |
 |Container {#NAME}: Container has been stopped with error code |<p>-</p> |`last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0` |AVERAGE |<p>Manual close: YES</p> |
 |Container {#NAME}: An error has occurred in the container |<p>Container {#NAME} has an error. Ack to close.</p> |`last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0` |WARNING |<p>Manual close: YES</p> |
 

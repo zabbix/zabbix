@@ -29,11 +29,13 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('User groups'))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create user group'),
-				(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.edit'))
-			)
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_USERGROUP_LIST))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('Create user group'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'usergroup.edit')
+				))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())

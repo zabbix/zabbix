@@ -17,31 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxconf.h"
+#include "active.h"
 
-#include "cfg.h"
+#include "zbxconf.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles/logfiles.h"
-#include "comms.h"
-#include "threads.h"
+#include "zbxcommshigh.h"
+#include "zbxthreads.h"
 #include "zbxjson.h"
-#include "alias.h"
-#include "metrics.h"
 #include "zbxregexp.h"
-
-#include "active.h"
 
 extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern ZBX_THREAD_LOCAL char		*CONFIG_HOSTNAME;
+extern int				CONFIG_HEARTBEAT_FREQUENCY;
 
 #if defined(ZABBIX_SERVICE)
-#	include "service.h"
+#	include "zbxwinservice.h"
 #elif defined(ZABBIX_DAEMON)
-#	include "daemon.h"
+#	include "zbxnix.h"
 #endif
 
 #include "zbxcrypto.h"
@@ -530,7 +526,7 @@ out:
  *             proto  - configuration parameter prototype                        *
  *                                                                               *
  ********************************************************************************/
-static void process_config_item(struct zbx_json *json, char *config, size_t length, const char *proto)
+static void	process_config_item(struct zbx_json *json, char *config, size_t length, const char *proto)
 {
 	char		**value;
 	AGENT_RESULT	result;
@@ -641,7 +637,7 @@ static int	refresh_active_checks(zbx_vector_ptr_t *addrs)
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
-	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
+	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
 			configured_tls_connect_mode, 0, level)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
@@ -822,7 +818,7 @@ static int	send_buffer(zbx_vector_ptr_t *addrs, zbx_vector_pre_persistent_t *pre
 
 	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
 
-	if (SUCCEED == (ret = connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * CONFIG_TIMEOUT, 60),
+	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * CONFIG_TIMEOUT, 60),
 			CONFIG_TIMEOUT, configured_tls_connect_mode, 0, level)))
 	{
 		zbx_timespec(&ts);
@@ -1356,11 +1352,57 @@ static void	zbx_active_checks_sigusr_handler(int flags)
 }
 #endif
 
+static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs)
+{
+	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
+	int				ret, level;
+	zbx_socket_t			s;
+	struct zbx_json			json;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(&json, ZBX_PROTO_TAG_HEARTBEAT_FREQ, CONFIG_HEARTBEAT_FREQUENCY);
+
+	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+
+	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, CONFIG_TIMEOUT, CONFIG_TIMEOUT,
+			configured_tls_connect_mode, 0, level)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
+
+		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))
+		{
+			if (last_ret == FAIL)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Successfully sent heartbeat message to [%s]:%d [%s]",
+						((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port, zbx_socket_strerror());
+			}
+		}
+		else
+		{
+			zabbix_log(level, "Unable to send heartbeat message to [%s]:%d [%s]",
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+					zbx_socket_strerror());
+		}
+
+		zbx_tcp_close(&s);
+	}
+
+	last_ret = ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Out %s()", __func__);
+}
+
 ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
-	time_t			nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0;
+	time_t			nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0, heartbeat_nextcheck = 0;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
@@ -1390,6 +1432,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_set_sigusr_handler(zbx_active_checks_sigusr_handler);
 #endif
 
+	if (0 != CONFIG_HEARTBEAT_FREQUENCY)
+		heartbeat_nextcheck = time(NULL);
+
 	while (ZBX_IS_RUNNING())
 	{
 #ifndef _WINDOWS
@@ -1407,6 +1452,12 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			send_buffer(&activechk_args.addrs, &pre_persistent_vec);
 			nextsend = time(NULL) + 1;
+		}
+
+		if (heartbeat_nextcheck != 0 && now >= heartbeat_nextcheck)
+		{
+			heartbeat_nextcheck = now + CONFIG_HEARTBEAT_FREQUENCY;
+			send_heartbeat_msg(&activechk_args.addrs);
 		}
 
 		if (now >= nextrefresh)
@@ -1450,6 +1501,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 				nextcheck += delta;
 				nextsend += delta;
 				nextrefresh += delta;
+
+				if (0 != heartbeat_nextcheck)
+					heartbeat_nextcheck += delta;
 			}
 
 			zbx_setproctitle("active checks #%d [idle 1 sec]", process_num);
@@ -1462,7 +1516,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_free(session_token);
 
 #ifdef _WINDOWS
-	zbx_addr_free(&activechk_args.addrs);
+	zbx_vector_ptr_clear_ext(&activechk_args.addrs, (zbx_clean_func_t)zbx_addr_free);
+	zbx_vector_ptr_destroy(&activechk_args.addrs);
 	free_active_metrics();
 
 	ZBX_DO_EXIT();

@@ -74,7 +74,9 @@
 			.val(ZBX_MACRO_TYPE_SECRET)
 			.trigger('change');
 
-		$('.btn-dropdown-container button', $container).addClass('btn-alt btn-dropdown-toggle icon-secret');
+		$('.btn-dropdown-container button', $container)
+			.removeClass('icon-text icon-secret')
+			.addClass('btn-alt btn-dropdown-toggle icon-invisible');
 
 		$this.hide();
 	}
@@ -152,7 +154,7 @@
 				.attr({
 					id: $input.attr('id'),
 					name: $input.attr('name'),
-					placeholder: (value_type == ZBX_MACRO_TYPE_VAULT) ? t('path/to/secret:key') : t('value'),
+					placeholder: t('value'),
 					maxlength: $input.attr('maxlength')
 				})
 				.text($input.is(':disabled') ? '' : $input.val())

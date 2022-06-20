@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -33,6 +33,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Hosts'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_LIST))
 	->setControls((new CTag('nav', true, (new CList())
 			->addItem(
 				(new CSimpleButton(_('Create host')))
@@ -54,7 +55,7 @@ $filter = (new CFilter())
 	->setResetUrl($action_url)
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
-	->addVar('action', $data['action'])
+	->addVar('action', $data['action'], 'filter_action')
 	->addFilterTab(_('Filter'), [
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
@@ -71,9 +72,9 @@ $filter = (new CFilter())
 								'srcfld1' => 'groupid',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_groups_',
-								'real_hosts' => 1,
-								'editable' => 1,
-								'enrich_parent_groups' => 1
+								'with_hosts' => true,
+								'editable' => true,
+								'enrich_parent_groups' => true
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -169,7 +170,7 @@ $widget->addItem($filter);
 
 // table hosts
 $form = (new CForm())->setName('hosts');
-$header_checkbox = (new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'ids');");
+$header_checkbox = (new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hostids');");
 $show_monitored_by = ($data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
 		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY);
 $header_sortable_name = make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
@@ -199,14 +200,13 @@ $table = (new CTableInfo())
 	]);
 
 $current_time = time();
-$interface_types = [INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI];
 
 foreach ($data['hosts'] as $host) {
 	// Select an interface from the list with highest priority.
 	$interface = null;
 
 	if ($host['interfaces']) {
-		foreach ($interface_types as $interface_type) {
+		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
 			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
 				return ($host_interface['type'] == $interface_type);
 			});
@@ -242,12 +242,13 @@ foreach ($data['hosts'] as $host) {
 			->setArgument('action', 'host.edit')
 			->setArgument('hostid', $host['hostid'])
 	))
-		->onClick('view.editHost(event, '.json_encode($host['hostid']).')');
+		->setAttribute('data-hostid', $host['hostid'])
+		->onClick('view.editHost(event, this.dataset.hostid);');
 
 	$maintenance_icon = false;
 	$status_toggle_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'popup.massupdate.host')
-		->setArgument('ids', [$host['hostid']])
+		->setArgument('hostids', [$host['hostid']])
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
 		->setArgument('backurl',
@@ -421,7 +422,7 @@ foreach ($data['hosts'] as $host) {
 	}
 
 	$table->addRow([
-		new CCheckBox('ids['.$host['hostid'].']', $host['hostid']),
+		new CCheckBox('hostids['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
@@ -493,7 +494,7 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 $form->addItem([
 	$table,
 	$data['paging'],
-	new CActionButtonList('action', 'ids', [
+	new CActionButtonList('action', 'hostids', [
 		'enable-hosts' => [
 			'name' => _('Enable'),
 			'confirm' => _('Enable selected hosts?'),

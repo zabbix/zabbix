@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/FilterTrait.php';
+require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  */
 class testDashboardProblemsBySeverityWidget extends CWebTest {
 
-	use FilterTrait;
+	use TagTrait;
 
 	/**
 	 * Id of the dashboard that is created within this test specifically for the update scenario.
@@ -1498,7 +1498,7 @@ class testDashboardProblemsBySeverityWidget extends CWebTest {
 			}
 		}
 		if (CTestArrayHelper::get($data,'tags',false)) {
-			$this->setFilterSelector('id:tags_table_tags');
+			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
 		}
 		$form->submit();

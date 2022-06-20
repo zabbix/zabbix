@@ -29,7 +29,8 @@ $this->includeJsFile('administration.trigdisplay.edit.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger displaying options'))
-	->setTitleSubmenu(getAdministrationGeneralSubmenu());
+	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_TRIGDISPLAY_EDIT));
 
 $form_list = (new CFormList())
 	->addRow(_('Use custom event status colors'), (new CCheckBox('custom_color'))

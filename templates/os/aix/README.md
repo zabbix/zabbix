@@ -3,13 +3,13 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 Official AIX template. Requires agent of Zabbix 4.0 and newer.
 
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Install Zabbix agent on AIX OS according to Zabbix documentation.
 
@@ -105,7 +105,7 @@ There are no template links in this template.
 |Lack of available memory on server |<p>-</p> |`last(/AIX by Zabbix agent/vm.memory.size[available])<20M` |AVERAGE | |
 |{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/AIX by Zabbix agent/vfs.fs.inode[{#FSNAME},pfree])<20` |WARNING | |
 |{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/AIX by Zabbix agent/vfs.fs.size[{#FSNAME},pfree])<20` |WARNING | |
-|Zabbix agent is not available (for {$AGENT.TIMEOUT}) |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/AIX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
+|Zabbix agent is not available |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/AIX by Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 

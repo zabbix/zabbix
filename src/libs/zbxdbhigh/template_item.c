@@ -19,12 +19,11 @@
 
 #include "common.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "dbcache.h"
-#include "../zbxalgo/vectorimpl.h"
-#include "../../libs/zbxaudit/audit.h"
-#include "../../libs/zbxaudit/audit_item.h"
+#include "audit/zbxaudit.h"
+#include "audit/zbxaudit_item.h"
 
 struct _zbx_template_item_preproc_t
 {
@@ -276,6 +275,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		switch (interface_type = get_interface_type_by_item_type(item->type))
 		{
 			case INTERFACE_TYPE_UNKNOWN:
+			case INTERFACE_TYPE_OPT:
 				item->interfaceid = 0;
 				break;
 			case INTERFACE_TYPE_ANY:
@@ -872,7 +872,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 					item->field##_orig, item->field);					\
 		}
 
-		zbx_audit_item_create_entry(AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
+		zbx_audit_item_create_entry(ZBX_AUDIT_ACTION_UPDATE, item->itemid, item->name, item->flags);
 		PREPARE_UPDATE_ID(INTERFACEID, interfaceid)
 		PREPARE_UPDATE_STR(NAME, name)
 		PREPARE_UPDATE_UC(TYPE, type)
@@ -942,7 +942,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
-		zbx_audit_item_create_entry(AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
+		zbx_audit_item_create_entry(ZBX_AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
 		zbx_audit_item_update_json_add_data(*itemid, item, hostid);
 
 		item->itemid = (*itemid)++;
@@ -1014,7 +1014,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	if (0 != upd_items)
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -1040,7 +1040,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 
 	if (0 != upd_items)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)
 			DBexecute("%s", sql);
@@ -1119,7 +1119,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		}
 	}
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* update lld rule conditions for existing items */
 	for (i = 0; i < rules->values_num; i++)
@@ -1214,7 +1214,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 		DBexecute("%s", sql);
@@ -1556,7 +1556,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 	}
 
 	if (0 != update_preproc_num)
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_preproc_num)
 	{
@@ -1656,7 +1656,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 
 	if (0 != update_preproc_num)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);
@@ -1736,7 +1736,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 	}
 
 	if (0 != update_tag_num)
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_tag_num)
 	{
@@ -1806,7 +1806,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 
 	if (0 != update_tag_num)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);
@@ -1886,7 +1886,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 	}
 
 	if (0 != update_param_num)
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_param_num)
 	{
@@ -1959,7 +1959,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 
 	if (0 != update_param_num)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);
@@ -2051,7 +2051,7 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 	}
 
 	if (0 != update_lld_macro_num)
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != new_lld_macro_num)
 	{
@@ -2128,7 +2128,7 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 
 	if (0 != update_lld_macro_num)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);

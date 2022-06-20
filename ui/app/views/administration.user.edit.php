@@ -33,6 +33,7 @@ $widget = new CWidget();
 
 if ($data['action'] === 'user.edit') {
 	$widget_name = _('Users');
+	$doc_url = CDocHelper::ADMINISTRATION_USER_EDIT;
 }
 else {
 	$widget_name = _('User profile').NAME_DELIMITER;
@@ -40,9 +41,12 @@ else {
 		? $data['name'].' '.$data['surname']
 		: $data['username'];
 	$widget->setTitleSubmenu(getUserSettingsSubmenu());
+	$doc_url = CDocHelper::ADMINISTRATION_USERPROFILE_EDIT;
 }
 
-$widget->setTitle($widget_name);
+$widget
+	->setTitle($widget_name)
+	->setDocUrl(CDocHelper::getUrl($doc_url));
 $tabs = new CTabView();
 
 if ($data['form_refresh'] == 0) {
@@ -173,7 +177,7 @@ else {
 		(new CSimpleButton(_('Change password')))
 			->setEnabled($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER)
 			->setAttribute('autofocus', 'autofocus')
-			->onClick('javascript: submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
+			->onClick('submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY)
 	);
 }
@@ -354,10 +358,11 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media", '.json_encode($parameters).');'),
+							->setAttribute('data-parameters', json_encode($parameters))
+							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters));'),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('javascript: removeMedia('.$index.');')
+							->onClick('removeMedia('.$index.');')
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]))->setId('medias_'.$index)
@@ -368,7 +373,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		(new CDiv([
 			$media_table_info,
 			(new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
+				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
 				->addClass(ZBX_STYLE_BTN_LINK)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -419,10 +424,11 @@ if ($data['action'] === 'user.edit') {
 
 		$permissions_table = (new CTable())
 			->setAttribute('style', 'width: 100%;')
-			->setHeader([_('Host group'), _('Permissions')]);
+			->setHeader([_('Group'), _('Type'), _('Permissions')]);
 
 		if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
-			$permissions_table->addRow([italic(_('All groups')), permissionText(PERM_READ_WRITE)]);
+			$permissions_table->addRow([italic(_('All groups')), _('Hosts'), permissionText(PERM_READ_WRITE)]);
+			$permissions_table->addRow([italic(_('All groups')), _('Templates'), permissionText(PERM_READ_WRITE)]);
 		}
 		else {
 			foreach ($data['groups_rights'] as $groupid => $group_rights) {
@@ -434,7 +440,21 @@ if ($data['action'] === 'user.edit') {
 				else {
 					$group_name = $group_rights['name'];
 				}
-				$permissions_table->addRow([$group_name, permissionText($group_rights['permission'])]);
+
+				$permissions_table->addRow([$group_name, _('Hosts'), permissionText($group_rights['permission'])]);
+			}
+
+			foreach ($data['templategroups_rights'] as $groupid => $group_rights) {
+				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
+					$group_name = ($groupid == 0)
+						? italic(_('All groups'))
+						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
+				}
+				else {
+					$group_name = $group_rights['name'];
+				}
+
+				$permissions_table->addRow([$group_name, _('Templates'), permissionText($group_rights['permission'])]);
 			}
 		}
 
@@ -686,12 +706,12 @@ if ($data['action'] !== 'user.edit') {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("javascript: testUserSound('messages_sounds.recovery');")
+					->onClick("testUserSound('messages_sounds.recovery');")
 					->removeId(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('stop', _('Stop')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('javascript: AudioControl.stop();')
+					->onClick('AudioControl.stop();')
 					->removeId()
 			]
 		]);
@@ -721,12 +741,12 @@ if ($data['action'] !== 'user.edit') {
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('start', _('Play')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick("javascript: testUserSound('messages_sounds.".$severity."');")
+					->onClick("testUserSound('messages_sounds.".$severity."');")
 					->removeId(),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('stop', _('Stop')))
 					->addClass(ZBX_STYLE_BTN_GREY)
-					->onClick('javascript: AudioControl.stop();')
+					->onClick('AudioControl.stop();')
 					->removeId()
 			]
 		]);

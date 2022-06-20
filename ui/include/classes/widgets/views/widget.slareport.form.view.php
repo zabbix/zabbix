@@ -61,23 +61,23 @@ $form_list->addRow(
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['date_from']),
 	CWidgetHelper::getDatePicker($fields['date_from'])
-		->setDateFormat(DATE_FORMAT)
-		->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+		->setDateFormat(ZBX_DATE)
+		->setPlaceholder(_('YYYY-MM-DD'))
 );
 
 // Date to.
 $form_list->addRow(
 	CWidgetHelper::getLabel($fields['date_to']),
 	CWidgetHelper::getDatePicker($fields['date_to'])
-		->setDateFormat(DATE_FORMAT)
-		->setPlaceholder(DATE_FORMAT_PLACEHOLDER)
+		->setDateFormat(ZBX_DATE)
+		->setPlaceholder(_('YYYY-MM-DD'))
 );
 
 $form->addItem($form_list);
 
 $form->addItem(
 	(new CScriptTag('
-		widget_slareport.init('.json_encode([
+		widget_slareport_form.init('.json_encode([
 			'serviceid_field_id' => $fields['serviceid']->getName(),
 			'serviceid_multiple' => $fields['serviceid']->isMultiple()
 		]).');

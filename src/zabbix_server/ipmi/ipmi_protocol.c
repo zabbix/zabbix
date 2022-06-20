@@ -21,10 +21,11 @@
 
 #ifdef HAVE_OPENIPMI
 
+#include "ipmi_protocol.h"
+
 #include "zbxserialize.h"
 #include "zbxserver.h"
 
-#include "ipmi_protocol.h"
 
 zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hostid, zbx_uint64_t objectid,
 		const char *addr, unsigned short port, signed char authtype, unsigned char privilege,
@@ -37,9 +38,9 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hosti
 	addr_len = strlen(addr) + 1;
 	user = zbx_strdup(NULL, username);
 	pwd = zbx_strdup(NULL, password);
-	substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			&user, MACRO_TYPE_COMMON, NULL, 0);
-	substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			&pwd, MACRO_TYPE_COMMON, NULL, 0);
 	username_len = strlen(user) + 1;
 	password_len = strlen(pwd) + 1;

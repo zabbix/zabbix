@@ -119,7 +119,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 		if ($data['Tile provider'] === 'OpenStreetMap Mapnik') {
 			// Check dropdown options presence.
 			$this->assertEquals(['OpenStreetMap Mapnik', 'OpenTopoMap', 'Stamen Toner Lite', 'Stamen Terrain',
-					'USGS US Topo', 'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asZDropdown()
+					'USGS US Topo', 'USGS US Imagery', 'Other'], $form->getField('Tile provider')->asDropdown()
 					->getOptions()->asText()
 			);
 
@@ -139,7 +139,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			];
 
 			foreach ($hintboxes as $field => $text) {
-				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']//span')->one()->click();
+				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
 				$hint->asOverlayDialog()->close();

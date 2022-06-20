@@ -17,16 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "cpustat.h"
+
 #include "common.h"
 #include "stats.h"
-#include "cpustat.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
 /* defined in sysinfo lib */
 extern int get_cpu_group_num_win32(void);
 extern int get_numa_node_num_win32(void);
 #endif
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "log.h"
 
 /* <sys/dkstat.h> removed in OpenBSD 5.7, only <sys/sched.h> with the same CP_* definitions remained */

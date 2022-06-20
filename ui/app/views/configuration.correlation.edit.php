@@ -26,7 +26,9 @@
 $this->addJsFile('popup.condition.common.js');
 $this->includeJsFile('configuration.correlation.edit.js.php');
 
-$widget = (new CWidget())->setTitle(_('Event correlation rules'));
+$widget = (new CWidget())
+	->setTitle(_('Event correlation rules'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_CORRELATION_EDIT));
 
 $form = (new CForm())
 	->setId('correlation.edit')

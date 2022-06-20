@@ -51,7 +51,8 @@ class CFormElement extends CElement {
 	public static function createInstance(RemoteWebElement $element, $options = []) {
 		$instance = parent::createInstance($element, $options);
 
-		if (get_class($instance) !== CGridFormElement::class) {
+		// TODO: remove condition with detectType after DEV-2200.
+		if (CTestArrayHelper::get($options, 'detectType', true) && get_class($instance) !== CGridFormElement::class) {
 			$grid = $instance->query('xpath:.//div[contains(@class, "form-grid")]')->one(false);
 			if ($grid->isValid() && !$grid->parents('xpath:*[contains(@class, "table-forms-td-right")]')->exists()) {
 				return $instance->asGridForm($options);
@@ -376,6 +377,11 @@ class CFormElement extends CElement {
 
 			return $this;
 		}
+		elseif ($values instanceof \Closure) {
+			$values($this, $field, $element);
+
+			return $this;
+		}
 
 		if ($this->filter !== null && !$this->filter->match($element)) {
 			return $this;
@@ -497,5 +503,21 @@ class CFormElement extends CElement {
 			CExceptionHelper::setMessage($exception, 'Failed to check value of field "'.$field.'":' . "\n" . $exception->getMessage());
 			throw $exception;
 		}
+	}
+
+	/**
+	 * Wait for form reload after form element select.
+	 *
+	 * @param string $value		text to be written into the field
+	 *
+	 * @return Closure
+	 */
+	public static function RELOADABLE_FILL($value) {
+		return function ($form, $field, $element) use ($value) {
+			if (!($element instanceof CDropdownElement) || $element->getText() !== $value) {
+				$element->fill($value);
+				$form->waitUntilReloaded();
+			}
+		};
 	}
 }

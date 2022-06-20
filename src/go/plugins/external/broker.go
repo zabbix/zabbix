@@ -24,12 +24,13 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strconv"
 	"time"
 
-	"zabbix.com/pkg/conf"
-	"zabbix.com/pkg/log"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/plugin/comms"
+	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin/comms"
 )
 
 const queSize = 100
@@ -322,7 +323,7 @@ func (b *pluginBroker) register() (*comms.RegisterResponse, error) {
 			Common: comms.Common{
 				Type: comms.RegisterRequestType,
 			},
-			Version: comms.Version,
+			Version: strconv.Itoa(comms.MajorVersion),
 		},
 		out: make(chan interface{}),
 	}

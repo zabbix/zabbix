@@ -27,14 +27,21 @@ require_once dirname(__FILE__).'/js/configuration.trigger.prototype.list.js.php'
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger prototypes'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_TRIGGER_PROTOTYPE_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATES_TRIGGER_PROTOTYPE_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(new CRedirectButton(_('Create trigger prototype'),
-				(new CUrl('trigger_prototypes.php'))
-					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-					->setArgument('form', 'create')
-					->setArgument('context', $data['context'])
-			))
+			(new CList())
+				->addItem(
+					new CRedirectButton(_('Create trigger prototype'),
+						(new CUrl('trigger_prototypes.php'))
+							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+							->setArgument('form', 'create')
+							->setArgument('context', $data['context'])
+					)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->setNavigation(getHostNavigation('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
@@ -47,8 +54,8 @@ $url = (new CUrl('trigger_prototypes.php'))
 // create form
 $triggersForm = (new CForm('post', $url))
 	->setName('triggersForm')
-	->addVar('parent_discoveryid', $data['parent_discoveryid'])
-	->addVar('context', $data['context']);
+	->addVar('parent_discoveryid', $data['parent_discoveryid'], 'form_parent_discoveryid')
+	->addVar('context', $data['context'], 'form_context');
 
 // create table
 $triggersTable = (new CTableInfo())

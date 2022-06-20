@@ -46,25 +46,26 @@ function Overlay(type, dialogueid) {
 		'aria-labeledby': this.headerid
 	});
 
-	var $close_btn = jQuery('<button>', {
-			class: 'overlay-close-btn',
-			title: t('S_CLOSE')
-		})
-		.click(function(e) {
-			overlayDialogueDestroy(this.dialogueid);
-			e.preventDefault();
-		}.bind(this));
-
-	this.$dialogue.append($close_btn);
-
 	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
+
+	const $close_btn = jQuery('<button>', {
+		class: 'overlay-close-btn',
+		title: t('S_CLOSE')
+	}).click(function(e) {
+		overlayDialogueDestroy(this.dialogueid);
+		e.preventDefault();
+	}.bind(this));
+
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
+	this.$dialogue.$head = jQuery('<div>', {class: 'dashboard-widget-head'});
 	this.$dialogue.$body = jQuery('<div>', {class: 'overlay-dialogue-body'});
 	this.$dialogue.$debug = jQuery('<pre>', {class: 'debug-output'});
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
 	this.$dialogue.$script = jQuery('<script>');
 
-	this.$dialogue.append(jQuery('<div>', {class: 'dashboard-widget-head'}).append(this.$dialogue.$header));
+	this.$dialogue.$head.append(this.$dialogue.$header, $close_btn);
+
+	this.$dialogue.append(this.$dialogue.$head);
 	this.$dialogue.append(this.$dialogue.$body);
 	this.$dialogue.append(this.$dialogue.$footer);
 
@@ -166,12 +167,13 @@ Overlay.prototype.recoverFocus = function() {
 Overlay.prototype.containFocus = function() {
 	var focusable = jQuery(':focusable', this.$dialogue);
 
+	focusable.off('keydown');
+
 	if (focusable.length > 1) {
 		var first_focusable = focusable.filter(':first'),
 			last_focusable = focusable.filter(':last');
 
 		first_focusable
-			.off('keydown')
 			.on('keydown', function(e) {
 				// TAB and SHIFT
 				if (e.which == 9 && e.shiftKey) {
@@ -181,7 +183,6 @@ Overlay.prototype.containFocus = function() {
 			});
 
 		last_focusable
-			.off('keydown')
 			.on('keydown', function(e) {
 				// TAB and not SHIFT
 				if (e.which == 9 && !e.shiftKey) {
@@ -192,7 +193,6 @@ Overlay.prototype.containFocus = function() {
 	}
 	else {
 		focusable
-			.off('keydown')
 			.on('keydown', function(e) {
 				if (e.which == 9) {
 					return false;
@@ -265,6 +265,8 @@ Overlay.prototype.unmount = function() {
 	this.cancel_action && this.cancel_action();
 
 	jQuery.unsubscribe('debug.click', this.center_dialog_function);
+
+	this.unsetProperty('prevent_navigation');
 
 	this.$backdrop.remove();
 	this.$dialogue.remove();
@@ -396,6 +398,11 @@ Overlay.prototype.makeButtons = function(arr) {
 	return buttons;
 };
 
+Overlay.prototype.preventNavigation = function(event) {
+	event.preventDefault();
+	event.returnValue = '';
+};
+
 /**
  * @param {string} key
  */
@@ -403,6 +410,13 @@ Overlay.prototype.unsetProperty = function(key) {
 	switch (key) {
 		case 'title':
 			this.$dialogue.$header.text('');
+			break;
+
+		case 'doc_url':
+			const doc_link = this.$dialogue.$head[0].querySelector('.icon-doc-link');
+			if (doc_link !== null) {
+				doc_link.remove();
+			}
 			break;
 
 		case 'buttons':
@@ -427,6 +441,10 @@ Overlay.prototype.unsetProperty = function(key) {
 		case 'script_inline':
 			this.$dialogue.$script.remove();
 			break;
+
+		case 'prevent_navigation':
+			window.removeEventListener('beforeunload', this.preventNavigation);
+			break;
 	}
 };
 
@@ -449,6 +467,13 @@ Overlay.prototype.setProperties = function(obj) {
 
 			case 'title':
 				this.$dialogue.$header.text(obj[key]);
+				break;
+
+			case 'doc_url':
+				this.unsetProperty(key);
+				this.$dialogue.$header[0].insertAdjacentHTML('afterend', `
+					<a class="icon-doc-link" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+				`);
 				break;
 
 			case 'buttons':
@@ -484,6 +509,11 @@ Overlay.prototype.setProperties = function(obj) {
 				// If content matches this regex it will be parsed in jQuery.buildFragment as HTML, but here we have JS.
 				this.$dialogue.$script.get(0).innerHTML = obj[key];
 				this.$dialogue.$footer.prepend(this.$dialogue.$script);
+				break;
+
+			case 'prevent_navigation':
+				this.unsetProperty(key);
+				window.addEventListener('beforeunload', this.preventNavigation, {passive: false});
 				break;
 
 			case 'element':

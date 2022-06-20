@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -63,7 +63,13 @@ class CControllerHintboxEventlist extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData([]));
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
@@ -178,7 +184,8 @@ class CControllerHintboxEventlist extends CController {
 			'allowed_acknowledge' => $this->checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
 			'allowed_close' => ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 				&& $this->checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
-			)
+			),
+			'allowed_suppress' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 		]));
 	}
 }

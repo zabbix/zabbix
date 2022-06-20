@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -29,7 +29,9 @@ $this->includeJsFile('reports.scheduledreport.edit.js.php', [
 	'dashboard_inaccessible' => $data['dashboard_inaccessible']
 ]);
 
-$widget = (new CWidget())->setTitle(_('Scheduled reports'));
+$widget = (new CWidget())
+	->setTitle(_('Scheduled reports'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_SCHEDULEDREPORT_EDIT));
 
 $form = (new CForm())
 	->setId('scheduledreport-form')

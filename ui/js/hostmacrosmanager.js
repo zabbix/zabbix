@@ -30,9 +30,11 @@ class HostMacrosManager {
 	static ZBX_STYLE_ICON_INVISIBLE = 'icon-invisible';
 	static ZBX_STYLE_ICON_SECRET_TEXT = 'icon-secret';
 	static ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
+	static DISCOVERY_STATE_AUTOMATIC = 0x1;
+	static DISCOVERY_STATE_CONVERTING = 0x2;
+	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({readonly, parent_hostid}) {
-		this.readonly = readonly;
+	constructor({parent_hostid}) {
 		this.parent_hostid = parent_hostid ?? null;
 		this.$container = $('#macros_container .table-forms-td-right');
 	}
@@ -61,8 +63,10 @@ class HostMacrosManager {
 			}
 		})
 			.done((response) => {
-				if (typeof response === 'object' && 'errors' in response) {
-					this.$container.append(response.errors);
+				if (typeof response === 'object' && 'error' in response) {
+					const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
+
+					this.$container.append(message_box);
 				}
 				else {
 					if (typeof response.messages !== 'undefined') {
@@ -71,13 +75,7 @@ class HostMacrosManager {
 
 					this.$container.append(response.body);
 
-					// Initialize macros.
-					if (this.readonly) {
-						$('.' + HostMacrosManager.ZBX_STYLE_TEXTAREA_FLEXIBLE, this.getMacroTable()).textareaFlexible();
-					}
-					else {
-						this.initMacroTable(show_inherited_macros);
-					}
+					this.initMacroTable(show_inherited_macros);
 
 					// Display debug after loaded content if it is enabled for user.
 					if (typeof response.debug !== 'undefined') {
@@ -117,6 +115,11 @@ class HostMacrosManager {
 
 	initMacroTable(show_inherited_macros) {
 		const $parent = this.getMacroTable();
+		const dropdown_btn_classes = {
+			[HostMacrosManager.ZBX_MACRO_TYPE_TEXT]: HostMacrosManager.ZBX_STYLE_ICON_TEXT,
+			[HostMacrosManager.ZBX_MACRO_TYPE_SECRET]: HostMacrosManager.ZBX_STYLE_ICON_INVISIBLE,
+			[HostMacrosManager.ZBX_MACRO_TYPE_VAULT]: HostMacrosManager.ZBX_STYLE_ICON_SECRET_TEXT
+		};
 
 		$parent
 			.dynamicRows({
@@ -128,54 +131,107 @@ class HostMacrosManager {
 			})
 			.on('click', 'button.element-table-change', (e) => {
 				const macro_num = e.target.id.split('_')[1];
-				const inherited_type = $('#macros_'+macro_num+'_inherited_type').val();
-				const macro_type = $('#macros_'+macro_num+'_inherited_macro_type').val();
+				const inherited_type = $('#macros_' + macro_num + '_inherited_type').val();
+				const macro_type = $('#macros_' + macro_num + '_inherited_macro_type').val();
+				const inherited_value_field_state = (macro_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET)
+					? {'disabled': true}
+					: {'readonly': true};
 
 				if (inherited_type & HostMacrosManager.ZBX_PROPERTY_OWN) {
-					const dropdown_btn_classes = {
-						[HostMacrosManager.ZBX_MACRO_TYPE_TEXT]: HostMacrosManager.ZBX_STYLE_ICON_TEXT,
-						[HostMacrosManager.ZBX_MACRO_TYPE_SECRET]: HostMacrosManager.ZBX_STYLE_ICON_INVISIBLE,
-						[HostMacrosManager.ZBX_MACRO_TYPE_VAULT]: HostMacrosManager.ZBX_STYLE_ICON_SECRET_TEXT
-					};
-
-					$('#macros_'+macro_num+'_inherited_type').val(inherited_type & ~HostMacrosManager.ZBX_PROPERTY_OWN);
-					$('#macros_'+macro_num+'_description')
+					// Switching from ZBX_PROPERTY_BOTH to ZBX_PROPERTY_INHERITED.
+					$('#macros_' + macro_num + '_inherited_type')
+						.val(inherited_type & ~HostMacrosManager.ZBX_PROPERTY_OWN);
+					$('#macros_' + macro_num + '_description')
 						.prop('readonly', true)
-						.val($('#macros_'+macro_num+'_inherited_description').val())
+						.val($('#macros_' + macro_num + '_inherited_description').val())
 						.trigger('input');
-					$('#macros_'+macro_num+'_type_button')
+					$('#macros_' + macro_num + '_type_button')
 						.removeClass()
 						.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[macro_type]].join(' '))
 						.prop('disabled', true)
 						.attr({'aria-haspopup': false});
-					$('input[type=hidden]', $('#macros_'+macro_num+'_type_button').parent())
+					$('input[type=hidden]', $('#macros_' + macro_num + '_type_button').parent())
 						.val(macro_type)
 						.trigger('change');
-					$('#macros_'+macro_num+'_value')
-						.prop('readonly', true)
-						.val($('#macros_'+macro_num+'_inherited_value').val())
+					$('#macros_' + macro_num + '_value')
+						.prop(inherited_value_field_state)
+						.val($('#macros_' + macro_num + '_inherited_value').val())
 						.trigger('input');
-					if (macro_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET) {
-						jQuery('#macros_'+macro_num+'_value').prop('disabled', true);
-					}
-					$('#macros_'+macro_num+'_value')
+					$('#macros_' + macro_num + '_value')
 						.closest('.macro-input-group')
 						.find('.btn-undo')
 						.hide();
-					$('#macros_'+macro_num+'_value_btn').prop('disabled', true);
-					$('#macros_'+macro_num+'_change').text(t('Change'));
+					$('#macros_' + macro_num + '_value_btn').prop('disabled', true);
+					$('#macros_' + macro_num + '_change_inheritance').text(t('Change'));
 				}
 				else {
-					$('#macros_'+macro_num+'_inherited_type').val(inherited_type | HostMacrosManager.ZBX_PROPERTY_OWN);
-					$('#macros_'+macro_num+'_value')
+					// Switching from ZBX_PROPERTY_INHERITED to ZBX_PROPERTY_BOTH.
+					$('#macros_' + macro_num + '_inherited_type')
+						.val(inherited_type | HostMacrosManager.ZBX_PROPERTY_OWN);
+					$('#macros_' + macro_num + '_value')
 						.prop('readonly', false)
 						.focus();
-					$('#macros_'+macro_num+'_value_btn').prop('disabled', false);
-					$('#macros_'+macro_num+'_description').prop('readonly', false);
-					$('#macros_'+macro_num+'_type_button')
+					$('#macros_' + macro_num + '_value_btn').prop('disabled', false);
+					$('#macros_' + macro_num + '_description').prop('readonly', false);
+					$('#macros_' + macro_num + '_type_button')
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
-					$('#macros_'+macro_num+'_change').text(t('Remove'));
+					$('#macros_' + macro_num + '_change_inheritance').text(t('Remove'));
+				}
+
+				$('#macros_' + macro_num + '_discovery_state').val(HostMacrosManager.DISCOVERY_STATE_MANUAL);
+				$('#macros_' + macro_num + '_change_state').remove();
+			})
+			.on('click', 'button.element-table-set-manual', (e) => {
+				const num = e.target.id.split('_')[1];
+				const $row = $(e.target.closest('.form_row'));
+				const $discovery = $('#macros_' + num + '_discovery_state', $row);
+
+				if ($discovery.val() == HostMacrosManager.DISCOVERY_STATE_CONVERTING) {
+					const original_type = $('#macros_' + num + '_original_macro_type').val();
+					const original_value = $('#macros_' + num + '_original_value', $row).val();
+					const original_descr = $('#macros_' + num + '_original_description', $row).val();
+					const original_value_field_state = (original_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET)
+						? {'disabled': true}
+						: {'readonly': true};
+
+					$('#macros_' + num + '_value_btn', $row).prop('disabled', true);
+					$('#macros_' + num + '_type_button', $row)
+						.removeClass()
+						.addClass(['btn-alt', 'btn-dropdown-toggle', dropdown_btn_classes[original_type]].join(' '))
+						.prop('disabled', true)
+						.attr({'aria-haspopup': false});
+					$('input[type=hidden]', $('#macros_' + num + '_type_button', $row).parent())
+						.val(original_type)
+						.trigger('change');
+					$('#macros_' + num + '_value', $row)
+						.val(original_value)
+						.prop(original_value_field_state)
+						.trigger('input');
+					$('#macros_' + num + '_value', $row)
+						.closest('.macro-input-group')
+						.find('.btn-undo')
+						.hide();
+					$('#macros_' + num + '_description')
+						.val(original_descr)
+						.prop('readonly', true)
+						.trigger('input');
+					$('#macros_' + num + '_type_button', $row).trigger('change');
+					$discovery.val(HostMacrosManager.DISCOVERY_STATE_AUTOMATIC);
+					$('#macros_' + num + '_change_state').text(t('Change'));
+				}
+				else {
+					$('#macros_' + num + '_value', $row)
+						.prop('readonly', false)
+						.focus();
+					$('#macros_' + num + '_value_btn', $row).prop('disabled', false);
+					$('#macros_' + num + '_type_button', $row)
+						.prop('disabled', false)
+						.attr({'aria-haspopup': true});
+					$('#macros_' + num + '_description').prop('readonly', false);
+					$('#macros_' + num + '_type_button', $row).trigger('change');
+					$discovery.val(HostMacrosManager.DISCOVERY_STATE_CONVERTING);
+					$('#macros_' + num + '_change_state').text(t('Revert'));
 				}
 			})
 			.on('afteradd.dynamicRows', function() {
@@ -241,4 +297,4 @@ class HostMacrosManager {
 			$element.val(macro_part.toUpperCase() + context_part);
 		}
 	}
-};
+}

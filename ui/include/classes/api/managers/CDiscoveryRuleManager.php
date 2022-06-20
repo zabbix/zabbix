@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -72,6 +72,12 @@ class CDiscoveryRuleManager {
 		}
 
 		// Delete LLD rules.
+		DB::delete('item_tag', ['itemid' => $ruleids]);
+		DB::delete('item_preproc', ['itemid' => $ruleids]);
+		DB::update('items', [
+			'values' => ['templateid' => 0],
+			'where' => ['itemid' => $ruleids]
+		]);
 		DB::delete('items', ['itemid' => $ruleids]);
 
 		$insert = [];

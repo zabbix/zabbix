@@ -17,17 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "dbsyncer.h"
 
-#include "db.h"
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "zbxself.h"
-#include "sighandler.h"
 
 #include "dbcache.h"
-#include "dbsyncer.h"
-#include "export.h"
+#include "zbxexport.h"
 
 extern int				CONFIG_HISTSYNCER_FREQUENCY;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;

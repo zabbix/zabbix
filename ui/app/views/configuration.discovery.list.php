@@ -29,16 +29,14 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
-	->setControls((new CTag('nav', true,
-		(new CForm('get'))
-			->cleanItems()
-			->addItem((new CList())
-				->addItem(new CRedirectButton(_('Create discovery rule'), (new CUrl('zabbix.php'))
-					->setArgument('action', 'discovery.edit'))
-				)
-			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_DISCOVERY_LIST))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(new CRedirectButton(_('Create discovery rule'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'discovery.edit')
+				))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'discovery.list'))

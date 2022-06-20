@@ -20,8 +20,7 @@
 #ifndef ZABBIX_SERVICE_MANAGER_H
 #define ZABBIX_SERVICE_MANAGER_H
 
-#include "common.h"
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(service_manager_thread, args);
 

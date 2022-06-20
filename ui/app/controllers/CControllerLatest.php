@@ -25,16 +25,16 @@
 abstract class CControllerLatest extends CController {
 
 	// Filter idx prefix.
-	const FILTER_IDX = 'web.monitoring.latest';
-
-	// Number of subfilter values per row.
-	const SUBFILTERS_VALUES_PER_ROW = 100;
+	public const FILTER_IDX = 'web.monitoring.latest';
 
 	// Number of tag value rows allowed to be included in subfilter.
-	const SUBFILTERS_TAG_VALUE_ROWS = 20;
+	public const SUBFILTERS_TAG_VALUE_ROWS = 10;
+
+	// Number of tag value rows when tag values subfilter is expanded.
+	private const SUBFILTERS_TAG_VALUE_ROWS_EXPANDED = 200;
 
 	// Filter fields default values.
-	const FILTER_FIELDS_DEFAULT = [
+	public const FILTER_FIELDS_DEFAULT = [
 		'groupids' => [],
 		'hostids' => [],
 		'name' => '',
@@ -79,7 +79,6 @@ abstract class CControllerLatest extends CController {
 			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'groupids' => $groupids,
 			'hostids' => $filter['hostids'] ? $filter['hostids'] : null,
-			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 
@@ -124,6 +123,20 @@ abstract class CControllerLatest extends CController {
 				'preservekeys' => true
 			]);
 
+			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is ON, read-write items are the same.
+			$items_rw = $items;
+
+			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is OFF, get only read-write items.
+			if (!$this->hasInput('filter_counters') && $this->getUserType() < USER_TYPE_SUPER_ADMIN
+					&& !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW)) {
+				$items_rw = API::Item()->get([
+					'output' => [],
+					'itemids' => array_keys($items),
+					'editable' => true,
+					'preservekeys' => true
+				]);
+			}
+
 			if ($sort_field === 'host') {
 				$items = array_map(function ($item) use ($hosts) {
 					return $item + [
@@ -146,11 +159,13 @@ abstract class CControllerLatest extends CController {
 		else {
 			$hosts = [];
 			$items = [];
+			$items_rw = [];
 		}
 
 		return [
 			'hosts' => $hosts,
-			'items' => $items
+			'items' => $items,
+			'items_rw' => $items_rw
 		];
 	}
 
@@ -238,10 +253,6 @@ abstract class CControllerLatest extends CController {
 	 * @return array
 	 */
 	protected function cleanInput(array $input): array {
-		if (array_key_exists('filter_reset', $input) && $input['filter_reset']) {
-			return array_intersect_key(['filter_name' => ''], $input);
-		}
-
 		if (array_key_exists('tags', $input) && $input['tags']) {
 			$input['tags'] = array_filter($input['tags'], function ($tag) {
 				return !($tag['tag'] === '' && $tag['value'] === '');
@@ -655,14 +666,14 @@ abstract class CControllerLatest extends CController {
 	public static function getTopPrioritySubfilters(array $subfilters): array {
 		$top_priority_fields = [];
 
-		if (self::SUBFILTERS_VALUES_PER_ROW < count($subfilters)) {
+		if (SUBFILTER_VALUES_PER_GROUP < count($subfilters)) {
 			// All selected subfilters must always be included.
 			$top_priority_fields = array_filter($subfilters, function ($field) {
 				return $field['selected'];
 			});
 
 			// Add first non-selected subfilter values in case limit is not exceeded.
-			$remaining = self::SUBFILTERS_VALUES_PER_ROW - count($top_priority_fields);
+			$remaining = SUBFILTER_VALUES_PER_GROUP - count($top_priority_fields);
 			if ($remaining > 0) {
 				$subfilters = array_diff_key($subfilters, $top_priority_fields);
 				CArrayHelper::sort($subfilters, ['name']);
@@ -696,16 +707,20 @@ abstract class CControllerLatest extends CController {
 					return ($field['selected'] || $field['count'] != 0);
 				});
 
+				$values_count = count($values);
+				$values = self::getTopPrioritySubfilters($values);
+
 				$top_priority_fields[] = [
 					'name' => $tag,
-					'values' => self::getTopPrioritySubfilters($values)
+					'values' => $values,
+					'trimmed' => ($values_count > count($values))
 				];
 				unset($tags[$tag]);
 			}
 		}
 
 		// Add first non-selected subfilter values in case limit is not exceeded.
-		if (self::SUBFILTERS_TAG_VALUE_ROWS > count($top_priority_fields)) {
+		if (self::SUBFILTERS_TAG_VALUE_ROWS_EXPANDED > count($top_priority_fields)) {
 			$tags_names = array_keys($tags);
 			uasort($tags_names, 'strnatcasecmp');
 
@@ -719,12 +734,16 @@ abstract class CControllerLatest extends CController {
 				});
 
 				if ($tag_values) {
+					$tag_values_count = count($tag_values);
+					$tag_values = self::getTopPrioritySubfilters($tag_values);
+
 					$top_priority_fields[] = [
 						'name' => $tag_name,
-						'values' => self::getTopPrioritySubfilters($tag_values)
+						'values' => $tag_values,
+						'trimmed' => ($tag_values_count > count($tag_values))
 					];
 				}
-			} while (self::SUBFILTERS_TAG_VALUE_ROWS > count($top_priority_fields));
+			} while (self::SUBFILTERS_TAG_VALUE_ROWS_EXPANDED > count($top_priority_fields));
 		}
 
 		CArrayHelper::sort($top_priority_fields, ['name']);

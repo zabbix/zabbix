@@ -17,13 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "db.h"
+#include "zbxdbhigh.h"
 
 #include "log.h"
 #include "events.h"
-#include "threads.h"
+#include "zbxthreads.h"
 #include "dbcache.h"
 #include "cfg.h"
+#include "zbxcrypto.h"
 
 #if defined(HAVE_POSTGRESQL)
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET	"utf8"
@@ -36,6 +37,16 @@
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4 	"utf8mb4"
 #	define ZBX_SUPPORTED_DB_CHARACTER_SET		ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8 "," ZBX_SUPPORTED_DB_CHARACTER_SET_UTF8MB4
 #	define ZBX_SUPPORTED_DB_COLLATION		"utf8_bin,utf8mb3_bin,utf8mb4_bin"
+#endif
+
+#ifdef HAVE_ORACLE
+#	if 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
+#		define	ZBX_SQL_EXEC_FROM	ZBX_CONST_STRLEN(ZBX_PLSQL_BEGIN)
+#	else
+#		define	ZBX_SQL_EXEC_FROM	0
+#	endif
+#else
+#	define	ZBX_SQL_EXEC_FROM	0
 #endif
 
 typedef struct
@@ -498,34 +509,6 @@ DB_RESULT	DBselectN(const char *query, int n)
 	}
 
 	return rc;
-}
-
-int	DBget_proxy_lastaccess(const char *hostname, int *lastaccess, char **error)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*host_esc;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	host_esc = DBdyn_escape_string(hostname);
-	result = DBselect("select lastaccess from hosts where host='%s' and status in (%d,%d)",
-			host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
-	zbx_free(host_esc);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		*lastaccess = atoi(row[0]);
-		ret = SUCCEED;
-	}
-	else
-		*error = zbx_dsprintf(*error, "Proxy \"%s\" does not exist.", hostname);
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
 }
 
 #ifdef HAVE_MYSQL
@@ -1676,7 +1659,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 	if (0 != (update = autoreg_hosts->values_num - create))
 	{
 		sql = (char *)zbx_malloc(sql, sql_alloc);
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	}
 
 	zbx_vector_ptr_sort(autoreg_hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1727,7 +1710,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 
 	if (0 != update)
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
 		zbx_free(sql);
 	}
@@ -1814,7 +1797,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 		/* Oracle fails with ORA-00911 if it encounters ';' w/o PL/SQL block */
 		zbx_rtrim(*sql, ZBX_WHITESPACE ";");
 #else
-		DBend_multiple_update(sql, sql_alloc, sql_offset);
+		zbx_DBend_multiple_update(sql, sql_alloc, sql_offset);
 #endif
 		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
 		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
@@ -1823,7 +1806,7 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 
 		*sql_offset = 0;
 
-		DBbegin_multiple_update(sql, sql_alloc, sql_offset);
+		zbx_DBbegin_multiple_update(sql, sql_alloc, sql_offset);
 	}
 
 	return ret;
@@ -2255,13 +2238,13 @@ int	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vect
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	ret = DBprepare_multiple_query(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && sql_offset > 16)	/* in ORACLE always present begin..end; */
 	{
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
@@ -2993,7 +2976,7 @@ retry_oracle:
 	ret = (ZBX_DB_OK <= rc ? SUCCEED : FAIL);
 
 #else
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < self->rows.values_num; i++)
 	{
@@ -3063,7 +3046,7 @@ retry_oracle:
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 #	endif
-		DBend_multiple_update(sql, sql_alloc, sql_offset);
+		zbx_DBend_multiple_update(sql, sql_alloc, sql_offset);
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
@@ -3310,108 +3293,6 @@ int	DBlock_ids(const char *table_name, const char *field_name, zbx_vector_uint64
 		zbx_vector_uint64_remove_noorder(ids, i);
 
 	return (0 != ids->values_num ? SUCCEED : FAIL);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: adds interface availability update to sql statement               *
- *                                                                            *
- * Parameters: ia           [IN] the interface availability data              *
- *             sql        - [IN/OUT] the sql statement                        *
- *             sql_alloc  - [IN/OUT] the number of bytes allocated for sql    *
- *                                   statement                                *
- *             sql_offset - [IN/OUT] the number of bytes used in sql          *
- *                                   statement                                *
- *                                                                            *
- * Return value: SUCCEED - sql statement is created                           *
- *               FAIL    - no interface availability is set                   *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_sql_add_interface_availability(const zbx_interface_availability_t *ia, char **sql,
-		size_t *sql_alloc, size_t *sql_offset)
-{
-	char		delim = ' ';
-
-	if (FAIL == zbx_interface_availability_is_set(ia))
-		return FAIL;
-
-	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update interface set");
-
-	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_AVAILABLE))
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cavailable=%d", delim, (int)ia->agent.available);
-		delim = ',';
-	}
-
-	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
-	{
-		char	*error_esc;
-
-		error_esc = DBdyn_escape_field("interface", "error", ia->agent.error);
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerror='%s'", delim, error_esc);
-		zbx_free(error_esc);
-		delim = ',';
-	}
-
-	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
-	{
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cerrors_from=%d", delim, ia->agent.errors_from);
-		delim = ',';
-	}
-
-	if (0 != (ia->agent.flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
-		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cdisable_until=%d", delim, ia->agent.disable_until);
-
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where interfaceid=" ZBX_FS_UI64, ia->interfaceid);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sync interface availabilities updates into database               *
- *                                                                            *
- * Parameters: interface_availabilities [IN] the interface availability data  *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_update_interface_availabilities(const zbx_vector_availability_ptr_t *interface_availabilities)
-{
-	int	txn_error;
-	char	*sql = NULL;
-	size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
-	int	i;
-
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	do
-	{
-		size_t	sql_offset = 0;
-
-		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		for (i = 0; i < interface_availabilities->values_num; i++)
-		{
-			if (SUCCEED != zbx_sql_add_interface_availability(interface_availabilities->values[i], &sql,
-					&sql_alloc, &sql_offset))
-			{
-				continue;
-			}
-
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		}
-
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		if (16 < sql_offset)
-			DBexecute("%s", sql);
-
-		txn_error = DBcommit();
-	}
-	while (ZBX_DB_DOWN == txn_error);
-
-	zbx_free(sql);
 }
 
 /******************************************************************************

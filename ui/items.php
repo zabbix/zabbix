@@ -37,7 +37,9 @@ $fields = [
 	'hostid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID.NOT_ZERO, 'isset({form}) && !isset({itemid})'],
 	'interfaceid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null, _('Interface')],
 	'copy_type' =>					[T_ZBX_INT, O_OPT, P_SYS,
-										IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+										IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
+											COPY_TYPE_TO_TEMPLATE
+										]),
 										'isset({copy})'
 									],
 	'copy_mode' =>					[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
@@ -222,7 +224,7 @@ $fields = [
 	// actions
 	'action' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 										IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
-											'"item.massdisable","item.massenable","item.masscheck_now"'
+											'"item.massdisable","item.massenable"'
 										),
 										null
 									],
@@ -232,7 +234,6 @@ $fields = [
 	'copy' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'check_now' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>				[T_ZBX_INT, O_OPT, null,	null,		null],
 	'tags' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -295,6 +296,11 @@ $fields = [
 									],
 	'sortorder' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'), null]
 ];
+
+if (getRequest('type') == ITEM_TYPE_HTTPAGENT && getRequest('interfaceid') == INTERFACE_TYPE_OPT) {
+	unset($fields['interfaceid']);
+	unset($_REQUEST['interfaceid']);
+}
 
 $valid_input = check_fields($fields);
 
@@ -468,7 +474,10 @@ else {
 	}
 }
 
-$filter_groupids = getSubGroups(getRequest('filter_groupids', []));
+$ms_groups = [];
+$filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, ['editable' => true],
+	getRequest('context')
+);
 $filter_hostids = getRequest('filter_hostids');
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
@@ -590,6 +599,32 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$preprocessing = getRequest('preprocessing', []);
 		$preprocessing = normalizeItemPreprocessingSteps($preprocessing);
 
+		if ($type == ITEM_TYPE_HTTPAGENT) {
+			$http_item = [
+				'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
+				'url' => getRequest('url'),
+				'query_fields' => getRequest('query_fields', []),
+				'posts' => getRequest('posts'),
+				'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
+				'follow_redirects' => (int) getRequest('follow_redirects'),
+				'post_type' => (int) getRequest('post_type'),
+				'http_proxy' => getRequest('http_proxy'),
+				'headers' => getRequest('headers', []),
+				'retrieve_mode' => (int) getRequest('retrieve_mode'),
+				'request_method' => (int) getRequest('request_method'),
+				'output_format' => (int) getRequest('output_format'),
+				'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
+				'ssl_cert_file' => getRequest('ssl_cert_file'),
+				'ssl_key_file' => getRequest('ssl_key_file'),
+				'ssl_key_password' => getRequest('ssl_key_password'),
+				'verify_peer' => (int) getRequest('verify_peer'),
+				'verify_host' => (int) getRequest('verify_host'),
+				'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
+				'username' => getRequest('http_username', ''),
+				'password' => getRequest('http_password', '')
+			];
+		}
+
 		if (hasRequest('add')) {
 			$item = [
 				'hostid' => getRequest('hostid'),
@@ -624,29 +659,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			];
 
 			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				$http_item = [
-					'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
-					'url' => getRequest('url'),
-					'query_fields' => getRequest('query_fields', []),
-					'posts' => getRequest('posts'),
-					'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-					'follow_redirects' => (int) getRequest('follow_redirects'),
-					'post_type' => (int) getRequest('post_type'),
-					'http_proxy' => getRequest('http_proxy'),
-					'headers' => getRequest('headers', []),
-					'retrieve_mode' => (int) getRequest('retrieve_mode'),
-					'request_method' => (int) getRequest('request_method'),
-					'output_format' => (int) getRequest('output_format'),
-					'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-					'ssl_cert_file' => getRequest('ssl_cert_file'),
-					'ssl_key_file' => getRequest('ssl_key_file'),
-					'ssl_key_password' => getRequest('ssl_key_password'),
-					'verify_peer' => (int) getRequest('verify_peer'),
-					'verify_host' => (int) getRequest('verify_host'),
-					'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-					'username' => getRequest('http_username', ''),
-					'password' => getRequest('http_password', '')
-				];
 				$item = prepareItemHttpAgentFormData($http_item) + $item;
 			}
 
@@ -677,6 +689,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			$result = (bool) API::Item()->create($item);
 		}
+		// Update
 		else {
 			$db_items = API::Item()->get([
 				'output' => ['name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'authtype', 'username', 'password',
@@ -727,29 +740,32 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
 						$item['logtimefmt'] = getRequest('logtimefmt', '');
 					}
+					if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+						$item['interfaceid'] = getRequest('interfaceid', 0);
+					}
+					if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
+						$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
+					}
+					if ($db_item['username'] !== getRequest('username', '')) {
+						$item['username'] = getRequest('username', '');
+					}
+					if ($db_item['password'] !== getRequest('password', '')) {
+						$item['password'] = getRequest('password', '');
+					}
+					if ($db_item['publickey'] !== getRequest('publickey', '')) {
+						$item['publickey'] = getRequest('publickey', '');
+					}
+					if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
+						$item['privatekey'] = getRequest('privatekey', '');
+					}
+					if ($db_item['params'] !== getRequest('params', '')) {
+						$item['params'] = getRequest('params', '');
+					}
+					if ($db_item['preprocessing'] !== $preprocessing) {
+						$item['preprocessing'] = $preprocessing;
+					}
 				}
 
-				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
-					$item['interfaceid'] = getRequest('interfaceid', 0);
-				}
-				if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
-					$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
-				}
-				if ($db_item['username'] !== getRequest('username', '')) {
-					$item['username'] = getRequest('username', '');
-				}
-				if ($db_item['password'] !== getRequest('password', '')) {
-					$item['password'] = getRequest('password', '');
-				}
-				if ($db_item['publickey'] !== getRequest('publickey', '')) {
-					$item['publickey'] = getRequest('publickey', '');
-				}
-				if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
-					$item['privatekey'] = getRequest('privatekey', '');
-				}
-				if ($db_item['params'] !== getRequest('params', '')) {
-					$item['params'] = getRequest('params', '');
-				}
 				if ($db_item['delay'] != $delay) {
 					$item['delay'] = $delay;
 				}
@@ -777,33 +793,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['description'] !== getRequest('description', '')) {
 					$item['description'] = getRequest('description', '');
 				}
-				if ($db_item['preprocessing'] !== $preprocessing) {
-					$item['preprocessing'] = $preprocessing;
-				}
-				if (getRequest('type') == ITEM_TYPE_HTTPAGENT) {
-					$http_item = [
-						'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
-						'url' => getRequest('url'),
-						'query_fields' => getRequest('query_fields', []),
-						'posts' => getRequest('posts'),
-						'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-						'follow_redirects' => (int) getRequest('follow_redirects'),
-						'post_type' => (int) getRequest('post_type'),
-						'http_proxy' => getRequest('http_proxy'),
-						'headers' => getRequest('headers', []),
-						'retrieve_mode' => (int) getRequest('retrieve_mode'),
-						'request_method' => (int) getRequest('request_method'),
-						'output_format' => (int) getRequest('output_format'),
-						'allow_traps' => (int) getRequest('allow_traps', HTTPCHECK_ALLOW_TRAPS_OFF),
-						'ssl_cert_file' => getRequest('ssl_cert_file'),
-						'ssl_key_file' => getRequest('ssl_key_file'),
-						'ssl_key_password' => getRequest('ssl_key_password'),
-						'verify_peer' => (int) getRequest('verify_peer'),
-						'verify_host' => (int) getRequest('verify_host'),
-						'authtype' => getRequest('http_authtype', HTTPTEST_AUTH_NONE),
-						'username' => getRequest('http_username', ''),
-						'password' => getRequest('http_password', '')
-					];
+
+				if ($db_item['templateid'] == 0 && $type == ITEM_TYPE_HTTPAGENT) {
 					$item = prepareItemHttpAgentFormData($http_item) + $item;
 				}
 			}
@@ -855,6 +846,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			CArrayHelper::sort($db_item['tags'], ['tag', 'value']);
 			CArrayHelper::sort($tags, ['tag', 'value']);
+
 			if (array_values($db_item['tags']) !== array_values($tags)) {
 				$item['tags'] = $tags;
 			}
@@ -883,16 +875,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		unset($_REQUEST['itemid'], $_REQUEST['form']);
 		uncheckTableRows(getRequest('checkbox_hash'));
 	}
-}
-elseif (hasRequest('check_now') && hasRequest('itemid')) {
-	$result = (bool) API::Task()->create([
-		'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-		'request' => [
-			'itemid' => getRequest('itemid')
-		]
-	]);
-
-	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 // cleaning history for one item
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
@@ -929,29 +911,29 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_itemid')) {
 	if (getRequest('copy_targetids', []) && hasRequest('copy_type')) {
-		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
-			$hosts_ids = getRequest('copy_targetids');
+			$hostids = getRequest('copy_targetids');
 		}
-		// host groups
+		elseif (getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE_GROUP) {
+			$hostids = array_keys(API::Template()->get([
+				'output' => [],
+				'groupids' => getRequest('copy_targetids'),
+				'editable' => true,
+				'preservekeys' => true
+			]));
+		}
 		else {
-			$hosts_ids = [];
-			$group_ids = getRequest('copy_targetids');
-
-			$db_hosts = DBselect(
-				'SELECT DISTINCT h.hostid'.
-				' FROM hosts h,hosts_groups hg'.
-				' WHERE h.hostid=hg.hostid'.
-					' AND '.dbConditionInt('hg.groupid', $group_ids)
-			);
-			while ($db_host = DBfetch($db_hosts)) {
-				$hosts_ids[] = $db_host['hostid'];
-			}
+			$hostids = array_keys(API::Host()->get([
+				'output' => [],
+				'groupids' => getRequest('copy_targetids'),
+				'editable' => true,
+				'preservekeys' => true
+			]));
 		}
 
 		DBstart();
 
-		$result = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
+		$result = copyItemsToHosts(getRequest('group_itemid'), $hostids);
 		$result = DBend($result);
 
 		$items_count = count(getRequest('group_itemid'));
@@ -989,26 +971,6 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 	show_messages($result, _('Items deleted'), _('Cannot delete items'));
-}
-elseif (hasRequest('action') && getRequest('action') === 'item.masscheck_now' && hasRequest('group_itemid')) {
-	$tasks = [];
-
-	foreach (getRequest('group_itemid') as $itemid) {
-		$tasks[] = [
-			'type' => ZBX_TM_DATA_TYPE_CHECK_NOW,
-			'request' => [
-				'itemid' => $itemid
-			]
-		];
-	}
-
-	$result = (bool) API::Task()->create($tasks);
-
-	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
-	}
-
-	show_messages($result, _('Request sent successfully'), _('Cannot send request'));
 }
 
 if (hasRequest('action') && hasRequest('group_itemid') && !$result) {
@@ -1202,7 +1164,6 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'hostid' => $hostid,
-		'is_template' => true,
 		'context' => getRequest('context')
 	];
 
@@ -1470,13 +1431,7 @@ else {
 	}
 
 	$data['filter_data'] = [
-		'groups' => hasRequest('filter_groupids')
-			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => getRequest('filter_groupids'),
-				'editable' => true
-			]), ['groupid' => 'id'])
-			: [],
+		'groups' => $ms_groups,
 		'hosts' => $host_template_filter,
 		'filter_name' => getRequest('filter_name'),
 		'filter_key' => getRequest('filter_key'),
@@ -1579,20 +1534,6 @@ else {
 	}
 	else {
 		$page_num = CPagerHelper::loadPage($page['file']);
-	}
-
-	// Set is_template false, when one of hosts is not template.
-	if ($data['items']) {
-		$hosts_status = [];
-		foreach ($data['items'] as $item) {
-			$hosts_status[$item['hosts'][0]['status']] = true;
-		}
-		foreach ($hosts_status as $key => $value) {
-			if ($key != HOST_STATUS_TEMPLATE) {
-				$data['is_template'] = false;
-				break;
-			}
-		}
 	}
 
 	CPagerHelper::savePage($page['file'], $page_num);

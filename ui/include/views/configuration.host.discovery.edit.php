@@ -26,6 +26,7 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Discovery rules'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_HOST_DISCOVERY_EDIT))
 	->setNavigation(getHostNavigation('discoveries', $data['hostid'],
 		array_key_exists('itemid', $data) ? $data['itemid'] : 0
 	));
@@ -518,7 +519,6 @@ $item_tab
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'master_itemid',
 						'hostid' => $data['hostid'],
-						'webitems' => true,
 						'normal_only' => true
 					]
 				]
@@ -987,11 +987,12 @@ if (!empty($data['itemid'])) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
-		$buttons[] = (new CSubmit('check_now', _('Execute now')))
+		$buttons[] = (new CSimpleButton(_('Execute now')))
 			->setEnabled(in_array($data['item']['type'], checkNowAllowedTypes())
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
-			);
+			)
+			->onClick('view.checkNow(this);');
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');
@@ -1001,21 +1002,23 @@ if (!empty($data['itemid'])) {
 	))->setEnabled(!$data['limited']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
-	$tab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$form_actions = new CFormActions(new CSubmit('update', _('Update')), $buttons);
 }
 else {
 	$cancel_button = $data['backurl'] !== null
 		? new CButtonCancel(null, "redirect('".$data['backurl']."');")
 		: new CButtonCancel(url_param('context'));
 
-	$tab->setFooter(makeFormFooter(
+	$form_actions = new CFormActions(
 		new CSubmit('add', _('Add')),
 		[
 			(new CSimpleButton(_('Test')))->setId('test_item'),
 			$cancel_button
 		]
-	));
+	);
 }
+
+$tab->setFooter(new CFormGrid($form_actions));
 
 $form->addItem($tab);
 $widget->addItem($form);

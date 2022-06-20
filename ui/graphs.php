@@ -35,7 +35,9 @@ $fields = [
 	'parent_discoveryid' =>	[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,			null],
 	'copy_type' =>			[T_ZBX_INT, O_OPT, P_SYS,
-								IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+								IN([COPY_TYPE_TO_TEMPLATE_GROUP, COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
+									COPY_TYPE_TO_TEMPLATE
+								]),
 								'isset({copy})'
 							],
 	'copy_mode' =>			[T_ZBX_INT, O_OPT, P_SYS,		IN('0'),		null],
@@ -96,7 +98,14 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 }
 check_fields($fields);
 
-$gitems = getRequest('items', []);
+$gitems = [];
+foreach (getRequest('items', []) as $gitem) {
+	if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
+			&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
+			&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+		$gitems[] = $gitem;
+	}
+}
 
 $_REQUEST['show_3d'] = getRequest('show_3d', 0);
 $_REQUEST['show_legend'] = getRequest('show_legend', 0);
@@ -340,29 +349,11 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && h
 			'templated_hosts' => true
 		];
 
-		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
 			$options['hostids'] = getRequest('copy_targetids');
 		}
-		// host groups
 		else {
-			$groupids = getRequest('copy_targetids');
-			zbx_value2array($groupids);
-
-			$dbGroups = API::HostGroup()->get([
-				'output' => ['groupid'],
-				'groupids' => $groupids,
-				'editable' => true
-			]);
-			$dbGroups = zbx_toHash($dbGroups, 'groupid');
-
-			foreach ($groupids as $groupid) {
-				if (!isset($dbGroups[$groupid])) {
-					access_deny();
-				}
-			}
-
-			$options['groupids'] = $groupids;
+			$options['groupids'] = getRequest('copy_targetids');
 		}
 
 		$dbHosts = API::Host()->get($options);
@@ -423,51 +414,32 @@ elseif (hasRequest('filter_rst')) {
 /*
  * Display
  */
-if (hasRequest('parent_discoveryid')) {
-	// Argument parent_discoveryid is considered as alternative filter.
-	$filter = [
-		'groups' => null,
-		'hosts' => null
-	];
-}
-else {
-	$filter = [
-		'groups' => CProfile::getArray($prefix.'graphs.filter_groupids', null),
-		'hosts' => CProfile::getArray($prefix.'graphs.filter_hostids', null)
-	];
-}
+$filter_groupids = hasRequest('parent_discoveryid') ? [] : CProfile::getArray($prefix.'graphs.filter_groupids', []);
+$filter_hostids = hasRequest('parent_discoveryid') ? [] : CProfile::getArray($prefix.'graphs.filter_hostids', []);
 
-// Get host groups.
-$filter['groups'] = $filter['groups']
-	? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-		'output' => ['groupid', 'name'],
-		'groupids' => $filter['groups'],
-		'editable' => true,
-		'preservekeys' => true
-	]), ['groupid' => 'id'])
-	: [];
+$filter = [
+	'groups' => [],
+	'hosts' => []
+];
 
-$filter_groupids = $filter['groups'] ? array_keys($filter['groups']) : null;
-if ($filter_groupids) {
-	$filter_groupids = getSubGroups($filter_groupids);
-}
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
 
 // Get hosts.
 if (getRequest('context') === 'host') {
-	$filter['hosts'] = $filter['hosts']
+	$filter['hosts'] = $filter_hostids
 		? CArrayHelper::renameObjectsKeys(API::Host()->get([
 			'output' => ['hostid', 'name'],
-			'hostids' => $filter['hosts'],
+			'hostids' => $filter_hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['hostid' => 'id'])
 		: [];
 }
 else {
-	$filter['hosts'] = $filter['hosts']
+	$filter['hosts'] = $filter_hostids
 		? CArrayHelper::renameObjectsKeys(API::Template()->get([
 			'output' => ['templateid', 'name'],
-			'templateids' => $filter['hosts'],
+			'templateids' => $filter_hostids,
 			'editable' => true,
 			'preservekeys' => true
 		]), ['templateid' => 'id'])
@@ -555,7 +527,7 @@ elseif (isset($_REQUEST['form'])) {
 		// templates
 		$flag = ($data['parent_discoveryid'] === null) ? ZBX_FLAG_DISCOVERY_NORMAL : ZBX_FLAG_DISCOVERY_PROTOTYPE;
 		$data['templates'] = makeGraphTemplatesHtml($graph['graphid'], getGraphParentTemplates([$graph], $flag),
-			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			$flag, CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		// items
@@ -593,7 +565,6 @@ elseif (isset($_REQUEST['form'])) {
 		$data['visible'] = getRequest('visible');
 		$data['percent_left'] = 0;
 		$data['percent_right'] = 0;
-		$data['visible'] = getRequest('visible');
 		$data['items'] = $gitems;
 		$data['discover'] = getRequest('discover', DB::getDefault('graphs', 'discover'));
 		$data['templates'] = [];
@@ -625,15 +596,17 @@ elseif (isset($_REQUEST['form'])) {
 			'preservekeys' => true
 		]);
 
-		foreach ($data['items'] as &$item) {
-			$host = reset($items[$item['itemid']]['hosts']);
+		if ($items) {
+			foreach ($data['items'] as &$item) {
+				$host = reset($items[$item['itemid']]['hosts']);
 
-			$item['host'] = $host['name'];
-			$item['hostid'] = $items[$item['itemid']]['hostid'];
-			$item['name'] = $items[$item['itemid']]['name'];
-			$item['flags'] = $items[$item['itemid']]['flags'];
+				$item['host'] = $host['name'];
+				$item['hostid'] = $items[$item['itemid']]['hostid'];
+				$item['name'] = $items[$item['itemid']]['name'];
+				$item['flags'] = $items[$item['itemid']]['flags'];
+			}
+			unset($item);
 		}
-		unset($item);
 	}
 
 	// Set ymin_item_name.
@@ -708,7 +681,7 @@ else {
 	$options = [
 		'output' => ['graphid', 'name', 'graphtype'],
 		'hostids' => $filter['hosts'] ? array_keys($filter['hosts']) : null,
-		'groupids' => $filter_groupids,
+		'groupids' => $filter_groupids ? $filter_groupids : null,
 		'discoveryids' => hasRequest('parent_discoveryid') ? $discoveryRule['itemid'] : null,
 		'templated' => ($data['context'] === 'template'),
 		'editable' => true,

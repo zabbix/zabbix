@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -40,7 +40,8 @@ class CConfigurationImportcompare {
 	 */
 	public function __construct(array $options) {
 		$this->uuid_structure = [
-			'groups' => [],
+			'template_groups' => [],
+			'host_groups' => [],
 			'templates' => [
 				'groups' => [],
 				'items' => [
@@ -52,7 +53,9 @@ class CConfigurationImportcompare {
 					],
 					'trigger_prototypes' => [],
 					'graph_prototypes' => [],
-					'host_prototypes' => []
+					'host_prototypes' => [
+						'group_links' => []
+					]
 				],
 				'dashboards' => [],
 				'httptests' => [],
@@ -217,7 +220,10 @@ class CConfigurationImportcompare {
 	 */
 	protected function applyOptions(array $options, string $entity_key, array $diff): array {
 		$option_key_map = [
-			'groups' => 'groups',
+			'template_groups' => 'template_groups',
+			'host_groups' => 'host_groups',
+			'group_links' => 'host_groups',
+			'groups' => 'template_groups',
 			'templates' => 'templates',
 			'items' => 'items',
 			'triggers' => 'triggers',

@@ -17,13 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "dbcache.h"
+#include "snmptrapper.h"
+
 #include "zbxself.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "log.h"
 #include "proxy.h"
-#include "snmptrapper.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "preproc.h"
@@ -80,15 +79,18 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 {
 	DC_ITEM			*items = NULL;
 	const char		*regex;
-	char			error[ITEM_ERROR_LEN_MAX];
+	char			error[ZBX_ITEM_ERROR_LEN_MAX];
 	size_t			num, i;
 	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL, value_type, regexp_ret;
 	zbx_uint64_t		*itemids = NULL;
 	AGENT_RESULT		*results = NULL;
 	AGENT_REQUEST		request;
 	zbx_vector_ptr_t	regexps;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zbx_vector_ptr_create(&regexps);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	num = DCconfig_get_snmp_items_by_interfaceid(interfaceid, &items);
 
@@ -103,7 +105,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 		errcodes[i] = FAIL;
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
-		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
+		if (SUCCEED != zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
 				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
@@ -215,6 +217,8 @@ next:
 
 	DCconfig_clean_items(items, NULL, num);
 	zbx_free(items);
+
+	zbx_dc_close_user_macros(um_handle);
 
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_ptr_destroy(&regexps);

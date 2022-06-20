@@ -20,7 +20,7 @@
 #include "net.h"
 
 #include "common.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
 #include "cfg.h"
 
@@ -79,7 +79,7 @@ int	NET_TCP_PORT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	unsigned short	port;
 	int		value_int, ret;
-	char		*ip_str, ip[MAX_ZBX_DNSNAME_LEN + 1], *port_str;
+	char		*ip_str, ip[ZBX_MAX_DNSNAME_LEN + 1], *port_str;
 
 	if (2 < request->nparam)
 	{

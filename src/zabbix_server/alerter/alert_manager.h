@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ALERT_MANAGER_H
 #define ZABBIX_ALERT_MANAGER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 ZBX_THREAD_ENTRY(alert_manager_thread, args);
 

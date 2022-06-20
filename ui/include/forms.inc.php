@@ -143,14 +143,14 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 	return $output;
 }
 
-function makeItemSubfilter(array &$filter_data, array $items = [], string $context) {
+function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 	// subfilters
 	$table_subfilter = (new CTableInfo())
 		->addRow([
 			new CTag('h4', true, [
 				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 			])
-		]);
+		], ZBX_STYLE_HOVER_NOBG);
 
 	// array contains subfilters and number of items in each
 	$item_params = [
@@ -514,9 +514,7 @@ function makeItemSubfilter(array &$filter_data, array $items = [], string $conte
 
 	// output
 	if (count($item_params['tags']) > 1) {
-		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags'],
-			'subfilter_tags'
-		);
+		$tags_output = prepareTagsSubfilterOutput($item_params['tags'], $filter_data['subfilter_tags']);
 		$table_subfilter->addRow([$tags_output]);
 	}
 
@@ -921,7 +919,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 
 		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 	}
 
@@ -1573,10 +1571,17 @@ function getCopyElementsFormData($elements_field, $title = null) {
 		'title' => $title,
 		'elements_field' => $elements_field,
 		'elements' => getRequest($elements_field, []),
-		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_HOST_GROUP),
+		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_TEMPLATE_GROUP),
 		'copy_targetids' => getRequest('copy_targetids', []),
-		'hostid' => getRequest('hostid', 0)
+		'hostid' => 0
 	];
+
+	$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
+	$filter_hostids = getRequest('filter_hostids', CProfile::getArray($prefix.'triggers.filter_hostids', []));
+
+	if (count($filter_hostids) == 1) {
+		$data['hostid'] = reset($filter_hostids);
+	}
 
 	if (!$data['elements'] || !is_array($data['elements'])) {
 		show_error_message(_('Incorrect list of items.'));
@@ -1608,6 +1613,15 @@ function getCopyElementsFormData($elements_field, $title = null) {
 					'templateids' => $data['copy_targetids'],
 					'editable' => true
 				]), ['templateid' => 'id']);
+				break;
+
+			case COPY_TYPE_TO_TEMPLATE_GROUP:
+				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
+					'output' => ['groupid', 'name'],
+					'groupids' => $data['copy_targetids'],
+					'editable' => true
+				]), ['groupid' => 'id']);
+				break;
 		}
 	}
 
@@ -1744,7 +1758,7 @@ function getTriggerFormData(array $data) {
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
 			getTriggerParentTemplates([$trigger], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES), $data['context']
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
 		if ($data['show_inherited_tags']) {
@@ -2048,24 +2062,29 @@ function getTriggerFormData(array $data) {
  * Renders tag table row.
  *
  * @param int|string $index
- * @param string     $tag      (optional)
- * @param string     $value    (optional)
- * @param array      $options  (optional)
+ * @param string     $tag        (optional)
+ * @param string     $value      (optional)
+ * @param int        $automatic  (optional)
+ * @param array      $options    (optional)
  *
  * @return CRow
  */
-function renderTagTableRow($index, $tag = '', $value = '', array $options = []) {
-	$options = array_merge([
+function renderTagTableRow($index, $tag = '', $value = '', int $automatic = ZBX_TAG_MANUAL, array $options = []) {
+	$options += [
 		'readonly' => false,
-		'field_name' => 'tags'
-	], $options);
+		'field_name' => 'tags',
+		'with_automatic' => false
+	];
 
 	return (new CRow([
-		(new CCol(
+		(new CCol([
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag, $options))
 				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
-				->setAttribute('placeholder', _('tag'))
-		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				->setAttribute('placeholder', _('tag')),
+			$options['with_automatic']
+				? new CVar($options['field_name'].'['.$index.'][automatic]', $automatic)
+				: null
+		]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $value, $options))
 				->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
@@ -2097,14 +2116,21 @@ function renderTagTable(array $tags, $readonly = false, array $options = []) {
 		->addStyle('width: 100%; max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER);
 
-	$row_options = ['readonly' => $readonly];
+	$with_automatic = array_key_exists('with_automatic', $options) && $options['with_automatic'];
+
+	$row_options = [
+		'readonly' => $readonly,
+		'with_automatic' => $with_automatic
+	];
 
 	if (array_key_exists('field_name', $options)) {
 		$row_options['field_name'] = $options['field_name'];
 	}
 
 	foreach ($tags as $index => $tag) {
-		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'], $row_options));
+		$table->addRow(renderTagTableRow($index, $tag['tag'], $tag['value'],
+			$with_automatic ? $tag['automatic'] : ZBX_TAG_MANUAL, $row_options
+		));
 	}
 
 	return $table->setFooter(new CCol(

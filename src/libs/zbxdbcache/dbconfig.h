@@ -20,9 +20,10 @@
 #ifndef ZABBIX_DBCONFIG_H
 #define ZABBIX_DBCONFIG_H
 
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxalgo.h"
 #include "dbcache.h"
+#include "user_macro.h"
 
 typedef struct
 {
@@ -97,12 +98,12 @@ typedef struct
 	const char		*port;
 	const char		*error;
 	const char		*delay;
+	const char		*delay_ex;
+	const char		*history_period;
 	ZBX_DC_TRIGGER		**triggers;
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
-	int			history_sec;
-	unsigned char		history;
 	unsigned char		type;
 	unsigned char		value_type;
 	unsigned char		poller_type;
@@ -113,7 +114,6 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		status;
 	unsigned char		queue_priority;
-	unsigned char		schedulable;
 	unsigned char		update_triggers;
 	zbx_uint64_t		templateid;
 
@@ -156,8 +156,7 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	const char	*units;
-	unsigned char	trends;
-	int		trends_sec;
+	const char	*trends_period;
 }
 ZBX_DC_NUMITEM;
 
@@ -404,16 +403,10 @@ ZBX_DC_IPMIHOST;
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
-	zbx_vector_uint64_t	templateids;
-}
-ZBX_DC_HTMPL;
-
-typedef struct
-{
-	const char	*key;
-	const char	*value;
-	int		refcount;
+	const char			*key;
+	const char			*value;
+	zbx_vector_uint64_pair_t	macros;
+	unsigned char			update;
 }
 zbx_dc_kv_t;
 
@@ -423,46 +416,6 @@ typedef struct
 	zbx_hashset_t	kvs;
 }
 zbx_dc_kvs_path_t;
-
-typedef struct
-{
-	zbx_uint64_t	globalmacroid;
-	const char	*macro;
-	const char	*context;
-	const char	*value;
-	zbx_dc_kv_t	*kv;
-	unsigned char	type;
-	unsigned char	context_op;
-}
-ZBX_DC_GMACRO;
-
-typedef struct
-{
-	const char		*macro;
-	zbx_vector_ptr_t	gmacros;
-}
-ZBX_DC_GMACRO_M;
-
-typedef struct
-{
-	zbx_uint64_t	hostmacroid;
-	zbx_uint64_t	hostid;
-	const char	*macro;
-	const char	*context;
-	const char	*value;
-	zbx_dc_kv_t	*kv;
-	unsigned char	type;
-	unsigned char	context_op;
-}
-ZBX_DC_HMACRO;
-
-typedef struct
-{
-	zbx_uint64_t		hostid;
-	const char		*macro;
-	zbx_vector_ptr_t	hmacros;
-}
-ZBX_DC_HMACRO_HM;
 
 typedef struct
 {
@@ -792,6 +745,14 @@ zbx_dc_timer_trigger_t;
 
 typedef struct
 {
+	zbx_uint64_t		macroid;
+	zbx_dc_kv_t		*kv;
+	zbx_dc_kvs_path_t	*kv_path;
+}
+zbx_dc_macro_kv_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 	int			proxy_lastaccess_ts;
@@ -843,11 +804,8 @@ typedef struct
 							/* locking cache and therefore it cannot be updated by      */
 							/* by history syncers when new data is received.	    */
 	zbx_hashset_t		ipmihosts;
-	zbx_hashset_t		htmpls;
 	zbx_hashset_t		gmacros;
-	zbx_hashset_t		gmacros_m;		/* macro */
 	zbx_hashset_t		hmacros;
-	zbx_hashset_t		hmacros_hm;		/* hostid, macro */
 	zbx_hashset_t		interfaces;
 	zbx_hashset_t		interfaces_snmp;
 	zbx_hashset_t		interfaces_ht;		/* hostid, type */
@@ -867,6 +825,8 @@ typedef struct
 	zbx_hashset_t		hostgroups;
 	zbx_vector_ptr_t	hostgroups_name;	/* host groups sorted by name */
 	zbx_vector_ptr_t	kvs_paths;
+	zbx_hashset_t		gmacro_kv;
+	zbx_hashset_t		hmacro_kv;
 	zbx_hashset_t		preprocops;
 	zbx_hashset_t		itemscript_params;
 	zbx_hashset_t		maintenances;
@@ -883,6 +843,7 @@ typedef struct
 	ZBX_DC_CONFIG_TABLE	*config;
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
+	zbx_um_cache_t		*um_cache;
 	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 }
@@ -908,8 +869,10 @@ void	DCdump_configuration(void);
 void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found);
 
 /* string pool */
-void	zbx_strpool_release(const char *str);
-int	DCstrpool_replace(int found, const char **curr, const char *new_str);
+const char	*dc_strpool_intern(const char *str);
+const char	*dc_strpool_acquire(const char *str);
+void	dc_strpool_release(const char *str);
+int	dc_strpool_replace(int found, const char **curr, const char *new_str);
 
 /* host groups */
 void	dc_get_nested_hostgroupids(zbx_uint64_t groupid, zbx_vector_uint64_t *nested_groupids);
@@ -934,14 +897,16 @@ char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostid
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);
 char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid);
 
-char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num);
-int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *hostids, int hostids_num,
-		char **value, char **error);
+char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num);
 
 #define ZBX_TRIGGER_TIMER_NONE			0x0000
 #define ZBX_TRIGGER_TIMER_TRIGGER		0x0001
 #define ZBX_TRIGGER_TIMER_FUNCTION_TIME		0x0002
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
+
+
+zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_dbsync_t *gmacros, zbx_dbsync_t *hmacros,
+		zbx_dbsync_t *htmpls);
 
 #endif

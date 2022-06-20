@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -38,7 +38,7 @@
 		submit(button) {
 			this.setLoading(button);
 
-			const fields = host_edit.preprocessFormFields(getFormFields(this.form));
+			const fields = host_edit.preprocessFormFields(getFormFields(this.form), false);
 			const curl = new Curl(this.form.getAttribute('action'), false);
 
 			fetch(curl.getUrl(), {
@@ -73,7 +73,7 @@
 			const url = new Curl('', false);
 			url.setArgument('clone', 1);
 
-			const fields = host_edit.preprocessFormFields(getFormFields(this.form));
+			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
 			delete fields.sid;
 
 			post(url.getUrl(), fields);
@@ -83,7 +83,7 @@
 			const url = new Curl('', false);
 			url.setArgument('full_clone', 1);
 
-			const fields = host_edit.preprocessFormFields(getFormFields(this.form));
+			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
 			delete fields.sid;
 
 			post(url.getUrl(), fields);
@@ -148,19 +148,20 @@
 		},
 
 		ajaxExceptionHandler: (exception) => {
-			let title;
-			let messages = [];
+			clearMessages();
+
+			let title, messages;
 
 			if (typeof exception === 'object' && 'error' in exception) {
 				title = exception.error.title;
 				messages = exception.error.messages;
-			} else {
-				title = <?= json_encode(_('Unexpected server error.')) ?>;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 			}
 
-			const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+			const message_box = makeMessageBox('bad', messages, title);
 
-			clearMessages();
 			addMessage(message_box);
 		},
 

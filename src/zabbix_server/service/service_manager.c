@@ -17,18 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "service_manager.h"
+
 #include "log.h"
 #include "zbxself.h"
+#include "zbxnix.h"
 #include "zbxservice.h"
-#include "zbxipcservice.h"
-#include "daemon.h"
-#include "sighandler.h"
-#include "zbxalgo.h"
-#include "service_protocol.h"
 #include "service_actions.h"
 #include "zbxserialize.h"
-
-#include "service_manager.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -1354,7 +1350,7 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 	}
 
 	/* write service status changes into database */
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (0 != updates.values_num)
 	{
@@ -1384,7 +1380,7 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)
 	{
@@ -2271,7 +2267,7 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 	/* update problems, escalations and link problems with recovery events */
 
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	zbx_db_insert_prepare(&db_insert_recovery, "event_recovery", "eventid", "r_eventid", NULL);
 
@@ -2296,7 +2292,7 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
@@ -2940,7 +2936,7 @@ static int	db_update_service_problems(const zbx_vector_ptr_t *event_severities)
 		size_t	sql_offset = 0;
 
 		DBbegin();
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < event_severities->values_num; i++)
 		{
@@ -2952,7 +2948,7 @@ static int	db_update_service_problems(const zbx_vector_ptr_t *event_severities)
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (16 < sql_offset)
 			DBexecute("%s", sql);

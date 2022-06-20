@@ -56,7 +56,7 @@ function getSystemStatusData(array $filter) {
 			if ($filter_groupids === null) {
 				$filter_groupids = array_keys(API::HostGroup()->get([
 					'output' => [],
-					'real_hosts' => true,
+					'with_hosts' => true,
 					'preservekeys' => true
 				]));
 			}
@@ -85,7 +85,7 @@ function getSystemStatusData(array $filter) {
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter_groupids,
 			'hostids' => $filter_hostids,
-			'monitored_hosts' => true,
+			'with_monitored_hosts' => true,
 			'preservekeys' => true
 		]),
 		'triggers' => [],
@@ -96,7 +96,8 @@ function getSystemStatusData(array $filter) {
 			'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 			'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
 			'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
-			'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
+			'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
+			'suppress' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 		]
 	];
 
@@ -120,7 +121,7 @@ function getSystemStatusData(array $filter) {
 
 	$options = [
 		'output' => ['eventid', 'r_eventid', 'objectid', 'clock', 'ns', 'name', 'acknowledged', 'severity'],
-		'selectAcknowledges' => ['action'],
+		'selectAcknowledges' => ['action', 'clock', 'userid'],
 		'groupids' => array_keys($data['groups']),
 		'hostids' => $filter_hostids,
 		'evaltype' => $filter_evaltype,
@@ -144,7 +145,7 @@ function getSystemStatusData(array $filter) {
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
 		unset($options['suppressed']);
-		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until'];
+		$options['selectSuppressionData'] = ['maintenanceid', 'suppress_until', 'userid'];
 	}
 
 	if ($filter_ext_ack == EXTACK_OPTION_UNACK) {
@@ -165,7 +166,7 @@ function getSystemStatusData(array $filter) {
 
 		$options = [
 			'output' => ['priority', 'manual_close'],
-			'selectGroups' => ['groupid'],
+			'selectHostGroups' => ['groupid'],
 			'selectHosts' => ['name'],
 			'triggerids' => array_keys($triggerids),
 			'monitored' => true,
@@ -222,7 +223,7 @@ function getSystemStatusData(array $filter) {
 			}
 
 			// groups
-			foreach ($trigger['groups'] as $trigger_group) {
+			foreach ($trigger['hostgroups'] as $trigger_group) {
 				if (!array_key_exists($trigger_group['groupid'], $data['groups'])) {
 					continue;
 				}
@@ -257,7 +258,9 @@ function getSystemStatusData(array $filter) {
 		$problems_data = API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'severity'],
 			'eventids' => array_keys($visible_problems),
-			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity'],
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+				'suppress_until'
+			],
 			'selectTags' => ['tag', 'value'],
 			'preservekeys' => true
 		]);
@@ -369,6 +372,7 @@ function getSystemStatusTotals(array $data) {
  * @param bool  $data['allowed']['change_severity']
  * @param bool  $data['allowed']['acknowledge']
  * @param bool  $data['allowed']['close']
+ * @param bool  $data['allowed']['suppress']
  * @param bool  $hide_empty_groups
  * @param CUrl  $groupurl
  *
@@ -419,6 +423,7 @@ function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupu
  * @param bool  $data['allowed']['change_severity']
  * @param bool  $data['allowed']['acknowledge']
  * @param bool  $data['allowed']['close']
+ * @param bool  $data['allowed']['suppress']
  *
  * @return CDiv
  */
@@ -453,6 +458,7 @@ function makeSeverityTotals(array $data) {
  * @param bool  $data['allowed']['change_severity']
  * @param bool  $data['allowed']['acknowledge']
  * @param bool  $data['allowed']['close']
+ * @param bool  $data['allowed']['suppress']
  * @param array $stat
  * @param int   $stat['count']
  * @param array $stat['problems']
@@ -545,6 +551,7 @@ function getSeverityTableCell($severity, array $data, array $stat, $is_total = f
  * @param bool   $allowed['change_severity']
  * @param bool   $allowed['acknowledge']
  * @param bool   $allowed['close']
+ * @param bool   $allowed['suppress']
  *
  * @return CTableInfo
  */
@@ -603,7 +610,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 	$tags = makeTags($problems);
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {
-		CScreenProblem::addMaintenanceNames($problems);
+		CScreenProblem::addSuppressionNames($problems);
 	}
 
 	foreach ($problems as $problem) {
@@ -646,8 +653,32 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		}
 
 		$info_icons = [];
-		if (array_key_exists('suppression_data', $problem) && $problem['suppression_data']) {
-			$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data']);
+		if (array_key_exists('suppression_data', $problem)) {
+			if (count($problem['suppression_data']) == 1
+					&& $problem['suppression_data'][0]['maintenanceid'] == 0
+					&& isEventRecentlyUnsuppressed($problem['acknowledges'], $unsuppression_action)) {
+				// Show blinking button if the last manual suppression was recently revoked.
+				$user_unsuppressed = array_key_exists($unsuppression_action['userid'], $actions['users'])
+					? getUserFullname($actions['users'][$unsuppression_action['userid']])
+					: _('Inaccessible user');
+
+				$info_icons[] = (new CSimpleButton())
+					->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
+					->addClass('blink')
+					->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
+			}
+			elseif ($problem['suppression_data']) {
+				$info_icons[] = makeSuppressedProblemIcon($problem['suppression_data'], false);
+			}
+			elseif (isEventRecentlySuppressed($problem['acknowledges'], $suppression_action)) {
+				// Show blinking button if suppression was made but is not yet processed by server.
+				$info_icons[] = makeSuppressedProblemIcon([[
+					'suppress_until' => $suppression_action['suppress_until'],
+					'username' => array_key_exists($suppression_action['userid'], $actions['users'])
+						? getUserFullname($actions['users'][$suppression_action['userid']])
+						: _('Inaccessible user')
+				]], true);
+			}
 		}
 
 		// operational data
@@ -699,11 +730,12 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		// Create acknowledge link.
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
-				|| $can_be_closed)
+				|| $can_be_closed || $allowed['suppress'])
 			? (new CLink($is_acknowledged ? _('Yes') : _('No')))
 				->addClass($is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->onClick('acknowledgePopUp('.json_encode(['eventids' => [$problem['eventid']]]).', this);')
+				->setAttribute('data-eventid', $problem['eventid'])
+				->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
 			: (new CSpan($is_acknowledged ? _('Yes') : _('No')))->addClass(
 				$is_acknowledged ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
 			);

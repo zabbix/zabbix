@@ -26,7 +26,8 @@
 $rules_table = new CTable();
 
 $titles = [
-	'groups' => _('Groups'),
+	'template_groups' => _('Template groups'),
+	'host_groups' => _('Host groups'),
 	'hosts' => _('Hosts'),
 	'templates' => _('Templates'),
 	'valueMaps' => _('Value mappings'),
@@ -44,6 +45,23 @@ if ($data['user']['type'] == USER_TYPE_SUPER_ADMIN) {
 	$titles['images'] = _('Images');
 	$titles['mediaTypes'] = _('Media types');
 }
+
+switch ($data['rules_preset']) {
+	case 'map':
+		$doc_url = CDocHelper::POPUP_MAPS_IMPORT;
+		break;
+	case 'template':
+		$doc_url = CDocHelper::POPUP_TEMPLATE_IMPORT;
+		break;
+	case 'host':
+		$doc_url = CDocHelper::POPUP_HOST_IMPORT;
+		break;
+	case 'mediatype':
+		$doc_url = CDocHelper::POPUP_MEDIA_IMPORT;
+		break;
+	default:
+		$doc_url = ZBX_DOCUMENTATION_URL;
+	}
 
 $col_update = false;
 $col_create = false;
@@ -149,6 +167,7 @@ $form = (new CForm('post', null, 'multipart/form-data'))
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl($doc_url),
 	'script_inline' => trim($this->readJsFile('popup.import.js.php')),
 	'body' => $form->toString(),
 	'buttons' => [

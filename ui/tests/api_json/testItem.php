@@ -259,6 +259,33 @@ class testItem extends CAPITest {
 					]
 				],
 				'expected_error' => 'Incorrect value for field "error_handler": unexpected value "0".'
+			],
+
+			'HTTP Agent item without direct interface' => [
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'NoInterfaceItem123',
+					'key_' => '1234',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_HTTPAGENT,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => null
+			],
+			'Sample/Simple Check item requires interface' => [
+				'request_data' => [
+					'hostid' => '50009',
+					'name' => 'NoInterfaceItem123',
+					'key_' => '1234',
+					'interfaceid' => 0,
+					'value_type' => ITEM_VALUE_TYPE_UINT64,
+					'type' => ITEM_TYPE_SIMPLE,
+					'delay' => '30s',
+					'url' => '192.168.0.1'
+				],
+				'expected_error' => 'No interface found.'
 			]
 		] + $item_type_tests;
 	}

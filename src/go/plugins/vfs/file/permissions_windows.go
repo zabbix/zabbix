@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 /*
@@ -22,7 +23,7 @@
 package file
 
 import (
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 // exportPermissions - returns 4-digit string containing octal number with Unix permissions

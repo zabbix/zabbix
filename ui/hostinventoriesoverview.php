@@ -148,6 +148,7 @@ $select_groupby = (new CSelect('filter_groupby'))
 
 (new CWidget())
 	->setTitle(_('Host inventory overview'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::INVENTORY_HOST_OVERVIEW))
 	->addItem(
 		(new CFilter())
 			->setResetUrl(new CUrl('hostinventoriesoverview.php'))
@@ -167,7 +168,7 @@ $select_groupby = (new CSelect('filter_groupby'))
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'zbx_filter',
 									'dstfld1' => 'filter_groups_',
-									'real_hosts' => 1,
+									'with_hosts' => true,
 									'enrich_parent_groups' => true
 								]
 							]

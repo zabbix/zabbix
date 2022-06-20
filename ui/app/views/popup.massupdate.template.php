@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -22,9 +22,6 @@
 /**
  * @var CView $this
  */
-
-// Visibility box javascript is already added. It should not be added in popup response.
-define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
@@ -84,7 +81,7 @@ $template_tab->addRow(
 $template_tab
 	->addRow(
 		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))
-			->setLabel(_('Host groups'))
+			->setLabel(_('Template groups'))
 			->setAttribute('autofocus', 'autofocus'),
 		(new CDiv([
 			(new CRadioButtonList('mass_update_groups', ZBX_ACTION_ADD))
@@ -95,12 +92,12 @@ $template_tab
 				->addStyle('margin-bottom: 5px;'),
 			(new CMultiSelect([
 				'name' => 'groups[]',
-				'object_name' => 'hostGroup',
+				'object_name' => 'templateGroup',
 				'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
 				'data' => [],
 				'popup' => [
 					'parameters' => [
-						'srctbl' => 'host_groups',
+						'srctbl' => 'template_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
 						'dstfld1' => 'groups_',
@@ -162,6 +159,7 @@ $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.macros.js.php')
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_MASSUPDATE_TEMPLATE),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

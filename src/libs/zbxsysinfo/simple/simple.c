@@ -21,10 +21,9 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "comms.h"
+#include "zbxcomms.h"
 #include "log.h"
 #include "cfg.h"
-#include "telnet.h"
 #include "../common/net.h"
 #include "ntp.h"
 
@@ -238,7 +237,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 				zbx_strerror(errno));
 		}
 #endif
-		if (SUCCEED == telnet_test_login(s.socket))
+		if (SUCCEED == zbx_telnet_test_login(s.socket))
 			*value_int = 1;
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Telnet check error: no login prompt");
@@ -297,7 +296,7 @@ static int	validate_imap(const char *line)
 int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
 {
 	unsigned short	port = 0;
-	char		*service, *ip_str, ip[MAX_ZBX_DNSNAME_LEN + 1], *port_str;
+	char		*service, *ip_str, ip[ZBX_MAX_DNSNAME_LEN + 1], *port_str;
 	int		value_int, ret = SYSINFO_RET_FAIL;
 	double		check_time;
 

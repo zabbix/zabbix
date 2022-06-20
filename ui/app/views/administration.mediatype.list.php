@@ -29,6 +29,7 @@ if ($data['uncheck']) {
 
 $widget = (new CWidget())
 	->setTitle(_('Media types'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_MEDIATYPE_LIST))
 	->setControls((new CTag('nav', true,
 		(new CList())
 			->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'))
@@ -151,12 +152,13 @@ foreach ($data['mediatypes'] as $mediaType) {
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId()
 		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
+		->setAttribute('data-mediatypeid', $mediaType['mediatypeid'])
 		->onClick('
-			return PopUp("popup.mediatypetest.edit", '.json_encode(['mediatypeid' => $mediaType['mediatypeid']]).', {
+			PopUp("popup.mediatypetest.edit", {mediatypeid: this.dataset.mediatypeid}, {
 				dialogueid: "mediatypetest_edit",
 				dialogue_class: "modal-popup-medium"
-			});'
-		);
+			});
+		');
 
 	$name = new CLink($mediaType['name'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
 

@@ -41,24 +41,6 @@ $script_inline = '';
 $header_form = ($data['popup_type'] === 'help_items') ? (new CForm())->cleanItems() : new CDiv();
 $header_form->setId('generic-popup-form');
 
-// Make 'empty' button.
-if ($data['popup_type'] === 'triggers' && !array_key_exists('noempty', $options)) {
-	$value1 = (strpos($options['dstfld1'], 'id') !== false) ? 0 : '';
-	$value2 = (strpos($options['dstfld2'], 'id') !== false) ? 0 : '';
-	$value3 = (strpos($options['dstfld3'], 'id') !== false) ? 0 : '';
-
-	$empty_btn = (new CButton('empty', _('Empty')))
-		->addStyle('float: right; margin-left: 5px;')
-		->onClick('popup_generic.setEmpty(event, '.json_encode([
-			$options['dstfld1'] => $value1,
-			$options['dstfld2'] => $value2,
-			$options['dstfld3'], $value3
-		]).')');
-}
-else {
-	$empty_btn = null;
-}
-
 // Add host group multiselect control.
 if (array_key_exists('groups', $data['filter'])) {
 	$multiselect_options = $data['filter']['groups'];
@@ -70,6 +52,18 @@ if (array_key_exists('groups', $data['filter'])) {
 	$script_inline .= $hostgroup_ms->getPostJS(). 'popup_generic.initGroupsFilter();';
 }
 
+// Add template group multiselect control.
+if (array_key_exists('templategroups', $data['filter'])) {
+	$multiselect_options = $data['filter']['templategroups'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
+
+	$templategroup_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	$controls[] = (new CFormList())
+		->addRow(new CLabel(_('Template group'), 'popup_template_group_ms'), $templategroup_ms);
+
+	$script_inline .= $templategroup_ms->getPostJS(). 'popup_generic.initTemplategroupsFilter();';
+}
+
 // Add host multiselect.
 if (array_key_exists('hosts', $data['filter'])) {
 	$multiselect_options = $data['filter']['hosts'];
@@ -79,12 +73,23 @@ if (array_key_exists('hosts', $data['filter'])) {
 	if ($multiselect_options['disabled']) {
 		$host_ms->setTitle(_('You cannot switch hosts for current selection.'));
 	}
-	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), [$empty_btn, $host_ms]);
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), $host_ms);
 
 	$script_inline .= $host_ms->getPostJS(). 'popup_generic.initHostsFilter();';
 }
-elseif ($empty_btn) {
-	$controls[] = (new CFormList())->addRow($empty_btn);
+
+// Add template multiselect.
+if (array_key_exists('templates', $data['filter'])) {
+	$multiselect_options = $data['filter']['templates'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
+
+	$template_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	if ($multiselect_options['disabled']) {
+		$template_ms->setTitle(_('You cannot switch templates for current selection.'));
+	}
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Template'), 'popup_template_ms'), $template_ms);
+
+	$script_inline .= $template_ms->getPostJS(). 'popup_generic.initTemplatesFilter();';
 }
 
 // Show Type dropdown in header for help items.
@@ -131,7 +136,7 @@ $table_columns = [];
 
 if ($data['multiselect'] && $form !== null) {
 	$ch_box = (new CColHeader(
-		(new CCheckBox('all_records'))->onClick("javascript: checkAll('".$form->getName()."', 'all_records', 'item');")
+		(new CCheckBox('all_records'))->onClick("checkAll('".$form->getName()."', 'all_records', 'item');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH);
 
 	$table_columns[] = $ch_box;
@@ -143,11 +148,10 @@ if ($data['preselect_required']) {
 	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
 }
 
-$js_action_onclick = 'popup_generic.closePopup(event);';
-
 // Output table rows.
 switch ($data['popup_type']) {
 	case 'hosts':
+	case 'template_groups':
 	case 'host_groups':
 	case 'proxies':
 	case 'host_templates':
@@ -171,12 +175,15 @@ switch ($data['popup_type']) {
 				unset($data['table_records'][$item['id']]);
 			}
 			else {
-				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-						zbx_jsvalue($item['id']).', '.$options['parentid'].');';
-
-				$name = (new CLink($item['name'], 'javascript:void(0);'))
+				$name = (new CLink($item['name']))
 					->setId('spanid'.$item['id'])
-					->onClick($js_action.$js_action_onclick);
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-itemid', $item['id'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
 			}
 
 			$table->addRow([$check_box, $name]);
@@ -189,12 +196,15 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$user['userid'].']', $user['userid'])
 				: null;
 
-			$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-					zbx_jsvalue($user['userid']).', '.$options['parentid'].');';
-
-			$username = (new CLink($user['username'], 'javascript:void(0);'))
+			$username = (new CLink($user['username']))
 				->setId('spanid'.$user['userid'])
-				->onClick($js_action.$js_action_onclick);
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-userid', $user['userid'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.userid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
 
 			$table->addRow([$check_box, $username, $user['name'], $user['surname']]);
 
@@ -226,12 +236,15 @@ switch ($data['popup_type']) {
 				? new CCheckBox('item['.$item['usrgrpid'].']', $item['usrgrpid'])
 				: null;
 
-			$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
-				zbx_jsvalue($item['usrgrpid']).', '.$options['parentid'].');';
-
-			$name = (new CLink($item['name'], 'javascript: void(0);'))
-						->setId('spanid'.$item['usrgrpid'])
-						->onClick($js_action.$js_action_onclick);
+			$name = (new CLink($item['name']))
+				->setId('spanid'.$item['usrgrpid'])
+				->setAttribute('data-reference', $options['reference'])
+				->setAttribute('data-usrgrpid', $item['usrgrpid'])
+				->setAttribute('data-parentid', $options['parentid'])
+				->onClick('
+					addValue(this.dataset.reference, this.dataset.usrgrpid, this.dataset.parentid ?? null);
+					popup_generic.closePopup(event);
+				');
 
 			$table->addRow([$check_box, $name]);
 
@@ -241,12 +254,13 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'triggers':
+	case 'template_triggers':
 	case 'trigger_prototypes':
 		foreach ($data['table_records'] as &$trigger) {
 			$host = reset($trigger['hosts']);
 			$trigger['hostname'] = $host['name'];
 
-			$description = new CLink($trigger['description'], 'javascript:void(0);');
+			$description = new CLink($trigger['description']);
 			$trigger['description'] = $trigger['hostname'].NAME_DELIMITER.$trigger['description'];
 
 			$check_box = $data['multiselect']
@@ -254,26 +268,36 @@ switch ($data['popup_type']) {
 				: null;
 
 			if ($data['multiselect']) {
-				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-					zbx_jsvalue($trigger['triggerid']).', '.$options['parentid'].');';
+				$description
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-triggerid', $trigger['triggerid'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.triggerid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
 			}
 			else {
-				$values = [
-					$options['dstfld1'] => $trigger[$options['srcfld1']],
-					$options['dstfld2'] => $trigger[$options['srcfld2']]
-				];
-				if (array_key_exists('dstfld3', $options)) {
-					if (array_key_exists($options['srcfld3'], $trigger) && array_key_exists($trigger[$options['srcfld3']], $trigger)) {
-						$values[$options['dstfld3']] = $trigger[$trigger[$options['srcfld3']]];
-					}
-					else {
-						$values[$options['dstfld3']] = null;
-					}
-				}
-				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).','.zbx_jsvalue($values).');';
-			}
+				$values = [];
 
-			$description->onClick($js_action.$js_action_onclick);
+				if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
+					$values[$options['dstfld1']] = $trigger[$options['srcfld1']];
+				}
+				if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
+					$values[$options['dstfld2']] = $trigger[$options['srcfld2']];
+				}
+				if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
+					$values[$options['dstfld3']] = $trigger[$options['srcfld3']];
+				}
+
+				$description
+					->setAttribute('data-dstfrm', $options['dstfrm'])
+					->setAttribute('data-values', json_encode($values))
+					->onClick('
+						addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
+						popup_generic.closePopup(event);
+					');
+			}
 
 			if ($trigger['dependencies']) {
 				$description = [$description, BR(), bold(_('Depends on')), BR()];
@@ -319,22 +343,39 @@ switch ($data['popup_type']) {
 				$check_box = new CCheckBox('item['.$sysmap['sysmapid'].']', $sysmap['sysmapid']);
 			}
 
+			$name = (new CLink($sysmap['name']))->setId('spanid'.$sysmap['sysmapid']);
+
 			if ($data['multiselect']) {
-				$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
-						zbx_jsvalue($sysmap['sysmapid']).', '.$options['parentid'].');';
+				$name
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-sysmapid', $sysmap['sysmapid'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.sysmapid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
 			}
 			else {
-				$values = [
-					$options['dstfld1'] => $sysmap[$options['srcfld1']],
-					$options['dstfld2'] => $sysmap[$options['srcfld2']]
-				];
-				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-						zbx_jsvalue($values).');';
-			}
+				$values = [];
 
-			$name = (new CLink($sysmap['name'], 'javascript:void(0);'))
-						->setId('spanid'.$sysmap['sysmapid'])
-						->onClick($js_action.$js_action_onclick);
+				if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
+					$values[$options['dstfld1']] = $sysmap[$options['srcfld1']];
+				}
+				if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
+					$values[$options['dstfld2']] = $sysmap[$options['srcfld2']];
+				}
+				if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
+					$values[$options['dstfld3']] = $sysmap[$options['srcfld3']];
+				}
+
+				$name
+					->setAttribute('data-dstfrm', $options['dstfrm'])
+					->setAttribute('data-values', json_encode($values))
+					->onClick('
+						addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
+						popup_generic.closePopup(event);
+					');
+			}
 
 			$table->addRow([$data['multiselect'] ? $check_box : null, $name]);
 		}
@@ -344,19 +385,35 @@ switch ($data['popup_type']) {
 		foreach ($data['table_records'] as $key => $item) {
 			$item['key'] = $key;
 
-			$action = 'popup_generic.setPopupOpenerFieldValues('.json_encode([
+			$values = [
 				$options['dstfld1'] => $item[$options['srcfld1']]
-			]).');';
-			$action .= 'document.getElementById('.json_encode($options['dstfld1']).')'.
-					'.dispatchEvent(new CustomEvent(\'help_items.paste\'));';
-			$action .= 'updateItemFormElements();';
-			$action .= $options['srcfld2']
-				? 'popup_generic.setPopupOpenerFieldValues('.json_encode([
-					$options['dstfld2'] => $item[$options['srcfld2']]
-				]).')'
-				: '';
+			];
 
-			$name = (new CLink($item['key'], 'javascript:void(0);'))->onClick($action.$js_action_onclick);
+			if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
+				$values[$options['dstfld2']] = $item[$options['srcfld2']];
+			}
+
+			$name = (new CLink($key))
+				->setAttribute('data-dstfld1', $options['dstfld1'])
+				->setAttribute('data-dstfld2', $options['dstfld2'])
+				->setAttribute('data-values', json_encode($values))
+				->onClick('
+					const values = JSON.parse(this.dataset.values);
+
+					popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld1]: values[this.dataset.dstfld1]});
+
+					document
+						.getElementById(this.dataset.dstfld1)
+						.dispatchEvent(new CustomEvent("help_items.paste"));
+
+					updateItemFormElements();
+
+					if (this.dataset.dstfld2 in values) {
+						popup_generic.setPopupOpenerFieldValues({[this.dataset.dstfld2]: values[this.dataset.dstfld2]});
+					}
+
+					popup_generic.closePopup(event);
+				');
 			$table->addRow([$name, $item['description']]);
 		}
 		unset($data['table_records']);
@@ -368,16 +425,34 @@ switch ($data['popup_type']) {
 				$name = $d_rule['name'].
 					NAME_DELIMITER.discovery_check2str($d_check['type'], $d_check['key_'], $d_check['ports']);
 
-				$action = 'popup_generic.setPopupOpenerFieldValues('.json_encode([
+				$values = [
 					$options['dstfld1'] => $d_check[$options['srcfld1']]
-				]).');';
+				];
 
-				$action .= $options['srcfld2']
-					? 'popup_generic.setPopupOpenerFieldValues('.json_encode([$options['dstfld2'] => $name]).');'
-					: '';
+				if ($options['dstfld2'] !== '' && $options['srcfld2'] === 'name') {
+					$values[$options['dstfld2']] = $name;
+				}
 
 				$table->addRow(
-					(new CLink($name, 'javascript:void(0);'))->onClick($action.$js_action_onclick)
+					(new CLink($name))
+						->setAttribute('data-dstfld1', $options['dstfld1'])
+						->setAttribute('data-dstfld2', $options['dstfld2'])
+						->setAttribute('data-values', json_encode($values))
+						->onClick('
+							const values = JSON.parse(this.dataset.values);
+
+							popup_generic.setPopupOpenerFieldValues({
+								[this.dataset.dstfld1]: values[this.dataset.dstfld1]
+							});
+
+							if (this.dataset.dstfld2 in values) {
+								popup_generic.setPopupOpenerFieldValues({
+									[this.dataset.dstfld2]: values[this.dataset.dstfld2]
+								});
+							}
+
+							popup_generic.closePopup(event);
+						')
 				);
 			}
 		}
@@ -385,14 +460,16 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'items':
+	case 'template_items':
 	case 'item_prototypes':
+
 		if ($options['srcfld2'] !== '' && $options['dstfld2'] !== '') {
 			// TODO: this condition must be removed after all item and item_prototype fields changing to multiselect
 			foreach ($data['table_records'] as &$item) {
 				$host = reset($item['hosts']);
 				$item['hostname'] = $host['name'];
 
-				$description = new CLink($item['name'], 'javascript:void(0);');
+				$description = new CLink($item['name']);
 				$item['name'] = $item['hostname'].NAME_DELIMITER.$item['name'];
 
 				$checkbox_key = is_numeric($item[$options['srcfld1']])
@@ -400,11 +477,18 @@ switch ($data['popup_type']) {
 					: zbx_jsValue($item[$options['srcfld1']]);
 
 				if ($data['multiselect']) {
-					$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-						zbx_jsvalue($item['itemid']).', '.$options['parentid'].');';
+					$description
+						->setAttribute('data-reference', $options['reference'])
+						->setAttribute('data-itemid', $options['itemid'])
+						->setAttribute('data-parentid', $options['parentid'])
+						->onClick('
+							addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
+							popup_generic.closePopup(event);
+						');
 				}
 				else {
 					$values = [];
+
 					if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
 						$values[$options['dstfld1']] = $item[$options['srcfld1']];
 					}
@@ -415,12 +499,14 @@ switch ($data['popup_type']) {
 						$values[$options['dstfld3']] = $item[$options['srcfld3']];
 					}
 
-					$submit_parent = array_key_exists('submit_parent', $options) ? 'true' : 'false';
-					$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-						zbx_jsvalue($values).', '.$submit_parent.');';
+					$description
+						->setAttribute('data-dstfrm', $options['dstfrm'])
+						->setAttribute('data-values', json_encode($values))
+						->onClick('
+							addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
+							popup_generic.closePopup(event);
+						');
 				}
-
-				$description->onClick($js_action.$js_action_onclick);
 
 				$table->addRow([
 					$data['multiselect'] ? new CCheckBox('item['.$checkbox_key.']', $item['itemid']) : null,
@@ -457,12 +543,14 @@ switch ($data['popup_type']) {
 					$data['multiselect']
 						? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid'])
 						: null,
-					(new CLink($item['name'], 'javascript:void(0);'))
-						->onClick('javascript: addValue('.
-							json_encode($options['reference']).', '.
-							json_encode($item['itemid']).', '.
-							$options['parentid'].
-							');'.$js_action_onclick),
+					(new CLink($item['name']))
+						->setAttribute('data-reference', $options['reference'])
+						->setAttribute('data-itemid', $item['itemid'])
+						->setAttribute('data-parentid', $options['parentid'])
+						->onClick('
+							addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
+							popup_generic.closePopup(event);
+						'),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 					item_type2str($item['type']),
 					itemValueTypeString($item['value_type']),
@@ -514,45 +602,61 @@ switch ($data['popup_type']) {
 					: null,
 
 				// Clickable graph name.
-				(new CLink($graph['name'], 'javascript:void(0);'))
-					->onClick('javascript: addValue('.
-						json_encode($options['reference']).', '.
-						json_encode($graph['graphid']).', '.
-						$options['parentid'].
-						');'.$js_action_onclick
-					),
+				(new CLink($graph['name']))
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-graphid', $graph['graphid'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.graphid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					'),
 
 				// Graph type.
 				$graphtype
 			]);
 
+			if ($options['patternselect']) {
+				$graph_name = $graph['name'];
+			}
+			else {
+				if ($data['popup_type'] === 'graphs') {
+					$host_name = $graph['hosts'][0]['name'];
+				}
+				else {
+					$host_names = array_column($graph['hosts'], 'name', 'hostid');
+					$host_name = $host_names[$graph['discoveryRule']['hostid']];
+				}
+
+				$graph_name = $host_name.NAME_DELIMITER.$graph['name'];
+			}
+
 			// For returned data array.
 			$graph = [
 				'id' => $graph['graphid'],
-				'name' => $options['patternselect']
-					? $graph['name']
-					: reset($graph['hosts'])['name'].NAME_DELIMITER.$graph['name']
+				'name' => $graph_name
 			];
 		}
 		unset($graph);
 		break;
 
 	case 'valuemap_names':
-		$inline_js = 'addValue('.json_encode($options['reference']).',%1$s,'.$options['parentid'].');%2$s';
-
 		foreach ($data['table_records'] as $valuemap) {
 			$table->addRow([
 				new CCheckBox('item['.$valuemap['id'].']', $valuemap['id']),
 				(new CLink($valuemap['name'], '#'))
 					->setId('spanid'.$valuemap['id'])
-					->onClick(sprintf($inline_js, $valuemap['id'], $js_action_onclick))
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-valuemapid', $valuemap['id'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.valuemapid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					')
 			]);
 		}
 		break;
 
 	case 'valuemaps':
-		$inline_js = 'addValue('.json_encode($options['reference']).',%1$s,'.$options['parentid'].');%2$s';
-
 		foreach ($data['table_records'] as $valuemap) {
 			$name = [];
 			$check_box = $data['multiselect']
@@ -572,12 +676,15 @@ switch ($data['popup_type']) {
 				unset($data['table_records'][$valuemap['id']]);
 			}
 			else {
-				$js_action = 'addValue('.json_encode($options['reference']).', '.
-					json_encode($valuemap['id']).', '.$options['parentid'].');';
-
 				$name[] = (new CLink($valuemap['name'], '#'))
 					->setId('spanid'.$valuemap['id'])
-					->onClick(sprintf($inline_js, $valuemap['id'], $js_action_onclick));
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-valuemapid', $valuemap['id'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.valuemapid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
 			}
 
 			$mappings_table = [];
@@ -632,12 +739,15 @@ switch ($data['popup_type']) {
 				unset($data['table_records'][$item['id']]);
 			}
 			else {
-				$js_action = 'javascript: addValue('.zbx_jsvalue($options['reference']).', '.
-						zbx_jsvalue($item['id']).', '.$options['parentid'].');';
-
-				$name = (new CLink($item['name'], 'javascript:void(0);'))
+				$name = (new CLink($item['name']))
 					->setId('spanid'.$item['id'])
-					->onClick($js_action.$js_action_onclick);
+					->setAttribute('data-reference', $options['reference'])
+					->setAttribute('data-itemid', $item['id'])
+					->setAttribute('data-parentid', $options['parentid'])
+					->onClick('
+						addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
+						popup_generic.closePopup(event);
+					');
 			}
 
 			if (array_key_exists('status', $item)) {
@@ -656,12 +766,19 @@ switch ($data['popup_type']) {
 
 // Add submit button at footer.
 if ($data['multiselect'] && $form !== null) {
+	$form
+		->setAttribute('data-reference', $options['reference'])
+		->setAttribute('data-parentid', $options['parentid']);
+
 	$output['buttons'] = [
 		[
 			'title' => _('Select'),
 			'class' => '',
 			'isSubmit' => true,
-			'action' => 'return addSelectedValues('.zbx_jsvalue($options['reference']).', '.$options['parentid'].');'
+			'action' => '
+				const form = document.getElementById("'.$form->getId().'");
+				addSelectedValues(form.dataset.reference, form.dataset.parentid ?? null);
+			'
 		]
 	];
 }
@@ -675,6 +792,7 @@ $types = [
 	'hosts',
 	'host_templates',
 	'host_groups',
+	'template_groups',
 	'items',
 	'item_prototypes',
 	'proxies',

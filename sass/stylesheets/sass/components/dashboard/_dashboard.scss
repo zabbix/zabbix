@@ -420,6 +420,14 @@
 	.msg-warning {
 		margin: 0 10px;
 	}
+
+	&.no-padding {
+		.msg-bad,
+		.msg-good,
+		.msg-warning {
+			margin: 8px 10px;
+		}
+	}
 }
 
 .dashboard-grid-widget-mask {
@@ -818,6 +826,11 @@
 				border-color: darken($ui-border-color, 6%);
 			}
 		}
+
+		&:not(.dashboard-grid-widget-focus) {
+			transition-property: width, height, left, top;
+			transition-duration: 0.15s;
+		}
 	}
 
 	.dashboard-grid-iterator {
@@ -938,6 +951,10 @@
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 
+	.dashboard-widget-head {
+		margin: 8px 10px;
+	}
+
 	.list-table {
 		border: 0;
 
@@ -978,38 +995,17 @@
 }
 
 .dashboard-widget-head {
-	position: relative;
-	padding: 8px 60px 8px 10px;
+	display: flex;
+	margin-bottom: 8px;
 
 	h4 {
 		color: widget-head-font-color($font-color);
 		font-weight: bold;
+		margin-right: auto;
 	}
 
-	ul {
-		position: absolute;
-		top: 0;
-		right: 0;
-
-		li {
-			display: block;
-			float: left;
-			padding: 0;
-
-			select {
-				margin: 4px 0;
-			}
-		}
-	}
-
-	z-select {
-		.list {
-			li {
-				float: none;
-				line-height: normal;
-				padding: 5px;
-			}
-		}
+	& > ul {
+		margin: -8px -10px -10px 10px;
 	}
 }
 
@@ -1055,6 +1051,13 @@
 			background-color: $dashboard-shared-bg-color;
 			border-color: $dashboard-shared-bg-color;
 		}
+	}
+}
+
+.overlay-dialogue {
+	&.modal-popup.modal-widget-configuration {
+		max-width: 1120px;
+		min-width: 650px;
 	}
 }
 

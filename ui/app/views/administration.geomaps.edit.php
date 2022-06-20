@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -126,6 +126,7 @@ $form = (new CForm())
 (new CWidget())
 	->setTitle(_('Geographical maps'))
 	->setTitleSubmenu(getAdministrationGeneralSubmenu())
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_GEOMAPS_EDIT))
 	->addItem($form)
 	->show();
 

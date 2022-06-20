@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -98,11 +98,12 @@ abstract class CControllerHostUpdateGeneral extends CController {
 			}
 
 			unset($interfaces[$key]['isNew']);
-			$interfaces[$key]['main'] = 0;
+			$interfaces[$key]['main'] = INTERFACE_SECONDARY;
 		}
 
 		$main_interfaces = $this->getInput('mainInterfaces', []);
-		foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
+
+		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
 			if (array_key_exists($type, $main_interfaces) && array_key_exists($main_interfaces[$type], $interfaces)) {
 				$interfaces[$main_interfaces[$type]]['main'] = INTERFACE_PRIMARY;
 			}
@@ -118,8 +119,43 @@ abstract class CControllerHostUpdateGeneral extends CController {
 	 *
 	 * @return array Macros for assigning to host.
 	 */
-	protected function processUserMacros(array $macros): array {
-		return array_filter(cleanInheritedMacros($macros),
+	protected function processUserMacros(array $macros, array $db_macros = []): array {
+		$db_macros = array_column($db_macros, null, 'hostmacroid');
+		$macro_fields = array_flip(['macro', 'value', 'type', 'description']);
+		$macros = cleanInheritedMacros($macros);
+
+		foreach ($macros as &$macro) {
+			if (array_key_exists('hostmacroid', $macro) && array_key_exists($macro['hostmacroid'], $db_macros)) {
+				$db_macro = $db_macros[$macro['hostmacroid']];
+				$macro_diff = array_diff_assoc(array_intersect_key($macro, $macro_fields), $db_macro);
+				$mandatory_fields = ['hostmacroid' => $macro['hostmacroid']];
+
+				if (array_key_exists('discovery_state', $macro)
+						&& $macro['discovery_state'] == CControllerHostMacrosList::DISCOVERY_STATE_CONVERTING) {
+					$macro_diff['automatic'] = ZBX_USERMACRO_MANUAL;
+				}
+
+				if ($macro['type'] == ZBX_MACRO_TYPE_VAULT
+						&& (!array_key_exists('discovery_state', $macro)
+							|| $macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_AUTOMATIC)) {
+					/**
+					 * Macro value must be passed to be sure its syntax is still valid.
+					 * Syntax may be changed, e.g., if the Vault provider has been changed.
+					 */
+					$mandatory_fields['value'] = $macro['value'];
+				}
+
+				$macro = $mandatory_fields + $macro_diff;
+			}
+			else {
+				unset($macro['discovery_state'], $macro['original_value'], $macro['original_description'],
+					$macro['original_macro_type']
+				);
+			}
+		}
+		unset($macro);
+
+		return array_filter($macros,
 			function (array $macro): bool {
 				return (bool) array_filter(
 					array_intersect_key($macro, array_flip(['hostmacroid', 'macro', 'value', 'description']))

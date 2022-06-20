@@ -12,5 +12,9 @@ libzbxnix_a_SOURCES = \
 	fatal.h \
 	ipc.c \
 	pid.c \
+	pid.h \
 	sigcommon.h \
 	sighandler.c
+
+libzbxnix_a_CFLAGS = \
+	$(TLS_CFLAGS)

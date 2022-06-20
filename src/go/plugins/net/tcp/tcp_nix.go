@@ -1,3 +1,4 @@
+//go:build !windows
 // +build !windows
 
 /*
@@ -24,7 +25,7 @@ package tcpudp
 import (
 	"errors"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
 func exportSystemTcpListen(port uint16) (result interface{}, err error) {

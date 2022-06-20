@@ -32,6 +32,29 @@ class CLdap {
 	const ERR_OPT_DEREF_FAILED = 13;
 
 	/**
+	 * @var array $cnf  LDAP connection settings.
+	 */
+	private $cnf = [
+		'host'				=> '',
+		'port'				=> '',
+		'bind_dn'			=> '',
+		'bind_password'		=> '',
+		'base_dn'			=> '',
+		'search_attribute'	=> '',
+		'search_filter'		=> '',
+		'groupkey'			=> 'cn',
+		'mapping'			=> [
+			'username' => 'uid',
+			'userid' => 'uidnumbera',
+			'passwd' => 'userpassword'
+		],
+		'referrals'			=> 0,
+		'version'			=> 3,
+		'start_tls'			=> ZBX_AUTH_START_TLS_OFF,
+		'deref' => null
+	];
+
+	/**
 	 * @var int
 	 */
 	public $error;
@@ -39,28 +62,13 @@ class CLdap {
 	public function __construct($arg = []) {
 		$this->ds = false;
 		$this->info = [];
-		$this->cnf = [
-			'host' => 'ldap://localhost',
-			'port' => '389',
-			'bind_dn' => 'uid=admin,ou=system',
-			'bind_password' => '',
-			'base_dn' => 'ou=users,ou=system',
-			'search_attribute' => 'uid',
-			'userfilter' => '(%{attr}=%{user})',
-			'groupkey' => 'cn',
-			'mapping' => [
-				'username' => 'uid',
-				'userid' => 'uidnumbera',
-				'passwd' => 'userpassword'
-			],
-			'referrals' => 0,
-			'version' => 3,
-			'starttls' => null,
-			'deref' => null
-		];
 
 		if (is_array($arg)) {
 			$this->cnf = zbx_array_merge($this->cnf, $arg);
+		}
+
+		if ($this->cnf['search_filter'] === '') {
+			$this->cnf['search_filter'] = '(%{attr}=%{user})';
 		}
 
 		$this->error = $this->moduleEnabled() ? 0 : static::ERR_PHP_EXTENSION;
@@ -100,7 +108,7 @@ class CLdap {
 			}
 			else {
 				// use TLS (needs version 3)
-				if (isset($this->cnf['starttls']) && !@ldap_start_tls($this->ds)) {
+				if ($this->cnf['start_tls'] && !@ldap_start_tls($this->ds)) {
 					$this->error = static::ERR_OPT_TLS_FAILED;
 				}
 
@@ -144,7 +152,7 @@ class CLdap {
 
 			$this->bound = 2;
 		}
-		elseif (!empty($this->cnf['bind_dn']) && !empty($this->cnf['base_dn']) && !empty($this->cnf['userfilter'])) {
+		elseif (!empty($this->cnf['bind_dn']) && !empty($this->cnf['base_dn']) && !empty($this->cnf['search_filter'])) {
 			// special bind string
 			$dn = $this->makeFilter($this->cnf['bind_dn'], ['user' => $user, 'host' => $this->cnf['host']]);
 		}
@@ -171,8 +179,6 @@ class CLdap {
 			}
 
 			$this->bound = 1;
-
-			return true;
 		}
 		else {
 			// see if we can find the user
@@ -193,11 +199,9 @@ class CLdap {
 			}
 
 			$this->bound = 1;
-
-			return true;
 		}
 
-		return false;
+		return true;
 	}
 
 	private function getUserData($user) {
@@ -221,13 +225,7 @@ class CLdap {
 
 		// get info for given user
 		$base = $this->makeFilter($this->cnf['base_dn'], $info);
-
-		if (isset($this->cnf['userfilter']) && !empty($this->cnf['userfilter'])) {
-			$filter = $this->makeFilter($this->cnf['userfilter'], $info);
-		}
-		else {
-			$filter = '(ObjectClass=*)';
-		}
+		$filter = $this->makeFilter($this->cnf['search_filter'], $info);
 		$sr = @ldap_search($this->ds, $base, $filter);
 		$result = is_resource($sr) ? @ldap_get_entries($this->ds, $sr) : [];
 

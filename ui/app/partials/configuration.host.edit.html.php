@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -104,110 +104,91 @@ $host_tab = (new CFormGrid())
 
 $templates_field_items = [];
 
-if ($host_is_discovered) {
-	if ($data['host']['parentTemplates']) {
-		$linked_templates = (new CTable())
-			->setHeader([_('Name')])
-			->setId('linked-templates')
-			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+if ($data['host']['parentTemplates']) {
+	$linked_templates = (new CTable())
+		->setHeader([_('Name'), _('Action')])
+		->setId('linked-templates')
+		->addClass(ZBX_STYLE_TABLE_FORMS)
+		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
-		foreach ($data['host']['parentTemplates'] as $template) {
-			if ($data['allowed_ui_conf_templates']
-					&& array_key_exists($template['templateid'], $data['editable_templates'])) {
-				$template_link = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form','update')
-						->setArgument('templateid', $template['templateid'])
-				))->setTarget('_blank');
-			}
-			else {
-				$template_link = new CSpan($template['name']);
-			}
-
-			$linked_templates->addRow(
-				(new CCol([
-					$template_link,
-					(new CVar('templates[' . $template['templateid'] . ']', $template['templateid']))->removeId()
-				]))
-					->addClass(ZBX_STYLE_WORDWRAP)
-					->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-			);
+	foreach ($data['host']['parentTemplates'] as $template) {
+		if ($data['allowed_ui_conf_templates']
+				&& array_key_exists($template['templateid'], $data['editable_templates'])) {
+			$template_link = (new CLink($template['name'],
+				(new CUrl('templates.php'))
+					->setArgument('form','update')
+					->setArgument('templateid', $template['templateid'])
+			))->setTarget('_blank');
+		}
+		else {
+			$template_link = new CSpan($template['name']);
 		}
 
-		$templates_field_items[] = $linked_templates;
-	}
-}
-else {
-	if ($data['host']['parentTemplates']) {
-		$linked_templates = (new CTable())
-			->setHeader([_('Name'), _('Action')])
-			->setId('linked-templates')
-			->addClass(ZBX_STYLE_TABLE_FORMS)
-			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+		$template_row = [$template_link];
 
-		foreach ($data['host']['parentTemplates'] as $template) {
-			if ($data['allowed_ui_conf_templates']
-					&& array_key_exists($template['templateid'], $data['editable_templates'])) {
-				$template_link = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form','update')
-						->setArgument('templateid', $template['templateid'])
-				))->setTarget('_blank');
-			}
-			else {
-				$template_link = new CSpan($template['name']);
-			}
+		if ($template['link_type'] == TEMPLATE_LINK_LLD) {
+			$template_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+			$template_row[] = new CSup(_('(linked by host discovery)'));
+		}
 
-			$linked_templates->addRow([
-				(new CCol([
-					$template_link,
-					(new CVar('templates[]', $template['templateid']))->removeId()
-				]))
-					->addClass(ZBX_STYLE_WORDWRAP)
-					->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
-				(new CCol(
-					new CHorList([
+		$template_row[] = (new CVar('templates[]', $template['templateid']))->removeId();
+
+		$linked_templates->addRow([
+			(new CCol($template_row))
+				->addClass(ZBX_STYLE_WORDWRAP)
+				->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+			(new CCol(
+				($template['link_type'] == TEMPLATE_LINK_MANUAL)
+					? new CHorList([
 						(new CSimpleButton(_('Unlink')))
 							->onClick('host_edit.unlinkTemplate(this)')
 							->addClass(ZBX_STYLE_BTN_LINK),
-						$data['clone_hostid'] === null
+						($data['clone_hostid'] === null)
 							? (new CSimpleButton(_('Unlink and clear')))
-								->onClick('host_edit.unlinkAndClearTemplate(this, '.
-										json_encode($template['templateid']).')'
-								)
+								->setAttribute('data-templateid', $template['templateid'])
+								->onClick('host_edit.unlinkAndClearTemplate(this, this.dataset.templateid)')
 								->addClass(ZBX_STYLE_BTN_LINK)
 							: null
 					])
-				))->addClass(ZBX_STYLE_NOWRAP)
-			]);
-		}
-
-		$templates_field_items[] = $linked_templates;
+					: ''
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]);
 	}
 
-	$templates_field_items[] = (new CMultiSelect([
-		'name' => 'add_templates[]',
-		'object_name' => 'templates',
-		'data' => array_key_exists('add_templates', $data['host'])
-			? $data['host']['add_templates']
-			: [],
-		'popup' => [
-			'parameters' => [
-				'srctbl' => 'templates',
-				'srcfld1' => 'hostid',
-				'srcfld2' => 'host',
-				'dstfrm' => $host_form->getName(),
-				'dstfld1' => 'add_templates_',
-				'disableids' => array_column($data['host']['parentTemplates'], 'templateid')
-			]
-		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	$templates_field_items[] = $linked_templates;
 }
+
+$templates_field_items[] = (new CMultiSelect([
+	'name' => 'add_templates[]',
+	'object_name' => 'templates',
+	'data' => array_key_exists('add_templates', $data['host'])
+		? $data['host']['add_templates']
+		: [],
+	'popup' => [
+		'parameters' => [
+			'srctbl' => 'templates',
+			'srcfld1' => 'hostid',
+			'srcfld2' => 'host',
+			'dstfrm' => $host_form->getName(),
+			'dstfld1' => 'add_templates_',
+			'disableids' => array_column($data['host']['parentTemplates'], 'templateid')
+		]
+	]
+]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $host_tab
 	->addItem([
-		new CLabel(_('Templates')),
+		new CLabel([
+			_('Templates'),
+			$host_is_discovered
+				? makeHelpIcon([
+					(new CList([
+						_('Templates linked by host discovery cannot be unlinked.'),
+						_('Use host prototype configuration form to remove automatically linked templates on upcoming discovery.')
+					]))
+				])
+				: null
+		]),
 		(new CFormField(
 			(count($templates_field_items) > 1)
 				? (new CDiv($templates_field_items))->addClass('linked-templates')
@@ -215,7 +196,7 @@ $host_tab
 		))
 	])
 	->addItem([
-		(new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
+		(new CLabel(_('Host groups'), 'groups__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'groups[]',
@@ -331,7 +312,8 @@ $ipmi_tab = (new CFormGrid())
 $tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'host',
 	'tags' => $data['host']['tags'],
-	'readonly' => $host_is_discovered,
+	'with_automatic' => true,
+	'readonly' => false,
 	'tabs_id' => 'host-tabs'
 ]);
 
@@ -344,8 +326,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 	)
 	->addRow(null,
 		new CPartial('hostmacros.list.html', [
-			'macros' => $data['host']['macros'],
-			'readonly' => $host_is_discovered
+			'macros' => $data['host']['macros']
 		]), 'macros_container'
 	);
 

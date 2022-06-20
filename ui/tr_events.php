@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 $page['title'] = _('Event details');
 $page['file'] = 'tr_events.php';
 $page['type'] = detect_page_type();
-$page['scripts'] = ['layout.mode.js'];
+$page['scripts'] = ['layout.mode.js', 'class.calendar.js'];
 $page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -72,7 +72,9 @@ $trigger = reset($triggers);
 $events = API::Event()->get([
 	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity'],
 	'selectTags' => ['tag', 'value'],
-	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity'],
+	'select_acknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity',
+		'suppress_until'
+	],
 	'source' => EVENT_SOURCE_TRIGGERS,
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
@@ -158,6 +160,7 @@ $allowed = [
 	'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 	'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
 	'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+	'suppress_problems' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
 	'close' => ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 			&& CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS)
 	)
@@ -194,11 +197,12 @@ $event_tab = (new CDiv([
 (new CWidget())
 	->setTitle(_('Event details'))
 	->setWebLayoutMode($page['web_layout_mode'])
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']]))
-		))
-		->setAttribute('aria-label', _('Content controls'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::TR_EVENTS))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())
+				->addItem(get_icon('kioskmode', ['mode' => $page['web_layout_mode']]))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($event_tab)
 	->show();

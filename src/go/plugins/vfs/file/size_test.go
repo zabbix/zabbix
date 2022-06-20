@@ -1,3 +1,4 @@
+//go:build linux && amd64
 // +build linux,amd64
 
 /*
@@ -25,7 +26,7 @@ import (
 	"reflect"
 	"testing"
 
-	"zabbix.com/pkg/std"
+	"git.zabbix.com/ap/plugin-support/std"
 )
 
 func TestFileSize(t *testing.T) {

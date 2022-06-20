@@ -27,7 +27,8 @@
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxdb.h"
-#include "db.h"
+#include "zbxdbhigh.h"
+#include "zbxavailability.h"
 
 void	__wrap_zbx_sleep_loop(int sleeptime);
 zbx_uint64_t	__wrap_DCget_nextid(const char *table_name, int num);

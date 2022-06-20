@@ -940,7 +940,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Max count of elements to show inside table cell' => '2'
 					],
-					'link' => 'hostgroups.php?filter_name=Templates&filter_set=1',
+					'link' => 'zabbix.php?action=templategroup.list&filter_name=Templates&filter_set=1',
 					'element_count' => 2
 				]
 			],
@@ -991,7 +991,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 			case 'Max count of elements to show inside table cell':
 				$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
-				$element_count = $table->findRow('Name', 'Templates/Applications')->getColumn('Members')
+				$element_count = $table->findRow('Name', 'Templates/Applications')->getColumn(3)
 						->query('xpath:.//a[@class="link-alt grey"]')->all()->count();
 				$this->assertEquals(CTestArrayHelper::get($data, 'element_count'), $element_count);
 				break;
@@ -1006,7 +1006,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				// Days count for the case when current or past year is leap year.
 				$days_count = CDateTimeHelper::countDays();
 				$this->assertEquals('Maximum time period to display is '.$days_count.' days.',
-						$this->query('class:time-input-error')->waitUntilPresent()->one()->getText());
+						$this->query('class:time-input-error')->waitUntilVisible()->one()->getText());
 				break;
 		}
 	}

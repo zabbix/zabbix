@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -24,12 +24,7 @@
  */
 ?>
 
-window.services_popup = {
-	is_multiple: null,
-
-	overlay: null,
-	dialogue: null,
-	form: null,
+window.services_popup = new class {
 
 	init({is_multiple}) {
 		this.is_multiple = is_multiple;
@@ -78,7 +73,7 @@ window.services_popup = {
 				this.submit(e.target.closest('tr').querySelector('input[name="serviceid"]').value);
 			}
 		});
-	},
+	}
 
 	submit(serviceid = null) {
 		const services = [];
@@ -96,6 +91,7 @@ window.services_popup = {
 
 			services.push(service);
 		}
+
 		this.overlay.unsetLoading();
 
 		overlayDialogueDestroy('services');

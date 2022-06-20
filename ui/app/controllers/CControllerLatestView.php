@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -56,7 +56,8 @@ class CControllerLatestView extends CControllerLatest {
 			'subfilter_hostids' =>		'array',
 			'subfilter_tagnames' =>		'array',
 			'subfilter_tags' =>			'array',
-			'subfilter_data' =>			'array'
+			'subfilter_data' =>			'array',
+			'subfilters_expanded' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -117,12 +118,16 @@ class CControllerLatestView extends CControllerLatest {
 	}
 
 	protected function doAction(): void {
-
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))
-			->read()
-			->setInput($this->cleanInput($this->getInputAll()));
-
 		$filter_tabs = [];
+		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+
+		if ($this->hasInput('filter_reset')) {
+			$profile->reset();
+		}
+		else {
+			$profile->setInput($this->cleanInput($this->getInputAll()));
+		}
+
 		foreach ($profile->getTabsWithDefaults() as $index => $filter_tab) {
 			if ($index == $profile->selected) {
 				// Initialize multiselect data for filter_scr to allow tabfilter correctly handle unsaved state.

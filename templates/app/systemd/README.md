@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor systemd units.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -17,7 +17,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent2) for basic instructions.
 
 1. Setup and configure zabbix-agent2 compiled with the Systemd monitoring plugin.
 2. Set filters with macros if you want to override default filter parameters.
@@ -73,7 +73,7 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |{#UNIT.NAME}: Service is not running |<p>-</p> |`last(/Systemd by Zabbix agent 2/systemd.service.active_state["{#UNIT.NAME}"])<>1` |WARNING |<p>Manual close: YES</p> |
-|{#UNIT.NAME}: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Systemd by Zabbix agent 2/systemd.service.uptime["{#UNIT.NAME}"])<10m` |INFO |<p>Manual close: YES</p> |
+|{#UNIT.NAME}: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Systemd by Zabbix agent 2/systemd.service.uptime["{#UNIT.NAME}"])<10m` |INFO |<p>Manual close: YES</p> |
 
 ## Feedback
 

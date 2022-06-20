@@ -22,7 +22,6 @@
 /**
  * @var CView $this
  */
-insert_javascript_for_visibilitybox();
 ?>
 <script type="text/x-jquery-tmpl" id="lldoverride-row-templated">
 	<?= (new CRow([
@@ -150,7 +149,7 @@ insert_javascript_for_visibilitybox();
 	?>
 </script>
 <script type="text/x-jquery-tmpl" id="lldoverride-tag-row">
-	<?= renderTagTableRow('#{rowNum}', '', '', ['field_name' => 'optag', 'add_post_js' => false]) ?>
+	<?= renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['field_name' => 'optag', 'add_post_js' => false]) ?>
 </script>
 <script type="text/javascript">
 	jQuery(function($) {
@@ -844,8 +843,10 @@ insert_javascript_for_visibilitybox();
 			overlay.unsetLoading();
 		})
 		.done(function(ret) {
-			if (typeof ret.errors !== 'undefined') {
-				return jQuery(ret.errors).insertBefore(this.$form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				return message_box.insertBefore(this.$form);
 			}
 
 			if (!lldoverrides.overrides.data[ret.params.no]) {
@@ -1170,8 +1171,10 @@ insert_javascript_for_visibilitybox();
 			overlay.unsetLoading();
 		})
 		.done(function(ret) {
-			if (typeof ret.errors !== 'undefined') {
-				return jQuery(ret.errors).insertBefore(this.$form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				return message_box.insertBefore(this.$form);
 			}
 
 			if (!lldoverrides.operations.data[ret.params.no]) {

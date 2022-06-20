@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -51,6 +51,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'tls_connect', 'tls_accept', 'tls_issuer',
 				'tls_subject', 'flags', 'inventory_mode'
 			],
+			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description', 'automatic'],
 			'hostids' => $this->getInput('hostid'),
 			'editable' => true
 		]);
@@ -93,7 +94,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 					$this->getInput('add_templates', []), $this->getInput('templates', [])
 				]),
 				'templates_clear' => zbx_toObject($clear_templates, 'templateid'),
-				'macros' => $this->processUserMacros($this->getInput('macros', [])),
+				'macros' => $this->processUserMacros($this->getInput('macros', []), $this->host['macros']),
 				'inventory' => $inventory_enabled ? $this->getInput('host_inventory', []) : [],
 				'tls_connect' => $this->getInput('tls_connect', $this->host['tls_connect']),
 				'tls_accept' => $this->getInput('tls_accept', $this->host['tls_accept'])
@@ -122,7 +123,11 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 			}
 
 			if ($this->host['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				$host = array_intersect_key($host, array_flip(['hostid', 'status', 'inventory', 'description']));
+				$host = array_intersect_key($host,
+					array_flip(['hostid', 'status', 'description', 'tags', 'macros', 'inventory', 'templates',
+						'templates_clear'
+					])
+				);
 			}
 
 			$hostids = API::Host()->update($host);

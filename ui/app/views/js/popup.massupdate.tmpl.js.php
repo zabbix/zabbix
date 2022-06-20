@@ -1,4 +1,4 @@
-<?php  declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 <?= (new CScriptTemplate('valuemap-rename-row-tmpl'))->addItem(
@@ -69,7 +70,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="tag-row-tmpl">
-	<?= renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]) ?>
+	<?= renderTagTableRow('#{rowNum}', '', '', ZBX_TAG_MANUAL, ['add_post_js' => false]) ?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="custom-intervals-tmpl">

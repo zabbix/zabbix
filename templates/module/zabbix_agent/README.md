@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -39,7 +39,7 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Zabbix agent is not available (for {$AGENT.TIMEOUT}) |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
+|Zabbix agent is not available |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/Zabbix agent/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 
@@ -49,7 +49,7 @@ Please report any issues with the template at https://support.zabbix.com
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 
 ## Setup
 
@@ -64,6 +64,7 @@ No specific Zabbix configuration is required.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$AGENT.NODATA_TIMEOUT} |<p>No data timeout for active agents. Consider to keep it relatively high.</p> |`30m` |
+|{$AGENT.TIMEOUT} |<p>Timeout after which agent is considered unavailable.</p> |`5m` |
 
 ## Template links
 
@@ -78,13 +79,15 @@ There are no template links in this template.
 |-----|----|-----------|----|---------------------|
 |Monitoring agent |Version of Zabbix agent running |<p>-</p> |ZABBIX_ACTIVE |agent.version<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
 |Monitoring agent |Host name of Zabbix agent running |<p>-</p> |ZABBIX_ACTIVE |agent.hostname<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
+|Monitoring agent |Active agent availability |<p>Availability of active checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - unknown</p><p>1 - available</p><p>2 - not available</p> |INTERNAL |zabbix[host,active_agent,available] |
 |Status |Zabbix agent ping |<p>The agent always returns 1 for this item. It could be used in combination with nodata() for availability check.</p> |ZABBIX_ACTIVE |agent.ping |
 
 ## Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|Zabbix agent is not available (or nodata for {$AGENT.NODATA_TIMEOUT}) |<p>For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.</p> |`nodata(/Zabbix agent active/agent.ping,{$AGENT.NODATA_TIMEOUT})=1` |AVERAGE |<p>Manual close: YES</p> |
+|Zabbix agent: active checks are not available |<p>Active checks are considered unavailable. Agent is not sending heartbeat for prolonged time.</p> |`min(/Zabbix agent active/zabbix[host,active_agent,available],{$AGENT.TIMEOUT})=2` |HIGH | |
+|Zabbix agent is not available |<p>For active agents, nodata() with agent.ping is used with {$AGENT.NODATA_TIMEOUT} as time threshold.</p> |`nodata(/Zabbix agent active/agent.ping,{$AGENT.NODATA_TIMEOUT})=1` |AVERAGE |<p>Manual close: YES</p> |
 
 ## Feedback
 

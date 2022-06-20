@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor Etcd by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -18,7 +18,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 1. Import template into Zabbix
 2. After importing template make sure that etcd allows for metric collection.
@@ -48,7 +48,7 @@ No specific Zabbix configuration is required.
 |{$ETCD.GRPC.ERRORS.MAX.WARN} |<p>Maximum number of gRPC requests failures.</p> |`1` |
 |{$ETCD.GRPC_CODE.MATCHES} |<p>Filter of discoverable gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.</p> |`.*` |
 |{$ETCD.GRPC_CODE.NOT_MATCHES} |<p>Filter to exclude discovered gRPC codes https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.</p> |`CHANGE_IF_NEEDED` |
-|{$ETCD.GRPC_CODE.TRIGGER.MATCHES} |<p>Filter of discoverable gRPC codes which will be create triggers.</p> |`Aborted|Unavailable` |
+|{$ETCD.GRPC_CODE.TRIGGER.MATCHES} |<p>Filter of discoverable gRPC codes which will create triggers.</p> |`Aborted|Unavailable` |
 |{$ETCD.HTTP.FAIL.MAX.WARN} |<p>Maximum number of HTTP requests failures.</p> |`2` |
 |{$ETCD.LEADER.CHANGES.MAX.WARN} |<p>Maximum number of leader changes.</p> |`5` |
 |{$ETCD.OPEN.FDS.MAX.WARN} |<p>Maximum percentage of used file descriptors.</p> |`90` |
@@ -78,7 +78,7 @@ There are no template links in this template.
 |Etcd |Etcd: Node health |<p>-</p> |HTTP_AGENT |etcd.health<p>**Preprocessing**:</p><p>- JSONPATH: `$.health`</p><p>- BOOL_TO_DECIMAL</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Etcd |Etcd: Server is a leader |<p>Whether or not this member is a leader. 1 if is, 0 otherwise.</p> |DEPENDENT |etcd.is.leader<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_is_leader`</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
 |Etcd |Etcd: Server has a leader |<p>Whether or not a leader exists. 1 is existence, 0 is not.</p> |DEPENDENT |etcd.has.leader<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_has_leader`</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `10m`</p> |
-|Etcd |Etcd: Leader changes |<p>The the number of leader changes the member has seen since its start.</p> |DEPENDENT |etcd.leader.changes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_leader_changes_seen_total`</p> |
+|Etcd |Etcd: Leader changes |<p>The number of leader changes the member has seen since its start.</p> |DEPENDENT |etcd.leader.changes<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_leader_changes_seen_total`</p> |
 |Etcd |Etcd: Proposals committed per second |<p>The number of consensus proposals committed.</p> |DEPENDENT |etcd.proposals.committed.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_committed_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Proposals applied per second |<p>The number of consensus proposals applied.</p> |DEPENDENT |etcd.proposals.applied.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_applied_total`</p><p>- CHANGE_PER_SECOND</p> |
 |Etcd |Etcd: Proposals failed per second |<p>The number of failed proposals seen.</p> |DEPENDENT |etcd.proposals.failed.rate<p>**Preprocessing**:</p><p>- PROMETHEUS_PATTERN: `etcd_server_proposals_failed_total`</p><p>- CHANGE_PER_SECOND</p> |
@@ -124,17 +124,17 @@ There are no template links in this template.
 |----|-----------|----|----|----|
 |Etcd: Service is unavailable |<p>-</p> |`last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{HOST.CONN}","{$ETCD.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p> |
 |Etcd: Node healthcheck failed |<p>https://etcd.io/docs/v3.4.0/op-guide/monitoring/#health-check</p> |`last(/Etcd by HTTP/etcd.health)=0` |AVERAGE |<p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
-|Etcd: Failed to fetch info data (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
+|Etcd: Failed to fetch info data |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Etcd: Service is unavailable</p> |
 |Etcd: Member has no leader |<p>If a member does not have a leader, it is totally unavailable.</p> |`last(/Etcd by HTTP/etcd.has.leader)=0` |AVERAGE | |
-|Etcd: Instance has seen too many leader changes (over {$ETCD.LEADER.CHANGES.MAX.WARN} for 15m)' |<p>Rapid leadership changes impact the performance of etcd significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the etcd cluster.</p> |`(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}` |WARNING | |
-|Etcd: Too many proposal failures (over {$ETCD.PROPOSAL.FAIL.MAX.WARN} for 5m)' |<p>Normally related to two issues: temporary failures related to a leader election or longer downtime caused by a loss of quorum in the cluster.</p> |`min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}` |WARNING | |
-|Etcd: Too many proposals are queued to commit (over {$ETCD.PROPOSAL.PENDING.MAX.WARN} for 5m)' |<p>Rising pending proposals suggests there is a high client load or the member cannot commit proposals.</p> |`min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}` |WARNING | |
-|Etcd: Too many HTTP requests failures (over {$ETCD.HTTP.FAIL.MAX.WARN} for 5m)' |<p>Too many requests failed on etcd instance with 5xx HTTP code.</p> |`min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}` |WARNING | |
-|Etcd: Server version has changed (new version: {ITEM.VALUE}) |<p>Etcd version has changed. Ack to close.</p> |`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0` |INFO |<p>Manual close: YES</p> |
-|Etcd: Cluster version has changed (new version: {ITEM.VALUE}) |<p>Etcd version has changed. Ack to close.</p> |`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0` |INFO |<p>Manual close: YES</p> |
-|Etcd: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Etcd by HTTP/etcd.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Etcd: Current number of open files is too high (over {$ETCD.OPEN.FDS.MAX.WARN}% for 5m) |<p>Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p><p>If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.</p> |`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}` |WARNING | |
-|Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} (over {$ETCD.GRPC.ERRORS.MAX.WARN} in 5m) |<p>-</p> |`min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}` |WARNING | |
+|Etcd: Instance has seen too many leader changes |<p>Rapid leadership changes impact the performance of etcd significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the etcd cluster.</p> |`(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}` |WARNING | |
+|Etcd: Too many proposal failures |<p>Normally related to two issues: temporary failures related to a leader election or longer downtime caused by a loss of quorum in the cluster.</p> |`min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}` |WARNING | |
+|Etcd: Too many proposals are queued to commit |<p>Rising pending proposals suggests there is a high client load or the member cannot commit proposals.</p> |`min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}` |WARNING | |
+|Etcd: Too many HTTP requests failures |<p>Too many requests failed on etcd instance with 5xx HTTP code.</p> |`min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}` |WARNING | |
+|Etcd: Server version has changed |<p>Etcd version has changed. Ack to close.</p> |`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0` |INFO |<p>Manual close: YES</p> |
+|Etcd: Cluster version has changed |<p>Etcd version has changed. Ack to close.</p> |`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0` |INFO |<p>Manual close: YES</p> |
+|Etcd: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Etcd by HTTP/etcd.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Etcd: Current number of open files is too high |<p>Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p><p>If the file descriptors are exhausted, etcd may panic because it cannot create new WAL files.</p> |`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}` |WARNING | |
+|Etcd: Too many failed gRPC requests with code: {#GRPC.CODE} |<p>-</p> |`min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}` |WARNING | |
 
 ## Feedback
 

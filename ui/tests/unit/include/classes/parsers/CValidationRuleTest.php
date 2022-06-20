@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -63,6 +63,11 @@ class CValidationRuleTest extends TestCase {
 			['int32', '',
 				[
 					'int32' => true
+				]
+			],
+			['uint64', '',
+				[
+					'uint64' => true
 				]
 			],
 			['db hosts.name', '',
@@ -139,6 +144,16 @@ class CValidationRuleTest extends TestCase {
 			['range_time', '',
 				[
 					'range_time' => true
+				]
+			],
+			['abs_date', '',
+				[
+					'abs_date' => true
+				]
+			],
+			['abs_time', '',
+				[
+					'abs_time' => true
 				]
 			],
 			['time_unit', '',

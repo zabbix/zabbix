@@ -48,7 +48,7 @@ $filter_column = (new CFormList())
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'groupids_',
-					'real_hosts' => true,
+					'with_hosts' => true,
 					'enrich_parent_groups' => true
 				]
 			]
@@ -120,6 +120,7 @@ zbx_add_post_js('timeControl.processObjects();');
 
 (new CWidget())
 	->setTitle(_('100 busiest triggers'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::REPORTS_TOPTRIGGERS))
 	->addItem($filterForm)
 	->addItem($table)
 	->show();

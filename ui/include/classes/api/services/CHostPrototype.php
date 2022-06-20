@@ -234,8 +234,7 @@ class CHostPrototype extends CHostBase {
 
 		$hostids = array_keys($result);
 
-		// adding discovery rule
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+		if ($options['selectDiscoveryRule'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'parent_itemid', 'host_discovery');
 			$discoveryRules = API::DiscoveryRule()->get([
 				'output' => $options['selectDiscoveryRule'],
@@ -249,8 +248,7 @@ class CHostPrototype extends CHostBase {
 		self::addRelatedGroupLinks($options, $result);
 		self::addRelatedGroupPrototypes($options, $result);
 
-		// adding host
-		if ($options['selectParentHost'] !== null && $options['selectParentHost'] != API_OUTPUT_COUNT) {
+		if ($options['selectParentHost'] !== null) {
 			$hosts = [];
 			$relationMap = new CRelationMap();
 			$dbRules = DBselect(
@@ -278,7 +276,6 @@ class CHostPrototype extends CHostBase {
 			$result = $relationMap->mapOne($result, $hosts, 'parentHost');
 		}
 
-		// adding templates
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
 				$templates = [];
@@ -310,20 +307,35 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		// adding tags
-		if ($options['selectTags'] !== null && $options['selectTags'] !== API_OUTPUT_COUNT) {
-			$tags = API::getApiService()->select('host_tag', [
-				'output' => $this->outputExtend($options['selectTags'], ['hostid', 'hosttagid']),
-				'filter' => ['hostid' => $hostids],
-				'preservekeys' => true
-			]);
+		if ($options['selectTags'] !== null) {
+			foreach ($result as &$row) {
+				$row['tags'] = [];
+			}
+			unset($row);
 
-			$relation_map = $this->createRelationMap($tags, 'hostid', 'hosttagid');
-			$tags = $this->unsetExtraFields($tags, ['hostid', 'hosttagid'], []);
-			$result = $relation_map->mapMany($result, $tags, 'tags');
+			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
+				$output = ['hosttagid', 'hostid', 'tag', 'value'];
+			}
+			else {
+				$output = array_unique(array_merge(['hosttagid', 'hostid'], $options['selectTags']));
+			}
+
+			$sql_options = [
+				'output' => $output,
+				'filter' => ['hostid' => $hostids]
+			];
+			$db_tags = DBselect(DB::makeSql('host_tag', $sql_options));
+
+			while ($db_tag = DBfetch($db_tags)) {
+				$hostid = $db_tag['hostid'];
+
+				unset($db_tag['hosttagid'], $db_tag['hostid']);
+
+				$result[$hostid]['tags'][] = $db_tag;
+			}
 		}
 
-		if ($options['selectInterfaces'] !== null && $options['selectInterfaces'] != API_OUTPUT_COUNT) {
+		if ($options['selectInterfaces'] !== null) {
 			$interfaces = API::HostInterface()->get([
 				'output' => $this->outputExtend($options['selectInterfaces'], ['hostid', 'interfaceid']),
 				'hostids' => $hostids,
@@ -480,7 +492,7 @@ class CHostPrototype extends CHostBase {
 				'macro' =>				['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
 				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
 				'value' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'length' => DB::getFieldLength('hostmacro', 'value')],
+											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
 											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
 				]],
 				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')]
@@ -527,7 +539,7 @@ class CHostPrototype extends CHostBase {
 		self::updateGroupLinks($host_prototypes);
 		self::updateGroupPrototypes($host_prototypes);
 		$this->updateTemplates($host_prototypes);
-		$this->updateTagsNew($host_prototypes);
+		$this->updateTags($host_prototypes);
 		$this->updateMacros($host_prototypes);
 		self::updateHostInventories($host_prototypes);
 
@@ -792,7 +804,7 @@ class CHostPrototype extends CHostBase {
 		self::updateGroupLinks($host_prototypes, $db_host_prototypes);
 		self::updateGroupPrototypes($host_prototypes, $db_host_prototypes);
 		$this->updateTemplates($host_prototypes, $db_host_prototypes);
-		$this->updateTagsNew($host_prototypes, $db_host_prototypes);
+		$this->updateTags($host_prototypes, $db_host_prototypes);
 		$this->updateMacros($host_prototypes, $db_host_prototypes);
 		self::updateHostInventories($host_prototypes, $db_host_prototypes);
 
@@ -2237,7 +2249,10 @@ class CHostPrototype extends CHostBase {
 		DB::delete('host_tag', ['hostid' => $hostids]);
 		DB::delete('hostmacro', ['hostid' => $hostids]);
 		DB::delete('host_inventory', ['hostid' => $hostids]);
-
+		DB::update('hosts', [
+			'values' => ['templateid' => 0],
+			'where' => ['hostid' => $hostids]
+		]);
 		DB::delete('hosts', ['hostid' => $hostids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_PROTOTYPE, $db_host_prototypes);

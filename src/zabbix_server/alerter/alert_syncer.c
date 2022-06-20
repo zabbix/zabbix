@@ -17,19 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "daemon.h"
+#include "alert_syncer.h"
+
+#include "../db_lengths.h"
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
-#include "db.h"
-#include "zbxipcservice.h"
-#include "zbxjson.h"
 #include "alerter_protocol.h"
 #include "zbxservice.h"
-#include "service_protocol.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
-
-#include "alert_syncer.h"
+#include "dbcache.h"
 
 #define ZBX_POLL_INTERVAL	1
 
@@ -152,7 +148,7 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 	DBbegin();
 	result = DBselect("%s", sql);
 	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -707,7 +703,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 			sql_offset = 0;
 
 			DBbegin();
-			DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 			zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
 			zbx_db_insert_prepare(&db_problem, "problem_tag", "problemtagid", "eventid", "tag", "value",
 					NULL);
@@ -748,7 +744,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 			am_db_validate_tags_for_update(&update_events_tags, &db_event, &db_problem);
 
-			DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+			zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 			if (16 < sql_offset)
 				DBexecute("%s", sql);
 

@@ -17,29 +17,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "config.h"
 
 #ifdef HAVE_SQLITE3
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
 
+#include "zbxexport.h"
+#include "zbxself.h"
+
 #include "cfg.h"
-#include "pid.h"
-#include "db.h"
-#include "dbcache.h"
 #include "zbxdbupgrade.h"
 #include "log.h"
 #include "zbxgetopt.h"
-#include "mutexs.h"
-
-#include "sysinfo.h"
+#include "zbxmutexs.h"
 #include "zbxmodules.h"
-#include "zbxserver.h"
-
 #include "zbxnix.h"
-#include "daemon.h"
-#include "zbxself.h"
-#include "../libs/zbxnix/control.h"
+#include "zbxcomms.h"
 
 #include "alerter/alerter.h"
 #include "alerter/alert_manager.h"
@@ -74,13 +68,15 @@
 #include "zbxcrypto.h"
 #include "zbxhistory.h"
 #include "postinit.h"
-#include "export.h"
-#include "zbxvault.h"
+#include "../libs/zbxvault/vault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
-#include "sighandler.h"
 #include "zbxrtc.h"
 #include "zbxha.h"
+#include "zbxserver.h"
+#include "stats/zabbix_stats.h"
+#include "zbxdiag.h"
+#include "diag/diag_server.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -108,23 +104,26 @@ const char	*help_message[] = {
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
-	"      " ZBX_CONFIG_CACHE_RELOAD "         Reload configuration cache",
-	"      " ZBX_HOUSEKEEPER_EXECUTE "         Execute the housekeeper",
-	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE " Execute the trigger housekeeper",
-	"      " ZBX_LOG_LEVEL_INCREASE "=target   Increase log level, affects all processes if",
-	"                                  target is not specified",
-	"      " ZBX_LOG_LEVEL_DECREASE "=target   Decrease log level, affects all processes if",
-	"                                  target is not specified",
-	"      " ZBX_SNMP_CACHE_RELOAD "           Reload SNMP cache",
-	"      " ZBX_SECRETS_RELOAD "              Reload secrets from Vault",
-	"      " ZBX_DIAGINFO "=section            Log internal diagnostic information of the",
-	"                                  section (historycache, preprocessing, alerting,",
-	"                                  lld, valuecache, locks) or everything if section is",
-	"                                  not specified",
-	"      " ZBX_SERVICE_CACHE_RELOAD "        Reload service manager cache",
-	"      " ZBX_HA_STATUS "                   Display HA cluster status",
-	"      " ZBX_HA_REMOVE_NODE "=target       Remove the HA node specified by its name or ID",
-	"      " ZBX_HA_SET_FAILOVER_DELAY "=delay Set HA failover delay",
+	"      " ZBX_CONFIG_CACHE_RELOAD "             Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_EXECUTE "             Execute the housekeeper",
+	"      " ZBX_TRIGGER_HOUSEKEEPER_EXECUTE "     Execute the trigger housekeeper",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target       Increase log level, affects all processes if",
+	"                                        target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target       Decrease log level, affects all processes if",
+	"                                        target is not specified",
+	"      " ZBX_SNMP_CACHE_RELOAD "               Reload SNMP cache",
+	"      " ZBX_SECRETS_RELOAD "                  Reload secrets from Vault",
+	"      " ZBX_DIAGINFO "=section                Log internal diagnostic information of the",
+	"                                        section (historycache, preprocessing, alerting,",
+	"                                        lld, valuecache, locks) or everything if section is",
+	"                                        not specified",
+	"      " ZBX_SERVICE_CACHE_RELOAD "             Reload service manager cache",
+	"      " ZBX_HA_STATUS "                        Display HA cluster status",
+	"      " ZBX_HA_REMOVE_NODE "=target            Remove the HA node specified by its name or ID",
+	"      " ZBX_HA_SET_FAILOVER_DELAY "=delay      Set HA failover delay",
+	"      " ZBX_PROXY_CONFIG_CACHE_RELOAD "[=name] Reload configuration cache on proxy by its name,",
+	"                                        comma-separated list can be used to pass multiple names.",
+	"                                        All proxies will be reloaded if no names were specified.",
 	"",
 	"      Log level control targets:",
 	"        process-type              All processes of specified type",
@@ -180,6 +179,7 @@ static int	*threads_flags;
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
+static char	*CONFIG_PID_FILE = NULL;
 
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
@@ -245,7 +245,7 @@ zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 32 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
+static zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_EXPORT_FILE_SIZE		= ZBX_GIBIBYTE;
@@ -264,8 +264,11 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
-char	*CONFIG_VAULTTOKEN		= NULL;
+char	*CONFIG_VAULT			= NULL;
 char	*CONFIG_VAULTURL		= NULL;
+char	*CONFIG_VAULTTOKEN		= NULL;
+char	*CONFIG_VAULTTLSCERTFILE	= NULL;
+char	*CONFIG_VAULTTLSKEYFILE		= NULL;
 char	*CONFIG_VAULTDBPATH		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
 char	*CONFIG_DB_TLS_CONNECT		= NULL;
@@ -295,8 +298,8 @@ int	CONFIG_SERVER_STARTUP_TIME	= 0;	/* zabbix server startup time */
 
 int	CONFIG_PROXYPOLLER_FORKS	= 1;	/* parameters for passive proxies */
 
-/* how often Zabbix server sends configuration data to proxy, in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_HOUR;
+/* how often Zabbix server sends configuration data to passive proxy, in seconds */
+int	CONFIG_PROXYCONFIG_FREQUENCY	= SEC_PER_MIN * 5;
 int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
@@ -686,6 +689,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	err |= (FAIL == check_cfg_feature_str("HistoryStorageTypes", CONFIG_HISTORY_STORAGE_OPTS, "cURL library"));
 	err |= (FAIL == check_cfg_feature_int("HistoryStorageDateIndex", CONFIG_HISTORY_STORAGE_PIPELINES,
 			"cURL library"));
+	err |= (FAIL == check_cfg_feature_str("Vault", CONFIG_VAULT, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("VaultToken", CONFIG_VAULTTOKEN, "cURL library"));
 	err |= (FAIL == check_cfg_feature_str("VaultDBPath", CONFIG_VAULTDBPATH, "cURL library"));
 
@@ -844,6 +848,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"VaultToken",			&CONFIG_VAULTTOKEN,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"Vault",			&CONFIG_VAULT,				TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultTLSCertFile",		&CONFIG_VAULTTLSCERTFILE,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"VaultTLSKeyFile",		&CONFIG_VAULTTLSKEYFILE,		TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{"VaultURL",			&CONFIG_VAULTURL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"VaultDBPath",			&CONFIG_VAULTDBPATH,			TYPE_STRING,
@@ -993,6 +1003,80 @@ static void	zbx_free_config(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: callback function for providing PID file path to libraries        *
+ *                                                                            *
+ ******************************************************************************/
+static const char	*get_pid_file_path(void)
+{
+	return CONFIG_PID_FILE;
+}
+
+static void	zbx_on_exit(int ret)
+{
+	char	*error = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+
+	if (NULL != threads)
+	{
+		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
+		zbx_free(threads);
+		zbx_free(threads_flags);
+	}
+
+#ifdef HAVE_PTHREAD_PROCESS_SHARED
+		zbx_locks_disable();
+#endif
+
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		DBconnect(ZBX_DB_CONNECT_EXIT);
+		free_database_cache(ZBX_SYNC_ALL);
+		DBclose();
+	}
+
+	if (SUCCEED != zbx_ha_stop(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
+		zbx_free(error);
+		zbx_ha_kill();
+	}
+
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		free_metrics();
+		zbx_ipc_service_free_env();
+		free_configuration_cache();
+
+		/* free history value cache */
+		zbx_vc_destroy();
+
+		/* free vmware support */
+		zbx_vmware_destroy();
+
+		free_selfmon_collector();
+	}
+
+	zbx_uninitialize_events();
+
+	zbx_unload_modules();
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
+			ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_close_log();
+
+	zbx_locks_destroy();
+
+#if defined(PS_OVERWRITE_ARGV)
+	setproctitle_free_env();
+#endif
+
+	exit(EXIT_SUCCESS);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: executes server processes                                         *
  *                                                                            *
  ******************************************************************************/
@@ -1002,13 +1086,20 @@ int	main(int argc, char **argv)
 	char		ch;
 	int		opt_c = 0, opt_r = 0;
 
+	/* see description of 'optarg' in 'man 3 getopt' */
+	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
+	int		zbx_optind = 0;
+
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
 #endif
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		switch (ch)
 		{
@@ -1023,18 +1114,22 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -1092,7 +1187,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
+	return zbx_daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit);
 }
 
 static void	zbx_check_db(void)
@@ -1224,7 +1319,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_tfc_init(&error))
+	if (SUCCEED != zbx_tfc_init(CONFIG_TREND_FUNC_CACHE_SIZE, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize trends read cache: %s", error);
 		zbx_free(error);
@@ -1653,14 +1748,21 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init_token_from_env(&error))
+	if (SUCCEED != zbx_vault_token_from_env_get(&CONFIG_VAULTTOKEN, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_init_db_credentials(&error))
+	if (SUCCEED != zbx_vault_init(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != zbx_vault_db_credentials_get(&CONFIG_DBUSER, &CONFIG_DBPASSWORD, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);
@@ -1736,14 +1838,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start server: %s", error);
 		zbx_free(error);
-		sig_exiting = ZBX_EXIT_FAILURE;
+		zbx_set_exiting_with_fail();
 	}
+
+	zbx_zabbix_stats_init(zbx_get_zabbix_stats_ext);
+	zbx_diag_init(diag_add_section_info);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
 		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 		{
-			sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_set_exiting_with_fail();
 			ha_status = ZBX_NODE_STATUS_ERROR;
 		}
 		else
@@ -1782,7 +1887,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			if (SUCCEED != zbx_ha_dispatch_message(message, &ha_status, &ha_failover_delay, &error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "HA manager error: %s", error);
-				sig_exiting = ZBX_EXIT_FAILURE;
+				zbx_set_exiting_with_fail();
 			}
 		}
 		else
@@ -1805,6 +1910,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
+		if (ZBX_NODE_STATUS_ERROR == ha_status)
+			break;
+
 		now = time(NULL);
 
 		if (ZBX_NODE_STATUS_UNKNOWN != ha_status && ha_status != ha_status_old)
@@ -1818,7 +1926,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				case ZBX_NODE_STATUS_ACTIVE:
 					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
 					{
-						sig_exiting = ZBX_EXIT_FAILURE;
+						zbx_set_exiting_with_fail();
 						ha_status = ZBX_NODE_STATUS_ERROR;
 						continue;
 					}
@@ -1836,7 +1944,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				default:
 					zabbix_log(LOG_LEVEL_CRIT, "unsupported status %d received from HA manager",
 							ha_status);
-					sig_exiting = ZBX_EXIT_FAILURE;
+					zbx_set_exiting_with_fail();
 					continue;
 			}
 		}
@@ -1854,14 +1962,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
-			sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_set_exiting_with_fail();
 			break;
 		}
 
 		if (-1 == ret && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			sig_exiting = ZBX_EXIT_FAILURE;
+			zbx_set_exiting_with_fail();
 			break;
 		}
 	}
@@ -1878,68 +1986,4 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_on_exit(ZBX_EXIT_STATUS());
 
 	return SUCCEED;
-}
-
-void	zbx_on_exit(int ret)
-{
-	char	*error = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
-
-	if (NULL != threads)
-	{
-		zbx_threads_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
-		zbx_free(threads);
-		zbx_free(threads_flags);
-	}
-
-#ifdef HAVE_PTHREAD_PROCESS_SHARED
-		zbx_locks_disable();
-#endif
-
-	if (SUCCEED != zbx_ha_stop(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
-		zbx_free(error);
-		zbx_ha_kill();
-	}
-
-	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-	{
-		free_metrics();
-		zbx_ipc_service_free_env();
-
-		DBconnect(ZBX_DB_CONNECT_EXIT);
-
-		free_database_cache(ZBX_SYNC_ALL);
-
-		DBclose();
-
-		free_configuration_cache();
-
-		/* free history value cache */
-		zbx_vc_destroy();
-
-		/* free vmware support */
-		zbx_vmware_destroy();
-
-		free_selfmon_collector();
-	}
-
-	zbx_uninitialize_events();
-
-	zbx_unload_modules();
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
-			ZABBIX_VERSION, ZABBIX_REVISION);
-
-	zabbix_close_log();
-
-	zbx_locks_destroy();
-
-#if defined(PS_OVERWRITE_ARGV)
-	setproctitle_free_env();
-#endif
-
-	exit(EXIT_SUCCESS);
 }

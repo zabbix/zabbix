@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor TiKV server of TiDB cluster by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
@@ -16,7 +16,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 This template works with TiKV server of TiDB cluster.
 Internal service metrics are collected from TiKV /metrics endpoint.
@@ -98,11 +98,11 @@ There are no template links in this template.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
-|TiKV: Too many coprocessor request error (over {$TIKV.COPOCESSOR.ERRORS.MAX.WARN} in 5m) |<p>-</p> |`min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}` |WARNING | |
-|TiKV: Too many pending commands (over {$TIKV.PENDING_COMMANDS.MAX.WARN} for 5m) |<p>-</p> |`min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_COMMANDS.MAX.WARN}` |AVERAGE | |
-|TiKV: Too many pending tasks (over {$TIKV.PENDING_TASKS.MAX.WARN} for 5m) |<p>-</p> |`min(/TiDB TiKV by HTTP/tikv.worker_pending_task,5m)>{$TIKV.PENDING_TASKS.MAX.WARN}` |AVERAGE | |
-|TiKV: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/TiDB TiKV by HTTP/tikv.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}" (over {$TIKV.STORE.ERRORS.MAX.WARN} in 5m) |<p>Indicates that the remote TiKV cannot be connected.</p> |`min(/TiDB TiKV by HTTP/tikv.messages.failure.rate[{#STORE_ID},{#TYPE}],5m)>{$TIKV.STORE.ERRORS.MAX.WARN}` |WARNING | |
+|TiKV: Too many coprocessor request error |<p>-</p> |`min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}` |WARNING | |
+|TiKV: Too many pending commands |<p>-</p> |`min(/TiDB TiKV by HTTP/tikv.scheduler_contex,5m)>{$TIKV.PENDING_COMMANDS.MAX.WARN}` |AVERAGE | |
+|TiKV: Too many pending tasks |<p>-</p> |`min(/TiDB TiKV by HTTP/tikv.worker_pending_task,5m)>{$TIKV.PENDING_TASKS.MAX.WARN}` |AVERAGE | |
+|TiKV: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/TiDB TiKV by HTTP/tikv.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|TiKV: Store_id {#STORE_ID}: Too many failure messages "{#TYPE}" |<p>Indicates that the remote TiKV cannot be connected.</p> |`min(/TiDB TiKV by HTTP/tikv.messages.failure.rate[{#STORE_ID},{#TYPE}],5m)>{$TIKV.STORE.ERRORS.MAX.WARN}` |WARNING | |
 
 ## Feedback
 

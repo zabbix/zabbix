@@ -17,20 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "scripts.h"
+
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"
 #include "../poller/checks_ssh.h"
 #include "../poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxserver.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxtasks.h"
-#include "zbxjson.h"
 #include "zbxembed.h"
-
-#include "scripts.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;
@@ -56,7 +54,7 @@ static int	zbx_execute_script_on_agent(const DC_HOST *host, const char *command,
 	}
 
 	port = zbx_strdup(port, item.interface.port_orig);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			&port, MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
@@ -330,20 +328,23 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
  ***********************************************************************************/
 int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len)
 {
-	int	ret = FAIL;
+	int			ret = FAIL;
+	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	um_handle = zbx_dc_open_user_macros();
 
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_SSH:
-			substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->publickey, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
 			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_TELNET:
-			substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->port, MACRO_TYPE_COMMON, NULL, 0);
 
 			if ('\0' != *script->port && SUCCEED != (ret = is_ushort(script->port, NULL)))
@@ -352,9 +353,9 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 				goto out;
 			}
 
-			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL,
 					NULL, NULL, &script->username, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL,
 					NULL, NULL, &script->password, MACRO_TYPE_COMMON, NULL, 0);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
@@ -367,6 +368,8 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);
 			goto out;
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 
 	ret = SUCCEED;
 out:
@@ -460,8 +463,11 @@ int	zbx_script_execute(const zbx_script_t *script, const DC_HOST *host, const ch
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
-					ret = zbx_execute(script->command, result, error, max_error_len,
-							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL);
+					if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
+							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
+					{
+						ret = FAIL;
+					}
 					break;
 				default:
 					zbx_snprintf(error, max_error_len, "Invalid 'Execute on' option \"%d\".",

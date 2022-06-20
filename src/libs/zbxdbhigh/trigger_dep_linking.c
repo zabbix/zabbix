@@ -19,10 +19,9 @@
 
 #include "trigger_dep_linking.h"
 
-#include "db.h"
+#include "zbxdbhigh.h"
 #include "log.h"
-#include "../../libs/zbxaudit/audit_trigger.h"
-#include "../../libs/zbxalgo/vectorimpl.h"
+#include "audit/zbxaudit_trigger.h"
 
 typedef struct
 {

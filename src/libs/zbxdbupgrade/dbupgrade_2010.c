@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
 #include "dbupgrade.h"
+
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "sysinfo.h"
 
@@ -44,7 +44,7 @@ static int	DBmodify_proxy_table_id_field(const char *table_name)
 /*********************************************************************************
  *                                                                               *
  * Purpose: parse database monitor item params string "user=<user> password=     *
- *          <passsword> DSN=<dsn> sql=<sql>" into parameter values.              *
+ *          <password> DSN=<dsn> sql=<sql>" into parameter values.               *
  *                                                                               *
  * Parameters:  params     - [IN] the params string                              *
  *              dsn        - [OUT] the ODBC DSN output buffer                    *
@@ -930,9 +930,9 @@ static int	DBpatch_2010101(void)
 
 		if (0 != strncmp(row[1], "db.odbc.select[", 15) || ']' != row[1][key_len - 1])
 			error_message = zbx_dsprintf(error_message, "key \"%s\" is invalid", row[1]);
-		else if (ITEM_USERNAME_LEN < strlen(user))
+		else if (64 /* ZBX_ITEM_USERNAME_LEN */ < strlen(user))
 			error_message = zbx_dsprintf(error_message, "ODBC username \"%s\" is too long", user);
-		else if (ITEM_PASSWORD_LEN < strlen(password))
+		else if (64 /* ZBX_ITEM_PASSWORD_LEN */ < strlen(password))
 			error_message = zbx_dsprintf(error_message, "ODBC password \"%s\" is too long", password);
 		else
 		{
@@ -963,7 +963,7 @@ static int	DBpatch_2010101(void)
 
 				zbx_free(param);
 
-				if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+				if (255 /* ZBX_ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 					error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
 			}
 
@@ -1721,7 +1721,7 @@ static int	DBpatch_2010195(void)
 			continue;
 		}
 
-		if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+		if (255 /* ZBX_ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": key is too long", row[1]);
 			continue;

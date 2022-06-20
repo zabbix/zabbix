@@ -17,17 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
+#include "proxydata.h"
+#include "zbxdbhigh.h"
 #include "log.h"
 #include "proxy.h"
 
 #include "zbxtasks.h"
-#include "mutexs.h"
-#include "daemon.h"
+#include "zbxmutexs.h"
+#include "zbxnix.h"
 #include "zbxcompress.h"
-
-#include "proxydata.h"
+#include "zbxcommshigh.h"
+#include "zbxavailability.h"
 
 extern unsigned char	program_type;
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
@@ -248,6 +248,7 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 	proxy_get_hist_data(&j, &history_lastid, &more_history);
 	proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
 	proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+	proxy_get_host_active_availability(&j);
 
 	zbx_vector_ptr_create(&tasks);
 	zbx_tm_get_remote_tasks(&tasks, 0);
@@ -284,7 +285,23 @@ void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts)
 		DBbegin();
 
 		if (0 != history_lastid)
+		{
+			zbx_uint64_t	history_maxid;
+			DB_RESULT	result;
+			DB_ROW		row;
+
+			result = DBselect("select max(id) from proxy_history");
+
+			if (NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]))
+				history_maxid = history_lastid;
+			else
+				ZBX_STR2UINT64(history_maxid, row[0]);
+
+			DBfree_result(result);
+
+			reset_proxy_history_count(history_maxid - history_lastid);
 			proxy_set_hist_lastid(history_lastid);
+		}
 
 		if (0 != discovery_lastid)
 			proxy_set_dhis_lastid(discovery_lastid);

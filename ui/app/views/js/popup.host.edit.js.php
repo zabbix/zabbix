@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -34,27 +34,15 @@ window.host_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		this.addEventListeners();
-
 		history.replaceState({}, '', popup_url);
 
 		host_edit.init({form_name, host_interfaces, host_is_discovered});
 	},
 
-	addEventListeners() {
-		this.enableNavigationWarning();
-		this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayClose, {once: true});
-	},
-
-	removeEventListeners() {
-		this.disableNavigationWarning();
-		this.overlay.$dialogue[0].removeEventListener('overlay.close', this.events.overlayClose);
-	},
-
 	submit() {
 		this.removePopupMessages();
 
-		const fields = host_edit.preprocessFormFields(getFormFields(this.form));
+		const fields = host_edit.preprocessFormFields(getFormFields(this.form), false);
 		const curl = new Curl(this.form.getAttribute('action'), false);
 
 		fetch(curl.getUrl(), {
@@ -93,27 +81,27 @@ window.host_edit_popup = {
 
 	clone() {
 		this.overlay.setLoading();
-		const parameters = host_edit.preprocessFormFields(getFormFields(this.form));
+		const parameters = host_edit.preprocessFormFields(getFormFields(this.form), true);
 		delete parameters.sid;
 		parameters.clone = 1;
 
-		this.removeEventListeners();
 		PopUp('popup.host.edit', parameters, {
 			dialogueid: 'host_edit',
-			dialogue_class: 'modal-popup-large'
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
 		});
 	},
 
 	fullClone() {
 		this.overlay.setLoading();
-		const parameters = host_edit.preprocessFormFields(getFormFields(this.form));
+		const parameters = host_edit.preprocessFormFields(getFormFields(this.form), true);
 		delete parameters.sid;
 		parameters.full_clone = 1;
 
-		this.removeEventListeners();
 		PopUp('popup.host.edit', parameters, {
 			dialogueid: 'host_edit',
-			dialogue_class: 'modal-popup-large'
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
 		});
 	},
 
@@ -156,41 +144,21 @@ window.host_edit_popup = {
 		}
 	},
 
-	enableNavigationWarning() {
-		window.addEventListener('beforeunload', this.events.beforeUnload, {passive: false});
-	},
-
-	disableNavigationWarning() {
-		window.removeEventListener('beforeunload', this.events.beforeUnload);
-	},
-
 	ajaxExceptionHandler: (exception) => {
 		const form = host_edit_popup.form;
-		let title;
-		let messages = [];
+
+		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
 			title = exception.error.title;
 			messages = exception.error.messages;
 		}
 		else {
-			title = <?= json_encode(_('Unexpected server error.')) ?>;
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+		const message_box = makeMessageBox('bad', messages, title)[0];
 
 		form.parentNode.insertBefore(message_box, form);
-	},
-
-	events: {
-		beforeUnload(e) {
-			// Display confirmation message.
-			e.preventDefault();
-			e.returnValue = '';
-		},
-
-		overlayClose() {
-			host_edit_popup.disableNavigationWarning();
-		}
 	}
 };

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -21,10 +21,8 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
-
-// Visibility box javascript is already added. It should not be added in popup response.
-define('CVISIBILITYBOX_JAVASCRIPT_INSERTED', 1);
 
 // Create form.
 $form = (new CForm())
@@ -96,51 +94,86 @@ $dependencies_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('Name'), (new CColHeader(_('Action')))->setWidth(50)]);
 
-$bttn_prototype = '';
+$normal_only = $data['prototype'] ? ['normal_only' => 1] : [];
+
+if ($data['context'] === 'host') {
+	$buttons[] = (new CButton('add_dep_trigger', _('Add')))
+		->onClick('
+			PopUp("popup.generic", '.json_encode([
+				'srctbl' => 'triggers',
+				'srcfld1' => 'triggerid',
+				'dstfrm' => 'massupdate',
+				'dstfld1' => 'new_dependency',
+				'dstact' => 'add_dependency',
+				'reference' => 'deptrigger',
+				'objname' => 'triggers',
+				'multiselect' => 1,
+				'with_triggers' => 1,
+				'real_hosts' => 1
+			] + $normal_only).', {dialogue_class: "modal-popup-generic"});
+		')
+		->addClass(ZBX_STYLE_BTN_LINK);
+}
+else {
+	$buttons[] = (new CButton('add_dep_trigger', _('Add')))
+		->onClick('
+			PopUp("popup.generic", '.json_encode([
+				'srctbl' => 'template_triggers',
+				'srcfld1' => 'triggerid',
+				'dstfrm' => 'massupdate',
+				'dstfld1' => 'new_dependency',
+				'dstact' => 'add_dependency',
+				'reference' => 'deptrigger',
+				'objname' => 'triggers',
+				'multiselect' => 1,
+				'with_triggers' => 1
+			]).', {dialogue_class: "modal-popup-generic"});
+		')
+		->addClass(ZBX_STYLE_BTN_LINK);
+}
+
 if ($data['prototype']) {
-	$bttn_prototype = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
-	->onClick(
-		'return PopUp("popup.generic", '.json_encode([
-			'srctbl' => 'trigger_prototypes',
-			'srcfld1' => 'triggerid',
-			'dstfrm' => 'massupdate',
-			'dstfld1' => 'new_dependency',
-			'dstact' => 'add_dependency',
-			'reference' => 'deptrigger_prototype',
-			'multiselect' => '1',
-			'objname' => 'triggers',
-			'parent_discoveryid' => $data['parent_discoveryid']
-		]).', {dialogue_class: "modal-popup-generic"});'
-	)
-	->addClass(ZBX_STYLE_BTN_LINK);
+	$buttons[] = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
+		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+		->onClick('
+			PopUp("popup.generic", {
+				srctbl: "trigger_prototypes",
+				srcfld1: "triggerid",
+				dstfrm: "massupdate",
+				dstfld1: "new_dependency",
+				dstact: "add_dependency",
+				reference: "deptrigger_prototype",
+				objname: "triggers",
+				parent_discoveryid: this.dataset.parent_discoveryid,
+				multiselect: 1
+			}, {dialogue_class: "modal-popup-generic"});
+		')
+		->addClass(ZBX_STYLE_BTN_LINK);
+}
+
+if ($data['context'] === 'template') {
+	$buttons[] = (new CButton('add_dep_host_trigger', _('Add host trigger')))
+		->onClick('
+			PopUp("popup.generic", '.json_encode([
+				'srctbl' => 'triggers',
+				'srcfld1' => 'triggerid',
+				'dstfrm' => 'massupdate',
+				'dstfld1' => 'new_dependency',
+				'dstact' => 'add_dependency',
+				'reference' => 'deptrigger',
+				'objname' => 'triggers',
+				'multiselect' => 1,
+				'with_triggers' => 1,
+				'real_hosts' => 1
+			] + $normal_only).', {dialogue_class: "modal-popup-generic"});
+		')
+		->addClass(ZBX_STYLE_BTN_LINK);
 }
 
 $dependencies_form_list->addRow(
 	(new CVisibilityBox('visible[dependencies]', 'dependencies-div', _('Original')))
 		->setLabel(_('Replace dependencies')),
-	(new CDiv([
-		$dependencies_table,
-		new CHorList([
-			(new CButton('btn1', _('Add')))
-				->onClick(
-					'return PopUp("popup.generic", '.json_encode([
-						'srctbl' => 'triggers',
-						'srcfld1' => 'triggerid',
-						'dstfrm' => 'massupdate',
-						'dstfld1' => 'new_dependency',
-						'dstact' => 'add_dependency',
-						'reference' => 'deptrigger',
-						'objname' => 'triggers',
-						'multiselect' => '1',
-						'with_triggers' => '1',
-						'normal_only' => '1',
-						'noempty' => '1'
-					]).', {dialogue_class: "modal-popup-generic"});'
-				)
-				->addClass(ZBX_STYLE_BTN_LINK),
-			$bttn_prototype
-		])
-	]))->setId('dependencies-div')
+	(new CDiv([$dependencies_table, new CHorList($buttons)]))->setId('dependencies-div')
 );
 
 // Append tabs to the form.
@@ -158,6 +191,7 @@ $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.trigger.js.php'
 
 $output = [
 	'header' => $data['title'],
+	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_MASSUPDATE_TRIGGER),
 	'body' => $form->toString(),
 	'buttons' => [
 		[

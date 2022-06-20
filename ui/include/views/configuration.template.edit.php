@@ -25,7 +25,9 @@
 
 require_once __DIR__.'/js/common.template.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Templates'));
+$widget = (new CWidget())
+	->setTitle(_('Templates'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::CONFIGURATION_TEMPLATES_EDIT));
 
 if ($data['form'] !== 'clone' && $data['form'] !== 'full_clone') {
 	$widget->setNavigation(getHostNavigation('', $data['templateid']));
@@ -91,28 +93,24 @@ if ($data['linked_templates']) {
 
 		$clone_mode = ($data['form'] === 'clone' || $data['form'] === 'full_clone');
 
-		$unlink_parameters = array_map('json_encode', [
-			$form->getName(),
-			'unlink['.$template['templateid'].']',
-			'1'
-		]);
-
-		$unlink_clear_parameters = array_map('json_encode', [
-			$form->getName(),
-			'unlink_and_clear['.$template['templateid'].']',
-			'1'
-		]);
-
 		$linked_templates->addRow([
 			$template_link,
 			(new CCol(
 				new CHorList([
 					(new CSimpleButton(_('Unlink')))
-						->onClick('submitFormWithParam('.implode(', ', $unlink_parameters).');')
+						->setAttribute('data-templateid', $template['templateid'])
+						->onClick('
+							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
+						')
 						->addClass(ZBX_STYLE_BTN_LINK),
 					(array_key_exists($template['templateid'], $data['original_templates']) && !$clone_mode)
 						? (new CSimpleButton(_('Unlink and clear')))
-							->onClick('submitFormWithParam('.implode(', ', $unlink_clear_parameters).');')
+							->setAttribute('data-templateid', $template['templateid'])
+							->onClick('
+								submitFormWithParam("'.$form->getName().'",
+									`unlink_and_clear[${this.dataset.templateid}]`, 1
+								);
+							')
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])
@@ -147,15 +145,15 @@ $template_tab
 			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items
 	)
-	->addRow((new CLabel(_('Groups'), 'groups__ms'))->setAsteriskMark(),
+	->addRow((new CLabel(_('Template groups'), 'groups__ms'))->setAsteriskMark(),
 		(new CMultiSelect([
 			'name' => 'groups[]',
-			'object_name' => 'hostGroup',
+			'object_name' => 'templateGroup',
 			'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 			'data' => $data['groups_ms'],
 			'popup' => [
 				'parameters' => [
-					'srctbl' => 'host_groups',
+					'srctbl' => 'template_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
 					'dstfld1' => 'groups_',
@@ -194,8 +192,7 @@ $tabs->addTab('macroTab', _('Macros'),
 			->setModern(true)
 		)
 		->addRow(null, new CPartial($tmpl, [
-			'macros' => $data['macros'],
-			'readonly' => $data['readonly']
+			'macros' => $data['macros']
 		]), 'macros_container'),
 	TAB_INDICATOR_MACROS
 );

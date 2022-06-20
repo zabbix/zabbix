@@ -21,6 +21,9 @@
 
 class CWidgetHelper {
 
+	public const DATASET_TYPE_SINGLE_ITEM = 0;
+	public const DATASET_TYPE_PATTERN_ITEM = 1;
+
 	/**
 	 * Create CForm for widget configuration form.
 	 *
@@ -168,7 +171,7 @@ class CWidgetHelper {
 	/**
 	 * @param CWidgetFieldTextArea $field
 	 *
-	 * @return CTextBox
+	 * @return CTextArea
 	 */
 	public static function getTextArea($field) {
 		return (new CTextArea($field->getName(), $field->getValue()))
@@ -230,7 +233,7 @@ class CWidgetHelper {
 	 * @param CWidgetFieldHostPatternSelect  $field      Widget field object.
 	 * @param string                         $form_name  HTML form element name.
 	 *
-	 * @return CDiv
+	 * @return CPatternSelect
 	 */
 	public static function getHostPatternSelect($field, $form_name) {
 		return (new CPatternSelect([
@@ -238,6 +241,7 @@ class CWidgetHelper {
 			'object_name' => 'hosts',
 			'data' => $field->getValue(),
 			'placeholder' => $field->getPlaceholder(),
+			'wildcard_allowed' => 1,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'hosts',
@@ -375,8 +379,7 @@ class CWidgetHelper {
 	public static function getItem($field, $captions, $form_name) {
 		return self::getMultiselectField($field, $captions, $form_name, 'items', [
 			'srctbl' => 'items',
-			'srcfld1' => 'itemid',
-			'webitems' => true
+			'srcfld1' => 'itemid'
 		] + $field->getFilterParameters());
 	}
 
@@ -652,7 +655,10 @@ class CWidgetHelper {
 			$tags = [['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']];
 		}
 
-		$tags_table = (new CTable())->setId('tags_table_'.$field->getName());
+		$tags_table = (new CTable())
+			->setId('tags_table_'.$field->getName())
+			->addClass('table-initial-width');
+
 		$enabled = !($field->getFlags() & CWidgetField::FLAG_DISABLED);
 		$i = 0;
 
@@ -772,7 +778,7 @@ class CWidgetHelper {
 	 * @param string                     $form_name  Name of form in which data set fields resides.
 	 * @param int|string                 $row_num    Unique data set numeric identifier. Used to make unique field names.
 	 *
-	 * @return array
+	 * @return CListItem
 	 */
 	public static function getGraphOverrideLayout($field, array $value, $form_name, $row_num) {
 		$inputs = [];
@@ -800,6 +806,7 @@ class CWidgetHelper {
 							'object_name' => 'hosts',
 							'data' => $value['hosts'],
 							'placeholder' => _('host pattern'),
+							'wildcard_allowed' => 1,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'hosts',
@@ -821,13 +828,13 @@ class CWidgetHelper {
 							'data' => $value['items'],
 							'placeholder' => _('item pattern'),
 							'multiple' => true,
+							'wildcard_allowed' => 1,
 							'popup' => [
 								'parameters' => [
 									'srctbl' => 'items',
 									'srcfld1' => 'itemid',
 									'real_hosts' => 1,
 									'numeric' => 1,
-									'webitems' => 1,
 									'dstfrm' => $form_name,
 									'dstfld1' => zbx_formatDomId($field->getName().'['.$row_num.'][items][]')
 								]
@@ -936,6 +943,7 @@ class CWidgetHelper {
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_NONE => _('None'),
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_CONNECTED => _x('Connected', 'missing data function'),
 			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO => _x('Treat as 0', 'missing data function'),
+			'missingdatafunc'.SVG_GRAPH_MISSING_DATA_LAST_KNOWN => _x('Last known', 'missing data function'),
 			'axisy' => _('Y-axis'),
 			'axisy'.GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 			'axisy'.GRAPH_YAXIS_SIDE_RIGHT => _('Right'),
@@ -1011,6 +1019,7 @@ class CWidgetHelper {
 						['name' => _('Missing data').'/'._('None'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_NONE]],
 						['name' => _('Missing data').'/'._x('Connected', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_CONNECTED]],
 						['name' => _('Missing data').'/'._x('Treat as 0', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO]],
+						['name' => _('Missing data').'/'._x('Last known', 'missing data function'), 'callback' => 'addOverride', 'args' => ['missingdatafunc', SVG_GRAPH_MISSING_DATA_LAST_KNOWN]],
 
 						['name' => _('Y-axis').'/'._('Left'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_LEFT]],
 						['name' => _('Y-axis').'/'._('Right'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_RIGHT]],
@@ -1030,101 +1039,102 @@ class CWidgetHelper {
 	 * @return string
 	 */
 	public static function getGraphOverrideJavascript($field) {
-		$scripts = [
+		return '
 			// Define it as function to avoid redundancy.
-			'function initializeOverrides() {'.
-				'jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_OPTIONS_LIST.'").overrides({'.
-					'add: ".'.ZBX_STYLE_BTN_ALT.'",'.
-					'options: "input[type=hidden]",'.
-					'captions: '.json_encode(self::getGraphOverrideOptionNames()).','.
-					'makeName: function(option, row_id) {'.
-						'return "'.$field->getName().'[" + row_id + "][" + option + "]";'.
-					'},'.
-					'makeOption: function(name) {'.
-						'return name.match('.
-							'/.*\[('.implode('|', CWidgetFieldGraphOverride::getOverrideOptions()).')\]/'.
-						')[1];'.
-					'},'.
-					'override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
-					'overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",'.
-					'onUpdate: onGraphConfigChange,'.
-					'menu: '.json_encode(self::getGraphOverrideMenu()).
-				'});'.
-			'}',
+			function initializeOverrides() {
+				jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_OPTIONS_LIST.'").overrides({
+					add: ".'.ZBX_STYLE_BTN_ALT.'",
+					options: "input[type=hidden]",
+					captions: '.json_encode(self::getGraphOverrideOptionNames()).',
+					makeName: function(option, row_id) {
+						return "'.$field->getName().'[" + row_id + "][" + option + "]";
+					},
+					makeOption: function(name) {
+						return name.match(
+							/.*\[('.implode('|', CWidgetFieldGraphOverride::getOverrideOptions()).')\]/
+						)[1];
+					},
+					override: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",
+					overridesList: ".'.ZBX_STYLE_OVERRIDES_LIST.'",
+					onUpdate: () => widget_svggraph_form.onGraphConfigChange(),
+					menu: '.json_encode(self::getGraphOverrideMenu()).'
+				});
+			}
 
 			// Initialize dynamicRows.
-			'jQuery("#overrides")'.
-				'.dynamicRows({'.
-					'template: "#overrides-row",'.
-					'beforeRow: ".overrides-foot",'.
-					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
-					'add: "#override-add",'.
-					'row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"'.
-				'})'.
-				'.bind("afteradd.dynamicRows", function(event, options) {'.
-					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(Math.max(container.scrollTop(),
-						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
-					));'.
+			jQuery("#overrides")
+				.dynamicRows({
+					template: "#overrides-row",
+					beforeRow: ".overrides-foot",
+					remove: ".'.ZBX_STYLE_BTN_REMOVE.'",
+					add: "#override-add",
+					row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"
+				})
+				.bind("afteradd.dynamicRows", function(event, options) {
+					const container = jQuery(".overlay-dialogue-body");
 
-					'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
-						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
-					'});'.
-					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'onGraphConfigChange();'.
-				'})'.
-				'.bind("afterremove.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'onGraphConfigChange();'.
-				'})'.
-				'.bind("tableupdate.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-					'initializeOverrides();'.
-					'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {'.
-						'jQuery("#overrides .drag-icon").removeClass("disabled");'.
-						'jQuery("#overrides").sortable("enable");'.
-					'}'.
-					'else {'.
-						'jQuery("#overrides .drag-icon").addClass("disabled");'.
-						'jQuery("#overrides").sortable("disable");'.
-					'}'.
-				'});',
+					container.scrollTop(Math.max(container.scrollTop(),
+						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
+					));
+
+					jQuery(".multiselect", jQuery("#overrides")).each(function() {
+						jQuery(this).multiSelect(jQuery(this).data("params"));
+					});
+
+					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
+					widget_svggraph_form.onGraphConfigChange();
+				})
+				.bind("afterremove.dynamicRows", function(event, options) {
+					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
+					widget_svggraph_form.onGraphConfigChange();
+				})
+				.bind("tableupdate.dynamicRows", function(event, options) {
+					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
+					initializeOverrides();
+					if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length > 1) {
+						jQuery("#overrides .drag-icon").removeClass("disabled");
+						jQuery("#overrides").sortable("enable");
+					}
+					else {
+						jQuery("#overrides .drag-icon").addClass("disabled");
+						jQuery("#overrides").sortable("disable");
+					}
+				});
 
 			// Initialize overrides UI control.
-			'initializeOverrides();',
+			initializeOverrides();
 
 			// Initialize override pattern-selectors.
-			'jQuery(".multiselect", jQuery("#overrides")).each(function() {'.
-				'jQuery(this).multiSelect(jQuery(this).data("params"));'.
-			'});',
+			jQuery(".multiselect", jQuery("#overrides")).each(function() {
+				jQuery(this).multiSelect(jQuery(this).data("params"));
+			});
 
 			// Make overrides sortable.
-			'if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {'.
-				'jQuery("#overrides .drag-icon").addClass("disabled");'.
-			'}'.
-			'jQuery("#overrides").sortable({'.
-				'items: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",'.
-				'containment: "parent",'.
-				'handle: ".drag-icon",'.
-				'tolerance: "pointer",'.
-				'scroll: false,'.
-				'cursor: "grabbing",'.
-				'opacity: 0.6,'.
-				'axis: "y",'.
-				'disabled: function() {'.
-					'return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;'.
-				'}(),'.
-				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
-					'jQuery(this).sortable("refreshPositions");'.
-				'},'.
-				'stop: onGraphConfigChange,'.
-				'update: function() {'.
-					'updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");'.
-				'}'.
-			'});'
-		];
+			if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {
+				jQuery("#overrides .drag-icon").addClass("disabled");
+			}
 
-		return implode ('', $scripts);
+			jQuery("#overrides").sortable({
+				items: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'",
+				containment: "parent",
+				handle: ".drag-icon",
+				tolerance: "pointer",
+				scroll: false,
+				cursor: "grabbing",
+				opacity: 0.6,
+				axis: "y",
+				disabled: function() {
+					return jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2;
+				}(),
+				start: function() { // Workaround to fix wrong scrolling at initial sort.
+					jQuery(this).sortable("refreshPositions");
+				},
+				stop: () => widget_svggraph_form.onGraphConfigChange(),
+				update: function() {
+					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
+				}
+			});
+		';
 	}
 
 	/**
@@ -1140,90 +1150,173 @@ class CWidgetHelper {
 	 *
 	 * @return CListItem
 	 */
-	private static function getGraphDataSetLayout($field_name, array $value, $form_name, $row_num, $is_opened) {
-		return (new CListItem([
-			// Accordion head - data set selection fields and tools.
-			(new CDiv([
-				(new CDiv())
-					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('position: absolute; margin-left: -25px;'),
-				(new CDiv([
-					(new CDiv([
-						(new CButton())
-							->addClass(ZBX_STYLE_COLOR_PREVIEW_BOX)
-							->addStyle('background-color: #'.$value['color'].';')
-							->setAttribute('title', $is_opened ? _('Collapse') : _('Expand'))
-							->removeId(),
-						(new CPatternSelect([
-							'name' => $field_name.'['.$row_num.'][hosts][]',
-							'object_name' => 'hosts',
-							'data' => $value['hosts'],
-							'placeholder' => _('host pattern'),
-							'popup' => [
-								'parameters' => [
-									'srctbl' => 'hosts',
-									'srcfld1' => 'host',
-									'dstfrm' => $form_name,
-									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
-								]
-							],
-							'add_post_js' => false
-						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					]))->addClass(ZBX_STYLE_COLUMN_50),
-					(new CDiv(
-						(new CPatternSelect([
-							'name' => $field_name.'['.$row_num.'][items][]',
-							'object_name' => 'items',
-							'data' => $value['items'],
-							'placeholder' => _('item pattern'),
-							'popup' => [
-								'parameters' => [
-									'srctbl' => 'items',
-									'srcfld1' => 'name',
-									'real_hosts' => 1,
-									'numeric' => 1,
-									'webitems' => 1,
-									'dstfrm' => $form_name,
-									'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
-								]
-							],
-							'add_post_js' => false
-						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-					))->addClass(ZBX_STYLE_COLUMN_50)
-				]))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
-					->addClass(ZBX_STYLE_COLUMN_95),
-				(new CDiv([
-					(new CButton())
-						->setAttribute('title', _('Delete'))
-						->addClass(ZBX_STYLE_BTN_REMOVE)
-						->removeId()
-				]))->addClass(ZBX_STYLE_COLUMN_5)
-			]))
-				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
-				->addClass(ZBX_STYLE_COLUMNS),
+	private static function getGraphDataSetLayout($field_name, array $value, $form_name, $row_num, $is_opened,
+			int $dataset_type = CWidgetHelper::DATASET_TYPE_PATTERN_ITEM) {
+		$dataset_head = [
+			new CDiv((new CSimpleButton('&nbsp;'))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)),
+			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
+		];
 
-			// Accordion body - data set configuration options.
-			(new CDiv(
-				(new CDiv([
-					// Left column fields.
-					(new CDiv(
-						(new CFormList())
-							->addRow(_('Base color'),
-								(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
-									->appendColorPickerJs(false)
-							)
-							->addRow(_('Draw'),
+		if ($dataset_type == self::DATASET_TYPE_PATTERN_ITEM) {
+			$dataset_head = array_merge($dataset_head, [
+				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))->appendColorPickerJs(false),
+				(new CPatternSelect([
+					'name' => $field_name.'['.$row_num.'][hosts][]',
+					'object_name' => 'hosts',
+					'data' => $value['hosts'],
+					'placeholder' => _('host pattern'),
+					'wildcard_allowed' => 1,
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'hosts',
+							'srcfld1' => 'host',
+							'dstfrm' => $form_name,
+							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][hosts][]')
+						]
+					],
+					'add_post_js' => false
+				]))
+					->addClass('js-hosts-multiselect')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
+				(new CPatternSelect([
+					'name' => $field_name.'['.$row_num.'][items][]',
+					'object_name' => 'items',
+					'data' => $value['items'],
+					'placeholder' => _('item pattern'),
+					'wildcard_allowed' => 1,
+					'popup' => [
+						'parameters' => [
+							'srctbl' => 'items',
+							'srcfld1' => 'name',
+							'real_hosts' => 1,
+							'numeric' => 1,
+							'dstfrm' => $form_name,
+							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
+						]
+					],
+					'add_post_js' => false
+				]))
+					->addClass('js-items-multiselect')
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			]);
+		}
+		else {
+			$item_rows = [];
+			foreach($value['itemids'] as $i => $itemid) {
+				$item_name = array_key_exists($itemid, $value['item_names'])
+					? $value['item_names'][$itemid]
+					: '';
+
+				$item_rows[] = (new CRow([
+					(new CCol(
+						(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+					))
+						->addClass('table-col-handle')
+						->addClass(ZBX_STYLE_TD_DRAG_ICON),
+					(new CCol(
+						(new CColor($field_name.'['.$row_num.'][color][]', $value['color'][$i],
+							'items_'.$row_num.'_'.($i + 1).'_color'
+						))->appendColorPickerJs(false)
+					))->addClass('table-col-color'),
+					(new CCol(new CSpan(($i + 1).':')))->addClass('table-col-no'),
+					(new CCol(
+						(new CLink($item_name))
+							->setId('items_'.$row_num.'_'.($i + 1).'_name')
+							->addClass('js-click-expend')
+					))->addClass('table-col-name'),
+					(new CCol([
+						(new CButton('button', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove'),
+						new CVar($field_name.'['.$row_num.'][itemids][]', $itemid,
+							'items_'.$row_num.'_'.($i + 1).'_input'
+						)
+					]))
+						->addClass('table-col-action')
+						->addClass(ZBX_STYLE_NOWRAP)
+				]))
+					->addClass('sortable')
+					->addClass('single-item-table-row')
+					->setAttribute('data-number', $i + 1);
+			}
+
+			$empty_msg_block = (new CDiv(_('No item selected.')))->addClass('no-items-message');
+
+			$items_list = (new CTable())
+				->addClass('single-item-table')
+				->setAttribute('data-set', $row_num)
+				->setColumns([
+					(new CTableColumn())->addClass('table-col-handle'),
+					(new CTableColumn())->addClass('table-col-color'),
+					(new CTableColumn())->addClass('table-col-no'),
+					(new CTableColumn(_('Name')))->addClass('table-col-name'),
+					(new CTableColumn(_('Action')))->addClass('table-col-action')
+				])
+				->addItem([
+					$item_rows,
+					(new CTag('tfoot', true))
+						->addItem(
+							(new CCol(
+								(new CList())
+									->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
+									->addItem(
+										(new CSimpleButton(_('Add')))
+											->addClass(ZBX_STYLE_BTN_LINK)
+											->addClass('js-add-item')
+									)
+							))->setColSpan(5)
+						)
+				]);
+
+			$dataset_head = array_merge($dataset_head, [
+				(new CDiv([$empty_msg_block, $items_list]))->addClass('items-list table-forms-separator')
+			]);
+		}
+
+		$dataset_head[] = (new CDiv(
+			(new CButton())
+				->setAttribute('title', _('Delete'))
+				->addClass(ZBX_STYLE_BTN_REMOVE)
+				->removeId()
+		))->addClass('dataset-actions');
+
+		return (new CListItem([
+			(new CDiv())
+				->addClass(ZBX_STYLE_DRAG_ICON)
+				->addClass('js-main-drag-icon'),
+			(new CDiv())
+				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
+				->addClass('dataset-head')
+				->addItem($dataset_head),
+			(new CDiv())
+				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
+				->addClass('dataset-body')
+				->addItem([
+					(new CFormGrid())
+						->addItem([
+							new CLabel(_('Draw')),
+							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][type]', (int) $value['type']))
 									->addValue(_('Line'), SVG_GRAPH_TYPE_LINE)
 									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
 									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
 									->addValue(_('Bar'), SVG_GRAPH_TYPE_BAR)
-									->onChange('changeDataSetDrawType(this)')
+									->onChange('widget_svggraph_form.changeDataSetDrawType(this)')
 									->setModern(true)
 							)
-							->addRow(_('Width'),
+						])
+						->addItem([
+							new CLabel(_('Stacked'), $field_name.'['.$row_num.'][stacked]'),
+							new CFormField([
+								(new CVar($field_name.'['.$row_num.'][stacked]', '0'))->removeId(),
+								(new CCheckBox($field_name.'['.$row_num.'][stacked]'))
+									->setChecked((bool) $value['stacked'])
+									->setEnabled($value['type'] == SVG_GRAPH_TYPE_LINE)
+							])
+						])
+						->addItem([
+							new CLabel(_('Width')),
+							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -1231,7 +1324,10 @@ class CWidgetHelper {
 									->setMin(0)
 									->setMax(10)
 							)
-							->addRow(_('Point size'),
+						])
+						->addItem([
+							new CLabel(_('Point size')),
+							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -1239,16 +1335,22 @@ class CWidgetHelper {
 									->setMin(1)
 									->setMax(10)
 							)
-							->addRow(_('Transparency'),
+						])
+						->addItem([
+							new CLabel(_('Transparency')),
+							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
-										(int) $value['transparency'])
-									)
+									(int) $value['transparency'])
+								)
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 									->setStep(1)
 									->setMin(0)
 									->setMax(10)
 							)
-							->addRow(_('Fill'),
+						])
+						->addItem([
+							new CLabel(_('Fill')),
+							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -1256,17 +1358,14 @@ class CWidgetHelper {
 									->setMin(0)
 									->setMax(10)
 							)
-						)
-					)
-						->addClass(ZBX_STYLE_COLUMN_50),
-
-					// Right column fields.
-					(new CDiv(
-						(new CFormList())
-							->addRow(_('Missing data'),
+						]),
+					(new CFormGrid())
+						->addItem([
+							new CLabel(_('Missing data')),
+							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][missingdatafunc]',
-										(int) $value['missingdatafunc'])
-									)
+									(int) $value['missingdatafunc'])
+								)
 									->addValue(_('None'), SVG_GRAPH_MISSING_DATA_NONE)
 									->addValue(_x('Connected', 'missing data function'),
 										SVG_GRAPH_MISSING_DATA_CONNECTED
@@ -1274,24 +1373,35 @@ class CWidgetHelper {
 									->addValue(_x('Treat as 0', 'missing data function'),
 										SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO
 									)
+									->addValue(_x('Last known', 'missing data function'),
+										SVG_GRAPH_MISSING_DATA_LAST_KNOWN
+									)
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setModern(true)
 							)
-							->addRow(_('Y-axis'),
+						])
+						->addItem([
+							new CLabel(_('Y-axis')),
+							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][axisy]', (int) $value['axisy']))
 									->addValue(_('Left'), GRAPH_YAXIS_SIDE_LEFT)
 									->addValue(_('Right'), GRAPH_YAXIS_SIDE_RIGHT)
 									->setModern(true)
 							)
-							->addRow(_('Time shift'),
+						])
+						->addItem([
+							new CLabel(_('Time shift'), $field_name.'['.$row_num.'][timeshift]'),
+							new CFormField(
 								(new CTextBox($field_name.'['.$row_num.'][timeshift]', $value['timeshift']))
 									->setAttribute('placeholder', _('none'))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(
-								new CLabel(_('Aggregation function'),
-									'label-'.$field_name.'_'.$row_num.'_aggregate_function'
-								),
+						])
+						->addItem([
+							new CLabel(_('Aggregation function'),
+								'label-'.$field_name.'_'.$row_num.'_aggregate_function'
+							),
+							new CFormField(
 								(new CSelect($field_name.'['.$row_num.'][aggregate_function]'))
 									->setId($field_name.'_'.$row_num.'_aggregate_function')
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
@@ -1308,18 +1418,22 @@ class CWidgetHelper {
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(_('Aggregation interval'),
-								(new CTextBox(
-									$field_name.'['.$row_num.'][aggregate_interval]',
+						])
+						->addItem([
+							new CLabel(_('Aggregation interval'), $field_name.'['.$row_num.'][aggregate_interval]'),
+							new CFormField(
+								(new CTextBox($field_name.'['.$row_num.'][aggregate_interval]',
 									$value['aggregate_interval']
 								))
 									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
 									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
-							->addRow(_('Aggregate'),
-								(new CRadioButtonList(
-									$field_name.'['.$row_num.'][aggregate_grouping]',
+						])
+						->addItem([
+							new CLabel(_('Aggregate')),
+							new CFormField(
+								(new CRadioButtonList($field_name.'['.$row_num.'][aggregate_grouping]',
 									(int) $value['aggregate_grouping'])
 								)
 									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
@@ -1327,32 +1441,46 @@ class CWidgetHelper {
 									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
 									->setModern(true)
 							)
-					))
-						->addClass(ZBX_STYLE_COLUMN_50)
-				]))
-					->addClass(ZBX_STYLE_COLUMNS)
-					->addClass(ZBX_STYLE_COLUMNS_NOWRAP)
-					->addClass(ZBX_STYLE_COLUMN_95)
-			))
-				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
-				->addClass(ZBX_STYLE_COLUMNS)
+						])
+						->addItem([
+							new CLabel(_('Approximation'),
+								'label-'.$field_name.'_'.$row_num.'_approximation'
+							),
+							new CFormField(
+								(new CSelect($field_name.'['.$row_num.'][approximation]'))
+									->setId($field_name.'_'.$row_num.'_approximation')
+									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_approximation')
+									->setValue((int) $value['approximation'])
+									->addOptions(CSelect::createOptionsFromArray([
+										APPROXIMATION_ALL =>_('all'),
+										APPROXIMATION_MIN =>_('min'),
+										APPROXIMATION_AVG =>_('avg'),
+										APPROXIMATION_MAX =>_('max')
+									]))
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+						])
+				])
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
-			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED);
+			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
+			->setAttribute('data-set', $row_num)
+			->setAttribute('data-type', $dataset_type);
 	}
 
 	/**
 	 * Return template used by dynamic rows in CWidgetFieldGraphDataSet field.
 	 *
 	 * @param CWidgetFieldGraphDataSet $field
-	 * @param string                   $form_name   Form name in which data set field resides.
+	 * @param string                   $form_name     Form name in which data set field resides.
+	 * @param int                      $dataset_type
 	 *
 	 * @return string
 	 */
-	public static function getGraphDataSetTemplate($field, $form_name) {
-		$value = ['color' => '#{color}'] + CWidgetFieldGraphDataSet::getDefaults();
+	public static function getGraphDataSetTemplate($field, $form_name, int $dataset_type) {
+		$value = ['color' => '#{color}'] +  CWidgetFieldGraphDataSet::getDefaults();
 
-		return self::getGraphDataSetLayout($field->getName(), $value, $form_name, '#{rowNum}', true)->toString();
+		return self::getGraphDataSetLayout($field->getName(), $value, $form_name, '#{rowNum}', true, $dataset_type)->toString();
 	}
 
 	/**
@@ -1371,193 +1499,65 @@ class CWidgetHelper {
 			$values[] = CWidgetFieldGraphDataSet::getDefaults();
 		}
 
+		// Get item names for single item datasets.
+		$itemids = array_merge(...array_column($values, 'itemids'));
+		if ($itemids) {
+			$names = self::getItemNames($itemids);
+		}
+
 		foreach ($values as $i => $value) {
-			$list->addItem(self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i == 0));
+			if ($value['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
+				$value['item_names'] = $names;
+			}
+
+			$list->addItem(
+				self::getGraphDataSetLayout($field->getName(), $value, $form_name, $i, $i == 0, $value['dataset_type'])
+			);
 		}
 
 		// Add 'Add' button under accordion.
 		$list->addItem(
-			(new CDiv(
-				(new CButton('data_sets_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new data set')]))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->setId('dataset-add')
-			)),
+			(new CList())
+				->addClass(ZBX_STYLE_BTN_SPLIT)
+				->addItem([
+					(new CButton(null, [
+						(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON),
+						_('Add new data set')
+					]))
+						->setId('dataset-add')
+						->addClass(ZBX_STYLE_BTN_ALT),
+					(new CButton(null, '&#8203;'))
+						->setId('dataset-menu')
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+				]),
 			ZBX_STYLE_LIST_ACCORDION_FOOT
 		);
 
 		return $list;
 	}
 
-	/**
-	 * Return javascript necessary to initialize CWidgetFieldGraphDataSet field.
-	 *
-	 * @return string
-	 */
-	public static function getGraphDataSetJavascript() {
-		$scripts = [
-			'function changeDataSetDrawType(obj) {'.
-				'var row_num = obj.id.replace("ds_", "").replace("_type", "");'.
-				'switch (jQuery(":checked", jQuery(obj)).val()) {'.
-					'case "'.SVG_GRAPH_TYPE_POINTS.'":'.
-						'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
-						'break;'.
-					'case "'.SVG_GRAPH_TYPE_BAR.'":'.
-						'jQuery("#ds_" + row_num + "_width").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_fill").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", true);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", true);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", true);'.
-						'break;'.
-					'default:'.
-						'jQuery("#ds_" + row_num + "_width").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_pointsize").rangeControl("disable");'.
-						'jQuery("#ds_" + row_num + "_transparency").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_fill").rangeControl("enable");'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_0").prop("disabled", false);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_1").prop("disabled", false);'.
-						'jQuery("#ds_" + row_num + "_missingdatafunc_2").prop("disabled", false);'.
-						'break;'.
-				'}'.
-			'};',
+	private static function getItemNames(array $itemids): array {
+		$names = [];
 
-			'function changeDataSetAggregateFunction(obj) {'.
-				'var row_num = obj.id.replace("ds_", "").replace("_aggregate_function", "");'.
-				'var no_aggregation = (jQuery(obj).val() == '.AGGREGATE_NONE.');'.
-				'jQuery("#ds_" + row_num + "_aggregate_interval").prop("disabled", no_aggregation);'.
-				'jQuery("#ds_" + row_num + "_aggregate_grouping_0").prop("disabled", no_aggregation);'.
-				'jQuery("#ds_" + row_num + "_aggregate_grouping_1").prop("disabled", no_aggregation);'.
-			'};',
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name'],
+			'selectHosts' => ['hostid', 'name'],
+			'webitems' => true,
+			'itemids' => $itemids,
+			'preservekeys' => true
+		]);
 
-			// Initialize dynamic rows.
-			'jQuery("#data_sets")'.
-				'.dynamicRows({'.
-					'template: "#dataset-row",'.
-					'beforeRow: ".'.ZBX_STYLE_LIST_ACCORDION_FOOT.'",'.
-					'remove: ".'.ZBX_STYLE_BTN_REMOVE.'",'.
-					'add: "#dataset-add",'.
-					'row: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
-					'dataCallback: function(data) {'.
-						'data.color = function(num) {'.
-							'var palette = '.CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE.';'.
-							'return palette[num % palette.length];'.
-						'} (data.rowNum);'.
-						'return data;'.
-					'}'.
-				'})'.
-				'.bind("beforeadd.dynamicRows", function(event, options) {'.
-					'jQuery("#data_sets").zbx_vertical_accordion("collapseAll");'.
-				'})'.
-				'.bind("afteradd.dynamicRows", function(event, options) {'.
-					'var container = jQuery(".overlay-dialogue-body");'.
-					'container.scrollTop(Math.max(container.scrollTop(),
-						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
-					));'.
+		if (!$items) {
+			return $names;
+		}
 
-					'jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color) {'.
-						'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
-						'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
-					'}, appendTo: ".overlay-dialogue-body"});'.
+		foreach ($items as $item) {
+			$hosts = array_column($item['hosts'], 'name', 'hostid');
+			$names[$item['itemid']] = $hosts[$item['hostid']].NAME_DELIMITER.$item['name'];
+		}
 
-					'jQuery(".multiselect", jQuery("#data_sets")).each(function() {'.
-						'jQuery(this).multiSelect(jQuery(this).data("params"));'.
-					'});'.
-					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'onGraphConfigChange();'.
-				'})'.
-				'.bind("afterremove.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'onGraphConfigChange();'.
-				'})'.
-				'.bind("tableupdate.dynamicRows", function(event, options) {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-					'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'[data-options]").rangeControl();'.
-					'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length > 1) {'.
-						'jQuery("#data_sets .drag-icon").removeClass("disabled");'.
-						'jQuery("#data_sets").sortable("enable");'.
-					'}'.
-					'else {'.
-						'jQuery("#data_sets .drag-icon").addClass("disabled");'.
-						'jQuery("#data_sets").sortable("disable");'.
-					'}'.
-				'});',
-
-			// Initialize vertical accordion.
-			'jQuery("#data_sets")'.
-				'.on("focus", ".'.CMultiSelect::ZBX_STYLE_CLASS.' input.input", function() {'.
-					'jQuery("#data_sets").zbx_vertical_accordion("expandNth",'.
-						'jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index());'.
-					'})'.
-				'.on("collapse", function(event, data) {'.
-					'jQuery("textarea, .multiselect", data.section).scrollTop(0);'.
-					'jQuery(window).trigger("resize");'.
-				'})'.
-				'.on("expand", function() {'.
-					'jQuery(window).trigger("resize");'.
-				'})'.
-				'.zbx_vertical_accordion({handler: ".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'"});',
-
-			// Initialize rangeControl UI elements.
-			'jQuery(".'.CRangeControl::ZBX_STYLE_CLASS.'", jQuery("#data_sets")).rangeControl();',
-
-			// Expand dataset when click in pattern fields.
-			'jQuery("#data_sets").on("click", "'.implode(', ', [
-				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.CPatternSelect::ZBX_STYLE_CLASS,
-				'.'.ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED.' .'.ZBX_STYLE_BTN_GREY
-			]).'", function(event) {'.
-				'var index = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").index();'.
-				'jQuery("#data_sets").zbx_vertical_accordion("expandNth", index);'.
-				'jQuery(event.currentTarget).find("input.input").focus();'.
-			'});',
-
-			// Initialize pattern fields.
-			'jQuery(".multiselect", jQuery("#data_sets")).each(function() {'.
-				'jQuery(this).multiSelect(jQuery(this).data("params"));'.
-			'});',
-
-			// Initialize color-picker UI elements.
-			'jQuery(".'.ZBX_STYLE_COLOR_PICKER.' input").colorpicker({onUpdate: function(color){'.
-				'var ds = jQuery(this).closest(".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'");'.
-				'jQuery(".'.ZBX_STYLE_COLOR_PREVIEW_BOX.'", ds).css("background-color", "#"+color);'.
-			'}, appendTo: ".overlay-dialogue-body"});',
-
-			// Initialize sortability.
-			'if (jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2) {'.
-				'jQuery("#data_sets .drag-icon").addClass("disabled");'.
-			'}'.
-			'jQuery("#data_sets").sortable({'.
-				'items: ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'",'.
-				'containment: "parent",'.
-				'handle: ".drag-icon",'.
-				'tolerance: "pointer",'.
-				'scroll: false,'.
-				'cursor: "grabbing",'.
-				'opacity: 0.6,'.
-				'axis: "y",'.
-				'disabled: function() {'.
-					'return jQuery("#data_sets .'.ZBX_STYLE_LIST_ACCORDION_ITEM.'").length < 2;'.
-				'}(),'.
-				'start: function() {'. // Workaround to fix wrong scrolling at initial sort.
-					'jQuery(this).sortable("refreshPositions");'.
-				'},'.
-				'stop: onGraphConfigChange,'.
-				'update: function() {'.
-					'updateVariableOrder(jQuery("#data_sets"), ".'.ZBX_STYLE_LIST_ACCORDION_ITEM.'", "ds");'.
-				'}'.
-			'});'.
-			'$(".overlay-dialogue-body").on("change", "z-select[id$=\"aggregate_function\"]", (e) => {'.
-				'changeDataSetAggregateFunction(e.target);'.
-			'});'
-		];
-
-		return implode ('', $scripts);
+		return $names;
 	}
 
 	/**

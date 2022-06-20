@@ -3,7 +3,7 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 The template to monitor Apache HTTPD by Zabbix that work without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.  
 Template `Apache by HTTP` - collects metrics by polling [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html) with HTTP agent remotely:  
@@ -57,7 +57,7 @@ This template was tested on:
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/http) for basic instructions.
 
 Setup [mod_status](https://httpd.apache.org/docs/current/mod/mod_status.html)
 
@@ -136,10 +136,10 @@ There are no template links in this template.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----|----|----|
 |Apache: Service is down |<p>-</p> |`last(/Apache by HTTP/net.tcp.service[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"])=0` |AVERAGE |<p>Manual close: YES</p> |
-|Apache: Service response time is too high (over {$APACHE.RESPONSE_TIME.MAX.WARN}s for 5m) |<p>-</p> |`min(/Apache by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
-|Apache: has been restarted (uptime < 10m) |<p>Uptime is less than 10 minutes</p> |`last(/Apache by HTTP/apache.uptime)<10m` |INFO |<p>Manual close: YES</p> |
-|Apache: Version has changed (new version: {ITEM.VALUE}) |<p>Apache version has changed. Ack to close.</p> |`last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2) and length(last(/Apache by HTTP/apache.version))>0` |INFO |<p>Manual close: YES</p> |
-|Apache: Failed to fetch status page (or no data for 30m) |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Apache by HTTP/apache.get_status,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
+|Apache: Service response time is too high |<p>-</p> |`min(/Apache by HTTP/net.tcp.service.perf[http,"{HOST.CONN}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
+|Apache: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/Apache by HTTP/apache.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|Apache: Version has changed |<p>Apache version has changed. Ack to close.</p> |`last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2) and length(last(/Apache by HTTP/apache.version))>0` |INFO |<p>Manual close: YES</p> |
+|Apache: Failed to fetch status page |<p>Zabbix has not received data for items for the last 30 minutes.</p> |`nodata(/Apache by HTTP/apache.get_status,30m)=1` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Apache: Service is down</p> |
 
 ## Feedback
 

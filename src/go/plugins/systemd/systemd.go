@@ -27,7 +27,7 @@ import (
 	"strings"
 	"sync"
 
-	"zabbix.com/pkg/plugin"
+	"git.zabbix.com/ap/plugin-support/plugin"
 
 	"github.com/godbus/dbus"
 )
@@ -55,7 +55,7 @@ type unit struct {
 }
 
 type unitFile struct {
-	Name	        string
+	Name            string
 	EnablementState string
 }
 

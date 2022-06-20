@@ -193,7 +193,7 @@ class CTest extends TestCase {
 			try {
 				$method->invoke(!$method->isStatic() ? $context : null);
 			} catch (Exception $e) {
-				$error = 'Failed to execute callback "'.$callback.'": '.$e->getMessage();
+				$error = 'Failed to execute callback "'.$callback.'": '.$e->getMessage()."\n\n".$e->getTraceAsString();
 				if (!$required) {
 					self::zbxAddWarning($error);
 				}
@@ -243,8 +243,6 @@ class CTest extends TestCase {
 		if (!self::executeCallbacks($this, $callbacks)) {
 			self::markTestSuiteSkipped();
 			throw new Exception(implode("\n", static::$warnings));
-
-			return;
 		}
 
 		// Store callback to be executed later.

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -22,33 +22,11 @@
 
 window.service_edit_popup = new class {
 
-	constructor() {
-		this.status_rule_template = null;
-		this.child_template = null;
-
-		this.serviceid = null;
-		this.children = new Map();
-
-		this.create_url = null;
-		this.update_url = null;
-		this.delete_url = null;
-		this.search_limit = null;
-
-		this.overlay = null;
-		this.dialogue = null;
-		this.form = null;
-		this.footer = null;
-	}
-
-	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, create_url, update_url,
-			delete_url, search_limit}) {
-		this.initTemplates();
+	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit}) {
+		this._initTemplates();
 
 		this.serviceid = serviceid;
 
-		this.create_url = create_url;
-		this.update_url = update_url;
-		this.delete_url = delete_url;
 		this.search_limit = search_limit;
 
 		this.overlay = overlays_stack.getById('service_edit');
@@ -57,8 +35,10 @@ window.service_edit_popup = new class {
 		this.footer = this.overlay.$dialogue.$footer[0];
 
 		for (const status_rule of status_rules) {
-			this.addStatusRule(status_rule);
+			this._addStatusRule(status_rule);
 		}
+
+		this.children = new Map();
 
 		for (const service of children) {
 			this.children.set(service.serviceid, {
@@ -68,14 +48,14 @@ window.service_edit_popup = new class {
 			});
 		}
 
-		this.filterChildren();
+		this._filterChildren();
 
 		// Setup parent services.
 
 		jQuery('#parent_serviceids_')
 			.multiSelect('getSelectButton')
 			.addEventListener('click', () => {
-				this.selectParents();
+				this._selectParents();
 			});
 
 		// Setup problem tags.
@@ -87,9 +67,9 @@ window.service_edit_popup = new class {
 			rows: problem_tags
 		});
 
-		$problem_tags.on('tableupdate.dynamicRows', () => this.update());
+		$problem_tags.on('tableupdate.dynamicRows', () => this._update());
 
-		document.getElementById('problem_tags').addEventListener('change', () => this.update());
+		document.getElementById('problem_tags').addEventListener('change', () => this._update());
 
 		// Setup service rules.
 
@@ -97,10 +77,10 @@ window.service_edit_popup = new class {
 			.getElementById('status_rules')
 			.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-add')) {
-					this.editStatusRule();
+					this._editStatusRule();
 				}
 				else if (e.target.classList.contains('js-edit')) {
-					this.editStatusRule(e.target.closest('tr'));
+					this._editStatusRule(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
 					e.target.closest('tr').remove();
@@ -139,11 +119,11 @@ window.service_edit_popup = new class {
 			.getElementById('children-filter')
 			.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-filter')) {
-					this.filterChildren();
+					this._filterChildren();
 				}
 				else if (e.target.classList.contains('js-reset')) {
 					document.getElementById('children-filter-name').value = '';
-					this.filterChildren();
+					this._filterChildren();
 				}
 			});
 
@@ -151,7 +131,7 @@ window.service_edit_popup = new class {
 			.getElementById('children-filter-name')
 			.addEventListener('keypress', (e) => {
 				if (e.key === 'Enter') {
-					this.filterChildren();
+					this._filterChildren();
 					e.preventDefault();
 				}
 			}, {passive: false});
@@ -160,10 +140,10 @@ window.service_edit_popup = new class {
 			.getElementById('children')
 			.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-add')) {
-					this.selectChildren();
+					this._selectChildren();
 				}
 				else if (e.target.classList.contains('js-remove')) {
-					this.removeChild(e.target.closest('tr').dataset.serviceid);
+					this._removeChild(e.target.closest('tr').dataset.serviceid);
 				}
 			});
 
@@ -172,13 +152,13 @@ window.service_edit_popup = new class {
 		for (const id of ['advanced_configuration', 'propagation_rule', 'algorithm']) {
 			document
 				.getElementById(id)
-				.addEventListener('change', () => this.update());
+				.addEventListener('change', () => this._update());
 		}
 
-		this.update();
+		this._update();
 	}
 
-	initTemplates() {
+	_initTemplates() {
 		this.status_rule_template = new Template(`
 			<tr data-row_index="#{row_index}">
 				<td>
@@ -212,7 +192,7 @@ window.service_edit_popup = new class {
 		`);
 	}
 
-	update() {
+	_update() {
 		const advanced_configuration = document.getElementById('advanced_configuration').checked;
 		const propagation_rule = document.getElementById('propagation_rule').value;
 
@@ -265,7 +245,7 @@ window.service_edit_popup = new class {
 		document.querySelector('#children .js-add').disabled = has_problem_tags;
 	}
 
-	editStatusRule(row = null) {
+	_editStatusRule(row = null) {
 		let parameters;
 
 		if (row !== null) {
@@ -294,26 +274,26 @@ window.service_edit_popup = new class {
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			if (row !== null) {
-				this.updateStatusRule(row, e.detail)
+				this._updateStatusRule(row, e.detail)
 			}
 			else {
-				this.addStatusRule(e.detail);
+				this._addStatusRule(e.detail);
 			}
 		});
 	}
 
-	addStatusRule(status_rule) {
+	_addStatusRule(status_rule) {
 		document
 			.querySelector('#status_rules tbody')
 			.insertAdjacentHTML('beforeend', this.status_rule_template.evaluate(status_rule));
 	}
 
-	updateStatusRule(row, status_rule) {
+	_updateStatusRule(row, status_rule) {
 		row.insertAdjacentHTML('afterend', this.status_rule_template.evaluate(status_rule));
 		row.remove();
 	}
 
-	renderChild(service) {
+	_renderChild(service) {
 		document
 			.querySelector('#children tbody')
 			.insertAdjacentHTML('beforeend', this.child_template.evaluate({
@@ -323,7 +303,7 @@ window.service_edit_popup = new class {
 			}));
 	}
 
-	removeChild(serviceid) {
+	_removeChild(serviceid) {
 		const child = this.form.querySelector(`#children tbody tr[data-serviceid="${serviceid}"]`);
 
 		if (child !== null) {
@@ -331,21 +311,21 @@ window.service_edit_popup = new class {
 		}
 
 		this.children.delete(serviceid);
-		this.updateChildrenFilterStats();
-		this.updateTabIndicator();
-		this.update();
+		this._updateChildrenFilterStats();
+		this._updateTabIndicator();
+		this._update();
 	}
 
-	removeAllChildren() {
+	_removeAllChildren() {
 		document.querySelector('#children tbody').innerHTML = '';
 
 		this.children.clear();
-		this.updateChildrenFilterStats();
-		this.updateTabIndicator();
-		this.update();
+		this._updateChildrenFilterStats();
+		this._updateTabIndicator();
+		this._update();
 	}
 
-	filterChildren() {
+	_filterChildren() {
 		const container = document.querySelector('#children tbody');
 
 		container.innerHTML = '';
@@ -359,18 +339,18 @@ window.service_edit_popup = new class {
 				continue;
 			}
 
-			this.renderChild(service);
+			this._renderChild(service);
 
 			if (++count == this.search_limit) {
 				break;
 			}
 		}
 
-		this.updateChildrenFilterStats();
-		this.updateTabIndicator();
+		this._updateChildrenFilterStats();
+		this._updateTabIndicator();
 	}
 
-	updateChildrenFilterStats() {
+	_updateChildrenFilterStats() {
 		const container = document.querySelector('#children tbody');
 
 		const stats_template = <?= json_encode(_('Displaying %1$s of %2$s found')) ?>;
@@ -380,13 +360,13 @@ window.service_edit_popup = new class {
 			: '';
 	}
 
-	updateTabIndicator() {
+	_updateTabIndicator() {
 		document
 			.querySelector('#children')
 			.setAttribute('data-tab-indicator', this.children.size);
 	}
 
-	selectChildren() {
+	_selectChildren() {
 		const exclude_serviceids = [];
 
 		if (this.serviceid !== null) {
@@ -406,17 +386,17 @@ window.service_edit_popup = new class {
 			for (const service of e.detail) {
 				if (!this.children.has(service.serviceid)) {
 					this.children.set(service.serviceid, service);
-					this.renderChild(service);
+					this._renderChild(service);
 				}
 			}
 
-			this.updateChildrenFilterStats();
-			this.updateTabIndicator();
-			this.update();
+			this._updateChildrenFilterStats();
+			this._updateTabIndicator();
+			this._update();
 		});
 	}
 
-	selectParents() {
+	_selectParents() {
 		const exclude_serviceids = [];
 
 		if (this.serviceid !== null) {
@@ -446,61 +426,23 @@ window.service_edit_popup = new class {
 	clone({title, buttons}) {
 		this.serviceid = null;
 
-		this.removeAllChildren();
+		this._removeAllChildren();
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
 	}
 
 	delete() {
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
-
 		this.overlay.setLoading();
 
-		const curl = new Curl(this.delete_url);
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'service.delete');
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({serviceids: [this.serviceid]})
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {response_error: response.error};
-				}
+		this._post(curl.getUrl(), {serviceids: [this.serviceid]}, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
 
-				if ('success' in response) {
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
-						detail: {
-							title: response.success.title,
-							messages: ('messages' in response.success) ? response.success.messages : null
-						}
-					}));
-				}
-			})
-			.catch((error) => {
-				this.overlay.unsetLoading();
-
-				let title, messages;
-
-				if (typeof error === 'object' && 'response_error' in error) {
-					title = error.response_error.title;
-					messages = error.response_error.messages;
-				}
-				else {
-					title = <?= json_encode(_('Unexpected server error.')) ?>;
-					messages = [];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title, true, false)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+		});
 	}
 
 	submit() {
@@ -527,48 +469,51 @@ window.service_edit_popup = new class {
 			}
 		}
 
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
-
 		this.overlay.setLoading();
 
-		const curl = new Curl(this.serviceid !== null ? this.update_url : this.create_url);
+		const curl = new Curl('zabbix.php', false);
+		curl.setArgument('action', this.serviceid !== null ? 'service.update' : 'service.create');
 
-		fetch(curl.getUrl(), {
+		this._post(curl.getUrl(), fields, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+		});
+	}
+
+	_post(url, data, success_callback) {
+		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(fields)
+			body: JSON.stringify(data)
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('errors' in response) {
-					throw {html_string: response.errors};
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
-				overlayDialogueDestroy(this.overlay.dialogueid);
-
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
-					detail: {
-						title: response.title,
-						messages: ('messages' in response) ? response.messages : null
-					}
-				}));
+				return response;
 			})
-			.catch((error) => {
-				let message_box;
+			.then(success_callback)
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
 
-				if (typeof error === 'object' && 'html_string' in error) {
-					message_box =
-						new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild;
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
 				}
 				else {
-					const error = <?= json_encode(_('Unexpected server error.')) ?>;
-
-					message_box = makeMessageBox('bad', [], error, true, false)[0];
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
@@ -576,4 +521,4 @@ window.service_edit_popup = new class {
 				this.overlay.unsetLoading();
 			});
 	}
-}();
+};

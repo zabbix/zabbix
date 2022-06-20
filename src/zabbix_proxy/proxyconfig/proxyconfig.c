@@ -17,17 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "db.h"
+#include "proxyconfig.h"
+
 #include "log.h"
-#include "daemon.h"
+#include "zbxnix.h"
 #include "proxy.h"
 #include "zbxself.h"
 
-#include "proxyconfig.h"
-#include "zbxcrypto.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
+#include "zbxcommshigh.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
@@ -40,7 +39,7 @@ extern char		*CONFIG_HOSTNAME;
 extern char		*CONFIG_SOURCE_IP;
 extern unsigned int	configured_tls_connect_mode;
 
-static void	process_configuration_sync(size_t *data_size)
+static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced)
 {
 	zbx_socket_t		sock;
 	struct	zbx_json_parse	jp, jp_kvs_paths = {0};
@@ -69,7 +68,7 @@ static void	process_configuration_sync(size_t *data_size)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 
-	if (FAIL == connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
+	if (FAIL == zbx_connect_to_server(&sock,CONFIG_SOURCE_IP, &zbx_addrs, 600, CONFIG_TIMEOUT,
 			configured_tls_connect_mode, CONFIG_PROXYCONFIG_RETRY, LOG_LEVEL_WARNING))	/* retry till have a connection */
 	{
 		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
@@ -78,7 +77,7 @@ static void	process_configuration_sync(size_t *data_size)
 
 	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
-	if (SUCCEED != get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
+	if (SUCCEED != zbx_get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
 				sock.peer, error);
@@ -123,7 +122,8 @@ static void	process_configuration_sync(size_t *data_size)
 
 	if (SUCCEED == process_proxyconfig(&jp, &jp_kvs_paths))
 	{
-		DCsync_configuration(ZBX_DBSYNC_UPDATE);
+		DCsync_configuration(ZBX_DBSYNC_UPDATE, *synced);
+		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (NULL != jp_kvs_paths.start)
 			DCsync_kvs_paths(&jp_kvs_paths);
@@ -131,7 +131,7 @@ static void	process_configuration_sync(size_t *data_size)
 		DCupdate_interfaces_availability();
 	}
 error:
-	disconnect_server(&sock);
+	zbx_disconnect_from_server(&sock);
 out:
 	zbx_free(error);
 	zbx_free(buffer);
@@ -153,6 +153,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	double			sec;
 	zbx_ipc_async_socket_t	rtc;
 	int			sleeptime;
+	zbx_synced_new_config_t	synced = ZBX_SYNCED_NEW_CONFIG_NO;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;
@@ -172,7 +173,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	DCsync_configuration(ZBX_DBSYNC_INIT);
+	DCsync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO);
 
 	zbx_rtc_notify_config_sync(&rtc);
 
@@ -203,7 +204,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			{
 				zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-				DCsync_configuration(ZBX_DBSYNC_UPDATE);
+				DCsync_configuration(ZBX_DBSYNC_UPDATE, synced);
+				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				DCupdate_interfaces_availability();
 				zbx_rtc_notify_config_sync(&rtc);
 
@@ -220,7 +222,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		process_configuration_sync(&data_size);
+		process_configuration_sync(&data_size, &synced);
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL " sec, idle %d sec]",

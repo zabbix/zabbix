@@ -26,9 +26,9 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/zbxerr"
 )
 
 const (
@@ -167,7 +167,7 @@ func parseAnswers(answers []dns.RR) string {
 			out += getSRVString(rr)
 		}
 
-		if i != answersNum - 1 {
+		if i != answersNum-1 {
 			out += "\n"
 		}
 	}

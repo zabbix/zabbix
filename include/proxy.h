@@ -20,8 +20,6 @@
 #ifndef ZABBIX_PROXY_H
 #define ZABBIX_PROXY_H
 
-#include "zbxjson.h"
-#include "comms.h"
 #include "dbcache.h"
 
 #define ZBX_PROXYMODE_ACTIVE	0
@@ -36,6 +34,8 @@
 #define ZBX_PROXY_UPLOAD_UNDEFINED	0
 #define ZBX_PROXY_UPLOAD_DISABLED	1
 #define ZBX_PROXY_UPLOAD_ENABLED	2
+
+#define ZBX_PROXY_ACTIVE_CHECK_AVAIL_TIMEOUT		30
 
 int	get_active_proxy_from_request(struct zbx_json_parse *jp, DC_PROXY *proxy, char **error);
 int	zbx_proxy_check_permissions(const DC_PROXY *proxy, const zbx_socket_t *sock, char **error);
@@ -54,6 +54,7 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
 void	proxy_set_hist_lastid(const zbx_uint64_t lastid);
 void	proxy_set_dhis_lastid(const zbx_uint64_t lastid);
 void	proxy_set_areg_lastid(const zbx_uint64_t lastid);
+int	proxy_get_host_active_availability(struct zbx_json *j);
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format);
 

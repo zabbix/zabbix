@@ -3,13 +3,13 @@
 
 ## Overview
 
-For Zabbix version: 6.0 and higher  
+For Zabbix version: 6.2 and higher  
 Official Solaris OS template. Requires Zabbix agent 4.0.0 or newer.
 
 
 ## Setup
 
-> See [Zabbix template operation](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
+> See [Zabbix template operation](https://www.zabbix.com/documentation/6.2/manual/config/templates_out_of_the_box/zabbix_agent) for basic instructions.
 
 Install Zabbix agent on Solaris OS according to Zabbix documentation.
 
@@ -39,7 +39,7 @@ There are no template links in this template.
 
 |Group|Name|Description|Type|Key and additional info|
 |-----|----|-----------|----|---------------------|
-|Solaris |Maximum number of processes |<p>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxproc |
+|Solaris |Maximum number of processes |<p>It could be increased by using sysctl utility or modifying file /etc/sysctl.conf.</p> |ZABBIX_PASSIVE |kernel.maxproc |
 |Solaris |Number of running processes |<p>Number of processes in running state.</p> |ZABBIX_PASSIVE |proc.num[,,run] |
 |Solaris |Number of processes |<p>Total number of processes in any state.</p> |ZABBIX_PASSIVE |proc.num[] |
 |Solaris |Host boot time |<p>-</p> |ZABBIX_PASSIVE |system.boottime |
@@ -90,7 +90,7 @@ There are no template links in this template.
 |Server has just been restarted |<p>-</p> |`change(/Solaris/system.uptime)<0` |INFO | |
 |/etc/passwd has been changed |<p>-</p> |`last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#1)<>last(/Solaris/vfs.file.cksum[/etc/passwd,sha256],#2)` |WARNING | |
 |Lack of available memory on server |<p>-</p> |`last(/Solaris/vm.memory.size[available])<20M` |AVERAGE | |
-|Zabbix agent is not available (for {$AGENT.TIMEOUT}) |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/Solaris/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
+|Zabbix agent is not available |<p>For passive only agents, host availability is used with {$AGENT.TIMEOUT} as time threshold.</p> |`max(/Solaris/zabbix[host,agent,available],{$AGENT.TIMEOUT})=0` |AVERAGE |<p>Manual close: YES</p> |
 |{#FSNAME}: Free inodes is less than 20% |<p>-</p> |`last(/Solaris/vfs.fs.inode[{#FSNAME},pfree])<20` |WARNING | |
 |{#FSNAME}: Free disk space is less than 20% |<p>-</p> |`last(/Solaris/vfs.fs.size[{#FSNAME},pfree])<20` |WARNING | |
 

@@ -17,17 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "daemon.h"
+#include "report_writer.h"
+
+#include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
-#include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxalert.h"
-#include "db.h"
 #include "report_protocol.h"
-
-#include "report_writer.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
@@ -317,7 +314,7 @@ static int	rw_send_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispat
 {
 	int			ret = FAIL;
 	zbx_vector_str_t	recipients;
-	DB_MEDIATYPE		mt;
+	ZBX_DB_MEDIATYPE		mt;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

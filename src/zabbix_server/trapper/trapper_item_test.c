@@ -17,18 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "trapper_item_test.h"
+
 #include "log.h"
-#include "zbxjson.h"
-#include "dbcache.h"
 #include "zbxserver.h"
 #include "../poller/poller.h"
 #include "zbxtasks.h"
+#include "zbxcommshigh.h"
 #ifdef HAVE_OPENIPMI
 #include "../ipmi/ipmi.h"
 #endif
 
 #include "trapper_auth.h"
-#include "trapper_item_test.h"
 
 static void	dump_item(const DC_ITEM *item)
 {
@@ -147,7 +147,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	if (0 != proxy_hostid && FAIL == is_item_processed_by_server(item.type, item.key))
 	{
-		ret = zbx_tm_execute_task_data(jp_data->start, jp_data->end - jp_data->start + 1, proxy_hostid, info);
+		ret = zbx_tm_execute_task_data(jp_data->start, (size_t)(jp_data->end - jp_data->start + 1),
+				proxy_hostid, info);
 		goto out;
 	}
 
@@ -338,7 +339,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			zbx_eval_context_t	ctx;
 			char			*error = NULL;
 
-			if (FAIL == zbx_eval_parse_expression(&ctx, item.params, ZBX_EVAL_PARSE_CALC_EXPRESSSION, &error))
+			if (FAIL == zbx_eval_parse_expression(&ctx, item.params, ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
 			{
 				zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
 				zbx_free(error);

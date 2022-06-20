@@ -185,13 +185,14 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
-	char			url[ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *error = NULL, *headers, *line, *buffer;
+	char			url[ZBX_ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *headers, *line, *buffer,
+				*error = NULL;
 	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
 	long			response_code;
 	struct curl_slist	*headers_slist = NULL;
 	struct zbx_json		json;
 	zbx_http_response_t	body = {0}, header = {0};
-	size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
+	zbx_curl_cb_t		curl_body_cb;
 	char			application_json[] = {"Content-Type: application/json"};
 	char			application_xml[] = {"Content-Type: application/xml"};
 

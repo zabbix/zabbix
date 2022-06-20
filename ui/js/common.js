@@ -325,19 +325,22 @@ function getPosition(obj) {
 /**
  * Opens popup content in overlay dialogue.
  *
- * @param {string}           action           Popup controller related action.
- * @param {array|object}     parameters       Array with key/value pairs that will be used as query for popup request.
+ * @param {string}           action              Popup controller related action.
+ * @param {array|object}     parameters          Array with key/value pairs that will be used as query for popup
+ *                                               request.
  *
- * @param {string}           dialogue_class   CSS class, usually based on .modal-popup and .modal-popup-{size}.
- * @param {string|null}      dialogueid       ID of overlay dialogue.
- * @param {HTMLElement|null} trigger_element  UI element which was clicked to open overlay dialogue.
+ * @param {string}           dialogue_class      CSS class, usually based on .modal-popup and .modal-popup-{size}.
+ * @param {string|null}      dialogueid          ID of overlay dialogue.
+ * @param {HTMLElement|null} trigger_element     UI element which was clicked to open overlay dialogue.
+ * @param {bool}             prevent_navigation  Show warning when navigating away from an active dialogue.
  *
  * @returns {Overlay}
  */
 function PopUp(action, parameters, {
 	dialogueid = null,
 	dialogue_class = '',
-	trigger_element = document.activeElement
+	trigger_element = document.activeElement,
+	prevent_navigation = false
 } = {}) {
 	var overlay = overlays_stack.getById(dialogueid);
 
@@ -345,20 +348,22 @@ function PopUp(action, parameters, {
 		overlay = overlayDialogue({
 			dialogueid,
 			title: '',
+			doc_url: '',
 			content: jQuery('<div>', {'height': '68px', class: 'is-loading'}),
 			class: 'modal-popup ' + dialogue_class,
 			buttons: [],
 			element: trigger_element,
-			type: 'popup'
+			type: 'popup',
+			prevent_navigation
 		});
 	}
 
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
-			if (typeof resp.errors !== 'undefined') {
+			if ('error' in resp) {
 				overlay.setProperties({
-					content: resp.errors
+					content: makeMessageBox('bad', resp.error.messages, resp.error.title, false)
 				});
 			}
 			else {
@@ -386,9 +391,10 @@ function PopUp(action, parameters, {
 
 				overlay.setProperties({
 					title: resp.header,
+					doc_url: resp.doc_url,
 					content: resp.body,
 					controls: resp.controls,
-					buttons: buttons,
+					buttons,
 					debug: resp.debug,
 					script_inline: resp.script_inline,
 					data: resp.data || null
@@ -518,8 +524,7 @@ function closeDialogHandler(event) {
  * @return {object|undefined|null}  Overlay object, if found.
  */
 function removeFromOverlaysStack(dialogueid, return_focus) {
-	var overlay = null,
-		index;
+	var overlay = null;
 
 	if (return_focus !== false) {
 		return_focus = true;
@@ -545,14 +550,11 @@ function removeFromOverlaysStack(dialogueid, return_focus) {
  * @param {string} action	(optional) action value that is used in CRouter. Default value is 'popup.generic'.
  */
 function reloadPopup(form, action) {
-	var dialogueid = form.closest('[data-dialogueid]').dataset.dialogueid,
-		dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class'),
-		action = action || 'popup.generic',
-		parameters = {};
+	const dialogueid = form.closest('[data-dialogueid]').dataset.dialogueid;
+	const dialogue_class = jQuery(form).closest('[data-dialogueid]').prop('class');
+	const parameters = getFormFields(form);
 
-	for (const input of form.elements) {
-		parameters[input.name] = input.value;
-	};
+	action = action || 'popup.generic';
 
 	PopUp(action, parameters, {dialogueid, dialogue_class});
 }
@@ -592,11 +594,9 @@ function addValue(object, single_value, parentid) {
  *
  * @param {string} frame			refers to destination form
  * @param {object} values			values added to destination form
- * @param {boolean} submit_parent	indicates that after adding values, form must be submitted
  */
-function addValues(frame, values, submit_parent) {
+function addValues(frame, values) {
 	var forms = document.getElementsByTagName('FORM')[frame],
-		submit_parent = submit_parent || false,
 		frm_storage = null;
 
 	for (var key in values) {
@@ -611,16 +611,12 @@ function addValues(frame, values, submit_parent) {
 			frm_storage = document.getElementById(key);
 		}
 
-		if (jQuery(frm_storage).is('span')) {
-			jQuery(frm_storage).html(values[key]);
-		}
-		else {
+		if (jQuery(frm_storage).is(':input')) {
 			jQuery(frm_storage).val(values[key]).change();
 		}
-	}
-
-	if (frm_storage !== null && submit_parent) {
-		frm_storage.form.submit();
+		else {
+			jQuery(frm_storage).html(values[key]);
+		}
 	}
 }
 
@@ -703,24 +699,27 @@ function validate_trigger_expression(overlay) {
 		success: function(ret) {
 			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
 
-			if (typeof ret.errors !== 'undefined') {
-				jQuery(ret.errors).insertBefore($form);
+			if ('error' in ret) {
+				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
+
+				message_box.insertBefore($form);
+
+				return;
+			}
+
+			var form = window.document.forms[ret.dstfrm];
+			var obj = (typeof form !== 'undefined')
+				? jQuery(form).find('#' + ret.dstfld1).get(0)
+				: document.getElementById(ret.dstfld1);
+
+			if (ret.dstfld1 === 'expression' || ret.dstfld1 === 'recovery_expression') {
+				jQuery(obj).val(jQuery(obj).val() + ret.expression);
 			}
 			else {
-				var form = window.document.forms[ret.dstfrm];
-				var obj = (typeof form !== 'undefined')
-					? jQuery(form).find('#' + ret.dstfld1).get(0)
-					: document.getElementById(ret.dstfld1);
-
-				if (ret.dstfld1 === 'expression' || ret.dstfld1 === 'recovery_expression') {
-					jQuery(obj).val(jQuery(obj).val() + ret.expression);
-				}
-				else {
-					jQuery(obj).val(ret.expression);
-				}
-
-				overlayDialogueDestroy(overlay.dialogueid);
+				jQuery(obj).val(ret.expression);
 			}
+
+			overlayDialogueDestroy(overlay.dialogueid);
 		},
 		dataType: 'json',
 		type: 'POST'
@@ -1008,22 +1007,29 @@ function openMassupdatePopup(action, parameters = {}, {
 }) {
 	const form = trigger_element.closest('form');
 
-	parameters.ids = chkbxRange.getSelectedIds();
+	switch (action) {
+		case 'popup.massupdate.host':
+			parameters.hostids = Object.keys(chkbxRange.getSelectedIds());
+			break;
+
+		default:
+			parameters.ids = Object.keys(chkbxRange.getSelectedIds());
+	}
 
 	switch (action) {
 		case 'popup.massupdate.item':
-			parameters.context = form.querySelector('#context').value;
+			parameters.context = form.querySelector('#form_context').value;
 			parameters.prototype = 0;
 			break;
 
 		case 'popup.massupdate.trigger':
-			parameters.context = form.querySelector('#context').value;
+			parameters.context = form.querySelector('#form_context').value;
 			break;
 
 		case 'popup.massupdate.itemprototype':
 		case 'popup.massupdate.triggerprototype':
-			parameters.parent_discoveryid = form.querySelector('#parent_discoveryid').value;
-			parameters.context = form.querySelector('#context').value;
+			parameters.parent_discoveryid = form.querySelector('#form_parent_discoveryid').value;
+			parameters.context = form.querySelector('#form_context').value;
 			parameters.prototype = 1;
 			break;
 	}
@@ -1032,21 +1038,59 @@ function openMassupdatePopup(action, parameters = {}, {
 }
 
 /**
+ * @param {boolean} value
+ * @param {string} objectid
+ * @param {string} replace_to
+ */
+function visibilityStatusChanges(value, objectid, replace_to) {
+	const obj = document.getElementById(objectid);
+
+	if (obj === null) {
+		throw `Cannot find objects with name [${objectid}]`;
+	}
+
+	if (replace_to && replace_to != '') {
+		if (obj.originalObject) {
+			const old_obj = obj.originalObject;
+			old_obj.originalObject = obj;
+
+			obj.parentNode.replaceChild(old_obj, obj);
+		}
+		else if (!value) {
+			const new_obj = document.createElement('span');
+			new_obj.setAttribute('name', obj.name);
+			new_obj.setAttribute('id', obj.id);
+			new_obj.innerHTML = replace_to;
+			new_obj.originalObject = obj;
+
+			obj.parentNode.replaceChild(new_obj, obj);
+		}
+		else {
+			throw 'Missing originalObject for restoring';
+		}
+	}
+	else {
+		obj.style.visibility = value ? 'visible' : 'hidden';
+	}
+}
+
+/**
  * Clears session storage from markers of checked table rows.
  * Or keeps only accessible IDs in the list of checked rows.
  *
  * @param {string}       page
  * @param {array|Object} keepids
+ * @param {boolean}      mvc
  */
-function uncheckTableRows(page, keepids = []) {
-	// This key only works for new MVC pages.
-	const key = (page === '') ? 'cb_zabbix' : 'cb_zabbix_'+page;
+function uncheckTableRows(page, keepids = [], mvc = true) {
+	const key = mvc ? 'cb_zabbix_'+page : 'cb_'+page;
 
 	if (keepids.length) {
-		// If keepids will not have same key as value, it will create mess, when new checkbox will be checked.
 		let keepids_formatted = {};
+		const current = chkbxRange.getSelectedIds();
+
 		for (const id of Object.values(keepids)) {
-			keepids_formatted[id.toString()] = id.toString();
+			keepids_formatted[id.toString()] = (id in current) ? current[id] : '';
 		}
 
 		sessionStorage.setItem(key, JSON.stringify(keepids_formatted));

@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -26,11 +26,6 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 	 */
 	private $schedule = [];
 
-	/**
-	 * @var int
-	 */
-	private $effective_date;
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -45,7 +40,7 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 			'schedule_mode' =>		'required|in '.implode(',', [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]),
 			'schedule_enabled' =>	'array',
 			'schedule_periods' =>	'array',
-			'effective_date' =>		'required|string|not_empty',
+			'effective_date' =>		'required|abs_date',
 			'service_tags' =>		'required|array',
 			'description' =>		'required|string',
 			'status' =>				'in '.ZBX_SLA_STATUS_ENABLED,
@@ -66,23 +61,16 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 					$ret = false;
 				}
 			}
-
-			try {
-				$this->effective_date = self::validateEffectiveDate($this->getInput('effective_date'),
-					'effective_date'
-				);
-			}
-			catch (InvalidArgumentException $e) {
-				info($e->getMessage());
-				$ret = false;
-			}
 		}
 
 		if (!$ret) {
 			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode(['errors' => getMessages()->toString()])
-				]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot update SLA'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])])
 			);
 		}
 
@@ -105,11 +93,17 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 	}
 
 	/**
-	 * @throws APIException
+	 * @throws Exception
 	 */
 	protected function doAction(): void {
+		$parser = new CAbsoluteTimeParser();
+		$parser->parse($this->getInput('effective_date'));
+		$effective_date = $parser
+			->getDateTime(true, new DateTimeZone('UTC'))
+			->getTimestamp();
+
 		$sla = [
-			'effective_date' => $this->effective_date,
+			'effective_date' => $effective_date,
 			'status' => $this->hasInput('status') ? ZBX_SLA_STATUS_ENABLED : ZBX_SLA_STATUS_DISABLED,
 			'schedule' => $this->schedule,
 			'service_tags' => [],
@@ -130,19 +124,22 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 
 		$result = API::Sla()->update($sla);
 
-		if ($result) {
-			$output = ['title' => _('SLA updated')];
+		$output = [];
 
-			if ($messages = CMessageHelper::getMessages()) {
-				$output['messages'] = array_column($messages, 'message');
+		if ($result) {
+			$output['success']['title'] = _('SLA updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
 			}
 		}
 		else {
-			$output = [
-				'errors' => makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())->toString()
+			$output['error'] = [
+				'title' => _('Cannot update SLA'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}
 
-		$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

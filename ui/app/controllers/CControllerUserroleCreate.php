@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -51,6 +51,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'ui_reports_audit' => 						'in 0,1',
 			'ui_reports_action_log' => 					'in 0,1',
 			'ui_reports_notifications' => 				'in 0,1',
+			'ui_configuration_template_groups' => 		'in 0,1',
 			'ui_configuration_host_groups' => 			'in 0,1',
 			'ui_configuration_templates' => 			'in 0,1',
 			'ui_configuration_hosts' => 				'in 0,1',
@@ -72,12 +73,14 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'actions_edit_maintenance' => 				'in 0,1',
 			'actions_acknowledge_problems' => 			'in 0,1',
 			'actions_close_problems' => 				'in 0,1',
+			'actions_suppress_problems' =>				'in 0,1',
 			'actions_change_severity' => 				'in 0,1',
 			'actions_add_problem_comments' => 			'in 0,1',
 			'actions_execute_scripts' => 				'in 0,1',
 			'actions_manage_api_tokens' => 				'in 0,1',
 			'actions_manage_scheduled_reports' => 		'in 0,1',
 			'actions_manage_sla' => 					'in 0,1',
+			'actions_invoke_execute_now' =>				'in 0,1',
 			'modules' => 								'array',
 			'api_mode' => 								'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
 			'api_methods' => 							'array',

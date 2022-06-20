@@ -17,17 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "daemon.h"
-#include "db.h"
+#include "lld_worker.h"
+
+#include "zbxnix.h"
 #include "log.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
-#include "dbcache.h"
 #include "proxy.h"
 #include "../events.h"
-
-#include "lld_worker.h"
 #include "lld_protocol.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
@@ -147,9 +144,9 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 		diff.itemid = itemid;
 		zbx_vector_ptr_append(&diffs, &diff);
 
-		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, &diffs, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
-		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+		zbx_DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		if (16 < sql_offset)
 			DBexecute("%s", sql);
 

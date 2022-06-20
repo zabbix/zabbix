@@ -17,19 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-
-#include "threads.h"
-#include "comms.h"
+#include "zbxthreads.h"
+#include "zbxcommshigh.h"
 #include "cfg.h"
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
-#include "mutexs.h"
+#include "zbxmutexs.h"
 #include "zbxcrypto.h"
-#if defined(_WINDOWS)
-#	include "../libs/zbxcrypto/tls.h"
-#else
+
+#if !defined(_WINDOWS)
 #	include "zbxnix.h"
 #endif
 
@@ -715,7 +712,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	if (SUCCEED == connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs,
+	if (SUCCEED == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs,
 			CONFIG_SENDER_TIMEOUT, CONFIG_TIMEOUT, configured_tls_connect_mode, 0, LOG_LEVEL_DEBUG))
 	{
 		if (1 == sendval_args->sync_timestamp)
@@ -1012,8 +1009,15 @@ static void	parse_commandline(int argc, char **argv)
 	unsigned int	opt_mask = 0;
 	unsigned short	opt_count[256] = {0};
 
+	/* see description of 'optarg' in 'man 3 getopt' */
+	char		*zbx_optarg = NULL;
+
+	/* see description of 'optind' in 'man 3 getopt' */
+	int		zbx_optind = 0;
+
 	/* parse the command-line */
-	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
+	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
+			&zbx_optind)))
 	{
 		opt_count[(unsigned char)ch]++;
 
@@ -1024,11 +1028,15 @@ static void	parse_commandline(int argc, char **argv)
 					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
 			case 'h':
-				help();
+				zbx_help();
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				version();
+				zbx_version();
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				printf("\n");
+				zbx_tls_version();
+#endif
 				exit(EXIT_SUCCESS);
 				break;
 			case 'I':
@@ -1142,7 +1150,7 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #endif
 			default:
-				usage();
+				zbx_usage();
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -1381,7 +1389,7 @@ static void	parse_commandline(int argc, char **argv)
 	if (0 == opt_count['c'] + opt_count['z'])
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
-		usage();
+		zbx_usage();
 		printf("Try '%s --help' for more information.\n", progname);
 		exit(EXIT_FAILURE);
 	}
@@ -1433,7 +1441,7 @@ static void	parse_commandline(int argc, char **argv)
 					(0x7c0 <= opt_mask && opt_mask <= 0x7c3))))
 	{
 		zbx_error("too few or mutually exclusive options used");
-		usage();
+		zbx_usage();
 		exit(EXIT_FAILURE);
 	}
 
@@ -1861,6 +1869,9 @@ exit:
 	}
 #endif
 	zabbix_close_log();
+#ifndef _WINDOWS
+	zbx_locks_destroy();
+#endif
 #if defined(_WINDOWS)
 	while (0 == WSACleanup())
 		;

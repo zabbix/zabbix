@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2022 Zabbix SIA
@@ -393,7 +393,7 @@ class CTemplateImporter extends CImporter {
 		}
 
 		foreach ($template['groups'] as $index => $group) {
-			$groupid = $this->referencer->findGroupidByName($group['name']);
+			$groupid = $this->referencer->findTemplateGroupidByName($group['name']);
 
 			if ($groupid === null) {
 				throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));

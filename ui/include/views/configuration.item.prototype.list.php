@@ -27,15 +27,21 @@ require_once dirname(__FILE__).'/js/configuration.item.prototype.list.js.php';
 
 $widget = (new CWidget())
 	->setTitle(_('Item prototypes'))
+	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
+		? CDocHelper::CONFIGURATION_HOST_ITEM_PROTOTYPE_LIST
+		: CDocHelper::CONFIGURATION_TEMPLATES_ITEM_PROTOTYPE_LIST
+	))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(new CRedirectButton(_('Create item prototype'),
-				(new CUrl('disc_prototypes.php'))
-					->setArgument('form', 'create')
-					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-					->setArgument('context', $data['context'])
-					->getUrl()
-			))
+			(new CList())
+				->addItem(
+					new CRedirectButton(_('Create item prototype'),
+						(new CUrl('disc_prototypes.php'))
+							->setArgument('form', 'create')
+							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+							->setArgument('context', $data['context'])
+					)
+				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->setNavigation(getHostNavigation('items', $data['hostid'], $data['parent_discoveryid']));
@@ -48,8 +54,8 @@ $url = (new CUrl('disc_prototypes.php'))
 // create form
 $itemForm = (new CForm('post', $url))
 	->setName('items')
-	->addVar('parent_discoveryid', $data['parent_discoveryid'])
-	->addVar('context', $data['context']);
+	->addVar('parent_discoveryid', $data['parent_discoveryid'], 'form_parent_discoveryid')
+	->addVar('context', $data['context'], 'form_context');
 
 // create table
 $itemTable = (new CTableInfo())
@@ -155,7 +161,7 @@ foreach ($data['items'] as $item) {
 	]);
 
 	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
 		->setMenuPopup($item_menu);
 
 	$nodiscover = ($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);

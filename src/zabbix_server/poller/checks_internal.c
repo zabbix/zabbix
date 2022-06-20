@@ -17,17 +17,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "checks_internal.h"
+
 #include "checks_java.h"
-#include "dbcache.h"
 #include "zbxself.h"
 #include "preproc.h"
 #include "zbxtrends.h"
 #include "../vmware/vmware.h"
-#include "../../libs/zbxserver/zabbix_stats.h"
+#include "zbxserver.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
-
-#include "checks_internal.h"
+#include "zbxavailability.h"
 
 extern unsigned char	program_type;
 
@@ -342,6 +341,12 @@ int	get_value_internal(const DC_ITEM *item, AGENT_RESULT *result)
 				SET_UI64_RESULT(result, agents[ZBX_AGENT_IPMI].available);
 			else if (0 == strcmp(tmp, "jmx"))
 				SET_UI64_RESULT(result, agents[ZBX_AGENT_JMX].available);
+			else if (0 == strcmp(tmp, "active_agent"))
+			{
+				SET_UI64_RESULT(result, zbx_get_active_agent_availability(item->host.hostid));
+				ret = SUCCEED;
+				goto out;
+			}
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));

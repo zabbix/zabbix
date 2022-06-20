@@ -20,7 +20,7 @@
 #ifndef ZABBIX_LLD_MANAGER_H
 #define ZABBIX_LLD_MANAGER_H
 
-#include "threads.h"
+#include "zbxthreads.h"
 
 typedef struct zbx_lld_value
 {

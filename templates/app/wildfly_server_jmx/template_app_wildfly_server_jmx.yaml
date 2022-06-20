@@ -1,7 +1,7 @@
 zabbix_export:
-  version: '6.0'
-  date: '2022-01-26T10:31:18Z'
-  groups:
+  version: '6.2'
+  date: '2022-06-07T19:37:55Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -47,7 +47,8 @@ zabbix_export:
             -
               uuid: 8a4fab49eb1e4ebbb1459d9b0f848771
               expression: 'nodata(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"],15m)=1'
-              name: 'WildFly: Failed to fetch info data (or no data for 15m)'
+              name: 'WildFly: Failed to fetch info data'
+              event_name: 'WildFly: Failed to fetch info data (or no data for 15m)'
               priority: WARNING
               description: 'Zabbix has not received data for items for the last 15 minutes'
               tags:
@@ -57,9 +58,10 @@ zabbix_export:
             -
               uuid: 71db189440ec4355aa06262e3200d47e
               expression: 'last(/WildFly Server by JMX/jmx["java.lang:type=Runtime","Uptime"])<10m'
-              name: 'WildFly: has been restarted (uptime < 10m)'
+              name: 'WildFly: has been restarted'
+              event_name: 'WildFly: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -155,7 +157,8 @@ zabbix_export:
             -
               uuid: 2923ab6f81d64579b6ba778bc0467042
               expression: 'last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#1)<>last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"],#2) and length(last(/WildFly Server by JMX/jmx["jboss.as:management-root=server","productVersion"]))>0'
-              name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
+              name: 'WildFly: Version has changed'
+              event_name: 'WildFly: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'WildFly version has changed. Ack to close.'
               manual_close: 'YES'
@@ -590,7 +593,8 @@ zabbix_export:
                 -
                   uuid: 6b432b25debe4277a971bc8a906e07b1
                   expression: 'last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#1)<>last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status],#2) and length(last(/WildFly Server by JMX/jmx["{#JMXOBJ}",status]))>0'
-                  name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE})'
+                  name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed'
+                  event_name: 'WildFly deployment [{#DEPLOYMENT}]: Deployment status has changed (new status: {ITEM.VALUE})'
                   priority: WARNING
                   description: 'Deployment status has changed. Ack to close.'
                   manual_close: 'YES'
@@ -1227,7 +1231,7 @@ zabbix_export:
                   tags:
                     -
                       tag: scope
-                      value: perfomance
+                      value: performance
             -
               uuid: 4832c8d39e0d4329af6876c594a3d741
               name: 'WildFly {#JMX_DATA_SOURCE}: Connections: Wait'
@@ -1253,12 +1257,13 @@ zabbix_export:
                 -
                   uuid: 2e38504216d84f3b9fe43b0bea86e388
                   expression: 'min(/WildFly Server by JMX/jmx["{#JMXOBJ}",WaitCount],5m)>{$WILDFLY.CONN.WAIT.MAX.WARN}'
-                  name: 'WildFly {#JMX_DATA_SOURCE}: Too many waiting connections (over {$WILDFLY.CONN.WAIT.MAX.WARN} for 5m)'
+                  name: 'WildFly {#JMX_DATA_SOURCE}: Too many waiting connections'
+                  event_name: 'WildFly {#JMX_DATA_SOURCE}: Too many waiting connections (over {$WILDFLY.CONN.WAIT.MAX.WARN} for 5m)'
                   priority: WARNING
                   tags:
                     -
                       tag: scope
-                      value: perfomance
+                      value: performance
             -
               uuid: c22389aa983a4cdca504e3cc41126f03
               name: 'WildFly {#JMX_DATA_SOURCE}: XA: Commit time, avg'
@@ -1481,7 +1486,7 @@ zabbix_export:
               value_type: FLOAT
               username: '{$WILDFLY.USER}'
               password: '{$WILDFLY.PASSWORD}'
-              description: 'The number of XAResource recover invocationsper second.'
+              description: 'The number of XAResource recover invocations per second.'
               preprocessing:
                 -
                   type: CHANGE_PER_SECOND
@@ -1598,7 +1603,8 @@ zabbix_export:
             -
               uuid: 6a40b3e94cc0441abc95fe3bc94397bf
               expression: 'min(/WildFly Server by JMX/jmx["{#JMXOBJ}",InUseCount],5m)/last(/WildFly Server by JMX/jmx["{#JMXOBJ}",AvailableCount])*100>{$WILDFLY.CONN.USAGE.WARN.MAX}'
-              name: 'WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m)'
+              name: 'WildFly {#JMX_DATA_SOURCE}: Connection usage is too high'
+              event_name: 'WildFly {#JMX_DATA_SOURCE}: Connection usage is too high (over {$WILDFLY.CONN.USAGE.WARN.MAX} in 5m)'
               priority: HIGH
               tags:
                 -
