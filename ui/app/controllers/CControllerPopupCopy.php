@@ -35,47 +35,20 @@ class CControllerPopupCopy extends CController {
 
 	protected function checkPermissions() {
 		$entity = API::Item();
+		$action = $this->getAction();
 
-		if ($this->getInput('itemids')) {
-			return (bool) $entity->get([
-				'output' => [],
-				'itemids' => $this->getInput('itemids'),
+		return (bool) $entity->get([
+			'output' => [],
+				$action => $this->getInput($action),
 				'editable' => true,
-				'limit' => 1
-			]);
-		}
-		else if ($this->getInput('triggerids')) {
-			return (bool) $entity->get([
-				'output' => [],
-				'triggerids' => $this->getInput('triggerids'),
-				'editable' => true,
-				'limit' => 1
-			]);
-		}
-		else if ($this->getInput('graphids')) {
-			return (bool) $entity->get([
-				'output' => [],
-				'graphids' => $this->getInput('graphids'),
-				'editable' => true,
-				'limit' => 1
-			]);
-		}
+		]);
 	}
 
 	protected function doAction() {
-		$this->setResponse($this->form());
-	}
-
-	/**
-	 * Handle item mass update form initialization.
-	 *
-	 * @return CControllerResponse
-	 */
-	protected function form(): CControllerResponse {
 		$data = [
 			'action' => $this->getAction(),
 			'form_refresh' => getRequest('form_refresh')
-			];
+		];
 
 		if ($this->getInput('itemids')) {
 			$data['itemids'] = $this->getInput('itemids');
@@ -87,6 +60,6 @@ class CControllerPopupCopy extends CController {
 			$data['graphids'] = $this->getInput('graphids');
 		}
 
-		return new CControllerResponseData($data);
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }
