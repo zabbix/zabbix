@@ -123,7 +123,7 @@ window.widget_svggraph_form = new class {
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
 
 		for (const element of this.dataset_wrapper.querySelectorAll('.js-type, .js-stacked')) {
-			element.addEventListener('change', () => this.updatedForm());
+			element.addEventListener('change', () => this._updatedForm());
 		}
 
 		// Initialize rangeControl UI elements.
