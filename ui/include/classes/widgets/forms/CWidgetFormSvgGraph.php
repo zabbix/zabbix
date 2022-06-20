@@ -51,7 +51,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 	public function validate($strict = false): array {
 		$errors = parent::validate($strict);
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+		$number_parser_w_suffix = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+		$number_parser_wo_suffix = new CNumberParser();
 
 		// Percentiles
 		if ($this->fields['percentile_left']->getValue() == SVG_GRAPH_PERCENTILE_LEFT_ON) {
@@ -59,8 +60,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 			if ($percentile_left_value !== '') {
 				$percentile_left_value_calculated =
-						$number_parser->parse($percentile_left_value) == CParser::PARSE_SUCCESS
-					? $number_parser->calcValue()
+						$number_parser_wo_suffix->parse($percentile_left_value) == CParser::PARSE_SUCCESS
+					? $number_parser_wo_suffix->calcValue()
 					: null;
 
 				if ($percentile_left_value_calculated === null
@@ -80,8 +81,8 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 			if ($percentile_right_value !== '') {
 				$percentile_right_value_calculated =
-						$number_parser->parse($percentile_right_value) == CParser::PARSE_SUCCESS
-					? $number_parser->calcValue()
+						$number_parser_wo_suffix->parse($percentile_right_value) == CParser::PARSE_SUCCESS
+					? $number_parser_wo_suffix->calcValue()
 					: null;
 
 				if ($percentile_right_value_calculated === null
@@ -105,12 +106,14 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 
 		// Validate Min/Max values in Axes tab.
 		if ($this->fields['lefty']->getValue() == SVG_GRAPH_AXIS_SHOW) {
-			$lefty_min = $number_parser->parse($this->fields['lefty_min']->getValue()) == CParser::PARSE_SUCCESS
-				? $number_parser->calcValue()
+			$lefty_min =
+					$number_parser_w_suffix->parse($this->fields['lefty_min']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser_w_suffix->calcValue()
 				: '';
 
-			$lefty_max = $number_parser->parse($this->fields['lefty_max']->getValue()) == CParser::PARSE_SUCCESS
-				? $number_parser->calcValue()
+			$lefty_max =
+					$number_parser_w_suffix->parse($this->fields['lefty_max']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser_w_suffix->calcValue()
 				: '';
 
 			if ($lefty_min !== '' && $lefty_max !== '' && $lefty_min >= $lefty_max) {
@@ -121,12 +124,14 @@ class CWidgetFormSvgGraph extends CWidgetForm {
 		}
 
 		if ($this->fields['righty']->getValue() == SVG_GRAPH_AXIS_SHOW) {
-			$righty_min = $number_parser->parse($this->fields['righty_min']->getValue()) == CParser::PARSE_SUCCESS
-				? $number_parser->calcValue()
+			$righty_min =
+					$number_parser_w_suffix->parse($this->fields['righty_min']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser_w_suffix->calcValue()
 				: '';
 
-			$righty_max = $number_parser->parse($this->fields['righty_max']->getValue()) == CParser::PARSE_SUCCESS
-				? $number_parser->calcValue()
+			$righty_max =
+					$number_parser_w_suffix->parse($this->fields['righty_max']->getValue()) == CParser::PARSE_SUCCESS
+				? $number_parser_w_suffix->calcValue()
 				: '';
 
 			if ($righty_min !== '' && $righty_max !== '' && $righty_min >= $righty_max) {
