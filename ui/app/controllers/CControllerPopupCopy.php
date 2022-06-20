@@ -24,8 +24,7 @@ class CControllerPopupCopy extends CController {
 	protected function checkInput() {
 		$fields = [
 			'authtype' => 'string',
-			'context' => 'required|string|in host,template',
-			'form_refresh' => getRequest('form_refresh'),
+			'context' => 'required|in host,template',
 			'itemids' => 'array_id',
 			'triggerids' => 'array_id',
 			'graphids' => 'array_id'
