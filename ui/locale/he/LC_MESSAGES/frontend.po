@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-05-27 06:24+0000\n"
+"PO-Revision-Date: 2022-06-07 11:58+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -12925,6 +12925,10 @@ msgstr "מספר הפריטים במסד הנתונים של Zabbix."
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "מספר הפריטים בהיסטוריה של המתווך שלא נשלחו עדיין לשרת"
 
+#: include/classes/data/CItemData.php:1668
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr "מספר הפריטים בתור שהושהו למשך תקופת שניות מ־ עד, כולל."
+
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "מספר הפריטים בתור שהושהו למשך תקופת שניות מ־ עד, כולל."
@@ -17944,57 +17948,57 @@ msgstr "ההקפצה „%1$s” שייכת לתבניות עם קישוריות 
 #: include/triggers.inc.php:372 include/triggers.inc.php:433
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להסתמך על ההקפצה „%2$s” שאינה קיימת, במארח „%3$s”."
 
 #: include/triggers.inc.php:373 include/triggers.inc.php:434
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להסתמך על ההקפצה „%2$s”, שאינה קיימת, בתבנית „%3$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2728
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” מהמארח „%3$s”, כיוון שתלויות בהקפצות מתבנית צאצאית או מארח אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2727
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” מהתבנית „%3$s”, כיוון שתלויות בהקפצות מתבנית צאצאית או מארח אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2621
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” מהתבנית „%3$s”, כיוון שתלויות בהקפצות מתבנית הורה אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2354
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” כיוון שתיווצר קישוריות מעגלית (%3$s) למארח „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2349
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” כיוון שתיווצר קישוריות מעגלית (%3$s) לתבנית „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2365
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” כיוון שתיווצר קישוריות מעגלית (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:2472
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להיות תלויה בהקפצה „%2$s” כיוון שתלויות של הקפצות מארח בתבניות הקפצה אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2857
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להסתמך על ההקפצה „%2$s”, כיוון שהתבנית „%3$s” לא מקושרת למארח „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2856
 #, c-format
 msgid "Trigger \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "ההקפצה „%1$s” לא יכולה להסתמך על ההקפצה „%2$s”, כיוון שהתבנית „%3$s” לא מקושרת לתבנית „%4$s”."
 
 #: include/classes/import/CConfigurationImport.php:1800
 #, c-format
@@ -18101,62 +18105,62 @@ msgstr "אבטיפוס ההקפצה „%1$s” שייך לתבניות עם קי
 #: include/classes/api/services/CDiscoveryRule.php:916
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the host \"%3$s\"."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להסתמך על ההקפצה „%2$s” שאינה קיימת, במארח „%3$s”."
 
 #: include/classes/api/services/CDiscoveryRule.php:915
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the non-existent trigger \"%2$s\" on the template \"%3$s\"."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להסתמך על ההקפצה „%2$s”, שאינה קיימת, בתבנית „%3$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2733
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the host \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלויה בהקפצה „%2$s” מהמארח „%3$s”, כיוון שתלויות בהקפצות מתבנית צאצאית או מארח אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2732
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from a child template or host are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלויה בהקפצה „%2$s” מהתבנית „%3$s”, כיוון שתלויות בהקפצות מתבנית צאצאית או מארח אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2622
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\" from the template \"%3$s\", because dependencies on triggers from the parent template are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי בהקפצה „%2$s” מהתבנית „%3$s”, כיוון שתלויות בהקפצות מתבנית הורה אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2473
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because dependencies of host triggers on template triggers are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי בהקפצה „%2$s” כיוון שתלויות של הקפצות מארח בתבניות הקפצה אסורות."
 
 #: include/classes/api/services/CTriggerGeneral.php:2862
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the host \"%4$s\"."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להסתמך על ההקפצה „%2$s”, כיוון שהתבנית „%3$s” לא מקושרת למארח „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2861
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger \"%2$s\", because the template \"%3$s\" is not linked to the template \"%4$s\"."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להסתמך על ההקפצה „%2$s”, כיוון שהתבנית „%3$s” לא מקושרת לתבנית „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2355
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for host \"%4$s\"."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי באבטיפוס ההקפצה „%2$s” כיוון שתיווצר קישוריות מעגלית (%3$s) למארח „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2350
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur for template \"%4$s\"."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי באבטיפוס ההקפצה „%2$s” כיוון שתיווצר קישוריות מעגלית (%3$s) לתבנית „%4$s”."
 
 #: include/classes/api/services/CTriggerGeneral.php:2366
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי באבטיפוס ההקפצה „%2$s”, כיוון שתיווצר קישוריות מעגלית (%3$s)."
 
 #: include/classes/api/services/CTriggerGeneral.php:1325
 #, c-format
 msgid "Trigger prototype \"%1$s\" cannot depend on the trigger prototype \"%2$s\", because dependencies on trigger prototypes from another LLD rule are not allowed."
-msgstr ""
+msgstr "אבטיפוס ההקפצה „%1$s” לא יכול להיות תלוי באבטיפוס ההקפצה „%2$s” כיוון שתלויות באבות טיפוס של הקפצות מכלל LLD (גילוי ברמה נמוכה) אסורים."
 
 #: include/classes/api/services/CTriggerGeneral.php:1716
 #, c-format

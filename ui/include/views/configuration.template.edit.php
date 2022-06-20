@@ -142,7 +142,7 @@ $templates_field_items[] = (new CMultiSelect([
 
 $template_tab
 	->addRow(
-		new CLabel(_('Templates')),
+		new CLabel(_('Templates'), 'add_templates__ms'),
 		(count($templates_field_items) > 1)
 			? (new CDiv($templates_field_items))->addClass('linked-templates')
 			: $templates_field_items

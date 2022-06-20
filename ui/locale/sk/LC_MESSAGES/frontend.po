@@ -13032,6 +13032,10 @@ msgstr "Počet položiek v Zabbix databáze."
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Počet položiek v histórii proxy, ktoré ešte neboli odoslané serveru"
 
+#: include/classes/data/CItemData.php:1668
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
 msgstr "Počet položiek vo fronte, ktoré meškajú od do sekúnd vrátane."
