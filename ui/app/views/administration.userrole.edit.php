@@ -89,6 +89,7 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	$ui = [];
 	foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
 		$ui[] = [
+			'id' => $rule_key,
 			'name' => str_replace('.', '_', $rule_key),
 			'label' => $rule_label,
 			'value' => 1,
