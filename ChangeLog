@@ -2523,8 +2523,8 @@ New features:
 A......PS. [ZBXNEXT-7694] added "utf8mb3" character set support for MySQL database (Sasha)
 
 Bug fixes:
-.......PS. [ZBX-21123] fixed crash when vmware vc was not available at the first moment when starting zabbix_server (MVekslers)
-.......PS. [ZBX-21137] fixed vmware collector crash related to datastore state disconnected from all HVs (MVekslers)
+.......PS. [ZBX-21123] fixed crash when VMware VC was not available at the first moment when starting zabbix_server (MVekslers)
+.......PS. [ZBX-21137] fixed VMware collector crash related to datastore state disconnected from all HVs (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.41
