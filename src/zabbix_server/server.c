@@ -1094,7 +1094,7 @@ static void	zbx_check_db(void)
 	struct zbx_json			db_version_json;
 	int				result = SUCCEED;
 
-	result = zbx_check_db_version_info(&db_version_info);
+	result = DBcheck_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
 
 	if(SUCCEED == result && (SUCCEED != DBcheck_capabilities(db_version_info.current_version) ||
 			SUCCEED != DBcheck_version()))

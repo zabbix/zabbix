@@ -240,6 +240,4 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 void zbx_db_set_character_set(const char *char_set);
 #endif
 
-int	zbx_check_db_version_info(struct zbx_db_version_info_t *info);
-
 #endif

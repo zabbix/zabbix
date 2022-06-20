@@ -1040,7 +1040,7 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 
-	if (FAIL == zbx_check_db_version_info(&db_version_info))
+	if (FAIL == DBcheck_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS))
 	{
 		zbx_free(db_version_info.friendly_current_version);
 		exit(EXIT_FAILURE);
