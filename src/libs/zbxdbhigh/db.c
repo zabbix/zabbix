@@ -784,6 +784,81 @@ void	DBflush_version_requirements(const char *version)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: verify that Zabbix server/proxy will start with provided DB version  *
+ *          and configuration                                                    *
+ *                                                                               *
+ * Parameters: allow_unsupported - [IN] value of AllowUnsupportedDBVersions flag *
+ *                                                                               *
+ *********************************************************************************/
+int	DBcheck_version_info(struct zbx_db_version_info_t *info, int allow_unsupported)
+{
+	DBextract_version_info(info);
+
+	if (DB_VERSION_NOT_SUPPORTED_ERROR == info->flag ||
+			DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag || DB_VERSION_LOWER_THAN_MINIMUM == info->flag)
+	{
+		const char	*program_type_s;
+
+		program_type_s = get_program_type_string(program_type);
+
+		if (0 == allow_unsupported || (DB_VERSION_LOWER_THAN_MINIMUM == info->flag &&
+					0 == (program_type & ZBX_PROGRAM_TYPE_PROXY)
+					&& 1 == allow_unsupported))
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Unable to start Zabbix %s due to unsupported %s database"
+					" version (%s).", program_type_s, info->database,
+					info->friendly_current_version);
+
+			if (DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Must not be higher than (%s).",
+						info->friendly_max_version);
+				info->flag = DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Must be at least (%s).",
+						info->friendly_min_supported_version);
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, "Override by setting AllowUnsupportedDBVersions=1"
+					" in Zabbix %s configuration file at your own risk.", program_type_s);
+			zabbix_log(LOG_LEVEL_ERR, " ");
+
+			return FAIL;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_ERR, " ");
+			zabbix_log(LOG_LEVEL_ERR, "Warning! Unsupported %s database version (%s).",
+					info->database, info->friendly_current_version);
+
+			if (DB_VERSION_HIGHER_THAN_MAXIMUM == info->flag)
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Should not be higher than (%s).",
+						info->friendly_max_version);
+				info->flag = DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Should be at least (%s).",
+						info->friendly_min_supported_version);
+				info->flag = DB_VERSION_NOT_SUPPORTED_WARNING;
+			}
+
+			zabbix_log(LOG_LEVEL_ERR, "Use of supported database version is highly recommended.");
+			zabbix_log(LOG_LEVEL_ERR, " ");
+		}
+	}
+
+	return SUCCEED;
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks DBMS for optional features and exit if is not suitable     *
