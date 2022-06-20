@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 class testTagFiltering extends CAPITest {
 
-	const HOST_GROUP = '50027';
+	const HOST_GROUPS = [50027, 50028];
 
 	public static function host_get_data() {
 		return [
@@ -176,7 +176,7 @@ class testTagFiltering extends CAPITest {
 	public function testHost_Get($filter, $expected) {
 		$request = [
 			'output' => ['host'],
-			'groupids' => self::HOST_GROUP
+			'groupids' => self::HOST_GROUPS
 		] + $filter;
 
 		['result' => $result] = $this->call('host.get', $request);
@@ -351,7 +351,7 @@ class testTagFiltering extends CAPITest {
 	public function testHostTagInheritance_Get($filter, $expected) {
 		$request = [
 			'output' => ['host'],
-			'groupids' => self::HOST_GROUP,
+			'groupids' => self::HOST_GROUPS,
 			'inheritedTags' => true
 		] + $filter;
 
@@ -537,7 +537,7 @@ class testTagFiltering extends CAPITest {
 	public function testTemplate_Get($filter, $expected) {
 		$request = [
 			'output' => ['name'],
-			'groupids' => self::HOST_GROUP
+			'groupids' => self::HOST_GROUPS
 		] + $filter;
 
 		['result' => $result] = $this->call('template.get', $request);
@@ -765,7 +765,7 @@ class testTagFiltering extends CAPITest {
 	public function testEvent_Get($filter, $expected) {
 		$request = [
 			'output' => ['name'],
-			'groupids' => self::HOST_GROUP
+			'groupids' => self::HOST_GROUPS
 		] + $filter;
 
 		['result' => $result] = $this->call('event.get', $request);
@@ -784,7 +784,7 @@ class testTagFiltering extends CAPITest {
 	public function testProblem_Get($filter, $expected) {
 		$request = [
 			'output' => ['name'],
-			'groupids' => self::HOST_GROUP
+			'groupids' => self::HOST_GROUPS
 		] + $filter;
 
 		['result' => $result] = $this->call('problem.get', $request);

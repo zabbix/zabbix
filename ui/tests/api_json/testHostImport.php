@@ -27,7 +27,7 @@ class testHostImport extends CAPITest {
 		$source = file_get_contents(dirname(__FILE__).'/xml/testDiscoveredHostGroupsAfterImportParentHost.xml');
 
 		$rules = [
-			'groups' => [
+			'host_groups' => [
 				'createMissing' => true
 			],
 			'hosts' => [

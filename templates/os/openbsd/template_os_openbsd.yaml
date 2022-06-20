@@ -1,7 +1,7 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:59:18Z'
-  groups:
+  date: '2022-06-07T19:36:33Z'
+  template_groups:
     -
       uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -766,8 +766,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'OpenBSD by Zabbix agent'
                         name: 'CPU load'
-                        host: 'OpenBSD by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -782,8 +782,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
+                        host: 'OpenBSD by Zabbix agent'
                         name: 'CPU utilization'
-                        host: 'OpenBSD by Zabbix agent'
                 -
                   type: GRAPH_CLASSIC
                   'y': '5'
@@ -798,8 +798,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Memory usage'
                         host: 'OpenBSD by Zabbix agent'
+                        name: 'Memory usage'
                 -
                   type: GRAPH_CLASSIC
                   x: '12'
@@ -815,8 +815,8 @@ zabbix_export:
                       type: GRAPH
                       name: graphid
                       value:
-                        name: 'Swap usage'
                         host: 'OpenBSD by Zabbix agent'
+                        name: 'Swap usage'
       valuemaps:
         -
           uuid: 693c226692c548869e77d3313934ca28

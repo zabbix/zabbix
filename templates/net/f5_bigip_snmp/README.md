@@ -200,7 +200,7 @@ There are no template links in this template.
 |F5 BIG-IP: Power supply [{#POWER.INDEX}] is not present |<p>Please check the power supply unit</p> |`last(/F5 Big-IP SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=2` |INFO | |
 |F5 BIG-IP: Certificate expires ({#CERT.NAME}) |<p>Please check certificate</p> |`last(/F5 Big-IP SNMP/bigip.cert.expiration.date[{#CERT.NAME}]) - 86400 * {$BIGIP.CERT.MIN} < now()` |WARNING | |
 |F5 BIG-IP: No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/F5 Big-IP SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING | |
-|F5 BIG-IP: has been restarted |<p>Uptime is less than 10 minutes</p> |`last(/F5 Big-IP SNMP/bigip.uptime)<10m` |INFO |<p>Manual close: YES</p> |
+|F5 BIG-IP: has been restarted |<p>Uptime is less than 10 minutes.</p> |`last(/F5 Big-IP SNMP/bigip.uptime)<10m` |INFO |<p>Manual close: YES</p> |
 |F5 BIG-IP: Chassis temperature |<p>-</p> |`last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}` |HIGH | |
 |F5 BIG-IP: Chassis temperature |<p>-</p> |`last(/F5 Big-IP SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.WARN}` |WARNING |<p>**Depends on**:</p><p>- F5 BIG-IP: Chassis temperature</p> |
 
