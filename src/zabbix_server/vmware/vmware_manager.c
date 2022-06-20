@@ -21,7 +21,6 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 
-
 extern int				CONFIG_VMWARE_FREQUENCY;
 extern int				CONFIG_VMWARE_PERF_FREQUENCY;
 
@@ -47,14 +46,14 @@ static const char	*vmware_job_type_string(zbx_vmware_job_t *job)
 {
 	switch (job->type)
 	{
-	case ZBX_VMWARE_UPDATE_CONF:
-		return "update_conf";
-	case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
-		return "update_perf_counters";
-	case ZBX_VMWARE_UPDATE_REST_TAGS:
-		return "update_tags";
-	default:
-		return "unknown_job";
+		case ZBX_VMWARE_UPDATE_CONF:
+			return "update_conf";
+		case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
+			return "update_perf_counters";
+		case ZBX_VMWARE_UPDATE_REST_TAGS:
+			return "update_tags";
+		default:
+			return "unknown_job";
 	}
 }
 
@@ -122,17 +121,17 @@ static int	vmware_job_exec(zbx_vmware_job_t *job)
 
 	switch (job->type)
 	{
-	case ZBX_VMWARE_UPDATE_CONF:
-		ret = zbx_vmware_service_update(job->service);
-		break;
-	case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
-		ret = zbx_vmware_service_update_perf(job->service);
-		break;
-	case ZBX_VMWARE_UPDATE_REST_TAGS:
-		ret = zbx_vmware_service_update_tags(job->service);
-		break;
-	default:
-		ret = FAIL;
+		case ZBX_VMWARE_UPDATE_CONF:
+			ret = zbx_vmware_service_update(job->service);
+			break;
+		case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
+			ret = zbx_vmware_service_update_perf(job->service);
+			break;
+		case ZBX_VMWARE_UPDATE_REST_TAGS:
+			ret = zbx_vmware_service_update_tags(job->service);
+			break;
+		default:
+			ret = FAIL;
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s ret:%s", __func__, vmware_job_type_string(job),
@@ -257,4 +256,3 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	zbx_thread_exit(EXIT_SUCCESS);
 #endif
 }
-

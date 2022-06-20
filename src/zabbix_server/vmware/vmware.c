@@ -2287,7 +2287,6 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 	zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_free);
 	zbx_vector_vmware_datacenter_destroy(&data->datacenters);
 
-
 	zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_resourcepool_free);
 	zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
 
@@ -3618,7 +3617,6 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
 		zbx_snprintf(tmp, sizeof(tmp), ZBX_XPATH_GET_RESOURCEPOOL_PARENTID("%s"), id_esc);
 		id = zbx_xml_doc_read_value(xdoc , tmp);
 
-
 		if (NULL != id)	/* we do not include the last default 'ResourcePool' */
 		{
 			if (NULL == *path)
@@ -3637,7 +3635,6 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
 		zbx_free(name);
 	}
 	while (NULL != id);
-
 
 	if (SUCCEED == ret)
 	{
@@ -8062,7 +8059,7 @@ static int	vmware_job_compare_nextcheck(const void *d1, const void *d2)
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	return ((zbx_vmware_job_t *)e1->data)->nextcheck - ((zbx_vmware_job_t *)e2->data)->nextcheck;
+	return ((const zbx_vmware_job_t *)e1->data)->nextcheck - ((const zbx_vmware_job_t *)e2->data)->nextcheck;
 }
 
 /******************************************************************************
@@ -8299,11 +8296,8 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, 
 			zbx_vector_vmware_tag_append(&to_entity->tags, to_tag);
 		}
 
-		zbx_vector_vmware_tag_sort(&to_entity->tags, ZBX_DEFAULT_STR_COMPARE_FUNC);
 		zbx_vector_vmware_entity_tags_append(dst, to_entity);
 	}
-
-	zbx_vector_vmware_entity_tags_sort(dst, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 	zbx_vmware_unlock();
 }
