@@ -464,7 +464,7 @@ static int	get_trigger_funcs(zbx_vector_uint64_t *triggerids, zbx_hashset_t *fun
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select f.triggerid,f.functionid,f.parameter,i.itemid,i.key_"
+			"select f.triggerid,f.functionid,f.parameter,i.itemid,i.key_,f.name"
 			" from functions f,items i"
 			" where i.itemid=f.itemid"
 			" and");
@@ -493,6 +493,7 @@ static int	get_trigger_funcs(zbx_vector_uint64_t *triggerids, zbx_hashset_t *fun
 			zbx_vector_uint64_append(&(found->itemids), itemid_temp_var);
 			zbx_vector_str_append(&(found->itemkeys), zbx_strdup(NULL, row[4]));
 			zbx_vector_str_append(&(found->parameters), zbx_strdup(NULL, row[2]));
+			zbx_vector_str_append(&(found->names), zbx_strdup(NULL, row[5]));
 		}
 		else
 		{
@@ -502,7 +503,7 @@ static int	get_trigger_funcs(zbx_vector_uint64_t *triggerids, zbx_hashset_t *fun
 			zbx_vector_uint64_create(&(local_temp_t.itemids));
 			zbx_vector_str_create(&(local_temp_t.itemkeys));
 
-			/* do not need names, but still initialize it to make it consistent with other funcs */
+			/* we definitely do need names, when comparing triggers expressions for identity */
 			zbx_vector_str_create(&(local_temp_t.names));
 			zbx_vector_str_create(&(local_temp_t.parameters));
 
@@ -510,6 +511,7 @@ static int	get_trigger_funcs(zbx_vector_uint64_t *triggerids, zbx_hashset_t *fun
 			zbx_vector_uint64_append(&(local_temp_t.itemids), itemid_temp_var);
 			zbx_vector_str_append(&(local_temp_t.itemkeys), zbx_strdup(NULL, row[4]));
 			zbx_vector_str_append(&(local_temp_t.parameters), zbx_strdup(NULL, row[2]));
+			zbx_vector_str_append(&(local_temp_t.names), zbx_strdup(NULL, row[5]));
 
 			local_temp_t.triggerid = temp_t.triggerid;
 			zbx_hashset_insert(funcs_res, &local_temp_t, sizeof(local_temp_t));
@@ -725,13 +727,15 @@ static int	compare_triggers(zbx_trigger_copy_t * template_trigger, zbx_target_ho
 		{
 			char	*itemkeys_value = found_template_trigger_funcs->itemkeys.values[i];
 			char	*parameters_value = found_template_trigger_funcs->parameters.values[i];
+			char	*names_value = found_template_trigger_funcs->names.values[i];
 			char	*functionid = found_template_trigger_funcs->functionids.values[i];
 
 			for (j = 0; j < found_host_trigger_funcs->functionids.values_num; j++)
 			{
 				if (0 == strcmp(itemkeys_value, found_host_trigger_funcs->itemkeys.values[j]) &&
 						0 == strcmp(parameters_value,
-						found_host_trigger_funcs->parameters.values[j]))
+						found_host_trigger_funcs->parameters.values[j]) &&
+						0 == strcmp(names_value, found_host_trigger_funcs->names.values[j]))
 				{
 					zbx_snprintf(search, sizeof(search), "{%s}",
 							found_host_trigger_funcs->functionids.values[j]);
@@ -938,7 +942,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				char	*event_name_esc = DBdyn_escape_string(found->event_name);
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sevent_name='%s'", d,
-						found->event_name);
+						event_name_esc);
 				d = ",";
 				zbx_free(event_name_esc);
 
@@ -960,7 +964,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				char	*comments_esc = DBdyn_escape_string(found->comments);
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scomments='%s'", d,
-						found->comments);
+						comments_esc);
 				d = ",";
 				zbx_free(comments_esc);
 
@@ -973,7 +977,7 @@ static int	execute_triggers_updates(zbx_hashset_t *zbx_host_triggers_main_data)
 				char	*url_esc = DBdyn_escape_string(found->url);
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%surl='%s'", d,
-						found->url);
+						url_esc);
 				d = ",";
 				zbx_free(url_esc);
 
@@ -1362,8 +1366,8 @@ static void	process_triggers(zbx_trigger_copy_t *trigger_copy_template, zbx_hash
 		trigger_copy_insert->event_name = zbx_strdup(NULL, trigger_copy_template->event_name);
 
 		trigger_copy_insert->priority = trigger_copy_template->priority;
-		trigger_copy_insert->comments =  DBdyn_escape_string(trigger_copy_template->comments);
-		trigger_copy_insert->url = DBdyn_escape_string(trigger_copy_template->url);
+		trigger_copy_insert->comments =  zbx_strdup(NULL, trigger_copy_template->comments);
+		trigger_copy_insert->url = zbx_strdup(NULL, trigger_copy_template->url);
 		trigger_copy_insert->correlation_tag = zbx_strdup(NULL, trigger_copy_template->correlation_tag);
 		trigger_copy_insert->status = trigger_copy_template->status;
 		trigger_copy_insert->type = trigger_copy_template->type;
