@@ -35,12 +35,14 @@
 		$('#<?= $data['tabs_id'] ?>').on('tabscreate tabsactivate', function(event, ui) {
 			const $panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
-			if ($panel.attr('id') === 'tags-tab') {
+			let $table;
+
+			if ($panel.attr('id') === '<?= $data['tags_tab_id'] ?>') {
 				if (tags_initialized) {
 					return;
 				}
 
-				const $table = $('#tags-table');
+				$table = $panel.find('.tags-table');
 
 				$table
 					.dynamicRows({template: '#tag-row-tmpl'})
@@ -54,7 +56,7 @@
 			}
 
 			if (tags_initialized) {
-				$('#tags-table').on('click', 'button.element-table-disable', function() {
+				$table.on('click', 'button.element-table-disable', function() {
 					var num = $(this).attr('id').split('_')[1],
 						$type = $('#tags_' + num + '_type');
 

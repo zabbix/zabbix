@@ -355,21 +355,27 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 		super(TAB_INDICATOR_TYPE_COUNT);
 	}
 
+	addAttributes(element) {
+		this.target_node = document.querySelector(element.getAttribute('href') + ' .tags-table');
+
+		super.addAttributes(element);
+
+		return this;
+	}
+
 	getValue() {
-		return document
-			.querySelectorAll('#tags-table tr.form_row > td:first-child > textarea:not(:placeholder-shown):not([readonly])')
+		return this.target_node
+			.querySelectorAll('tr.form_row > td:first-child > textarea:not(:placeholder-shown):not([readonly])')
 			.length;
 	}
 
 	initObserver(element) {
-		const target_node = document.querySelector('#tags-table');
-
-		if (target_node !== null) {
+		if (this.target_node !== null) {
 			const observer = new MutationObserver(() => {
 				this.addAttributes(element);
 			});
 
-			observer.observe(target_node, {
+			observer.observe(this.target_node, {
 				childList: true,
 				attributes: true,
 				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
