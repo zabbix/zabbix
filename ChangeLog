@@ -2087,8 +2087,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.25rc1
 
-New features:
-
 Bug fixes:
 ..F.....S. [ZBX-20994] fixed access limitation for Oracle DB to list tables accessible to the user (asestakovs)
 .......PS. [ZBX-21123] fixed crash when VMware VC was not available at the first moment when starting zabbix_server (MVekslers)
