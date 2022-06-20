@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-15T08:11:32Z'
+  date: '2022-06-20T19:42:28Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -18,7 +18,7 @@ zabbix_export:
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
-        Template tooling version used: 0.41
+        Template tooling version used: 0.42
       groups:
         -
           name: Templates/Applications
@@ -378,6 +378,8 @@ zabbix_export:
                   try {
                       var input = JSON.parse(value),
                           output = [];
+                          api_url = '{$KUBE.API.ENDPOINT.URL}',
+                          hostname = api_url.match(/\/\/(.+):/);
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
                           Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);
@@ -404,7 +406,8 @@ zabbix_export:
                                       '{#IP}': internalIP,
                                       '{#ROLES}': node.status.roles,
                                       '{#ARCH}': node.metadata.labels['kubernetes.io/arch'] || '',
-                                      '{#OS}': node.metadata.labels['kubernetes.io/os'] || ''
+                                      '{#OS}': node.metadata.labels['kubernetes.io/os'] || '',
+                                      '{#CLUSTER_HOSTNAME}': hostname[1]
                                   });
                               }
                               else {
@@ -1448,7 +1451,7 @@ zabbix_export:
                     name: Templates/Applications
               group_prototypes:
                 -
-                  name: 'Kubernetes/Nodes/Role: {#ROLES}'
+                  name: '{#CLUSTER_HOSTNAME}: Kubernetes/Nodes/Role: {#ROLES}'
               templates:
                 -
                   name: 'Linux by Zabbix agent'
