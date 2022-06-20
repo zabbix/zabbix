@@ -26,6 +26,7 @@ window.widget_svggraph_form = new class {
 		colorPalette.setThemeColors(<?= json_encode(CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE) ?>);
 
 		this.overlay_body = jQuery('.overlay-dialogue-body');
+		this.form = document.getElementById(form_id);
 		this.form_id = form_id;
 		this.form_tabs = form_tabs_id;
 
@@ -66,13 +67,9 @@ window.widget_svggraph_form = new class {
 		});
 
 		this._datasetTabInit();
-		this._displayingOptionsTabInit();
 		this._timePeriodTabInit();
-		this._axesTabInit();
 		this._legendTabInit();
 		this._problemsTabInit();
-
-		this.updatedForm();
 
 		this.onGraphConfigChange();
 	}
@@ -183,17 +180,6 @@ window.widget_svggraph_form = new class {
 			.addEventListener('click', this._addDatasetMenu);
 	}
 
-	_displayingOptionsTabInit() {
-		document.getElementById('percentile_left')
-			.addEventListener('click', (e) => {
-				document.getElementById('percentile_left_value').disabled = !e.target.checked;
-			});
-		document.getElementById('percentile_right')
-			.addEventListener('click', (e) => {
-				document.getElementById('percentile_right_value').disabled = !e.target.checked;
-			});
-	}
-
 	_timePeriodTabInit() {
 		document.getElementById('graph_time')
 			.addEventListener('click', (e) => {
@@ -202,12 +188,6 @@ window.widget_svggraph_form = new class {
 				document.getElementById('time_from_calendar').disabled = !e.target.checked;
 				document.getElementById('time_to_calendar').disabled = !e.target.checked;
 			});
-	}
-
-	_axesTabInit() {
-		this.onLeftYChange();
-
-		this.onRightYChange();
 	}
 
 	_legendTabInit() {
@@ -381,123 +361,9 @@ window.widget_svggraph_form = new class {
 		return jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>[data-set]:last').data('set');
 	}
 
-	onLeftYChange() {
-		const on = (!jQuery('#lefty').is(':disabled') && jQuery('#lefty').is(':checked'));
-
-		if (jQuery('#lefty').is(':disabled') && !jQuery('#lefty').is(':checked')) {
-			jQuery('#lefty').prop('checked', true);
-		}
-
-		jQuery('#lefty_min, #lefty_max, #lefty_units').prop('disabled', !on);
-
-		jQuery('#lefty_static_units').prop('disabled',
-			!on || jQuery('#lefty_units').val() != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>
-		);
-	}
-
-	onRightYChange() {
-		const on = (!jQuery('#righty').is(':disabled') && jQuery('#righty').is(':checked'));
-
-		if (jQuery('#righty').is(':disabled') && !jQuery('#righty').is(':checked')) {
-			jQuery('#righty').prop('checked', true);
-		}
-
-		jQuery('#righty_min, #righty_max, #righty_units').prop('disabled', !on);
-
-		jQuery('#righty_static_units').prop('disabled',
-			!on || jQuery('#righty_units').val() != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>
-		);
-	}
-
-	onGraphConfigChange(e) {
-		// Update graph preview.
-		const $preview = jQuery('#svg-graph-preview');
-		const $preview_container = $preview.parent();
-		const preview_data = $preview_container.data();
-		const $form = jQuery(`#${this.form_id}`);
-		const url = new Curl('zabbix.php');
-		const data = {
-			uniqueid: 0,
-			preview: 1,
-			content_width: Math.floor($preview.width()),
-			content_height: Math.floor($preview.height()) - 10
-		};
-
-		url.setArgument('action', 'widget.svggraph.view');
-
-		// Enable/disable fields for Y axis.
-		const axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
-
-		jQuery('[type=radio]', $form).each(function() {
-			if (jQuery(this).attr('name').match(/ds\[\d+]\[axisy]/) && jQuery(this).is(':checked')) {
-				axes_used[jQuery(this).val()]++;
-			}
-		});
-
-		jQuery('[type=hidden]', $form).each(function() {
-			if (jQuery(this).attr('name').match(/or\[\d+]\[axisy]/)) {
-				axes_used[jQuery(this).val()]++;
-			}
-		});
-
-		jQuery('#lefty').prop('disabled', !axes_used[<?= GRAPH_YAXIS_SIDE_LEFT ?>]);
-		jQuery('#righty').prop('disabled', !axes_used[<?= GRAPH_YAXIS_SIDE_RIGHT ?>]);
-
-		this.onLeftYChange();
-		this.onRightYChange();
-
-		const form_fields = $form.serializeJSON();
-
-		if ('ds' in form_fields) {
-			for (const i in form_fields.ds) {
-				form_fields.ds[i] = jQuery.extend({'hosts': [], 'items': []}, form_fields.ds[i]);
-			}
-		}
-		if ('or' in form_fields) {
-			for (const i in form_fields.or) {
-				form_fields.or[i] = jQuery.extend({'hosts': [], 'items': []}, form_fields.or[i]);
-			}
-		}
-		data.fields = JSON.stringify(form_fields);
-
-		if (preview_data.xhr) {
-			preview_data.xhr.abort();
-		}
-
-		if (preview_data.timeoutid) {
-			clearTimeout(preview_data.timeoutid);
-		}
-
-		preview_data.timeoutid = setTimeout(function() {
-			$preview_container.addClass('is-loading');
-		}, 1000);
-
-		preview_data.xhr = jQuery.ajax({
-			url: url.getUrl(),
-			method: 'POST',
-			contentType: 'application/json',
-			data: JSON.stringify(data),
-			dataType: 'json',
-			success: function(r) {
-				if (preview_data.timeoutid) {
-					clearTimeout(preview_data.timeoutid);
-				}
-				$preview_container.removeClass('is-loading');
-
-				$form.prev('.msg-bad').remove();
-
-				if ('error' in r) {
-					const message_box = makeMessageBox('bad', r.error.messages, r.error.title);
-					message_box.insertBefore($form);
-				}
-
-				if (typeof r.body !== 'undefined') {
-					$preview.html(jQuery(r.body)).attr('unselectable', 'on').css('user-select', 'none');
-				}
-			}
-		});
-
-		$preview_container.data(preview_data);
+	onGraphConfigChange() {
+		this._updatedForm();
+		this._updatePreview();
 	}
 
 	updateVariableOrder(obj, row_selector, var_prefix) {
@@ -746,12 +612,27 @@ window.widget_svggraph_form = new class {
 		this.rewriteNameLinks();
 	}
 
-	updatedForm() {
+	_updatedForm() {
 		const row_num = this.getDataSetNumber();
 
 		const draw_type = document.querySelector(`#ds_${row_num}_type :checked`).value;
 		const is_stacked = document.getElementById(`ds_${row_num}_stacked`).checked;
 
+		const axes_used = {<?= GRAPH_YAXIS_SIDE_LEFT ?>: 0, <?= GRAPH_YAXIS_SIDE_RIGHT ?>: 0};
+
+		for (const element of this.form.querySelectorAll('[type=radio], [type=hidden]')) {
+			if (element.name.match(/ds\[\d+]\[axisy]/) && element.checked) {
+				axes_used[element.value]++;
+			}
+		}
+
+		for (const element of this.form.querySelectorAll('[type=hidden]')) {
+			if (element.name.match(/or\[\d+]\[axisy]/)) {
+				axes_used[element.value]++;
+			}
+		}
+
+		// Data set tab.
 		const aggregate_function_select = document.getElementById(`ds_${row_num}_aggregate_function`);
 		const approximation_select = document.getElementById(`ds_${row_num}_approximation`);
 
@@ -816,6 +697,120 @@ window.widget_svggraph_form = new class {
 		if (!approximation_all_enabled && approximation_select.value == <?= APPROXIMATION_ALL ?>) {
 			approximation_select.value = <?= APPROXIMATION_AVG ?>;
 		}
+
+		// Displaying options tab.
+		const percentile_left_checkbox = document.getElementById('percentile_left');
+		percentile_left_checkbox.disabled = !axes_used[<?= GRAPH_YAXIS_SIDE_LEFT ?>];
+
+		document.getElementById('percentile_left_value').disabled = !percentile_left_checkbox.checked;
+
+		const percentile_right_checkbox = document.getElementById('percentile_right');
+		percentile_right_checkbox.disabled = !axes_used[<?= GRAPH_YAXIS_SIDE_RIGHT ?>];
+
+		document.getElementById('percentile_right_value').disabled = !percentile_right_checkbox.checked;
+
+		// Axes tab.
+		const lefty_checkbox = document.getElementById('lefty');
+		lefty_checkbox.disabled = !axes_used[<?= GRAPH_YAXIS_SIDE_LEFT ?>];
+
+		const lefty_on = !lefty_checkbox.disabled && lefty_checkbox.checked;
+
+		if (lefty_checkbox.disabled) {
+			lefty_checkbox.checked = true;
+		}
+
+		for (const element of document.querySelectorAll('#lefty_min, #lefty_max, #lefty_units')) {
+			element.disabled = !lefty_on;
+		}
+
+		document.getElementById('lefty_static_units').disabled = !lefty_on
+			|| document.getElementById('lefty_units').value != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>;
+
+		const righty_checkbox = document.getElementById('righty');
+		righty_checkbox.disabled = !axes_used[<?= GRAPH_YAXIS_SIDE_RIGHT ?>];
+
+		const righty_on = !righty_checkbox.disabled && righty_checkbox.checked;
+
+		if (righty_checkbox.disabled) {
+			righty_checkbox.checked = true;
+		}
+
+		for (const element of document.querySelectorAll('#righty_min, #righty_max, #righty_units')) {
+			element.disabled = !righty_on;
+		}
+
+		document.getElementById('righty_static_units').disabled = !righty_on
+			|| document.getElementById('righty_units').value != <?= SVG_GRAPH_AXIS_UNITS_STATIC ?>;
+	}
+
+	_updatePreview() {
+		// Update graph preview.
+		const $preview = jQuery('#svg-graph-preview');
+		const $preview_container = $preview.parent();
+		const preview_data = $preview_container.data();
+		const $form = jQuery(this.form);
+		const url = new Curl('zabbix.php');
+		const data = {
+			uniqueid: 0,
+			preview: 1,
+			content_width: Math.floor($preview.width()),
+			content_height: Math.floor($preview.height()) - 10
+		};
+
+		url.setArgument('action', 'widget.svggraph.view');
+
+		const form_fields = $form.serializeJSON();
+
+		if ('ds' in form_fields) {
+			for (const i in form_fields.ds) {
+				form_fields.ds[i] = jQuery.extend({'hosts': [], 'items': []}, form_fields.ds[i]);
+			}
+		}
+		if ('or' in form_fields) {
+			for (const i in form_fields.or) {
+				form_fields.or[i] = jQuery.extend({'hosts': [], 'items': []}, form_fields.or[i]);
+			}
+		}
+		data.fields = JSON.stringify(form_fields);
+
+		if (preview_data.xhr) {
+			preview_data.xhr.abort();
+		}
+
+		if (preview_data.timeoutid) {
+			clearTimeout(preview_data.timeoutid);
+		}
+
+		preview_data.timeoutid = setTimeout(function() {
+			$preview_container.addClass('is-loading');
+		}, 1000);
+
+		preview_data.xhr = jQuery.ajax({
+			url: url.getUrl(),
+			method: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify(data),
+			dataType: 'json',
+			success: function(r) {
+				if (preview_data.timeoutid) {
+					clearTimeout(preview_data.timeoutid);
+				}
+				$preview_container.removeClass('is-loading');
+
+				$form.prev('.msg-bad').remove();
+
+				if ('error' in r) {
+					const message_box = makeMessageBox('bad', r.error.messages, r.error.title);
+					message_box.insertBefore($form);
+				}
+
+				if (typeof r.body !== 'undefined') {
+					$preview.html(jQuery(r.body)).attr('unselectable', 'on').css('user-select', 'none');
+				}
+			}
+		});
+
+		$preview_container.data(preview_data);
 	}
 
 	changeDataSetAggregateFunction(obj) {
