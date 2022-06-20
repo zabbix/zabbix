@@ -376,7 +376,6 @@ int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, c
 		src->values[0]->value = NULL;
 		zbx_db_tag_free(src->values[0]);
 		zbx_vector_db_tag_ptr_remove_noorder(src, 0);
-		continue;
 	}
 
 	/* add leftover new tags */
