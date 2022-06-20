@@ -19,9 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/forms.inc.php';
-require_once dirname(__FILE__).'/../../include/items.inc.php';
-
 class CControllerPopupCopy extends CController {
 
 	protected function checkInput() {
@@ -75,8 +72,7 @@ class CControllerPopupCopy extends CController {
 	 *
 	 * @return CControllerResponse
 	 */
-	protected function form(): CControllerResponse
-	{
+	protected function form(): CControllerResponse {
 		$data = [
 			'action' => $this->getAction(),
 			'form_refresh' => getRequest('form_refresh')
@@ -92,6 +88,6 @@ class CControllerPopupCopy extends CController {
 			$data['graphids'] = $this->getInput('graphids');
 		}
 
-			return new CControllerResponseData($data);
+		return new CControllerResponseData($data);
 	}
 }

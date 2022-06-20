@@ -252,11 +252,11 @@ foreach ($data['graphs'] as $graph) {
 // buttons
 $buttonsArray = [];
 if (!$this->data['parent_discoveryid']) {
-	$buttonsArray += [
-		'graph.masscopyto' => [	'content' => (new CButton('', _('Copy')))
+	$buttonsArray['graph.masscopyto'] = [
+		'content' => (new CButton('', _('Copy')))
 			->onClick("view.openCopyPopup(this);")
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeAttribute('id')]
+			->removeAttribute('id')
 	];
 }
 $buttonsArray['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
