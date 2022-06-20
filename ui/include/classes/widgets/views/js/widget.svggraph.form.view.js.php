@@ -706,12 +706,14 @@ window.widget_svggraph_form = new class {
 		const percentile_left_checkbox = document.getElementById('percentile_left');
 		percentile_left_checkbox.disabled = !axes_used[<?= GRAPH_YAXIS_SIDE_LEFT ?>];
 
-		document.getElementById('percentile_left_value').disabled = !percentile_left_checkbox.checked;
+		document.getElementById('percentile_left_value').disabled = !percentile_left_checkbox.checked
+			|| percentile_left_checkbox.disabled;
 
 		const percentile_right_checkbox = document.getElementById('percentile_right');
 		percentile_right_checkbox.disabled = !axes_used[<?= GRAPH_YAXIS_SIDE_RIGHT ?>];
 
-		document.getElementById('percentile_right_value').disabled = !percentile_right_checkbox.checked;
+		document.getElementById('percentile_right_value').disabled = !percentile_right_checkbox.checked
+			|| percentile_right_checkbox.disabled;
 
 		// Axes tab.
 		const lefty_checkbox = document.getElementById('lefty');
