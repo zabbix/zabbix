@@ -34,36 +34,33 @@ $form = (new CForm('post', (new CUrl())->getUrl()))
 	->addVar('action', $data['action'])
 	->addVar($data['elements_field'], $data['elements'])
 	->addVar('hostid', $data['hostid'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));;
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if (isset($data['itemids'])) {
-	$form
-		->addVar('itemids', $data['itemids']);
+if (array_key_exists('itemids', $data)) {
+	$form->addVar('itemids', $data['itemids']);
 	$action = 'copy.items';
 }
 
-if (isset($data['triggerids'])) {
-	$form
-		->addVar('triggerids', $data['triggerids']);
+elseif (array_key_exists('triggerids', $data)) {
+	$form->addVar('triggerids', $data['triggerids']);
 	$action = 'copy.triggers';
 }
 
-if (isset($data['graphids'])) {
-	$form
-		->addVar('graphids', $data['graphids']);
+elseif (array_key_exists('graphids', $data)) {
+	$form->addVar('graphids', $data['graphids']);
 	$action = 'copy.graphs';
 }
 
 $form_grid = (new CFormGrid())
 	->setName('elements_form_list')
 	->addItem([
-	(new CLabel(_('Target type'), 'copy_type')),
-	(new CRadioButtonList('copy_type', (int) $data['copy_type']))
-		->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
-		->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
-		->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE)
-		->setModern(true)
-		->setName('copy_type')
+		(new CLabel(_('Target type'), 'copy_type')),
+		(new CRadioButtonList('copy_type', (int) $data['copy_type']))
+			->addValue(_('Host groups'), COPY_TYPE_TO_HOST_GROUP)
+			->addValue(_('Hosts'), COPY_TYPE_TO_HOST)
+			->addValue(_('Templates'), COPY_TYPE_TO_TEMPLATE)
+			->setModern(true)
+			->setName('copy_type')
 	])
 	->addItem([
 		(new CLabel(_('Target'), 'copy_targetids_ms'))->setAsteriskMark(),
@@ -98,8 +95,7 @@ $output = [
 	'copy_targetids' => $data['copy_targetids'],
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.copy.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('popup.copy.js.php')
 ];
 
 echo json_encode($output);

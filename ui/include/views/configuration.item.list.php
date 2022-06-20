@@ -324,10 +324,12 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'item.masscopyto' => [	'content' => (new CButton('', _('Copy')))
-		->onClick("view.openCopyPopup(this);")
-		->addClass(ZBX_STYLE_BTN_ALT)
-		->removeAttribute('id')],
+	'item.masscopyto' => [
+		'content' => (new CButton('', _('Copy')))
+			->onClick('view.openCopyPopup(this);')
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->removeAttribute('id')
+	],
 	'popup.massupdate.item' => [
 		'content' => (new CButton('', _('Mass update')))
 			->onClick(
@@ -343,9 +345,10 @@ $button_list += [
 ];
 
 // Append table to form.
-$itemForm->addItem([$itemTable, $data['paging'], new CActionButtonList('action', 'group_itemid', $button_list,
-	$data['checkbox_hash']
-)]);
+$itemForm->addItem([
+	$itemTable, $data['paging'],
+	new CActionButtonList('action', 'group_itemid', $button_list, $data['checkbox_hash'])
+]);
 
 // Append form to widget.
 $widget->addItem($itemForm);

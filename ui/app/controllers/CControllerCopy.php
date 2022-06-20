@@ -28,17 +28,16 @@ class CControllerCopy extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput(): bool
-	{
+	protected function checkInput(): bool {
 		$fields = [
-			'authtype' => 'string',
 			'context' => 'string|in host,template',
-			'action' => 'string|not_empty',
 			'copy_targetids' => 'array|not_empty',
 			'itemids' =>  'array_id',
 			'triggerids' => 'array_id',
 			'graphids' => 'array_id',
-			'copy_type' => 'in '.implode(',', [COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE]),
+			'copy_type' => 'in '.implode(',', [
+				COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE
+				]),
 		];
 
 		$ret = $this->validateInput($fields);
@@ -60,24 +59,27 @@ class CControllerCopy extends CController {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
 
-	protected function doAction(){
+	protected function doAction() {
+		$output = '';
 		// Item copy
 		if($this->getAction() === 'copy.items') {
-			$this->copyItems();
+			$output = $this->copyItems();
 		}
 
 		// Trigger copy
-		if($this->getAction() === 'copy.triggers'){
-			$this->copyTriggers();
+		elseif($this->getAction() === 'copy.triggers'){
+			$output = $this->copyTriggers();
 		}
 
 		// Graph copy
-		if ($this->getAction() === 'copy.graphs') {
-			$this->copyGraphs();
+		elseif ($this->getAction() === 'copy.graphs') {
+			$output = $this->copyGraphs();
 		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
-	function copyItems() {
+	protected function copyItems() {
 		$copy_targetids = $this->getInput('copy_targetids');
 		$copy_type = $this->getInput('copy_type');
 		$itemids = $this->getInput('itemids');
@@ -123,10 +125,11 @@ class CControllerCopy extends CController {
 				'title' => _('No target selected.')
 			];
 		}
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+
+		return $output;
 	}
 
-	function copyTriggers() {
+	protected function copyTriggers() {
 		$copy_targetids = $this->getInput('copy_targetids');
 		$copy_type = $this->getInput('copy_type');
 		$triggerids = $this->getInput('triggerids');
@@ -172,11 +175,12 @@ class CControllerCopy extends CController {
 				'title' => _('No target selected.')
 			];
 		}
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+
+		return $output;
 	}
 
-	function copyGraphs() {
-		if ($this->getAction() === 'copy.graphs'){
+	protected function copyGraphs() {
+		if ($this->getAction() === 'copy.graphs') {
 			$copy_targetids = $this->getInput('copy_targetids');
 			$copy_type = $this->getInput('copy_type');
 			$graphids = $this->getInput('graphids');
@@ -206,7 +210,7 @@ class CControllerCopy extends CController {
 				$dbGroups = zbx_toHash($dbGroups, 'groupid');
 
 				foreach ($groupids as $groupid) {
-					if (!isset($dbGroups[$groupid])) {
+					if (!array_key_exists($groupid, $dbGroups)) {
 						access_deny();
 					}
 				}
@@ -243,7 +247,8 @@ class CControllerCopy extends CController {
 					'title' => _('No target selected.')
 				];
 			}
-			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+
+			return $output;
 		}
 	}
 }
