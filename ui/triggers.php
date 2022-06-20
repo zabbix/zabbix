@@ -34,13 +34,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $fields = [
 	'hostid' =>									[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'(isset({form}) && ({form} == "update"))'],
-	'copy_type' =>								[T_ZBX_INT, O_OPT, P_SYS,
-													IN([COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST,
-														COPY_TYPE_TO_TEMPLATE
-													]),
-													'isset({copy})'
-												],
-	'copy_mode' =>								[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),		null],
 	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),		null],
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'event_name' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
@@ -63,7 +56,6 @@ $fields = [
 	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0',	'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
-	'copy_targetids' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
 	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
 	'show_inherited_tags' =>					[T_ZBX_INT, O_OPT, null,	IN([0,1]),		null],
@@ -128,7 +120,6 @@ $fields = [
 	'group_enable' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_disable' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'copy' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'clone' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
