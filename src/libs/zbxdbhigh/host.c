@@ -3140,7 +3140,7 @@ static void	DBhost_prototypes_tags_make(zbx_vector_ptr_t *host_prototypes)
 						break;
 				}
 
-				if (NULL != host_prototype && host_prototype->hostid != hostid)
+				if (NULL == host_prototype || host_prototype->hostid != hostid)
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 					continue;
