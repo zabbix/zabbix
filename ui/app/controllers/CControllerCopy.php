@@ -56,7 +56,41 @@ class CControllerCopy extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS) ||
+			!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
+			return false;
+		}
+
+		$action = $this->getAction();
+
+		if ($action == 'copy.items') {
+			$entity = API::Item()->get([
+				'output' => [],
+				'itemids' => $this->getInput('itemids'),
+				'editable' => true,
+			]);
+			$element_count = count($this->getInput('itemids'));
+		}
+
+		elseif ($action == 'copy.triggers') {
+			$entity = API::Trigger()->get([
+				'output' => [],
+				'triggerids' => $this->getInput('triggerids'),
+				'editable' => true,
+			]);
+			$element_count = count($this->getInput('triggerids'));
+		}
+
+		elseif ($action == 'copy.graphs') {
+			$entity = API::Graph()->get([
+				'output' => [],
+				'graphids' => $this->getInput('graphids'),
+				'editable' => true,
+			]);
+			$element_count = count($this->getInput('graphids'));
+		}
+
+		return $element_count === count($entity);
 	}
 
 	protected function doAction() {
