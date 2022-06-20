@@ -90,13 +90,13 @@ class CControllerPopupCopy extends CController {
 			'form_refresh' => getRequest('form_refresh')
 		];
 
-		if ($this->getInput('itemids')) {
+		if ($data['action'] === 'popup.copy.items') {
 			$data['itemids'] = $this->getInput('itemids');
 		}
-		else if ($this->getInput('triggerids')) {
+		elseif ($data['action'] === 'popup.copy.triggers') {
 			$data['triggerids'] =  $this->getInput('triggerids');
 		}
-		else if ($this->getInput('graphids')) {
+		elseif ($data['action'] === 'popup.copy.graphs') {
 			$data['graphids'] = $this->getInput('graphids');
 		}
 
