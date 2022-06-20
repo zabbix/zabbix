@@ -841,7 +841,7 @@ int	DBcheck_version_info(struct zbx_db_version_info_t *info, int allow_unsupport
 		program_type_s = get_program_type_string(program_type);
 
 		server_db_deprecated = (DB_VERSION_LOWER_THAN_MINIMUM == info->flag &&
-				0 == (program_type & ZBX_PROGRAM_TYPE_PROXY));
+				0 != (program_type & ZBX_PROGRAM_TYPE_SERVER));
 
 		if (0 == allow_unsupported || 0 != server_db_deprecated)
 		{
