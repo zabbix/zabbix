@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-15T14:36:14Z'
+  date: '2022-06-20T11:03:28Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -2336,11 +2336,11 @@ zabbix_export:
         -
           macro: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable discovered service by namespace on local node. Enterprise only, in case Open Source version Namespace will be set to ''None''.'
+          description: 'Filter of discoverable discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to ''None''.'
         -
           macro: '{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES}'
           value: 'CHANGE IF NEEDED'
-          description: 'Filter to exclude discovered service by namespace on local node. Enterprise only, in case Open Source version Namespace will be set to ''None''.'
+          description: 'Filter to exclude discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to ''None''.'
         -
           macro: '{$CONSUL.NODE.API.URL}'
           value: 'http://localhost:8500'

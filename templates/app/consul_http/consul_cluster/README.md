@@ -26,7 +26,7 @@ Don't forget to change macros {$CONSUL.CLUSTER.URL}, {$CONSUL.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.  
 
 This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macro {$CONSUL.NAMESPACE}, if you interested in only one service namespace. Do not specify this macro to get all of services.  
-In case Open Source version leave this macro empty.
+In case of Open Source version leave this macro empty.
 
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
 *NOTE.* You may be interested in Envoy Proxy by HTTP [template](../envoy_proxy_http).
@@ -47,7 +47,7 @@ No specific Zabbix configuration is required.
 |{$CONSUL.LLD.FILTER.NODE_NAME.NOT_MATCHES} |<p>Filter to exclude discovered nodes.</p> |`CHANGE IF NEEDED` |
 |{$CONSUL.LLD.FILTER.SERVICE_NAME.MATCHES} |<p>Filter of discoverable discovered services.</p> |`.*` |
 |{$CONSUL.LLD.FILTER.SERVICE_NAME.NOT_MATCHES} |<p>Filter to exclude discovered services.</p> |`CHANGE IF NEEDED` |
-|{$CONSUL.NAMESPACE} |<p>Consul service namespace. Enterprise only, in case Open Source version leave this macro empty. Do not specify this macro to get all of services.</p> |`` |
+|{$CONSUL.NAMESPACE} |<p>Consul service namespace. Enterprise only, in case of Open Source version leave this macro empty. Do not specify this macro to get all of services.</p> |`` |
 |{$CONSUL.SERVICE_NODES.CRITICAL.MAX.AVG} |<p>Maximum number of service nodes in status 'critical' for trigger expression. Can be used with context.</p> |`0` |
 |{$CONSUL.TOKEN} |<p>Consul auth token.</p> |`<PUT YOUR AUTH TOKEN>` |
 

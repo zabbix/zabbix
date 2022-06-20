@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-15T14:36:11Z'
+  date: '2022-06-20T11:03:30Z'
   template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -626,7 +626,7 @@ zabbix_export:
           description: 'Filter to exclude discovered services.'
         -
           macro: '{$CONSUL.NAMESPACE}'
-          description: 'Consul service namespace. Enterprise only, in case Open Source version leave this macro empty. Do not specify this macro to get all of services.'
+          description: 'Consul service namespace. Enterprise only, in case of Open Source version leave this macro empty. Do not specify this macro to get all of services.'
         -
           macro: '{$CONSUL.SERVICE_NODES.CRITICAL.MAX.AVG}'
           value: '0'

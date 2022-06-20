@@ -30,7 +30,7 @@ Don't forget to change macros {$CONSUL.NODE.API.URL}, {$CONSUL.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.  
 
 This template support [Consul namespaces](https://www.consul.io/docs/enterprise/namespaces). You can set macros {$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES}, {$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES} if you want to filter discovered services by namespace.  
-In case Open Source version service namespace will be set to 'None'.
+In case of Open Source version service namespace will be set to 'None'.
 
 *NOTE.* Some metrics may not be collected depending on your HashiCorp Consul instance version and configuration.  
 *NOTE.* You may be interested in Envoy Proxy by HTTP [template]([Readme](../envoy_proxy_http).
@@ -46,8 +46,8 @@ No specific Zabbix configuration is required.
 |----|-----------|-------|
 |{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES} |<p>Filter of discoverable discovered services on local node.</p> |`.*` |
 |{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.NOT_MATCHES} |<p>Filter to exclude discovered services on local node.</p> |`CHANGE IF NEEDED` |
-|{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES} |<p>Filter of discoverable discovered service by namespace on local node. Enterprise only, in case Open Source version Namespace will be set to 'None'.</p> |`.*` |
-|{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered service by namespace on local node. Enterprise only, in case Open Source version Namespace will be set to 'None'.</p> |`CHANGE IF NEEDED` |
+|{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.MATCHES} |<p>Filter of discoverable discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to 'None'.</p> |`.*` |
+|{$CONSUL.LLD.FILTER.SERVICE_NAMESPACE.NOT_MATCHES} |<p>Filter to exclude discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to 'None'.</p> |`CHANGE IF NEEDED` |
 |{$CONSUL.NODE.API.URL} |<p>Consul instance URL.</p> |`http://localhost:8500` |
 |{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH} |<p>Maximum acceptable value of node's health score for AVERAGE trigger expression.</p> |`4` |
 |{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN} |<p>Maximum acceptable value of node's health score for WARNING trigger expression.</p> |`2` |
