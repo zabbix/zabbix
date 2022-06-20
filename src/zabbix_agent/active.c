@@ -1389,6 +1389,8 @@ static void	send_heartbeat_msg(zbx_vector_ptr_t *addrs)
 					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 					zbx_socket_strerror());
 		}
+
+		zbx_tcp_close(&s);
 	}
 
 	last_ret = ret;

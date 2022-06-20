@@ -218,7 +218,7 @@ class testFormFilterLatestData extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterLatestData_CheckCreatedFilter($data) {
-		$this->createFilter($data, 'filter-create', 'zabbix');
+		$this->createFilter($data, 'filter-create', 'zabbix', $this->getTableSelector());
 		$this->checkFilters($data, $this->getTableSelector());
 	}
 

@@ -25,7 +25,7 @@
 #include "common.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
-#include "db.h"
+#include "zbxdbhigh.h"
 
 void	zbx_mock_test_entry(void **state)
 {

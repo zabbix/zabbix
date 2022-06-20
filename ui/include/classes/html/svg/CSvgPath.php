@@ -27,32 +27,28 @@ class CSvgPath extends CSvgTag {
 	public function __construct($directions = '') {
 		parent::__construct('path');
 
-		$this->setDirections($directions);
-	}
-
-	public function setDirections($directions) {
 		$this->directions = $directions;
 	}
 
-	public function moveTo($x, $y) {
+	public function moveTo($x, $y): self {
 		$this->directions .= ' M'.floor($x).','.ceil($y);
 
 		return $this;
 	}
 
-	public function lineTo($x, $y) {
+	public function lineTo($x, $y): self {
 		$this->directions .= ' L'.floor($x).','.ceil($y);
 
 		return $this;
 	}
 
-	public function closePath() {
+	public function closePath(): self {
 		$this->directions .= ' Z';
 
 		return $this;
 	}
 
-	public function toString($destroy = true) {
+	public function toString($destroy = true): string {
 		$this->setAttribute('d', trim($this->directions));
 
 		return parent::toString($destroy);

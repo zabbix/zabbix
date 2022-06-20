@@ -126,7 +126,7 @@ CViewSwitcher.prototype = {
 			}
 		}
 
-		if (isset(myValue, this.depObjects)) {
+		if (isset(myValue, this.depObjects) && !this.mainObj.disabled) {
 			for (var key in this.depObjects[myValue]) {
 				if (empty(this.depObjects[myValue][key])) {
 					continue;
@@ -146,20 +146,19 @@ CViewSwitcher.prototype = {
 			return null;
 		}
 
-		switch (obj.tagName) {
-			case 'SELECT':
+		switch (obj.tagName.toLowerCase) {
+			case 'select':
 				return (obj.selectedIndex > -1) ? obj.options[obj.selectedIndex].value : null;
 
-			case 'INPUT':
-				if (obj.getAttribute('type').toUpperCase() === 'CHECKBOX') {
+			case 'input':
+				if (obj.getAttribute('type').toLowerCase() === 'checkbox') {
 					return obj.checked ? obj.value : null;
 				}
+				return obj.value;
 
 			default:
 				return obj.value;
 		}
-
-		return null;
 	},
 
 	setObjValue : function (obj, value) {
@@ -176,16 +175,19 @@ CViewSwitcher.prototype = {
 					}
 				}
 				break;
+
 			case 'input':
-				var inpType = obj.getAttribute('type');
-				if (!is_null(inpType) && inpType.toLowerCase() == 'checkbox') {
+				const input_type = obj.getAttribute('type');
+				if (!is_null(input_type) && input_type.toLowerCase() === 'checkbox') {
 					obj.checked = true;
-					obj.value == value;
-					break;
 				}
+				obj.value = value;
+				break;
+
 			case 'textarea':
 			default:
 				obj.value = value;
+				break;
 		}
 	},
 

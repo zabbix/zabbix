@@ -154,7 +154,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 				[
 					'fields' => [
 						'Host name' => 'test Inheritance host prototype',
-						'Groups' => 'Zabbix servers'
+						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
 						[
@@ -212,7 +212,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 * @param array $data	test case data from data provider
 	 */
 	private function sqlForHostPrototypeCompare($data) {
-		$sql = 'SELECT host, status, name, lastaccess, ipmi_authtype,'.
+		$sql = 'SELECT host, status, name, ipmi_authtype,'.
 				' ipmi_privilege, ipmi_username, ipmi_password,'.
 				' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
 				' tls_psk_identity, tls_psk, auto_compress, flags'.
@@ -287,11 +287,11 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'visible_name' => 'New visible name',
 					'create_enabled' => false,
 					'groups' => [
-						'Templates'
+						'Linux servers'
 					],
 					'group_macro' => '{#GROUP_MACRO}',
 					'templates' => [
-						['name' => 'Inheritance test template', 'group' => 'Templates']
+						['name' => 'Inheritance test template', 'group' => 'Linux servers']
 					],
 					'host_inventory' => 'Automatic'
 				]

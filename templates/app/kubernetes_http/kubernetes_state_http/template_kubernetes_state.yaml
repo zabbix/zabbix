@@ -1,10 +1,14 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-04-06T19:54:53Z'
-  groups:
+  date: '2022-06-07T19:33:39Z'
+  template_groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
+  host_groups:
+    -
+      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Applications
   templates:
     -
       uuid: 07695028a2ba4b66a5414797bec791df
@@ -166,6 +170,9 @@ zabbix_export:
           timeout: 10s
           parameters:
             -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
+            -
               name: token
               value: '{$KUBE.API.TOKEN}'
             -
@@ -186,9 +193,6 @@ zabbix_export:
             -
               name: scheduler_port
               value: '{$KUBE.SCHEDULER.PORT}'
-            -
-              name: api_endpoint
-              value: '{$KUBE.API.URL}/api'
           tags:
             -
               tag: component
@@ -471,6 +475,9 @@ zabbix_export:
           timeout: 10s
           parameters:
             -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
+            -
               name: token
               value: '{$KUBE.API.TOKEN}'
             -
@@ -479,9 +486,6 @@ zabbix_export:
             -
               name: kubelet_port
               value: '{$KUBE.KUBELET.PORT}'
-            -
-              name: api_endpoint
-              value: '{$KUBE.API.URL}/api'
           tags:
             -
               tag: component
@@ -682,14 +686,14 @@ zabbix_export:
           timeout: 10s
           parameters:
             -
+              name: api_endpoint
+              value: '{$KUBE.API.URL}/api'
+            -
               name: state_endpoint_name
               value: '{$KUBE.STATE.ENDPOINT.NAME}'
             -
               name: token
               value: '{$KUBE.API.TOKEN}'
-            -
-              name: api_endpoint
-              value: '{$KUBE.API.URL}/api'
           tags:
             -
               tag: component
@@ -731,7 +735,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Applications
               group_prototypes:
                 -
                   name: 'Kubernetes/Components: {#COMPONENT.API}'
@@ -832,7 +836,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Applications
               group_prototypes:
                 -
                   name: 'Kubernetes/Components: {#COMPONENT.CONTROLLER}'
@@ -1928,7 +1932,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Applications
               group_prototypes:
                 -
                   name: 'Kubernetes/Components: {#COMPONENT}'
@@ -3671,7 +3675,7 @@ zabbix_export:
               group_links:
                 -
                   group:
-                    name: Templates/Applications
+                    name: Applications
               group_prototypes:
                 -
                   name: 'Kubernetes/Components: {#COMPONENT.SCHEDULER}'

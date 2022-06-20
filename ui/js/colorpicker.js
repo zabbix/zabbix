@@ -215,6 +215,21 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 				methods.hide();
 			},
+
+			destroy: function(element) {
+				const id = $(element).attr('id');
+
+				if ($('#lbl_' + id).length == 0) {
+					return;
+				}
+
+				element.next().remove();
+
+				$(element)
+					.off('change')
+					.data('use_default', null);
+			},
+
 			/**
 			 * Hide colorpicker overlay.
 			 */
@@ -237,6 +252,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 			 * @param object target  jQuery element (colorbox) which triggered show action.
 			 */
 			show: function(id, target) {
+				this.hide();
+
 				input = $('#' + id);
 				colorbox = $('#lbl_' + id);
 

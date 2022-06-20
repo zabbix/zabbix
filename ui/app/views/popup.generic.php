@@ -52,6 +52,18 @@ if (array_key_exists('groups', $data['filter'])) {
 	$script_inline .= $hostgroup_ms->getPostJS(). 'popup_generic.initGroupsFilter();';
 }
 
+// Add template group multiselect control.
+if (array_key_exists('templategroups', $data['filter'])) {
+	$multiselect_options = $data['filter']['templategroups'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
+
+	$templategroup_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	$controls[] = (new CFormList())
+		->addRow(new CLabel(_('Template group'), 'popup_template_group_ms'), $templategroup_ms);
+
+	$script_inline .= $templategroup_ms->getPostJS(). 'popup_generic.initTemplategroupsFilter();';
+}
+
 // Add host multiselect.
 if (array_key_exists('hosts', $data['filter'])) {
 	$multiselect_options = $data['filter']['hosts'];
@@ -64,6 +76,20 @@ if (array_key_exists('hosts', $data['filter'])) {
 	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), $host_ms);
 
 	$script_inline .= $host_ms->getPostJS(). 'popup_generic.initHostsFilter();';
+}
+
+// Add template multiselect.
+if (array_key_exists('templates', $data['filter'])) {
+	$multiselect_options = $data['filter']['templates'];
+	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
+
+	$template_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
+	if ($multiselect_options['disabled']) {
+		$template_ms->setTitle(_('You cannot switch templates for current selection.'));
+	}
+	$controls[] = (new CFormList())->addRow(new CLabel(_('Template'), 'popup_template_ms'), $template_ms);
+
+	$script_inline .= $template_ms->getPostJS(). 'popup_generic.initTemplatesFilter();';
 }
 
 // Show Type dropdown in header for help items.
@@ -125,6 +151,7 @@ if ($data['preselect_required']) {
 // Output table rows.
 switch ($data['popup_type']) {
 	case 'hosts':
+	case 'template_groups':
 	case 'host_groups':
 	case 'proxies':
 	case 'host_templates':
@@ -227,6 +254,7 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'triggers':
+	case 'template_triggers':
 	case 'trigger_prototypes':
 		foreach ($data['table_records'] as &$trigger) {
 			$host = reset($trigger['hosts']);
@@ -432,6 +460,7 @@ switch ($data['popup_type']) {
 		break;
 
 	case 'items':
+	case 'template_items':
 	case 'item_prototypes':
 
 		if ($options['srcfld2'] !== '' && $options['dstfld2'] !== '') {
@@ -512,14 +541,14 @@ switch ($data['popup_type']) {
 
 				$table->addRow([
 					$data['multiselect']
-						? new CCheckBox('item['.$item[$options['srcfld1']].']', $item['itemid'])
+						? new CCheckBox('item['.$item['itemid'].']', $item['pattern'])
 						: null,
 					(new CLink($item['name']))
 						->setAttribute('data-reference', $options['reference'])
-						->setAttribute('data-itemid', $item['itemid'])
+						->setAttribute('data-pattern', $item['pattern'])
 						->setAttribute('data-parentid', $options['parentid'])
 						->onClick('
-							addValue(this.dataset.reference, this.dataset.itemid, this.dataset.parentid ?? null);
+							addValue(this.dataset.reference, this.dataset.pattern, this.dataset.parentid ?? null);
 							popup_generic.closePopup(event);
 						'),
 					(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
@@ -532,7 +561,7 @@ switch ($data['popup_type']) {
 				]);
 
 				$item = [
-					'id' => $item['itemid'],
+					'id' => $item['pattern'],
 					'itemid' => $item['itemid'],
 					'name' => $options['patternselect']
 						? $item['name']
@@ -763,6 +792,7 @@ $types = [
 	'hosts',
 	'host_templates',
 	'host_groups',
+	'template_groups',
 	'items',
 	'item_prototypes',
 	'proxies',

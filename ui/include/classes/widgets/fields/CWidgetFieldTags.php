@@ -77,8 +77,6 @@ class CWidgetFieldTags extends CWidgetField {
 					'new CTagFilterItem(rows[rows.length - 1]);'.
 				'});'.
 
-			'tags_table.parent().addClass("has-before");'.
-
 			// Init existing fields once loaded.
 			'document.querySelectorAll("#tags_table_'.$this->getName().' .form_row").forEach(row => {'.
 				'new CTagFilterItem(row);'.

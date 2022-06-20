@@ -330,8 +330,10 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		case ZBX_VMWARE_UNIT_PERCENT:
 			SET_DBL_RESULT(result, (double)perfvalue->value / 100.0);
 			break;
-		case ZBX_VMWARE_UNIT_JOULE:
 		case ZBX_VMWARE_UNIT_MEGAHERTZ:
+			SET_UI64_RESULT(result, perfvalue->value * 1000000);
+			break;
+		case ZBX_VMWARE_UNIT_JOULE:
 		case ZBX_VMWARE_UNIT_MICROSECOND:
 		case ZBX_VMWARE_UNIT_MILLISECOND:
 		case ZBX_VMWARE_UNIT_NUMBER:
@@ -634,11 +636,29 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 
 	for (i = 0; i < service->data->clusters.values_num; i++)
 	{
+		int			j;
 		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t *)service->data->clusters.values[i];
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#CLUSTER.ID}", cluster->id, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#CLUSTER.NAME}", cluster->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json_data, "resource_pool");
+
+		for (j = 0; j < service->data->resourcepools.values_num; j++)
+		{
+			zbx_vmware_resourcepool_t	*rp = service->data->resourcepools.values[j];
+
+			if (0 != strcmp(rp->parentid, cluster->id))
+				continue;
+
+			zbx_json_addobject(&json_data, NULL);
+			zbx_json_addstring(&json_data, "rpid", rp->id, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&json_data, "vm_count", rp->vm_num);
+			zbx_json_close(&json_data);
+		}
+
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 
@@ -1152,6 +1172,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_hashset_iter_reset(&service->data->hvs, &iter);
 	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
 	{
+		int			i;
 		zbx_vmware_cluster_t	*cluster = NULL;
 
 		if (NULL == (name = hv->props[ZBX_VMWARE_HVPROP_NAME]))
@@ -1172,6 +1193,23 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 		zbx_json_addstring(&json_data, "{#PARENT.TYPE}", hv->parent_type, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "{#HV.NETNAME}",
 				ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NET_NAME]), ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&json_data, "resource_pool");
+
+		for (i = 0; NULL == cluster && i < service->data->resourcepools.values_num; i++)
+		{
+			zbx_vmware_resourcepool_t	*rp = service->data->resourcepools.values[i];
+
+			if (0 != strcmp(rp->parentid, hv->props[ZBX_VMWARE_HVPROP_PARENT]))
+				continue;
+
+			zbx_json_addobject(&json_data, NULL);
+			zbx_json_addstring(&json_data, "rpid", rp->id, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json_data, "rpath", rp->path, ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&json_data, "vm_count", rp->vm_num);
+			zbx_json_close(&json_data);
+		}
+
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 
@@ -2094,12 +2132,6 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 		}
 
 		datastore = service->data->datastores.values[i];
-	}
-
-	if (NULL == datastore->uuid)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-		goto unlock;
 	}
 
 	switch (direction)
@@ -3517,8 +3549,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				if (FAIL != (idx = zbx_vector_vmware_resourcepool_bsearch(&service->data->resourcepools,
 						&rpool_cmp, vmware_resourcepool_compare_id)))
 				{
-					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}",
-							ZBX_NULL2EMPTY_STR(service->data->resourcepools.values[idx]->path),
+					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", ZBX_NULL2EMPTY_STR(
+							service->data->resourcepools.values[idx]->path),
 							ZBX_JSON_TYPE_STRING);
 				}
 				else
@@ -3851,12 +3883,9 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 		if (dev_type != dev->type)
 			continue;
 
-		if (NULL != props_cb)
-		{
-			zbx_json_addobject(&json_data, NULL);
-			props_cb(&json_data, dev);
-			zbx_json_close(&json_data);
-		}
+		zbx_json_addobject(&json_data, NULL);
+		props_cb(&json_data, dev);
+		zbx_json_close(&json_data);
 	}
 
 	zbx_json_close(&json_data);
@@ -4799,6 +4828,134 @@ int	check_vcenter_vm_guest_uptime(AGENT_REQUEST *request, const char *username, 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "sys/osUptime[latest]", 1, result);
 unlock:
 	zbx_vmware_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+static int	check_vcenter_rp_common(const char *url, const char *username, const char *password,
+		const char *counter, const char *rpid, AGENT_RESULT *result)
+{
+	zbx_vmware_service_t		*service;
+	zbx_vmware_resourcepool_t	rp_cmp;
+	zbx_uint64_t			counterid;
+	int				unit, ret = SYSINFO_RET_FAIL;
+
+	zbx_vmware_lock();
+
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+		goto unlock;
+
+	if (FAIL == zbx_vmware_service_get_counterid(service, counter, &counterid, &unit))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter is not available."));
+		goto unlock;
+	}
+
+	rp_cmp.id = (char *)rpid;
+
+	if (FAIL == zbx_vector_vmware_resourcepool_bsearch(&service->data->resourcepools, &rp_cmp,
+			vmware_resourcepool_compare_id))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown resource pool id."));
+		goto unlock;
+	}
+
+	/* FAIL is returned if counter already exists */
+	if (SUCCEED == zbx_vmware_service_add_perf_counter(service, ZBX_VMWARE_SOAP_RESOURCEPOOL, rpid, counterid, ""))
+	{
+		ret = SYSINFO_RET_OK;
+		goto unlock;
+	}
+
+	/* the performance counter is already being monitored, try to get the results from statistics */
+	ret = vmware_service_get_counter_value_by_id(service, ZBX_VMWARE_SOAP_RESOURCEPOOL, rpid, counterid, "", 0,
+			unit, result);
+unlock:
+	zbx_vmware_unlock();
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_rp_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char	*rpid, *url;
+	int		ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+
+	if (NULL == (rpid = get_rparam(request, 1)) || '\0' == *rpid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	ret = check_vcenter_rp_common(url, username, password, "cpu/usagemhz[average]", rpid, result);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
+
+	return ret;
+}
+
+int	check_vcenter_rp_memory(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result)
+{
+	const char	*rpid, *url, *mode, *counter;
+	int		ret = SYSINFO_RET_FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 > request->nparam || 3 < request->nparam )
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		goto out;
+	}
+
+	url = get_rparam(request, 0);
+	rpid = get_rparam(request, 1);
+	mode = get_rparam(request, 2);
+
+	if (NULL == rpid || '\0' == *rpid)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		goto out;
+	}
+
+	if (NULL == mode || '\0' == *mode)
+	{
+		mode = "consumed";
+	}
+
+	if (0 == strcmp(mode, "consumed"))
+	{
+		counter = "mem/consumed[average]";
+	}
+	else if (0 == strcmp(mode, "ballooned"))
+	{
+		counter = "mem/vmmemctl[average]";
+	}
+	else if (0 == strcmp(mode, "overhead"))
+	{
+		counter = "mem/overhead[average]";
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		goto out;
+	}
+
+	ret = check_vcenter_rp_common(url, username, password, counter, rpid, result);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));
 

@@ -130,10 +130,9 @@ if ($data['recovery_expression_field_readonly']) {
 }
 
 $popup_parameters = [
-	'srctbl' => $data['expression_field_name'],
-	'srcfld1' => $data['expression_field_name'],
 	'dstfrm' => $triggersForm->getName(),
-	'dstfld1' => $data['expression_field_name']
+	'dstfld1' => $data['expression_field_name'],
+	'context' => $data['context']
 ];
 
 if ($data['hostid']) {
@@ -150,13 +149,13 @@ $expression_row = [
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
+	(new CButton('insert', $data['expression_constructor'] == IM_TREE ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->setAttribute('data-parameters', json_encode($popup_parameters))
 		->onClick('
 			PopUp("popup.triggerexpr", {
 				...JSON.parse(this.dataset.parameters),
-				expression: document.getElementsByName("'.$data['expression_field_name'].'").value
+				expression: document.querySelector("[name='.$data['expression_field_name'].']").value
 			}, {dialogue_class: "modal-popup-generic"});
 		')
 		->setEnabled(!$readonly)
@@ -338,10 +337,9 @@ $triggersFormList->addRow(_('OK event generation'),
 );
 
 $popup_parameters = [
-	'srctbl' => $data['recovery_expression_field_name'],
-	'srcfld1' => $data['recovery_expression_field_name'],
 	'dstfrm' => $triggersForm->getName(),
-	'dstfld1' => $data['recovery_expression_field_name']
+	'dstfld1' => $data['recovery_expression_field_name'],
+	'context' => $data['context']
 ];
 
 if ($data['hostid']) {
@@ -358,13 +356,13 @@ $recovery_expression_row = [
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
+	(new CButton('insert', $data['recovery_expression_constructor'] == IM_TREE ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->setAttribute('data-parameters', json_encode($popup_parameters))
 		->onClick('
 			PopUp("popup.triggerexpr", {
 				...JSON.parse(this.dataset.parameters),
-				expression: document.getElementsByName("'.$data['recovery_expression_field_name'].'").value
+				expression: document.querySelector("[name='.$data['recovery_expression_field_name'].']").value
 			}, {dialogue_class: "modal-popup-generic"});
 		')
 		->setEnabled(!$readonly)
@@ -606,7 +604,7 @@ $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
 	->setId('dependency-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Name'), $readonly ? null : _('Action')]);
+	->setHeader([_('Name'), $discovered_trigger ? null : _('Action')]);
 
 foreach ($data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
@@ -624,7 +622,7 @@ foreach ($data['db_dependencies'] as $dependency) {
 					->setArgument('context', $data['context'])
 			))->setTarget('_blank'),
 			(new CCol(
-				$readonly
+				$discovered_trigger
 					? null
 					: (new CButton('remove', _('Remove')))
 						->setAttribute('data-triggerid', $dependency['triggerid'])
@@ -636,25 +634,55 @@ foreach ($data['db_dependencies'] as $dependency) {
 	);
 }
 
+$buttons = null;
+
+if (!$discovered_trigger) {
+	$buttons = $data['context'] === 'host'
+		? (new CButton('add_dep_trigger', _('Add')))
+			->setAttribute('data-hostid', $data['hostid'])
+			->onClick('
+				PopUp("popup.generic", {
+					srctbl: "triggers",
+					srcfld1: "triggerid",
+					reference: "deptrigger",
+					hostid: this.dataset.hostid,
+					multiselect: 1,
+					with_triggers: 1,
+					real_hosts: 1
+				}, {dialogue_class: "modal-popup-generic"});
+			')
+			->addClass(ZBX_STYLE_BTN_LINK)
+		: new CHorList([
+				(new CButton('add_dep_trigger', _('Add')))
+					->setAttribute('data-templateid', $data['hostid'])
+					->onClick('
+						PopUp("popup.generic", {
+							srctbl: "template_triggers",
+							srcfld1: "triggerid",
+							reference: "deptrigger",
+							templateid: this.dataset.templateid,
+							multiselect: 1,
+							with_triggers: 1
+						}, {dialogue_class: "modal-popup-generic"});
+					')
+					->addClass(ZBX_STYLE_BTN_LINK),
+				(new CButton('add_dep_host_trigger', _('Add host trigger')))
+					->onClick('
+						PopUp("popup.generic", {
+							srctbl: "triggers",
+							srcfld1: "triggerid",
+							reference: "deptrigger",
+							multiselect: 1,
+							with_triggers: 1,
+							real_hosts: 1
+						}, {dialogue_class: "modal-popup-generic"});
+					')
+					->addClass(ZBX_STYLE_BTN_LINK)
+		]);
+}
+
 $dependenciesFormList->addRow(_('Dependencies'),
-	(new CDiv([
-		$dependenciesTable,
-		$readonly
-			? null
-			: (new CButton('bnt1', _('Add')))
-				->setAttribute('data-hostid', $data['hostid'])
-				->onClick('
-					PopUp("popup.generic", {
-						srctbl: "triggers",
-						srcfld1: "triggerid",
-						reference: "deptrigger",
-						hostid: this.dataset.hostid,
-						multiselect: 1,
-						with_triggers: 1
-					}, {dialogue_class: "modal-popup-generic"});
-				')
-				->addClass(ZBX_STYLE_BTN_LINK)
-	]))
+	(new CDiv([$dependenciesTable, $buttons]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );

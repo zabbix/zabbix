@@ -37,6 +37,11 @@ typedef struct
 	char		*state;
 	zbx_uint64_t	processes;
 
+	char		*user;
+	char		*group;
+	zbx_uint64_t	uid;
+	zbx_uint64_t	gid;
+
 	zbx_uint64_t	cputime_user;
 	zbx_uint64_t	cputime_system;
 	zbx_uint64_t	ctx_switches;
@@ -67,6 +72,8 @@ static void	proc_data_free(proc_data_t *proc_data)
 	zbx_free(proc_data->name);
 	zbx_free(proc_data->cmdline);
 	zbx_free(proc_data->state);
+	zbx_free(proc_data->user);
+	zbx_free(proc_data->group);
 
 	zbx_free(proc_data);
 }
@@ -486,6 +493,8 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	for (i = 0; i < count; i++)
 	{
 		proc_data_t	*proc_data;
+		struct passwd	*pw;
+		struct group	*gr;
 
 		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, proc[i].p_comm))
 			continue;
@@ -499,15 +508,26 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (ZBX_PROC_MODE_PROCESS == zbx_proc_mode)
 		{
+			pw = getpwuid(proc[i].p_ruid);
+			gr = getgrgid(proc[i].p_rgid);
+
 			proc_data->pid = proc[i].p_pid;
 			proc_data->ppid = proc[i].p_ppid;
 			proc_data->cmdline = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(args));
 			proc_data->state = get_state(&proc[i]);
+			proc_data->uid = proc[i].p_ruid;
+			proc_data->gid = proc[i].p_rgid;
+			proc_data->user = NULL != pw ? zbx_strdup(NULL, pw->pw_name) :
+					zbx_dsprintf(NULL, ZBX_FS_UI64, proc_data->uid);
+			proc_data->group = NULL != gr ? zbx_strdup(NULL, gr->gr_name) :
+					zbx_dsprintf(NULL, ZBX_FS_UI64, proc_data->gid);
 		}
 		else
 		{
 			proc_data->cmdline = NULL;
 			proc_data->state = NULL;
+			proc_data->user = NULL;
+			proc_data->group = NULL;
 		}
 
 		proc_data->name = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(proc[i].p_comm));
@@ -580,6 +600,10 @@ int	PROC_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			zbx_json_addint64(&j, "ppid", pdata->ppid);
 			zbx_json_addstring(&j, "name", pdata->name, ZBX_JSON_TYPE_STRING);
 			zbx_json_addstring(&j, "cmdline", pdata->cmdline, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "user", pdata->user, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&j, "group", pdata->group, ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(&j, "uid", pdata->uid);
+			zbx_json_adduint64(&j, "gid", pdata->gid);
 		}
 		else
 		{

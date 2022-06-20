@@ -34,6 +34,7 @@ sbin_PROGRAMS = zabbix_server
 noinst_LIBRARIES = libzbxserver.a
 
 libzbxserver_a_SOURCES = \
+	db_lengths.h \
 	actions.c \
 	actions.h \
 	events.c \
@@ -46,7 +47,8 @@ libzbxserver_a_SOURCES = \
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \
-	-I$(top_srcdir)/src/libs/zbxdbcache
+	-I$(top_srcdir)/src/libs/zbxdbcache \
+	$(TLS_CFLAGS)
 
 zabbix_server_SOURCES = server.c
 
@@ -76,6 +78,8 @@ zabbix_server_LDADD = \
 	availability/libavailability.a \
 	service/libservice.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
+	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
+	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
@@ -91,6 +95,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxdbcache/libzbxdbcache.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \
@@ -118,6 +123,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_builddir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_builddir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_builddir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(top_builddir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_builddir)/src/libs/zbxmodules/libzbxmodules.a \
 	$(top_builddir)/src/libs/zbxtasks/libzbxtasks.a \
@@ -152,7 +158,8 @@ zabbix_server_CFLAGS = \
 	-DDEFAULT_CONFIG_FILE="\"$(SERVER_CONFIG_FILE)\"" \
 	-DDEFAULT_EXTERNAL_SCRIPTS_PATH="\"$(EXTERNAL_SCRIPTS_PATH)\"" \
 	-DDEFAULT_ALERT_SCRIPTS_PATH="\"$(ALERT_SCRIPTS_PATH)\"" \
-	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\""
+	-DDEFAULT_LOAD_MODULE_PATH="\"$(LOAD_MODULE_PATH)\"" \
+	$(TLS_CFLAGS)
 
 install-data-hook:
 	$(MKDIR_P) "$(DESTDIR)$(SERVER_CONFIG_FILE).d"

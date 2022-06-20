@@ -244,8 +244,12 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 int	check_vcenter_ds_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
-
 int	check_vcenter_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+
+int	check_vcenter_rp_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_rp_memory(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

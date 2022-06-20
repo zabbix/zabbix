@@ -21,7 +21,11 @@
 
 /**
  * Clock widget form view.
+ *
+ * @var CView $this
+ * @var array $data
  */
+
 $fields = $data['dialogue']['fields'];
 
 $form = CWidgetHelper::createForm();

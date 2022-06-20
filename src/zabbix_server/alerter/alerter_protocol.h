@@ -274,9 +274,9 @@ zbx_uint32_t	zbx_alerter_serialize_begin_dispatch(unsigned char **data, const ch
 void	zbx_alerter_deserialize_begin_dispatch(const unsigned char *data, char **subject, char **message,
 		char **content_name, char **content_type, char **content, zbx_uint32_t *content_size);
 
-zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const DB_MEDIATYPE *mt,
+zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const ZBX_DB_MEDIATYPE *mt,
 		const zbx_vector_str_t *recipients);
-void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, DB_MEDIATYPE *mt, zbx_vector_str_t
+void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, ZBX_DB_MEDIATYPE *mt, zbx_vector_str_t
 		*recipients);
 
 #endif
