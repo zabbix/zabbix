@@ -408,7 +408,7 @@ int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, c
 	zbx_vector_db_tag_ptr_append_array(dst, src->values, src->values_num);
 	zbx_vector_db_tag_ptr_clear(src);
 out:
-	if (SUCCEED != (ret = check_tag_fields(dst, owner, error)))
+	if (SUCCEED != check_tag_fields(dst, owner, error))
 		ret = FAIL;
 
 	zbx_vector_db_tag_ptr_sort(dst, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
