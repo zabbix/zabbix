@@ -369,8 +369,6 @@ int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, c
 
 		if (j != src->values_num)
 		{
-			db_tag_merge_automatic(dst->values[i], src->values[j]);
-
 			dst->values[i]->value_orig = dst->values[i]->value;
 			dst->values[i]->value = src->values[j]->value;
 			dst->values[i]->flags = ZBX_FLAG_DB_TAG_UPDATE_VALUE;
@@ -389,8 +387,6 @@ int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, c
 	{
 		if (ZBX_FLAG_DB_TAG_REMOVE != dst->values[i]->flags)
 			continue;
-
-		db_tag_merge_automatic(dst->values[i], src->values[j]);
 
 		dst->values[i]->tag_orig = dst->values[i]->tag;
 		dst->values[i]->value_orig = dst->values[i]->value;
