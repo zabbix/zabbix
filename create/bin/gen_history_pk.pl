@@ -132,6 +132,8 @@ HEREDOC
 );
 
 my $tsdb_compress_sql = <<'HEREDOC'
+SELECT set_integer_now_func('%HISTTBL', 'zbx_ts_unix_now', true);
+
 ALTER TABLE %HISTTBL
 	SET (timescaledb.compress,timescaledb.compress_segmentby='itemid',timescaledb.compress_orderby='clock,ns');
 
@@ -185,8 +187,6 @@ CREATE TEMP TABLE temp_%HISTTBL (
 
 SELECT create_hypertable('%HISTTBL', 'clock', chunk_time_interval => 86400, migrate_data => true);
 INSERT INTO %HISTTBL SELECT * FROM temp_%HISTTBL ON CONFLICT (itemid,clock,ns) DO NOTHING;
-
-SELECT set_integer_now_func('%HISTTBL', 'zbx_ts_unix_now', true);
 %COMPRESS
 HEREDOC
 ;
