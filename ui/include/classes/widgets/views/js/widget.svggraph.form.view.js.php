@@ -179,7 +179,7 @@ window.widget_svggraph_form = new class {
 
 		document
 			.getElementById('dataset-add')
-			.addEventListener('click', () => this._addDataset(1));
+			.addEventListener('click', () => this._addDataset(<?= CWidgetHelper::DATASET_TYPE_PATTERN_ITEM ?>));
 
 		document
 			.getElementById('dataset-menu')
@@ -255,13 +255,13 @@ window.widget_svggraph_form = new class {
 					{
 						label: <?= json_encode(_('Item pattern')) ?>,
 						clickCallback: () => {
-							widget_svggraph_form._addDataset(1)
+							widget_svggraph_form._addDataset(<?= CWidgetHelper::DATASET_TYPE_PATTERN_ITEM ?>)
 						}
 					},
 					{
 						label: <?= json_encode(_('Item list')) ?>,
 						clickCallback: () => {
-							widget_svggraph_form._addDataset(0)
+							widget_svggraph_form._addDataset(<?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>)
 						}
 					}
 				]
@@ -373,28 +373,29 @@ window.widget_svggraph_form = new class {
 	}
 
 	updateVariableOrder(obj, row_selector, var_prefix) {
-		jQuery.each([10000, 0], function(_, value) {
-			jQuery(row_selector, obj).each(function(i) {
-				jQuery('.multiselect[data-params]', this).each(function() {
-					const name = jQuery(this).multiSelect('getOption', 'name');
+		jQuery(row_selector, obj).each(function(i) {
+			jQuery(this).attr('data-set', i).data('set', i);
+			jQuery('.single-item-table', this).attr('data-set', i).data('set', i);
 
-					if (name !== null) {
-						jQuery(this).multiSelect('modify', {
-							name: name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${value + i}$2`)
-						});
-					}
-				});
+			jQuery('.multiselect[data-params]', this).each(function() {
+				const name = jQuery(this).multiSelect('getOption', 'name');
 
-				jQuery(`[name^="${var_prefix}["]`, this)
-					.filter(function () {
-						return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
-					})
-					.each(function () {
-						jQuery(this).attr('name',
-							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${value + i}$2`)
-						);
+				if (name !== null) {
+					jQuery(this).multiSelect('modify', {
+						name: name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${i}$2`)
 					});
+				}
 			});
+
+			jQuery(`[name^="${var_prefix}["]`, this)
+				.filter(function () {
+					return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
+				})
+				.each(function () {
+					jQuery(this).attr('name',
+						jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${i}$2`)
+					);
+				});
 		});
 	}
 
