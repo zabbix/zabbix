@@ -328,7 +328,7 @@ window.widget_svggraph_form = new class {
 			jQuery('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>')
 		).rangeControl();
 
-		if (clone) {
+		if (!clone) {
 			this.recalculateSortOrder();
 			this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 
@@ -617,6 +617,7 @@ window.widget_svggraph_form = new class {
 		this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 
 		this.rewriteNameLinks();
+		this.initDataSetSortable();
 		this.initSingleItemSortable();
 		this.onGraphConfigChange();
 	}
