@@ -182,7 +182,7 @@ window.widget_svggraph_form = new class {
 
 		document
 			.getElementById('dataset-add')
-			.addEventListener('click', () => this._addDataset(<?= CWidgetHelper::DATASET_TYPE_PATTERN_ITEM ?>));
+			.addEventListener('click', () => this._addDataset(<?= CWidgetHelper::DATASET_TYPE_PATTERN_ITEM ?>), false);
 
 		document
 			.getElementById('dataset-menu')
@@ -258,13 +258,13 @@ window.widget_svggraph_form = new class {
 					{
 						label: <?= json_encode(_('Item pattern')) ?>,
 						clickCallback: () => {
-							widget_svggraph_form._addDataset(<?= CWidgetHelper::DATASET_TYPE_PATTERN_ITEM ?>)
+							widget_svggraph_form._addDataset(<?= CWidgetHelper::DATASET_TYPE_PATTERN_ITEM ?>, false)
 						}
 					},
 					{
 						label: <?= json_encode(_('Item list')) ?>,
 						clickCallback: () => {
-							widget_svggraph_form._addDataset(<?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>)
+							widget_svggraph_form._addDataset(<?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>, false)
 						}
 					}
 				]
@@ -294,7 +294,7 @@ window.widget_svggraph_form = new class {
 		});
 	}
 
-	_addDataset(type) {
+	_addDataset(type, clone) {
 		jQuery(this.dataset_wrapper).zbx_vertical_accordion('collapseAll');
 
 		const template = (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>)
@@ -328,12 +328,15 @@ window.widget_svggraph_form = new class {
 			jQuery('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>')
 		).rangeControl();
 
-		this.recalculateSortOrder();
-		this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
+		if (clone) {
+			this.recalculateSortOrder();
+			this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 
-		this.initDataSetSortable();
-		this.initSingleItemSortable();
-		this.onGraphConfigChange();
+			this.initDataSetSortable();
+			this.initSingleItemSortable();
+
+			this.onGraphConfigChange();
+		}
 	}
 
 	removeDataSet(obj) {
@@ -351,10 +354,10 @@ window.widget_svggraph_form = new class {
 
 	getDataSetNumber() {
 		if (jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]').length) {
-			return jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]').data('set');
+			return jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]').attr('data-set');
 		}
 
-		return jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>[data-set]:last').data('set');
+		return jQuery('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>[data-set]:last').attr('data-set');
 	}
 
 	onGraphConfigChange() {
@@ -364,8 +367,10 @@ window.widget_svggraph_form = new class {
 
 	updateVariableOrder(obj, row_selector, var_prefix) {
 		jQuery(row_selector, obj).each(function(i) {
-			jQuery(this).attr('data-set', i).data('set', i);
-			jQuery('.single-item-table', this).attr('data-set', i).data('set', i);
+			if (var_prefix === 'ds') {
+				jQuery(this).attr('data-set', i);
+				jQuery('.single-item-table', this).attr('data-set', i);
+			}
 
 			jQuery('.multiselect[data-params]', this).each(function() {
 				const name = jQuery(this).multiSelect('getOption', 'name');
@@ -544,7 +549,7 @@ window.widget_svggraph_form = new class {
 		const dataset_type = dataset_elem.dataset.type;
 		const inputs = dataset_elem.querySelectorAll('input[name^=ds]');
 
-		this._addDataset(dataset_type);
+		this._addDataset(dataset_type, true);
 
 		const cloned_dataset = this.dataset_wrapper.querySelector(
 			'.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]'
@@ -608,7 +613,11 @@ window.widget_svggraph_form = new class {
 			}
 		});
 
+		this.recalculateSortOrder();
+		this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
+
 		this.rewriteNameLinks();
+		this.initSingleItemSortable();
 		this.onGraphConfigChange();
 	}
 
