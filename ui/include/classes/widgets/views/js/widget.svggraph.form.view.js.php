@@ -368,8 +368,6 @@ window.widget_svggraph_form = new class {
 	updateVariableOrder(obj, row_selector, var_prefix) {
 		for (const k of [10000, 0]) {
 			jQuery(row_selector, obj).each(function(i) {
-				console.log('ROW:', i);
-
 				if (var_prefix === 'ds') {
 					jQuery(this).attr('data-set', i);
 					jQuery('.single-item-table', this).attr('data-set', i);
