@@ -22,6 +22,10 @@
 
 window.widget_svggraph_form = new class {
 
+	constructor() {
+		this._dataset_number = 0;
+	}
+
 	init({form_id, form_tabs_id}) {
 		colorPalette.setThemeColors(<?= json_encode(CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE) ?>);
 
@@ -75,6 +79,8 @@ window.widget_svggraph_form = new class {
 	}
 
 	_datasetTabInit() {
+		this._dataset_number = this.dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
+
 		// Initialize vertical accordion.
 		jQuery(this.dataset_wrapper)
 			.on('focus', '.<?= CMultiSelect::ZBX_STYLE_CLASS ?> input.input', function() {
@@ -286,8 +292,6 @@ window.widget_svggraph_form = new class {
 	}
 
 	_addDataset(type) {
-		const row_numb = jQuery('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
-
 		jQuery(this.dataset_wrapper).zbx_vertical_accordion('collapseAll');
 
 		const template = (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>)
@@ -296,7 +300,7 @@ window.widget_svggraph_form = new class {
 
 		jQuery('#data_sets .list-accordion-foot').before(
 			template.evaluate({
-				rowNum: row_numb,
+				rowNum: this._dataset_number++,
 				color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>)
 					? ''
 					: colorPalette.getNextColor()
@@ -631,9 +635,10 @@ window.widget_svggraph_form = new class {
 			}
 		}
 
-		if (this.dataset_wrapper.querySelector('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]') !== null) {
-			const row_num = this.getDataSetNumber();
-			const draw_type = document.querySelector(`#ds_${row_num}_type :checked`).value;
+		const row_num = this.getDataSetNumber();
+		const draw_type = document.querySelector(`#ds_${row_num}_type`);
+
+		if (draw_type !== null) {
 			const is_stacked = document.getElementById(`ds_${row_num}_stacked`).checked;
 
 			// Data set tab.
@@ -648,7 +653,7 @@ window.widget_svggraph_form = new class {
 			let aggregate_none_enabled = true;
 			let approximation_all_enabled = true;
 
-			switch (draw_type) {
+			switch (draw_type.querySelector(':checked').value) {
 				case '<?= SVG_GRAPH_TYPE_LINE ?>':
 					pointsize_enabled = false;
 					if (is_stacked) {

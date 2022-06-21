@@ -65,7 +65,6 @@ $scripts[] = $form_tabs->makeJavascript();
 $form
 	->addItem($form_list)
 	->addItem($graph_preview)
-	// ->addItem((new CDiv())->addStyle('width: 960px;'))	// TODO: debug
 	->addItem($form_tabs)
 	->addItem(
 		(new CScriptTag('
