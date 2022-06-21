@@ -124,6 +124,9 @@ window.widget_svggraph_form = new class {
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
 						message_block.style.display = 'none';
 					}
+
+					widget_svggraph_form.recalculateSortOrder();
+					widget_svggraph_form.initSingleItemSortable();
 				}
 			})
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
@@ -325,9 +328,11 @@ window.widget_svggraph_form = new class {
 			jQuery('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>')
 		).rangeControl();
 
+		this.recalculateSortOrder();
 		this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 
 		this.initDataSetSortable();
+		this.initSingleItemSortable();
 		this.onGraphConfigChange();
 	}
 
@@ -336,27 +341,12 @@ window.widget_svggraph_form = new class {
 			.closest('.list-accordion-item')
 			.remove();
 
-		this.recalculateDataSetAttribute();
-
 		this.recalculateSortOrder();
 		this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 
 		this.initDataSetSortable();
+		this.initSingleItemSortable();
 		this.onGraphConfigChange();
-	}
-
-	recalculateDataSetAttribute() {
-		let i = 0;
-
-		[...this.dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')].map((elem) => {
-			elem.dataset.set = i;
-
-			if (elem.querySelector('.single-item-table')) {
-				elem.querySelector('.single-item-table').dataset.set = i;
-			}
-
-			i++;
-		});
 	}
 
 	getDataSetNumber() {
@@ -476,7 +466,7 @@ window.widget_svggraph_form = new class {
 
 	rewriteNameLinks() {
 		[...document.querySelectorAll('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>[data-set]')].map((element) => {
-			const dataset_number = element.dataset.set;
+			const dataset_number = element.getAttribute('data-set');
 			const size = jQuery('.single-item-table-row', jQuery(element)).length + 1;
 
 			for (let i = 0; i < size; i++) {
@@ -560,7 +550,7 @@ window.widget_svggraph_form = new class {
 			'.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]'
 		);
 
-		const cloned_number = cloned_dataset.dataset.set;
+		const cloned_number = cloned_dataset.getAttribute('data-set');
 
 		if (dataset_type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>) {
 			const list = {
@@ -609,7 +599,8 @@ window.widget_svggraph_form = new class {
 			else if (type === 'checkbox' || type === 'radio') {
 				if (elem.checked) {
 					// Click to fire events.
-					cloned_dataset.querySelector(`[name="${cloned_name}"][value="${value}"]`).click();
+					cloned_dataset.querySelector(`[name="${cloned_name}"][value="${value}"]`)
+						.dispatchEvent(new Event('click'));
 				}
 			}
 			else if (cloned_dataset.querySelector(`z-select[name="${cloned_name}"]`)) {
