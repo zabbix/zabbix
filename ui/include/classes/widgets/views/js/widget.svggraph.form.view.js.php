@@ -125,7 +125,6 @@ window.widget_svggraph_form = new class {
 						message_block.style.display = 'none';
 					}
 
-					widget_svggraph_form.recalculateSortOrder();
 					widget_svggraph_form.initSingleItemSortable();
 				}
 			})
