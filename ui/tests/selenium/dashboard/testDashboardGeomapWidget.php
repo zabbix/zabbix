@@ -145,7 +145,7 @@ class testDashboardGeomapWidget extends CWebTest {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => 'Geomap']);
 		$dialog->waitUntilReady();
-		$this->assertEquals(["Type", "Name", "Refresh interval", "Host groups", "Hosts", "Tags", "", "Initial view"],
+		$this->assertEquals(["Type", "Name", "Refresh interval", "Host groups", "Hosts", "Tags", "Initial view"],
 				$form->getLabels()->asText()
 		);
 		$form->checkValue(['id:show_header' => true, 'Refresh interval' => 'Default (1 minute)']);
@@ -476,9 +476,10 @@ class testDashboardGeomapWidget extends CWebTest {
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 			$saved_form = $dashboard->getWidget($header)->edit();
 
-			// If tags table has been cleared, after form saving there is one empty tag field.
+			// Compare tags after widget update.
 			if (CTestArrayHelper::get($data, 'Tags') === []) {
-				$values[''] = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
+				$values_tags = [['tag' => '', 'operator' => 'Contains', 'value' => '']];
+				$this->assertEquals($values_tags, $saved_form->query('id:tags_table_tags')->asMultifieldTable()->one()->getValue());
 			}
 
 			// Check widget form fields and values in frontend.

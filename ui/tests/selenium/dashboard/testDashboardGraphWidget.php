@@ -2227,8 +2227,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
-		// TODO: after DEV-2200 change to $form->fill(CTestArrayHelper::get($data, 'main_fields', []));
-		$this->query('id:widget-dialogue-form')->asForm(['detectType' => false])->one()->fill(CTestArrayHelper::get($data, 'main_fields', []));
+		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDataSets($data['Data set']);
 		$form->submit();
 
@@ -2282,8 +2281,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
-		// TODO: after DEV-2200 change to $form->fill($data['main_fields']);
-		$this->query('id:widget-dialogue-form')->asForm(['detectType' => false])->one()->fill($data['main_fields']);
+		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
 		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
 						->asOverlayDialog()->one();

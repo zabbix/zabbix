@@ -289,27 +289,29 @@ class testDashboardCopyWidgets extends CWebTest {
 			$url = 'zabbix.php?action=dashboard.view&dashboardid=';
 		}
 
-		// Mapping for tags in problem widgets.
-		$mapping = [
-			'tag',
-			[
-				'name' => 'match',
-				'class' => CSegmentedRadioElement::class
-			],
-			'value'
-		];
 		$this->page->login()->open($url.$dashboard_id);
 		$dashboard = CDashboardElement::find()->one();
 
 		// Get fields from widget form to compare them with new widget after copying.
-		$fields = $dashboard->getWidget($name)->edit()->getFields();
+		$widget = $dashboard->getWidget($name)->edit();
 
-		// Add tag fields mapping to form for problem widgets.
-		if (stristr($name, 'Problem')) {
-			$fields->set('', $fields->get('')->asMultifieldTable(['mapping' => $mapping]));
+		// Get values of original Clock or Item value widget.
+		if (stristr($name, 'Clock') || stristr($name, 'item value')) {
+			foreach ($widget->getLabels()->asText() as $label) {
+				$label = ($label === 'DescriptionSupported macros:{HOST.*}{ITEM.*}{INVENTORY.*}User macros') ? 'Description' : $label;
+				$original_form[] = [$label => $widget->getFieldContainer($label)->getText()];
+			}
+		}
+		else {
+			$fields = $widget->getFields();
+			$original_form = $fields->asValues();
 		}
 
-		$original_form = $fields->asValues();
+		// Get tags of original widget.
+		if (stristr($name, 'Problem')) {
+			$tags = $widget->query('id:tags_table_tags')->asMultifieldTable()->one()->getValue();
+		}
+
 		$original_widget_size = $replace
 			? self::$replaced_widget_size
 			: CDBHelper::getRow('SELECT w.width, w.height'.
@@ -360,14 +362,28 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 
 		$this->assertEquals($name, $copied_widget->getHeaderText());
-		$copied_fields = $copied_widget->edit()->getFields();
 
-		// Add tag fields mapping to form for newly copied problem widgets.
-		if (stristr($name, 'Problem')) {
-			$copied_fields->set('', $copied_fields->get('')->asMultifieldTable(['mapping' => $mapping]));
+		// Get values of copied Clock or Item value widget.
+		if (stristr($name, 'Clock') || stristr($name, 'item value')) {
+			$copied_widget_form = $copied_widget->edit();
+			foreach ($copied_widget_form->getLabels()->asText() as $label) {
+				$label = ($label === 'DescriptionSupported macros:{HOST.*}{ITEM.*}{INVENTORY.*}User macros') ? 'Description' : $label;
+				$copied_form[] = [$label => $copied_widget_form->getFieldContainer($label)->getText()];
+			}
+		}
+		else {
+			$copied_fields = $copied_widget->edit()->getFields();
+			$copied_form = $copied_fields->asValues();
 		}
 
-		$copied_form = $copied_fields->asValues();
+		// Check tags of original and copied widget.
+		if (stristr($name, 'Problem')) {
+			$copied_tags = COverlayDialogElement::find()->waitUntilReady()->one()->query('id:tags_table_tags')
+					->asMultifieldTable()->one()->getValue();
+			$this->assertEquals($tags, $copied_tags);
+		}
+
+
 		$this->assertEquals($original_form, $copied_form);
 
 		// Close overlay and save dashboard to get new widget size from DB.
