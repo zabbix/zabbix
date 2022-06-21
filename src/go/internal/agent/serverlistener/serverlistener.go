@@ -77,7 +77,7 @@ func (sl *ServerListener) run() {
 				log.Warningf("failed to accept an incoming connection: connection from \"%s\" rejected, allowed hosts: \"%s\"",
 					conn.RemoteIP(), sl.options.Server)
 			} else if err := sl.processConnection(conn); err != nil {
-				log.Warningf("failed to accept an incoming connection from %s: %s", conn.RemoteIP(), err.Error())
+				log.Warningf("failed to process an incoming connection from %s: %s", conn.RemoteIP(), err.Error())
 			}
 		} else {
 			if nerr, ok := err.(net.Error); ok && nerr.Temporary() {
