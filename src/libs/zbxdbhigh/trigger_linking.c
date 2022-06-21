@@ -361,7 +361,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 			" where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", triggerids.values,
 			triggerids.values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by triggerid");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by t.triggerid");
 
 	if (NULL == (result = DBselect("%s", sql)))
 	{
