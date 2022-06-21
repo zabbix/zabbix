@@ -19,6 +19,8 @@
 
 #include "vmware.h"
 
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 extern int	CONFIG_VMWARE_TIMEOUT;
 #define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
 
@@ -836,3 +838,5 @@ out:
 
 	return ret;
 }
+
+#endif

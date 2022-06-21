@@ -21,6 +21,8 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 extern int				CONFIG_VMWARE_FREQUENCY;
 extern int				CONFIG_VMWARE_PERF_FREQUENCY;
 
@@ -176,6 +178,8 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, int ti
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() type:%s nextcheck:%s", __func__, vmware_job_type_string(job),
 			zbx_time2str(job->nextcheck, NULL));
 }
+
+#endif
 
 /******************************************************************************
  *                                                                            *

@@ -8047,7 +8047,6 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 
 	return pcq;
 }
-#endif
 
 /******************************************************************************
  *                                                                            *
@@ -8061,6 +8060,8 @@ static int	vmware_job_compare_nextcheck(const void *d1, const void *d2)
 
 	return ((const zbx_vmware_job_t *)e1->data)->nextcheck - ((const zbx_vmware_job_t *)e2->data)->nextcheck;
 }
+
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -8176,6 +8177,8 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 
 	return SUCCEED;
 }
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 /******************************************************************************
  *                                                                            *
@@ -8301,3 +8304,5 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, 
 
 	zbx_vmware_unlock();
 }
+
+#endif
