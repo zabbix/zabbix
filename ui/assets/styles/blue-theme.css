@@ -336,12 +336,10 @@ svg a {
     top: 0;
     left: 0;
     transition: left .2s, top .2s; }
-    .sortable .sortable-list .sortable-item {
+    .sortable .sortable-list .sortable-item:not(.sortable-dragging) {
       transition: left .2s, top .2s; }
   .sortable.sortable-dragging .sortable-item {
     position: absolute; }
-    .sortable.sortable-dragging .sortable-item.sortable-dragging {
-      display: none; }
 
 html,
 body {
@@ -1716,11 +1714,17 @@ form.dashboard-grid-widget-svggraph .list-vertical-accordion {
   position: relative;
   margin-left: 15px;
   padding-left: 0; }
+  form.dashboard-grid-widget-svggraph .list-vertical-accordion.sortable {
+    overflow: visible;
+    margin-top: -5px;
+    margin-bottom: -5px; }
   form.dashboard-grid-widget-svggraph .list-vertical-accordion .list-accordion-item-head {
     padding: 0; }
 form.dashboard-grid-widget-svggraph .list-accordion-item {
   position: relative;
-  margin-bottom: 10px; }
+  width: 100%;
+  padding: 5px 0;
+  list-style-type: none; }
   form.dashboard-grid-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
     content: ' ';
     position: absolute;
@@ -5334,7 +5338,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .svg-graph-preview {
   margin-top: 10px;
-  width: 1080px;
+  min-width: 1120px;
   height: 300px;
   position: relative; }
   .svg-graph-preview > div {

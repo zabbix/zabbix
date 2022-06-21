@@ -125,7 +125,9 @@ function getDatasetTab(array $fields, array &$jq_templates, string $form_name): 
 	return (new CFormGrid())
 		->addItem([
 			CWidgetHelper::getLabel($fields['ds']),
-			new CFormField(CWidgetHelper::getGraphDataSet($fields['ds'], $form_name))
+			(new CFormField(CWidgetHelper::getGraphDataSet($fields['ds'], $form_name)))
+				->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
+			(new CFormField(CWidgetHelper::getGraphDataSetFooter()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
 		]);
 }
 

@@ -1232,7 +1232,7 @@ class CWidgetHelper {
 						->addClass('table-col-action')
 						->addClass(ZBX_STYLE_NOWRAP)
 				]))
-					->addClass('sortable')
+					->addClass(ZBX_STYLE_SORTABLE)
 					->addClass('single-item-table-row')
 					->setAttribute('data-number', $i + 1);
 			}
@@ -1280,6 +1280,7 @@ class CWidgetHelper {
 		return (new CListItem([
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
+				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-main-drag-icon'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
@@ -1464,6 +1465,7 @@ class CWidgetHelper {
 				])
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
+			->addClass(ZBX_STYLE_SORTABLE_ITEM)
 			->addClass($is_opened ? ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED : ZBX_STYLE_LIST_ACCORDION_ITEM_CLOSED)
 			->setAttribute('data-set', $row_num)
 			->setAttribute('data-type', $dataset_type);
@@ -1491,8 +1493,8 @@ class CWidgetHelper {
 	 */
 	public static function getGraphDataSet($field, $form_name) {
 		$list = (new CList())
-			->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION)
-			->setId('data_sets');
+			->setId('data_sets')
+			->addClass(ZBX_STYLE_SORTABLE_LIST);
 
 		$values = $field->getValue();
 
@@ -1516,26 +1518,24 @@ class CWidgetHelper {
 			);
 		}
 
-		// Add 'Add' button under accordion.
-		$list->addItem(
-			(new CList())
-				->addClass(ZBX_STYLE_BTN_SPLIT)
-				->addItem([
-					(new CButton(null, [
-						(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON),
-						_('Add new data set')
-					]))
-						->setId('dataset-add')
-						->addClass(ZBX_STYLE_BTN_ALT),
-					(new CButton(null, '&#8203;'))
-						->setId('dataset-menu')
-						->addClass(ZBX_STYLE_BTN_ALT)
-						->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
-				]),
-			ZBX_STYLE_LIST_ACCORDION_FOOT
-		);
-
 		return $list;
+	}
+
+	public static function getGraphDataSetFooter() {
+		return (new CList())
+			->addClass(ZBX_STYLE_BTN_SPLIT)
+			->addItem([
+				(new CButton(null, [
+					(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON),
+					_('Add new data set')
+				]))
+					->setId('dataset-add')
+					->addClass(ZBX_STYLE_BTN_ALT),
+				(new CButton(null, '&#8203;'))
+					->setId('dataset-menu')
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+			]);
 	}
 
 	private static function getItemNames(array $itemids): array {

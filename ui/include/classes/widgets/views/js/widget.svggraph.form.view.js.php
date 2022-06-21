@@ -301,7 +301,7 @@ window.widget_svggraph_form = new class {
 			? new Template(jQuery('#dataset-single-item-tmpl').html())
 			: new Template(jQuery('#dataset-pattern-item-tmpl').html());
 
-		jQuery('#data_sets .list-accordion-foot').before(
+		jQuery('#data_sets').append(
 			template.evaluate({
 				rowNum: this._dataset_number++,
 				color: (type == <?= CWidgetHelper::DATASET_TYPE_SINGLE_ITEM ?>)
@@ -395,33 +395,27 @@ window.widget_svggraph_form = new class {
 	}
 
 	initDataSetSortable() {
-		// Initialize sorting.
-		if (jQuery('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length == 1) {
+		if (jQuery('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length === 1) {
 			jQuery('#data_sets .js-main-drag-icon').addClass('disabled');
 		}
 		else {
 			jQuery('#data_sets .js-main-drag-icon').removeClass('disabled');
 		}
 
-		jQuery('#data_sets').sortable({
-			disabled: jQuery('#data_sets .<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length < 2,
-			items: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>',
-			containment: 'parent',
-			handle: '.js-main-drag-icon',
-			tolerance: 'pointer',
-			scroll: false,
-			cursor: 'grabbing',
-			opacity: 0.6,
-			axis: 'y',
-			start: function() { // Workaround to fix wrong scrolling at initial sort.
-				jQuery(this).sortable('refreshPositions');
-			},
-			stop: () => widget_svggraph_form._updatePreview(),
-			update: function() {
-				widget_svggraph_form.updateVariableOrder(jQuery('#data_sets'), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>',
-					'ds'
-				);
-			}
+		if (this.sortable_data_set !== undefined) {
+			this.sortable_data_set.deactivate();
+		}
+
+		this.sortable_data_set = new CSortable(
+			document.querySelector('#data_set .<?= ZBX_STYLE_LIST_VERTICAL_ACCORDION ?>'),
+			{is_vertical: true}
+		);
+
+		this.sortable_data_set.on(SORTABLE_EVENT_DRAG_END, () => {
+			widget_svggraph_form.updateVariableOrder(jQuery('#data_sets'), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>',
+				'ds'
+			);
+			widget_svggraph_form._updatePreview();
 		});
 	}
 
