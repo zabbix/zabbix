@@ -162,7 +162,7 @@ static int	db_tag_check_field(const zbx_db_tag_t *tag, zbx_db_tag_field_t type, 
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 
-			if (NULL != *error)
+			if (NULL != error)
 			{
 				*error = zbx_strdcatf(*error, "Cannot %s %s tag: invalid field type.\n", ZBX_TAG_OP(tag),
 						owner);
@@ -190,7 +190,7 @@ static int	db_tag_check_field(const zbx_db_tag_t *tag, zbx_db_tag_field_t type, 
 
 	if (field_len < str_len)
 	{
-		if (NULL != *error)
+		if (NULL != error)
 		{
 			*error = zbx_strdcatf(*error, "Cannot %s %s tag: %s \"%128s...\" is too long.\n",
 					ZBX_TAG_OP(tag), owner, field, str);
