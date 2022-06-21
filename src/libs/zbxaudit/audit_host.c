@@ -545,7 +545,7 @@ void	zbx_audit_host_update_json_update_tag_create_entry(zbx_uint64_t hostid, zbx
 }
 
 void	zbx_audit_host_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t tagid,
-		const char* tag_old, const char *tag_new)
+		const char *tag_old, const char *tag_new)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 
@@ -557,7 +557,7 @@ void	zbx_audit_host_update_json_update_tag_tag(zbx_uint64_t hostid, zbx_uint64_t
 }
 
 void	zbx_audit_host_update_json_update_tag_value(zbx_uint64_t hostid, zbx_uint64_t tagid,
-		const char* value_old, const char *value_new)
+		const char *value_old, const char *value_new)
 {
 	char	buf[AUDIT_DETAILS_KEY_LEN];
 
