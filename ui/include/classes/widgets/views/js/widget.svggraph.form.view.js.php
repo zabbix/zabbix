@@ -366,32 +366,36 @@ window.widget_svggraph_form = new class {
 	}
 
 	updateVariableOrder(obj, row_selector, var_prefix) {
-		jQuery(row_selector, obj).each(function(i) {
-			if (var_prefix === 'ds') {
-				jQuery(this).attr('data-set', i);
-				jQuery('.single-item-table', this).attr('data-set', i);
-			}
+		for (const k of [10000, 0]) {
+			jQuery(row_selector, obj).each(function(i) {
+				console.log('ROW:', i);
 
-			jQuery('.multiselect[data-params]', this).each(function() {
-				const name = jQuery(this).multiSelect('getOption', 'name');
-
-				if (name !== null) {
-					jQuery(this).multiSelect('modify', {
-						name: name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${i}$2`)
-					});
+				if (var_prefix === 'ds') {
+					jQuery(this).attr('data-set', i);
+					jQuery('.single-item-table', this).attr('data-set', i);
 				}
-			});
 
-			jQuery(`[name^="${var_prefix}["]`, this)
-				.filter(function () {
-					return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
-				})
-				.each(function () {
-					jQuery(this).attr('name',
-						jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${i}$2`)
-					);
+				jQuery('.multiselect[data-params]', this).each(function() {
+					const name = jQuery(this).multiSelect('getOption', 'name');
+
+					if (name !== null) {
+						jQuery(this).multiSelect('modify', {
+							name: name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
+						});
+					}
 				});
-		});
+
+				jQuery(`[name^="${var_prefix}["]`, this)
+					.filter(function () {
+						return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
+					})
+					.each(function () {
+						jQuery(this).attr('name',
+							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
+						);
+					});
+			});
+		}
 	}
 
 	initDataSetSortable() {
