@@ -358,8 +358,8 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 			" from triggers t"
 			" left join trigger_tag tt on tt.triggerid=t.triggerid"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", cur_triggerids->values,
-			cur_triggerids->values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.triggerid", triggerids.values,
+			triggerids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by triggerid");
 
 	if (NULL == (result = DBselect("%s", sql)))
