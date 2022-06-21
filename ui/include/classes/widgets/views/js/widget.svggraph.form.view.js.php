@@ -338,8 +338,8 @@ window.widget_svggraph_form = new class {
 
 		this.recalculateDataSetAttribute();
 
-		this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 		this.recalculateSortOrder();
+		this.updateVariableOrder(jQuery(this.dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 
 		this.initDataSetSortable();
 		this.onGraphConfigChange();
