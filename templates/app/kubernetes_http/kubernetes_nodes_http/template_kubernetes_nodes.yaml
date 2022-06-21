@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-20T19:42:28Z'
+  date: '2022-06-21T16:32:25Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -380,6 +380,11 @@ zabbix_export:
                           output = [];
                           api_url = '{$KUBE.API.ENDPOINT.URL}',
                           hostname = api_url.match(/\/\/(.+):/);
+                  
+                      if (typeof hostname[1] === 'undefined') {
+                          Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+                          throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                      };
                   
                       if (typeof input !== 'object' || typeof input.items === 'undefined') {
                           Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + input);

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-20T19:42:10Z'
+  date: '2022-06-21T16:32:14Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -126,6 +126,11 @@ zabbix_export:
                     controlPlaneNodes = [],
                     api_url = '{$KUBE.API.URL}',
                     hostname = api_url.match(/\/\/(.+):/);
+            
+                if (typeof hostname[1] === 'undefined') {
+                        Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+                        throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                    };
             
                 for (idx in nodes.items) {
                     for (label in nodes.items[idx].metadata.labels) {
@@ -444,6 +449,10 @@ zabbix_export:
                     api_url = '{$KUBE.API.URL}',
                     hostname = api_url.match(/\/\/(.+):/);
             
+                if (typeof hostname[1] === 'undefined') {
+                      Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+                      throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                    };
                 for (idx in nodes.items) {
                     var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
                         return addr.type === 'InternalIP';

@@ -34,7 +34,6 @@ Get the generated service account token using the command
 `kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
 
 Then set it to the macro `{$KUBE.API.TOKEN}`.  
-
 Set `{$KUBE.STATE.ENDPOINT.NAME}` with Kube state metrics endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-kube-state-metrics`.
 
 Also, see the Macros section for a list of macros used to set trigger values.
