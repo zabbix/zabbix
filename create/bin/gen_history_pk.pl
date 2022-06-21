@@ -173,6 +173,8 @@ HEREDOC
 ;
 
 my $tsdb = <<'HEREDOC'
+\set ON_ERROR_STOP on
+
 \copy (select * from %HISTTBL_old) TO '/tmp/%HISTTBL.csv' DELIMITER ',' CSV;
 
 CREATE TEMP TABLE temp_%HISTTBL (
