@@ -3719,7 +3719,8 @@ out:
 int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function, const char *parameter,
 		const zbx_timespec_t *ts, char **error)
 {
-	int	ret;
+	int		ret;
+	const char	*ptr;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s(/%s/%s,%s)' ts:'%s\'", __func__,
 			function, item->host.host, item->key_orig, parameter, zbx_timespec_str(ts));
@@ -3855,6 +3856,11 @@ int	evaluate_function2(zbx_variant_t *value, DC_ITEM *item, const char *function
 	else if (0 == strncmp(function, "baseline", 8))
 	{
 		ret = evaluate_BASELINE(value, item, function + 8, parameter, ts, error);
+	}
+	else if (NULL != (ptr = strstr(function, "_foreach")) && 8 == strlen(ptr))
+	{
+		*error = zbx_dsprintf(*error, "single item query is not supported by \"%s\" function", function);
+		ret = FAIL;
 	}
 	else
 	{
