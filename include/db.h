@@ -945,4 +945,6 @@ void	zbx_db_trigger_get_itemids(const DB_TRIGGER *trigger, zbx_vector_uint64_t *
 
 int	DBselect_ids_names(const char *sql, zbx_vector_uint64_t *ids, zbx_vector_str_t *names);
 
+int	DBcheck_version_info(struct zbx_db_version_info_t *info, int allow_unsupported);
+
 #endif
