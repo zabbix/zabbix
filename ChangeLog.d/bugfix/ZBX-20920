@@ -1,0 +1,1 @@
+..F....... [ZBX-20920] fixed problem with empty psk fields which were sent to audit log when any proxy parameter is updated (dpetra)
