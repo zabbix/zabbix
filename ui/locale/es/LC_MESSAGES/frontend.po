@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-06-07 17:11+0000\n"
-"Last-Translator: Edinson <edinson.vivas@gmail.com>\n"
+"PO-Revision-Date: 2022-06-22 06:25+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -325,7 +325,7 @@ msgstr "10 segundos"
 
 #: include/views/reports.toptriggers.php:118 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr "100 disparadores más ocupados"
+msgstr "100 triggers más ocupados"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
@@ -2836,64 +2836,64 @@ msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\" porqu
 #: include/classes/api/services/CHostBase.php:749
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\" debido a la dependencia del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:799
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\" due to expression of trigger \"%3$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\" debido a la expresión del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:502
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\" porque se ocurrirá una referencia circular (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" a la plantilla \"%2$s\" porque su plantilla padre \"%3$s\" se vincularía dos veces."
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" al host \"%3$s\" debido a la dependencia del trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:832
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" al host \"%3$s\" debido a la expresión del trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:702
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" al prototipo del host \"%3$s\" debido a la dependencia del trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:829
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to host prototype \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" al prototipo del host \"%3$s\" debido a la expresión del trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:699
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" a la plantilla \"%3$s\" debido a la dependencia del trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:826
 #, c-format
 msgid "Cannot link template \"%1$s\" without template \"%2$s\" to template \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" a la plantilla \"%3$s\" debido a la expresión del trigger \"%4$s\"."
 
 #: app/controllers/CControllerModuleEdit.php:106
 #: include/classes/core/ZBase.php:674
 #, c-format
 msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "No se puede cargar el módulo en: %1$s."
+msgstr[1] "No se puede cargar los módulos en: %1$s."
 
 #: include/classes/api/services/CUser.php:1449
 msgid "Cannot log out."
-msgstr ""
+msgstr "No se puede cerrar la sesión."
 
 #: include/classes/api/services/CHost.php:986
 msgid "Cannot mass update host name."
@@ -2966,13 +2966,13 @@ msgstr "No se pudo enviar la instrucción. Verifique la conexión con el servido
 
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
 msgid "Cannot send request"
-msgstr ""
+msgstr "No se puede enviar la solicitud"
 
 #: include/classes/api/services/CTask.php:441
 #: include/classes/api/services/CTask.php:454
 #, c-format
 msgid "Cannot send request: %1$s."
-msgstr ""
+msgstr "No se puede enviar la solicitud: %1$s."
 
 #: include/classes/api/services/CGraphGeneral.php:535
 #, c-format
@@ -3020,7 +3020,7 @@ msgstr ""
 #: app/controllers/CControllerUserUnblock.php:68
 msgid "Cannot unblock user"
 msgid_plural "Cannot unblock users"
-msgstr[0] ""
+msgstr[0] "No se puede desbloquear el usuario"
 msgstr[1] ""
 
 #: include/classes/api/services/CHostGeneral.php:719
@@ -3035,47 +3035,47 @@ msgstr "No se pudo desenlazar la plantilla"
 #: include/classes/api/services/CHostBase.php:331
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "No se puede desvincular la plantilla \"%1$s\" del host \"%2$s\" debido a la dependencia del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:415
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
-msgstr ""
+msgstr "No se puede desvincular la plantilla \"%1$s\" de la plantilla \"%2$s\" debido a la dependencia del trigger \"%3$s\" en el host \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:414
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
-msgstr ""
+msgstr "No se puede desvincular la plantilla \"%1$s\" de la plantilla \"%2$s\" debido a la dependencia del trigger \"%3$s\" en la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:330
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "No se puede vincular la plantilla \"%1$s\" de la plantilla \"%2$s\" debido a la dependencia del trigger \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede desvincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" del host \"%3$s\" debido a la dependencia del trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:300
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from host \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede desvincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" del host \"%3$s\" debido a la expresión del trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:255
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from template \"%3$s\" due to dependency of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede desvincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" de la plantilla \"%3$s\" debido a la dependencia del trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:299
 #, c-format
 msgid "Cannot unlink template \"%1$s\" without template \"%2$s\" from template \"%3$s\" due to expression of trigger \"%4$s\"."
-msgstr ""
+msgstr "No se puede desvincular la plantilla \"%1$s\" sin la plantilla \"%2$s\" de la plantilla \"%3$s\" debido a la expresión del trigger \"%4$s\"."
 
 #: include/classes/api/services/CHostGeneral.php:1037
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "No se puede desvincular el trigger \"%1$s\", tiene items de la plantilla que se deja vinculada al host."
 
 #: include/classes/api/services/CAction.php:2636
 #, c-format
@@ -3085,12 +3085,12 @@ msgstr "No se puede actualizar el \"%1$s\" de una acción \"%2$s\"."
 #: include/classes/api/services/CGraphGeneral.php:721
 #, c-format
 msgid "Cannot update \"%1$s\" for graph \"%2$s\"."
-msgstr ""
+msgstr "No se puede actualizar \"%1$s\" para el gráfico \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:726
 #, c-format
 msgid "Cannot update \"%1$s\" for graph prototype \"%2$s\"."
-msgstr ""
+msgstr "No se puede actualizar \"%1$s\" para el prototipo del gráfico \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:287
 #, c-format
@@ -3100,12 +3100,12 @@ msgstr "No se puede actualizar el \"%1$s\" de un ítem \"%2$s\"."
 #: include/classes/api/services/CTriggerGeneral.php:1018
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr ""
+msgstr "No se puede actualizar \"%1$s\" para el trigger \"%2$s\" de plantilla."
 
 #: include/classes/api/services/CTriggerGeneral.php:1029
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
-msgstr ""
+msgstr "No se puede actualizar \"%1$s\" para el trigger prototipo \"%2$s\" de plantilla."
 
 #: include/classes/api/services/CHost.php:2195
 #, c-format
@@ -3127,7 +3127,7 @@ msgstr "No se pudo actualizar \"%2$s\" en el disparador descubierto \"%1$s\"."
 #: app/controllers/CControllerTokenUpdate.php:47
 #: app/controllers/CControllerTokenUpdate.php:122
 msgid "Cannot update API token"
-msgstr ""
+msgstr "No se puede actualizar el token de API"
 
 #: include/classes/api/services/CGraphGeneral.php:67
 msgid "Cannot update a discovered graph."
@@ -3626,6 +3626,10 @@ msgstr "No se permite el enlace de plantillas circular."
 #: include/classes/core/ZBase.php:494
 #, c-format
 msgid "Class %1$s not found for action %2$s."
+msgstr ""
+
+#: include/classes/core/ZBase.php:494
+msgid "Class not found."
 msgstr ""
 
 #: include/views/configuration.httpconf.list.php:217
@@ -6507,6 +6511,13 @@ msgstr ""
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
 msgstr ""
 
 #: include/classes/screens/CScreenHttpTestDetails.php:111
@@ -14097,6 +14108,10 @@ msgstr ""
 msgid "Position"
 msgstr ""
 
+#: include/classes/widgets/views/widget.item.form.view.php:142
+msgid "Position is ignored for s, uptime and unixtime units."
+msgstr ""
+
 #: app/views/popup.httpstep.php:90
 msgid "Post fields"
 msgstr ""
@@ -17363,6 +17378,10 @@ msgstr "Plantillas"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr ""
 
+#: app/partials/configuration.host.edit.html.php:215
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
 msgstr ""
@@ -18648,6 +18667,16 @@ msgstr "Desvincular de plantillas"
 msgid "Unmute"
 msgstr ""
 
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
 #, c-format
@@ -18834,6 +18863,10 @@ msgstr ""
 
 #: jsLoader.php:402
 msgid "Use default"
+msgstr ""
+
+#: app/partials/configuration.host.edit.html.php:216
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
 msgstr ""
 
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
@@ -19735,9 +19768,23 @@ msgstr ""
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
 msgstr ""
 
 #: jsLoader.php:301
