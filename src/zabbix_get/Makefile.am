@@ -22,10 +22,10 @@ zabbix_get_LDADD = \
 	$(top_builddir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_builddir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a\
-	$(top_builddir)/src/libs/zbxnum/libzbxnum.a\
-	$(top_builddir)/src/libs/zbxip/libzbxip.a\
-	$(top_builddir)/src/libs/zbxtime/libzbxtime.a\
+	$(top_builddir)/src/libs/zbxcompress/libzbxcompress.a \
+	$(top_builddir)/src/libs/zbxnum/libzbxnum.a \
+	$(top_builddir)/src/libs/zbxip/libzbxip.a \
+	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
 	$(ZBXGET_LIBS)
 
 zabbix_get_LDFLAGS = $(ZBXGET_LDFLAGS)

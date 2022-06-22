@@ -14,6 +14,7 @@ WINDRES = windres.exe
 
 OBJS = \
 	$(OUTPUTDIR)\threads.o \
+	$(OUTPUTDIR)\interval.o \
 	$(OUTPUTDIR)\num.o \
 	$(OUTPUTDIR)\str.o \
 	$(OUTPUTDIR)\temp_str.o \
@@ -108,6 +109,9 @@ $(OUTPUTDIR)\misc.o: $(TOPDIR)\src\libs\zbxcommon\misc.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\iprange.o: $(TOPDIR)\src\libs\zbxcommon\iprange.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\interval.o: $(TOPDIR)\src\libs\zbxexpr\interval.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\num.o: $(TOPDIR)\src\libs\zbxnum\num.c

@@ -1,4 +1,4 @@
-l## Process this file with automake to produce Makefile.in
+## Process this file with automake to produce Makefile.in
 
 bin_PROGRAMS = zabbix_sender
 

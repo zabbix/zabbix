@@ -33,6 +33,7 @@
 #include "../events.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxip.h"
 
 extern int				CONFIG_DISCOVERER_FORKS;
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
