@@ -1,1 +1,1 @@
-..F....... [ZBX-21040] fixed Clock, Item, SLA report, SVG graph and Top hosts widgets overlay dialog jumping problem (dpetra)
+..F....... [ZBX-21040] fixed widget configuration form flickering when switching widget types (dpetra)
