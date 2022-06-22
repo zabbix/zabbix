@@ -1089,7 +1089,7 @@ class testHostPrototype extends CAPITest {
 							'main' => 1,
 							'details' => [
 								'version' => SNMP_V3,
-								'contextname' => '',
+								'contextname' => ''
 							]
 						]
 					]
@@ -1104,7 +1104,7 @@ class testHostPrototype extends CAPITest {
 							'port' => '1234',
 							'main' => 1,
 							'details' => [
-								'version' => SNMP_V3,
+								'version' => SNMP_V3
 							]
 						]
 					]
@@ -1123,7 +1123,7 @@ class testHostPrototype extends CAPITest {
 							'main' => 1,
 							'details' => [
 								'version' => SNMP_V3,
-								'securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+								'securitylevel' => ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
 							]
 						]
 					]
@@ -1262,17 +1262,19 @@ class testHostPrototype extends CAPITest {
 		foreach ($update_interfaces['interfaces'] as $i => $interface) {
 			foreach ($db_interfaces_before as $db_interface) {
 				if ($interface == array_diff_key($db_interface, array_flip(['interfaceid']))) {
-					$this->assertArrayHasKey($db_interface['interfaceid'], $db_interfaces_after,
+					$interfaceid = $db_interface['interfaceid'];
+
+					$this->assertArrayHasKey($interfaceid, $db_interfaces_after,
 						sprintf('The ID of updated interface "%1$s" was not found.', $i)
 					);
 
-					$this->assertEquals(true, ($db_interfaces_after[$db_interface['interfaceid']] == $db_interface),
+					$this->assertEquals(true, ($db_interfaces_after[$interfaceid] == $db_interface),
 						sprintf('Unexpected values are encountered upon the interface "%1$s" update.', $i)
 					);
 
 					unset($update_interfaces['interfaces'][$i]);
-					unset($db_interfaces_before[$db_interface['interfaceid']]);
-					unset($db_interfaces_after[$db_interface['interfaceid']]);
+					unset($db_interfaces_before[$interfaceid]);
+					unset($db_interfaces_after[$interfaceid]);
 					break;
 				}
 			}
