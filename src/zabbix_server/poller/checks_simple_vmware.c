@@ -1945,6 +1945,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", dsname->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", dsname->uuid, ZBX_JSON_TYPE_STRING);
 		zbx_json_adduint64(&json_data, "{#MULTIPATH.COUNT}", (unsigned int)total);
 		zbx_json_adduint64(&json_data, "{#MULTIPATH.PARTITION.COUNT}",
 				(unsigned int)dsname->hvdisks.values_num);
@@ -2959,6 +2960,7 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 		zbx_vmware_datastore_t	*datastore = service->data->datastores.values[i];
 		zbx_json_addobject(&json_data, NULL);
 		zbx_json_addstring(&json_data, "{#DATASTORE}", datastore->name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#DATASTORE.UUID}", datastore->uuid, ZBX_JSON_TYPE_STRING);
 		zbx_json_addobject(&json_data, "{#DATASTORE.EXTENT}");
 
 		for (j = 0; j < datastore->diskextents.values_num; j++)

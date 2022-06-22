@@ -269,7 +269,7 @@ static zbx_uint64_t	evt_req_chunk_size;
 	"/*[local-name()='val']/*[@type='Datastore']"
 
 #define ZBX_XPATH_HV_DATASTORE_MOUNTINFO(id)								\
-	ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_DS, "[text()='" id "']")
+	ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_DS, "[text()='" id "']")
 
 #define ZBX_XPATH_HV_VMS()										\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
@@ -347,10 +347,10 @@ static zbx_uint64_t	evt_req_chunk_size;
 #	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
 #	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
 
-#define ZBX_XPATH_PROP_OBJECTS_ID(type, id)								\
+#define ZBX_XPATH_PROP_OBJECT_ID(type, id)								\
 	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']" id "][1]"
 
-#define ZBX_XPATH_PROP_OBJECTS(type)	ZBX_XPATH_PROP_OBJECTS_ID(type, "") "/"
+#define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
 
 #define ZBX_XPATH_PROP_NAME_NODE(property)								\
 	"*[local-name()='propSet'][*[local-name()='name'][text()='" property "']][1]/*[local-name()='val']"
@@ -366,11 +366,11 @@ static zbx_uint64_t	evt_req_chunk_size;
 #define ZBX_VM_NONAME_XML	"noname.xml"
 
 #define ZBX_HVPROPMAP_EXT(property, func, ver)								\
-	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}
+	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}
 #define ZBX_HVPROPMAP(property)										\
 	ZBX_HVPROPMAP_EXT(property, NULL, 0)
 #define ZBX_VMPROPMAP(property)										\
-	{property, ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL, 0}
+	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL, 0}
 
 typedef int	(*nodeprocfunc_t)(void *, char **);
 static int	vmware_service_get_vm_snapshot(void *xml_node, char **jstr);
@@ -438,9 +438,9 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_VMPROPMAP("guest.guestFullName"),			/* ZBX_VMWARE_VMPROP_GUESTFULLNAME */
 	ZBX_VMPROPMAP("parent"),				/* ZBX_VMWARE_VMPROP_FOLDER */
 	{"layoutEx</ns0:pathSet><ns0:pathSet>snapshot",		/* ZBX_VMWARE_VMPROP_SNAPSHOT */
-			ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
+			ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE("snapshot"),
 			vmware_service_get_vm_snapshot, 0},
-	{"datastore", ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
+	{"datastore", ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM)/* ZBX_VMWARE_VMPROP_DATASTOREID */
 			ZBX_XPATH_PROP_NAME_NODE("datastore") ZBX_XPATH_LN("ManagedObjectReference"), NULL, 0},
 	ZBX_VMPROPMAP("summary.runtime.consolidationNeeded"),	/* ZBX_VMWARE_VMPROP_CONSOLIDATION_NEEDED */
 	ZBX_VMPROPMAP("resourcePool"),				/* ZBX_VMWARE_VMPROP_RESOURCEPOOL */
@@ -450,14 +450,14 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 };
 
 #define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
-	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "'][1]]"
+	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']]"
 
 #define ZBX_XPATH_NAME_BY_TYPE(type)									\
-	ZBX_XPATH_PROP_OBJECTS(type) "*[local-name()='propSet'][*[local-name()='name']]"		\
+	ZBX_XPATH_PROP_OBJECT(type) "*[local-name()='propSet'][*[local-name()='name']]"			\
 	"/*[local-name()='val']"
 
 #define ZBX_XPATH_HV_PARENTID										\
-	ZBX_XPATH_PROP_OBJECTS(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE("parent")
+	ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE("parent")
 
 #define ZBX_XPATH_HV_PARENTFOLDERNAME(parent_id)							\
 	"/*/*/*/*/*[local-name()='objects']["								\
@@ -469,25 +469,25 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	"]/*[local-name()='propSet'][*[local-name()='name'][text()='name']]/*[local-name()='val']"
 
 #define ZBX_XPATH_GET_OBJECT_NAME(object, id)								\
-		ZBX_XPATH_PROP_OBJECTS_ID(object, "[text()='" id "']") "/"				\
+		ZBX_XPATH_PROP_OBJECT_ID(object, "[text()='" id "']") "/"				\
 		ZBX_XPATH_PROP_NAME_NODE("name")
 
 #define ZBX_XPATH_GET_FOLDER_NAME(id)									\
 		ZBX_XPATH_GET_OBJECT_NAME(ZBX_VMWARE_SOAP_FOLDER, id)
 
 #define ZBX_XPATH_GET_FOLDER_PARENTID(id)								\
-		ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_FOLDER, "[text()='" id "']") "/"		\
+		ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_FOLDER, "[text()='" id "']") "/"		\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='Folder']"
 
 #define ZBX_XPATH_GET_RESOURCEPOOL_NAME(id)								\
 		ZBX_XPATH_GET_OBJECT_NAME(ZBX_VMWARE_SOAP_RESOURCEPOOL, id)
 
 #define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID(id)								\
-		ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='" id "']") "/"	\
+		ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='" id "']") "/"	\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='ResourcePool']"
 
 #define ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID(id)							\
-		ZBX_XPATH_PROP_OBJECTS_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='" id "']") "/"	\
+		ZBX_XPATH_PROP_OBJECT_ID(ZBX_VMWARE_SOAP_RESOURCEPOOL, "[text()='" id "']") "/"	\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type!='ResourcePool']"
 
 /* hypervisor hashset support */
@@ -3827,8 +3827,8 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
  *             alarm        - [OUT] the alarm details                         *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
- * Return value: SUCCEED   - the operation has completed successfully         *
- *               FAIL      - the operation has failed                         *
+ * Return value: index - the element id in the vector                         *
+ *               FAIL  - the operation has failed                             *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *service, CURL *easyhandle,
@@ -3859,7 +3859,7 @@ static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *servi
 	int				ret = FAIL;
 	char				tmp[MAX_STRING_LEN], *value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() alarm:%s", __func__, alarm_id);
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_GET_ALARMS,
 			vmware_service_objects[service->type].property_collector, alarm_id);
@@ -3869,39 +3869,53 @@ static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *servi
 
 	detail = (zbx_vmware_alarm_details_t *)zbx_malloc(NULL, sizeof(zbx_vmware_alarm_details_t));
 	memset(detail, 0, sizeof(zbx_vmware_alarm_details_t));
+	detail->alarm = zbx_strdup(NULL, alarm_id);
 
 	if (NULL == (detail->name = zbx_xml_doc_read_value(doc_details, ZBX_XPATH_PROP_NAME("info.name"))))
-		goto out;
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() alarm:%s not present 'info.name'", __func__, alarm_id);
+		detail->name = zbx_strdup(NULL, "");
+	}
 
 	if (NULL == (detail->system_name = zbx_xml_doc_read_value(doc_details,
 			ZBX_XPATH_PROP_NAME("info.systemName"))))
 	{
-		goto out;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() alarm:%s not present 'info.systemName'", __func__, alarm_id);
+		detail->system_name = zbx_strdup(NULL, "");
 	}
 
 	if (NULL == (detail->description = zbx_xml_doc_read_value(doc_details,
 			ZBX_XPATH_PROP_NAME("info.description"))))
 	{
-		goto out;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() alarm:%s not present 'info.description'", __func__, alarm_id);
+		detail->description = zbx_strdup(NULL, "");
 	}
 
 	if (NULL == (value = zbx_xml_doc_read_value(doc_details, ZBX_XPATH_PROP_NAME("info.enabled"))))
-		goto out;
-
-	detail->enabled = 0 == strcmp(value, "true") ? 1 : 0;
-	zbx_free(value);
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() alarm:%s not present 'info.enabled'", __func__, alarm_id);
+		detail->enabled = 0;
+	}
+	else
+	{
+		detail->enabled = 0 == strcmp(value, "true") ? 1 : 0;
+		zbx_free(value);
+	}
 
 	zbx_vector_vmware_alarm_details_append(details, detail);
 	detail = NULL;
 	zbx_vector_vmware_alarm_details_sort(details, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
-	ret = zbx_vector_vmware_alarm_details_bsearch(details, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+
+	if (FAIL == (ret = zbx_vector_vmware_alarm_details_bsearch(details, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+		*error = zbx_dsprintf(*error, "Cannot update alarm details:%s", alarm_id);
 out:
 	zbx_xml_free_doc(doc_details);
 
 	if (NULL != detail)
 		vmware_alarm_details_free(detail);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() index:%d", __func__, ret);
+
 	return ret;
 }
 
@@ -3934,7 +3948,7 @@ static int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmw
 
 	xpathCtx = xmlXPathNewContext(xdoc);
 
-	if (NULL == node && NULL == (node = zbx_xml_doc_get(xdoc, ZBX_XPATH_PROP_NAME_NODE("triggeredAlarmState"))))
+	if (NULL == node && NULL == (node = zbx_xml_doc_get(xdoc, ZBX_XPATH_PROP_NAME("triggeredAlarmState"))))
 		goto clean;
 
 	xpathCtx->node = node;
@@ -3966,7 +3980,7 @@ static int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmw
 		detail_cmp.alarm = value;
 
 		if (FAIL == (j = zbx_vector_vmware_alarm_details_bsearch(&alarms_data->details, &detail_cmp,
-				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)) ||
+				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)) &&
 				FAIL == (j = vmware_service_alarm_details_update(service, easyhandle, value,
 				&alarms_data->details, error)))
 		{
@@ -3979,6 +3993,7 @@ static int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmw
 
 		if (NULL == (value = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("key"))))
 		{
+			*error = zbx_strdup(*error, "Cannot get alarms key.");
 			ret = FAIL;
 			break;
 		}
@@ -5380,7 +5395,8 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 		datacenter->name = name;
 		zbx_vector_str_create(&datacenter->alarm_ids);
 
-		if (FAIL == vmware_service_get_alarms_data(__func__, service, easyhandle, doc, nodeset->nodeTab[i],
+		if (FAIL == vmware_service_get_alarms_data(__func__, service, easyhandle, doc, zbx_xml_node_get(doc,
+				nodeset->nodeTab[i], ZBX_XPATH_PROP_NAME_NODE("triggeredAlarmState")),
 				&datacenter->alarm_ids, alarms_data, &error))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get datacenter alarms: %s.", __func__, error);
@@ -5653,8 +5669,8 @@ static int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *serv
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-#define ZBX_XPATH_GET_ROOT_ALARMS(object, idd)							\
-		ZBX_XPATH_PROP_OBJECTS_ID(object, "[text()='" idd "']") "/"			\
+#define ZBX_XPATH_GET_ROOT_ALARMS(object, id)							\
+		ZBX_XPATH_PROP_OBJECT_ID(object, "[text()='" id "']") "/"			\
 		ZBX_XPATH_PROP_NAME_NODE("triggeredAlarmState")
 
 	char				tmp[MAX_STRING_LEN * 2];
@@ -7619,7 +7635,7 @@ out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, vmware_mem);
 
-	zbx_snprintf(msg, sizeof(msg), "Events:%d DC:%d DS:%d CL:%d HV:%d VM:%d DVS:%d"
+	zbx_snprintf(msg, sizeof(msg), "Events:%d DC:%d DS:%d CL:%d HV:%d VM:%d DVS:%d Alarms:%d"
 			" VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / " ZBX_FS_UI64 " / "
 			ZBX_FS_UI64, NULL != service->data ? service->data->events.values_num : 0 ,
 			NULL != service->data ? service->data->datacenters.values_num : 0 ,
@@ -7628,6 +7644,7 @@ out:
 			NULL != service->data ? service->data->hvs.num_data : 0 ,
 			NULL != service->data ? service->data->vms_index.num_data : 0 ,
 			NULL != service->data ? service->data->dvswitches.values_num : 0 ,
+			NULL != service->data ? service->data->alarms.values_num : 0 ,
 			vmware_mem->free_size, vmware->strpool_sz, vmware_mem->total_size);
 
 	zbx_vmware_unlock();

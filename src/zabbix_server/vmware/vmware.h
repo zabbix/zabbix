@@ -228,9 +228,6 @@ typedef struct
 	char		*name;
 	char		*system_name;
 	char		*description;
-//	int		entity_type;
-//	char		*entity_name;
-//	char		*entity_uuid;
 	char		*overall_status;
 	char		*time;
 	int		enabled;
