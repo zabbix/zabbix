@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-07 12:01+0000\n"
+"PO-Revision-Date: 2022-06-20 12:45+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -269,7 +269,7 @@ msgstr "%1$s, בבחירה"
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "האחוזון ה־%1$s:‏ %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -307,7 +307,7 @@ msgstr "(רק מנהלי על יכולים ליצור קבוצות)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(נוצר על ידי גילוי מארחים)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -892,7 +892,7 @@ msgstr "הוספת מארח"
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "הוספת הקפצת מארח"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
@@ -1288,7 +1288,7 @@ msgstr "להחיל הרשאות ומסנני תגיות לכל תת הקבוצו
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "החלת ההרשאות לכל תת־הקבוצות"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
@@ -1298,7 +1298,7 @@ msgstr "בהמשך"
 
 #: include/classes/widgets/CWidgetHelper.php:1443
 msgid "Approximation"
-msgstr ""
+msgstr "שערוך"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1431,7 +1431,7 @@ msgstr "חייבת להיות לפחות פעולה אחת."
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "יש להפעיל לפחות אחד מהמשתנים „%1$s” או „%2$s”."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -1982,7 +1982,7 @@ msgstr "לא ניתן להוסיף מארח"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "לא ניתן להוסיף קבוצת מארחים"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
@@ -2067,7 +2067,7 @@ msgstr "לא ניתן להוסיף תבנית"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "לא ניתן להוסיף קבוצת תבניות"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2340,8 +2340,8 @@ msgstr[1] "לא ניתן למחוק את המארחים %1$s מכיוון שהת
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק קבוצת מארחים"
+msgstr[1] "לא ניתן למחוק קבוצות מארחים"
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
@@ -2353,7 +2353,7 @@ msgstr[1] "לא ניתן למחוק את קבוצות המארחים %1$s מכי
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "לא ניתן למחוק קבוצות מארחים"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2474,8 +2474,8 @@ msgstr "לא ניתן למחוק תבנית"
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק קבוצת תבניות"
+msgstr[1] "לא ניתן למחוק קבוצות תבניות"
 
 #: include/classes/api/services/CGraphPrototype.php:374
 msgid "Cannot delete templated graph prototype."
@@ -3343,7 +3343,7 @@ msgstr "לא ניתן לעדכן את הגדרות הצפנת המארח. יש �
 #: app/controllers/CControllerHostGroupUpdate.php:43
 #: app/controllers/CControllerHostGroupUpdate.php:105
 msgid "Cannot update host group"
-msgstr ""
+msgstr "לא ניתן לעדכן את קבוצת המארחים"
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
 msgid "Cannot update host prototype"
@@ -3477,7 +3477,7 @@ msgstr "לא ניתן לעדכן את התבנית"
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
 msgid "Cannot update template group"
-msgstr ""
+msgstr "לא ניתן לעדכן את קבוצת התבניות"
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:351
 msgid "Cannot update templates"
@@ -3768,7 +3768,7 @@ msgstr "המחלקה %1$s לא נמצאה לפעולה %2$s."
 
 #: include/classes/core/ZBase.php:563
 msgid "Class not found."
-msgstr ""
+msgstr "המחלקה לא נמצאה."
 
 #: include/views/configuration.httpconf.list.php:221
 #: include/views/configuration.item.list.php:301
@@ -4044,7 +4044,7 @@ msgstr "הגדרת מארח"
 
 #: app/controllers/CControllerHostGroupEdit.php:89
 msgid "Configuration of host group"
-msgstr ""
+msgstr "הגדרת קבוצת מארחים"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
@@ -4114,11 +4114,11 @@ msgstr "הגדרת סקריפטים"
 
 #: app/controllers/CControllerTemplateGroupEdit.php:88
 msgid "Configuration of template group"
-msgstr ""
+msgstr "הגדרת קבוצת תבניות"
 
 #: app/controllers/CControllerTemplateGroupList.php:123
 msgid "Configuration of template groups"
-msgstr ""
+msgstr "הגדרת קבוצות תבניות"
 
 #: templates.php:27
 msgid "Configuration of templates"
@@ -4658,7 +4658,7 @@ msgstr "יצירת תבנית"
 #: app/views/configuration.templategroup.list.php:33
 #: app/views/configuration.templategroup.list.php:35
 msgid "Create template group"
-msgstr ""
+msgstr "יצירת קבוצת תבניות"
 
 #: include/views/configuration.triggers.list.php:153 jsLoader.php:357
 msgid "Create trigger"
@@ -5431,7 +5431,7 @@ msgstr "למחוק את הקבוצות הנבחרות?"
 #: app/views/js/configuration.hostgroup.list.js.php:104
 #: app/views/popup.hostgroup.edit.php:50
 msgid "Delete selected host group?"
-msgstr ""
+msgstr "למחוק את קבוצת המארחים הנבחרת?"
 
 #: include/views/configuration.hostgroups.list.php:205
 msgid "Delete selected host groups?"
@@ -5529,11 +5529,11 @@ msgstr "למחוק את הצורות הנבחרות?"
 #: app/views/js/configuration.templategroup.list.js.php:70
 #: app/views/popup.templategroup.edit.php:50
 msgid "Delete selected template group?"
-msgstr ""
+msgstr "למחוק את קבוצת התבניות הנבחרת?"
 
 #: app/views/js/configuration.templategroup.list.js.php:69
 msgid "Delete selected template groups?"
-msgstr ""
+msgstr "למחוק את קבוצות התבניות הנבחרות?"
 
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
@@ -8242,13 +8242,13 @@ msgstr "קבוצת המארחים „%1$s” היא פנימית ואי אפשר
 
 #: app/controllers/CControllerHostGroupCreate.php:62
 msgid "Host group added"
-msgstr ""
+msgstr "נוספה קבוצת מארחים"
 
 #: app/controllers/CControllerHostGroupDelete.php:60
 msgid "Host group deleted"
 msgid_plural "Host groups deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נמחקה קבוצת מארחים"
+msgstr[1] "נמחקו קבוצות מארחים"
 
 #: include/views/js/monitoring.sysmaps.js.php:109
 msgid "Host group elements"
@@ -8260,7 +8260,7 @@ msgstr "סוג תווית קבוצת מארחים"
 
 #: app/controllers/CControllerHostGroupUpdate.php:97
 msgid "Host group updated"
-msgstr ""
+msgstr "קבוצת מארחים עודכנה"
 
 #: include/classes/api/services/CDashboardGeneral.php:560
 #: include/classes/api/services/CScript.php:814
@@ -8358,7 +8358,7 @@ msgstr "רשתות המארח"
 
 #: app/views/administration.usergroup.edit.php:274
 msgid "Host permissions"
-msgstr ""
+msgstr "הרשאות מארח"
 
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/views/popup.lldoperation.php:54
@@ -10511,7 +10511,7 @@ msgstr "פריט במצב „לא נתמך”"
 
 #: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:268
 msgid "Item list"
-msgstr ""
+msgstr "פריט ברשימה"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1564
 msgid "Item not selected"
@@ -10519,7 +10519,7 @@ msgstr "לא נבחר פריט"
 
 #: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:262
 msgid "Item pattern"
-msgstr ""
+msgstr "תבנית פריט"
 
 #: include/classes/api/services/CItemGeneral.php:1254
 #, c-format
@@ -12555,7 +12555,7 @@ msgstr "מארח חדש"
 #: app/views/configuration.hostgroup.edit.php:52
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
-msgstr ""
+msgstr "קבוצת מארחים חדשה"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -12580,7 +12580,7 @@ msgstr "שם תגית חדש"
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
-msgstr ""
+msgstr "קבוצת תבניות חדשה"
 
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
@@ -12783,7 +12783,7 @@ msgstr "לא צוין מצב מאגר לפעולת משימה."
 
 #: include/classes/widgets/CWidgetHelper.php:1240
 msgid "No item selected."
-msgstr ""
+msgstr "לא נבחר פריט."
 
 #: include/items.inc.php:742
 #, c-format
@@ -13269,7 +13269,7 @@ msgstr "מספר נתיבי מאגרי נתונים, <url> - כתובת שירו
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:463
 msgid "Number of columns"
-msgstr ""
+msgstr "מספר העמודות"
 
 #: include/classes/data/CItemData.php:882
 msgid "Number of currently open file descriptors. Returns integer"
@@ -14116,7 +14116,7 @@ msgstr "הפרמטר „%1$s” נזנח."
 #: include/classes/api/services/CTemplateGroup.php:1226
 #, c-format
 msgid "Parameter \"%1$s\" must be enabled."
-msgstr ""
+msgstr "חובה להפעיל את המשתנה „%1$s”."
 
 #: app/views/administration.mediatype.edit.php:213
 #: app/views/administration.script.edit.php:181
@@ -14665,7 +14665,7 @@ msgstr "התקלה נפתרה"
 
 #: app/views/administration.usergroup.edit.php:275
 msgid "Problem tag filter"
-msgstr ""
+msgstr "מסנן תגיות תקלה"
 
 #: app/views/popup.service.edit.php:59 app/views/popup.service.edit.php:269
 #: app/views/popup.services.php:62
@@ -15272,7 +15272,7 @@ msgstr "הסרה"
 #: app/partials/hostmacros.inherited.list.html.php:121
 msgctxt "verb"
 msgid "Remove"
-msgstr ""
+msgstr "הסרה"
 
 #: app/partials/massupdate.macros.tab.php:127
 #: app/partials/massupdate.valuemaps.tab.php:98
@@ -15673,7 +15673,7 @@ msgstr "מחזירה אחוזים של מנות נתונים מסוג ping ב־I
 #: app/partials/hostmacros.inherited.list.html.php:105
 #: app/partials/hostmacros.list.html.php:77 jsLoader.php:331
 msgid "Revert"
-msgstr ""
+msgstr "שחזור"
 
 #: include/classes/html/CMacroValue.php:94
 msgid "Revert changes"
@@ -16913,7 +16913,7 @@ msgstr "תרשימים פשוטים"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:168
 msgid "Simple triggers"
-msgstr ""
+msgstr "הקפצות פשוטות"
 
 #: include/views/configuration.trigger.prototype.edit.php:507
 #: include/views/configuration.triggers.edit.php:536
@@ -17717,7 +17717,7 @@ msgstr "התבנית „%1$s” לא יכולה להיות ללא קבוצת מ�
 #: include/classes/api/services/CTemplateGroup.php:942
 #, c-format
 msgid "Template \"%1$s\" cannot be without template group."
-msgstr ""
+msgstr "התבנית „%1$s” לא יכולה להיות בלי קבוצת תבניות."
 
 #: include/classes/import/importers/CHostImporter.php:54
 #, c-format
@@ -17755,26 +17755,26 @@ msgstr "קבוצת תבניות"
 #: include/classes/api/services/CTemplateGroup.php:540
 #, c-format
 msgid "Template group \"%1$s\" already exists."
-msgstr ""
+msgstr "קבוצת התבניות „%1$s” כבר קיימת."
 
 #: app/controllers/CControllerTemplateGroupCreate.php:62
 msgid "Template group added"
-msgstr ""
+msgstr "נוספה קבוצת תבניות"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:60
 msgid "Template group deleted"
 msgid_plural "Template groups deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נמחקה קבוצת תבניות"
+msgstr[1] "נמחקו קבוצות תבניות"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
-msgstr ""
+msgstr "קבוצת תבניות עודכנה"
 
 #: include/classes/api/services/CUserGroup.php:487
 #, c-format
 msgid "Template group with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "לא קיימת קבוצת תבניות עם המזהה „%1$s”."
 
 #: app/controllers/CControllerPopupGeneric.php:197
 #: app/controllers/CControllerPopupImportCompare.php:168
@@ -17792,7 +17792,7 @@ msgstr ""
 #: include/views/configuration.template.list.php:45
 #: include/views/configuration.triggers.list.php:33
 msgid "Template groups"
-msgstr ""
+msgstr "קבוצות תבניות"
 
 #: app/views/popup.import.php:34
 msgid "Template linkage"
@@ -17808,7 +17808,7 @@ msgstr "שם התבנית"
 
 #: app/views/administration.usergroup.edit.php:273
 msgid "Template permissions"
-msgstr ""
+msgstr "הרשאות תבנית"
 
 #: report2.php:396
 msgid "Template trigger"
@@ -18710,7 +18710,7 @@ msgstr "חומרת הקפצה"
 
 #: app/views/popup.condition.common.php:228
 msgid "Trigger source"
-msgstr ""
+msgstr "מקור הקפצה"
 
 #: jsLoader.php:367
 msgid "Trigger status \"OK\""
@@ -19209,7 +19209,7 @@ msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:91
 msgid "Until"
-msgstr ""
+msgstr "עד"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:98
 #: include/classes/services/CTabFilterProfile.php:95
@@ -20810,7 +20810,7 @@ msgstr "לא ניתן להחליף מארחים בבחירה הנוכחית."
 
 #: app/views/popup.generic.php:88
 msgid "You cannot switch templates for current selection."
-msgstr ""
+msgstr "לא ניתן להחליף תבניות לבחירה הנוכחית."
 
 #: include/classes/api/services/CAuditLog.php:73
 #: include/classes/api/services/CHaNode.php:45
@@ -21949,7 +21949,7 @@ msgstr "משתנה שביעי שגוי בפונקציה „%1$s”"
 
 #: include/classes/validators/CApiInputValidator.php:3078
 msgid "invalid template group name"
-msgstr ""
+msgstr "שם קבוצת תבניות שגוי"
 
 #: include/classes/validators/CHistFunctionValidator.php:65
 #, c-format
@@ -21958,7 +21958,7 @@ msgstr "משתמש שלישי שגוי בפונקציה „%1$s”"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 msgid "invalid time"
-msgstr ""
+msgstr "שעה שגויה"
 
 #: app/controllers/CControllerWidgetTopHostsView.php:422
 #: include/classes/graphdraw/CLineGraphDraw.php:250
