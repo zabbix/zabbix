@@ -5070,7 +5070,7 @@ out:												\
 												\
 	return ret
 
-int	check_vcenter_hv_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_hv_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	zbx_vmware_hv_t	*hv;
@@ -5086,7 +5086,7 @@ int	check_vcenter_hv_alarm_get(AGENT_REQUEST *request, const char *username, con
 	ALARMS_GET_END(hv->alarm_ids);
 }
 
-int	check_vcenter_vm_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_vm_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	zbx_vmware_vm_t	*vm;
@@ -5102,7 +5102,7 @@ int	check_vcenter_vm_alarm_get(AGENT_REQUEST *request, const char *username, con
 	ALARMS_GET_END(vm->alarm_ids);
 }
 
-int	check_vcenter_datastore_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_datastore_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	zbx_vmware_datastore_t	*ds;
@@ -5118,7 +5118,7 @@ int	check_vcenter_datastore_alarm_get(AGENT_REQUEST *request, const char *userna
 	ALARMS_GET_END(ds->alarm_ids);
 }
 
-int	check_vcenter_dc_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_dc_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	zbx_vmware_datacenter_t	*dc;
@@ -5134,7 +5134,7 @@ int	check_vcenter_dc_alarm_get(AGENT_REQUEST *request, const char *username, con
 	ALARMS_GET_END(dc->alarm_ids);
 }
 
-int	check_vcenter_cluster_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_cluster_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	zbx_vmware_cluster_t	*cl;
@@ -5150,7 +5150,7 @@ int	check_vcenter_cluster_alarm_get(AGENT_REQUEST *request, const char *username
 	ALARMS_GET_END(cl->alarm_ids);
 }
 
-int	check_vcenter_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
 	ALARMS_GET_START(1);

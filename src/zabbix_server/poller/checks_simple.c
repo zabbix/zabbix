@@ -43,14 +43,14 @@ zbx_vmcheck_t;
 
 static zbx_vmcheck_t	vmchecks[] =
 {
-	{"alarm.get", VMCHECK_FUNC(check_vcenter_alarm_get)},
-	{"cluster.alarm.get", VMCHECK_FUNC(check_vcenter_cluster_alarm_get)},
+	{"alarms.get", VMCHECK_FUNC(check_vcenter_alarms_get)},
+	{"cluster.alarms.get", VMCHECK_FUNC(check_vcenter_cluster_alarms_get)},
 	{"cluster.discovery", VMCHECK_FUNC(check_vcenter_cluster_discovery)},
 	{"cluster.status", VMCHECK_FUNC(check_vcenter_cluster_status)},
 	{"cl.perfcounter", VMCHECK_FUNC(check_vcenter_cl_perfcounter)},
 	{"version", VMCHECK_FUNC(check_vcenter_version)},
 	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
-	{"datastore.alarm.get", VMCHECK_FUNC(check_vcenter_datastore_alarm_get)},
+	{"datastore.alarms.get", VMCHECK_FUNC(check_vcenter_datastore_alarms_get)},
 	{"datastore.discovery", VMCHECK_FUNC(check_vcenter_datastore_discovery)},
 	{"datastore.read", VMCHECK_FUNC(check_vcenter_datastore_read)},
 	{"datastore.size", VMCHECK_FUNC(check_vcenter_datastore_size)},
@@ -58,7 +58,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"datastore.hv.list", VMCHECK_FUNC(check_vcenter_datastore_hv_list)},
 	{"dvswitch.discovery", VMCHECK_FUNC(check_vcenter_dvswitch_discovery)},
 	{"dvswitch.fetchports.get", VMCHECK_FUNC(check_vcenter_dvswitch_fetchports_get)},
-	{"hv.alarm.get", VMCHECK_FUNC(check_vcenter_hv_alarm_get)},
+	{"hv.alarms.get", VMCHECK_FUNC(check_vcenter_hv_alarms_get)},
 	{"hv.cluster.name", VMCHECK_FUNC(check_vcenter_hv_cluster_name)},
 	{"hv.connectionstate", VMCHECK_FUNC(check_vcenter_hv_connectionstate)},
 	{"hv.cpu.usage", VMCHECK_FUNC(check_vcenter_hv_cpu_usage)},
@@ -99,7 +99,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"hv.hw.sensors.get", VMCHECK_FUNC(check_vcenter_hv_hw_sensors_get)},
 	{"hv.vm.num", VMCHECK_FUNC(check_vcenter_hv_vm_num)},
 
-	{"vm.alarm.get", VMCHECK_FUNC(check_vcenter_vm_alarm_get)},
+	{"vm.alarms.get", VMCHECK_FUNC(check_vcenter_vm_alarms_get)},
 	{"vm.attribute", VMCHECK_FUNC(check_vcenter_vm_attribute)},
 	{"vm.cluster.name", VMCHECK_FUNC(check_vcenter_vm_cluster_name)},
 	{"vm.cpu.num", VMCHECK_FUNC(check_vcenter_vm_cpu_num)},
@@ -148,7 +148,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.vfs.fs.discovery", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_discovery)},
 	{"vm.vfs.fs.size", VMCHECK_FUNC(check_vcenter_vm_vfs_fs_size)},
 
-	{"dc.alarm.get", VMCHECK_FUNC(check_vcenter_dc_alarm_get)},
+	{"dc.alarms.get", VMCHECK_FUNC(check_vcenter_dc_alarms_get)},
 	{"dc.discovery", VMCHECK_FUNC(check_vcenter_dc_discovery)},
 
 	{"rp.cpu.usage", VMCHECK_FUNC(check_vcenter_rp_cpu_usage)},
