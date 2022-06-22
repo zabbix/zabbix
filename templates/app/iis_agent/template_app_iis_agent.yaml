@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-04-06T19:27:43Z'
+  date: '2022-06-14T13:45:14Z'
   groups:
     -
       uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
@@ -51,7 +51,7 @@ zabbix_export:
               dependencies:
                 -
                   name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
-                  expression: 'last(/IIS by Zabbix agent/service_state[W3SVC])<>0'
+                  expression: 'last(/IIS by Zabbix agent/service.info[W3SVC])<>0'
               tags:
                 -
                   tag: scope
@@ -448,7 +448,7 @@ zabbix_export:
               name: 'IIS: has been restarted'
               event_name: 'IIS: has been restarted (uptime < 10m)'
               priority: INFO
-              description: 'Uptime is less than 10 minutes'
+              description: 'Uptime is less than 10 minutes.'
               manual_close: 'YES'
               tags:
                 -
@@ -585,7 +585,7 @@ zabbix_export:
         -
           uuid: 7d76ec3d35f6446c842595c4831fabf4
           name: 'IIS: World Wide Web Publishing Service (W3SVC) state'
-          key: 'service_state[W3SVC]'
+          key: 'service.info[W3SVC]'
           history: 7d
           description: 'The World Wide Web Publishing Service (W3SVC) provides web connectivity and administration of websites through the IIS snap-in. If the World Wide Web Publishing Service stops, the operating system cannot serve any form of web request. This service was dependent on "Windows Process Activation Service".'
           valuemap:
@@ -605,14 +605,14 @@ zabbix_export:
           triggers:
             -
               uuid: cac6bbb13ce84772a976275da0805179
-              expression: 'last(/IIS by Zabbix agent/service_state[W3SVC])<>0'
+              expression: 'last(/IIS by Zabbix agent/service.info[W3SVC])<>0'
               name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
               priority: HIGH
-              description: 'The World Wide Web Publishing Service (W3SVC) is not in running state. IIS cannot start.'
+              description: 'The World Wide Web Publishing Service (W3SVC) is not in the running state. IIS cannot start.'
               dependencies:
                 -
-                  name: 'IIS: Windows process Activation Service (WAS) is not the running'
-                  expression: 'last(/IIS by Zabbix agent/service_state[WAS])<>0'
+                  name: 'IIS: Windows process Activation Service (WAS) is not running'
+                  expression: 'last(/IIS by Zabbix agent/service.info[WAS])<>0'
               tags:
                 -
                   tag: scope
@@ -620,7 +620,7 @@ zabbix_export:
         -
           uuid: 38858eb3cc2f4580a0a3c56c11fdeba5
           name: 'IIS: Windows Process Activation Service (WAS) state'
-          key: 'service_state[WAS]'
+          key: 'service.info[WAS]'
           history: 7d
           description: 'Windows Process Activation Service (WAS) is a tool for managing worker processes that contain applications that host Windows Communication Foundation (WCF) services. Worker processes handle requests that are sent to a Web Server for specific application pools. Each application pool sets boundaries for the applications it contains.'
           valuemap:
@@ -640,8 +640,8 @@ zabbix_export:
           triggers:
             -
               uuid: 98fc8e403ac0405e84bf533336c4102c
-              expression: 'last(/IIS by Zabbix agent/service_state[WAS])<>0'
-              name: 'IIS: Windows process Activation Service (WAS) is not the running'
+              expression: 'last(/IIS by Zabbix agent/service.info[WAS])<>0'
+              name: 'IIS: Windows process Activation Service (WAS) is not running'
               priority: HIGH
               description: 'Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.'
               tags:
@@ -696,7 +696,7 @@ zabbix_export:
                   dependencies:
                     -
                       name: 'IIS: The World Wide Web Publishing Service (W3SVC) is not running'
-                      expression: 'last(/IIS by Zabbix agent/service_state[W3SVC])<>0'
+                      expression: 'last(/IIS by Zabbix agent/service.info[W3SVC])<>0'
                   tags:
                     -
                       tag: scope
@@ -723,7 +723,7 @@ zabbix_export:
                   name: 'IIS: {#APPPOOL} has been restarted'
                   event_name: 'IIS: {#APPPOOL} has been restarted (uptime < 10m)'
                   priority: INFO
-                  description: 'Uptime is less than 10 minutes'
+                  description: 'Uptime is less than 10 minutes.'
                   manual_close: 'YES'
                   tags:
                     -

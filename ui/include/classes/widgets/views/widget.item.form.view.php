@@ -138,7 +138,9 @@ $form_list
 				->addClass('form-field')
 				->addClass('field-fluid'),
 
-			CWidgetHelper::getLabel($fields['units_pos']),
+			CWidgetHelper::getLabel($fields['units_pos'], null,
+				_('Position is ignored for s, uptime and unixtime units.')
+			),
 			(new CDiv(CWidgetHelper::getSelect($fields['units_pos'])))->addClass('form-field'),
 
 			CWidgetHelper::getLabel($fields['units_size']),

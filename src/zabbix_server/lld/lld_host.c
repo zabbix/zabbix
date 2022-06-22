@@ -302,7 +302,7 @@ typedef struct
 zbx_lld_group_rights_t;
 
 static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
-		const zbx_vector_ptr_t *lld_macros, char **info);
+		const zbx_vector_ptr_t *lld_macros, char **error);
 
 typedef struct
 {
@@ -820,7 +820,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_proto, const char *name_proto,
 		signed char inventory_mode_proto, unsigned char status_proto, unsigned char discover_proto,
 		zbx_vector_db_tag_ptr_t *tags, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macros,
-		char **info, unsigned char custom_iface)
+		unsigned char custom_iface, char **error)
 {
 	char			*buffer = NULL;
 	int			i, host_found = 0;
@@ -968,7 +968,7 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 	if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 	{
 		zbx_vector_db_tag_ptr_append_array(&tmp_tags, tags->values, tags->values_num);
-		lld_host_update_tags(host, &tmp_tags, lld_macros, info);
+		lld_host_update_tags(host, &tmp_tags, lld_macros, error);
 
 		if (0 != lnk_templateids.values_num)
 		{
@@ -2210,80 +2210,6 @@ static void	lld_proto_tags_get(zbx_uint64_t parent_hostid, zbx_vector_db_tag_ptr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate host tag field                                           *
- *                                                                            *
- * Parameters: name      - [IN] the field name (tag, value)                   *
- *             field     - [IN] the field value                               *
- *             field_len - [IN] the field length                              *
- *             info      - [OUT] error information                            *
- *                                                                            *
- ******************************************************************************/
-static int	lld_tag_validate_field(const char *name, const char *field, size_t field_len, char **info)
-{
-	if (SUCCEED != zbx_is_utf8(field))
-	{
-		char	*field_utf8;
-
-		field_utf8 = zbx_strdup(NULL, field);
-		zbx_replace_invalid_utf8(field_utf8);
-		*info = zbx_strdcatf(*info, "Cannot create host tag: %s \"%s\" has invalid UTF-8 sequence.\n",
-				name, field_utf8);
-		zbx_free(field_utf8);
-		return FAIL;
-	}
-
-	if (zbx_strlen_utf8(field) > field_len)
-	{
-		*info = zbx_strdcatf(*info, "Cannot create host tag: %s \"%128s...\" is too long.\n", name, field);
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: validate host tag                                                 *
- *                                                                            *
- * Parameters: tags     - [IN] the current host tags                          *
- *             tags_num - [IN] the number of host tags                        *
- *             name     - [IN] the new tag name                               *
- *             value    - [IN] the new tag value                              *
- *             info     - [OUT] error information                             *
- *                                                                            *
- ******************************************************************************/
-static int	lld_tag_validate(zbx_db_tag_t **tags, int tags_num, const char *name, const char *value, char **info)
-{
-	int	i;
-
-	if ('\0' == *name)
-	{
-		*info = zbx_strdcatf(*info, "Cannot create host tag: empty tag name.\n");
-		return FAIL;
-	}
-
-	if (SUCCEED != lld_tag_validate_field("name", name, TAG_NAME_LEN, info))
-		return FAIL;
-
-	if (SUCCEED != lld_tag_validate_field("value", value, TAG_VALUE_LEN, info))
-		return FAIL;
-
-	for (i = 0; i < tags_num; i++)
-	{
-		if (0 == strcmp(tags[i]->tag, name) && 0 == strcmp(tags[i]->value, value))
-		{
-			*info = zbx_strdcatf(*info, "Cannot create host tag: tag \"%s\",\"%s\" already exists.\n",
-					name, value);
-
-			return FAIL;
-		}
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: update host tags                                                  *
  *                                                                            *
  * Parameters: host       - [IN] a host with existing tags, sorted by tag +   *
@@ -2301,10 +2227,10 @@ static int	lld_tag_validate(zbx_db_tag_t **tags, int tags_num, const char *name,
  *                                                                            *
  ******************************************************************************/
 static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_ptr_t *tags,
-		const zbx_vector_ptr_t *lld_macros, char **info)
+		const zbx_vector_ptr_t *lld_macros, char **error)
 {
 	int			i;
-	zbx_db_tag_t		*host_tag, *proto_tag;
+	zbx_db_tag_t		*proto_tag;
 	zbx_vector_db_tag_ptr_t	new_tags;
 	char			*tag = NULL, *value = NULL;
 
@@ -2320,9 +2246,6 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 		substitute_lld_macros(&tag, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 		substitute_lld_macros(&value, host->jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 
-		if (SUCCEED != lld_tag_validate(new_tags.values, new_tags.values_num, tag, value, info))
-			continue;
-
 		proto_tag = zbx_db_tag_create(tag, value);
 		zbx_vector_db_tag_ptr_append(&new_tags, proto_tag);
 
@@ -2330,51 +2253,13 @@ static void	lld_host_update_tags(zbx_lld_host_t *host, const zbx_vector_db_tag_p
 		zbx_free(value);
 	}
 
-	zbx_vector_db_tag_ptr_sort(&new_tags, zbx_db_tag_compare_func);
-
-	zbx_vector_db_tag_ptr_reserve(&host->tags, (size_t)new_tags.values_num);
-
-	/* update host tags or flag them for removal */
-	for (i = 0; i < host->tags.values_num; i++)
+	if (SUCCEED != zbx_merge_tags(&host->tags, &new_tags, "host", error))
 	{
-		host_tag = (zbx_db_tag_t *)host->tags.values[i];
-		if (i < new_tags.values_num)
+		if (0 == host->hostid)
 		{
-			proto_tag = (zbx_db_tag_t *)new_tags.values[i];
-
-			if (0 != strcmp(host_tag->tag, proto_tag->tag))
-			{
-				host_tag->tag_orig = zbx_strdup(NULL, host_tag->tag);
-				host_tag->tag = zbx_strdup(host_tag->tag, proto_tag->tag);
-				host_tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_TAG;
-			}
-
-			if (0 != strcmp(host_tag->value, proto_tag->value))
-			{
-				host_tag->value_orig = zbx_strdup(NULL, host_tag->value);
-				host_tag->value = zbx_strdup(host_tag->value, proto_tag->value);
-				host_tag->flags |= ZBX_FLAG_DB_TAG_UPDATE_VALUE;
-			}
+			host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
+			*error = zbx_strdcatf(*error, "Cannot create host: tag validation failed.\n");
 		}
-		else
-			host_tag->flags = ZBX_FLAG_DB_TAG_REMOVE;
-	}
-
-	/* add missing tags */
-	if (i < new_tags.values_num)
-	{
-		int	j;
-
-		/* set uninitialized properties of new tags that will be moved to host */
-		for (j = i; j < new_tags.values_num; j++)
-		{
-			proto_tag = (zbx_db_tag_t *)new_tags.values[j];
-			proto_tag->tagid = 0;
-			proto_tag->flags = 0;
-		}
-
-		zbx_vector_db_tag_ptr_append_array(&host->tags, new_tags.values + i, new_tags.values_num - i);
-		new_tags.values_num = i;
 	}
 
 	zbx_free(tag);
@@ -4541,7 +4426,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 			const zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
 			if (NULL == (host = lld_host_make(&hosts, host_proto, name_proto, inventory_mode_proto,
-					status, discover, &tags, lld_row, lld_macro_paths, error, use_custom_interfaces)))
+					status, discover, &tags, lld_row, lld_macro_paths, use_custom_interfaces,
+					error)))
 			{
 				continue;
 			}

@@ -225,7 +225,7 @@ class CLdap {
 			$filter = '(ObjectClass=*)';
 		}
 		$sr = @ldap_search($this->ds, $base, $filter);
-		$result = is_resource($sr) ? @ldap_get_entries($this->ds, $sr) : [];
+		$result = $sr !== false ? @ldap_get_entries($this->ds, $sr) : [];
 
 		// don't accept more or less than one response
 		if (!$result || $result['count'] != 1) {

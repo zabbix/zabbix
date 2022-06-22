@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.0.5rc1])
+AC_INIT([Zabbix],[6.0.6rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -152,6 +152,9 @@ AC_CHECK_HEADERS(libperfstat.h, [], [], [
 #  include <sys/protosw.h>
 #endif
 ])
+
+dnl Kluge for building wihout pkg-config
+m4_ifdef([PKG_PROG_PKG_CONFIG], [], [ AC_DEFUN([PKG_PROG_PKG_CONFIG], []) ])
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1320,6 +1323,10 @@ AC_ARG_ENABLE(static-libs,[  --enable-static-libs    Build statically linked bin
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-static-libs]) ;;
 esac])
 
+if test "x#static_linking" = "xyes" && test "x$static_linking_libs" = "xyes"; then
+  AC_MSG_ERROR([cannot use --static and --static-libs at the same time])
+fi
+
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of Zabbix server],
 [case "${enableval}" in
   yes) server=yes ;;
@@ -1543,9 +1550,12 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_libxml2="yes"
 		fi
 	fi
-	
-	LDFLAGS="$LDFLAGS $LIBXML2_LDFLAGS"
-	LIBS="$LIBS $LIBXML2_LIBS"
+
+	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
+	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
+
+	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
+	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
 
 	AC_SUBST(LIBXML2_CFLAGS)
 
@@ -1871,19 +1881,41 @@ ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
-dnl Check for libpcre or libpcre2, used by Zabbix for regular expressions
-dnl Must check for both pcre and pcre2 to check if both were selected by the user and produce an error in that case
-LIBPCRE_CHECK_CONFIG([no])
-if test "x$enable_static_libs" != "xyes" || test "x$found_libpcre" != "xyes"; then
-LIBPCRE2_CHECK_CONFIG([no])
-fi
-if test "x$want_libpcre2" = "xyes"; then
-	if test "x$want_libpcre" = "xyes"; then
-		AC_MSG_ERROR([Cannot use both pcre and pcre2 at the same time!])
+LIBPCRE_CHECK_CONFIG([flags-only])
+LIBPCRE2_CHECK_CONFIG([flags-only])
+
+if test "x$want_libpcre2" = "xno"; then # default to old pcre
+	if test "x$want_libpcre" = "xno"; then
+		AC_MSG_NOTICE([using old pcre library by default])
 	fi
 
+	LIBPCRE_CHECK_CONFIG([mandatory])
+
+	if test "x$found_libpcre" != "xyes"; then
+		AC_MSG_ERROR([unable to use libpcre (libpcre check failed)])
+	fi
+
+	LIBPCRE_CHECK_CONFIG([no])
+
+	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE_LIBS"
+	fi
+
+	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
+	have_pcre=1
+else
+	if test "x$want_libpcre" != "xno"; then
+		AC_MSG_ERROR([cannot use both pcre and pcre2 at the same time])
+	fi
+
+	LIBPCRE2_CHECK_CONFIG([mandatory])
+
 	if test "x$found_libpcre2" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpcre2 (libpcre2 check failed)])
+	    AC_MSG_ERROR([unable to use libpcre2 (libpcre2 check failed)])
 	fi
 
 	CFLAGS="$CFLAGS $LIBPCRE2_CFLAGS"
@@ -1896,21 +1928,10 @@ if test "x$want_libpcre2" = "xyes"; then
 
 	AC_DEFINE([HAVE_PCRE2_H], 1, [Define to 1 if you have the 'libpcre2' library (-lpcre2-8)])
 	have_pcre2=1
-else
-	if test "x$found_libpcre" != "xyes"; then
-		AC_MSG_ERROR([Unable to use libpcre (libpcre check failed)])
-	fi
+fi
 
-	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
-	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
-	if test "x$ARCH" = "xosx"; then
-		LIBS="$LIBPCRE_LIBS $LIBS"
-	else
-		LIBS="$LIBS $LIBPCRE_LIBS"
-	fi
-
-	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
-	have_pcre=1
+if test "x$have_pcre" != "x1" && test "x$have_pcre2" != "x1"; then
+    AC_MSG_ERROR([cannot build with libpcre or libpcre2])
 fi
 fi
 
@@ -2217,6 +2238,14 @@ Configuration:
 
 if test "x$DB_CFLAGS" != "x"; then
 	echo "    database:              ${DB_CFLAGS}"
+fi
+
+if test "x$LIBPCRE_CFLAGS" != "x"; then
+	echo "    libpcre:               ${LIBPCRE_CFLAGS}"
+fi
+
+if test "x$LIBPCRE2_CFLAGS" != "x"; then
+	echo "    libpcre2:              ${LIBPCRE2_CFLAGS}"
 fi
 
 if test "x$LIBXML2_CFLAGS" != "x"; then

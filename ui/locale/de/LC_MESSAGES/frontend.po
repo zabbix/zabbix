@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2022-04-12 18:25+0000\n"
-"Last-Translator: Joachim <joachim.schwender@web.de>\n"
+"PO-Revision-Date: 2022-06-21 14:37+0000\n"
+"Last-Translator: Philipp <philipp@herzo.gs>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "Das Datum „%1$s“ muss vor dem Datum „%2$s“ liegen."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -970,7 +970,7 @@ msgstr "Weitere Regeln"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "Adresse"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1030,7 +1030,7 @@ msgstr "Agent-Schnittstellen"
 
 #: include/classes/data/CItemData.php:829
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Prüfung der Agent-Variante. Rückgabewert 1 für Zabbix Agent; 2 für Zabbix Agent 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
@@ -1361,7 +1361,7 @@ msgstr "At least one UI element must be enabled for the \"%1$s\" user role."
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Mindestens ein Wochentag oder Tag im Monat muss angegeben werden. "
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
@@ -1509,7 +1509,7 @@ msgstr "Autorisierung"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:156
@@ -1697,7 +1697,7 @@ msgstr "Hauptteil und Kopfzeilen"
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Fett"
 
 # Vielleicht reichts sogar "fett"
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:780
@@ -3632,6 +3632,10 @@ msgstr "Zirkulare Verknüpfungen zwischen Vorlagen sind unzulässig."
 msgid "Class %1$s not found for action %2$s."
 msgstr "Klasse %1$s nicht gefunden für Aktion %2$s."
 
+#: include/classes/core/ZBase.php:494
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:217
 #: include/views/configuration.item.list.php:297
 msgid "Clear history"
@@ -3754,7 +3758,7 @@ msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:785
 msgid "Color (OK)"
-msgstr ""
+msgstr "Farbe (OK)"
 
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
@@ -4091,7 +4095,7 @@ msgstr ""
 
 #: include/classes/server/CZabbixServer.php:590
 msgid "Connection to Zabbix server failed. Incorrect configuration."
-msgstr ""
+msgstr "Verbindung zum Zabbix Server fehlgeschlagen. Konfiguration inkorrekt."
 
 #: include/classes/setup/CSetupWizard.php:552
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
@@ -4781,7 +4785,7 @@ msgstr "Gestrichelte Linie"
 #: app/views/popup.tophosts.column.edit.php:58
 #: include/classes/widgets/CWidgetHelper.php:587
 msgid "Data"
-msgstr ""
+msgstr "Daten"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2214
 #: include/classes/graphdraw/CPieGraphDraw.php:770
@@ -5993,7 +5997,7 @@ msgstr "Existiert nicht"
 
 #: include/items.inc.php:1873
 msgid "Does not match regular expression"
-msgstr ""
+msgstr "Entspricht nicht dem regulären Ausdruck"
 
 #: include/graphs.inc.php:61 include/views/js/monitoring.sysmaps.js.php:781
 #: include/views/js/monitoring.sysmaps.js.php:871
@@ -6468,7 +6472,7 @@ msgstr "Zeilenende-Sequenz"
 
 #: include/locales.inc.php:33
 msgid "English (en_GB)"
-msgstr ""
+msgstr "Englisch (en_GB)"
 
 #: include/locales.inc.php:33
 msgid "English (en_US)"
@@ -6533,6 +6537,13 @@ msgstr "Fehlermeldung"
 msgid "Error! Unable to start Zabbix server due to unsupported %1$s database server version. Must be at least (%2$s)"
 msgstr ""
 
+#: app/partials/administration.system.info.php:140
+#: app/partials/administration.system.info.php:147
+#: app/partials/administration.system.info.php:159
+#: app/partials/administration.system.info.php:172
+msgid "Error! Unable to start Zabbix server."
+msgstr ""
+
 #: include/classes/screens/CScreenHttpTestDetails.php:111
 #: include/classes/screens/CScreenHttpTestDetails.php:182
 #, c-format
@@ -6541,7 +6552,7 @@ msgstr "Fehler: %1$s"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1091
 msgid "Evaluation period"
-msgstr ""
+msgstr "Auswertungszeitraum"
 
 #: include/events.inc.php:180
 msgid "Event"
@@ -6625,7 +6636,7 @@ msgstr "Jede Woche(n)"
 
 #: app/views/administration.geomaps.edit.php:33
 msgid "Example"
-msgstr ""
+msgstr "Beispiel"
 
 #: app/views/administration.miscconfig.edit.php:36
 msgid "Example: https://localhost/zabbix/ui/"
@@ -6634,7 +6645,7 @@ msgstr "Beispiel: https://localhost/zabbix/ui/"
 #: app/partials/massupdate.macros.tab.php:103
 #: app/partials/massupdate.valuemaps.tab.php:77
 msgid "Except selected"
-msgstr ""
+msgstr "Außer ausgewählt"
 
 #: app/partials/js/scheduledreport.subscription.js.php:170
 #: app/partials/js/scheduledreport.subscription.js.php:185
@@ -7279,7 +7290,7 @@ msgstr ""
 
 #: include/classes/widgets/CWidgetConfig.php:58
 msgid "Geomap"
-msgstr ""
+msgstr "Karte"
 
 #: include/locales.inc.php:42
 msgid "Georgian (ka_GE)"
@@ -7822,7 +7833,7 @@ msgstr "Die Bereinigung des Verlaufs wird nicht unterstützt, wenn die Komprimie
 
 #: app/controllers/CControllerAuditLogList.php:198
 msgid "History clear"
-msgstr ""
+msgstr "Verlauf leeren"
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "History cleared"
@@ -7982,7 +7993,7 @@ msgstr[1] "Hosts aktiviert"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "Host graphs"
-msgstr ""
+msgstr "Host Graphen"
 
 #: app/controllers/CControllerAuditLogList.php:220
 #: app/partials/administration.usergroup.grouprights.html.php:29
@@ -8186,7 +8197,7 @@ msgstr "Subnetzmaske des Hosts"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:91
 msgid "Host tags"
-msgstr ""
+msgstr "Host Tags"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:34
 msgid "Host time"
@@ -8284,7 +8295,7 @@ msgstr "Hosts geändert"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:118
 msgid "Hour"
-msgstr ""
+msgstr "Stunde"
 
 #: app/views/popup.maintenance.period.php:170
 #: app/views/popup.sla.excludeddowntime.edit.php:68
@@ -10678,7 +10689,7 @@ msgstr[1] "Letzte %1$d Jahre"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Last access"
-msgstr ""
+msgstr "Letzter Zugriff"
 
 #: app/views/administration.token.list.php:143
 #: app/views/administration.user.token.list.php:99
@@ -12193,7 +12204,7 @@ msgstr "Neue Zusatzregel"
 
 #: app/views/popup.tophosts.column.edit.php:249
 msgid "New column"
-msgstr ""
+msgstr "Neue Spalte"
 
 #: app/controllers/CControllerPopupConditionActions.php:94
 #: app/controllers/CControllerPopupConditionEventCorr.php:87
@@ -12218,7 +12229,7 @@ msgstr ""
 #: include/classes/helpers/CCorrelationHelper.php:53
 #: include/classes/helpers/CCorrelationHelper.php:123
 msgid "New event tag name"
-msgstr ""
+msgstr "Neuer Ereignis Tag Name"
 
 #: include/classes/helpers/CCorrelationHelper.php:57
 msgid "New event tag value"
@@ -12230,7 +12241,7 @@ msgstr ""
 
 #: app/views/configuration.host.edit.php:65 app/views/popup.host.edit.php:97
 msgid "New host"
-msgstr ""
+msgstr "Neuer Host"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -12344,7 +12355,7 @@ msgstr "Keine Bedingungen definiert."
 
 #: app/views/monitoring.widget.item.view.php:157
 msgid "No data"
-msgstr ""
+msgstr "Keine Daten"
 
 #: include/views/configuration.maintenance.edit.php:105
 #: include/views/configuration.maintenance.list.php:111
@@ -12718,7 +12729,7 @@ msgstr "Keine Datei mit privatem Schlüssel angegeben."
 
 #: jsLoader.php:175
 msgid "No problems"
-msgstr ""
+msgstr "Keine Probleme"
 
 #: app/views/configuration.discovery.edit.php:54
 msgid "No proxy"
@@ -12948,6 +12959,10 @@ msgstr "Anzahl der Datenpunkte in Zabbix Datenbank."
 #: include/classes/data/CItemData.php:1681
 msgid "Number of items in proxy history that are not yet sent to the server"
 msgstr "Anzahl der Datenpunkte in Proxy-Ablaufverfolgung, die noch nicht an den Server gesendet wurden"
+
+#: include/classes/data/CItemData.php:1668
+msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -13283,7 +13298,7 @@ msgstr "Informationen zum Betriebssystem. Rüchgabewert Zeichenfolge"
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
 msgid "Operation"
-msgstr ""
+msgstr "Operation"
 
 #: include/classes/api/services/CAction.php:2805
 #, c-format
@@ -13920,12 +13935,12 @@ msgstr "Einfügen"
 #: app/views/js/configuration.dashboard.edit.js.php:217
 #: app/views/js/monitoring.dashboard.view.js.php:305
 msgid "Paste page"
-msgstr ""
+msgstr "Seite einfügen"
 
 #: app/views/js/configuration.dashboard.edit.js.php:210
 #: app/views/js/monitoring.dashboard.view.js.php:298 jsLoader.php:143
 msgid "Paste widget"
-msgstr ""
+msgstr "Widget einfügen"
 
 #: jsLoader.php:283
 msgid "Paste without external links"
@@ -14129,6 +14144,10 @@ msgstr "Portugiesisch (pt_PT)"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:249
 msgid "Position"
+msgstr "Position"
+
+#: include/classes/widgets/views/widget.item.form.view.php:142
+msgid "Position is ignored for s, uptime and unixtime units."
 msgstr ""
 
 #: app/views/popup.httpstep.php:90
@@ -14457,7 +14476,7 @@ msgstr "Proxy angelegt"
 
 #: app/views/administration.proxy.edit.php:81
 msgid "Proxy address"
-msgstr ""
+msgstr "Proxy Adresse"
 
 #: app/controllers/CControllerProxyDelete.php:66
 msgid "Proxy deleted"
@@ -16940,7 +16959,7 @@ msgstr "Berechtigungsnachweise speichern in"
 #: include/classes/setup/CSetupWizard.php:656
 #: include/classes/setup/CSetupWizard.php:657
 msgid "Stored in HashiCorp Vault secret"
-msgstr ""
+msgstr "Gespeichert in HashiCorp Vault Secret"
 
 # Autorisierungs-Form-IPMI
 #: include/hosts.inc.php:35
@@ -16954,7 +16973,7 @@ msgstr "Zeichenkette"
 
 #: app/views/popup.triggerexpr.php:116
 msgid "String functions"
-msgstr ""
+msgstr "Funktionen für Zeichenketten"
 
 #: include/items.inc.php:1820 include/items.inc.php:1824
 #: include/items.inc.php:1828 include/items.inc.php:1832
@@ -17185,7 +17204,7 @@ msgstr "Maker-Wert"
 #: app/partials/monitoring.charts.subfilter.php:199
 #: app/partials/monitoring.latest.subfilter.php:178
 msgid "Tag values"
-msgstr ""
+msgstr "Tag Werte"
 
 #: app/controllers/CControllerPopupLldOperation.php:138
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -17407,6 +17426,10 @@ msgstr "Vorlagen"
 #, c-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Vorlage \"%1$s\" getrennt von Host \"%2$s\"."
+
+#: app/partials/configuration.host.edit.html.php:215
+msgid "Templates linked by host discovery cannot be unlinked."
+msgstr ""
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
@@ -17697,7 +17720,7 @@ msgstr "Schwellenwert"
 
 #: app/views/popup.tophosts.column.edit.php:232
 msgid "Thresholds"
-msgstr ""
+msgstr "Schwellenwert"
 
 #: include/items.inc.php:1892 include/items.inc.php:1896
 msgid "Throttling"
@@ -18534,11 +18557,11 @@ msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:91
 msgid "Unacknowledge"
-msgstr ""
+msgstr "Bestätigung zurücknehmen"
 
 #: include/actions.inc.php:2079
 msgid "Unacknowledged"
-msgstr ""
+msgstr "Unbestätigt"
 
 #: app/views/administration.trigdisplay.edit.php:40
 msgid "Unacknowledged PROBLEM events"
@@ -18556,7 +18579,7 @@ msgstr "Nur Unbestätigte"
 
 #: app/partials/administration.ha.nodes.php:56
 msgid "Unavailable"
-msgstr ""
+msgstr "Nicht verfügbar"
 
 #: app/views/administration.user.list.php:249
 msgid "Unblock"
@@ -18693,6 +18716,16 @@ msgstr "Verbindung mit Vorlagen entfernen"
 #: jsLoader.php:296
 msgid "Unmute"
 msgstr "Ton an"
+
+#: app/partials/administration.system.info.php:160
+#, c-format
+msgid "Unsupported %1$s database server version. Must be at least %2$s."
+msgstr ""
+
+#: app/partials/administration.system.info.php:173
+#, c-format
+msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
 
 #: include/classes/db/MysqlDbBackend.php:99
 #: include/classes/db/PostgresqlDbBackend.php:131
@@ -18840,7 +18873,7 @@ msgstr ""
 #: app/controllers/CControllerAuditLogList.php:364
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
-msgstr ""
+msgstr "Aktualisiert"
 
 #: include/classes/api/services/CHost.php:1256
 #, c-format
@@ -18882,13 +18915,17 @@ msgstr "Benutzerdefinierte Farben für den Ereignisstatus verwenden"
 msgid "Use default"
 msgstr ""
 
+#: app/partials/configuration.host.edit.html.php:216
+msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
+msgstr ""
+
 #: app/views/administration.user.edit.php:296 app/views/popup.media.php:88
 msgid "Use if severity"
 msgstr "Bei Schweregrad"
 
 #: app/views/administration.miscconfig.edit.php:119
 msgid "Use iframe sandboxing"
-msgstr ""
+msgstr "Verwende iFrame Sandboxing"
 
 #: app/views/administration.mediatype.list.php:85
 #: app/views/administration.script.list.php:76
@@ -19069,7 +19106,7 @@ msgstr "Benutzer darf sich nicht selbst löschen."
 
 #: include/classes/widgets/views/widget.item.form.view.php:64
 msgid "User macros"
-msgstr ""
+msgstr "Benutzer Macros"
 
 #: app/partials/layout.htmlpage.aside.php:94
 msgid "User menu"
@@ -19659,7 +19696,7 @@ msgstr "Verschiedene Informationen über spezifische Prozesse. Gibt Fließkommaz
 #: include/classes/setup/CSetupWizard.php:516
 #: include/classes/setup/CSetupWizard.php:696
 msgid "Vault API endpoint"
-msgstr ""
+msgstr "Vault API Endpunkt"
 
 #: include/classes/setup/CSetupWizard.php:529
 #: include/classes/setup/CSetupWizard.php:704
@@ -19673,7 +19710,7 @@ msgstr ""
 
 #: include/classes/html/CMacroValue.php:158
 msgid "Vault secret"
-msgstr ""
+msgstr "Vault Secret"
 
 #: include/classes/setup/CSetupWizard.php:522
 #: include/classes/setup/CSetupWizard.php:700
@@ -19703,7 +19740,7 @@ msgstr "Version des Zabbix-Agenten. Übergibt Zeichenfolge"
 
 #: include/classes/data/CItemData.php:1733
 msgid "Version of Zabbix server or proxy"
-msgstr ""
+msgstr "Version des Zabbix Servers oder Proxys"
 
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:50
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:123
@@ -19781,9 +19818,23 @@ msgstr "Warnung"
 msgid "Warning message"
 msgstr "Warnmeldung"
 
+#: app/partials/administration.system.info.php:154
+msgid "Warning! Unable to retrieve database version."
+msgstr ""
+
+#: app/partials/administration.system.info.php:166
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should be at least %2$s."
+msgstr ""
+
 #: app/partials/administration.system.info.php:167
 #, c-format
 msgid "Warning! Unsupported %1$s database server version. Should be at least (%2$s)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:179
+#, c-format
+msgid "Warning! Unsupported %1$s database server version. Should not be higher than %2$s."
 msgstr ""
 
 # "remember"?
@@ -19817,7 +19868,7 @@ msgstr "Web-Überwachung"
 
 #: app/controllers/CControllerAuditLogList.php:235
 msgid "Web scenario"
-msgstr ""
+msgstr "Web Szenario"
 
 #: include/classes/api/managers/CHttpTestManager.php:378
 #: include/classes/api/managers/CHttpTestManager.php:391
@@ -19862,7 +19913,7 @@ msgstr "Web-Szenarien"
 #: app/views/administration.script.edit.php:114
 #: app/views/administration.script.list.php:156 include/media.inc.php:27
 msgid "Webhook"
-msgstr ""
+msgstr "Webhook"
 
 #: app/views/popup.mediatypetest.edit.php:42
 msgid "Webhook does not have parameters."
@@ -22565,7 +22616,7 @@ msgstr "Falscher Suchlaufregel-Typ"
 
 #: include/classes/api/services/CTask.php:444
 msgid "wrong item type"
-msgstr ""
+msgstr "Falscher Item Typ"
 
 #: include/func.inc.php:591 jsLoader.php:221
 msgctxt "year short"
