@@ -1,3 +1,22 @@
+Changes for 6.2.0rc2
+
+New features:
+.......PS. [ZBXNEXT-7813] updated MariaDB maximum supported version to 10.7 (arimdjonoks)
+..F....... [ZBXNEXT-7722] fixed runtime errors when using Zabbix with PHP 8.1 (agriscenko)
+..F....... [ZBXNEXT-7769] added support of PHP 8.1 to LDAP authentication (gcalenko)
+..F....... [ZBXNEXT-6940] added support for stacked bar and stacked staircase graphs (averza)
+
+Bug fixes:
+....I..... [ZBX-21066] fixed libopenssl.m4 when dealing with lib/64 in openssl 3 (yurii)
+...GI..PS. [ZBX-20105] removed bogus dependency on libxml2 from agent (yurii)
+........S. [ZBX-20750] fixed excessive escaping of special characters in audit log details, triggers and graphs (akozlovs)
+..F.....S. [ZBX-20994] fixed access limitation for Oracle DB to list tables accessible to the user (asestakovs)
+........S. [ZBX-21145] changed host, item and trigger tag merging logic during template linking and LLD to reduce database updates (wiper)
+....I..... [ZBX-21064] rewrote pcre.m4 and pcre2.m4 file (yurii)
+..F....... [ZBX-21185] fixed pattern selector when item name contains square brackets (miks)
+..F....... [ZBX-21190] fixed templated host prototype macros tab being editable (miks)
+
+--------------------------------------------------------------------------------
 Changes for 6.2.0rc1
 
 New features:
@@ -151,14 +170,14 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-21145] changed host, item and trigger tag merging logic during template linking and LLD to reduce database updates (wiper)
-..F....PS. [ZBX-20638] fixed handling of db version higher than supported (agriscenko, dgoloscapov)
+..F....PS. [ZBX-20638] fixed handling of DB version higher than supported (agriscenko, dgoloscapov)
 ........S. [ZBX-20750] fixed excessive escaping of special characters in audit log details, triggers and graphs (akozlovs)
-..F....... [ZBX-21015] fixed web scenario tags disappearing from Monitoring -> Hosts -> Web scenario on page auto refresh (agriscenko)
+..F....... [ZBX-21015] fixed web scenario tags disappearing from Monitoring -> Hosts -> Web scenario on page autorefresh (agriscenko)
 ..F....... [ZBX-20960] fixed SVG graph widget throwing error when attempting to plot item with valid user macro defined in history storage period (agriscenko)
 ..F....... [ZBX-20965] fixed positioning of change indicator in Item value widget (dpetra)
 ..F.....S. [ZBX-20994] fixed access limitation for Oracle DB to list tables accessible to the user (asestakovs)
 .......PS. [ZBX-21123] fixed crash when VMware VC was not available at the first moment when starting zabbix_server (MVekslers)
-........S. [ZBX-21044] fixed javascript preprocessing output conversion to utf-8 (kprutkovs)
+........S. [ZBX-21044] fixed JavaScript preprocessing output conversion to utf-8 (kprutkovs)
 ..F....... [ZBX-20534] fixed popup layout for importing when horizontal scroll was not visible (rlataria)
 ..F....... [ZBX-21185] fixed pattern selector when item name contains square brackets (miks)
 ..F....... [ZBX-20669] fixed focus on fields when clicking on labels (esekace)
