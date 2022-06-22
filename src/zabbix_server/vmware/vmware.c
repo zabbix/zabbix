@@ -275,9 +275,6 @@ static zbx_uint64_t	evt_req_chunk_size;
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
 	"/*[local-name()='val']/*[@type='VirtualMachine']"
 
-#define ZBX_XPATH_ALARMS()										\
-	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='AlarmState']"	\
-
 #define ZBX_XPATH_DATASTORE_SUMMARY(property)								\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"		\
 		"/*[local-name()='val']/*[local-name()='" property "']"

@@ -45,16 +45,6 @@
 
 #define ZBX_VMWARE_EVENT_KEY_UNINITIALIZED	__UINT64_C(0xffffffffffffffff)
 
-/*
-#define ZBX_VMWARE_ENTITY_UNKNOWN	-1
-#define ZBX_VMWARE_ENTITY_ANY		0
-#define ZBX_VMWARE_ENTITY_HV		1
-#define ZBX_VMWARE_ENTITY_VM		2
-#define ZBX_VMWARE_ENTITY_DATASTORE	3
-#define ZBX_VMWARE_ENTITY_DATACENTER	4
-#define ZBX_VMWARE_ENTITY_CLUSTER	5
-*/
-
 typedef struct
 {
 	char		*name;
@@ -221,20 +211,19 @@ zbx_vmware_pnic_t;
 int	vmware_pnic_compare(const void *v1, const void *v2);
 ZBX_PTR_VECTOR_DECL(vmware_pnic, zbx_vmware_pnic_t *)
 
-/* hypervisor alarm data */
+/* Alarm data */
 typedef struct
 {
-	char		*key;
-	char		*name;
-	char		*system_name;
-	char		*description;
-	char		*overall_status;
-	char		*time;
-	int		enabled;
-	int		acknowledged;
+	char	*key;
+	char	*name;
+	char	*system_name;
+	char	*description;
+	char	*overall_status;
+	char	*time;
+	int	enabled;
+	int	acknowledged;
 }
 zbx_vmware_alarm_t;
-
 ZBX_PTR_VECTOR_DECL(vmware_alarm, zbx_vmware_alarm_t *)
 
 /* file system data */
