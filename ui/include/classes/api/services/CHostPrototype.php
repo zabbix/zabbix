@@ -1310,33 +1310,43 @@ class CHostPrototype extends CHostBase {
 	 * @return string|null
 	 */
 	private static function getInterfaceId(array $interface, array $db_interfaces): ?string {
-		return key(array_filter($db_interfaces, static function (array $db_interface) use ($interface): bool {
+		$details = array_key_exists('details', $interface) ? $interface['details'] : [];
+		$def_details = array_intersect_key(DB::getDefaults('interface_snmp'), array_flip(['bulk', 'contextname',
+			'securityname', 'securitylevel', 'authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase'
+		]));
+
+		return key(array_filter($db_interfaces, static function (array $db_interface)
+				use ($interface, $details, $def_details): bool {
+			$db_details = array_key_exists('details', $db_interface) ? $db_interface['details'] : [];
+
 			return $interface['type'] == $db_interface['type']
 				&& $interface['useip'] == $db_interface['useip']
-				&& (!array_key_exists('ip', $interface) || $interface['ip'] === $db_interface['ip'])
-				&& (!array_key_exists('dns', $interface) || $interface['dns'] === $db_interface['dns'])
+				&& ((!array_key_exists('ip', $interface) && $db_interface['ip'] == DB::getDefault('interface', 'ip'))
+					|| $interface['ip'] === $db_interface['ip'])
+				&& ((!array_key_exists('dns', $interface) && $db_interface['dns'] == DB::getDefault('interface', 'dns'))
+					|| $interface['dns'] === $db_interface['dns'])
 				&& $interface['port'] === $db_interface['port']
 				&& $interface['main'] == $db_interface['main']
 				&& (!array_key_exists('details', $interface)
-					|| ($interface['details']['version'] == $db_interface['details']['version'])
-						&& (!array_key_exists('bulk', $interface['details'])
-							|| $interface['details']['bulk'] == $db_interface['details']['bulk'])
-						&& (!array_key_exists('community', $interface['details'])
-							|| $interface['details']['community'] === $db_interface['details']['community'])
-						&& (!array_key_exists('contextname', $interface['details'])
-							|| $interface['details']['contextname'] === $db_interface['details']['contextname'])
-						&& (!array_key_exists('securityname', $interface['details'])
-							|| $interface['details']['securityname'] === $db_interface['details']['securityname'])
-						&& (!array_key_exists('securitylevel', $interface['details'])
-							|| $interface['details']['securitylevel'] == $db_interface['details']['securitylevel'])
-						&& (!array_key_exists('authprotocol', $interface['details'])
-							|| $interface['details']['authprotocol'] == $db_interface['details']['authprotocol'])
-						&& (!array_key_exists('authpassphrase', $interface['details'])
-							|| $interface['details']['authpassphrase'] === $db_interface['details']['authpassphrase'])
-						&& (!array_key_exists('privprotocol', $interface['details'])
-							|| $interface['details']['privprotocol'] == $db_interface['details']['privprotocol'])
-						&& (!array_key_exists('privpassphrase', $interface['details'])
-							|| $interface['details']['privpassphrase'] === $db_interface['details']['privpassphrase']));
+					|| (array_key_exists('details', $db_interface) && $details['version'] == $db_details['version'])
+						&& ((!array_key_exists('bulk', $details) && $db_details['bulk'] == $def_details['bulk'])
+							|| $details['bulk'] == $db_details['bulk'])
+						&& (!array_key_exists('community', $details)
+							|| $details['community'] === $db_details['community'])
+						&& ((!array_key_exists('contextname', $details) && $db_details['contextname'] === $def_details['contextname'])
+							|| $details['contextname'] === $db_details['contextname'])
+						&& ((!array_key_exists('securityname', $details) && $db_details['securityname'] === $def_details['securityname'])
+							|| $details['securityname'] === $db_details['securityname'])
+						&& ((!array_key_exists('securitylevel', $details) && $db_details['securitylevel'] == $def_details['securitylevel'])
+							|| $details['securitylevel'] == $db_details['securitylevel'])
+						&& ((!array_key_exists('authprotocol', $details) && $db_details['authprotocol'] == $def_details['authprotocol'])
+							|| $details['authprotocol'] == $db_details['authprotocol'])
+						&& ((!array_key_exists('authpassphrase', $details) && $db_details['authpassphrase'] === $def_details['authpassphrase'])
+							|| $details['authpassphrase'] === $db_details['authpassphrase'])
+						&& ((!array_key_exists('privprotocol', $details) && $db_details['privprotocol'] == $def_details['privprotocol'])
+							|| $details['privprotocol'] == $db_details['privprotocol'])
+						&& ((!array_key_exists('privpassphrase', $details) && $db_details['privpassphrase'] === $def_details['privpassphrase'])
+							|| $details['privpassphrase'] === $db_details['privpassphrase']));
 		}));
 	}
 
