@@ -136,6 +136,31 @@ static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_t *dvss, 
 	return dvss->values[i];
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return pointer to Datacenter data from vector with id             *
+ *                                                                            *
+ * Parameters: dcs - [IN] the vector with all Datacenters                     *
+ *             id  - [IN] the id of Datacenter                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *        zbx_vmware_datacenter_t* - the operation has completed successfully *
+ *        NULL                     - the operation has failed                 *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_datacenter_t	*dc_get(const zbx_vector_vmware_datacenter_t *dcs, const char *id)
+{
+	int			i;
+	zbx_vmware_datacenter_t	cmp;
+
+	cmp.id = (char *)id;
+
+	if (FAIL == (i = zbx_vector_vmware_datacenter_bsearch(dcs, &cmp, vmware_dc_id_compare)))
+		return NULL;
+
+	return dcs->values[i];
+}
+
 static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service, const char *uuid)
 {
 	zbx_vmware_vm_t		vm_local = {.uuid = (char *)uuid};
@@ -4962,161 +4987,177 @@ out:
 	return ret;
 }
 
-int	check_vcenter_alarm_get_common(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result, int entity_type, const char *func_parent)
+
+static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_t *alarms, zbx_vector_str_t *ids, AGENT_RESULT *result)
 {
-	zbx_vmware_service_t	*service;
-	int			i, ret = SYSINFO_RET_FAIL;
-	const char		*url, *uuid;
+	int			i, ret = SYSINFO_RET_OK;
 	struct zbx_json		json_data;
-	zbx_vmware_hv_t		*hv;
-	zbx_vmware_vm_t		*vm;
-	zbx_vmware_datastore_t	*ds;
-	zbx_vmware_cluster_t	*cluster;
-	zbx_vmware_alarm_t	*alarm;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
-	if ((ZBX_VMWARE_ENTITY_ANY == entity_type && 1 != request->nparam) || (2 != request->nparam))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		goto out;
-	}
-
-	url = get_rparam(request, 0);
-
-	if (ZBX_VMWARE_ENTITY_ANY != entity_type)
-	{
-		uuid = get_rparam(request, 1);
-		if ('\0' == *uuid)
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-			goto out;
-		}
-	}
-
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-		goto unlock;
-
-	zbx_vmware_lock();
-
-	switch (entity_type)
-	{
-		case ZBX_VMWARE_ENTITY_HV:
-			if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
-				goto unlock;
-			}
-			break;
-
-		case ZBX_VMWARE_ENTITY_VM:
-			if (NULL == (vm = service_vm_get(service, uuid)))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
-				goto unlock;
-			}
-			break;
-
-		case ZBX_VMWARE_ENTITY_DATASTORE:
-			if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
-				goto unlock;
-			}
-			break;
-
-		case ZBX_VMWARE_ENTITY_CLUSTER:
-			if (NULL == (cluster = cluster_get(&service->data->clusters, uuid)))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown cluster uuid."));
-			}
-			break;
-
-		case ZBX_VMWARE_ENTITY_ANY:
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < service->data->alarms.values_num; i++)
+	for (i = 0; i < ids->values_num; i++)
 	{
-		alarm = service->data->alarms.values[i];
+		zbx_vmware_alarm_t	*alarm, cmp = {.key = ids->values[i]};
+		int			j;
 
-		/*
-		 * FIXME: currently for ZBX_VMWARE_ENTITY_ANY scenario this would return all available
-		 * VCs, need additional filter here.
-		 * Also it does not support cluster and datacenter entities at this moment.
-		 */
-		if (entity_type != ZBX_VMWARE_ENTITY_ANY && entity_type != alarm->entity_type && uuid != alarm->entity_uuid)
-			continue;
+		if (FAIL == (j = zbx_vector_vmware_alarm_bsearch(alarms, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Alarm not found:%s", cmp.key));
+			ret = SYSINFO_RET_FAIL;
+			break;
+		}
+
+		alarm = alarms->values[j];
 
 		zbx_json_addobject(&json_data, NULL);
-
 		zbx_json_addstring(&json_data, "name", alarm->name, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "entity_name", alarm->entity_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "system_name", alarm->system_name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "description", alarm->description, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "enabled", (1 == alarm->enabled ? "true" : "false"), ZBX_JSON_TYPE_INT);
 		zbx_json_addstring(&json_data, "key", alarm->key, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "time", alarm->time, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "overall_status", alarm->overall_status, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json_data, "acknowledged", (1 == alarm->acknowledged ? "true" : "false"), ZBX_JSON_TYPE_INT);
+		zbx_json_addstring(&json_data, "acknowledged", (0 == alarm->acknowledged ? "false" : "true"),
+				ZBX_JSON_TYPE_INT);
 		zbx_json_close(&json_data);
 	}
 
 	zbx_json_close(&json_data);
 
-	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
+	if (SYSINFO_RET_OK == ret)
+		SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
 
 	zbx_json_free(&json_data);
 
 	ret = SYSINFO_RET_OK;
-unlock:
-	zbx_vmware_unlock();
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), func_parent:'%s', ret: %s", __func__, func_parent,
-			zbx_sysinfo_ret_string(ret));
-
 	return ret;
 }
+
+#define	ALARMS_GET_START(num)									\
+	const char		*uuid, *url;							\
+	int			ret = SYSINFO_RET_FAIL;						\
+	zbx_vmware_service_t	*service;							\
+												\
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);					\
+												\
+	if (num != request->nparam)								\
+	{											\
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));	\
+		goto out;									\
+	}											\
+												\
+	url = get_rparam(request, 0);								\
+												\
+	if (num > 1 && (NULL == (uuid = get_rparam(request, 1)) || '\0' == *uuid))		\
+	{											\
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));		\
+		goto out;									\
+	}											\
+												\
+	zbx_vmware_lock();									\
+												\
+	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))	\
+		goto unlock
+
+#define	ALARMS_GET_END(ids)									\
+	ret = check_vcenter_alarm_get_common(&service->data->alarms, &ids, result);		\
+unlock:												\
+	zbx_vmware_unlock();									\
+out:												\
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_sysinfo_ret_string(ret));	\
+												\
+	return ret
 
 int	check_vcenter_hv_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_HV, __func__);
+	zbx_vmware_hv_t	*hv;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(hv->alarm_ids);
 }
 
 int	check_vcenter_vm_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_VM, __func__);
+	zbx_vmware_vm_t	*vm;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (vm = service_vm_get(service, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(vm->alarm_ids);
 }
 
-int	check_vcenter_ds_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_datastore_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_DATASTORE, __func__);
+	zbx_vmware_datastore_t	*ds;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(ds->alarm_ids);
 }
 
 int	check_vcenter_dc_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_DATACENTER, __func__);
+	zbx_vmware_datacenter_t	*dc;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (dc = dc_get(&service->data->datacenters, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datacenter id."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(dc->alarm_ids);
 }
 
-int	check_vcenter_cl_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_cluster_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_CLUSTER, __func__);
+	zbx_vmware_cluster_t	*cl;
+
+	ALARMS_GET_START(2);
+
+	if (NULL == (cl = cluster_get(&service->data->clusters, uuid)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown cluster id."));
+		goto unlock;
+	}
+
+	ALARMS_GET_END(cl->alarm_ids);
 }
 
 int	check_vcenter_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return	check_vcenter_alarm_get_common(request, username, password, result, ZBX_VMWARE_ENTITY_ANY, __func__);
+	ALARMS_GET_START(1);
+	ALARMS_GET_END(service->data->alarm_ids);
 }
+
+#undef	ALARMS_GET_START
+#undef	ALARMS_GET_END
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

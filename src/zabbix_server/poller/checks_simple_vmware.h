@@ -237,12 +237,12 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RESULT *result,
 		zbx_vector_ptr_t *add_results);
 
-int	check_vcenter_cl_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_cluster_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
-int	check_vcenter_ds_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
+int	check_vcenter_datastore_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_alarm_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);

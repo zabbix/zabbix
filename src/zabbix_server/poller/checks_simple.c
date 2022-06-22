@@ -44,10 +44,13 @@ zbx_vmcheck_t;
 static zbx_vmcheck_t	vmchecks[] =
 {
 	{"alarm.get", VMCHECK_FUNC(check_vcenter_alarm_get)},
+	{"cluster.alarm.get", VMCHECK_FUNC(check_vcenter_cluster_alarm_get)},
 	{"cluster.discovery", VMCHECK_FUNC(check_vcenter_cluster_discovery)},
 	{"cluster.status", VMCHECK_FUNC(check_vcenter_cluster_status)},
+	{"cl.perfcounter", VMCHECK_FUNC(check_vcenter_cl_perfcounter)},
 	{"version", VMCHECK_FUNC(check_vcenter_version)},
 	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
+	{"datastore.alarm.get", VMCHECK_FUNC(check_vcenter_datastore_alarm_get)},
 	{"datastore.discovery", VMCHECK_FUNC(check_vcenter_datastore_discovery)},
 	{"datastore.read", VMCHECK_FUNC(check_vcenter_datastore_read)},
 	{"datastore.size", VMCHECK_FUNC(check_vcenter_datastore_size)},
@@ -148,10 +151,6 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"dc.alarm.get", VMCHECK_FUNC(check_vcenter_dc_alarm_get)},
 	{"dc.discovery", VMCHECK_FUNC(check_vcenter_dc_discovery)},
 
-	{"cl.alarm.get", VMCHECK_FUNC(check_vcenter_cl_alarm_get)},
-	{"cl.perfcounter", VMCHECK_FUNC(check_vcenter_cl_perfcounter)},
-
-	{"ds.alarm.get", VMCHECK_FUNC(check_vcenter_ds_alarm_get)},
 	{"rp.cpu.usage", VMCHECK_FUNC(check_vcenter_rp_cpu_usage)},
 	{"rp.memory", VMCHECK_FUNC(check_vcenter_rp_memory)},
 
