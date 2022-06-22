@@ -10,14 +10,14 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-21145] changed host, item and trigger tag merging logic during template linking and LLD to reduce database updates (wiper)
-..F....PS. [ZBX-20638] fixed handling of db version higher than supported (agriscenko, dgoloscapov)
+..F....PS. [ZBX-20638] fixed handling of DB version higher than supported (agriscenko, dgoloscapov)
 ........S. [ZBX-20750] fixed excessive escaping of special characters in audit log details, triggers and graphs (akozlovs)
-..F....... [ZBX-21015] fixed web scenario tags disappearing from Monitoring -> Hosts -> Web scenario on page auto refresh (agriscenko)
+..F....... [ZBX-21015] fixed web scenario tags disappearing from Monitoring -> Hosts -> Web scenario on page autorefresh (agriscenko)
 ..F....... [ZBX-20960] fixed SVG graph widget throwing error when attempting to plot item with valid user macro defined in history storage period (agriscenko)
 ..F....... [ZBX-20965] fixed positioning of change indicator in Item value widget (dpetra)
 ..F.....S. [ZBX-20994] fixed access limitation for Oracle DB to list tables accessible to the user (asestakovs)
 .......PS. [ZBX-21123] fixed crash when VMware VC was not available at the first moment when starting zabbix_server (MVekslers)
-........S. [ZBX-21044] fixed javascript preprocessing output conversion to utf-8 (kprutkovs)
+........S. [ZBX-21044] fixed JavaScript preprocessing output conversion to utf-8 (kprutkovs)
 ..F....... [ZBX-20534] fixed popup layout for importing when horizontal scroll was not visible (rlataria)
 ..F....... [ZBX-21185] fixed pattern selector when item name contains square brackets (miks)
 ..F....... [ZBX-20669] fixed focus on fields when clicking on labels (esekace)
