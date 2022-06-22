@@ -1,6 +1,7 @@
 Changes for 6.0.6rc1
 
 New features:
+.......PS. [ZBXNEXT-7813] updated MariaDB maximum supported version to 10.7 (arimdjonoks)
 ..F....... [ZBXNEXT-7769] added support of PHP 8.1 to LDAP authentication (gcalenko)
 ..F....... [ZBXNEXT-7722] fixed runtime errors when using Zabbix with PHP 8.1 (agriscenko)
 ...G.....T [ZBXNEXT-6891] removed mongodb implementation, updated template to work with new plugin (esneiders, ychukina)
@@ -8,6 +9,12 @@ New features:
 .........T [ZBXNEXT-7630] added templates for HPE MSA 2060 and MSA 2040 (drasihov)
 
 Bug fixes:
+........S. [ZBX-21145] changed host, item and trigger tag merging logic during template linking and LLD to reduce database updates (wiper)
+..F....PS. [ZBX-20638] fixed handling of db version higher than supported (agriscenko, dgoloscapov)
+........S. [ZBX-20750] fixed excessive escaping of special characters in audit log details, triggers and graphs (akozlovs)
+..F....... [ZBX-21015] fixed web scenario tags disappearing from Monitoring -> Hosts -> Web scenario on page auto refresh (agriscenko)
+..F....... [ZBX-20960] fixed SVG graph widget throwing error when attempting to plot item with valid user macro defined in history storage period (agriscenko)
+..F....... [ZBX-20965] fixed positioning of change indicator in Item value widget (dpetra)
 ..F.....S. [ZBX-20994] fixed access limitation for Oracle DB to list tables accessible to the user (asestakovs)
 .......PS. [ZBX-21123] fixed crash when VMware VC was not available at the first moment when starting zabbix_server (MVekslers)
 ........S. [ZBX-21044] fixed javascript preprocessing output conversion to utf-8 (kprutkovs)
