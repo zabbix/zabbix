@@ -21,6 +21,7 @@
 #include "zbxmockdata.h"
 
 #include "zbxstr.h"
+#include "zbxnum.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "module.h"

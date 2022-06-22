@@ -29,6 +29,9 @@
 #include "macrofunc.h"
 #include "zbxxml.h"
 #include "zbxstr.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 
 typedef struct
 {

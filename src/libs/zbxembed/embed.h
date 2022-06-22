@@ -22,6 +22,7 @@
 
 #include "common.h"
 #include "duktape.h"
+#include "zbxtime.h"
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
 

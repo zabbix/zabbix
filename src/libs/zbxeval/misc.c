@@ -24,6 +24,7 @@
 #include "zbxalgo.h"
 #include "zbxvariant.h"
 #include "zbxserialize.h"
+#include "zbxnum.h"
 
 #define ZBX_EVAL_STATIC_BUFFER_SIZE	4096
 

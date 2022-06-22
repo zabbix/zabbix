@@ -24,6 +24,7 @@
 #include "dbcache.h"
 #include "events.h"
 #include "zbxserver.h"
+#include "zbxnum.h"
 
 #define ZBX_FLAGS_TRIGGER_CREATE_NOTHING		0x00
 #define ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT		0x01

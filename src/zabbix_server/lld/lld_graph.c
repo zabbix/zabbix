@@ -23,6 +23,7 @@
 #include "zbxserver.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_graph.h"
+#include "zbxnum.h"
 
 typedef struct
 {

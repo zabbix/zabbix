@@ -23,6 +23,8 @@
 #include "zbxself.h"
 #include "zbxserver.h"
 #include "zbxrtc.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #include "history_compress.h"
 #include "../../libs/zbxdbcache/valuecache.h"

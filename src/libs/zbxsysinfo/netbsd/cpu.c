@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "zbxnum.h"
 #include "sysinfo.h"
 #include "stats.h"
 #include "log.h"

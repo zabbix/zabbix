@@ -21,6 +21,7 @@
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "dbcache.h"
+#include "zbxnum.h"
 #include "zbxhistory.h"
 
 #include "history.h"

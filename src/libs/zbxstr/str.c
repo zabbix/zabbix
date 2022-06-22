@@ -23,88 +23,6 @@
 #	include <iconv.h>
 #endif
 
-void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
-{
-	if (NULL == *str)
-	{
-		*alloc_len = n + 1;
-		*offset = 0;
-		*str = (char *)zbx_malloc(*str, *alloc_len);
-	}
-	else if (*offset + n >= *alloc_len)
-	{
-		while (*offset + n >= *alloc_len)
-			*alloc_len *= 2;
-		*str = (char *)zbx_realloc(*str, *alloc_len);
-	}
-
-	memcpy(*str + *offset, src, n);
-	*offset += n;
-	(*str)[*offset] = '\0';
-}
-
-void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src)
-{
-	zbx_strncpy_alloc(str, alloc_len, offset, src, strlen(src));
-}
-
-void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
-{
-	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
-}
-
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
-{
-	size_t		size;
-	const char	*src;
-	char		*dst;
-
-	for (size = 2, src = value_str; '\0' != *src; src++)
-	{
-		switch (*src)
-		{
-			case '\\':
-			case '"':
-				size++;
-		}
-		size++;
-	}
-
-	if (*str_alloc <= *str_offset + size)
-	{
-		if (0 == *str_alloc)
-			*str_alloc = size;
-
-		do
-		{
-			*str_alloc *= 2;
-		}
-		while (*str_alloc - *str_offset <= size);
-
-		*str = zbx_realloc(*str, *str_alloc);
-	}
-
-	dst = *str + *str_offset;
-	*dst++ = '"';
-
-	for (src = value_str; '\0' != *src; src++, dst++)
-	{
-		switch (*src)
-		{
-			case '\\':
-			case '"':
-				*dst++ = '\\';
-				break;
-		}
-
-		*dst = *src;
-	}
-
-	*dst++ = '"';
-	*dst = '\0';
-	*str_offset += size;
-}
-
 /* Has to be rewritten to avoid malloc */
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
@@ -146,67 +64,17 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 	return new_str;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: delete all right '0' and '.' for the string                       *
- *                                                                            *
- * Parameters: s - string to trim '0'                                         *
- *                                                                            *
- * Return value: string without right '0'                                     *
- *                                                                            *
- * Comments: 10.0100 => 10.01, 10. => 10                                      *
- *                                                                            *
- ******************************************************************************/
-void	del_zeros(char *s)
+int	is_ascii_string(const char *str)
 {
-	int	trim = 0;
-	size_t	len = 0;
-
-	while ('\0' != s[len])
+	while ('\0' != *str)
 	{
-		if ('e' == s[len] || 'E' == s[len])
-		{
-			/* don't touch numbers that are written in scientific notation */
-			return;
-		}
+		if (0 != ((1 << 7) & *str))	/* check for range 0..127 */
+			return FAIL;
 
-		if ('.' == s[len])
-		{
-			/* number has decimal part */
-
-			if (1 == trim)
-			{
-				/* don't touch invalid numbers with more than one decimal separator */
-				return;
-			}
-
-			trim = 1;
-		}
-
-		len++;
+		str++;
 	}
 
-	if (1 == trim)
-	{
-		size_t	i;
-
-		for (i = len - 1; ; i--)
-		{
-			if ('0' == s[i])
-			{
-				s[i] = '\0';
-			}
-			else if ('.' == s[i])
-			{
-				s[i] = '\0';
-				break;
-			}
-			else
-			{
-				break;
-			}
-		}
-	}
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -276,6 +144,113 @@ void	zbx_lrtrim(char *str, const char *charlist)
 {
 	zbx_rtrim(str, charlist);
 	zbx_ltrim(str, charlist);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
+ *          double quotation mark is present on both ends of the string. If   *
+ *          strip_plus_sign is non-zero, then removes single "+" sign from    *
+ *          the beginning of the trimmed and unquoted string.                 *
+ *                                                                            *
+ *          This function does not guarantee that the resulting string        *
+ *          contains numeric value. It is meant to be used for removing       *
+ *          "valid" characters from the value that is expected to be numeric  *
+ *          before checking if value is numeric.                              *
+ *                                                                            *
+ * Parameters: str             - [IN/OUT] string for processing               *
+ *             strip_plus_sign - [IN] non-zero if "+" should be stripped      *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_trim_number(char *str, int strip_plus_sign)
+{
+	char	*left = str;			/* pointer to the first character */
+	char	*right = strchr(str, '\0') - 1; /* pointer to the last character, not including terminating null-char */
+
+	if (left > right)
+	{
+		/* string is empty before any trimming */
+		return;
+	}
+
+	while (' ' == *left)
+	{
+		left++;
+	}
+
+	while (' ' == *right && left < right)
+	{
+		right--;
+	}
+
+	if ('"' == *left && '"' == *right && left < right)
+	{
+		left++;
+		right--;
+	}
+
+	if (0 != strip_plus_sign && '+' == *left)
+	{
+		left++;
+	}
+
+	if (left > right)
+	{
+		/* string is empty after trimming */
+		*str = '\0';
+		return;
+	}
+
+	if (str < left)
+	{
+		while (left <= right)
+		{
+			*str++ = *left++;
+		}
+		*str = '\0';
+	}
+	else
+	{
+		*(right + 1) = '\0';
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
+ *          double quotation mark is present on both ends of the string, then *
+ *          removes single "+" sign from the beginning of the trimmed and     *
+ *          unquoted string.                                                  *
+ *                                                                            *
+ *          This function does not guarantee that the resulting string        *
+ *          contains integer value. It is meant to be used for removing       *
+ *          "valid" characters from the value that is expected to be numeric  *
+ *          before checking if value is numeric.                              *
+ *                                                                            *
+ * Parameters: str - [IN/OUT] string for processing                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trim_integer(char *str)
+{
+	zbx_trim_number(str, 1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
+ *          double quotation mark is present on both ends of the string.      *
+ *                                                                            *
+ *          This function does not guarantee that the resulting string        *
+ *          contains floating-point number. It is meant to be used for        *
+ *          removing "valid" characters from the value that is expected to be *
+ *          numeric before checking if value is numeric.                      *
+ *                                                                            *
+ * Parameters: str - [IN/OUT] string for processing                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trim_float(char *str)
+{
+	zbx_trim_number(str, 0);
 }
 
 /******************************************************************************
@@ -360,6 +335,297 @@ char	*zbx_str_printable_dyn(const char *text)
 
 	return out;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: delete all right '0' and '.' for the string                       *
+ *                                                                            *
+ * Parameters: s - string to trim '0'                                         *
+ *                                                                            *
+ * Return value: string without right '0'                                     *
+ *                                                                            *
+ * Comments: 10.0100 => 10.01, 10. => 10                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	del_zeros(char *s)
+{
+	int	trim = 0;
+	size_t	len = 0;
+
+	while ('\0' != s[len])
+	{
+		if ('e' == s[len] || 'E' == s[len])
+		{
+			/* don't touch numbers that are written in scientific notation */
+			return;
+		}
+
+		if ('.' == s[len])
+		{
+			/* number has decimal part */
+
+			if (1 == trim)
+			{
+				/* don't touch invalid numbers with more than one decimal separator */
+				return;
+			}
+
+			trim = 1;
+		}
+
+		len++;
+	}
+
+	if (1 == trim)
+	{
+		size_t	i;
+
+		for (i = len - 1; ; i--)
+		{
+			if ('0' == s[i])
+			{
+				s[i] = '\0';
+			}
+			else if ('.' == s[i])
+			{
+				s[i] = '\0';
+				break;
+			}
+			else
+			{
+				break;
+			}
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculate the required size for the escaped string                *
+ *                                                                            *
+ * Parameters: src - [IN] null terminated source string                       *
+ *             charlist - [IN] null terminated to-be-escaped character list   *
+ *                                                                            *
+ * Return value: size of the escaped string                                   *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
+{
+	size_t	sz = 0;
+
+	for (; '\0' != *src; src++, sz++)
+	{
+		if (NULL != strchr(charlist, *src))
+			sz++;
+	}
+
+	return sz;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: escape characters in the source string                            *
+ *                                                                            *
+ * Parameters: src - [IN] null terminated source string                       *
+ *             charlist - [IN] null terminated to-be-escaped character list   *
+ *                                                                            *
+ * Return value: the escaped string                                           *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dyn_escape_string(const char *src, const char *charlist)
+{
+	size_t	sz;
+	char	*d, *dst = NULL;
+
+	sz = zbx_get_escape_string_len(src, charlist) + 1;
+
+	dst = (char *)zbx_malloc(dst, sz);
+
+	for (d = dst; '\0' != *src; src++)
+	{
+		if (NULL != strchr(charlist, *src))
+			*d++ = '\\';
+
+		*d++ = *src;
+	}
+
+	*d = '\0';
+
+	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: escape characters in the source string to fixed output buffer     *
+ *                                                                            *
+ * Parameters: dst      - [OUT] the output buffer                             *
+ *             len      - [IN] the output buffer size                         *
+ *             src      - [IN] null terminated source string                  *
+ *             charlist - [IN] null terminated to-be-escaped character list   *
+ *                                                                            *
+ * Return value: SUCCEED - the string was escaped successfully.               *
+ *               FAIL    - output buffer is too small.                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charlist)
+{
+	for (; '\0' != *src; src++)
+	{
+		if (NULL != strchr(charlist, *src))
+		{
+			if (0 == --len)
+				return FAIL;
+			*dst++ = '\\';
+		}
+		else
+		{
+			if (0 == --len)
+				return FAIL;
+		}
+
+		*dst++ = *src;
+	}
+
+	*dst = '\0';
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if string is contained in a list of delimited strings       *
+ *                                                                            *
+ * Parameters: list      - strings a,b,ccc,ddd                                *
+ *             value     - value                                              *
+ *             delimiter - delimiter                                          *
+ *                                                                            *
+ * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
+ *                                                                            *
+ ******************************************************************************/
+int	str_in_list(const char *list, const char *value, char delimiter)
+{
+	return str_n_in_list(list, value, strlen(value), delimiter);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is a hexadecimal representation of data in    *
+ *          the form "F4 CE 46 01 0C 44 8B F4\nA0 2C 29 74 5D 3F 13 49\n"     *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is formatted like the example above    *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	is_hex_string(const char *str)
+{
+	if ('\0' == *str)
+		return FAIL;
+
+	while ('\0' != *str)
+	{
+		if (0 == isxdigit(*str))
+			return FAIL;
+
+		if (0 == isxdigit(*(str + 1)))
+			return FAIL;
+
+		if ('\0' == *(str + 2))
+			break;
+
+		if (' ' != *(str + 2) && '\n' != *(str + 2))
+			return FAIL;
+
+		str += 3;
+	}
+
+	return SUCCEED;
+}
+
+void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
+{
+	if (NULL == *str)
+	{
+		*alloc_len = n + 1;
+		*offset = 0;
+		*str = (char *)zbx_malloc(*str, *alloc_len);
+	}
+	else if (*offset + n >= *alloc_len)
+	{
+		while (*offset + n >= *alloc_len)
+			*alloc_len *= 2;
+		*str = (char *)zbx_realloc(*str, *alloc_len);
+	}
+
+	memcpy(*str + *offset, src, n);
+	*offset += n;
+	(*str)[*offset] = '\0';
+}
+
+void	zbx_strcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src)
+{
+	zbx_strncpy_alloc(str, alloc_len, offset, src, strlen(src));
+}
+
+void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
+{
+	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
+}
+
+void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
+{
+	size_t		size;
+	const char	*src;
+	char		*dst;
+
+	for (size = 2, src = value_str; '\0' != *src; src++)
+	{
+		switch (*src)
+		{
+			case '\\':
+			case '"':
+				size++;
+		}
+		size++;
+	}
+
+	if (*str_alloc <= *str_offset + size)
+	{
+		if (0 == *str_alloc)
+			*str_alloc = size;
+
+		do
+		{
+			*str_alloc *= 2;
+		}
+		while (*str_alloc - *str_offset <= size);
+
+		*str = zbx_realloc(*str, *str_alloc);
+	}
+
+	dst = *str + *str_offset;
+	*dst++ = '"';
+
+	for (src = value_str; '\0' != *src; src++, dst++)
+	{
+		switch (*src)
+		{
+			case '\\':
+			case '"':
+				*dst++ = '\\';
+				break;
+		}
+
+		*dst = *src;
+	}
+
+	*dst++ = '"';
+	*dst = '\0';
+	*str_offset += size;
+}
+
+
 
 /******************************************************************************
  *                                                                            *
@@ -523,148 +789,6 @@ int	zbx_check_hostname(const char *hostname, char **error)
 	}
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: calculate the required size for the escaped string                *
- *                                                                            *
- * Parameters: src - [IN] null terminated source string                       *
- *             charlist - [IN] null terminated to-be-escaped character list   *
- *                                                                            *
- * Return value: size of the escaped string                                   *
- *                                                                            *
- ******************************************************************************/
-size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
-{
-	size_t	sz = 0;
-
-	for (; '\0' != *src; src++, sz++)
-	{
-		if (NULL != strchr(charlist, *src))
-			sz++;
-	}
-
-	return sz;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: escape characters in the source string                            *
- *                                                                            *
- * Parameters: src - [IN] null terminated source string                       *
- *             charlist - [IN] null terminated to-be-escaped character list   *
- *                                                                            *
- * Return value: the escaped string                                           *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_dyn_escape_string(const char *src, const char *charlist)
-{
-	size_t	sz;
-	char	*d, *dst = NULL;
-
-	sz = zbx_get_escape_string_len(src, charlist) + 1;
-
-	dst = (char *)zbx_malloc(dst, sz);
-
-	for (d = dst; '\0' != *src; src++)
-	{
-		if (NULL != strchr(charlist, *src))
-			*d++ = '\\';
-
-		*d++ = *src;
-	}
-
-	*d = '\0';
-
-	return dst;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: escape characters in the source string to fixed output buffer     *
- *                                                                            *
- * Parameters: dst      - [OUT] the output buffer                             *
- *             len      - [IN] the output buffer size                         *
- *             src      - [IN] null terminated source string                  *
- *             charlist - [IN] null terminated to-be-escaped character list   *
- *                                                                            *
- * Return value: SUCCEED - the string was escaped successfully.               *
- *               FAIL    - output buffer is too small.                        *
- *                                                                            *
- ******************************************************************************/
-int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charlist)
-{
-	for (; '\0' != *src; src++)
-	{
-		if (NULL != strchr(charlist, *src))
-		{
-			if (0 == --len)
-				return FAIL;
-			*dst++ = '\\';
-		}
-		else
-		{
-			if (0 == --len)
-				return FAIL;
-		}
-
-		*dst++ = *src;
-	}
-
-	*dst = '\0';
-
-	return SUCCEED;
-}
-
-char	*zbx_age2str(int age)
-{
-	size_t		offset = 0;
-	int		days, hours, minutes, seconds;
-	static char	buffer[32];
-
-	days = (int)((double)age / SEC_PER_DAY);
-	hours = (int)((double)(age - days * SEC_PER_DAY) / SEC_PER_HOUR);
-	minutes = (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR) / SEC_PER_MIN);
-	seconds = (int)((double)(age - days * SEC_PER_DAY - hours * SEC_PER_HOUR - minutes * SEC_PER_MIN));
-
-	if (0 != days)
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dd ", days);
-	if (0 != days || 0 != hours)
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dh ", hours);
-	if (0 != days || 0 != hours || 0 != minutes)
-		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%dm ", minutes);
-
-	zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "%ds", seconds);
-
-	return buffer;
-}
-
-char	*zbx_date2str(time_t date, const char *tz)
-{
-	static char	buffer[11];
-	struct tm	*tm;
-
-	tm = zbx_localtime(&date, tz);
-	zbx_snprintf(buffer, sizeof(buffer), "%.4d.%.2d.%.2d",
-			tm->tm_year + 1900,
-			tm->tm_mon + 1,
-			tm->tm_mday);
-
-	return buffer;
-}
-
-char	*zbx_time2str(time_t time, const char *tz)
-{
-	static char	buffer[9];
-	struct tm	*tm;
-
-	tm = zbx_localtime(&time, tz);
-	zbx_snprintf(buffer, sizeof(buffer), "%.2d:%.2d:%.2d",
-			tm->tm_hour,
-			tm->tm_min,
-			tm->tm_sec);
-	return buffer;
 }
 
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
@@ -1466,196 +1590,237 @@ void	dos2unix(char *str)
 	*o = '\0';
 }
 
+
+
+
 /******************************************************************************
  *                                                                            *
- * Purpose: convert string to 64bit unsigned integer                          *
+ * Purpose: remove whitespace surrounding a string list item delimiters       *
  *                                                                            *
- * Parameters: str   - string to convert                                      *
- *             value - a pointer to converted value                           *
- *                                                                            *
- * Return value:  SUCCEED - the string is unsigned integer                    *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Comments: the function automatically processes suffixes K, M, G, T         *
+ * Parameters: list      - the list (a string containing items separated by   *
+ *                         delimiter)                                         *
+ *             delimiter - the list delimiter                                 *
  *                                                                            *
  ******************************************************************************/
-int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
+void	zbx_trim_str_list(char *list, char delimiter)
 {
-	size_t		sz;
-	const char	*p;
-	int		ret;
-	zbx_uint64_t	factor = 1;
+	/* NB! strchr(3): "terminating null byte is considered part of the string" */
+	const char	*whitespace = " \t";
+	char		*out, *in;
 
-	sz = strlen(str);
-	p = str + sz - 1;
+	out = in = list;
 
-	if (NULL != strchr(suffixes, *p))
+	while ('\0' != *in)
 	{
-		factor = suffix2factor(*p);
+		/* trim leading spaces from list item */
+		while ('\0' != *in && NULL != strchr(whitespace, *in))
+			in++;
 
-		sz--;
+		/* copy list item */
+		while (delimiter != *in && '\0' != *in)
+			*out++ = *in++;
+
+		/* trim trailing spaces from list item */
+		if (out > list)
+		{
+			while (NULL != strchr(whitespace, *(--out)))
+				;
+			out++;
+		}
+		if (delimiter == *in)
+			*out++ = *in++;
+	}
+	*out = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     compares two strings where any of them can be a NULL pointer           *
+ *                                                                            *
+ * Parameters: same as strcmp() except NULL values are allowed                *
+ *                                                                            *
+ * Return value: same as strcmp()                                             *
+ *                                                                            *
+ * Comments: NULL is less than any string                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strcmp_null(const char *s1, const char *s2)
+{
+	if (NULL == s1)
+		return NULL == s2 ? 0 : -1;
+
+	if (NULL == s2)
+		return 1;
+
+	return strcmp(s1, s2);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: escape single quote in shell command arguments                    *
+ *                                                                            *
+ * Parameters: arg - [IN] the argument to escape                              *
+ *                                                                            *
+ * Return value: The escaped argument.                                        *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dyn_escape_shell_single_quote(const char *arg)
+{
+	int		len = 1; /* include terminating zero character */
+	const char	*pin;
+	char		*arg_esc, *pout;
+
+	for (pin = arg; '\0' != *pin; pin++)
+	{
+		if ('\'' == *pin)
+			len += 3;
+		len++;
 	}
 
-	if (SUCCEED == (ret = is_uint64_n(str, sz, value)))
-		*value *= factor;
+	pout = arg_esc = (char *)zbx_malloc(NULL, len);
+
+	for (pin = arg; '\0' != *pin; pin++)
+	{
+		if ('\'' == *pin)
+		{
+			*pout++ = '\'';
+			*pout++ = '\\';
+			*pout++ = '\'';
+			*pout++ = '\'';
+		}
+		else
+			*pout++ = *pin;
+	}
+
+	*pout = '\0';
+
+	return arg_esc;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: performs natural comparison of two strings                        *
+ *                                                                            *
+ * Parameters: s1 - [IN] the first string                                     *
+ *             s2 - [IN] the second string                                    *
+ *                                                                            *
+ * Return value:  0: the strings are equal                                    *
+ *               <0: s1 < s2                                                  *
+ *               >0: s1 > s2                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strcmp_natural(const char *s1, const char *s2)
+{
+	int	ret, value1, value2;
+
+	for (;'\0' != *s1 && '\0' != *s2; s1++, s2++)
+	{
+		if (0 == isdigit(*s1) || 0 == isdigit(*s2))
+		{
+			if (0 != (ret = *s1 - *s2))
+				return ret;
+
+			continue;
+		}
+
+		value1 = 0;
+		while (0 != isdigit(*s1))
+			value1 = value1 * 10 + *s1++ - '0';
+
+		value2 = 0;
+		while (0 != isdigit(*s2))
+			value2 = value2 * 10 + *s2++ - '0';
+
+		if (0 != (ret = value1 - value2))
+			return ret;
+
+		if ('\0' == *s1 || '\0' == *s2)
+			break;
+	}
+
+	return *s1 - *s2;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if pattern matches the specified value                      *
+ *                                                                            *
+ * Parameters: value    - [IN] the value to match                             *
+ *             pattern  - [IN] the pattern to match                           *
+ *             op       - [IN] the matching operator                          *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op)
+{
+	int	ret = FAIL;
+
+	switch (op)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			if (0 == strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (0 != strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_LIKE:
+			if (NULL != strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_LIKE:
+			if (NULL == strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+	}
 
 	return ret;
 }
 
-int	is_ascii_string(const char *str)
-{
-	while ('\0' != *str)
-	{
-		if (0 != ((1 << 7) & *str))	/* check for range 0..127 */
-			return FAIL;
-
-		str++;
-	}
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the string is boolean                                    *
+ * Purpose: check if string is contained in a list of delimited strings       *
  *                                                                            *
- * Parameters: str - string to check                                          *
+ * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
+ *             value     - [IN] value                                         *
+ *             len       - [IN] value length                                  *
+ *             delimiter - [IN] delimiter                                     *
  *                                                                            *
- * Return value:  SUCCEED - the string is boolean                             *
- *                FAIL - otherwise                                            *
+ * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
  *                                                                            *
  ******************************************************************************/
-int	is_boolean(const char *str, zbx_uint64_t *value)
+int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter)
 {
-	double	dbl_tmp;
-	int	res;
+	const char	*end;
+	size_t		token_len, next = 1;
 
-	if (SUCCEED == (res = is_double(str, &dbl_tmp)))
-		*value = (0 != dbl_tmp);
-	else
+	while ('\0' != *list)
 	{
-		char	tmp[16];
-
-		strscpy(tmp, str);
-		zbx_strlower(tmp);
-
-		if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up,running,enabled,available,ok,master", tmp, ',')))
+		if (NULL != (end = strchr(list, delimiter)))
 		{
-			*value = 1;
+			token_len = end - list;
+			next = 1;
 		}
-		else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down,unused,disabled,unavailable,err,slave",
-				tmp, ',')))
+		else
 		{
-			*value = 0;
+			token_len = strlen(list);
+			next = 0;
 		}
+
+		if (len == token_len && 0 == memcmp(list, value, len))
+			return SUCCEED;
+
+		list += token_len + next;
 	}
 
-	return res;
-}
+	if (1 == next && 0 == len)
+		return SUCCEED;
 
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the string is unsigned octal                             *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the string is unsigned octal                      *
- *                FAIL - otherwise                                            *
- *                                                                            *
- ******************************************************************************/
-int	is_uoct(const char *str)
-{
-	int	res = FAIL;
-
-	while (' ' == *str)	/* trim left spaces */
-		str++;
-
-	for (; '\0' != *str; str++)
-	{
-		if (*str < '0' || *str > '7')
-			break;
-
-		res = SUCCEED;
-	}
-
-	while (' ' == *str)	/* check right spaces */
-		str++;
-
-	if ('\0' != *str)
-		return FAIL;
-
-	return res;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the string is unsigned hexadecimal representation of     *
- *          data in the form "0-9, a-f or A-F"                                *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the string is unsigned hexadecimal                *
- *                FAIL - otherwise                                            *
- *                                                                            *
- ******************************************************************************/
-int	is_uhex(const char *str)
-{
-	int	res = FAIL;
-
-	while (' ' == *str)	/* trim left spaces */
-		str++;
-
-	for (; '\0' != *str; str++)
-	{
-		if (0 == isxdigit(*str))
-			break;
-
-		res = SUCCEED;
-	}
-
-	while (' ' == *str)	/* check right spaces */
-		str++;
-
-	if ('\0' != *str)
-		return FAIL;
-
-	return res;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the string is a hexadecimal representation of data in    *
- *          the form "F4 CE 46 01 0C 44 8B F4\nA0 2C 29 74 5D 3F 13 49\n"     *
- *                                                                            *
- * Parameters: str - string to check                                          *
- *                                                                            *
- * Return value:  SUCCEED - the string is formatted like the example above    *
- *                FAIL - otherwise                                            *
- *                                                                            *
- ******************************************************************************/
-int	is_hex_string(const char *str)
-{
-	if ('\0' == *str)
-		return FAIL;
-
-	while ('\0' != *str)
-	{
-		if (0 == isxdigit(*str))
-			return FAIL;
-
-		if (0 == isxdigit(*(str + 1)))
-			return FAIL;
-
-		if ('\0' == *(str + 2))
-			break;
-
-		if (' ' != *(str + 2) && '\n' != *(str + 2))
-			return FAIL;
-
-		str += 3;
-	}
-
-	return SUCCEED;
+	return FAIL;
 }
 
 /******************************************************************************
@@ -1782,562 +1947,6 @@ void	zbx_strarr_free(char ***arr)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: remove whitespace surrounding a string list item delimiters       *
- *                                                                            *
- * Parameters: list      - the list (a string containing items separated by   *
- *                         delimiter)                                         *
- *             delimiter - the list delimiter                                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_trim_str_list(char *list, char delimiter)
-{
-	/* NB! strchr(3): "terminating null byte is considered part of the string" */
-	const char	*whitespace = " \t";
-	char		*out, *in;
-
-	out = in = list;
-
-	while ('\0' != *in)
-	{
-		/* trim leading spaces from list item */
-		while ('\0' != *in && NULL != strchr(whitespace, *in))
-			in++;
-
-		/* copy list item */
-		while (delimiter != *in && '\0' != *in)
-			*out++ = *in++;
-
-		/* trim trailing spaces from list item */
-		if (out > list)
-		{
-			while (NULL != strchr(whitespace, *(--out)))
-				;
-			out++;
-		}
-		if (delimiter == *in)
-			*out++ = *in++;
-	}
-	*out = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose:                                                                   *
- *     compares two strings where any of them can be a NULL pointer           *
- *                                                                            *
- * Parameters: same as strcmp() except NULL values are allowed                *
- *                                                                            *
- * Return value: same as strcmp()                                             *
- *                                                                            *
- * Comments: NULL is less than any string                                     *
- *                                                                            *
- ******************************************************************************/
-int	zbx_strcmp_null(const char *s1, const char *s2)
-{
-	if (NULL == s1)
-		return NULL == s2 ? 0 : -1;
-
-	if (NULL == s2)
-		return 1;
-
-	return strcmp(s1, s2);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: escape single quote in shell command arguments                    *
- *                                                                            *
- * Parameters: arg - [IN] the argument to escape                              *
- *                                                                            *
- * Return value: The escaped argument.                                        *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_dyn_escape_shell_single_quote(const char *arg)
-{
-	int		len = 1; /* include terminating zero character */
-	const char	*pin;
-	char		*arg_esc, *pout;
-
-	for (pin = arg; '\0' != *pin; pin++)
-	{
-		if ('\'' == *pin)
-			len += 3;
-		len++;
-	}
-
-	pout = arg_esc = (char *)zbx_malloc(NULL, len);
-
-	for (pin = arg; '\0' != *pin; pin++)
-	{
-		if ('\'' == *pin)
-		{
-			*pout++ = '\'';
-			*pout++ = '\\';
-			*pout++ = '\'';
-			*pout++ = '\'';
-		}
-		else
-			*pout++ = *pin;
-	}
-
-	*pout = '\0';
-
-	return arg_esc;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parses function parameter                                         *
- *                                                                            *
- * Parameters: expr      - [IN] pre-validated function parameter list         *
- *             param_pos - [OUT] the parameter position, excluding leading    *
- *                               whitespace                                   *
- *             length    - [OUT] the parameter length including trailing      *
- *                               whitespace for unquoted parameter            *
- *             sep_pos   - [OUT] the parameter separator character            *
- *                               (',' or '\0' or ')') position                *
- *                                                                            *
- ******************************************************************************/
-void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
-{
-	const char	*ptr = expr;
-
-	/* skip the leading whitespace */
-	while (' ' == *ptr)
-		ptr++;
-
-	*param_pos = ptr - expr;
-
-	if ('"' == *ptr)	/* quoted parameter */
-	{
-		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
-			;
-
-		*length = ++ptr - expr - *param_pos;
-
-		/* skip trailing whitespace to find the next parameter */
-		while (' ' == *ptr)
-			ptr++;
-	}
-	else	/* unquoted parameter */
-	{
-		for (ptr = expr; '\0' != *ptr && ')' != *ptr && ',' != *ptr; ptr++)
-			;
-
-		*length = ptr - expr - *param_pos;
-	}
-
-	*sep_pos = ptr - expr;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: unquotes function parameter                                       *
- *                                                                            *
- * Parameters: param -  [IN] the parameter to unquote                         *
- *             len   -  [IN] the parameter length                             *
- *             quoted - [OUT] the flag that specifies whether parameter was   *
- *                            quoted before extraction                        *
- *                                                                            *
- * Return value: The unquoted parameter. This value must be freed by the      *
- *               caller.                                                      *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
-{
-	char	*out;
-
-	out = (char *)zbx_malloc(NULL, len + 1);
-
-	if (0 == (*quoted = (0 != len && '"' == *param)))
-	{
-		/* unquoted parameter - simply copy it */
-		memcpy(out, param, len);
-		out[len] = '\0';
-	}
-	else
-	{
-		/* quoted parameter - remove enclosing " and replace \" with " */
-		const char	*pin;
-		char		*pout = out;
-
-		for (pin = param + 1; (size_t)(pin - param) < len - 1; pin++)
-		{
-			if ('\\' == pin[0] && '"' == pin[1])
-				pin++;
-
-			*pout++ = *pin;
-		}
-
-		*pout = '\0';
-	}
-
-	return out;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: quotes function parameter                                         *
- *                                                                            *
- * Parameters: param   - [IN/OUT] function parameter                          *
- *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
- *                                contain any special characters              *
- *                            0 - do nothing if the parameter does not        *
- *                                contain any special characters              *
- *                                                                            *
- * Return value: SUCCEED - if parameter was successfully quoted or quoting    *
- *                         was not necessary                                  *
- *               FAIL    - if parameter needs to but cannot be quoted due to  *
- *                         backslash in the end                               *
- *                                                                            *
- ******************************************************************************/
-int	zbx_function_param_quote(char **param, int forced)
-{
-	size_t	sz_src, sz_dst;
-
-	if (0 == forced && '"' != **param && ' ' != **param && NULL == strchr(*param, ',') &&
-			NULL == strchr(*param, ')'))
-	{
-		return SUCCEED;
-	}
-
-	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
-		return FAIL;
-
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
-
-	*param = (char *)zbx_realloc(*param, sz_dst);
-
-	(*param)[--sz_dst] = '\0';
-	(*param)[--sz_dst] = '"';
-
-	while (0 < sz_src)
-	{
-		(*param)[--sz_dst] = (*param)[--sz_src];
-		if ('"' == (*param)[sz_src])
-			(*param)[--sz_dst] = '\\';
-	}
-	(*param)[--sz_dst] = '"';
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: return parameter by index (Nparam) from parameter list (params)   *
- *                                                                            *
- * Parameters:                                                                *
- *      params - [IN] parameter list                                          *
- *      Nparam - [IN] requested parameter index (from 1)                      *
- *                                                                            *
- * Return value:                                                              *
- *      NULL - requested parameter missing                                    *
- *      otherwise - requested parameter                                       *
- *                                                                            *
- ******************************************************************************/
-char	*zbx_function_get_param_dyn(const char *params, int Nparam)
-{
-	const char	*ptr;
-	size_t		sep_pos, params_len;
-	char		*out = NULL;
-	int		idx = 0;
-
-	params_len = strlen(params) + 1;
-
-	for (ptr = params; ++idx <= Nparam && ptr < params + params_len; ptr += sep_pos + 1)
-	{
-		size_t	param_pos, param_len;
-		int	quoted;
-
-		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
-
-		if (idx == Nparam)
-			out = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
-	}
-
-	return out;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: performs natural comparison of two strings                        *
- *                                                                            *
- * Parameters: s1 - [IN] the first string                                     *
- *             s2 - [IN] the second string                                    *
- *                                                                            *
- * Return value:  0: the strings are equal                                    *
- *               <0: s1 < s2                                                  *
- *               >0: s1 > s2                                                  *
- *                                                                            *
- ******************************************************************************/
-int	zbx_strcmp_natural(const char *s1, const char *s2)
-{
-	int	ret, value1, value2;
-
-	for (;'\0' != *s1 && '\0' != *s2; s1++, s2++)
-	{
-		if (0 == isdigit(*s1) || 0 == isdigit(*s2))
-		{
-			if (0 != (ret = *s1 - *s2))
-				return ret;
-
-			continue;
-		}
-
-		value1 = 0;
-		while (0 != isdigit(*s1))
-			value1 = value1 * 10 + *s1++ - '0';
-
-		value2 = 0;
-		while (0 != isdigit(*s2))
-			value2 = value2 * 10 + *s2++ - '0';
-
-		if (0 != (ret = value1 - value2))
-			return ret;
-
-		if ('\0' == *s1 || '\0' == *s2)
-			break;
-	}
-
-	return *s1 - *s2;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: count calculated item (prototype) formula characters that can be  *
- *          skipped without the risk of missing a function                    *
- *                                                                            *
- ******************************************************************************/
-static size_t	zbx_no_function(const char *expr)
-{
-	const char	*ptr = expr;
-	int		inside_quote = 0, len, c_l, c_r;
-	zbx_token_t	token;
-
-	while ('\0' != *ptr)
-	{
-		switch  (*ptr)
-		{
-			case '\\':
-				if (0 != inside_quote)
-					ptr++;
-				break;
-			case '"':
-				inside_quote = !inside_quote;
-				ptr++;
-				continue;
-		}
-
-		if (inside_quote)
-		{
-			if ('\0' == *ptr)
-				break;
-			ptr++;
-			continue;
-		}
-
-		if ('{' == *ptr && '$' == *(ptr + 1) && SUCCEED == zbx_user_macro_parse(ptr, &len, &c_l, &c_r, NULL))
-		{
-			ptr += len + 1;	/* skip to the position after user macro */
-		}
-		else if ('{' == *ptr && '{' == *(ptr + 1) && '#' == *(ptr + 2) &&
-				SUCCEED == zbx_token_parse_nested_macro(ptr, ptr, 0, &token))
-		{
-			ptr += token.loc.r - token.loc.l + 1;
-		}
-		else if (SUCCEED != is_function_char(*ptr))
-		{
-			ptr++;	/* skip one character which cannot belong to function name */
-		}
-		else if ((0 == strncmp("and", ptr, len = ZBX_CONST_STRLEN("and")) ||
-				0 == strncmp("not", ptr, len = ZBX_CONST_STRLEN("not")) ||
-				0 == strncmp("or", ptr, len = ZBX_CONST_STRLEN("or"))) &&
-				NULL != strchr("()" ZBX_WHITESPACE, ptr[len]))
-		{
-			ptr += len;	/* skip to the position after and/or/not operator */
-		}
-		else if (ptr > expr && 0 != isdigit(*(ptr - 1)) && NULL != strchr(ZBX_UNIT_SYMBOLS, *ptr))
-		{
-			ptr++;	/* skip unit suffix symbol if it's preceded by a digit */
-		}
-		else
-			break;
-	}
-
-	return ptr - expr;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: find the location of the next function and its parameters in      *
- *          calculated item (prototype) formula                               *
- *                                                                            *
- * Parameters: expr          - [IN] string to parse                           *
- *             func_pos      - [OUT] function position in the string          *
- *             par_l         - [OUT] position of the opening parenthesis      *
- *             par_r         - [OUT] position of the closing parenthesis      *
- *             error         - [OUT] error message                            *
- *             max_error_len - [IN] error size                                *
- *                                                                            *
- * Return value: SUCCEED - function was found at func_pos                     *
- *               FAIL    - there are no functions in the expression           *
- *                                                                            *
- ******************************************************************************/
-int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
-		int max_error_len)
-{
-	const char	*ptr;
-
-	for (ptr = expr; '\0' != *ptr; ptr += *par_l)
-	{
-		/* skip the part of expression that is definitely not a function */
-		ptr += zbx_no_function(ptr);
-		*par_r = 0;
-
-		/* try to validate function candidate */
-		if (SUCCEED != zbx_function_validate(ptr, par_l, par_r, error, max_error_len))
-		{
-			if (*par_l > *par_r)
-				return FAIL;
-
-			continue;
-		}
-
-		*func_pos = ptr - expr;
-		*par_l += *func_pos;
-		*par_r += *func_pos;
-		return SUCCEED;
-	}
-
-	zbx_snprintf(error, max_error_len, "Incorrect function expression: %s", expr);
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if pattern matches the specified value                      *
- *                                                                            *
- * Parameters: value    - [IN] the value to match                             *
- *             pattern  - [IN] the pattern to match                           *
- *             op       - [IN] the matching operator                          *
- *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op)
-{
-	int	ret = FAIL;
-
-	switch (op)
-	{
-		case CONDITION_OPERATOR_EQUAL:
-			if (0 == strcmp(value, pattern))
-				ret = SUCCEED;
-			break;
-		case CONDITION_OPERATOR_NOT_EQUAL:
-			if (0 != strcmp(value, pattern))
-				ret = SUCCEED;
-			break;
-		case CONDITION_OPERATOR_LIKE:
-			if (NULL != strstr(value, pattern))
-				ret = SUCCEED;
-			break;
-		case CONDITION_OPERATOR_NOT_LIKE:
-			if (NULL == strstr(value, pattern))
-				ret = SUCCEED;
-			break;
-	}
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parse a suffixed number like "12.345K"                            *
- *                                                                            *
- * Parameters: number - [IN] start of number                                  *
- *             len    - [OUT] length of parsed number                         *
- *                                                                            *
- * Return value: SUCCEED - the number was parsed successfully                 *
- *               FAIL    - invalid number                                     *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *           The token field locations are specified as offsets from the      *
- *           beginning of the expression.                                     *
- *                                                                            *
- ******************************************************************************/
-int	zbx_suffixed_number_parse(const char *number, int *len)
-{
-	if (FAIL == zbx_number_parse(number, len))
-		return FAIL;
-
-	if (0 != isalpha(number[*len]) && NULL != strchr(ZBX_UNIT_SYMBOLS, number[*len]))
-		(*len)++;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if string is contained in a list of delimited strings       *
- *                                                                            *
- * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
- *             value     - [IN] value                                         *
- *             len       - [IN] value length                                  *
- *             delimiter - [IN] delimiter                                     *
- *                                                                            *
- * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
- *                                                                            *
- ******************************************************************************/
-int	str_n_in_list(const char *list, const char *value, size_t len, char delimiter)
-{
-	const char	*end;
-	size_t		token_len, next = 1;
-
-	while ('\0' != *list)
-	{
-		if (NULL != (end = strchr(list, delimiter)))
-		{
-			token_len = end - list;
-			next = 1;
-		}
-		else
-		{
-			token_len = strlen(list);
-			next = 0;
-		}
-
-		if (len == token_len && 0 == memcmp(list, value, len))
-			return SUCCEED;
-
-		list += token_len + next;
-	}
-
-	if (1 == next && 0 == len)
-		return SUCCEED;
-
-	return FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if string is contained in a list of delimited strings       *
- *                                                                            *
- * Parameters: list      - strings a,b,ccc,ddd                                *
- *             value     - value                                              *
- *             delimiter - delimiter                                          *
- *                                                                            *
- * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
- *                                                                            *
- ******************************************************************************/
-int	str_in_list(const char *list, const char *value, char delimiter)
-{
-	return str_n_in_list(list, value, strlen(value), delimiter);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: to replace memory block and allocate more memory if needed        *
  *                                                                            *
  * Parameters: data       - [IN/OUT] allocated memory                         *
@@ -2425,113 +2034,6 @@ void	zbx_strsplit_first(const char *src, char delimiter, char **left, char **rig
 void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **right)
 {
 	zbx_string_split(src, delimiter, 1, left, right);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
- *          double quotation mark is present on both ends of the string. If   *
- *          strip_plus_sign is non-zero, then removes single "+" sign from    *
- *          the beginning of the trimmed and unquoted string.                 *
- *                                                                            *
- *          This function does not guarantee that the resulting string        *
- *          contains numeric value. It is meant to be used for removing       *
- *          "valid" characters from the value that is expected to be numeric  *
- *          before checking if value is numeric.                              *
- *                                                                            *
- * Parameters: str             - [IN/OUT] string for processing               *
- *             strip_plus_sign - [IN] non-zero if "+" should be stripped      *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_trim_number(char *str, int strip_plus_sign)
-{
-	char	*left = str;			/* pointer to the first character */
-	char	*right = strchr(str, '\0') - 1; /* pointer to the last character, not including terminating null-char */
-
-	if (left > right)
-	{
-		/* string is empty before any trimming */
-		return;
-	}
-
-	while (' ' == *left)
-	{
-		left++;
-	}
-
-	while (' ' == *right && left < right)
-	{
-		right--;
-	}
-
-	if ('"' == *left && '"' == *right && left < right)
-	{
-		left++;
-		right--;
-	}
-
-	if (0 != strip_plus_sign && '+' == *left)
-	{
-		left++;
-	}
-
-	if (left > right)
-	{
-		/* string is empty after trimming */
-		*str = '\0';
-		return;
-	}
-
-	if (str < left)
-	{
-		while (left <= right)
-		{
-			*str++ = *left++;
-		}
-		*str = '\0';
-	}
-	else
-	{
-		*(right + 1) = '\0';
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
- *          double quotation mark is present on both ends of the string, then *
- *          removes single "+" sign from the beginning of the trimmed and     *
- *          unquoted string.                                                  *
- *                                                                            *
- *          This function does not guarantee that the resulting string        *
- *          contains integer value. It is meant to be used for removing       *
- *          "valid" characters from the value that is expected to be numeric  *
- *          before checking if value is numeric.                              *
- *                                                                            *
- * Parameters: str - [IN/OUT] string for processing                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_trim_integer(char *str)
-{
-	zbx_trim_number(str, 1);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Removes spaces from both ends of the string, then unquotes it if  *
- *          double quotation mark is present on both ends of the string.      *
- *                                                                            *
- *          This function does not guarantee that the resulting string        *
- *          contains floating-point number. It is meant to be used for        *
- *          removing "valid" characters from the value that is expected to be *
- *          numeric before checking if value is numeric.                      *
- *                                                                            *
- * Parameters: str - [IN/OUT] string for processing                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_trim_float(char *str)
-{
-	zbx_trim_number(str, 0);
 }
 
 /******************************************************************************
@@ -2729,28 +2231,6 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
 	return buf;
 
 #	undef ZBX_SUFFIX
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: converts double value to string and truncates insignificant       *
- *          precision                                                         *
- *                                                                            *
- * Parameters: buffer - [OUT] the output buffer                               *
- *             size   - [IN] the output buffer size                           *
- *             val    - [IN] double value to be converted                     *
- *                                                                            *
- * Return value: the output buffer with printed value                         *
- *                                                                            *
- ******************************************************************************/
-const char	*zbx_print_double(char *buffer, size_t size, double val)
-{
-	zbx_snprintf(buffer, size, "%.15G", val);
-
-	if (atof(buffer) != val)
-		zbx_snprintf(buffer, size, ZBX_FS_DBL64, val);
-
-	return buffer;
 }
 
 /******************************************************************************
@@ -2964,33 +2444,6 @@ void	zbx_rtrim_utf8(char *str, const char *charlist)
 	*last = '\0';
 }
 
-zbx_uint64_t	suffix2factor(char c)
-{
-	switch (c)
-	{
-		case 'K':
-			return ZBX_KIBIBYTE;
-		case 'M':
-			return ZBX_MEBIBYTE;
-		case 'G':
-			return ZBX_GIBIBYTE;
-		case 'T':
-			return ZBX_TEBIBYTE;
-		case 's':
-			return 1;
-		case 'm':
-			return SEC_PER_MIN;
-		case 'h':
-			return SEC_PER_HOUR;
-		case 'd':
-			return SEC_PER_DAY;
-		case 'w':
-			return SEC_PER_WEEK;
-		default:
-			return 1;
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: convert string to double                                          *
@@ -3010,35 +2463,4 @@ double	str2double(const char *str)
 	sz = strlen(str) - 1;
 
 	return atof(str) * suffix2factor(str[sz]);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the string is double                                     *
- *                                                                            *
- * Parameters: str   - string to check                                        *
- *             flags - extra options including:                               *
- *                       ZBX_FLAG_DOUBLE_SUFFIX - allow suffixes              *
- *                                                                            *
- * Return value:  SUCCEED - the string is double                              *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Comments: the function automatically processes suffixes K, M, G, T and     *
- *           s, m, h, d, w                                                    *
- *                                                                            *
- ******************************************************************************/
-int	is_double_suffix(const char *str, unsigned char flags)
-{
-	int	len;
-
-	if ('-' == *str)	/* check leading sign */
-		str++;
-
-	if (FAIL == zbx_number_parse(str, &len))
-		return FAIL;
-
-	if ('\0' != *(str += len) && 0 != (flags & ZBX_FLAG_DOUBLE_SUFFIX) && NULL != strchr(ZBX_UNIT_SYMBOLS, *str))
-		str++;		/* allow valid suffix if flag is enabled */
-
-	return '\0' == *str ? SUCCEED : FAIL;
 }

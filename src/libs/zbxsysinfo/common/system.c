@@ -19,6 +19,7 @@
 
 #include "system.h"
 
+#include "zbxtime.h"
 #include "common.h"
 #include "zbxsysinfo_common.h"
 

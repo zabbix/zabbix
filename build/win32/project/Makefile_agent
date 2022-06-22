@@ -40,6 +40,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
+	..\..\..\src\libs\zbxnum\num.o \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxcommon\temp_str.o \
 	..\..\..\src\libs\zbxcommon\file.o \

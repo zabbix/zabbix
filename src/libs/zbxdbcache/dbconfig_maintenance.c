@@ -24,6 +24,8 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "dbsync.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 extern int		CONFIG_TIMER_FORKS;
 

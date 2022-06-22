@@ -26,6 +26,8 @@
 #include "zbxmutexs.h"
 #include "zbxcrypto.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #if !defined(_WINDOWS)
 #	include "zbxnix.h"

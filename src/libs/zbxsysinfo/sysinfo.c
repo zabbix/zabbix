@@ -28,6 +28,8 @@
 #include "zbxalgo.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 
 extern int	CONFIG_TIMEOUT;
 
@@ -1257,7 +1259,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 		case ITEM_VALUE_TYPE_FLOAT:
 			zbx_trim_float(c);
 
-			if (SUCCEED == is_double(c, &dbl_tmp))
+			if (SUCCEED == zbx_is_double(c, &dbl_tmp))
 			{
 				SET_DBL_RESULT(result, dbl_tmp);
 				ret = SUCCEED;
@@ -1350,7 +1352,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_trim_float(result->str);
 
-		if (SUCCEED != is_double(result->str, &value))
+		if (SUCCEED != zbx_is_double(result->str, &value))
 			return NULL;
 
 		SET_DBL_RESULT(result, value);
@@ -1359,7 +1361,7 @@ static double	*get_result_dbl_value(AGENT_RESULT *result)
 	{
 		zbx_trim_float(result->text);
 
-		if (SUCCEED != is_double(result->text, &value))
+		if (SUCCEED != zbx_is_double(result->text, &value))
 			return NULL;
 
 		SET_DBL_RESULT(result, value);

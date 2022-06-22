@@ -20,6 +20,7 @@
 #include "zbxdb.h"
 
 #include "zbxstr.h"
+#include "zbxtime.h"
 #include "log.h"
 
 #if defined(HAVE_MYSQL)

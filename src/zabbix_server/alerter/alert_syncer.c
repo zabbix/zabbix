@@ -26,6 +26,8 @@
 #include "alerter_protocol.h"
 #include "zbxservice.h"
 #include "dbcache.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define ZBX_POLL_INTERVAL	1
 

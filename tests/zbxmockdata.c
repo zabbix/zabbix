@@ -23,6 +23,7 @@
 #include "zbxmockdata.h"
 
 #include "zbxstr.h"
+#include "zbxnum.h"
 #include "zbxalgo.h"
 
 FILE	*__real_fopen(const char *path, const char *mode);
@@ -970,7 +971,7 @@ zbx_mock_error_t	zbx_mock_float(zbx_mock_handle_t object, double *value)
 	memcpy(tmp, handle->node->data.scalar.value, handle->node->data.scalar.length);
 	tmp[handle->node->data.scalar.length] = '\0';
 
-	if (SUCCEED != is_double(tmp, value))
+	if (SUCCEED != zbx_is_double(tmp, value))
 		res = ZBX_MOCK_NOT_A_FLOAT;
 
 	zbx_free(tmp);

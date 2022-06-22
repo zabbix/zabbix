@@ -20,7 +20,6 @@
 #ifndef ZABBIX_EVAL_H
 #define ZABBIX_EVAL_H
 
-#include "common.h"
 #include "zbxeval.h"
 
 int	eval_suffixed_number_parse(const char *value, char *suffix);

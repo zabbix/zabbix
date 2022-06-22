@@ -23,6 +23,7 @@
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "zbxcrypto.h"
+#include "zbxnum.h"
 
 extern unsigned char	program_type;
 

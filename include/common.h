@@ -93,6 +93,7 @@ extern char ZABBIX_EVENT_SOURCE[ZBX_SERVICE_NAME_LEN];
 const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
 
+
 #define MAX_ID_LEN			21
 #define MAX_STRING_LEN			2048
 #define MAX_BUFFER_LEN			65536
@@ -105,6 +106,8 @@ const char	*zbx_result_string(int result);
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
 #define ZBX_MAX_DOUBLE_LEN	24
+
+#define ZBX_SIZE_T_MAX	(~(size_t)0)
 
 /******************************************************************************
  *                                                                            *
@@ -120,28 +123,6 @@ const char	*zbx_result_string(int result);
  ******************************************************************************/
 #define ZBX_UNUSED(var) (void)(var)
 
-typedef struct
-{
-	int	sec;	/* seconds */
-	int	ns;	/* nanoseconds */
-}
-zbx_timespec_t;
-
-/* time zone offset */
-typedef struct
-{
-	char	tz_sign;	/* '+' or '-' */
-	int	tz_hour;
-	int	tz_min;
-}
-zbx_timezone_t;
-
-#define zbx_timespec_compare(t1, t2)	\
-	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
-
-extern double	ZBX_DOUBLE_EPSILON;
-
-int	zbx_double_compare(double a, double b);
 
 /* item types */
 typedef enum
@@ -1063,58 +1044,6 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
 	(data << ZBX_RTC_DATA_SHIFT))
 
-/* future param library */
-int	get_param(const char *p, int num, char *buf, size_t max_len, zbx_request_parameter_type_t *type);
-int	num_param(const char *p);
-char	*get_param_dyn(const char *p, int num, zbx_request_parameter_type_t *type);
-/******************************************************************************
- *                                                                            *
- * Purpose: replaces an item key, SNMP OID or their parameters                *
- *                                                                            *
- * Parameters:                                                                *
- *      data      - [IN] an item key, SNMP OID or their parameter             *
- *      key_type  - [IN] ZBX_KEY_TYPE_*                                       *
- *      level     - [IN] for item keys and OIDs the level will be 0;          *
- *                       for their parameters - 1 or higher (for arrays)      *
- *      num       - [IN] parameter number; for item keys and OIDs the level   *
- *                       will be 0; for their parameters - 1 or higher        *
- *      quoted    - [IN] 1 if parameter is quoted; 0 - otherwise              *
- *      cb_data   - [IN] callback function custom data                        *
- *      param     - [OUT] replaced item key string                            *
- *                                                                            *
- * Return value: SUCCEED - if parameter doesn't change or has been changed    *
- *                         successfully                                       *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: The new string should be quoted if it contains special           *
- *           characters                                                       *
- *                                                                            *
- ******************************************************************************/
-typedef int	(*replace_key_param_f)(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
-		char **param);
-#define ZBX_KEY_TYPE_ITEM	0
-#define ZBX_KEY_TYPE_OID	1
-int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, void *cb_data, char *error,
-		size_t maxerrlen);
-void	remove_param(char *param, int num);
-int	get_key_param(char *param, int num, char *buf, size_t max_len);
-int	num_key_param(char *param);
-/* future param library END */
-
-/* future scheduler library */
-typedef struct zbx_custom_interval	zbx_custom_interval_t;
-int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_custom_interval_t **custom_intervals,
-		char **error);
-int	zbx_validate_interval(const char *str, char **error);
-int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_intervals);
-void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals);
-int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_interval,
-		const zbx_custom_interval_t *custom_intervals, time_t now);
-int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_interval_t *custom_intervals,
-		time_t disable_until);
-time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
-int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);
-/* future scheduler library END */
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
@@ -1140,48 +1069,8 @@ int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
 
-double		zbx_time(void);
-void		zbx_timespec(zbx_timespec_t *ts);
-double		zbx_current_time(void);
-int		zbx_is_leap_year(int year);
-void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
-long		zbx_get_timezone_offset(time_t t, struct tm *tm);
-struct tm	*zbx_localtime(const time_t *time, const char *tz);
-int		zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
-int		zbx_day_in_month(int year, int mon);
-zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts);
 
 /* move remaining temp string functions into libzbxstr.a */
-#define ZBX_SIZE_T_MAX	(~(size_t)0)
-
-#define is_ushort(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
-
-#define is_uint32(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0xFFFFFFFF)
-
-#define is_uint64(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
-
-#define is_uint64_n(str, n, value) \
-	is_uint_n_range(str, n, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
-
-#define is_uint31(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFF)
-
-#define ZBX_MAX_UINT31_1	0x7FFFFFFE
-#define is_uint31_1(str, value) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, ZBX_MAX_UINT31_1)
-
-#define is_uint_range(str, value, min, max) \
-	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
-
-int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r,
-		unsigned char *context_op);
-int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length,
-		unsigned char *context_op);
-char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
-char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
 #else
@@ -1196,21 +1085,12 @@ void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const cha
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
-int	zbx_number_parse(const char *number, int *len);
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
-int	zbx_function_validate(const char *expr, size_t *par_l, size_t *par_r, char *error, int max_error_len);
-int	zbx_function_validate_parameters(const char *expr, size_t *length);
 
-#define ZBX_FLAG_DOUBLE_PLAIN	0x00
-#define ZBX_FLAG_DOUBLE_SUFFIX	0x01
-int	is_double(const char *str, double *value);
 #define ZBX_LENGTH_UNLIMITED	0x7fffffff
-int	is_time_suffix(const char *str, int *value, int length);
-int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
-int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 /* move remaining temp string functions into libzbxstr.a END */
 
 /* future proctitle library */
@@ -1224,50 +1104,6 @@ int	zbx_validate_hostname(const char *hostname);
 
 void	zbx_backtrace(void);
 
-int	int_in_list(char *list, int value);
-
-/* future IP library */
-int	is_ip6(const char *ip);
-int	is_ip4(const char *ip);
-int	is_supported_ip(const char *ip);
-int	is_ip(const char *ip);
-
-int	ip_in_list(const char *list, const char *ip);
-#define ZBX_IPRANGE_V4	0
-#define ZBX_IPRANGE_V6	1
-
-#define ZBX_IPRANGE_GROUPS_V4	4
-#define ZBX_IPRANGE_GROUPS_V6	8
-
-typedef struct
-{
-	int	from;
-	int	to;
-}
-zbx_range_t;
-
-typedef struct
-{
-	/* contains groups of ranges for either ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */
-	/* ex. 127-127.0-0.0-0.2-254 (from-to.from-to.from-to.from-to)           */
-	/*                                  0       1       2       3            */
-	zbx_range_t	range[ZBX_IPRANGE_GROUPS_V6];
-
-	/* range type - ZBX_IPRANGE_V4 or ZBX_IPRANGE_V6 */
-	unsigned char	type;
-
-	/* 1 if the range was defined with network mask, 0 otherwise */
-	unsigned char   mask;
-}
-zbx_iprange_t;
-
-int	iprange_parse(zbx_iprange_t *iprange, const char *address);
-void	iprange_first(const zbx_iprange_t *iprange, int *address);
-int	iprange_next(const zbx_iprange_t *iprange, int *address);
-int	iprange_validate(const zbx_iprange_t *iprange, const int *address);
-zbx_uint64_t	iprange_volume(const zbx_iprange_t *iprange);
-/* future IP library END */
-
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_values, int rm_num);
@@ -1275,7 +1111,6 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 #if defined(_WINDOWS) || defined(__MINGW32__)
 const OSVERSIONINFOEX	*zbx_win_getversion(void);
 void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeout, char **utf8_value);
-int	_wis_uint(const wchar_t *wide_string);
 wchar_t	*zbx_utf8_to_unicode(const char *utf8_string);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
@@ -1322,9 +1157,6 @@ int	parse_host_key(char *exp, char **host, char **key);
 void	make_hostname(char *host);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
-
-int	calculate_sleeptime(int nextcheck, int max_sleeptime);
-int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
 
 #define ZBX_SESSION_ACTIVE		0
@@ -1417,64 +1249,13 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_RETRIEVE_MODE_BOTH		2
 
 void	zbx_update_env(double time_now);
-int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
-		int *nextcheck, int *scheduling, char **error);
 
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
-typedef enum
-{
-	ZBX_TIME_UNIT_UNKNOWN,
-	ZBX_TIME_UNIT_SECOND,
-	ZBX_TIME_UNIT_MINUTE,
-	ZBX_TIME_UNIT_HOUR,
-	ZBX_TIME_UNIT_DAY,
-	ZBX_TIME_UNIT_WEEK,
-	ZBX_TIME_UNIT_MONTH,
-	ZBX_TIME_UNIT_YEAR,
-	ZBX_TIME_UNIT_ISOYEAR,
-	ZBX_TIME_UNIT_COUNT
-}
-zbx_time_unit_t;
-
-void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
-void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
-
-void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
-void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
-
-const char	*zbx_timespec_str(const zbx_timespec_t *ts);
-
-int	zbx_get_week_number(const struct tm *tm);
-
-zbx_time_unit_t	zbx_tm_str_to_unit(const char *text);
-int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_time_unit_t *base, char **error);
-
-typedef enum
-{
-	ZBX_FUNCTION_TYPE_UNKNOWN,
-	ZBX_FUNCTION_TYPE_HISTORY,
-	ZBX_FUNCTION_TYPE_TIMER,
-	ZBX_FUNCTION_TYPE_TRENDS
-}
-zbx_function_type_t;
-
-zbx_function_type_t	zbx_get_function_type(const char *func);
-
 /* includes terminating '\0' */
 #define CUID_LEN	26
 void	zbx_new_cuid(char *cuid);
-
-/* report scheduling */
-
-#define ZBX_REPORT_CYCLE_DAILY		0
-#define ZBX_REPORT_CYCLE_WEEKLY		1
-#define ZBX_REPORT_CYCLE_MONTHLY	2
-#define ZBX_REPORT_CYCLE_YEARLY		3
-
-int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
-		const char *tz);
 
 typedef struct
 {
@@ -1485,141 +1266,14 @@ zbx_tag_t;
 
 void	zbx_free_tag(zbx_tag_t *tag);
 
-/* future token library */
-/* tokens used in expressions */
-#define ZBX_TOKEN_OBJECTID		0x00001
-#define ZBX_TOKEN_MACRO			0x00002
-#define ZBX_TOKEN_LLD_MACRO		0x00004
-#define ZBX_TOKEN_USER_MACRO		0x00008
-#define ZBX_TOKEN_FUNC_MACRO		0x00010
-#define ZBX_TOKEN_SIMPLE_MACRO		0x00020
-#define ZBX_TOKEN_REFERENCE		0x00040
-#define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
-#define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
+#define ZBX_OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
+#define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
 
-/* additional token flags */
-#define ZBX_TOKEN_JSON		0x0010000
-#define ZBX_TOKEN_REGEXP	0x0040000
-#define ZBX_TOKEN_XPATH		0x0080000
-#define ZBX_TOKEN_REGEXP_OUTPUT	0x0100000
-#define ZBX_TOKEN_PROMETHEUS	0x0200000
-#define ZBX_TOKEN_JSONPATH	0x0400000
-#define ZBX_TOKEN_STR_REPLACE	0x0800000
-#define ZBX_TOKEN_STRING	0x1000000
+#define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
 
-/* location of a substring */
-typedef struct
-{
-	/* left position */
-	size_t	l;
-	/* right position */
-	size_t	r;
-}
-zbx_strloc_t;
+#define ZBX_CONST_STRING(str) "" str
+#define ZBX_CONST_STRLEN(str) (sizeof(ZBX_CONST_STRING(str)) - 1)
 
-/* data used by macros, lld macros and objectid tokens */
-typedef struct
-{
-	zbx_strloc_t	name;
-}
-zbx_token_macro_t;
-
-/* data used by macros, lld macros and objectid tokens */
-typedef struct
-{
-	zbx_strloc_t	expression;
-}
-zbx_token_expression_macro_t;
-
-/* data used by user macros */
-typedef struct
-{
-	/* macro name */
-	zbx_strloc_t	name;
-	/* macro context, for macros without context the context.l and context.r fields are set to 0 */
-	zbx_strloc_t	context;
-}
-zbx_token_user_macro_t;
-
-/* data used by macro functions */
-typedef struct
-{
-	/* the macro including the opening and closing brackets {}, for example: {ITEM.VALUE} */
-	zbx_strloc_t	macro;
-	/* function + parameters, for example: regsub("([0-9]+)", \1) */
-	zbx_strloc_t	func;
-	/* parameters, for example: ("([0-9]+)", \1) */
-	zbx_strloc_t	func_param;
-}
-zbx_token_func_macro_t;
-
-/* data used by simple (host:key) macros */
-typedef struct
-{
-	/* host name, supporting simple macros as a host name, for example Zabbix server or {HOST.HOST} */
-	zbx_strloc_t	host;
-	/* key + parameters, supporting {ITEM.KEYn} macro, for example system.uname or {ITEM.KEY1}  */
-	zbx_strloc_t	key;
-	/* function + parameters, for example avg(5m) */
-	zbx_strloc_t	func;
-	/* parameters, for example (5m) */
-	zbx_strloc_t	func_param;
-}
-zbx_token_simple_macro_t;
-
-/* data used by references */
-typedef struct
-{
-	/* index of constant being referenced (1 for $1, 2 for $2, ..., 9 for $9) */
-	int	index;
-}
-zbx_token_reference_t;
-
-/* the token type specific data */
-typedef union
-{
-	zbx_token_macro_t		objectid;
-	zbx_token_macro_t		macro;
-	zbx_token_macro_t		lld_macro;
-	zbx_token_expression_macro_t	expression_macro;
-	zbx_token_user_macro_t		user_macro;
-	zbx_token_func_macro_t		func_macro;
-	zbx_token_func_macro_t		lld_func_macro;
-	zbx_token_simple_macro_t	simple_macro;
-	zbx_token_reference_t		reference;
-}
-zbx_token_data_t;
-
-/* {} token data */
-typedef struct
-{
-	/* token type, see ZBX_TOKEN_ defines */
-	int			type;
-	/* the token location in expression including opening and closing brackets {} */
-	zbx_strloc_t		loc;
-	/* the token type specific data */
-	zbx_token_data_t	data;
-}
-zbx_token_t;
-
-#define ZBX_TOKEN_SEARCH_BASIC			0x00
-#define ZBX_TOKEN_SEARCH_REFERENCES		0x01
-#define ZBX_TOKEN_SEARCH_EXPRESSION_MACRO	0x02
-#define ZBX_TOKEN_SEARCH_FUNCTIONID		0x04
-#define ZBX_TOKEN_SEARCH_SIMPLE_MACRO		0x08	/* used by the upgrade patches only */
-
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
-		zbx_token_t *token);
-
-typedef int zbx_token_search_t;
-
-int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_token_search_t token_search);
-
-int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
-		zbx_token_t *token);
-/* future token library END */
+/* time and memory size suffixes */
+zbx_uint64_t	suffix2factor(char c);
 #endif

@@ -23,6 +23,8 @@
 #include "evalfunc.h"
 #include "zbxeval.h"
 #include "expression.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 
@@ -1473,7 +1475,7 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 
 		if (0 == strcmp(bucket, "+INF") || 0 == strcmp(bucket, "INF"))
 			le = ZBX_INFINITY;
-		else if (SUCCEED != is_double(bucket, &le))
+		else if (SUCCEED != zbx_is_double(bucket, &le))
 			continue;
 
 		if (SUCCEED != (ret = zbx_evaluate_RATE(&rate, dcitem, param, ts, error)))

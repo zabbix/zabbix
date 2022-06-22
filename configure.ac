@@ -2001,6 +2001,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxmutexs/libzbxmutexs.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
+		\${abs_top_builddir}/src/libs/zbxnum/libzbxnum.a \
 		\${abs_top_builddir}/src/libs/zbxstr/libzbxstr.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
@@ -2116,6 +2117,7 @@ AC_OUTPUT([
 	src/libs/zbxeval/Makefile
 	src/libs/zbxexec/Makefile
 	src/libs/zbxexport/Makefile
+	src/libs/zbxexpr/Makefile
 	src/libs/zbxgetopt/Makefile
 	src/libs/zbxha/Makefile
 	src/libs/zbxhash/Makefile
@@ -2123,6 +2125,7 @@ AC_OUTPUT([
 	src/libs/zbxhistory/Makefile
 	src/libs/zbxhttp/Makefile
 	src/libs/zbxicmpping/Makefile
+	src/libs/zbxip/Makefile
 	src/libs/zbxipcservice/Makefile
 	src/libs/zbxjson/Makefile
 	src/libs/zbxkvs/Makefile
@@ -2131,6 +2134,8 @@ AC_OUTPUT([
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxmutexs/Makefile
 	src/libs/zbxnix/Makefile
+	src/libs/zbxnum/Makefile
+	src/libs/zbxparam/Makefile
 	src/libs/zbxprometheus/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
@@ -2157,6 +2162,7 @@ AC_OUTPUT([
 	src/libs/zbxsysinfo/unknown/Makefile
 	src/libs/zbxtasks/Makefile
 	src/libs/zbxthreads/Makefile
+	src/libs/zbxtime/Makefile
 	src/libs/zbxtrends/Makefile
 	src/libs/zbxvariant/Makefile
 	src/libs/zbxvault/Makefile

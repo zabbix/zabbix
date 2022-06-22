@@ -21,6 +21,7 @@
 #define ZABBIX_ZBXIPCSERVICE_H
 
 #include "zbxalgo.h"
+#include "zbxtime.h"
 
 #define ZBX_IPC_SOCKET_BUFFER_SIZE	4096
 

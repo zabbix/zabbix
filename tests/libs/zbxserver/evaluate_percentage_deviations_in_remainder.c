@@ -27,6 +27,7 @@
 #include "valuecache.h"
 #include "zbxserver.h"
 #include "zbxtrends.h"
+#include "zbxparam.h"
 
 #include "mocks/valuecache/valuecache_mock.h"
 
@@ -91,7 +92,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_value_type_t		detect_period_season_type;
 
 	/* ZBX_DOUBLE_EPSILON = 0.000001; results into output that is different from python test case output */
-	ZBX_DOUBLE_EPSILON = 0.0001;
+	zbx_update_epsilon_to_python_compatible_precision();
 
 	zbx_history_record_vector_create(&values_in);
 

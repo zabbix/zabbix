@@ -29,6 +29,8 @@
 #include "zbxalert.h"
 #include "zbxserver.h"
 #include "report_protocol.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define ZBX_REPORT_STATUS_ENABLED	0
 #define ZBX_REPORT_STATUS_DISABLED	1

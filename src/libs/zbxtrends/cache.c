@@ -24,6 +24,7 @@
 #include "log.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
+#include "zbxnum.h"
 
 typedef struct
 {

@@ -24,10 +24,6 @@
 
 char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2);
 
-int	is_boolean(const char *str, zbx_uint64_t *value);
-int	is_uoct(const char *str);
-int	is_uhex(const char *str);
-int	is_hex_string(const char *str);
 int	is_ascii_string(const char *str);
 
 int	zbx_rtrim(char *str, const char *charlist);
@@ -72,13 +68,6 @@ char	*zbx_strdcatf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3
 #define VALUE_ERRMSG_MAX	128
 const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *buf, const size_t buf_len);
 const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf, const size_t buf_len);
-
-const char	*zbx_print_double(char *buffer, size_t size, double val);
-
-/* time related functions */
-char	*zbx_age2str(int age);
-char	*zbx_date2str(time_t date, const char *tz);
-char	*zbx_time2str(time_t time, const char *tz);
 
 #define ZBX_NULL2STR(str)	(NULL != str ? str : "(null)")
 #define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
@@ -129,13 +118,6 @@ int	zbx_strcmp_null(const char *s1, const char *s2);
 
 char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 
-void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
-char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
-int	zbx_function_param_quote(char **param, int forced);
-int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r,
-		char *error, int max_error_len);
-char	*zbx_function_get_param_dyn(const char *params, int Nparam);
-
 int	zbx_strcmp_natural(const char *s1, const char *s2);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 int	zbx_str_extract(const char *text, size_t len, char **value);
@@ -146,9 +128,4 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right);
 void	zbx_ltrim_utf8(char *str, const char *charlist);
 void	zbx_rtrim_utf8(char *str, const char *charlist);
 
-/* time and memory size suffixes */
-#define ZBX_UNIT_SYMBOLS	"KMGTsmhdw"
-zbx_uint64_t	suffix2factor(char c);
-
-int	is_double_suffix(const char *str, unsigned char flags);
 #endif /* ZABBIX_STR_H */

@@ -22,6 +22,9 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
+#include "zbxnum.h"
+#include "zbxexpr.h"
+
 #include "common.h"
 
 static void	compare_token(const char *prefix, const char *path, const char *expression, zbx_strloc_t strloc)

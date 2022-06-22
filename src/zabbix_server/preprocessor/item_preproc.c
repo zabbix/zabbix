@@ -30,6 +30,8 @@
 #	include <libxml/xpath.h>
 #endif
 
+#include "zbxnum.h"
+
 #include "preproc_history.h"
 
 extern zbx_es_t	es_engine;
@@ -205,7 +207,7 @@ static int	item_preproc_multiplier(unsigned char value_type, zbx_variant_t *valu
 
 	zbx_trim_float(buffer);
 
-	if (FAIL == is_double(buffer, NULL))
+	if (FAIL == zbx_is_double(buffer, NULL))
 		err = zbx_dsprintf(NULL, "a numerical value is expected or the value is out of range");
 	else if (SUCCEED == item_preproc_multiplier_variant(value_type, value, buffer, &err))
 		return SUCCEED;
@@ -585,6 +587,149 @@ static int item_preproc_lrtrim(zbx_variant_t *value, const char *params, char **
 	zbx_free(err);
 
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is boolean                                    *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is boolean                             *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_boolean(const char *str, zbx_uint64_t *value)
+{
+	double	dbl_tmp;
+	int	res;
+
+	if (SUCCEED == (res = zbx_is_double(str, &dbl_tmp)))
+		*value = (0 != dbl_tmp);
+	else
+	{
+		char	tmp[16];
+
+		strscpy(tmp, str);
+		zbx_strlower(tmp);
+
+		if (SUCCEED == (res = str_in_list("true,t,yes,y,on,up,running,enabled,available,ok,master", tmp, ',')))
+		{
+			*value = 1;
+		}
+		else if (SUCCEED == (res = str_in_list("false,f,no,n,off,down,unused,disabled,unavailable,err,slave",
+				tmp, ',')))
+		{
+			*value = 0;
+		}
+	}
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is unsigned octal                             *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned octal                      *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_uoct(const char *str)
+{
+	int	res = FAIL;
+
+	while (' ' == *str)	/* trim left spaces */
+		str++;
+
+	for (; '\0' != *str; str++)
+	{
+		if (*str < '0' || *str > '7')
+			break;
+
+		res = SUCCEED;
+	}
+
+	while (' ' == *str)	/* check right spaces */
+		str++;
+
+	if ('\0' != *str)
+		return FAIL;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is unsigned hexadecimal representation of     *
+ *          data in the form "0-9, a-f or A-F"                                *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is unsigned hexadecimal                *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_uhex(const char *str)
+{
+	int	res = FAIL;
+
+	while (' ' == *str)	/* trim left spaces */
+		str++;
+
+	for (; '\0' != *str; str++)
+	{
+		if (0 == isxdigit(*str))
+			break;
+
+		res = SUCCEED;
+	}
+
+	while (' ' == *str)	/* check right spaces */
+		str++;
+
+	if ('\0' != *str)
+		return FAIL;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the string is a hexadecimal representation of data in    *
+ *          the form "F4 CE 46 01 0C 44 8B F4\nA0 2C 29 74 5D 3F 13 49\n"     *
+ *                                                                            *
+ * Parameters: str - string to check                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - the string is formatted like the example above    *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_hex_string(const char *str)
+{
+	if ('\0' == *str)
+		return FAIL;
+
+	while ('\0' != *str)
+	{
+		if (0 == isxdigit(*str))
+			return FAIL;
+
+		if (0 == isxdigit(*(str + 1)))
+			return FAIL;
+
+		if ('\0' == *(str + 2))
+			break;
+
+		if (' ' != *(str + 2) && '\n' != *(str + 2))
+			return FAIL;
+
+		str += 3;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************

@@ -28,7 +28,8 @@
 #include "proxy.h"
 #include "zbxcomms.h"
 #include "dbcache.h"
-
+#include "zbxnum.h"
+#include "zbxtime.h"
 #include "../../zabbix_server/scripts/scripts.h"
 #include "../../zabbix_server/trapper/trapper_item_test.h"
 #include "../../zabbix_server/poller/checks_snmp.h"

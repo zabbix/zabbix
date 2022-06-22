@@ -22,10 +22,10 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "common.h"
 #include "macrofunc.h"
 #include "log.h"
 #include "zbxserver.h"
+#include "zbxexpr.h"
 
 #include "valuecache.h"
 #include "mocks/valuecache/valuecache_mock.h"

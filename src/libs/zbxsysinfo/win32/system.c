@@ -21,6 +21,7 @@
 #include "log.h"
 #include "perfmon.h"
 #include "cfg.h"
+#include "zbxtime.h"
 
 #pragma comment(lib, "user32.lib")
 

@@ -20,7 +20,9 @@
 #ifndef ZABBIX_ZBXEVAL_H
 #define ZABBIX_ZBXEVAL_H
 
+#include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbxexpr.h"
 
 /*
  * Token type flags (32 bits):

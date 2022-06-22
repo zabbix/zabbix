@@ -20,6 +20,8 @@
 #include "dir.h"
 
 #include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
 #include "log.h"

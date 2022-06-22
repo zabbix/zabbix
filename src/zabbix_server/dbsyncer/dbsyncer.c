@@ -22,6 +22,7 @@
 #include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
+#include "zbxtime.h"
 
 #include "dbcache.h"
 #include "zbxexport.h"

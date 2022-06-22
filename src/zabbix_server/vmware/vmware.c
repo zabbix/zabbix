@@ -29,6 +29,8 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.

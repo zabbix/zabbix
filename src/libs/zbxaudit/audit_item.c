@@ -24,6 +24,7 @@
 #include "audit.h"
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
+#include "zbxnum.h"
 
 static int	item_flag_to_resource_type(int flag)
 {

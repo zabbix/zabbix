@@ -21,6 +21,7 @@
 
 #include "dbupgrade.h"
 #include "zbxdbhigh.h"
+#include "zbxnum.h"
 
 /* Function argument descriptors.                                                */
 /* Used in varargs list to describe following parameter mapping to old position. */

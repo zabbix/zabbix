@@ -29,6 +29,7 @@
 #include "log.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
+#include "zbxnum.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_IPMIPOLLER_FORKS;

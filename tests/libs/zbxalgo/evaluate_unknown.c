@@ -22,6 +22,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxalgo.h"
+#include "zbxnum.h"
 #include "zbxserver.h"
 
 void	zbx_mock_test_entry(void **state)
@@ -37,7 +38,7 @@ void	zbx_mock_test_entry(void **state)
 	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	tmp = zbx_mock_get_parameter_string("out.value");
 
-	if (SUCCEED != is_double(tmp, &expected_value))
+	if (SUCCEED != zbx_is_double(tmp, &expected_value))
 	{
 		if (0 == strcmp(tmp, ZBX_UNKNOWN_STR))
 			expected_value = ZBX_UNKNOWN;

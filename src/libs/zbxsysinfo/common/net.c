@@ -24,6 +24,7 @@
 #include "log.h"
 #include "cfg.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
 
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)

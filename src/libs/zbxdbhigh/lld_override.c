@@ -21,6 +21,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
+#include "zbxnum.h"
 
 #include "zbxdbhigh.h"
 

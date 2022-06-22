@@ -30,6 +30,8 @@
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
 #include "zbxcomms.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 

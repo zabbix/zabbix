@@ -24,6 +24,7 @@
 #include "dbcache.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
+#include "zbxnum.h"
 
 struct _zbx_template_item_preproc_t
 {

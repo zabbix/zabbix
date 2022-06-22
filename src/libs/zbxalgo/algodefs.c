@@ -21,6 +21,7 @@
 #include "algodefs.h"
 
 #include "zbxstr.h"
+#include "zbxnum.h"
 
 typedef unsigned char uchar;
 

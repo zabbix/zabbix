@@ -22,6 +22,7 @@
 #include "zbxdbhigh.h"
 #include "log.h"
 #include "audit/zbxaudit_trigger.h"
+#include "zbxnum.h"
 
 typedef struct
 {

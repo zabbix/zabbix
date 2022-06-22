@@ -19,11 +19,13 @@
 
 #include "zbxprometheus.h"
 
-#include "zbxstr.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "zbxjson.h"
 #include "zbxeval.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
 
 /* Defines maximum row length to be written in error message in the case of parsing failure */
 #define ZBX_PROMEHTEUS_ERROR_MAX_ROW_LENGTH	50
@@ -896,7 +898,7 @@ static int	condition_match_metric_value(const char *pattern, const char *value)
 	double	pattern_dbl, value_dbl;
 	char	buffer[5];
 
-	if (SUCCEED != is_double(pattern, &pattern_dbl))
+	if (SUCCEED != zbx_is_double(pattern, &pattern_dbl))
 	{
 		if ('+' == *pattern)
 			pattern++;
@@ -909,10 +911,10 @@ static int	condition_match_metric_value(const char *pattern, const char *value)
 		return (0 == strcmp(pattern, buffer) ? SUCCEED : FAIL);
 	}
 
-	if (SUCCEED != is_double(value, &value_dbl))
+	if (SUCCEED != zbx_is_double(value, &value_dbl))
 		return FAIL;
 
-	if (ZBX_DOUBLE_EPSILON <= fabs(pattern_dbl - value_dbl))
+	if (zbx_get_double_epsilon() <= fabs(pattern_dbl - value_dbl))
 		return FAIL;
 
 	return SUCCEED;

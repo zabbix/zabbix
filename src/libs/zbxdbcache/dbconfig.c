@@ -35,6 +35,10 @@
 #include "zbxserialize.h"
 #include "user_macro.h"
 #include "zbxavailability.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 
 int	sync_in_progress = 0;
 
@@ -856,6 +860,29 @@ static int	DCsync_config(zbx_dbsync_t *sync, int *flags)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculate nextcheck timestamp for passive proxy                   *
+ *                                                                            *
+ * Parameters: hostid - [IN] host identifier from database                    *
+ *             delay  - [IN] default delay value, can be overridden           *
+ *             now    - [IN] current timestamp                                *
+ *                                                                            *
+ * Return value: nextcheck value                                              *
+ *                                                                            *
+ ******************************************************************************/
+static time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now)
+{
+	time_t	nextcheck;
+
+	nextcheck = delay * (now / delay) + (unsigned int)(hostid % delay);
+
+	while (nextcheck <= now)
+		nextcheck += delay;
+
+	return nextcheck;
 }
 
 static void	DCsync_autoreg_config(zbx_dbsync_t *sync)

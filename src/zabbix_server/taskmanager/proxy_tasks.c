@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "zbxdbhigh.h"
+#include "zbxnum.h"
 
 #include "zbxtasks.h"
 

@@ -21,6 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
 
+#include "zbxnum.h"
 #include "zbxstr.h"
 
 void	zbx_mock_test_entry(void **state)
@@ -33,7 +34,7 @@ void	zbx_mock_test_entry(void **state)
 	is_number = zbx_mock_get_parameter_string("in.num");
 	expected_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	if (expected_result != (actual_result = is_double_suffix(is_number, ZBX_FLAG_DOUBLE_SUFFIX)))
+	if (expected_result != (actual_result = zbx_is_double_suffix(is_number, ZBX_FLAG_DOUBLE_SUFFIX)))
 	{
 		fail_msg("Got %s instead of %s as a result validation [%s].", zbx_result_string(actual_result),
 			zbx_result_string(expected_result), is_number);

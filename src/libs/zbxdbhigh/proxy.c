@@ -35,6 +35,9 @@
 #include "../zbxvault/vault.h"
 #include "zbxavailability.h"
 #include "zbxcommshigh.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxip.h"
 
 extern char	*CONFIG_SERVER;
 extern char	*CONFIG_VAULTDBPATH;

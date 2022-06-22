@@ -22,6 +22,8 @@
 #include "common.h"
 #include "log.h"
 #include "zbxtrends.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
 
 const char	*zbx_type_string(zbx_value_type_t type)
 {
@@ -69,7 +71,7 @@ int	get_function_parameter_float(const char *parameters, int Nparam, unsigned ch
 	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == (ret = is_double_suffix(parameter, flags)))
+	if (SUCCEED == (ret = zbx_is_double_suffix(parameter, flags)))
 	{
 		*value = str2double(parameter);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() value:" ZBX_FS_DBL, __func__, *value);

@@ -193,15 +193,6 @@ typedef off_t	zbx_offset_t;
 #	define S_ISDIR(x) (((x) & S_IFMT) == S_IFDIR)
 #endif
 
-#define ZBX_STR2UINT64(uint, string) is_uint64(string, &uint)
-#define ZBX_OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
-#define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
-
-#define ZBX_STR2UCHAR(var, string) var = (unsigned char)atoi(string)
-
-#define ZBX_CONST_STRING(str) "" str
-#define ZBX_CONST_STRLEN(str) (sizeof(ZBX_CONST_STRING(str)) - 1)
-
 typedef struct
 {
 	zbx_uint64_t	lo;

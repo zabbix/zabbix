@@ -24,6 +24,7 @@
 #include "zbxserialize.h"
 #include "base64.h"
 #include "zbxeval.h"
+#include "zbxnum.h"
 
 #define ZBX_DBSYNC_OBJ_HOST		1
 #define ZBX_DBSYNC_OBJ_HOST_TAG		2

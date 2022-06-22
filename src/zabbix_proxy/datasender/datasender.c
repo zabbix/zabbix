@@ -28,6 +28,8 @@
 #include "zbxtasks.h"
 #include "zbxcompress.h"
 #include "zbxavailability.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

@@ -29,6 +29,7 @@
 #include "zbxembed.h"
 #include "item_preproc.h"
 #include "preproc_history.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

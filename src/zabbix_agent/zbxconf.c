@@ -22,6 +22,7 @@
 #include "log.h"
 #include "sysinfo.h"
 #include "zbxstr.h"
+#include "zbxparam.h"
 
 #ifdef _WINDOWS
 #	include "perfstat.h"

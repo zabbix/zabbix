@@ -26,6 +26,10 @@
 #include "valuecache.h"
 #include "zbxtrends.h"
 #include "anomalystl.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxexpr.h"
+#include "zbxparam.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
@@ -1118,19 +1122,19 @@ static void	count_one_dbl(int *count, int op, double value, double pattern)
 				(*count)++;
 			break;
 		case OP_GT:
-			if (value - pattern > ZBX_DOUBLE_EPSILON)
+			if (value - pattern > zbx_get_double_epsilon())
 				(*count)++;
 			break;
 		case OP_GE:
-			if (value - pattern >= -ZBX_DOUBLE_EPSILON)
+			if (value - pattern >= -zbx_get_double_epsilon())
 				(*count)++;
 			break;
 		case OP_LT:
-			if (pattern - value > ZBX_DOUBLE_EPSILON)
+			if (pattern - value > zbx_get_double_epsilon())
 				(*count)++;
 			break;
 		case OP_LE:
-			if (pattern - value >= -ZBX_DOUBLE_EPSILON)
+			if (pattern - value >= -zbx_get_double_epsilon())
 				(*count)++;
 	}
 }
@@ -1346,7 +1350,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const DC_ITEM *item, const char 
 			}
 			else
 			{
-				if (SUCCEED != is_double_suffix(pattern, ZBX_FLAG_DOUBLE_SUFFIX))
+				if (SUCCEED != zbx_is_double_suffix(pattern, ZBX_FLAG_DOUBLE_SUFFIX))
 				{
 					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
 							pattern);
@@ -3086,11 +3090,11 @@ static int	evaluate_MONO(zbx_variant_t *value, const DC_ITEM *item, const char *
 		{
 			if (MONOINC == gradient)
 			{
-				CHECK_MONOTONICITY(dbl, >, +ZBX_DOUBLE_EPSILON);
+				CHECK_MONOTONICITY(dbl, >, +zbx_get_double_epsilon());
 			}
 			else if (MONODEC == gradient)
 			{
-				CHECK_MONOTONICITY(dbl, <, -ZBX_DOUBLE_EPSILON);
+				CHECK_MONOTONICITY(dbl, <, -zbx_get_double_epsilon());
 			}
 			else
 			{
@@ -3592,7 +3596,7 @@ static int	evaluate_BASELINE(zbx_variant_t *value, const DC_ITEM *item, const ch
 		if (SUCCEED != zbx_eval_calc_stddevpop(&values, &value_dev, error))
 			goto out;
 
-		if (ZBX_DOUBLE_EPSILON <= value_dev)
+		if (zbx_get_double_epsilon() <= value_dev)
 		{
 			for (i = 0; i < values.values_num; i++)
 				value_avg += values.values[i];

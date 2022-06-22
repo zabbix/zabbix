@@ -23,6 +23,8 @@
 #include "dbcache.h"
 #include "zbxnix.h"
 #include "zbxself.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define ZBX_TIMER_DELAY		SEC_PER_MIN
 

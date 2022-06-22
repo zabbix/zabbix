@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxexpr.h"
 
 /******************************************************************************
  *                                                                            *
@@ -920,3 +920,7 @@ int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_tok
 {
 	return token_parse_lld_macro(expression, macro, token);
 }
+
+
+
+

@@ -19,12 +19,13 @@
 
 #include "jsonpath.h"
 
-#include "common.h"
 #include "zbxregexp.h"
 #include "zbxjson.h"
 #include "json.h"
 #include "json_parser.h"
 #include "zbxvariant.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
 
 typedef struct
 {
@@ -2071,7 +2072,7 @@ static int	jsonpath_extract_numeric_value(const char *ptr, double *value)
 	char	buffer[MAX_STRING_LEN];
 
 	if (NULL == zbx_json_decodevalue(ptr, buffer, sizeof(buffer), NULL) ||
-		SUCCEED != is_double(buffer, value))
+		SUCCEED != zbx_is_double(buffer, value))
 	{
 		zbx_set_json_strerror("array value is not a number or out of range starting with: %s", ptr);
 		return FAIL;
@@ -2220,7 +2221,7 @@ static int	jsonpath_apply_function(const zbx_vector_json_t *objects, zbx_jsonpat
 		result /= objects->values_num;
 
 	*output = zbx_dsprintf(NULL, ZBX_FS_DBL, result);
-	if (SUCCEED != is_double(*output, NULL))
+	if (SUCCEED != zbx_is_double(*output, NULL))
 	{
 		zbx_set_json_strerror("invalid function result: %s", *output);
 		goto out;

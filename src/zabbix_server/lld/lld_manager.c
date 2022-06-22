@@ -25,6 +25,7 @@
 #include "zbxipcservice.h"
 #include "lld_protocol.h"
 #include "zbxstr.h"
+#include "zbxtime.h"
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;

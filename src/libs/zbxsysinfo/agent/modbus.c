@@ -18,6 +18,8 @@
 **/
 
 #include "zbxstr.h"
+#include "zbxip.h"
+#include "zbxnum.h"
 
 #include "modbtype.h"
 

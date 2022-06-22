@@ -24,6 +24,7 @@
 #include "operations.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
+#include "zbxnum.h"
 
 /******************************************************************************
  *                                                                            *

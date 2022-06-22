@@ -20,6 +20,9 @@
 #include "file.h"
 
 #include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
+#include "zbxparam.h"
 #include "sysinfo.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"

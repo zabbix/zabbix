@@ -29,6 +29,7 @@
 #include "alerter_protocol.h"
 #include "zbxembed.h"
 #include "zbxhash.h"
+#include "zbxtime.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
 

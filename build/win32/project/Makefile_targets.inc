@@ -22,6 +22,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcommon}.c{..\..\..\src\libs\zbxcommon}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxnum}.c{..\..\..\src\libs\zbxnum}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxstr}.c{..\..\..\src\libs\zbxstr}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 

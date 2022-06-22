@@ -22,6 +22,7 @@
 
 #include "zbxvariant.h"
 #include "zbxjson.h"
+#include "zbxtime.h"
 
 /* the item history value */
 typedef struct

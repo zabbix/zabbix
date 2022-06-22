@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
+#include "zbxnum.h"
 #include "log.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"

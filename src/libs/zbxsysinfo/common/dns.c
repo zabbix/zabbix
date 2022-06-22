@@ -20,6 +20,7 @@
 #include "dns.h"
 
 #include "zbxstr.h"
+#include "zbxnum.h"
 #include "sysinfo.h"
 #include "zbxcomms.h"
 #include "log.h"

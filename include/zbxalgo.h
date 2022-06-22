@@ -20,7 +20,7 @@
 #ifndef ZABBIX_ZBXALGO_H
 #define ZABBIX_ZBXALGO_H
 
-#include "common.h"
+#include "zbxnum.h"
 #include "log.h"
 
 /* generic */

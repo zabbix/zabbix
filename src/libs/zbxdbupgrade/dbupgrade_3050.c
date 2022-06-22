@@ -23,6 +23,8 @@
 #include "zbxtasks.h"
 #include "zbxregexp.h"
 #include "log.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
 
 extern unsigned char	program_type;
 

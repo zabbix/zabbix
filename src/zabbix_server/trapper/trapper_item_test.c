@@ -27,6 +27,7 @@
 #ifdef HAVE_OPENIPMI
 #include "../ipmi/ipmi.h"
 #endif
+#include "zbxnum.h"
 
 #include "trapper_auth.h"
 

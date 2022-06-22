@@ -21,6 +21,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxnum.h"
 
 #define DB_INFINITY	(1e12 - 1e-4)
 

@@ -29,7 +29,7 @@
 #include "audit/zbxaudit.h"
 #include "trigger_linking.h"
 #include "graph_linking.h"
-
+#include "zbxnum.h"
 #include "zbxdbhigh.h"
 
 typedef struct

@@ -19,6 +19,7 @@
 
 #include "zbxnix.h"
 #include "control.h"
+#include "zbxnum.h"
 
 #include "common.h"
 

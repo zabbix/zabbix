@@ -21,6 +21,7 @@
 #include "zbxmockdata.h"
 
 #include "zbxalgo.h"
+#include "zbxnum.h"
 #include "zbxserver.h"
 
 void	zbx_mock_test_entry(void **state)
@@ -35,7 +36,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	ZBX_DOUBLE_EPSILON = 0.000001;
+	zbx_update_epsilon_to_not_use_double_precision();
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("expression", &param_handle)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &expression)))
@@ -67,7 +68,7 @@ void	zbx_mock_test_entry(void **state)
 			fail_msg("Cannot get expected 'value' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}
-		else if (SUCCEED != is_double(tmp, NULL))
+		else if (SUCCEED != zbx_is_double(tmp, NULL))
 		{
 			fail_msg("func_pos parameter \"%s\" is not double or is out of range.", tmp);
 		}

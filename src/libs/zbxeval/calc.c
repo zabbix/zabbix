@@ -19,7 +19,7 @@
 
 #include "zbxeval.h"
 
-#include "common.h"
+#include "zbxnum.h"
 #include "zbxalgo.h"
 
 typedef struct

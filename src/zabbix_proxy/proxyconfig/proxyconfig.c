@@ -23,6 +23,7 @@
 #include "zbxnix.h"
 #include "proxy.h"
 #include "zbxself.h"
+#include "zbxtime.h"
 
 #include "zbxcompress.h"
 #include "zbxrtc.h"

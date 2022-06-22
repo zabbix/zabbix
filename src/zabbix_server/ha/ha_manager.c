@@ -28,6 +28,8 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_ha.h"
 #include "audit/zbxaudit_settings.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 

@@ -23,6 +23,7 @@
 #include "log.h"
 #include "stats.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
 
 #if !defined(HAVE_ZONE_H) && defined(HAVE_SYS_UTSNAME_H)
 #	include <sys/utsname.h>

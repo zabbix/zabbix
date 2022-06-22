@@ -19,8 +19,9 @@
 
 #include "history.h"
 
-#include "zbxstr.h"
 #include "log.h"
+#include "zbxstr.h"
+#include "zbxnum.h"
 
 ZBX_VECTOR_IMPL(history_record, zbx_history_record_t)
 

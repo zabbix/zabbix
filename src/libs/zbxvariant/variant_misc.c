@@ -19,6 +19,7 @@
 
 #include "zbxvariant.h"
 
+#include "zbxnum.h"
 #include "zbxstr.h"
 
 /******************************************************************************

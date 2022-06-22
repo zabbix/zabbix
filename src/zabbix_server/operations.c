@@ -23,6 +23,7 @@
 #include "zbxavailability.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
+#include "zbxnum.h"
 
 typedef enum
 {

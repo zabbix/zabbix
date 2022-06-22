@@ -25,6 +25,8 @@
 #include "zbxserver.h"
 #include "zbxexport.h"
 #include "zbxservice.h"
+#include "zbxnum.h"
+#include "zbxexpr.h"
 
 /* event recovery data */
 typedef struct

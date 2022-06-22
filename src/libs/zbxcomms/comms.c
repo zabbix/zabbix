@@ -26,6 +26,9 @@
 #include "log.h"
 #include "zbxcompress.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
+#include "zbxip.h"
+#include "zbxtime.h"
 
 #ifdef _WINDOWS
 #	ifndef _WIN32_WINNT_WIN7

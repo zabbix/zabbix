@@ -17,9 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxrtc.h"
-#include "rtc.h"
-
 #include "zbxserialize.h"
 #include "zbxjson.h"
 #include "zbxnix.h"
@@ -27,6 +24,10 @@
 #include "zbxdiag.h"
 #include "zbxrtc.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
+
+#include "zbxrtc.h"
+#include "rtc.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)

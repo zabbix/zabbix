@@ -28,6 +28,9 @@
 #include "zbxjson.h"
 #include "sysinfo.h"
 #include "zbxcrypto.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxparam.h"
 
 /*
  * 5.4 development database patches

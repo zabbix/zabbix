@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxnum.h"
 #include "../common/zbxsysinfo_common.h"
 #include "log.h"
 
