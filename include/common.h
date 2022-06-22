@@ -1355,8 +1355,6 @@ int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
 void	zbx_replace_invalid_utf8(char *text);
 
-int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8);
-
 void	dos2unix(char *str);
 int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
 double	str2double(const char *str);

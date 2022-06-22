@@ -1052,7 +1052,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 	if ('{' == *s)	/* JSON protocol */
 	{
 		struct zbx_json_parse	jp;
-		char			value[MAX_STRING_LEN];
+		char			value[MAX_STRING_LEN] = "";
 
 		if (SUCCEED != zbx_json_open(s, &jp))
 		{
