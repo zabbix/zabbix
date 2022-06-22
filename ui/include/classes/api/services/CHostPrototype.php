@@ -1310,44 +1310,66 @@ class CHostPrototype extends CHostBase {
 	 * @return string|null
 	 */
 	private static function getInterfaceId(array $interface, array $db_interfaces): ?string {
-		$details = array_key_exists('details', $interface) ? $interface['details'] : [];
-		$def_details = array_intersect_key(DB::getDefaults('interface_snmp'), array_flip(['bulk', 'contextname',
-			'securityname', 'securitylevel', 'authprotocol', 'authpassphrase', 'privprotocol', 'privpassphrase'
+		$def_interface = array_intersect_key(DB::getDefaults('interface'), array_flip(['ip', 'dns']));
+		$def_details = array_intersect_key(DB::getDefaults('interface_snmp'), array_flip(['bulk', 'community',
+			'contextname', 'securityname', 'securitylevel', 'authprotocol', 'authpassphrase', 'privprotocol',
+			'privpassphrase'
 		]));
 
-		return key(array_filter($db_interfaces, static function (array $db_interface)
-				use ($interface, $details, $def_details): bool {
+		$interface += $def_interface;
+		$details = array_key_exists('details', $interface) ? $interface['details'] : [];
+
+		if (array_key_exists('details', $interface)) {
+			$details += $def_details;
+		}
+
+		foreach ($db_interfaces as $db_interface) {
 			$db_details = array_key_exists('details', $db_interface) ? $db_interface['details'] : [];
 
-			return $interface['type'] == $db_interface['type']
-				&& $interface['useip'] == $db_interface['useip']
-				&& ((!array_key_exists('ip', $interface) && $db_interface['ip'] == DB::getDefault('interface', 'ip'))
-					|| $interface['ip'] === $db_interface['ip'])
-				&& ((!array_key_exists('dns', $interface) && $db_interface['dns'] == DB::getDefault('interface', 'dns'))
-					|| $interface['dns'] === $db_interface['dns'])
-				&& $interface['port'] === $db_interface['port']
-				&& $interface['main'] == $db_interface['main']
-				&& (!array_key_exists('details', $interface)
-					|| (array_key_exists('details', $db_interface) && $details['version'] == $db_details['version'])
-						&& ((!array_key_exists('bulk', $details) && $db_details['bulk'] == $def_details['bulk'])
-							|| $details['bulk'] == $db_details['bulk'])
-						&& (!array_key_exists('community', $details)
-							|| $details['community'] === $db_details['community'])
-						&& ((!array_key_exists('contextname', $details) && $db_details['contextname'] === $def_details['contextname'])
-							|| $details['contextname'] === $db_details['contextname'])
-						&& ((!array_key_exists('securityname', $details) && $db_details['securityname'] === $def_details['securityname'])
-							|| $details['securityname'] === $db_details['securityname'])
-						&& ((!array_key_exists('securitylevel', $details) && $db_details['securitylevel'] == $def_details['securitylevel'])
-							|| $details['securitylevel'] == $db_details['securitylevel'])
-						&& ((!array_key_exists('authprotocol', $details) && $db_details['authprotocol'] == $def_details['authprotocol'])
-							|| $details['authprotocol'] == $db_details['authprotocol'])
-						&& ((!array_key_exists('authpassphrase', $details) && $db_details['authpassphrase'] === $def_details['authpassphrase'])
-							|| $details['authpassphrase'] === $db_details['authpassphrase'])
-						&& ((!array_key_exists('privprotocol', $details) && $db_details['privprotocol'] == $def_details['privprotocol'])
-							|| $details['privprotocol'] == $db_details['privprotocol'])
-						&& ((!array_key_exists('privpassphrase', $details) && $db_details['privpassphrase'] === $def_details['privpassphrase'])
-							|| $details['privpassphrase'] === $db_details['privpassphrase']));
-		}));
+			if (self::fieldUnchanged($interface, $db_interface, 'type', false)
+					&& self::fieldUnchanged($interface, $db_interface, 'useip', false)
+					&& self::fieldUnchanged($interface, $db_interface, 'ip', true)
+					&& self::fieldUnchanged($interface, $db_interface, 'dns', true)
+					&& self::fieldUnchanged($interface, $db_interface, 'port', true)
+					&& self::fieldUnchanged($interface, $db_interface, 'main', false)) {
+				if (!array_key_exists('details', $interface)) {
+					return $db_interface['interfaceid'];
+				}
+
+				if (!array_key_exists('details', $db_interface)) {
+					continue;
+				}
+
+				if (self::fieldUnchanged($details, $db_details, 'version', false)
+						&& self::fieldUnchanged($details, $db_details, 'bulk', false)
+						&& self::fieldUnchanged($details, $db_details, 'community', true)
+						&& self::fieldUnchanged($details, $db_details, 'contextname', true)
+						&& self::fieldUnchanged($details, $db_details, 'securityname', true)
+						&& self::fieldUnchanged($details, $db_details, 'securitylevel', false)
+						&& self::fieldUnchanged($details, $db_details, 'authprotocol', false)
+						&& self::fieldUnchanged($details, $db_details, 'authpassphrase', false)
+						&& self::fieldUnchanged($details, $db_details, 'privprotocol', false)
+						&& self::fieldUnchanged($details, $db_details, 'privpassphrase', false)) {
+					return $db_interface['interfaceid'];
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Check if value of the given object field remain unchanged.
+	 *
+	 * @param array  $object
+	 * @param array  $db_object
+	 * @param string $field
+	 * @param bool   $strict
+	 *
+	 * @return bool
+	 */
+	private static function fieldUnchanged(array $object, array $db_object, string $field, bool $strict): bool {
+		return $strict ? ($object[$field] === $db_object[$field]) : ($object[$field] == $db_object[$field]);
 	}
 
 	/**
