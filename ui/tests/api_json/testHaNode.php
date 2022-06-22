@@ -290,7 +290,7 @@ class testHaNode extends CAPITest {
 				],
 				'expected_result' => [
 					'ha_nodeid' => null,
-					'name' => 'node8',
+					'name' => 'ZZZnode8',
 					'address' => '192.168.1.12',
 					'port' => null,
 					'status' => null,
