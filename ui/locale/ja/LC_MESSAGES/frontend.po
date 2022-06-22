@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-06 11:43+0000\n"
+"PO-Revision-Date: 2022-06-17 12:52+0000\n"
 "Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -291,7 +291,7 @@ msgstr "(特権管理者のみがグループを作成できます)"
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(ホストディスカバリによって作成)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
@@ -871,7 +871,7 @@ msgstr "ホストを追加"
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "ホストトリガーを追加"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
@@ -1267,7 +1267,7 @@ msgstr "すべてのサブグループに権限とタグフィルターを適用
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "すべてのサブグループに権限を適用"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
@@ -1277,7 +1277,7 @@ msgstr "メンテナンス待ち"
 
 #: include/classes/widgets/CWidgetHelper.php:1443
 msgid "Approximation"
-msgstr ""
+msgstr "近似値"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1408,7 +1408,7 @@ msgstr "少なくとも1つ以上の実行内容が設定されている必要�
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "少なくとも1つ以上の\"%1$s\"か\"%2$s\"を有効にすることが必要です。"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
@@ -1827,7 +1827,7 @@ msgstr "インターバル中のCPU使用率、<url> - VMwareサービスURL、<
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
-msgstr ""
+msgstr "周波数でのVMwareリソースプール上のインターバル中のCPU使用率、<url> - VMwareサービスURL、<rpid> - VMwareリソースプールID"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
@@ -1959,7 +1959,7 @@ msgstr "ホストを追加できません"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "ホストグループを追加できません"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
@@ -2043,7 +2043,7 @@ msgstr "テンプレートを追加できません"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "テンプレートグループを追加できません"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2306,7 +2306,7 @@ msgstr[0] "メンテナンス\"%2$s\"が少なくとも1つのホストかホス
 #: app/controllers/CControllerHostGroupDelete.php:75
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
-msgstr[0] ""
+msgstr[0] "ホストグループを削除できません"
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
@@ -2317,7 +2317,7 @@ msgstr[0] "メンテナンス\"%2$s\"が少なくとも1つのホストかホス
 #: app/controllers/CControllerHostGroupDelete.php:39
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
-msgstr ""
+msgstr "ホストグループを削除できません"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2431,7 +2431,7 @@ msgstr "テンプレートを削除できません"
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
-msgstr[0] ""
+msgstr[0] "テンプレートグループを削除できません"
 
 #: include/classes/api/services/CGraphPrototype.php:374
 msgid "Cannot delete templated graph prototype."
@@ -2988,7 +2988,7 @@ msgstr "レスポンスを読めません。Zabbixサーバー\"%1$s\"との接�
 #: app/controllers/CControllerPopupMassupdateHost.php:362
 #, c-format
 msgid "Cannot remove the tag with name \"%1$s\" and value \"%2$s\", defined in a host prototype, from host \"%3$s\"."
-msgstr ""
+msgstr "ホスト\"%3$s\"からホストプロトタイプ内に定義された名前が\"%1$s\"で値が\"%2$s\"のタグを削除できません。"
 
 #: include/classes/api/services/CUser.php:556
 msgid "Cannot rename guest user."
@@ -3268,7 +3268,7 @@ msgstr "ホストの暗号化設定が更新できません。両方向の接続
 #: app/controllers/CControllerHostGroupUpdate.php:43
 #: app/controllers/CControllerHostGroupUpdate.php:105
 msgid "Cannot update host group"
-msgstr ""
+msgstr "ホストグループを更新できません"
 
 #: host_prototypes.php:286 host_prototypes.php:320 host_prototypes.php:341
 msgid "Cannot update host prototype"
@@ -3400,7 +3400,7 @@ msgstr "テンプレートを更新できません"
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
 msgid "Cannot update template group"
-msgstr ""
+msgstr "テンプレートグループを更新できません"
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:351
 msgid "Cannot update templates"
@@ -3687,6 +3687,10 @@ msgstr "テンプレートの循環リンクは行えません。"
 msgid "Class %1$s not found for action %2$s."
 msgstr "アクション%2$sのためのクラス%1$sが見つかりません。"
 
+#: include/classes/core/ZBase.php:563
+msgid "Class not found."
+msgstr ""
+
 #: include/views/configuration.httpconf.list.php:221
 #: include/views/configuration.item.list.php:301
 msgid "Clear history"
@@ -3961,7 +3965,7 @@ msgstr "ホストの設定"
 
 #: app/controllers/CControllerHostGroupEdit.php:89
 msgid "Configuration of host group"
-msgstr ""
+msgstr "ホストグループの設定"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
@@ -4031,11 +4035,11 @@ msgstr "スクリプトの設定"
 
 #: app/controllers/CControllerTemplateGroupEdit.php:88
 msgid "Configuration of template group"
-msgstr ""
+msgstr "テンプレートグループの設定"
 
 #: app/controllers/CControllerTemplateGroupList.php:123
 msgid "Configuration of template groups"
-msgstr ""
+msgstr "テンプレートグループの設定"
 
 #: templates.php:27
 msgid "Configuration of templates"
@@ -4097,7 +4101,7 @@ msgstr "確認テキスト"
 
 #: app/views/popup.acknowledge.edit.php:114
 msgid "Confirms the problem is noticed (acknowledging user will be recorded). Status change triggers action update operation."
-msgstr ""
+msgstr "障害が通知されたことを確認します(確認したユーザーが記録されます)。ステータスの変更によってアクションの更新時処理が実行されます。"
 
 #: include/classes/setup/CSetupWizard.php:907
 msgid "Congratulations! You have successfully installed Zabbix frontend."
@@ -4572,7 +4576,7 @@ msgstr "テンプレートの作成"
 #: app/views/configuration.templategroup.list.php:33
 #: app/views/configuration.templategroup.list.php:35
 msgid "Create template group"
-msgstr ""
+msgstr "テンプレートグループの作成"
 
 #: include/views/configuration.triggers.list.php:153 jsLoader.php:357
 msgid "Create trigger"
@@ -5031,7 +5035,7 @@ msgstr "日"
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "Deactivates manual suppression."
-msgstr ""
+msgstr "手動での抑制を無効化します。"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:391
 msgid "Debug"
@@ -5344,7 +5348,7 @@ msgstr "選択したグループを削除しますか？"
 #: app/views/js/configuration.hostgroup.list.js.php:104
 #: app/views/popup.hostgroup.edit.php:50
 msgid "Delete selected host group?"
-msgstr ""
+msgstr "選択したホストグループを削除しますか？"
 
 #: include/views/configuration.hostgroups.list.php:205
 msgid "Delete selected host groups?"
@@ -5442,11 +5446,11 @@ msgstr "選択した図形を削除しますか？"
 #: app/views/js/configuration.templategroup.list.js.php:70
 #: app/views/popup.templategroup.edit.php:50
 msgid "Delete selected template group?"
-msgstr ""
+msgstr "選択したテンプレートグループを削除しますか？"
 
 #: app/views/js/configuration.templategroup.list.js.php:69
 msgid "Delete selected template groups?"
-msgstr ""
+msgstr "選択したテンプレートグループを削除しますか？"
 
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
@@ -5553,7 +5557,7 @@ msgstr "廃止予定"
 #: include/classes/validators/CApiInputValidator.php:1302
 #, c-format
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
-msgstr ""
+msgstr "廃止予定のパラメーター\"%1$s\"は、\"%2$s\"と一緒に使用できません。"
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -6023,7 +6027,7 @@ msgstr "グラフ表示"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:436
 msgid "Display min/max/avg"
-msgstr ""
+msgstr "最小/最大/平均の表示"
 
 #: include/views/monitoring.sysmap.edit.php:152
 msgid "Display problems"
@@ -8137,7 +8141,7 @@ msgstr "グローバルスクリプトに使用されているためホストグ
 #: include/classes/api/services/CHostGroup.php:631
 #, c-format
 msgid "Host group \"%1$s\" is group for discovered hosts and cannot be deleted."
-msgstr ""
+msgstr "ホストグループ\"%1$s\"は、ディスカバリしたホスト用のグループで削除できません。"
 
 #: include/classes/api/services/CHostGroup.php:642
 #, c-format
@@ -8146,12 +8150,12 @@ msgstr "ホストグループ\"%1$s\"は組み込まれたグループなので�
 
 #: app/controllers/CControllerHostGroupCreate.php:62
 msgid "Host group added"
-msgstr ""
+msgstr "ホストグループを追加しました"
 
 #: app/controllers/CControllerHostGroupDelete.php:60
 msgid "Host group deleted"
 msgid_plural "Host groups deleted"
-msgstr[0] ""
+msgstr[0] "ホストグループを削除しました"
 
 #: include/views/js/monitoring.sysmaps.js.php:109
 msgid "Host group elements"
@@ -8163,7 +8167,7 @@ msgstr "ホストグループのラベルタイプ"
 
 #: app/controllers/CControllerHostGroupUpdate.php:97
 msgid "Host group updated"
-msgstr ""
+msgstr "ホストグループを更新しました"
 
 #: include/classes/api/services/CDashboardGeneral.php:560
 #: include/classes/api/services/CScript.php:814
@@ -8261,7 +8265,7 @@ msgstr "ホストネットワーク"
 
 #: app/views/administration.usergroup.edit.php:274
 msgid "Host permissions"
-msgstr ""
+msgstr "ホストへの権限"
 
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/views/popup.lldoperation.php:54
@@ -9669,7 +9673,7 @@ msgstr "深刻度を増やす"
 #: app/views/popup.acknowledge.edit.php:90 include/actions.inc.php:1774
 #: include/actions.inc.php:2216 include/html.inc.php:978
 msgid "Indefinitely"
-msgstr ""
+msgstr "無期限"
 
 #: app/views/popup.tophosts.column.edit.php:152
 msgid "Indicators"
@@ -10408,7 +10412,7 @@ msgstr "アイテムが\"取得不可\"の状態"
 
 #: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:268
 msgid "Item list"
-msgstr ""
+msgstr "アイテムリスト"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1564
 msgid "Item not selected"
@@ -10416,7 +10420,7 @@ msgstr "アイテムが選択されていません"
 
 #: include/classes/widgets/views/js/widget.svggraph.form.view.js.php:262
 msgid "Item pattern"
-msgstr ""
+msgstr "アイテムパターン"
 
 #: include/classes/api/services/CItemGeneral.php:1254
 #, c-format
@@ -10867,7 +10871,7 @@ msgstr "最新1時間のグラフ"
 #: include/classes/widgets/CWidgetHelper.php:1373
 msgctxt "missing data function"
 msgid "Last known"
-msgstr ""
+msgstr "最終取得値"
 
 #: jsLoader.php:378
 msgid "Last month graph"
@@ -11072,7 +11076,7 @@ msgstr "OS上の属性情報付きのプロセスのリスト。JSONで返す"
 
 #: include/classes/data/CItemData.php:1021
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
-msgstr ""
+msgstr "キーで指定されたWindowsのレジストリの値またはキーのリスト。JSONで返す。"
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -11410,12 +11414,12 @@ msgstr "手動ホスト処理"
 
 #: app/views/popup.acknowledge.edit.php:83
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
-msgstr ""
+msgstr "手動での障害の抑制。日時の入力は、相対時間と絶対期間のフォーマットを受け付けます。"
 
 #: include/html.inc.php:1009
 #, c-format
 msgid "Manually by: %1$s"
-msgstr ""
+msgstr "手動操作者：%1$s"
 
 #: include/actions.inc.php:2070
 msgid "Manually closed"
@@ -11742,7 +11746,7 @@ msgstr "メモリ上限: %1$s"
 
 #: include/classes/data/CItemData.php:1433
 msgid "Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory"
-msgstr ""
+msgstr "VMwareリソースプールのメモリメトリクス、<url> - VMwareサービスURL、<rpid> - VMwareリソースプールID、<mode> - consumed(デフォルト)/ballooned/overhead"
 
 #: include/classes/data/CItemData.php:1210
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -12436,7 +12440,7 @@ msgstr "新しいホストの作成"
 #: app/views/configuration.hostgroup.edit.php:52
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
-msgstr ""
+msgstr "新しいホストグループの作成"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -12461,7 +12465,7 @@ msgstr "新しいタグ名"
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
-msgstr ""
+msgstr "新しいテンプレートグループの作成"
 
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
@@ -12664,7 +12668,7 @@ msgstr "実行するアクションのインベントリモードが設定され
 
 #: include/classes/widgets/CWidgetHelper.php:1240
 msgid "No item selected."
-msgstr ""
+msgstr "アイテムが選択されていません。"
 
 #: include/items.inc.php:742
 #, c-format
@@ -13064,7 +13068,7 @@ msgstr "すべてのテンプレートは\"%1$s\"にリンクされていませ�
 #: include/classes/api/services/CUserMacro.php:569
 #, c-format
 msgid "Not allowed to modify automatic user macro \"%1$s\"."
-msgstr ""
+msgstr "自動でのユーザーマクロ\"%1$s\"の変更はできません。"
 
 #: include/classes/api/services/CUser.php:577
 msgid "Not allowed to set language for user \"guest\"."
@@ -13150,7 +13154,7 @@ msgstr "使用可能なDSパスの数、<url> - VMwareサービスURL、<uuid> -
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:463
 msgid "Number of columns"
-msgstr ""
+msgstr "列数"
 
 #: include/classes/data/CItemData.php:882
 msgid "Number of currently open file descriptors. Returns integer"
@@ -13178,7 +13182,7 @@ msgstr "サーバーへ未送信のプロキシ内のヒストリアイテム数
 
 #: include/classes/data/CItemData.php:1729
 msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
-msgstr ""
+msgstr "fromからtoまでの秒数遅延したキュー内のアイテム数"
 
 #: include/classes/data/CItemData.php:1658
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -13996,7 +14000,7 @@ msgstr "パラメータ\"%1$s\"は廃止予定です。"
 #: include/classes/api/services/CTemplateGroup.php:1226
 #, c-format
 msgid "Parameter \"%1$s\" must be enabled."
-msgstr ""
+msgstr "パラメーター\"%1$s\"を有効にしてください。"
 
 #: app/views/administration.mediatype.edit.php:213
 #: app/views/administration.script.edit.php:181
@@ -14545,7 +14549,7 @@ msgstr "障害解決済"
 
 #: app/views/administration.usergroup.edit.php:275
 msgid "Problem tag filter"
-msgstr ""
+msgstr "障害タグフィルター"
 
 #: app/views/popup.service.edit.php:59 app/views/popup.service.edit.php:269
 #: app/views/popup.services.php:62
@@ -15150,7 +15154,7 @@ msgstr "削除"
 #: app/partials/hostmacros.inherited.list.html.php:121
 msgctxt "verb"
 msgid "Remove"
-msgstr ""
+msgstr "削除"
 
 #: app/partials/massupdate.macros.tab.php:127
 #: app/partials/massupdate.valuemaps.tab.php:98
@@ -15522,7 +15526,7 @@ msgstr "Zabbixサーバーまたはプロキシ内の内部メトリクスをJSO
 
 #: include/classes/data/CItemData.php:1673
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, active_agent, snmp, ipmi, jmx."
-msgstr ""
+msgstr "ホスト上の特定タイプのチェックの可用性を返す。このアイテムの値は、ホストリストの可用性アイコンに対応している。有効な値：agent、active_agent、snmp、ipmi、jmx。"
 
 #: include/classes/data/CItemData.php:1614
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
@@ -15551,7 +15555,7 @@ msgstr "ICMP pingパケットのロスト率を返す。"
 #: app/partials/hostmacros.inherited.list.html.php:105
 #: app/partials/hostmacros.list.html.php:77 jsLoader.php:331
 msgid "Revert"
-msgstr ""
+msgstr "元に戻す"
 
 #: include/classes/html/CMacroValue.php:94
 msgid "Revert changes"
@@ -16783,7 +16787,7 @@ msgstr "シンプルグラフ"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:168
 msgid "Simple triggers"
-msgstr ""
+msgstr "シンプルトリガー"
 
 #: include/views/configuration.trigger.prototype.edit.php:507
 #: include/views/configuration.triggers.edit.php:536
@@ -17309,19 +17313,19 @@ msgstr "サポートしているマクロ："
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 #: app/views/popup.acknowledge.edit.php:82
 msgid "Suppress"
-msgstr ""
+msgstr "抑制"
 
 #: include/classes/helpers/CRoleHelper.php:471
 msgid "Suppress problems"
-msgstr ""
+msgstr "障害の抑制"
 
 #: include/actions.inc.php:1761
 msgid "Suppress until"
-msgstr ""
+msgstr "抑制期限"
 
 #: include/actions.inc.php:1771 include/classes/screens/CScreenProblem.php:1259
 msgid "Suppressed"
-msgstr ""
+msgstr "抑制"
 
 #: include/html.inc.php:973
 #, c-format
@@ -17587,7 +17591,7 @@ msgstr "テンプレート\"%1$s\"にホストグループを設定してくだ�
 #: include/classes/api/services/CTemplateGroup.php:942
 #, c-format
 msgid "Template \"%1$s\" cannot be without template group."
-msgstr ""
+msgstr "テンプレート\"%1$s\"にはテンプレートグループが必要です。"
 
 #: include/classes/import/importers/CHostImporter.php:54
 #, c-format
@@ -17625,25 +17629,25 @@ msgstr "テンプレートグループ"
 #: include/classes/api/services/CTemplateGroup.php:540
 #, c-format
 msgid "Template group \"%1$s\" already exists."
-msgstr ""
+msgstr "テンプレートグループ\"%1$s\"はすでに存在します。"
 
 #: app/controllers/CControllerTemplateGroupCreate.php:62
 msgid "Template group added"
-msgstr ""
+msgstr "テンプレートグループを追加しました"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:60
 msgid "Template group deleted"
 msgid_plural "Template groups deleted"
-msgstr[0] ""
+msgstr[0] "テンプレートグループを削除しました"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
-msgstr ""
+msgstr "テンプレートグループを更新しました"
 
 #: include/classes/api/services/CUserGroup.php:487
 #, c-format
 msgid "Template group with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "ID\"%1$s\"のテンプレートグループは使用できません。"
 
 #: app/controllers/CControllerPopupGeneric.php:197
 #: app/controllers/CControllerPopupImportCompare.php:168
@@ -17661,7 +17665,7 @@ msgstr ""
 #: include/views/configuration.template.list.php:45
 #: include/views/configuration.triggers.list.php:33
 msgid "Template groups"
-msgstr ""
+msgstr "テンプレートグループ"
 
 #: app/views/popup.import.php:34
 msgid "Template linkage"
@@ -17677,7 +17681,7 @@ msgstr "テンプレート名"
 
 #: app/views/administration.usergroup.edit.php:273
 msgid "Template permissions"
-msgstr ""
+msgstr "テンプレートへの権限"
 
 #: report2.php:396
 msgid "Template trigger"
@@ -18573,7 +18577,7 @@ msgstr "トリガーの深刻度"
 
 #: app/views/popup.condition.common.php:228
 msgid "Trigger source"
-msgstr ""
+msgstr "トリガー発生元"
 
 #: jsLoader.php:367
 msgid "Trigger status \"OK\""
@@ -18891,7 +18895,7 @@ msgstr "選択したユーザーのブロックを解除しますか？"
 
 #: app/views/popup.acknowledge.edit.php:125
 msgid "Undo problem acknowledgement."
-msgstr ""
+msgstr "障害確認の解除"
 
 #: include/classes/core/ZBase.php:574
 #, c-format
@@ -19056,22 +19060,22 @@ msgstr "ディスカバリルール\"%1$s\"のフィルターではパラメー�
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "Unsuppress"
-msgstr ""
+msgstr "抑制解除"
 
 #: include/actions.inc.php:1785 include/actions.inc.php:2235
 #: include/classes/screens/CScreenProblem.php:1262
 msgid "Unsuppressed"
-msgstr ""
+msgstr "抑制解除"
 
 #: app/views/monitoring.widget.problems.view.php:174 include/blocks.inc.php:668
 #: include/classes/screens/CScreenProblem.php:1026
 #, c-format
 msgid "Unsuppressed by: %1$s"
-msgstr ""
+msgstr "抑制解除者：%1$s"
 
 #: app/views/popup.acknowledge.edit.php:91
 msgid "Until"
-msgstr ""
+msgstr "期限"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:98
 #: include/classes/services/CTabFilterProfile.php:95
@@ -19981,7 +19985,7 @@ msgstr "値を設定してください。"
 
 #: include/classes/data/CItemData.php:1017
 msgid "Value data for value name in Windows Registry key."
-msgstr ""
+msgstr "Windowsのレジストリキー内の値名の値データ。"
 
 #: app/controllers/CControllerAuditLogList.php:247
 msgid "Value map"
@@ -20665,7 +20669,7 @@ msgstr "現在選択しているホストを切り替えることができませ
 
 #: app/views/popup.generic.php:88
 msgid "You cannot switch templates for current selection."
-msgstr ""
+msgstr "現在選択しているテンプレートを切り替えることはできません。"
 
 #: include/classes/api/services/CAuditLog.php:73
 #: include/classes/api/services/CHaNode.php:45
@@ -21804,7 +21808,7 @@ msgstr "関数\"%1$s\"内の6番目のパラメーターが正しくありませ
 
 #: include/classes/validators/CApiInputValidator.php:3078
 msgid "invalid template group name"
-msgstr ""
+msgstr "テンプレートグループ名が正しくありません"
 
 #: include/classes/validators/CHistFunctionValidator.php:65
 #, c-format
@@ -21813,7 +21817,7 @@ msgstr "関数\"%1$s\"内の3番目のパラメーターが正しくありませ
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 msgid "invalid time"
-msgstr ""
+msgstr "時刻が正しくありません"
 
 #: app/controllers/CControllerWidgetTopHostsView.php:422
 #: include/classes/graphdraw/CLineGraphDraw.php:250
@@ -22173,7 +22177,7 @@ msgstr "マップの作成と変更の権限がありません"
 
 #: include/classes/api/services/CEvent.php:863
 msgid "no permissions to suppress problems"
-msgstr ""
+msgstr "障害抑制の権限がありません"
 
 #: include/classes/api/services/CEvent.php:774
 msgid "no permissions to unacknowledge problems"
@@ -22181,7 +22185,7 @@ msgstr "障害を未確認にする権限がありません"
 
 #: include/classes/api/services/CEvent.php:864
 msgid "no permissions to unsuppress problems"
-msgstr ""
+msgstr "障害抑制解除の権限がありません"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:836
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
