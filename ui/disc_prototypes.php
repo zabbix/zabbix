@@ -310,7 +310,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
 		] + $_REQUEST
 		: $_REQUEST;
-	$items = CItemBaseHelper::sanitizeItems([$input], $db_items);
+	$items = CItemBaseHelper::extractItems([$input], $db_items);
 
 	if ($items) {
 		DBstart();

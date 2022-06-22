@@ -58,11 +58,11 @@ class CItemTypeHttpAgent extends CItemType {
 			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]), 'default' => DB::getDefault('items', 'authtype')],
 			'username' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'username')]
 			]],
 			'password' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'password')]
 			]],
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
@@ -71,13 +71,13 @@ class CItemTypeHttpAgent extends CItemType {
 			'ssl_key_password' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'ssl_key_password')],
 			'interfaceid' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])], 'type' => API_ID],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
 			]],
 			'delay' =>				self::getCreateFieldRule('delay', $item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]), 'default' => DB::getDefault('items', 'allow_traps')],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_IP_RANGES, 'in' => DB::getDefault('items', 'trapper_hosts')]
 			]]
 		];
 	}
@@ -122,11 +122,11 @@ class CItemTypeHttpAgent extends CItemType {
 			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [HTTPTEST_AUTH_NONE, HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST]), 'default' => DB::getDefault('items', 'authtype')],
 			'username' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'username')],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'username')]
 			]],
 			'password' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'authtype', 'in' => implode(',', [HTTPTEST_AUTH_BASIC, HTTPTEST_AUTH_NTLM, HTTPTEST_AUTH_KERBEROS, HTTPTEST_AUTH_DIGEST])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'password')]
 			]],
 			'verify_peer' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_PEER_OFF, HTTPTEST_VERIFY_PEER_ON])],
 			'verify_host' =>		['type' => API_INT32, 'in' => implode(',', [HTTPTEST_VERIFY_HOST_OFF, HTTPTEST_VERIFY_HOST_ON])],
@@ -137,13 +137,13 @@ class CItemTypeHttpAgent extends CItemType {
 										['if' => static function () use ($db_item): bool {
 											return in_array($db_item['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 										}, 'type' => API_ID],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
 			]],
 			'delay' =>				self::getUpdateFieldRule('delay', $db_item),
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_IP_RANGES, 'in' => DB::getDefault('items', 'trapper_hosts')]
 			]]
 		];
 	}
@@ -178,7 +178,7 @@ class CItemTypeHttpAgent extends CItemType {
 			'allow_traps' =>		['type' => API_INT32, 'in' => implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON])],
 			'trapper_hosts' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'allow_traps', 'in' => HTTPCHECK_ALLOW_TRAPS_ON], 'type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS | API_ALLOW_USER_MACRO, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}'], 'length' => DB::getFieldLength('items', 'trapper_hosts')],
-										['else' => true, 'type' => API_UNEXPECTED]
+										['else' => true, 'type' => API_IP_RANGES, 'in' => DB::getDefault('items', 'trapper_hosts')]
 			]]
 		];
 	}

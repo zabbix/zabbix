@@ -623,7 +623,7 @@ function prepareItemHttpAgentFormData(array $item) {
 	if (array_key_exists('query_fields', $item) && $item['query_fields']) {
 		foreach ($item['query_fields']['name'] as $index => $key) {
 			$value = $item['query_fields']['value'][$index];
-			$sortorder = CArrayHelper::getByPath($item, ['query_fields', 'sortorder', $index], count($query_fields));
+			$sortorder = CItemBaseHelper::getInput($item, ['query_fields', 'sortorder', $index], count($query_fields));
 
 			if ($key !== '' || $value !== '') {
 				$query_fields[$sortorder] = [$key => $value];
@@ -638,7 +638,7 @@ function prepareItemHttpAgentFormData(array $item) {
 
 		foreach ($item['headers']['name'] as $index => $key) {
 			$value = $item['headers']['value'][$index];
-			$sortorder = CArrayHelper::getByPath($item, ['headers', 'sortorder', $index], count($tmp_headers));
+			$sortorder = CItemBaseHelper::getInput($item, ['headers', 'sortorder', $index], count($tmp_headers));
 
 			if ($key !== '' || $value !== '') {
 				$tmp_headers[$sortorder] = [$key => $value];

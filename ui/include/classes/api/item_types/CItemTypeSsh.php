@@ -37,11 +37,11 @@ class CItemTypeSsh extends CItemType {
 			'username' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'username')],
 			'publickey' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'publickey')]
 			]],
 			'privatekey' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')]
 			]],
 			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'params' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],
@@ -63,7 +63,7 @@ class CItemTypeSsh extends CItemType {
 											&& ($db_item['type'] != ITEM_TYPE_SSH || $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY);
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'publickey')]
 			]],
 			'privatekey' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function (array $data) use ($db_item): bool {
@@ -71,7 +71,7 @@ class CItemTypeSsh extends CItemType {
 											&& ($db_item['type'] != ITEM_TYPE_SSH || $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY);
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'privatekey')]
 			]],
 			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'params' =>			self::getUpdateFieldRule('params', $db_item),
@@ -92,14 +92,14 @@ class CItemTypeSsh extends CItemType {
 										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY && $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY;
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'publickey')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8,  'length' => DB::getDefault('items', 'publickey')]
 			]],
 			'privatekey' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => static function (array $data) use ($db_item): bool {
 										return $data['authtype'] == ITEM_AUTHTYPE_PUBLICKEY && $db_item['authtype'] != ITEM_AUTHTYPE_PUBLICKEY;
 									}, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
 									['if' => ['field' => 'authtype', 'in' => ITEM_AUTHTYPE_PUBLICKEY], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'privatekey')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8,  'in' => DB::getDefault('items', 'privatekey')]
 			]],
 			'password' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'password')],
 			'params' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'params')],

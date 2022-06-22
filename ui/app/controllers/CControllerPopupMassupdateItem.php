@@ -151,10 +151,10 @@ class CControllerPopupMassupdateItem extends CController {
 		);
 		$input_submitted = array_fill(0, count($this->db_items), $input_submitted);
 
-		$items = CItemBaseHelper::sanitizeItems($input_submitted, $this->db_items);
-		DBstart();
+		$items = CItemBaseHelper::extractItems($input_submitted, $this->db_items);
 
 		if ($items) {
+			DBstart();
 			// In case user chose unrelated fields, relay the errors.
 			foreach ($items as $i => $item) {
 				unset($input_submitted[$i]['mass_update_tags']);
@@ -162,9 +162,10 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 
 			$result = (bool) ($is_prototype ? API::ItemPrototype()->update($items) : API::Item()->update($items));
+			$result = DBend($result);
 		}
 
-		if (DBend($result)) {
+		if ($result) {
 			$output = ['title' => $is_prototype ? _('Item prototypes updated') : _('Items updated')];
 			$messages = CMessageHelper::getMessages();
 

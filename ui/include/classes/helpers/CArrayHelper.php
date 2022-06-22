@@ -94,36 +94,6 @@ class CArrayHelper {
 	}
 
 	/**
-	 * Get a value specified by key or multi-level deep path, with fallback.
-	 *
-	 * @param array $array
-	 * @param mixed $path     String/index or array thereof for multidimensional search.
-	 * @param mixed $default  Fallback value to be returned if path was not matched.
-	 *
-	 * @return mixed
-	 */
-	public static function getByPath(array $array, $path, $default = null) {
-		if (!is_array($path)) {
-			$path = [$path];
-		}
-
-		$key = array_shift($path);
-
-		if (!array_key_exists($key, $array)) {
-			return $default;
-		}
-
-		if (!$path) {
-			return $array[$key];
-		}
-		elseif (!is_array($array[$key])) {
-			return $default;
-		}
-
-		return self::getByPath($array[$key], $path, $default);
-	}
-
-	/**
 	 * Select sub-array of array items with keys in given numeric range.
 	 *
 	 * @static

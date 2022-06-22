@@ -45,7 +45,7 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * @inheritDoc
 	 */
-	public const PREPROC_TYPES_WITH_PARAMS = [
+	protected const PREPROC_TYPES_WITH_PARAMS = [
 		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_REGSUB,
 		ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
 		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
@@ -400,7 +400,7 @@ class CItemPrototype extends CItemGeneral {
 			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
 			]],
 			'hostid' =>			['type' => API_ANY],
 			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -410,20 +410,20 @@ class CItemPrototype extends CItemGeneral {
 			'value_type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
 			]],
 			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history'), 'default' => '90d'],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends'), 'default' => '365d'],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'trends')]
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_ID, 'in' =>ZEROID]
 			]],
 			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'logtimefmt')]
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
@@ -569,20 +569,20 @@ class CItemPrototype extends CItemGeneral {
 			'value_type' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
 			]],
 			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history'), 'default' => '90d'],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends'), 'default' => '365d'],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'trends')]
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
 			]],
 			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'logtimefmt')]
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
@@ -1025,7 +1025,7 @@ class CItemPrototype extends CItemGeneral {
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
 		DB::update('items', [
-			'values' => ['templateid' => 0, 'master_itemid' => 0],
+			'values' => ['templateid' => ZEROID, 'master_itemid' => ZEROID],
 			'where' => ['itemid' => $del_itemids]
 		]);
 		DB::delete('items', ['itemid' => $del_itemids]);

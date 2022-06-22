@@ -45,7 +45,7 @@ class CItem extends CItemGeneral {
 	/**
 	 * @inheritDoc
 	 */
-	public const PREPROC_TYPES_WITH_PARAMS = [
+	protected const PREPROC_TYPES_WITH_PARAMS = [
 		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_REGSUB,
 		ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
 		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
@@ -56,7 +56,7 @@ class CItem extends CItemGeneral {
 	/**
 	 * @inheritDoc
 	 */
-	public const PREPROC_TYPES_WITH_ERR_HANDLING = [
+	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [
 		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_REGSUB, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
 		ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
 		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
@@ -526,7 +526,7 @@ class CItem extends CItemGeneral {
 			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
 			]],
 			'hostid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
@@ -535,24 +535,24 @@ class CItem extends CItemGeneral {
 			'value_type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
 			]],
 			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history'), 'default' => '90d'],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends'), 'default' => '365d'],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'trends')]
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
 			]],
 			'inventory_link' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])], 'type' => API_INT32, 'in' => '0,'.implode(',', array_keys(getHostInventories()))],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('items', 'inventory_link')]
 			]],
 			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'logtimefmt')]
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
@@ -603,11 +603,7 @@ class CItem extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends'), 'default' => '365d'],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $items, '/', $error)) {
@@ -626,7 +622,7 @@ class CItem extends CItemGeneral {
 
 		$db_items = DBfetchArrayAssoc(DBselect(
 			'SELECT i.itemid,i.name,i.type,i.key_,i.value_type,i.units,i.history,i.trends,i.valuemapid,'.
-				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.flags,'.
+				'i.inventory_link,i.logtimefmt,i.description,i.status,i.hostid,i.templateid,i.master_itemid,i.flags,'.
 				'h.status AS host_status'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
@@ -686,7 +682,7 @@ class CItem extends CItemGeneral {
 	/**
 	 * @return array
 	 */
-	public static function getValidationRules(): array {
+	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'itemid' =>			['type' => API_ANY],
 			'hostid' =>			['type' => API_ANY],
@@ -696,24 +692,24 @@ class CItem extends CItemGeneral {
 			'value_type' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
 			]],
-			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history'), 'default' => '90d'],
+			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => ITEM_NO_STORAGE_VALUE.','.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends'), 'default' => '365d'],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
+									['else' => true, 'type' => API_TIME_UNIT, 'in' => implode(',', [ITEM_NO_STORAGE_VALUE, DB::getDefault('items', 'trends')])]
 			]],
 			'valuemapid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64])], 'type' => API_ID],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_ID, 'in' => ZEROID, 'flags' => API_ALLOW_NULL]
 			]],
 			'inventory_link' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])], 'type' => API_INT32, 'in' => '0,'.implode(',', array_keys(getHostInventories()))],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('items', 'inventory_link')]
 			]],
 			'logtimefmt' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => ITEM_VALUE_TYPE_LOG], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'logtimefmt')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'logtimefmt')]
 			]],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
 			'status' =>			['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
@@ -733,15 +729,15 @@ class CItem extends CItemGeneral {
 			'key_' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'value_type' =>		['type' => API_ANY],
 			'units' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history'), 'default' => '90d'],
+			'history' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => ITEM_NO_STORAGE_VALUE.','.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'history')],
 			'trends' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends'), 'default' => '365d'],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'trends')],
+									['else' => true, 'type' => API_TIME_UNIT, 'in' => implode(',', [ITEM_NO_STORAGE_VALUE, DB::getDefault('items', 'trends')])]
 			]],
 			'valuemapid' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'inventory_link' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])], 'type' => API_INT32, 'in' => '0,'.implode(',', array_keys(getHostInventories()))],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('items', 'inventory_link')]
 			]],
 			'logtimefmt' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
@@ -1413,7 +1409,7 @@ class CItem extends CItemGeneral {
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
 		DB::update('items', [
-			'values' => ['templateid' => 0, 'master_itemid' => 0],
+			'values' => ['templateid' => ZEROID, 'master_itemid' => ZEROID],
 			'where' => ['itemid' => $del_itemids]
 		]);
 		DB::delete('items', ['itemid' => $del_itemids]);

@@ -6644,7 +6644,7 @@ class CApiInputValidatorTest extends TestCase {
 				'/1/xml',
 				'<?xml version="1.0" encoding="UTF-8"?><node><script /></node>'
 			],
-			[
+			'Unparseable/unparsable mismatch OK here due to possible libxml version mismatch' => [
 				['type' => API_XML],
 				'<?xml version="1.0" encoding="UTF-8"?><node></></node>',
 				'/1/xml',

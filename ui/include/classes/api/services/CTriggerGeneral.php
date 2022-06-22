@@ -501,7 +501,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 					$hostid = $chd_trigger['hostid'];
 					unset($chd_trigger['hostid'], $chd_trigger['host']);
-					$chd_triggers_description[$hostid][$tpl_trigger['triggerid']] = $chd_trigger + ['templateid' => 0];
+					$chd_triggers_description[$hostid][$tpl_trigger['triggerid']] = $chd_trigger + ['templateid' => ZEROID];
 				}
 			}
 		}

@@ -49,8 +49,8 @@ class testItem extends CAPITest {
 			ITEM_TYPE_SNMP => '50029',
 			ITEM_TYPE_SCRIPT => '50022'
 		];
-
 		$item_type_tests = [];
+
 		foreach ($valid_item_types as $type => $interfaceid) {
 			switch ($type) {
 				case ITEM_TYPE_IPMI:
@@ -66,6 +66,11 @@ class testItem extends CAPITest {
 					break;
 
 				case ITEM_TYPE_TELNET:
+					$params = [
+						'username' => 'username'
+					];
+					break;
+
 				case ITEM_TYPE_SSH:
 					$params = [
 						'username' => 'username',
@@ -75,8 +80,7 @@ class testItem extends CAPITest {
 
 				case ITEM_TYPE_DEPENDENT:
 					$params = [
-						'master_itemid' => '150151',
-						'delay' => '0'
+						'master_itemid' => '150151'
 					];
 					break;
 
@@ -103,6 +107,14 @@ class testItem extends CAPITest {
 					$params = [
 						'params' => 'script',
 						'timeout' => '30s'
+					];
+
+					$interfaceid = false;
+					break;
+
+				case ITEM_TYPE_CALCULATED:
+					$params = [
+						'params' => '1+1'
 					];
 					break;
 
@@ -168,7 +180,7 @@ class testItem extends CAPITest {
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX
 				],
-				'expected_error' => 'Incorrect arguments passed to function.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "delay" is missing.'
 			],
 			[
 				'request_data' => [
@@ -180,7 +192,7 @@ class testItem extends CAPITest {
 					'type' => ITEM_TYPE_ZABBIX,
 					'delay' => '0'
 				],
-				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals set.'
 			],
 			// Test update interval for mqtt key of the Active agent type.
 			[
@@ -188,7 +200,6 @@ class testItem extends CAPITest {
 					'hostid' => '50009',
 					'name' => 'Test mqtt key for active agent',
 					'key_' => 'mqtt.get[3]',
-					'interfaceid' => '50022',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE
 				],
@@ -199,7 +210,6 @@ class testItem extends CAPITest {
 					'hostid' => '50009',
 					'name' => 'Test mqtt key with 0 delay for active agent',
 					'key_' => 'mqtt.get[4]',
-					'interfaceid' => '50022',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
@@ -213,7 +223,6 @@ class testItem extends CAPITest {
 					'key_' => 'trapper_item_1',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_TRAPPER,
-					'delay' => '0',
 					'tags' => [
 						[
 							'tag' => 'tag',
@@ -232,7 +241,6 @@ class testItem extends CAPITest {
 					'hostid' => '50009',
 					'name' => 'Test mqtt with wrong key and 0 delay',
 					'key_' => 'mqt.get[5]',
-					'interfaceid' => '50022',
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 					'delay' => '0'
@@ -252,7 +260,6 @@ class testItem extends CAPITest {
 					'preprocessing' => [
 						[
 							'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
-							'params' => '',
 							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 							'error_handler_params' => ''
 						]
@@ -282,8 +289,7 @@ class testItem extends CAPITest {
 					'interfaceid' => 0,
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'type' => ITEM_TYPE_SIMPLE,
-					'delay' => '30s',
-					'url' => '192.168.0.1'
+					'delay' => '30s'
 				],
 				'expected_error' => 'No interface found.'
 			]
@@ -377,7 +383,7 @@ class testItem extends CAPITest {
 					'key_' => 'mqtt.get[00]',
 					'delay' => '0'
 				],
-				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals set.'
 			],
 			// Test update interval for wrong mqtt key of the Active agent item type.
 			[
@@ -387,15 +393,14 @@ class testItem extends CAPITest {
 					'type' => ITEM_TYPE_ZABBIX,
 					'delay' => '0'
 				],
-				'expected_error' => 'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals set.'
 			],
 			// Change type to active agent and check update interval for mqtt key.
 			[
 				'request_data' => [
 					'item' => 'testItem_Update:agent.ping',
 					'key_' => 'mqtt.get[22]',
-					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-					'delay' => '0'
+					'type' => ITEM_TYPE_ZABBIX_ACTIVE
 				],
 				'expected_error' => null
 			],

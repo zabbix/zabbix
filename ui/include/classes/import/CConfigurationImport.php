@@ -837,83 +837,6 @@ class CConfigurationImport {
 					? $this->referencer->findItemidByUuid($item['uuid'])
 					: $this->referencer->findItemidByKey($hostid, $item['key_']);
 
-				unset($item['triggers']);
-
-				if ($item['type'] != ITEM_TYPE_HTTPAGENT) {
-					unset($item['allow_traps']);
-					unset($item['url']);
-					unset($item['query_fields']);
-					unset($item['post_type']);
-					unset($item['posts']);
-					unset($item['status_codes']);
-					unset($item['follow_redirects']);
-					unset($item['http_proxy']);
-					unset($item['headers']);
-					unset($item['retrieve_mode']);
-					unset($item['request_method']);
-					unset($item['output_format']);
-					unset($item['ssl_cert_file']);
-					unset($item['ssl_key_file']);
-					unset($item['ssl_key_password']);
-					unset($item['verify_peer']);
-					unset($item['verify_host']);
-				}
-
-				if ($item['type'] != ITEM_TYPE_SNMP) {
-					unset($item['snmp_oid']);
-				}
-
-				if ($item['type'] != ITEM_TYPE_IPMI) {
-					unset($item['ipmi_sensor']);
-				}
-
-				if ($item['type'] != ITEM_TYPE_JMX) {
-					unset($item['jmx_endpoint']);
-				}
-
-				if ($item['type'] != ITEM_TYPE_SSH) {
-					unset($item['publickey']);
-					unset($item['privatekey']);
-				}
-
-				if ($item['type'] != ITEM_TYPE_SCRIPT) {
-					unset($item['parameters']);
-				}
-
-				if ($item['value_type'] != ITEM_VALUE_TYPE_LOG) {
-					unset($item['logtimefmt']);
-				}
-
-				if (!in_array($item['type'], [ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SCRIPT,
-							ITEM_TYPE_CALCULATED
-						])) {
-					unset($item['params']);
-				}
-
-				if (!in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-					unset($item['trends']);
-					unset($item['units']);
-				}
-
-				if ($item['type'] != ITEM_TYPE_HTTPAGENT && $item['type'] != ITEM_TYPE_TRAPPER) {
-					unset($item['trapper_hosts']);
-				}
-
-				if ($item['type'] != ITEM_TYPE_HTTPAGENT && $item['type'] != ITEM_TYPE_SSH) {
-					unset($item['authtype']);
-				}
-
-				if ($item['type'] != ITEM_TYPE_HTTPAGENT && $item['type'] != ITEM_TYPE_SCRIPT) {
-					unset($item['timeout']);
-				}
-
-				if (!in_array($item['type'], [ITEM_TYPE_SIMPLE, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_DB_MONITOR,
-							ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT
-						])) {
-					unset($item['password']);
-					unset($item['username']);
-				}
-
 				if ($itemid !== null) {
 					$item['itemid'] = $itemid;
 
@@ -988,7 +911,7 @@ class CConfigurationImport {
 	 * Update CItem or CItemPrototype with dependency.
 	 *
 	 * @param array $items_by_level              Associative array of entities where key is entity dependency
-	 *                                             level and value is array of entities for this level.
+	 *                                           level and value is array of entities for this level.
 	 * @param string $master_item_key            Master entity array key in xml parsed data.
 	 * @param CItem|CItemPrototype $api_service  Entity service which is capable to proceed with entity update.
 	 *

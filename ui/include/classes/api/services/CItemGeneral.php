@@ -93,14 +93,14 @@ abstract class CItemGeneral extends CApiService {
 		$checked_fields = array_fill_keys($field_names, ['type' => API_ANY]);
 
 		foreach ($items as $i => &$item) {
-			$api_input_rules = ['type' => API_OBJECT, 'fields' => $checked_fields];
+			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => $checked_fields];
 			$db_item = ($db_items === null) ? null : $db_items[$item['itemid']];
 			$item_type = CItemTypeFactory::getObject($item['type']);
 
 			if ($db_item === null) {
 				$api_input_rules['fields'] += $item_type::getCreateValidationRules($item);
 			}
-			elseif ($db_item['templateid'] != 0) {
+			elseif ($db_item['templateid'] != ZEROID) {
 				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 					$item += array_intersect_key($db_item, array_flip(['allow_traps']));
 				}
@@ -150,41 +150,39 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				if (array_key_exists('query_fields', $item)) {
-					foreach ($item['query_fields'] as $query_field) {
-						if (count($query_field) != 1 || key($query_field) === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i + 1).'/query_fields', _('nonempty key and value pair expected'))
-							);
-						}
-					}
-
-					$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
-
-					if (strlen($item['query_fields']) > DB::getFieldLength('items', 'query_fields')) {
+			if (array_key_exists('query_fields', $item)) {
+				foreach ($item['query_fields'] as $query_field) {
+					if (count($query_field) != 1 || key($query_field) === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($i + 1).'/query_fields', _('value is too long')
+							'/'.($i + 1).'/query_fields', _('nonempty key and value pair expected'))
+						);
+					}
+				}
+
+				$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
+
+				if (strlen($item['query_fields']) > DB::getFieldLength('items', 'query_fields')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/query_fields', _('value is too long')
+					));
+				}
+			}
+
+			if (array_key_exists('headers', $item)) {
+				foreach ($item['headers'] as $name => $value) {
+					if (trim($name) === '' || !is_string($value) || $value === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							'/'.($i + 1).'/headers', _('nonempty key and value pair expected')
 						));
 					}
 				}
 
-				if (array_key_exists('headers', $item)) {
-					foreach ($item['headers'] as $name => $value) {
-						if (trim($name) === '' || !is_string($value) || $value === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($i + 1).'/headers', _('nonempty key and value pair expected'))
-							);
-						}
-					}
+				$item['headers'] = self::headersArrayToString($item['headers']);
 
-					$item['headers'] = self::headersArrayToString($item['headers']);
-
-					if (strlen($item['headers']) > DB::getFieldLength('items', 'headers')) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($i + 1).'/headers', _('value is too long')
-						));
-					}
+				if (strlen($item['headers']) > DB::getFieldLength('items', 'headers')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						'/'.($i + 1).'/headers', _('value is too long')
+					));
 				}
 			}
 		}
@@ -232,12 +230,12 @@ abstract class CItemGeneral extends CApiService {
 				'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
 				'params' =>					['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', static::PREPROC_TYPES_WITH_PARAMS)], 'type' => API_PREPROC_PARAMS, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($flags & API_ALLOW_LLD_MACRO), 'preproc_type' => ['field' => 'type'], 'length' => DB::getFieldLength('item_preproc', 'params')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_PREPROC_PARAMS, 'in' => DB::getDefault('item_preproc', 'params')]
 											]],
 				'error_handler' =>			['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'type', 'in' => implode(',', array_diff(static::PREPROC_TYPES_WITH_ERR_HANDLING, [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]))], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
 												['if' => ['field' => 'type', 'in' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('item_preproc', 'error_handler')]
 				]],
 				'error_handler_params' =>	['type' => API_MULTIPLE, 'rules' => [
 												['if' => static function (array $data): bool {
@@ -246,7 +244,7 @@ abstract class CItemGeneral extends CApiService {
 												['if' => static function (array $data): bool {
 													return array_key_exists('error_handler', $data) && $data['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR;
 												},  'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
-												['else' => true, 'type' => API_UNEXPECTED]
+												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('item_preproc', 'error_handler_params')]
 				]]
 			]
 		];
@@ -666,7 +664,7 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function checkKeyAlreadyInherited(array $item, array $row): void {
 		if (bccomp($item['hostid'], $row['parent_hostid']) == 0 && $row['key_'] === $item['key_']
-				&& $row['templateid'] != 0) {
+				&& $row['templateid'] != ZEROID) {
 			$item_hosts = DB::select('hosts', [
 				'output' => ['host'],
 				'hostids' => [$row['hostid']]
@@ -850,7 +848,7 @@ abstract class CItemGeneral extends CApiService {
 			foreach ($items as $i => $item) {
 				// Item is (or switched type) to dependent; is changed along with its master-item.
 				if ($item['type'] == ITEM_TYPE_DEPENDENT
-						|| (array_key_exists('master_itemid', $item) && $item['master_itemid'] != 0)) {
+						|| (array_key_exists('master_itemid', $item) && $item['master_itemid'] != ZEROID)) {
 					$dep_items[$i] = $item;
 					unset($items[$i]);
 				}
@@ -1038,11 +1036,6 @@ abstract class CItemGeneral extends CApiService {
 		}
 	}
 
-	/**
-	 * Common create handler for Items and derivatives.
-	 *
-	 * @param array $items Item or derived entity (prototype, discovery rule).
-	 */
 	public static function createForce(array &$items): void {
 		$itemids = DB::insert('items', $items);
 
@@ -1618,7 +1611,7 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($items as $i => $item) {
 			$interface_type = itemTypeInterface($item['type']);
 
-			if ($interface_type != INTERFACE_TYPE_OPT && $item['interfaceid'] != 0) {
+			if ($interface_type != INTERFACE_TYPE_OPT && $item['interfaceid'] != ZEROID) {
 				if (!array_key_exists($item['interfaceid'], $db_interfaces)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/interfaceid', _('the host interface ID is expected')
@@ -1771,7 +1764,7 @@ abstract class CItemGeneral extends CApiService {
 				unset($items[$i]);
 			}
 			elseif (array_key_exists('itemid', $item)) {
-				if ($db_items[$item['itemid']]['master_itemid'] != 0) {
+				if ($db_items[$item['itemid']]['master_itemid'] != ZEROID) {
 					$del_links[$item['itemid']] = $db_items[$item['itemid']]['master_itemid'];
 				}
 			}
@@ -1794,7 +1787,7 @@ abstract class CItemGeneral extends CApiService {
 		$root_itemids = [];
 
 		foreach ($dep_item_links as $itemid => $master_itemid) {
-			if ($master_itemid == 0) {
+			if ($master_itemid == ZEROID) {
 				$root_itemids[] = $itemid;
 			}
 		}
@@ -1860,12 +1853,9 @@ abstract class CItemGeneral extends CApiService {
 
 		foreach ($items as $i => $item) {
 			if (!array_key_exists($item['master_itemid'], $db_master_items)) {
-				if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$error = _('an item/item prototype ID is expected');
-				}
-				else {
-					$error = _('an item ID is expected');
-				}
+				$error = $flags == ZBX_FLAG_DISCOVERY_PROTOTYPE
+					? _('an item/item prototype ID is expected')
+					: _('an item ID is expected');
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i + 1).'/master_itemid', $error
@@ -1875,19 +1865,16 @@ abstract class CItemGeneral extends CApiService {
 			$db_master_item = $db_master_items[$item['master_itemid']];
 
 			if (bccomp($db_master_item['hostid'], $item['hostid']) != 0) {
-				if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$error = _('cannot be an item/item prototype ID from another host or template');
-				}
-				else {
-					$error = _('cannot be an item ID from another host or template');
-				}
+				$error = $flags == ZBX_FLAG_DISCOVERY_PROTOTYPE
+					? _('cannot be an item/item prototype ID from another host or template')
+					: _('cannot be an item ID from another host or template');
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 					'/'.($i + 1).'/master_itemid', $error
 				));
 			}
 
-			if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE && $db_master_item['ruleid'] != 0) {
+			if ($flags == ZBX_FLAG_DISCOVERY_PROTOTYPE && $db_master_item['ruleid'] != ZEROID) {
 				$item_ruleid = array_key_exists('itemid', $item)
 					? $item['ruleid']
 					: $db_items[$item['itemid']]['ruleid'];
@@ -1931,7 +1918,7 @@ abstract class CItemGeneral extends CApiService {
 
 				$links[$db_master_item['itemid']] = $db_master_item['master_itemid'];
 
-				if ($db_master_item['master_itemid'] != 0) {
+				if ($db_master_item['master_itemid'] != ZEROID) {
 					$master_itemids[$db_master_item['master_itemid']] = true;
 				}
 			}
@@ -1952,7 +1939,7 @@ abstract class CItemGeneral extends CApiService {
 		foreach ($items as $i => $item) {
 			$master_itemid = $item['master_itemid'];
 
-			while ($master_itemid != 0) {
+			while ($master_itemid != ZEROID) {
 				if ($master_itemid == $item['itemid']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/master_itemid', _('circular item dependency is not allowed')
@@ -1987,7 +1974,7 @@ abstract class CItemGeneral extends CApiService {
 				$upd_item_links[$item['master_itemid']][] = $item['itemid'];
 			}
 			else {
-				$ins_links[$item['master_itemid']][] = 0;
+				$ins_links[$item['master_itemid']][] = ZEROID;
 			}
 		}
 
@@ -2345,7 +2332,7 @@ abstract class CItemGeneral extends CApiService {
 		$item_indexes = [];
 
 		foreach ($items as $i => $item) {
-			if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != 0
+			if (array_key_exists('valuemapid', $item) && $item['valuemapid'] != ZEROID
 					&& ($db_items === null
 						|| bccomp($item['valuemapid'], $db_items[$item['itemid']]['valuemapid']) != 0)) {
 				$item_indexes[$item['valuemapid']][] = $i;

@@ -1183,7 +1183,7 @@ class CApiInputValidator {
 	private static function validateId($rule, &$data, $path, &$error) {
 		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-		if (($flags & API_ALLOW_NULL) && $data === null) {
+		if (($flags & API_ALLOW_NULL) && ($data === null || $data == ZEROID)) {
 			return true;
 		}
 
@@ -1204,12 +1204,8 @@ class CApiInputValidator {
 
 		$data = (string) $data;
 
-		if ($data[0] === '0') {
-			$data = ltrim($data, '0');
-
-			if ($data === '') {
-				$data = '0';
-			}
+		if (rtrim($data, '0') === '') {
+			$data = '0';
 		}
 
 		return true;
@@ -2086,6 +2082,12 @@ class CApiInputValidator {
 		if ($seconds < ZBX_MIN_INT32 || $seconds > ZBX_MAX_INT32) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a number is too large'));
 			return false;
+		}
+
+		$time_unit_in = timeUnitToSeconds($rule['in'], true);
+
+		if ($time_unit_in !== null) {
+			$rule['in'] = $time_unit_in;
 		}
 
 		return self::checkInt32In($rule, $seconds, $path, $error);
@@ -3401,6 +3403,47 @@ class CApiInputValidator {
 	}
 
 	/**
+	 * Combine overlapping segments of time to their longest forms.
+	 * ```
+	 * In:
+	 * [segment]-----[segment]
+	 * ---[segment]-----------
+	 * Out:
+	 * [segment---]--[segment]
+	 * ````
+	 * @param array $array  Entries containing time from/to information.
+	 *                      Earlier segment is used to carry other data contained in the overlapping segment arrays.
+	 * @param int $array['time_from']  timestamp
+	 * @param int $array['time_to']    timestamp
+	 *
+	 * @return array
+	 */
+	private static function mergeTimeSegments(array $array): array {
+		CArrayHelper::sort($array, ['time_from']);
+		$result = [array_shift($array)];
+
+		while ($segment = array_shift($array)) {
+			$last_segment = end($result);
+
+			// Already contained?
+			if ($segment['time_to'] < $last_segment['time_to']) {
+				continue;
+			}
+
+			// Starts after end of last segment?
+			if ($segment['time_from'] > $last_segment['time_to']) {
+				$result[] = $segment;
+				continue;
+			}
+
+			// Merge segments; time_to greater or equal to last segment's at this point.
+			$result[count($result) - 1]['time_to'] = $segment['time_to'];
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Try to parse delay/interval information and check that some polling can be performed during the schedule-week.
 	 *
 	 * Note: It is mainly assumed for macros to contain non-zero/empty values aimed at enabling polling.
@@ -3439,16 +3482,9 @@ class CApiInputValidator {
 		]);
 
 		if ($update_interval_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			if (is_numeric($data)) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-					_s('value must be one of %1$s', implode(':', [0, SEC_PER_DAY]))
-				);
-			}
-			else {
-				$error = strpos($data, ';') === false
-					? _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'))
-					:  _s('Invalid parameter "%1$s": %2$s.', $path, $update_interval_parser->getError());
-			}
+			$error = strpos($data, ';') === false
+				? _s('Invalid parameter "%1$s": %2$s.', $path, _('a time unit is expected'))
+				: _s('Invalid parameter "%1$s": %2$s.', $path, $update_interval_parser->getError());
 
 			return false;
 		}
@@ -3533,7 +3569,7 @@ class CApiInputValidator {
 		}
 
 		$end_of_week =  7 * SEC_PER_DAY;
-		$zero_segments = mergeTimeSegments($zero_intervals);
+		$zero_segments = self::mergeTimeSegments($zero_intervals);
 
 		// Check for 'zero-week' edge case - where the whole week was spanned by zero intervals.
 		if (count($zero_segments) == 1) {
@@ -3631,15 +3667,10 @@ class CApiInputValidator {
 		}
 
 		$json = $data;
-		$types = [];
-
-		if ($flags & API_ALLOW_USER_MACRO) {
-			$types['usermacros'] = true;
-		}
-
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$types['lldmacros'] = true;
-		}
+		$types = [
+			'usermacros' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'lldmacros' => (bool) ($flags & API_ALLOW_LLD_MACRO)
+		];
 
 		if (array_key_exists('macros_n', $rule)) {
 			$types['macros_n'] = $rule['macros_n'];
@@ -3657,7 +3688,7 @@ class CApiInputValidator {
 
 		json_decode($json);
 
-		if (json_last_error()) {
+		if (json_last_error() != JSON_ERROR_NONE) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('JSON is expected'));
 			return false;
 		}

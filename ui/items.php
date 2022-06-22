@@ -536,7 +536,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	$input = hasRequest('add')
 		? ['host_status' => $item_host['status'], 'flags' => ZBX_FLAG_DISCOVERY_NORMAL] + $_REQUEST
 		: $_REQUEST;
-	$items = CItemBaseHelper::sanitizeItems([$input], $db_items);
+	$items = CItemBaseHelper::extractItems([$input], $db_items);
 
 	if ($items) {
 		DBstart();
