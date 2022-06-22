@@ -1557,13 +1557,6 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50003, 
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99009, 90012, '{$PROTOYPE_MACRO_1}', 'Prototype macro value 1', 'Prototype macro description 1');
 INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (99010, 90012, '{$PROTOYPE_MACRO_2}', 'Prototype macro value 2', 'Prototype macro description 2');
 
--- LLD host with templates
-INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90079,'Host prototype LLD','Host prototype LLD',0,'',4);
-INSERT INTO host_discovery (hostid, parent_hostid) VALUES (90079, 90003);
-INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) values (50084,90079,1,1,1,'127.0.0.1','','10050');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99990, 90079, 4);
-INSERT INTO hosts_templates (hosttemplateid, hostid, templateid, link_type) VALUES (50011, 90079, 10001, 1);
-
 -- adding test data to the 'alerts' table for testing Reports-> Notifications
 INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (8, 12, 1, 1, 1483275171, 1, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.01.01 12:52:51', 1, 0, '', 1, 0, '');
 INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, message, status, retries, error, esc_step, alerttype, parameters) VALUES (9, 12, 1, 2, 1486039971, 3, 'notificatio.report@zabbix.com', 'PROBLEM: problem', 'Event at 2017.02.02 12:52:51', 1, 0, '', 1, 0, '');
