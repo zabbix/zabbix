@@ -386,10 +386,7 @@ static void	lld_hosts_get_tags(zbx_vector_ptr_t *hosts)
 	}
 out:
 	for (i = 0; i < hosts->values_num; i++)
-	{
 		host = (zbx_lld_host_t *)hosts->values[i];
-		zbx_vector_db_tag_ptr_sort(&host->tags, zbx_db_tag_compare_func);
-	}
 
 	DBfree_result(result);
 	zbx_free(sql);
