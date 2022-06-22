@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-14T13:06:15Z'
+  date: '2022-06-22T12:24:51Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -1098,33 +1098,40 @@ zabbix_export:
                     return response;
                 },
             
+            
                 getVolumesData: function () {
-                    var payload = {},
-                        result = [];
+                      var payload = {},
+                          volumes_list = [],
+                          result = [];
             
-                    payload['Action'] = 'DescribeVolumes',
-                        payload['MaxResults'] = 100,
-                        payload['Version'] = '2016-11-15',
-                        payload['Filter.1.Name'] = 'attachment.instance-id',
-                        payload['Filter.1.Value'] = AwsEbs.params.instance_id;
+                      payload['Action'] = 'DescribeVolumes',
+                          payload['MaxResults'] = 100,
+                          payload['Version'] = '2016-11-15',
+                          payload['Filter.1.Name'] = 'attachment.instance-id',
+                          payload['Filter.1.Value'] = AwsEbs.params.instance_id;
             
-                    while (payload.NextToken !== '') {
-                        var volumes = AwsEbs.request('GET', AwsEbs.params.region, 'ec2', AwsEbs.prepareParams(payload));
-                        if (typeof result !== 'object'
-                            || typeof volumes.DescribeVolumesResponse !== 'object'
-                            || typeof volumes.DescribeVolumesResponse.volumeSet !== 'object'
-                            || typeof volumes.DescribeVolumesResponse.volumeSet.item !== 'object') {
-                            throw 'Cannot get metrics data from AWS EC2 API. Check debug log for more information.';
-                        }
-                        payload.NextToken = volumes.DescribeVolumesResponse.NextToken || '';
-                        volumes.DescribeVolumesResponse.volumeSet.item.forEach(function (volume) {
-                            result.push(volume)
-                        });
-                    }
+                      while (payload.NextToken !== '') {
+                          var volumes = AwsEbs.request('GET', AwsEbs.params.region, 'ec2', AwsEbs.prepareParams(payload));
+                          if (typeof result !== 'object'
+                              || typeof volumes.DescribeVolumesResponse !== 'object'
+                              || typeof volumes.DescribeVolumesResponse.volumeSet !== 'object'
+                              || typeof volumes.DescribeVolumesResponse.volumeSet.item !== 'object') {
+                              throw 'Cannot get metrics data from AWS EC2 API. Check debug log for more information.';
+                          }
+                          payload.NextToken = volumes.DescribeVolumesResponse.NextToken || '';
+                          volumes_list = volumes.DescribeVolumesResponse.volumeSet.item
             
-                    return result;
-                }
-            };
+                          if (typeof volumes_list === 'object'
+                              && volumes_list !== null
+                              && !Array.isArray(volumes_list)) {
+                              volumes_list = [volumes_list];
+                          }
+            
+                      }
+            
+                      return volumes_list;
+                  }
+              };
             
             try {
                 AwsEbs.setParams(JSON.parse(value));
@@ -2559,7 +2566,6 @@ zabbix_export:
           description: 'Amazon EC2 Region code.'
         -
           macro: '{$AWS.SECRET.ACCESS.KEY}'
-          type: SECRET_TEXT
           description: 'Secret access key.'
       valuemaps:
         -
