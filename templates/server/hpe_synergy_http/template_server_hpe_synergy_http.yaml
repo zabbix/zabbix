@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-22T18:06:05Z'
+  date: '2022-06-23T08:37:51Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -5578,7 +5578,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].maintenanceState.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].maintenanceState.first()'
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5622,7 +5622,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].maintenanceStateReason.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].maintenanceStateReason.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5652,7 +5652,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].memoryMb.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].memoryMb.first()'
                 -
                   type: MULTIPLIER
                   parameters:
@@ -5695,7 +5695,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].migrationState.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].migrationState.first()'
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5744,7 +5744,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].model.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].model.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5775,7 +5775,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].partNumber.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].partNumber.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5806,7 +5806,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].powerState.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].powerState.first()'
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5871,7 +5871,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].processorCoreCount.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorCoreCount.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5903,7 +5903,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].processorCount.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorCount.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5936,7 +5936,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].processorSpeedMhz.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorSpeedMhz.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5970,7 +5970,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].processorType.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorType.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -6004,7 +6004,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].serialNumber.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].serialNumber.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -6051,7 +6051,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].state.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].state.first()'
                 -
                   type: STR_REPLACE
                   parameters:
@@ -6207,7 +6207,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].stateReason.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].stateReason.first()'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -6245,7 +6245,7 @@ zabbix_export:
                 -
                   type: JSONPATH
                   parameters:
-                    - '$.["server-hardware"].members[?(@.serverName == "{#SERVER_NAME}")].status.first()'
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].status.first()'
                 -
                   type: STR_REPLACE
                   parameters:
