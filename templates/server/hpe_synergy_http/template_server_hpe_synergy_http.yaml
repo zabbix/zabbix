@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2022-06-23T08:37:51Z'
+  date: '2022-06-24T13:00:03Z'
   groups:
     -
       uuid: e960332b3f6c46a1956486d4f3f99fce
@@ -232,13 +232,13 @@ zabbix_export:
                                 enclosures = Synergy.requestData(methods[i]);
             
                                 enclosures.members.forEach(function (enclosure) {
-                                    enclosureName = enclosure.name;
+                                    enclosure_name = enclosure.name;
             
                                     for (var j in bays) {
                                         bay = enclosure[bays[j]];
             
                                         bay.forEach(function (b) {
-                                            b.enclosureName = enclosureName;
+                                            b.enclosureName = enclosure_name;
                                             enclosures.members[bays[j[b]]] = b;
                                         });
                                     }
@@ -337,7 +337,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: d3be63fe949c4960ba5a66c546b4ebcd
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Power State'
+              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Power state'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",bay_power_state]'
               delay: '0'
@@ -387,7 +387,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -418,7 +418,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -428,7 +428,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: df7ef9ae030c417e9c3a9b64d22c2bb9
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part Number'
+              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part number'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
@@ -449,7 +449,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -459,7 +459,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 7921c3c8ac07452d9a0cc47436d10aac
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Powered On'
+              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Powered on'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",powered_on]'
               delay: '0'
@@ -484,7 +484,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -545,16 +545,16 @@ zabbix_export:
                     - '0'
                     - '4'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: '5'
+                  error_handler_params: '2'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -564,7 +564,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: f352ca846fa34ba698b28f8d8883a14d
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial Number'
+              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
@@ -585,7 +585,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -595,7 +595,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 6d47ed045d904cc780c538a330ba0895
-              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare Part Number'
+              name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare part number'
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",spare_part_number]'
               delay: '0'
@@ -616,7 +616,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -646,6 +646,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].applianceBays[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -682,7 +686,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -705,7 +709,7 @@ zabbix_export:
                   uuid: c4acd5d5451d437ab5366b24643577be
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -745,11 +749,11 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.synergy.crossbars.discovery
           delay: '0'
-          description: 'SDX cross fabric module,connects to all compute devices installed in the system enclosure and brings in the capability of hard partitioning. Crossbar details are relevant only for enclosures with type "SDX".'
+          description: 'SDX cross fabric module connects to all compute devices installed in the system enclosure and brings in the capability of hard partitioning. Crossbar details are relevant only for enclosures with type "SDX".'
           item_prototypes:
             -
               uuid: c64e3a01454f473b888e57496ec642d3
-              name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: HW Version'
+              name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: HW version'
               type: DEPENDENT
               key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",hw_version]'
               delay: '0'
@@ -770,7 +774,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -780,7 +784,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: aaa521f31d2d4e04b918892e8e02911d
-              name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part Number'
+              name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part number'
               type: DEPENDENT
               key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
@@ -801,7 +805,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -862,16 +866,16 @@ zabbix_export:
                     - '0'
                     - '4'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: '5'
+                  error_handler_params: '2'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -892,7 +896,7 @@ zabbix_export:
                       value: notice
             -
               uuid: c7fe889af0fc43e0b73b20a99b7d193a
-              name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial Number'
+              name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
@@ -913,7 +917,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -943,6 +947,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].crossBars[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -979,11 +987,11 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: croosbar
+                  value: crossbar
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -1002,7 +1010,7 @@ zabbix_export:
                   uuid: 264dff5509fb4608b862bfd3e0510e32
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -1171,11 +1179,11 @@ zabbix_export:
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -1183,6 +1191,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.datacenters.members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -1239,7 +1251,7 @@ zabbix_export:
                   uuid: d04a24eceaad4741a877fdf1c58141c5
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=4'
                   name: 'Datacenter [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Datacenter [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -1301,7 +1313,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -1311,7 +1323,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 125d25085af54d509c6f2401a85042dc
-              name: 'Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Powered allocation'
+              name: 'Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Power allocated'
               type: DEPENDENT
               key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",power_allocation]'
               delay: '0'
@@ -1331,7 +1343,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -1392,20 +1404,20 @@ zabbix_export:
                     - '0'
                     - '4'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: '5'
+                  error_handler_params: '2'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: appliance
+                  value: device
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -1422,7 +1434,7 @@ zabbix_export:
                       value: notice
             -
               uuid: c2c012eab77d425da1c69f65a5078277
-              name: 'Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial Number'
+              name: 'Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
@@ -1444,7 +1456,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -1480,7 +1492,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: fb5f6aaec9254d9b998d68d647321a28
-              name: 'Enclosure [{#NAME}]: Appliance bay count'
+              name: 'Enclosure [{#NAME}]: Appliance bays count'
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",appliance_bay_count]'
               delay: '0'
@@ -1509,7 +1521,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: e0cc3af5e941491ebbb6227f2ece06a7
-              name: 'Enclosure [{#NAME}]: Device bay count'
+              name: 'Enclosure [{#NAME}]: Device bays count'
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",device_bay_count]'
               delay: '0'
@@ -1596,7 +1608,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: d6af8f4c7cf04fe6a41c02e6ff50b98a
-              name: 'Enclosure [{#NAME}]: Fan bay count'
+              name: 'Enclosure [{#NAME}]: Fan bays count'
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",fan_bay_count]'
               delay: '0'
@@ -1653,7 +1665,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 145729f95cfe42f0a8e8308b856a03a2
-              name: 'Enclosure [{#NAME}]: Interconnect bay count'
+              name: 'Enclosure [{#NAME}]: Interconnect bays count'
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",interconnect_bay_count]'
               delay: '0'
@@ -1722,7 +1734,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1h
+                    - 1d
               master_item:
                 key: hpe.synergy.data.get
               tags:
@@ -1748,6 +1760,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#NAME}")].minimumPowerSuppliesForRedundantPowerFeed.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
               master_item:
                 key: hpe.synergy.data.get
               tags:
@@ -1790,7 +1806,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 2ff00b9a0e2446a88aefc5cd62ca8763
-              name: 'Enclosure [{#NAME}]: Part Number'
+              name: 'Enclosure [{#NAME}]: Part number'
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",part_number]'
               delay: '0'
@@ -1925,7 +1941,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 4ee9c37fd5024e3d820f74fe174a42e7
-              name: 'Enclosure [{#NAME}]: Serial Number'
+              name: 'Enclosure [{#NAME}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",serial_number]'
               delay: '0'
@@ -2044,37 +2060,6 @@ zabbix_export:
                 -
                   tag: enclosure
                   value: '{#NAME}'
-              trigger_prototypes:
-                -
-                  uuid: 7cd90689dd8147949b1da375b055c71f
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=3'
-                  name: 'Enclosure [{#NAME}]: Is interrupted'
-                  priority: WARNING
-                  description: 'The previous operation on the enclosure did not complete. The operation should be re-attempted.'
-                  tags:
-                    -
-                      tag: scope
-                      value: notice
-                -
-                  uuid: 7bfc1a8cde3349cba772a6217df3e275
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=9'
-                  name: 'Enclosure [{#NAME}]: Is unsupported'
-                  priority: AVERAGE
-                  description: 'The enclosure model or version is not currently supported by HPE OneView. It cannot be configured or monitored.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
-                  uuid: ef82fad1874d4dd5918d9c33323b6ae6
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=6'
-                  name: 'Enclosure [{#NAME}]: Remove failed'
-                  priority: WARNING
-                  description: 'The previous operation to remove the enclosure did not succeed. The operation should be re-attempted.'
-                  tags:
-                    -
-                      tag: scope
-                      value: notice
             -
               uuid: 6947d7dc74744e05a5b2fbd6ae918f16
               name: 'Enclosure [{#NAME}]: State reason'
@@ -2158,16 +2143,6 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 -
-                  uuid: 10d8d58f1fe34a04873581d46d8335c3
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])=6'
-                  name: 'Enclosure [{#NAME}]: Has unsupported firmware'
-                  priority: AVERAGE
-                  description: 'The firmware version of the enclosure is not supported by this version of HPE OneView.'
-                  tags:
-                    -
-                      tag: scope
-                      value: availability
-                -
                   uuid: 61f81dcbb3c74f14982bd29b78f6a57b
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])=0'
                   name: 'Enclosure [{#NAME}]: Is missing'
@@ -2210,6 +2185,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -2266,7 +2245,7 @@ zabbix_export:
                   uuid: 50f4cfc199564b26bf575d88ec5ba57e
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=4'
                   name: 'Enclosure [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Enclosure [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -2310,6 +2289,40 @@ zabbix_export:
                 -
                   tag: enclosure
                   value: '{#NAME}'
+          trigger_prototypes:
+            -
+              uuid: 7cd90689dd8147949b1da375b055c71f
+              expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=3 and last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])>-1'
+              name: 'Enclosure [{#NAME}]: Is interrupted'
+              opdata: 'Reason: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The previous operation on the enclosure did not complete. The operation should be re-attempted.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
+            -
+              uuid: 7bfc1a8cde3349cba772a6217df3e275
+              expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=9 and last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])>-1'
+              name: 'Enclosure [{#NAME}]: Is unsupported'
+              opdata: 'Reason: {ITEM.LASTVALUE2}'
+              priority: AVERAGE
+              description: 'The enclosure model or version is not currently supported by HPE OneView. It cannot be configured or monitored.'
+              tags:
+                -
+                  tag: scope
+                  value: availability
+            -
+              uuid: ef82fad1874d4dd5918d9c33323b6ae6
+              expression: 'last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=6 and last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])>-1'
+              name: 'Enclosure [{#NAME}]: Remove failed'
+              opdata: 'Reason: {ITEM.LASTVALUE2}'
+              priority: WARNING
+              description: 'The previous operation to remove the enclosure did not succeed. The operation should be re-attempted.'
+              tags:
+                -
+                  tag: scope
+                  value: notice
           graph_prototypes:
             -
               uuid: 1f9d74b503f14765ad6a054f604f3e28
@@ -2338,6 +2351,18 @@ zabbix_export:
                   item:
                     host: 'HPE Synergy by HTTP'
                     key: 'hpe.synergy.enclosure["{#NAME}",fans_mgmt_power]'
+                -
+                  sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'HPE Synergy by HTTP'
+                    key: 'hpe.synergy.enclosure["{#NAME}",device_bay_watts]'
+                -
+                  sortorder: '5'
+                  color: 6C59DC
+                  item:
+                    host: 'HPE Synergy by HTTP'
+                    key: 'hpe.synergy.enclosure["{#NAME}",interconnect_bay_watts]'
           master_item:
             key: hpe.synergy.data.get
           lld_macro_paths:
@@ -2399,11 +2424,11 @@ zabbix_export:
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -2411,6 +2436,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["ethernet-networks"].members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -2467,7 +2496,7 @@ zabbix_export:
                   uuid: 6881808352bd4588b42debf5f2703f69
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=4'
                   name: 'Ethernet network [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Ethernet network [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -2544,11 +2573,11 @@ zabbix_export:
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -2556,6 +2585,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.fabrics.members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -2612,7 +2645,7 @@ zabbix_export:
                   uuid: c546f87158ee42ba8d76aa3fd6767efa
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=4'
                   name: 'Fabric [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Fabric [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -2674,7 +2707,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -2684,7 +2717,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 539f8b373baf46d7bcde5fc090f02284
-              name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part Number'
+              name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part number'
               type: DEPENDENT
               key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
@@ -2705,7 +2738,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -2766,16 +2799,16 @@ zabbix_export:
                     - '0'
                     - '4'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: '5'
+                  error_handler_params: '2'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -2785,7 +2818,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 6782d5441add454384b41d9ede2a8cf2
-              name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Presence'
+              name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Required'
               type: DEPENDENT
               key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",required]'
               delay: '0'
@@ -2810,7 +2843,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -2820,7 +2853,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 16a8b59afdf04df1a070e1249fdd1a61
-              name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial Number'
+              name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
@@ -2841,7 +2874,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -2851,7 +2884,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 4e6338579bea4bb7acb06e57d55365e5
-              name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare Part Number'
+              name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare part number'
               type: DEPENDENT
               key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",spare_part_number]'
               delay: '0'
@@ -2872,7 +2905,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -2941,7 +2974,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -3013,6 +3046,10 @@ zabbix_export:
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].fanBays[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
                 -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+                -
                   type: STR_REPLACE
                   parameters:
                     - Critical
@@ -3048,7 +3085,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -3071,7 +3108,7 @@ zabbix_export:
                   uuid: 168ea39107c748d0b7008b4525ff4504
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -3137,9 +3174,9 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: fc_network
+                  value: fc-network
                 -
-                  tag: fc_network
+                  tag: fc-network
                   value: '{#NAME}'
             -
               uuid: db0c86d17310421088cad2853d35c177
@@ -3151,11 +3188,11 @@ zabbix_export:
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -3163,6 +3200,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["fc-networks"].members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -3200,9 +3241,9 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: fc_network
+                  value: fc-network
                 -
-                  tag: fc_network
+                  tag: fc-network
                   value: '{#NAME}'
               trigger_prototypes:
                 -
@@ -3219,7 +3260,7 @@ zabbix_export:
                   uuid: edf33e3c732442c6ac3327e995d0919e
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=4'
                   name: 'FC network [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'FC network [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -3252,7 +3293,7 @@ zabbix_export:
                 - 6h
         -
           uuid: 0ac7b7355249475eac517cbc9ac8ba83
-          name: 'Synergy frame link modules discovery'
+          name: 'Managers discovery'
           type: DEPENDENT
           key: hpe.synergy.frame_link_modules.discovery
           delay: '0'
@@ -3281,11 +3322,11 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -3339,11 +3380,11 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -3369,6 +3410,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].linkPortStatus.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -3405,11 +3450,11 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -3431,7 +3476,7 @@ zabbix_export:
                   uuid: 73fd558563794741b1416fb73ba4f173
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=4'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] link port status is warning. Needs attention soon.'
                   tags:
                     -
@@ -3518,11 +3563,11 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -3548,6 +3593,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].mgmtPortStatus.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -3584,11 +3633,11 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -3607,7 +3656,7 @@ zabbix_export:
                   uuid: 7dd75b26c54d41228199ee9e810272bc
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=4'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] MGMT port status is warning. Needs attention soon.'
                   tags:
                     -
@@ -3646,17 +3695,17 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 90a8d8e504834e4393c3fa0bbcb5e802
-              name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part Number'
+              name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part number'
               type: DEPENDENT
               key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
@@ -3677,11 +3726,11 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -3738,20 +3787,20 @@ zabbix_export:
                     - '0'
                     - '4'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: '5'
+                  error_handler_params: '2'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -3768,7 +3817,7 @@ zabbix_export:
                       value: notice
             -
               uuid: 1d9ac1bcc74048df8358c148c3ed9ce4
-              name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial Number'
+              name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
@@ -3789,17 +3838,17 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: c6ee7ec806e04600b6826dbb373bcafe
-              name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare Part Number'
+              name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare part number'
               type: DEPENDENT
               key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",spare_part_number]'
               delay: '0'
@@ -3820,11 +3869,11 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -3850,6 +3899,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].managerBays[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -3886,11 +3939,11 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
-                  value: frame_link_module
+                  value: manager
                 -
                   tag: enclosure
                   value: '{#ENCLOSURE_NAME}'
@@ -3909,7 +3962,7 @@ zabbix_export:
                   uuid: 44b30472c18a49cf9c0f7bb2f30fd184
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -3998,9 +4051,9 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: hypervisor_manager
+                  value: hypervisor-manager
                 -
-                  tag: hypervisor_manager
+                  tag: hypervisor-manager
                   value: '{#NAME}'
             -
               uuid: 2f0874b4d0464fc58d64c12a04b8d738
@@ -4026,9 +4079,9 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: hypervisor_manager
+                  value: hypervisor-manager
                 -
-                  tag: hypervisor_manager
+                  tag: hypervisor-manager
                   value: '{#NAME}'
             -
               uuid: e5ec285a6c74478d903284ecb67d3f96
@@ -4052,6 +4105,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["hypervisor-managers"].members[?(@.displayName == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -4089,9 +4146,9 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: hypervisor_manager
+                  value: hypervisor-manager
                 -
-                  tag: hypervisor_manager
+                  tag: hypervisor-manager
                   value: '{#NAME}'
               trigger_prototypes:
                 -
@@ -4108,7 +4165,7 @@ zabbix_export:
                   uuid: d81f11c478484d77a64049a2716865b4
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=4'
                   name: 'Hypervisor manager [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Hypervisor manager [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -4128,8 +4185,8 @@ zabbix_export:
             -
               uuid: fd90d819f10d43cc9b18ae5e5ee96b66
               expression: 'last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",state])=3 and length(last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",state_reason]))>0'
-              name: 'Hypervisor manager [{#NAME}]: Has error'
-              opdata: '{ITEM.LASTVALUE2}'
+              name: 'Hypervisor manager [{#NAME}]: Is in error state'
+              opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: HIGH
               description: 'Hypervisor manager [{#NAME}] has error.'
               tags:
@@ -4161,7 +4218,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: dc4822f158da4577a47ec4cf920b9b90
-              name: 'Interconnect [{#NAME}]: Hardware Health'
+              name: 'Interconnect [{#NAME}]: Hardware health'
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",hw.health]'
               delay: '0'
@@ -4220,7 +4277,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: d3e8fc007d5e4adf899fdb3d0f786fb1
-              name: 'Interconnect [{#NAME}]: Part Number'
+              name: 'Interconnect [{#NAME}]: Part number'
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",part_number]'
               delay: '0'
@@ -4274,7 +4331,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 27e4c424f81940b1958e0455042bf3d3
-              name: 'Interconnect [{#NAME}]: Serial Number'
+              name: 'Interconnect [{#NAME}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",serial_number]'
               delay: '0'
@@ -4302,7 +4359,7 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 8232b536d74846d7a90ce19400418a36
-              name: 'Interconnect [{#NAME}]: Spare Part Number'
+              name: 'Interconnect [{#NAME}]: Spare part number'
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",spare_part_number]'
               delay: '0'
@@ -4379,6 +4436,10 @@ zabbix_export:
                   parameters:
                     - '$.interconnects.members[?(@.name == "{#NAME}")].status.first()'
                 -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
+                -
                   type: STR_REPLACE
                   parameters:
                     - Critical
@@ -4434,7 +4495,7 @@ zabbix_export:
                   uuid: a6d1c63e2aa04c71bac2eaef5b693110
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=4'
                   name: 'Interconnect [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Interconnect [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -4541,9 +4602,9 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: logical_enclosure
+                  value: logical-enclosure
                 -
-                  tag: logical_enclosure
+                  tag: logical-enclosure
                   value: '{#NAME}'
               trigger_prototypes:
                 -
@@ -4576,11 +4637,11 @@ zabbix_export:
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -4588,6 +4649,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["logical-enclosures"].members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -4625,9 +4690,9 @@ zabbix_export:
               tags:
                 -
                   tag: component
-                  value: logical_enclosure
+                  value: logical-enclosure
                 -
-                  tag: logical_enclosure
+                  tag: logical-enclosure
                   value: '{#NAME}'
               trigger_prototypes:
                 -
@@ -4644,7 +4709,7 @@ zabbix_export:
                   uuid: 32061fadb9c74abab1a1d1371e2cf3e8
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=4'
                   name: 'Logical enclosure [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Logical enclosure [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -4685,7 +4750,7 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 8ee334ce899341a8b1292dd84d7b0af4
-              name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Device Count'
+              name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Devices count'
               type: DEPENDENT
               key: 'hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",device_count]'
               delay: '0'
@@ -4777,21 +4842,21 @@ zabbix_export:
                   value: '{#PARTITION_ID}'
               trigger_prototypes:
                 -
-                  uuid: fdf5fa892eda46aaa2551168e36428bc
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",health])=1'
-                  name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Health is invalid'
-                  priority: AVERAGE
-                  description: 'Partition health is invalid.'
+                  uuid: 1c85a47cfa96487f8c338afe21ad7ce3
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",health])=0'
+                  name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Health is degraded'
+                  priority: HIGH
+                  description: 'One or more resources in the partition are unhealthy.'
                   tags:
                     -
                       tag: scope
                       value: availability
                 -
-                  uuid: 1c85a47cfa96487f8c338afe21ad7ce3
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",health])=0'
-                  name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Is degraded'
-                  priority: HIGH
-                  description: 'One or more resources in the partition are unhealthy.'
+                  uuid: fdf5fa892eda46aaa2551168e36428bc
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",health])=1'
+                  name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Health is invalid'
+                  priority: AVERAGE
+                  description: 'Partition health is invalid.'
                   tags:
                     -
                       tag: scope
@@ -4835,7 +4900,7 @@ zabbix_export:
                   value: '{#PARTITION_ID}'
             -
               uuid: b388a6aeae4e4bd4b14b0eb334b67934
-              name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Device Count'
+              name: 'Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Processors Count'
               type: DEPENDENT
               key: 'hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",processor_count]'
               delay: '0'
@@ -4889,6 +4954,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].partitions[?(@.partitionID == "{#PARTITION_ID}")].partitionStatus.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5003,7 +5072,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -5013,7 +5082,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: e0ac31d34ab34af383e56fb1c0a9972a
-              name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Output Capacity'
+              name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Output capacity'
               type: DEPENDENT
               key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",output_capacity]'
               delay: '0'
@@ -5033,7 +5102,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -5043,7 +5112,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 98c72f6e11ab4dcba08c82793de9af96
-              name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part Number'
+              name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Part number'
               type: DEPENDENT
               key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
@@ -5064,7 +5133,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -5125,16 +5194,16 @@ zabbix_export:
                     - '0'
                     - '4'
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: '5'
+                  error_handler_params: '2'
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 10m
+                    - 1h
               master_item:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -5144,7 +5213,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: 87ee5abdfdcf41459dd11678469a2fb4
-              name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial Number'
+              name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
@@ -5165,7 +5234,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -5175,7 +5244,7 @@ zabbix_export:
                   value: '{#ENCLOSURE_NAME}'
             -
               uuid: ada2815275ce488f8ec1bc7a4a536681
-              name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare Part Number'
+              name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Spare part number'
               type: DEPENDENT
               key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",spare_part_number]'
               delay: '0'
@@ -5196,7 +5265,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -5226,6 +5295,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.enclosures.members[?(@.name == "{#ENCLOSURE_NAME}")].powerSupplyBays[?(@.bayNumber == "{#BAY_NUMBER}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5262,7 +5335,7 @@ zabbix_export:
                 key: hpe.synergy.data.get
               tags:
                 -
-                  tag: bay_number
+                  tag: bay-number
                   value: '{#BAY_NUMBER}'
                 -
                   tag: component
@@ -5285,7 +5358,7 @@ zabbix_export:
                   uuid: 711695d95bc14ddfbe54be917c5e3340
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4'
                   name: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -5457,11 +5530,11 @@ zabbix_export:
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -5469,6 +5542,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.racks.members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5525,7 +5602,7 @@ zabbix_export:
                   uuid: 74b635c0c6a7412395f36ac71fe56ec8
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=4'
                   name: 'Rack [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Rack [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -5565,6 +5642,137 @@ zabbix_export:
           description: 'The server hardware resource is a representation of a physical server.'
           item_prototypes:
             -
+              uuid: 44f23870429347fb8930669c98ded461
+              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Processor cores count'
+              type: DEPENDENT
+              key: 'hpe.synergy.server_hardware.processor["{#LOCATION}",cores_count]'
+              delay: '0'
+              history: 7d
+              description: 'The number of cores available per processor.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorCoreCount.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hpe.synergy.data.get
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: component
+                  value: server
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: server
+                  value: '{#SERVER_NAME}'
+            -
+              uuid: 5c9d2faf103241879fd19b0e18774dbd
+              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Processors count'
+              type: DEPENDENT
+              key: 'hpe.synergy.server_hardware.processor["{#LOCATION}",count]'
+              delay: '0'
+              history: 7d
+              description: 'The number of processors installed on this server hardware.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorCount.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hpe.synergy.data.get
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: component
+                  value: server
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: server
+                  value: '{#SERVER_NAME}'
+            -
+              uuid: dd1e7364fb614b2b9177f92b2ffe42a0
+              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Processor speed'
+              type: DEPENDENT
+              key: 'hpe.synergy.server_hardware.processor["{#LOCATION}",speed]'
+              delay: '0'
+              history: 7d
+              units: '!MHz'
+              description: 'Speed of the CPUs.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorSpeedMhz.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: hpe.synergy.data.get
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: component
+                  value: server
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: server
+                  value: '{#SERVER_NAME}'
+            -
+              uuid: a62de8aa573146d1a2118abff9f43245
+              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Processor type'
+              type: DEPENDENT
+              key: 'hpe.synergy.server_hardware.processor["{#LOCATION}",type]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'Type of CPU installed on this server hardware.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorType.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1d
+              master_item:
+                key: hpe.synergy.data.get
+              tags:
+                -
+                  tag: component
+                  value: cpu
+                -
+                  tag: component
+                  value: server
+                -
+                  tag: location
+                  value: '{#LOCATION}'
+                -
+                  tag: server
+                  value: '{#SERVER_NAME}'
+            -
               uuid: 67d50f909325417b9c47241cda44aa6b
               name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Maintenance state'
               type: DEPENDENT
@@ -5579,6 +5787,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].maintenanceState.first()'
+                  error_handler: DISCARD_VALUE
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5610,7 +5819,7 @@ zabbix_export:
                   value: '{#SERVER_NAME}'
             -
               uuid: 90dc2db2bb6c4a968899ef04b8e2f96e
-              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Maintenance state'
+              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Maintenance state reason'
               type: DEPENDENT
               key: 'hpe.synergy.server_hardware["{#LOCATION}",maintenance_state_reason]'
               delay: '0'
@@ -5623,6 +5832,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].maintenanceStateReason.first()'
+                  error_handler: DISCARD_VALUE
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -5696,6 +5906,7 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].migrationState.first()'
+                  error_handler: DISCARD_VALUE
                 -
                   type: STR_REPLACE
                   parameters:
@@ -5763,7 +5974,7 @@ zabbix_export:
                   value: '{#SERVER_NAME}'
             -
               uuid: 21edfb42e64e42878cccf66125d28b96
-              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Part Number'
+              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Part number'
               type: DEPENDENT
               key: 'hpe.synergy.server_hardware["{#LOCATION}",part_number]'
               delay: '0'
@@ -5860,139 +6071,8 @@ zabbix_export:
                   tag: server
                   value: '{#SERVER_NAME}'
             -
-              uuid: 44f23870429347fb8930669c98ded461
-              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Processor cores count'
-              type: DEPENDENT
-              key: 'hpe.synergy.server_hardware["{#LOCATION}",processor_cores_count]'
-              delay: '0'
-              history: 7d
-              description: 'The number of cores available per processor.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorCoreCount.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: hpe.synergy.data.get
-              tags:
-                -
-                  tag: component
-                  value: cpu
-                -
-                  tag: component
-                  value: server
-                -
-                  tag: location
-                  value: '{#LOCATION}'
-                -
-                  tag: server
-                  value: '{#SERVER_NAME}'
-            -
-              uuid: 5c9d2faf103241879fd19b0e18774dbd
-              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Processors count'
-              type: DEPENDENT
-              key: 'hpe.synergy.server_hardware["{#LOCATION}",processor_count]'
-              delay: '0'
-              history: 7d
-              description: 'The number of processors installed on this server hardware.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorCount.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: hpe.synergy.data.get
-              tags:
-                -
-                  tag: component
-                  value: cpu
-                -
-                  tag: component
-                  value: server
-                -
-                  tag: location
-                  value: '{#LOCATION}'
-                -
-                  tag: server
-                  value: '{#SERVER_NAME}'
-            -
-              uuid: dd1e7364fb614b2b9177f92b2ffe42a0
-              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Processor speed'
-              type: DEPENDENT
-              key: 'hpe.synergy.server_hardware["{#LOCATION}",processor_speed]'
-              delay: '0'
-              history: 7d
-              units: '!MHz'
-              description: 'Speed of the CPUs.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorSpeedMhz.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
-              master_item:
-                key: hpe.synergy.data.get
-              tags:
-                -
-                  tag: component
-                  value: cpu
-                -
-                  tag: component
-                  value: server
-                -
-                  tag: location
-                  value: '{#LOCATION}'
-                -
-                  tag: server
-                  value: '{#SERVER_NAME}'
-            -
-              uuid: a62de8aa573146d1a2118abff9f43245
-              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Processor type'
-              type: DEPENDENT
-              key: 'hpe.synergy.server_hardware["{#LOCATION}",processor_type]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: CHAR
-              description: 'Type of CPU installed on this server hardware.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].processorType.first()'
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1d
-              master_item:
-                key: hpe.synergy.data.get
-              tags:
-                -
-                  tag: component
-                  value: cpu
-                -
-                  tag: component
-                  value: server
-                -
-                  tag: location
-                  value: '{#LOCATION}'
-                -
-                  tag: server
-                  value: '{#SERVER_NAME}'
-            -
               uuid: eaf38e9c25fb46de8e621220bca8aed5
-              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Serial Number'
+              name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Serial number'
               type: DEPENDENT
               key: 'hpe.synergy.server_hardware["{#LOCATION}",serial_number]'
               delay: '0'
@@ -6234,11 +6314,11 @@ zabbix_export:
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational or that a server profile has not been assigned;
-                Warning - needs attention soon;
-                Critical - needs attention soon;
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational or that a server profile has not been assigned.
+                Warning - needs attention soon.
+                Critical - needs attention soon.
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -6246,6 +6326,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["server-hardware"].members[?(@.name == "{#LOCATION}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -6305,7 +6389,7 @@ zabbix_export:
                   uuid: 5c0da62e9a704d5ca556c04dbaa8e243
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=4'
                   name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Server [{#SERVER_NAME}:{#LOCATION}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -6326,7 +6410,7 @@ zabbix_export:
               uuid: cd1156d4df6e411690f94a2857beab16
               expression: 'last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",maintenance_state])=0 and length(last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",maintenance_state_reason]))>0'
               name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Is in maintenance mode'
-              opdata: '{ITEM.LASTVALUE2}'
+              opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: INFO
               description: 'Disruptive maintenance operations like firmware update can cause many server hardware alerts to be generated in a short period of time. Ex: Network connectivity lost or Server reset detected.'
               tags:
@@ -6337,7 +6421,7 @@ zabbix_export:
               uuid: f74bf53c1b394aad9019b603de9a2c09
               expression: 'last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=4 and length(last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state_reason]))>0'
               name: 'Server [{#SERVER_NAME}:{#LOCATION}]: Is unmanaged'
-              opdata: '{ITEM.LASTVALUE2}'
+              opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               description: 'Discovered a supported server.'
               tags:
@@ -6372,9 +6456,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 6f21fd88ccdb46ac83cd6a4beba12f95
-              name: 'Storage pool [{#NAME}]: Allocated capacity'
+              name: 'Storage pool [{#NAME}]: Capacity allocated'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_pool["{#NAME}",allocated_capacity]'
+              key: 'hpe.synergy.storage.pools.capacity["{#NAME}",allocated]'
               delay: '0'
               history: 7d
               units: B
@@ -6395,9 +6479,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: e6ffbb837f2945418f200f8d57b8bf39
-              name: 'Storage pool [{#NAME}]: Free capacity'
+              name: 'Storage pool [{#NAME}]: Capacity free'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_pool["{#NAME}",free_capacity]'
+              key: 'hpe.synergy.storage.pools.capacity["{#NAME}",free]'
               delay: '0'
               history: 7d
               units: B
@@ -6418,9 +6502,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: b3f2dc2c62574ead8986ace6751738d0
-              name: 'Storage pool [{#NAME}]: Pool capacity allocated to snapshots'
+              name: 'Storage pool [{#NAME}]: Capacity allocated to snapshots'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_pool["{#NAME}",snapshot_capacity]'
+              key: 'hpe.synergy.storage.pools.capacity["{#NAME}",snapshot]'
               delay: '0'
               history: 7d
               units: B
@@ -6440,10 +6524,33 @@ zabbix_export:
                   tag: pool
                   value: '{#NAME}'
             -
+              uuid: 5d172531ae344037a94e23fd5c72165a
+              name: 'Storage pool [{#NAME}]: Capacity total'
+              type: DEPENDENT
+              key: 'hpe.synergy.storage.pools.capacity["{#NAME}",total]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total capacity of the storage pool in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.["storage-pools"].members[?(@.name == "{#NAME}")].totalCapacity.first()'
+              master_item:
+                key: hpe.synergy.data.get
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: pool
+                  value: '{#NAME}'
+            -
               uuid: 52f63554126b4ee0a6fd6efdfea36356
               name: 'Storage pool [{#NAME}]: State'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_pool["{#NAME}",state]'
+              key: 'hpe.synergy.storage.pools["{#NAME}",state]'
               delay: '0'
               history: 7d
               description: |
@@ -6559,7 +6666,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: ae6ac88132f14763ba1ab0488d78d79d
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_pool["{#NAME}",state])=0'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=0'
                   name: 'Storage pool [{#NAME}]: Add failed'
                   priority: AVERAGE
                   description: 'Storage pool [{#NAME}] add failed.'
@@ -6572,7 +6679,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 439cee82cd6744d09b4597a6aeeda91a
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_pool["{#NAME}",state])=5'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=5'
                   name: 'Storage pool [{#NAME}]: Create failed'
                   priority: AVERAGE
                   description: 'Storage pool [{#NAME}] create failed.'
@@ -6585,7 +6692,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 91031655fd16446995f316b20e2c0bed
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_pool["{#NAME}",state])=7'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=7'
                   name: 'Storage pool [{#NAME}]: Delete failed'
                   priority: AVERAGE
                   description: 'Storage pool [{#NAME}] delete failed.'
@@ -6595,7 +6702,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: d0a7155241b34e1f9dd3e01203aee3ba
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_pool["{#NAME}",state])=12'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=12'
                   name: 'Storage pool [{#NAME}]: Update failed'
                   priority: AVERAGE
                   description: 'Storage pool [{#NAME}] update failed.'
@@ -6607,17 +6714,17 @@ zabbix_export:
               uuid: 9f3c42f517c64f9bb8869617438a9aff
               name: 'Storage pool [{#NAME}]: Status'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_pool["{#NAME}",status]'
+              key: 'hpe.synergy.storage.pools["{#NAME}",status]'
               delay: '0'
               history: 7d
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -6625,6 +6732,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["storage-pools"].members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -6669,7 +6780,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: bace21ba544d45b58541a3e2affde554
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_pool["{#NAME}",status])=0'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=0'
                   name: 'Storage pool [{#NAME}]: Has critical status'
                   priority: HIGH
                   description: 'Storage pool [{#NAME}] status is critical. Needs immediate attention.'
@@ -6682,9 +6793,9 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: 135683c55d81457e90ba97d8e02165a6
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_pool["{#NAME}",status])=4'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=4'
                   name: 'Storage pool [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Storage pool [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -6695,7 +6806,7 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: 4d7c963326d54600b639ec2d14babeb7
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_pool["{#NAME}",status])=1'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=1'
                   name: 'Storage pool [{#NAME}]: Is disabled'
                   priority: INFO
                   description: 'Storage pool [{#NAME}] currently not operational.'
@@ -6703,29 +6814,6 @@ zabbix_export:
                     -
                       tag: scope
                       value: capacity
-            -
-              uuid: 5d172531ae344037a94e23fd5c72165a
-              name: 'Storage pool [{#NAME}]: Total capacity'
-              type: DEPENDENT
-              key: 'hpe.synergy.storage_pool["{#NAME}",total_capacity]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Total capacity of the storage pool in bytes.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.["storage-pools"].members[?(@.name == "{#NAME}")].totalCapacity.first()'
-              master_item:
-                key: hpe.synergy.data.get
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: pool
-                  value: '{#NAME}'
           graph_prototypes:
             -
               uuid: a248b84392c44b4bbf9594550b35b8f8
@@ -6735,19 +6823,19 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE Synergy by HTTP'
-                    key: 'hpe.synergy.storage_pool["{#NAME}",allocated_capacity]'
+                    key: 'hpe.synergy.storage.pools.capacity["{#NAME}",allocated]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Synergy by HTTP'
-                    key: 'hpe.synergy.storage_pool["{#NAME}",free_capacity]'
+                    key: 'hpe.synergy.storage.pools.capacity["{#NAME}",free]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'HPE Synergy by HTTP'
-                    key: 'hpe.synergy.storage_pool["{#NAME}",snapshot_capacity]'
+                    key: 'hpe.synergy.storage.pools.capacity["{#NAME}",snapshot]'
           master_item:
             key: hpe.synergy.data.get
           lld_macro_paths:
@@ -6773,9 +6861,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: f1047d18a75f4981a5d1b16ccdafce5b
-              name: 'Storage system [{#NAME}]: Allocated capacity'
+              name: 'Storage system [{#NAME}]: Capacity allocated'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_system["{#NAME}",allocated_capacity]'
+              key: 'hpe.synergy.storage.system.capacity["{#NAME}",allocated]'
               delay: '0'
               history: 7d
               units: B
@@ -6796,9 +6884,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 501b587b1aa14263ac8d77325c8adfd3
-              name: 'Storage system [{#NAME}]: Free capacity'
+              name: 'Storage system [{#NAME}]: Capacity free'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_system["{#NAME}",free_capacity]'
+              key: 'hpe.synergy.storage.system.capacity["{#NAME}",free]'
               delay: '0'
               history: 7d
               units: B
@@ -6818,10 +6906,33 @@ zabbix_export:
                   tag: system
                   value: '{#NAME}'
             -
+              uuid: 1ee384a67e0c49b99beaca7c682e7f54
+              name: 'Storage system [{#NAME}]: Capacity total'
+              type: DEPENDENT
+              key: 'hpe.synergy.storage.system.capacity["{#NAME}",total]'
+              delay: '0'
+              history: 7d
+              units: B
+              description: 'Total capacity of the storage system in bytes.'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - '$.["storage-systems"].members[?(@.name == "{#NAME}")].totalCapacity.first()'
+              master_item:
+                key: hpe.synergy.data.get
+              tags:
+                -
+                  tag: component
+                  value: storage
+                -
+                  tag: system
+                  value: '{#NAME}'
+            -
               uuid: 5de77ea6bd76408792e45e111d46c501
               name: 'Storage system [{#NAME}]: State'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_system["{#NAME}",state]'
+              key: 'hpe.synergy.storage.system["{#NAME}",state]'
               delay: '0'
               history: 7d
               description: |
@@ -6937,7 +7048,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: cfdbabe4ff584b96a961e395b3a4cda8
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_system["{#NAME}",state])=0'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=0'
                   name: 'Storage system [{#NAME}]: Add failed'
                   priority: AVERAGE
                   description: 'Storage system [{#NAME}] add failed.'
@@ -6950,7 +7061,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: e759872ffa334bc2b73335b612238c82
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_system["{#NAME}",state])=5'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=5'
                   name: 'Storage system [{#NAME}]: Create failed'
                   priority: AVERAGE
                   description: 'Storage system [{#NAME}] create failed.'
@@ -6963,7 +7074,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 1df4613458b748b59d761d45f494920a
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_system["{#NAME}",state])=7'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=7'
                   name: 'Storage system [{#NAME}]: Delete failed'
                   priority: AVERAGE
                   description: 'Storage system [{#NAME}] delete failed.'
@@ -6973,7 +7084,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 3c856acaa42e4ee0807713afba3937ac
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_system["{#NAME}",state])=12'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=12'
                   name: 'Storage system [{#NAME}]: Update failed'
                   priority: AVERAGE
                   description: 'Storage system [{#NAME}] update failed.'
@@ -6985,17 +7096,17 @@ zabbix_export:
               uuid: 5f9b2be3d232468e98451b380a624ae9
               name: 'Storage system [{#NAME}]: Status'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_system["{#NAME}",status]'
+              key: 'hpe.synergy.storage.system["{#NAME}",status]'
               delay: '0'
               history: 7d
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -7003,6 +7114,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["storage-systems"].members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -7047,7 +7162,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: f8533d36153b4269916c7a9843ea8d5c
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_system["{#NAME}",status])=0'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=0'
                   name: 'Storage system [{#NAME}]: Has critical status'
                   priority: HIGH
                   description: 'Storage system [{#NAME}] status is critical. Needs immediate attention.'
@@ -7060,9 +7175,9 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: fc278fec8e3d452bb953599a1cd42336
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_system["{#NAME}",status])=4'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=4'
                   name: 'Storage system [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Storage system [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -7073,7 +7188,7 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: 4e60a92c30ed4cf7960d7979a8e2fb77
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_system["{#NAME}",status])=1'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=1'
                   name: 'Storage system [{#NAME}]: Is disabled'
                   priority: INFO
                   description: 'Storage system [{#NAME}] currently not operational.'
@@ -7081,29 +7196,6 @@ zabbix_export:
                     -
                       tag: scope
                       value: capacity
-            -
-              uuid: 1ee384a67e0c49b99beaca7c682e7f54
-              name: 'Storage system [{#NAME}]: Total capacity'
-              type: DEPENDENT
-              key: 'hpe.synergy.storage_system["{#NAME}",total_capacity]'
-              delay: '0'
-              history: 7d
-              units: B
-              description: 'Total capacity of the storage system in bytes.'
-              preprocessing:
-                -
-                  type: JSONPATH
-                  parameters:
-                    - '$.["storage-systems"].members[?(@.name == "{#NAME}")].totalCapacity.first()'
-              master_item:
-                key: hpe.synergy.data.get
-              tags:
-                -
-                  tag: component
-                  value: storage
-                -
-                  tag: system
-                  value: '{#NAME}'
           graph_prototypes:
             -
               uuid: c5c21884eb714c009dc0289f426b62e7
@@ -7113,19 +7205,19 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE Synergy by HTTP'
-                    key: 'hpe.synergy.storage_system["{#NAME}",allocated_capacity]'
+                    key: 'hpe.synergy.storage.system.capacity["{#NAME}",allocated]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Synergy by HTTP'
-                    key: 'hpe.synergy.storage_system["{#NAME}",free_capacity]'
+                    key: 'hpe.synergy.storage.system.capacity["{#NAME}",free]'
                 -
                   sortorder: '2'
                   color: F63100
                   item:
                     host: 'HPE Synergy by HTTP'
-                    key: 'hpe.synergy.storage_system["{#NAME}",total_capacity]'
+                    key: 'hpe.synergy.storage.system.capacity["{#NAME}",total]'
           master_item:
             key: hpe.synergy.data.get
           lld_macro_paths:
@@ -7151,9 +7243,9 @@ zabbix_export:
           item_prototypes:
             -
               uuid: 6c5fcfa5f07e4c07a1a05d6a49e1e5cd
-              name: 'Storage volume [{#NAME}]: Allocated capacity'
+              name: 'Storage volume [{#NAME}]: Capacity allocated'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_volume["{#NAME}",allocated_capacity]'
+              key: 'hpe.synergy.storage.volumes.capacity["{#NAME}",allocated]'
               delay: '0'
               history: 7d
               units: B
@@ -7174,9 +7266,9 @@ zabbix_export:
                   value: '{#NAME}'
             -
               uuid: 67076354bbb34d839c23873898dab4bd
-              name: 'Storage volume [{#NAME}]: Provisioned capacity'
+              name: 'Storage volume [{#NAME}]: Capacity provisioned'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_volume["{#NAME}",provisioned_capacity]'
+              key: 'hpe.synergy.storage.volumes.capacity["{#NAME}",provisioned]'
               delay: '0'
               history: 7d
               units: B
@@ -7199,7 +7291,7 @@ zabbix_export:
               uuid: 169c6201cabe48b89ff7591e9112394b
               name: 'Storage volume [{#NAME}]: State'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_volume["{#NAME}",state]'
+              key: 'hpe.synergy.storage.volumes["{#NAME}",state]'
               delay: '0'
               history: 7d
               description: |
@@ -7315,7 +7407,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: b13d8a034a214bb5bd82d9e573d06e7b
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_volume["{#NAME}",state])=0'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=0'
                   name: 'Storage volume [{#NAME}]: Add failed'
                   priority: AVERAGE
                   description: 'Storage volume [{#NAME}] add failed.'
@@ -7328,7 +7420,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: 15f5b0ded7d8430d9b6338d8ab4a26e7
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_volume["{#NAME}",state])=5'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=5'
                   name: 'Storage volume [{#NAME}]: Create failed'
                   priority: AVERAGE
                   description: 'Storage volume [{#NAME}] create failed.'
@@ -7341,7 +7433,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: d7b4d59197dc4471b3db746c527213ae
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_volume["{#NAME}",state])=7'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=7'
                   name: 'Storage volume [{#NAME}]: Delete failed'
                   priority: AVERAGE
                   description: 'Storage volume [{#NAME}] delete failed.'
@@ -7351,7 +7443,7 @@ zabbix_export:
                       value: notice
                 -
                   uuid: c0b2dc67758446fa82c6bf9c92c76e93
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_volume["{#NAME}",state])=12'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=12'
                   name: 'Storage volume [{#NAME}]: Update failed'
                   priority: AVERAGE
                   description: 'Storage volume [{#NAME}] update failed.'
@@ -7363,17 +7455,17 @@ zabbix_export:
               uuid: 6c9927a095e04feb808c05aa44b672d0
               name: 'Storage volume [{#NAME}]: Status'
               type: DEPENDENT
-              key: 'hpe.synergy.storage_volume["{#NAME}",status]'
+              key: 'hpe.synergy.storage.volumes["{#NAME}",status]'
               delay: '0'
               history: 7d
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -7381,6 +7473,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["storage-volumes"].members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -7425,7 +7521,7 @@ zabbix_export:
               trigger_prototypes:
                 -
                   uuid: 284d76cba28a4fc195b4b825665bc570
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_volume["{#NAME}",status])=0'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=0'
                   name: 'Storage volume [{#NAME}]: Has critical status'
                   priority: HIGH
                   description: 'Storage volume [{#NAME}] status is critical. Needs immediate attention.'
@@ -7438,9 +7534,9 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: ab040784159040a1ad031015e9ebef73
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_volume["{#NAME}",status])=4'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=4'
                   name: 'Storage volume [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Storage volume [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -7451,7 +7547,7 @@ zabbix_export:
                       value: capacity
                 -
                   uuid: ea9c2c2993b74859b30caaeac8871982
-                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage_volume["{#NAME}",status])=1'
+                  expression: 'last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=1'
                   name: 'Storage volume [{#NAME}]: Is disabled'
                   priority: INFO
                   description: 'Storage volume [{#NAME}] currently not operational.'
@@ -7471,13 +7567,13 @@ zabbix_export:
                   color: 1A7C11
                   item:
                     host: 'HPE Synergy by HTTP'
-                    key: 'hpe.synergy.storage_volume["{#NAME}",allocated_capacity]'
+                    key: 'hpe.synergy.storage.volumes.capacity["{#NAME}",allocated]'
                 -
                   sortorder: '1'
                   color: 2774A4
                   item:
                     host: 'HPE Synergy by HTTP'
-                    key: 'hpe.synergy.storage_volume["{#NAME}",provisioned_capacity]'
+                    key: 'hpe.synergy.storage.volumes.capacity["{#NAME}",provisioned]'
           master_item:
             key: hpe.synergy.data.get
           lld_macro_paths:
@@ -7528,9 +7624,9 @@ zabbix_export:
                   value: network
                 -
                   tag: component
-                  value: uplink_set
+                  value: uplink-set
                 -
-                  tag: uplink_set
+                  tag: uplink-set
                   value: '{#NAME}'
             -
               uuid: 08fe02575307492ea4ad42a6bfa4a2a9
@@ -7542,11 +7638,11 @@ zabbix_export:
               description: |
                 Overall health status of the resource. The following are the valid values for the status of the resource:
                 
-                OK - indicates normal/informational behavior;
-                Disabled - indicates that a resource is not operational;
-                Warning - needs attention soon;
+                OK - indicates normal/informational behavior.
+                Disabled - indicates that a resource is not operational.
+                Warning - needs attention soon.
                 Critical - needs immediate attention.
-                Unknown - should be avoided, but there may be rare occasions where status is Unknown;
+                Unknown - should be avoided, but there may be rare occasions where status is Unknown.
               valuemap:
                 name: Status
               preprocessing:
@@ -7554,6 +7650,10 @@ zabbix_export:
                   type: JSONPATH
                   parameters:
                     - '$.["uplink-sets"].members[?(@.name == "{#NAME}")].status.first()'
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
                 -
                   type: STR_REPLACE
                   parameters:
@@ -7594,9 +7694,9 @@ zabbix_export:
                   value: network
                 -
                   tag: component
-                  value: uplink_set
+                  value: uplink-set
                 -
-                  tag: uplink_set
+                  tag: uplink-set
                   value: '{#NAME}'
               trigger_prototypes:
                 -
@@ -7613,7 +7713,7 @@ zabbix_export:
                   uuid: 09f23615c85f43758a05d89466b3ca31
                   expression: 'last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=4'
                   name: 'Uplink set [{#NAME}]: Has warning status'
-                  priority: AVERAGE
+                  priority: WARNING
                   description: 'Uplink set [{#NAME}] status is warning. Needs attention soon.'
                   tags:
                     -
@@ -7705,9 +7805,6 @@ zabbix_export:
             -
               value: '4'
               newvalue: Subsumed
-            -
-              value: '5'
-              newvalue: Unknown
         -
           uuid: 082018b109e24116bbd92f0657113165
           name: 'Enclosure state'
