@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2022-06-21 18:34+0000\n"
+"PO-Revision-Date: 2022-06-22 18:16+0000\n"
 "Last-Translator: Robert Szulist <r.szulist+zabbix@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -2986,7 +2986,7 @@ msgstr "Nie można podłączyć szablonu \"%1$s\" do hosta \"%2$s\" ze względu 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Nie można podlinkować szablonu \"%1$s\" do hosta \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:517
 #, c-format
@@ -3007,7 +3007,7 @@ msgstr "Nie można podłączyć szablonu \"%1$s\" do prototypu hosta \"%2$s\" ze
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Nie można podlinkować szablonu \"%1$s\" do prototypu hosta \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:381
 #, c-format
@@ -3033,12 +3033,12 @@ msgstr "Nie można podłączyć szablonu \"%1$s\" do szablonu \"%2$s\" ze wzglę
 #: include/classes/api/services/CHostBase.php:502
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
-msgstr ""
+msgstr "Nie można podlinkować szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ spowoduje to linkowane kołowe (%3$s)."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked twice."
-msgstr ""
+msgstr "Nie można podlinkować szablonu \"%1$s\" do szablonu \"%2$s\", ponieważ jego szablon nadrzędny \"%3$s\" byłby podlinkowany dwukrotnie."
 
 #: include/classes/api/services/CHostBase.php:705
 #, c-format
@@ -3136,7 +3136,7 @@ msgstr "Nie można odczytać odpowiedzi, sprawdź połączenie z serwerem Zabbix
 #: app/controllers/CControllerPopupMassupdateHost.php:362
 #, c-format
 msgid "Cannot remove the tag with name \"%1$s\" and value \"%2$s\", defined in a host prototype, from host \"%3$s\"."
-msgstr ""
+msgstr "Nie można usunąć znacznika o nazwie \"%1$s\" i wartości \"%2$s\", zdefiniowanego w prototypie hosta, z hosta \"%3$s\"."
 
 #: include/classes/api/services/CUser.php:556
 msgid "Cannot rename guest user."
@@ -3229,22 +3229,22 @@ msgstr "Nie można odłączyć szablonu"
 #: include/classes/api/services/CHostBase.php:331
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from host \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Nie można odlinkować szablonu \"%1$s\" od hosta \"%2$s\" z względu na zależność wyzwalacza \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:415
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on host \"%4$s\"."
-msgstr ""
+msgstr "Nie można odlinkować szablonu \"%1$s\" od szablonu \"%2$s\" z względu na zależność wyzwalacza \"%3$s\" na hoście \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:414
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\" on template \"%4$s\"."
-msgstr ""
+msgstr "Nie można odlinkować szablonu \"%1$s\" od szablonu \"%2$s\" z względu na zależność wyzwalacza \"%3$s\" na szablonie \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:330
 #, c-format
 msgid "Cannot unlink template \"%1$s\" from template \"%2$s\" due to dependency of trigger \"%3$s\"."
-msgstr ""
+msgstr "Nie można odlinkować szablonu \"%1$s\" od szablonu \"%2$s\" ze względu na zależność wyzwalacza \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:256
 #, c-format
@@ -5203,7 +5203,7 @@ msgstr "Dni"
 
 #: app/views/popup.acknowledge.edit.php:102
 msgid "Deactivates manual suppression."
-msgstr ""
+msgstr "Wyłącza tłumienie ręczne."
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172 jsLoader.php:391
 msgid "Debug"
@@ -5725,7 +5725,7 @@ msgstr "Przestarzałe"
 #: include/classes/validators/CApiInputValidator.php:1302
 #, c-format
 msgid "Deprecated parameter \"%1$s\" cannot be used with \"%2$s\"."
-msgstr ""
+msgstr "Przestarzałego parametru \"%1$s\" nie można używać z \"%2$s\"."
 
 #: app/controllers/CControllerAuditLogList.php:287
 #: app/partials/configuration.host.edit.html.php:261
@@ -6067,7 +6067,7 @@ msgstr "Wykrywanie magazynu danych hypervisora VMWare, <url> - URL usługi VMwar
 
 #: include/classes/data/CItemData.php:1379
 msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
-msgstr ""
+msgstr "Wykrywanie interfejsów sieciowych hypervisora VMWare, <url> - URL usługi VMware, <uuid> - hypervisor VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1306
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
@@ -6201,7 +6201,7 @@ msgstr "Wyświetl wykres"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:436
 msgid "Display min/max/avg"
-msgstr ""
+msgstr "Wyświetl min./maks./śr."
 
 #: include/views/monitoring.sysmap.edit.php:152
 msgid "Display problems"
@@ -8327,7 +8327,7 @@ msgstr "Nie można usunąć grupy hostów \"%1$s\", jest użyta w skrypcie globa
 #: include/classes/api/services/CHostGroup.php:631
 #, c-format
 msgid "Host group \"%1$s\" is group for discovered hosts and cannot be deleted."
-msgstr ""
+msgstr "Grupa hostów \"%1$s\" jest przeznaczona dla wykrytych hostów i nie może zostać usunięta."
 
 #: include/classes/api/services/CHostGroup.php:642
 #, c-format
@@ -8453,7 +8453,7 @@ msgstr "Sieci hosta"
 
 #: app/views/administration.usergroup.edit.php:274
 msgid "Host permissions"
-msgstr ""
+msgstr "Uprawnienia hosta"
 
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/views/popup.lldoperation.php:54
@@ -11290,7 +11290,7 @@ msgstr "Lista procesów systemu operacyjnego wraz z atrybutami. Zwraca tablicę 
 
 #: include/classes/data/CItemData.php:1021
 msgid "List of Windows Registry values or keys located at given key. Returns JSON."
-msgstr ""
+msgstr "Lista wartości lub kluczy rejestru systemu Windows znajdujących się pod danym kluczem. Zwraca JSON."
 
 #: include/classes/data/CItemData.php:1126
 msgid "List of block devices and their type. Returns JSON"
@@ -12672,7 +12672,7 @@ msgstr "Nowy host"
 #: app/views/configuration.hostgroup.edit.php:52
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
-msgstr ""
+msgstr "Nowa grupa hostów"
 
 #: app/controllers/CControllerPopupLldOperation.php:351
 msgid "New operation"
@@ -12697,7 +12697,7 @@ msgstr "Nowa nazwa znacznika"
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
-msgstr ""
+msgstr "Nowa grupa szablonów"
 
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
@@ -13386,7 +13386,7 @@ msgstr "Liczba dostęony ścieżek DS, <url> - URL usługi VMware, <uuid> - nazw
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:463
 msgid "Number of columns"
-msgstr ""
+msgstr "Liczba kolumn"
 
 #: include/classes/data/CItemData.php:882
 msgid "Number of currently open file descriptors. Returns integer"
@@ -14783,7 +14783,7 @@ msgstr "Problem rozwiązany"
 
 #: app/views/administration.usergroup.edit.php:275
 msgid "Problem tag filter"
-msgstr ""
+msgstr "Filtr znaczników problemów"
 
 #: app/views/popup.service.edit.php:59 app/views/popup.service.edit.php:269
 #: app/views/popup.services.php:62
@@ -15392,7 +15392,7 @@ msgstr "Usuń"
 #: app/partials/hostmacros.inherited.list.html.php:121
 msgctxt "verb"
 msgid "Remove"
-msgstr ""
+msgstr "Usuń"
 
 #: app/partials/massupdate.macros.tab.php:127
 #: app/partials/massupdate.valuemaps.tab.php:98
@@ -17041,7 +17041,7 @@ msgstr "Proste wykresy"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:168
 msgid "Simple triggers"
-msgstr ""
+msgstr "Proste wyzwalacze"
 
 #: include/views/configuration.trigger.prototype.edit.php:507
 #: include/views/configuration.triggers.edit.php:536
@@ -17845,7 +17845,7 @@ msgstr "Szablon \"%1$s\" nie może istnieć bez grupy hostów."
 #: include/classes/api/services/CTemplateGroup.php:942
 #, c-format
 msgid "Template \"%1$s\" cannot be without template group."
-msgstr ""
+msgstr "Szablon \"%1$s\" nie może istnieć bez grupy szablonów."
 
 #: include/classes/import/importers/CHostImporter.php:54
 #, c-format
@@ -17883,22 +17883,22 @@ msgstr "Grupa szablonów"
 #: include/classes/api/services/CTemplateGroup.php:540
 #, c-format
 msgid "Template group \"%1$s\" already exists."
-msgstr ""
+msgstr "Grupa szablonów \"%1$s\" już istnieje."
 
 #: app/controllers/CControllerTemplateGroupCreate.php:62
 msgid "Template group added"
-msgstr ""
+msgstr "Dodano grupę szablonów"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:60
 msgid "Template group deleted"
 msgid_plural "Template groups deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Usunięto grupę szablonów"
+msgstr[1] "Usunięto grupy szablonów"
+msgstr[2] "Usunięto grupy szablonów"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
-msgstr ""
+msgstr "Zaktualizowano grupę szablonów"
 
 #: include/classes/api/services/CUserGroup.php:487
 #, c-format
@@ -17921,7 +17921,7 @@ msgstr ""
 #: include/views/configuration.template.list.php:45
 #: include/views/configuration.triggers.list.php:33
 msgid "Template groups"
-msgstr ""
+msgstr "Grupy szablonów"
 
 #: app/views/popup.import.php:34
 msgid "Template linkage"
@@ -17937,7 +17937,7 @@ msgstr "Nazwa szablonu"
 
 #: app/views/administration.usergroup.edit.php:273
 msgid "Template permissions"
-msgstr ""
+msgstr "Uprawnienia szablonu"
 
 #: report2.php:396
 msgid "Template trigger"
@@ -19345,7 +19345,7 @@ msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:91
 msgid "Until"
-msgstr ""
+msgstr "Do"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:98
 #: include/classes/services/CTabFilterProfile.php:95
@@ -19872,7 +19872,7 @@ msgstr "Użytkownicy"
 
 #: include/classes/data/CItemData.php:1255
 msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware Distributed Virtual Switch, <url> — adres URL usługi VMware. Zwraca JSON"
 
 #: include/classes/data/CItemData.php:1259
 msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
@@ -22092,7 +22092,7 @@ msgstr "szósty parametr funkcji \"%1$s\" jest nieprawidłowy"
 
 #: include/classes/validators/CApiInputValidator.php:3078
 msgid "invalid template group name"
-msgstr ""
+msgstr "nieprawidłowa nazwa grupy szablonów"
 
 #: include/classes/validators/CHistFunctionValidator.php:65
 #, c-format
@@ -22101,7 +22101,7 @@ msgstr "trzeci parametr funkcji \"%1$s\" jest nieprawidłowy"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:101
 msgid "invalid time"
-msgstr ""
+msgstr "nieprawidłowy czas"
 
 #: app/controllers/CControllerWidgetTopHostsView.php:422
 #: include/classes/graphdraw/CLineGraphDraw.php:250
