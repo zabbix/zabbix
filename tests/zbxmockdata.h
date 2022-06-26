@@ -22,6 +22,8 @@
 
 #include "common.h"
 
+#include "zbxtime.h"
+
 int	zbx_mock_data_init(void **state);
 int	zbx_mock_data_free(void **state);
 

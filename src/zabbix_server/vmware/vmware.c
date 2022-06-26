@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 #include "vmware.h"
 
 #include "zbxxml.h"
@@ -31,6 +32,7 @@
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxip.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.

@@ -28,6 +28,7 @@
 #include "dbcache.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxexpr.h"
 
 #define ZBX_POLL_INTERVAL	1
 

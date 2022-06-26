@@ -323,7 +323,7 @@ void	zbx_dbsync_env_init(ZBX_DC_CONFIG *cache)
  *          database time                                                     *
  *                                                                            *
  ******************************************************************************/
-static void	dbsync_prune_changelog()
+static void	dbsync_prune_changelog(void)
 {
 	static int		last_prune_time;
 	int			now;

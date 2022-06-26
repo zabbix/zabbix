@@ -2003,6 +2003,10 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 		\${abs_top_builddir}/src/libs/zbxnum/libzbxnum.a \
 		\${abs_top_builddir}/src/libs/zbxstr/libzbxstr.a \
+		\${abs_top_builddir}/src/libs/zbxparam/libzbxparam.a \
+		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
+		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
+		\${abs_top_builddir}/src/libs/zbxip/libzbxip.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspechostnamesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \

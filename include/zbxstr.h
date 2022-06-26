@@ -103,8 +103,6 @@ void	zbx_replace_invalid_utf8(char *text);
 int	zbx_cesu8_to_utf8(const char *cesu8, char **utf8);
 
 void	dos2unix(char *str);
-int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
-double	str2double(const char *str);
 
 int	zbx_check_hostname(const char *hostname, char **error);
 int	zbx_suffixed_number_parse(const char *number, int *len);

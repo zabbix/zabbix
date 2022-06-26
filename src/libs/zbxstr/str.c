@@ -849,6 +849,7 @@ int	cmp_key_id(const char *key_1, const char *key_2)
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+#include "log.h"
 /******************************************************************************
  *                                                                            *
  * Parameters: encoding - [IN] non-empty string, code page identifier         *
@@ -993,7 +994,6 @@ void	zbx_strupper(char *str)
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#include "log.h"
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 {
 #define STATIC_SIZE	1024
@@ -2267,7 +2267,7 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 						*ptr++ = '"';
 						break;
 					case '\0':
-						THIS_SHOULD_NEVER_HAPPEN;
+						exit(EXIT_FAILURE);
 						*ptr = '\0';
 						return str;
 				}
@@ -2442,25 +2442,4 @@ void	zbx_rtrim_utf8(char *str, const char *charlist)
 	}
 
 	*last = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: convert string to double                                          *
- *                                                                            *
- * Parameters: str - string to convert                                        *
- *                                                                            *
- * Return value: converted double value                                       *
- *                                                                            *
- * Comments: the function automatically processes suffixes K, M, G, T and     *
- *           s, m, h, d, w                                                    *
- *                                                                            *
- ******************************************************************************/
-double	str2double(const char *str)
-{
-	size_t	sz;
-
-	sz = strlen(str) - 1;
-
-	return atof(str) * suffix2factor(str[sz]);
 }

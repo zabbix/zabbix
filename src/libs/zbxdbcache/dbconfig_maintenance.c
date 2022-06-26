@@ -26,6 +26,7 @@
 #include "dbsync.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxexpr.h"
 
 extern int		CONFIG_TIMER_FORKS;
 

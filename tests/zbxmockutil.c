@@ -23,6 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
+#include "zbxexpr.h"
 #include "module.h"
 #include "zbxvariant.h"
 

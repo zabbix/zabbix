@@ -18,6 +18,7 @@
 **/
 
 #include "zbxalgo.h"
+#include "zbxtime.h"
 
 #ifndef ZABBIX_SERVICE_MANAGER_IMPL_H
 #define ZABBIX_SERVICE_MANAGER_IMPL_H

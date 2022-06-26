@@ -218,4 +218,6 @@ int	calculate_item_nextcheck_unreachable(int simple_interval, const zbx_custom_i
 int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);
 /* scheduler END */
 
+void	zbx_free_tag(zbx_tag_t *tag);
+
 #endif /* ZABBIX_EXPR_H */

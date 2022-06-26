@@ -29,6 +29,8 @@ package zbxlib
 #cgo LDFLAGS: -Wl,--start-group
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/misc.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/str.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/param.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/interval.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/temp_str.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/components_strings_representations.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o

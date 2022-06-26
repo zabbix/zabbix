@@ -22,6 +22,7 @@
 
 #include "common.h"
 #include "zbxvariant.h"
+#include "zbxtime.h"
 
 typedef struct
 {

@@ -1264,8 +1264,6 @@ typedef struct
 }
 zbx_tag_t;
 
-void	zbx_free_tag(zbx_tag_t *tag);
-
 #define ZBX_OCT2UINT64(uint, string) sscanf(string, ZBX_FS_UO64, &uint)
 #define ZBX_HEX2UINT64(uint, string) sscanf(string, ZBX_FS_UX64, &uint)
 

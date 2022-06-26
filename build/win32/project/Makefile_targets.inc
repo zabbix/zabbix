@@ -28,6 +28,18 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxstr}.c{..\..\..\src\libs\zbxstr}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxparam}.c{..\..\..\src\libs\zbxparam}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxexpr}.c{..\..\..\src\libs\zbxexpr}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxip}.c{..\..\..\src\libs\zbxip}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\libs\zbxtime}.c{..\..\..\src\libs\zbxtime}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxcommshigh}.c{..\..\..\src\libs\zbxcommshigh}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 

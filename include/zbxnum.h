@@ -72,4 +72,7 @@ double	zbx_get_double_epsilon(void);
 void	zbx_update_epsilon_to_not_use_double_precision(void);
 void	zbx_update_epsilon_to_python_compatible_precision(void);
 
+int	str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value);
+double	str2double(const char *str);
+
 #endif /* ZABBIX_NUM_H */

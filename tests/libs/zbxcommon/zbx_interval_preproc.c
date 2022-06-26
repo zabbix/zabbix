@@ -21,6 +21,8 @@
 #include "zbxmockutil.h"
 #include "zbxmockassert.h"
 
+#include "zbxexpr.h"
+
 void	zbx_mock_test_entry(void **state)
 {
 	const char		*str, *no_custom = NULL;
