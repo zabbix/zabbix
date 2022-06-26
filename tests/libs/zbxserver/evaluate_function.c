@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
@@ -27,6 +26,9 @@
 #include "valuecache.h"
 #include "zbxserver.h"
 #include "../../src/libs/zbxserver/evalfunc.h"
+
+#include "common.h"
+#include "zbxnum.h"
 
 #include "mocks/valuecache/valuecache_mock.h"
 

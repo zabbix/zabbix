@@ -22,6 +22,7 @@
 #include "zbxmockdata.h"
 
 #include "common.h"
+#include "zbxnum.h"
 #include "sysinfo.h"
 
 void	zbx_mock_test_entry_NET_IF_COMMON(void **state, int net_if_func)

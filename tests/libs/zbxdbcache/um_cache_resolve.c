@@ -23,6 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "common.h"
+#include "zbxnum.h"
 #include "zbxdbcache/user_macro.h"
 #include "um_cache_mock.h"
 

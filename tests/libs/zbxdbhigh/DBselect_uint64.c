@@ -22,6 +22,7 @@
 #include "zbxmockdb.h"
 
 #include "common.h"
+#include "zbxnum.h"
 #include "zbxalgo.h"
 #include "zbxdbhigh.h"
 
