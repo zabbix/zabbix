@@ -204,6 +204,7 @@ typedef struct
 zbx_vmware_alarm_details_t;
 ZBX_PTR_VECTOR_DECL(vmware_alarm_details, zbx_vmware_alarm_details_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_alarm_details, zbx_vmware_alarm_details_t *)
+
 typedef struct
 {
 	zbx_vector_vmware_alarm_t		*alarms;
@@ -1256,6 +1257,9 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_custom_attr_shared_free);
 	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
+
+	zbx_vector_str_clear_ext(&vm->alarm_ids, vmware_shared_strfree);
+	zbx_vector_str_destroy(&vm->alarm_ids);
 
 	if (NULL != vm->uuid)
 		vmware_shared_strfree(vm->uuid);
@@ -3821,7 +3825,8 @@ static int	vmware_service_get_resourcepool_data(xmlDoc *xdoc, const char *r_id, 
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
- *             alarm        - [OUT] the alarm details                         *
+ *             alarm_id     - [IN] the alarm details                          *
+ *             details      - [IN/OUT] the Alarms cache data                  *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: index - the element id in the vector                         *
@@ -3852,7 +3857,7 @@ static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *servi
 		ZBX_POST_VSPHERE_FOOTER
 
 	xmlDoc				*doc_details = NULL;
-	zbx_vmware_alarm_details_t	*detail = NULL, cmp = {.alarm = (char *)alarm_id};
+	zbx_vmware_alarm_details_t	*detail, cmp = {.alarm = (char *)alarm_id};
 	int				ret = FAIL;
 	char				tmp[MAX_STRING_LEN], *value;
 
@@ -3865,7 +3870,6 @@ static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *servi
 		goto out;
 
 	detail = (zbx_vmware_alarm_details_t *)zbx_malloc(NULL, sizeof(zbx_vmware_alarm_details_t));
-	memset(detail, 0, sizeof(zbx_vmware_alarm_details_t));
 	detail->alarm = zbx_strdup(NULL, alarm_id);
 
 	if (NULL == (detail->name = zbx_xml_doc_read_value(doc_details, ZBX_XPATH_PROP_NAME("info.name"))))
@@ -3908,12 +3912,11 @@ static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *servi
 out:
 	zbx_xml_free_doc(doc_details);
 
-	if (NULL != detail)
-		vmware_alarm_details_free(detail);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() index:%d", __func__, ret);
 
 	return ret;
+
+#	undef ZBX_POST_VMWARE_GET_ALARMS
 }
 
 /******************************************************************************
@@ -3923,9 +3926,10 @@ out:
  * Parameters: func_parent  - [IN] the parent function name                   *
  *             service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
- *             details      - [IN] the xml doc with info about alarms         *
- *             uuid         - [IN] the uuid of vm, hv etc                     *
- *             alarms       - [IN/OUT] the vector of alarms with details      *
+ *             xdoc         - [IN] the xml doc with info about alarms         *
+ *             node         - [IN] the xml node with info about alarms        *
+ *             ids          - [IN] the linked alarms ids                      *
+ *             alarms_data  - [IN/OUT] the all alarms with cache              *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED   - the operation has completed successfully         *
@@ -3936,10 +3940,10 @@ static int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmw
 		CURL *easyhandle, xmlDoc *xdoc, xmlNode *node, zbx_vector_str_t *ids,
 		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
+	int 		i, ret = SUCCEED;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj = NULL;
 	xmlNodeSetPtr	nodeset;
-	int 		i, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
@@ -3961,11 +3965,10 @@ static int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmw
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
-		zbx_vmware_alarm_t		*alarm;
-		zbx_vmware_alarm_details_t	detail_cmp;
 		char				*value;
 		int				j;
-
+		zbx_vmware_alarm_t		*alarm;
+		zbx_vmware_alarm_details_t	detail_cmp;
 
 		if (NULL == (value = zbx_xml_node_read_value(xdoc, nodeset->nodeTab[i], ZBX_XNN("alarm"))))
 		{
@@ -4034,7 +4037,7 @@ clean:
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             id           - [IN] the virtual machine id                     *
- *             alarms       - [IN/OUT] – the vector with all alarms           *
+ *             alarms_data  - [IN/OUT] the all alarms with cache              *
  *             rpools       - [IN/OUT] the vector with all Resource Pools     *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
@@ -4243,7 +4246,7 @@ out:
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             id           - [IN] the datastore id                           *
- *             alarms_data  - [IN/OUT] the vector with all alarms             *
+ *             alarms_data  - [IN/OUT] the all alarms with cache              *
  *                                                                            *
  * Return value: The created datastore object or NULL if an error was         *
  *                detected                                                    *
@@ -5141,8 +5144,6 @@ clean:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
 }
-
-
 
 /******************************************************************************
  *                                                                            *

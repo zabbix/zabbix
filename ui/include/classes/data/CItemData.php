@@ -230,19 +230,24 @@ final class CItemData {
 			'net.tcp.service[service,<ip>,<port>]',
 			'net.udp.service.perf[service,<ip>,<port>]',
 			'net.udp.service[service,<ip>,<port>]',
+			'vmware.alarms.get[<url>]',
 			'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]',
+			'vmware.cluster.alarms.get[<url>,<id>]',
 			'vmware.cluster.discovery[<url>]',
 			'vmware.cluster.status[<url>,<name>]',
+			'vmware.datastore.alarms.get[<url>,<uuid>]',
 			'vmware.datastore.discovery[<url>]',
 			'vmware.datastore.hv.list[<url>,<datastore>]',
 			'vmware.datastore.read[<url>,<datastore>,<mode>]',
 			'vmware.datastore.size[<url>,<datastore>,<mode>]',
 			'vmware.datastore.write[<url>,<datastore>,<mode>]',
+			'vmware.dc.alarms.get[<url>,<id>]',
 			'vmware.dc.discovery[<url>]',
 			'vmware.dvswitch.discovery[<url>]',
 			'vmware.dvswitch.fetchports.get[<url>,<filter>,<mode>]',
 			'vmware.eventlog[<url>,<mode>]',
 			'vmware.fullname[<url>]',
+			'vmware.hv.alarms.get[<url>,<uuid>]',
 			'vmware.hv.cluster.name[<url>,<uuid>]',
 			'vmware.hv.connectionstate[<url>,<uuid>]',
 			'vmware.hv.cpu.usage.perf[<url>,<uuid>]',
@@ -285,6 +290,7 @@ final class CItemData {
 			'vmware.rp.cpu.usage[<url>,<rpid>]',
 			'vmware.rp.memory[<url>,<rpid>,<mode>]',
 			'vmware.version[<url>]',
+			'vmware.vm.alarms.get[<url>,<uuid>]',
 			'vmware.vm.attribute[<url>,<uuid>,<name>]',
 			'vmware.vm.cluster.name[<url>,<uuid>]',
 			'vmware.vm.consolidationneeded[<url>,<uuid>]',
@@ -1229,17 +1235,17 @@ final class CItemData {
 				'description' => _('Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage'),
 				'value_type' => null
 			],
-			'vmware.alarms.get[<url>,<uuid>]' => [
-				'description' => _('VMware alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
-				'value_type' => ITEM_VALUE_TYPE_TEXT
-			],
-			'vmware.cl.alarms.get[<url>,<uuid>]' => [
-				'description' => _('VMware cluster alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+			'vmware.alarms.get[<url>]' => [
+				'description' => _('VMware virtual center alarms data, returns JSON, <url> - VMware service URL'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.cl.perfcounter[<url>,<id>,<path>,<instance>]' => [
 				'description' => _('VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			],
+			'vmware.cluster.alarms.get[<url>,<id>]' => [
+				'description' => _('VMware cluster alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware cluster name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.cluster.discovery[<url>]' => [
 				'description' => _('Discovery of VMware clusters, <url> - VMware service URL. Returns JSON'),
@@ -1248,6 +1254,10 @@ final class CItemData {
 			'vmware.cluster.status[<url>,<name>]' => [
 				'description' => _('VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'vmware.datastore.alarms.get[<url>,<uuid>]' => [
+				'description' => _('VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.datastore.discovery[<url>]' => [
 				'description' => _('Discovery of VMware datastores, <url> - VMware service URL. Returns JSON'),
@@ -1269,16 +1279,12 @@ final class CItemData {
 				'description' => _('VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
-			'vmware.dc.alarms.get[<url>,<uuid>]' => [
-				'description' => _('VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+			'vmware.dc.alarms.get[<url>,<id>]' => [
+				'description' => _('VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.dc.discovery[<url>]' => [
 				'description' => _('VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON'),
-				'value_type' => ITEM_VALUE_TYPE_TEXT
-			],
-			'vmware.ds.alarms.get[<url>,<uuid>]' => [
-				'description' => _('VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.dvswitch.discovery[<url>]' => [
@@ -1470,7 +1476,7 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_STR
 			],
 			'vmware.vm.alarms.get[<url>,<uuid>]' => [
-				'description' => _('VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name'),
+				'description' => _('VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			'vmware.vm.attribute[<url>,<uuid>,<name>]' => [

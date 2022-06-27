@@ -4992,10 +4992,8 @@ out:
 
 static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_t *alarms, zbx_vector_str_t *ids, AGENT_RESULT *result)
 {
-	int			i, ret = SYSINFO_RET_OK;
-	struct zbx_json		json_data;
-
-
+	int		i, ret = SYSINFO_RET_OK;
+	struct zbx_json	json_data;
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
@@ -5033,12 +5031,11 @@ static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_t *alarms, zbx
 
 	zbx_json_free(&json_data);
 
-	ret = SYSINFO_RET_OK;
 	return ret;
 }
 
 #define	ALARMS_GET_START(num)									\
-	const char		*uuid, *url;							\
+	const char		*uuid_or_id, *url;						\
 	int			ret = SYSINFO_RET_FAIL;						\
 	zbx_vmware_service_t	*service;							\
 												\
@@ -5052,7 +5049,7 @@ static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_t *alarms, zbx
 												\
 	url = get_rparam(request, 0);								\
 												\
-	if (num > 1 && (NULL == (uuid = get_rparam(request, 1)) || '\0' == *uuid))		\
+	if (num > 1 && (NULL == (uuid_or_id = get_rparam(request, 1)) || '\0' == *uuid_or_id))	\
 	{											\
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));		\
 		goto out;									\
@@ -5079,7 +5076,7 @@ int	check_vcenter_hv_alarms_get(AGENT_REQUEST *request, const char *username, co
 
 	ALARMS_GET_START(2);
 
-	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
+	if (NULL == (hv = hv_get(&service->data->hvs, uuid_or_id)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown hypervisor uuid."));
 		goto unlock;
@@ -5095,7 +5092,7 @@ int	check_vcenter_vm_alarms_get(AGENT_REQUEST *request, const char *username, co
 
 	ALARMS_GET_START(2);
 
-	if (NULL == (vm = service_vm_get(service, uuid)))
+	if (NULL == (vm = service_vm_get(service, uuid_or_id)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
 		goto unlock;
@@ -5111,7 +5108,7 @@ int	check_vcenter_datastore_alarms_get(AGENT_REQUEST *request, const char *usern
 
 	ALARMS_GET_START(2);
 
-	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
+	if (NULL == (ds = ds_get(&service->data->datastores, uuid_or_id)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore uuid."));
 		goto unlock;
@@ -5127,7 +5124,7 @@ int	check_vcenter_dc_alarms_get(AGENT_REQUEST *request, const char *username, co
 
 	ALARMS_GET_START(2);
 
-	if (NULL == (dc = dc_get(&service->data->datacenters, uuid)))
+	if (NULL == (dc = dc_get(&service->data->datacenters, uuid_or_id)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datacenter id."));
 		goto unlock;
@@ -5143,7 +5140,7 @@ int	check_vcenter_cluster_alarms_get(AGENT_REQUEST *request, const char *usernam
 
 	ALARMS_GET_START(2);
 
-	if (NULL == (cl = cluster_get(&service->data->clusters, uuid)))
+	if (NULL == (cl = cluster_get(&service->data->clusters, uuid_or_id)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown cluster id."));
 		goto unlock;
