@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.2'
-  date: '2022-06-22T12:24:51Z'
+  date: '2022-06-27T11:53:27Z'
   template_groups:
     -
       uuid: c2c162144c2d4c5491c8801193af4945
@@ -602,11 +602,11 @@ zabbix_export:
                    request.addHeader('Content-Encoding: amz-1.0');
                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsEc2.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
             
-                   Zabbix.log(4, '[ AWC EC2  ] Sending request: ' + url);
+                   Zabbix.log(4, '[ AWS EC2  ] Sending request: ' + url);
             
                    response = request.get(url);
             
-                   Zabbix.log(4, '[ AWC EC2 ] Received response with status code ' + request.getStatus() + ': ' + response);
+                   Zabbix.log(4, '[ AWS EC2 ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                    if (request.getStatus() !== 200) {
                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -886,7 +886,7 @@ zabbix_export:
             
                       var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
                           date = amzdate.replace(/T\d+Z/, ''),
-                          host = 'monitoring.' + region + '.amazonaws.com',
+                          host = service + '.' + region + '.amazonaws.com',
                           canonical_uri = '/',
                           canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
                           signed_headers = 'content-encoding;host;x-amz-date',
@@ -908,11 +908,11 @@ zabbix_export:
                       request.addHeader('Content-Encoding: amz-1.0');
                       request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsEc2.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
             
-                      Zabbix.log(4, '[ AWC EC2  ] Sending request: ' + url);
+                      Zabbix.log(4, '[ AWS EC2  ] Sending request: ' + url);
             
                       response = request.get(url);
             
-                      Zabbix.log(4, '[ AWC EC2 ] Received response with status code ' + request.getStatus() + ': ' + response);
+                      Zabbix.log(4, '[ AWS EC2 ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                       if (request.getStatus() !== 200) {
                           throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -1075,11 +1075,11 @@ zabbix_export:
                     request.addHeader('Content-Encoding: amz-1.0');
                     request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsEbs.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
             
-                    Zabbix.log(4, '[ AWC EBS ] Sending request: ' + url);
+                    Zabbix.log(4, '[ AWS EBS ] Sending request: ' + url);
             
                     response = request.get(url);
             
-                    Zabbix.log(4, '[ AWC EBS ] Received response with status code ' + request.getStatus() + ': ' + response);
+                    Zabbix.log(4, '[ AWS EBS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                     if (request.getStatus() !== 200) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
@@ -2314,7 +2314,7 @@ zabbix_export:
                 
                         var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
                             date = amzdate.replace(/T\d+Z/, ''),
-                            host = 'monitoring.' + region + '.amazonaws.com',
+                            host = service + '.' + region + '.amazonaws.com',
                             canonical_uri = '/',
                             canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
                             signed_headers = 'content-encoding;host;x-amz-date',
@@ -2336,11 +2336,11 @@ zabbix_export:
                         request.addHeader('Content-Encoding: amz-1.0');
                         request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsEbs.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
                 
-                        Zabbix.log(4, '[ AWC EBS ] Sending request: ' + url);
+                        Zabbix.log(4, '[ AWS EBS ] Sending request: ' + url);
                 
                         response = request.get(url);
                 
-                        Zabbix.log(4, '[ AWC EBS ] Received response with status code ' + request.getStatus() + ': ' + response);
+                        Zabbix.log(4, '[ AWS EBS ] Received response with status code ' + request.getStatus() + ': ' + response);
                 
                         if (request.getStatus() !== 200) {
                             throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
