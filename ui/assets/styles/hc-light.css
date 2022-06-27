@@ -7291,6 +7291,11 @@ z-select button.focusable:focus,
   .list-table.compact-view td .icon-wizard-action {
     background: transparent url("../img/icon-sprite.svg?20211222") no-repeat -165px -624px; }
 
+.overlay-dialogue .list-table th:first-child {
+  padding-left: 0px; }
+.overlay-dialogue .list-table td:first-child {
+  padding-left: 42px; }
+
 .filter-highlight-row-cb {
   display: none; }
 

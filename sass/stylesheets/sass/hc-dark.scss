@@ -947,6 +947,18 @@ a.link-action {
 	}
 }
 
+.overlay-dialogue {
+	.list-table {
+		th:first-child {
+			padding-left: 0px;
+		}
+
+		td:first-child {
+			padding-left: 42px;
+		}
+	}
+}
+
 // Filter checkboxes.
 .filter-highlight-row-cb {
 	display: none;
