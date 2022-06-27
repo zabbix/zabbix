@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-04 19:52+0200\n"
-"PO-Revision-Date: 2022-06-09 22:48+0000\n"
+"PO-Revision-Date: 2022-06-26 19:19+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" namísto \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -46,7 +46,7 @@ msgstr "\"%1$s\" je očekávána"
 #: maintenance.php:133 services.php:182 services.php:191
 #, c-format
 msgid "\"%1$s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%1$s\" musí být v intervalu od 1970.01.01 do 2038.01.18."
 
 #: include/classes/api/services/CItemGeneral.php:1381
 #, c-format
@@ -97,7 +97,7 @@ msgstr[2] "%1$d z %3$d%2$s zobrazených problémů"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:115
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "Počet vybraných problémů: %1$d."
 
 #: chart4.php:94 chart5.php:89
 #, c-format
@@ -246,9 +246,9 @@ msgstr[2] "%1$s sekund"
 #, c-format
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s nepotvrzený problém"
+msgstr[1] "%1$s nepotvrzené problémy"
+msgstr[2] "%1$s nepotvrzené problémy"
 
 #: app/views/monitoring.widget.problems.view.php:272
 #, c-format
@@ -1180,7 +1180,7 @@ msgstr "Jako prostý text"
 #: app/views/administration.authentication.edit.php:206
 #: app/views/administration.authentication.edit.php:240
 msgid "Assertions"
-msgstr ""
+msgstr "Tvrzení"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1218,7 +1218,7 @@ msgstr "V (hodina:minuta)"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Alespoň jedna akce je povinná."
 
 #: include/classes/api/services/CMaintenance.php:279
 #: include/classes/api/services/CMaintenance.php:706
@@ -1609,19 +1609,19 @@ msgstr "Vypočítaná"
 
 #: include/classes/items/CHelpItems.php:741
 msgid "Calculates the average value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Vypočítá průměrnou hodnotu na základě různých dodaných parametrů. Zabbix server shromažďuje souhrnné informace prováděním přímých databázových dotazů."
 
 #: include/classes/items/CHelpItems.php:749
 msgid "Calculates the maximum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Vypočítá maximální hodnotu na základě různých dodaných parametrů. Zabbix server shromažďuje souhrnné informace prováděním přímých databázových dotazů."
 
 #: include/classes/items/CHelpItems.php:745
 msgid "Calculates the minimum value, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Vypočítá minimální hodnotu na základě různých dodaných parametrů. Zabbix server shromažďuje souhrnné informace prováděním přímých databázových dotazů."
 
 #: include/classes/items/CHelpItems.php:753
 msgid "Calculates the sum of values, based on the various parameters supplied. Zabbix server collects aggregate information by doing direct database queries."
-msgstr ""
+msgstr "Vypočítá součet hodnot na základě různých dodaných parametrů. Zabbix server shromažďuje souhrnné informace prováděním přímých databázových dotazů."
 
 #: jsLoader.php:154
 msgid "Calendar"
@@ -1860,7 +1860,7 @@ msgstr "Není možné přidat webový scénář"
 
 #: jsLoader.php:136
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "Widget nelze přidat: na řídicím panelu není dostatek volného místa."
 
 #: jsLoader.php:126
 msgid "Cannot add widgets in kiosk mode"
@@ -1880,7 +1880,7 @@ msgstr "Nelze smazat historii"
 
 #: items.php:1293
 msgid "Cannot clear history: at least one of the selected items doesn't belong to any monitored host"
-msgstr ""
+msgstr "Nelze vymazat historii: alespoň jedna z vybraných položek nepatří žádnému monitorovanému hostiteli"
 
 #: include/classes/api/services/CDiscoveryRule.php:2448
 msgid "Cannot clone graph prototypes."
@@ -2089,7 +2089,7 @@ msgstr "Nelze smazat obrázek"
 #: include/classes/api/services/CHostInterface.php:626
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Rozhraní nalezeného hostitele \"%1$s\" nelze smazat."
 
 #: include/classes/api/services/CHost.php:1250
 msgid "Cannot delete inventory."
@@ -2474,12 +2474,12 @@ msgstr "Mapa ikon \"%1$s\" použitá v mapě \"%2$s\" nebyla nalezena."
 #: include/classes/import/CConfigurationImport.php:972
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for discovery rule \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Nelze najít rozhraní \"%1$s\" použité pro pravidlo zjišťování \"%2$s\" na \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:762
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr ""
+msgstr "Nelze najít rozhraní \"%1$s\" použité pro položku \"%2$s\" na \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1139
 #, c-format
@@ -2622,7 +2622,7 @@ msgstr "Není možné hromadně aktualizovat zobrazované jméno šablony."
 #: include/classes/api/services/CHostBase.php:61
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
-msgstr ""
+msgstr "Není možné vykonat vícenásobné linkovaní šablon s ID: %1$s."
 
 #: include/classes/db/DB.php:852
 #, c-format
@@ -2737,7 +2737,7 @@ msgstr "Není možné nastavit ID zdroje pro prvek obrazovky."
 
 #: jsLoader.php:217
 msgid "Cannot support notification audio for this device."
-msgstr ""
+msgstr "Pro toto zařízení není podporovaný zvuk oznámení."
 
 #: include/classes/api/services/CHostInterface.php:296
 msgid "Cannot switch host for interface."
@@ -2775,7 +2775,7 @@ msgstr "Není možné zrušit linkování šablony."
 #: include/classes/api/services/CHostGeneral.php:263
 #, c-format
 msgid "Cannot unlink trigger \"%1$s\", it has items from template that is left linked to host."
-msgstr ""
+msgstr "Není možné zrušit propojení spouštěče \"%1$s\", protože obsahuje položky ze šablony, která je propojená s hostem."
 
 #: include/classes/api/services/CAction.php:3012
 #: include/classes/api/services/CAction.php:3017
@@ -3259,7 +3259,7 @@ msgstr ""
 
 #: include/classes/items/CHelpItems.php:759
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "Zkontroluje, zda je hostitel přístupný pomocí ICMP ping. 0 - ICMP ping selhal. 1 - ICMP ping úspěšný."
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:475
@@ -3794,6 +3794,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
+"Připojení k Zabbix serveru \"%s\" selhalo. Možné důvody:\n"
+"1. Špatné nastavení IP/DNS v souboru \"zabbix.conf.php\";\n"
+"2. Špatné nastavení DNS serveru.\n"
 
 #: include/classes/server/CZabbixServer.php:533
 #, c-format
@@ -3804,6 +3807,11 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Připojení k serveru Zabbix \"%1$s\" bylo odmítnuto. Možné důvody:\n"
+"1. Nesprávná IP/DNS serveru v souboru \"zabbix.conf.php\";\n"
+"2. Bezpečnostní prostředí (například SELinux) blokuje připojení;\n"
+"3. Neběží démon serveru Zabbix;\n"
+"4. Firewall blokuje připojení TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:541
 #, c-format
@@ -3812,10 +3820,13 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"Časový limit připojení k serveru Zabbix \"%1$s\" vypršel. Možné důvody:\n"
+"1. Nesprávná IP/DNS serveru v souboru \"zabbix.conf.php\";\n"
+"2. Firewall blokuje připojení TCP.\n"
 
 #: include/classes/setup/CSetupWizard.php:273
 msgid "Connection will not be encrypted because it uses a socket file (on Unix) or shared memory (Windows)."
-msgstr ""
+msgstr "Připojení nebude šifrováno, protože se používá soubor soketu (v Unixu) nebo sdílená paměť (Windows)."
 
 #: include/views/configuration.host.massupdate.php:311
 msgid "Connections"
@@ -4448,38 +4459,38 @@ msgstr "Doba ukládání dat"
 #: include/classes/setup/CSetupWizard.php:389
 #: include/classes/setup/CSetupWizard.php:528
 msgid "Database TLS CA file"
-msgstr ""
+msgstr "Soubor databáze TLS CA"
 
 #: include/classes/setup/CFrontendSetup.php:686
 #: include/classes/setup/CSetupWizard.php:300
 #: include/classes/setup/CSetupWizard.php:395
 #: include/classes/setup/CSetupWizard.php:536
 msgid "Database TLS certificate file"
-msgstr ""
+msgstr "Soubor certifikátu TLS databáze"
 
 #: include/classes/setup/CFrontendSetup.php:690
 msgid "Database TLS certificate files must be read-only"
-msgstr ""
+msgstr "Soubory certifikátu TLS databáze musí být pouze pro čtení"
 
 #: include/classes/setup/CSetupWizard.php:312
 #: include/classes/setup/CSetupWizard.php:402
 msgid "Database TLS cipher list"
-msgstr ""
+msgstr "Databáze TLS šifrovacího seznamu"
 
 #: include/classes/setup/CSetupWizard.php:270
 #: include/classes/setup/CSetupWizard.php:385
 msgid "Database TLS encryption"
-msgstr ""
+msgstr "Databáze šifrování TLS"
 
 #: include/classes/setup/CSetupWizard.php:294
 #: include/classes/setup/CSetupWizard.php:392
 #: include/classes/setup/CSetupWizard.php:532
 msgid "Database TLS key file"
-msgstr ""
+msgstr "Soubor klíče TLS databáze"
 
 #: include/blocks.inc.php:696
 msgid "Database history tables upgraded"
-msgstr ""
+msgstr "Databázové tabulky historie byly upgradovány"
 
 #: include/classes/setup/CSetupWizard.php:238
 msgid "Database host"
@@ -4488,7 +4499,7 @@ msgstr "Databázový server"
 #: include/classes/setup/CSetupWizard.php:306
 #: include/classes/setup/CSetupWizard.php:398
 msgid "Database host verification"
-msgstr ""
+msgstr "Ověření hostitele databáze"
 
 #: include/items.inc.php:95
 msgid "Database monitor"
@@ -5086,7 +5097,7 @@ msgstr "Rozměr (soupce x řádky)"
 
 #: app/views/administration.module.edit.php:42
 msgid "Directory"
-msgstr ""
+msgstr "Adresář"
 
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:655
